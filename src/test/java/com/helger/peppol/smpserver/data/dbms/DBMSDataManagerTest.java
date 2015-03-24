@@ -71,7 +71,7 @@ import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
-import com.helger.peppol.smpclient.ESMPTransportProfile;
+import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smpserver.data.dbms.DBMSDataManager;
 import com.helger.peppol.smpserver.data.dbms.SMPEntityManagerFactory;
 import com.helger.peppol.smpserver.exception.UnauthorizedException;
