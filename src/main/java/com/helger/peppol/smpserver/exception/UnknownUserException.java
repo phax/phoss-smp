@@ -45,14 +45,12 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.exceptions.LoggedRuntimeException;
-
 /**
  * This exception is thrown if the provided user name does not exist.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public class UnknownUserException extends LoggedRuntimeException
+public class UnknownUserException extends RuntimeException
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (UnknownUserException.class);
 

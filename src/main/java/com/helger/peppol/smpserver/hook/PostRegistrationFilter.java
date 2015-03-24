@@ -120,7 +120,7 @@ public final class PostRegistrationFilter implements Filter
 
   private static final Logger s_aLogger = LoggerFactory.getLogger (PostRegistrationFilter.class);
 
-  public void init (final FilterConfig arg0)
+  public void init (final FilterConfig aFilterConfig)
   {}
 
   private static void _notifyRegistrationHook (@Nonnull final ESuccess eSuccess) throws ServletException

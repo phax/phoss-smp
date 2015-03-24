@@ -41,6 +41,7 @@
 package com.helger.peppol.smpserver.exception;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
@@ -57,6 +58,9 @@ public final class RuntimeExceptionMapper implements ExceptionMapper <RuntimeExc
   {
     final String sText = StackTraceHelper.getStackAsString (ex);
 
-    return Response.serverError ().entity (sText).type (CMimeType.TEXT_PLAIN.getAsString ()).build ();
+    return Response.status (Status.INTERNAL_SERVER_ERROR)
+                   .entity (sText)
+                   .type (CMimeType.TEXT_PLAIN.getAsString ())
+                   .build ();
   }
 }

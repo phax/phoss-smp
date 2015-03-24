@@ -86,7 +86,7 @@
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
       <!-- add package separated by ";" -->
-      <param-value>com.helger.peppol.smpserver.rest</param-value>
+      <param-value>com.helger.peppol.smpserver.rest;com.helger.peppol.smpserver.exception</param-value>
     </init-param>
     <init-param>
       <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
