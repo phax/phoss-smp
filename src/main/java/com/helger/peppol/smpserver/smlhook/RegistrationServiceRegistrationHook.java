@@ -44,6 +44,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
@@ -74,8 +75,14 @@ import com.helger.web.https.HostnameVerifierAlwaysTrue;
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @NotThreadSafe
-public final class RegistrationServiceRegistrationHook extends AbstractRegistrationHook
+public final class RegistrationServiceRegistrationHook implements IRegistrationHook
 {
+  private static enum EAction
+  {
+    CREATE,
+    DELETE
+  }
+
   private static final String CONFIG_HOOK_REG_LOCATOR_URL = "regServiceRegistrationHook.regLocatorUrl";
   private static final String CONFIG_HOOK_ID = "regServiceRegistrationHook.id";
   private static final String CONFIG_HOOK_KEYSTORE_CLASSPATH = "regServiceRegistrationHook.keystore.classpath";
@@ -84,6 +91,7 @@ public final class RegistrationServiceRegistrationHook extends AbstractRegistrat
   private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationServiceRegistrationHook.class);
   private static final URL s_aSMLEndpointURL;
   private static final String s_sSMPID;
+  private static final ThreadLocal <IRegistrationHook> s_aPostUpdateCallback = new ThreadLocal <IRegistrationHook> ();
 
   static
   {
@@ -106,18 +114,18 @@ public final class RegistrationServiceRegistrationHook extends AbstractRegistrat
     s_aLogger.info ("This SMP has the ID: " + s_sSMPID);
   }
 
-  private static enum EAction
-  {
-    CREATE,
-    DELETE
-  }
-
   private SimpleParticipantIdentifier m_aBusinessIdentifier;
   private EAction m_eAction;
 
   public RegistrationServiceRegistrationHook ()
+  {}
+
+  @Nullable
+  public static final IRegistrationHook getAndRemoveHook ()
   {
-    resetQueue ();
+    final IRegistrationHook ret = s_aPostUpdateCallback.get ();
+    s_aPostUpdateCallback.remove ();
+    return ret;
   }
 
   private static void _setupSSLSocketFactory ()
@@ -169,7 +177,7 @@ public final class RegistrationServiceRegistrationHook extends AbstractRegistrat
       s_aLogger.info ("Succeeded in creating business " +
                       m_aBusinessIdentifier +
                       " using Business Identifier Manager Service");
-      getQueueInstance ().set (this);
+      s_aPostUpdateCallback.set (this);
     }
     catch (final UnauthorizedFault ex)
     {
@@ -201,7 +209,7 @@ public final class RegistrationServiceRegistrationHook extends AbstractRegistrat
       s_aLogger.info ("Succeded in deleting business " +
                       m_aBusinessIdentifier +
                       " using Business Identifier Manager Service");
-      getQueueInstance ().set (this);
+      s_aPostUpdateCallback.set (this);
     }
     catch (final NotFoundFault e)
     {

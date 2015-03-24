@@ -47,11 +47,11 @@ import com.helger.peppol.identifier.IParticipantIdentifier;
 
 /**
  * An extension of the RegistrationHook class that does nothing.
- * 
+ *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Immutable
-public final class DoNothingRegistrationHook extends AbstractRegistrationHook
+public final class DoNothingRegistrationHook implements IRegistrationHook
 {
   public void create (final IParticipantIdentifier aPI)
   {}

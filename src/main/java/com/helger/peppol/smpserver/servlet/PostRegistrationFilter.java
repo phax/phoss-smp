@@ -56,8 +56,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.state.ESuccess;
-import com.helger.peppol.smpserver.smlhook.AbstractRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.HookException;
+import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
+import com.helger.peppol.smpserver.smlhook.RegistrationServiceRegistrationHook;
 
 /**
  * Filter which handles post-registration hooks. If a registration was started
@@ -127,21 +128,16 @@ public final class PostRegistrationFilter implements Filter
 
   private static void _notifyRegistrationHook (@Nonnull final ESuccess eSuccess) throws ServletException
   {
-    final AbstractRegistrationHook aCallback = AbstractRegistrationHook.getQueue ();
+    final IRegistrationHook aCallback = RegistrationServiceRegistrationHook.getAndRemoveHook ();
     if (aCallback != null)
     {
       try
       {
         aCallback.postUpdate (eSuccess);
       }
-      catch (final HookException e)
+      catch (final HookException ex)
       {
-        throw new ServletException (e);
-      }
-      finally
-      {
-        // Ensure that no memory leak resides in the ThreadLocal
-        AbstractRegistrationHook.resetQueue ();
+        throw new ServletException (ex);
       }
     }
   }

@@ -58,6 +58,9 @@ public final class RegistrationHookFactory
   private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationHookFactory.class);
   private static final String CONFIG_REGISTRATION_HOOK_CLASS = "registrationHook.class";
 
+  // The cached instance
+  private static IRegistrationHook s_aInstance;
+
   private RegistrationHookFactory ()
   {}
 
@@ -72,11 +75,28 @@ public final class RegistrationHookFactory
   @Nonnull
   public static IRegistrationHook createInstance ()
   {
+    // Create only once
     final String sRegHookName = CSMPServer.getConfigFile ().getString (CONFIG_REGISTRATION_HOOK_CLASS);
     final IRegistrationHook aHook = GenericReflection.newInstance (sRegHookName, IRegistrationHook.class);
     if (aHook == null)
       throw new IllegalStateException ("Failed to create registration hook instance from class '" + sRegHookName + "'");
     s_aLogger.info ("Registration hook class '" + sRegHookName + "' instantiated");
     return aHook;
+  }
+
+  /**
+   * Get the one and only instance.
+   *
+   * @return A new instance of {@link IRegistrationHook} according to the
+   *         configuration file.
+   * @throws IllegalStateException
+   *         If the class could not be instantiated
+   */
+  @Nonnull
+  public static IRegistrationHook getOrCreateInstance ()
+  {
+    if (s_aInstance == null)
+      s_aInstance = createInstance ();
+    return s_aInstance;
   }
 }
