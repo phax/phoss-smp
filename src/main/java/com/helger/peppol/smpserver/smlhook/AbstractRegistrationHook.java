@@ -38,27 +38,32 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.hook;
+package com.helger.peppol.smpserver.smlhook;
 
-import javax.annotation.concurrent.Immutable;
-
-import com.helger.commons.state.ESuccess;
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
- * An extension of the RegistrationHook class that does nothing.
- * 
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-@Immutable
-public final class DoNothingRegistrationHook extends AbstractRegistrationHook
+public abstract class AbstractRegistrationHook implements IRegistrationHook
 {
-  public void create (final IParticipantIdentifier aPI)
-  {}
+  private static final ThreadLocal <AbstractRegistrationHook> s_aQueue = new ThreadLocal <AbstractRegistrationHook> ();
 
-  public void delete (final IParticipantIdentifier aPI)
-  {}
+  @Nonnull
+  protected static final ThreadLocal <AbstractRegistrationHook> getQueueInstance ()
+  {
+    return s_aQueue;
+  }
 
-  public void postUpdate (final ESuccess eSuccess)
-  {}
+  @Nullable
+  public static final AbstractRegistrationHook getQueue ()
+  {
+    return s_aQueue.get ();
+  }
+
+  public static final void resetQueue ()
+  {
+    s_aQueue.set (null);
+  }
 }

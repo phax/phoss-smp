@@ -38,32 +38,20 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.hook;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+package com.helger.peppol.smpserver.smlhook;
 
 /**
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-abstract class AbstractRegistrationHook implements IRegistrationHook
+public final class HookException extends RuntimeException
 {
-  private static final ThreadLocal <AbstractRegistrationHook> s_aQueue = new ThreadLocal <AbstractRegistrationHook> ();
-
-  @Nonnull
-  protected static final ThreadLocal <AbstractRegistrationHook> getQueueInstance ()
+  public HookException (final String sMsg)
   {
-    return s_aQueue;
+    super (sMsg);
   }
 
-  @Nullable
-  public static final AbstractRegistrationHook getQueue ()
+  public HookException (final String sMsg, final Throwable t)
   {
-    return s_aQueue.get ();
-  }
-
-  public static final void resetQueue ()
-  {
-    s_aQueue.set (null);
+    super (sMsg, t);
   }
 }

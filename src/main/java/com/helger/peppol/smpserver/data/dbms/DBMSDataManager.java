@@ -92,8 +92,8 @@ import com.helger.peppol.smpserver.data.dbms.model.DBServiceMetadataRedirectionI
 import com.helger.peppol.smpserver.data.dbms.model.DBUser;
 import com.helger.peppol.smpserver.exception.UnauthorizedException;
 import com.helger.peppol.smpserver.exception.UnknownUserException;
-import com.helger.peppol.smpserver.hook.IRegistrationHook;
-import com.helger.peppol.smpserver.hook.RegistrationHookFactory;
+import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
+import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 import com.sun.jersey.api.NotFoundException;

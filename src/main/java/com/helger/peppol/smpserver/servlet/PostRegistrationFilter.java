@@ -38,7 +38,7 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.hook;
+package com.helger.peppol.smpserver.servlet;
 
 import java.io.IOException;
 
@@ -56,6 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.state.ESuccess;
+import com.helger.peppol.smpserver.smlhook.AbstractRegistrationHook;
+import com.helger.peppol.smpserver.smlhook.HookException;
 
 /**
  * Filter which handles post-registration hooks. If a registration was started

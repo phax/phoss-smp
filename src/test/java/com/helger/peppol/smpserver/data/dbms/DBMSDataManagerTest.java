@@ -76,7 +76,7 @@ import com.helger.peppol.smpserver.data.dbms.DBMSDataManager;
 import com.helger.peppol.smpserver.data.dbms.SMPEntityManagerFactory;
 import com.helger.peppol.smpserver.exception.UnauthorizedException;
 import com.helger.peppol.smpserver.exception.UnknownUserException;
-import com.helger.peppol.smpserver.hook.DoNothingRegistrationHook;
+import com.helger.peppol.smpserver.smlhook.DoNothingRegistrationHook;
 import com.helger.peppol.utils.ExtensionConverter;
 import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;

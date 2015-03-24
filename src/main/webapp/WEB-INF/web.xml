@@ -69,7 +69,7 @@
   <!-- SML handling: filter -->
   <filter>
     <filter-name>registrationhook</filter-name>
-    <filter-class>com.helger.peppol.smpserver.hook.PostRegistrationFilter</filter-class>
+    <filter-class>com.helger.peppol.smpserver.servlet.PostRegistrationFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>registrationhook</filter-name>

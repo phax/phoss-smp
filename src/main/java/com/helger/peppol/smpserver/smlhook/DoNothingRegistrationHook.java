@@ -38,46 +38,27 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.hook;
+package com.helger.peppol.smpserver.smlhook;
 
-import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import com.helger.commons.state.ESuccess;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 
 /**
+ * An extension of the RegistrationHook class that does nothing.
+ * 
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public interface IRegistrationHook
+@Immutable
+public final class DoNothingRegistrationHook extends AbstractRegistrationHook
 {
-  /**
-   * Create a participant in the SML.
-   * 
-   * @param aPI
-   *        The participant to be created
-   * @throws HookException
-   *         If something goes wrong.
-   */
-  void create (@Nonnull IParticipantIdentifier aPI) throws HookException;
+  public void create (final IParticipantIdentifier aPI)
+  {}
 
-  /**
-   * Delete a participant in the SML.
-   * 
-   * @param aPI
-   *        The participant to be deleted
-   * @throws HookException
-   *         If something goes wrong.
-   */
-  void delete (@Nonnull IParticipantIdentifier aPI) throws HookException;
+  public void delete (final IParticipantIdentifier aPI)
+  {}
 
-  /**
-   * In case of failure, this method is meant to rollback the previously done
-   * changes. It is call for success and failures.
-   * 
-   * @param eSuccess
-   *        The success state.
-   * @throws HookException
-   *         If something goes wrong.
-   */
-  void postUpdate (@Nonnull ESuccess eSuccess) throws HookException;
+  public void postUpdate (final ESuccess eSuccess)
+  {}
 }

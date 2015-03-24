@@ -38,7 +38,7 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.hook;
+package com.helger.peppol.smpserver.smlhook;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -138,7 +138,7 @@ public final class RegistrationServiceRegistrationHook extends AbstractRegistrat
 
       // Trust manager
 
-      // Assign key manager and empty trust manager to SSL context
+      // Assign key manager and empty trust manager to SSL/TLS context
       final SSLContext aSSLCtx = SSLContext.getInstance ("TLS");
       aSSLCtx.init (aKeyManagerFactory.getKeyManagers (),
                     new TrustManager [] { new DoNothingTrustManager () },
