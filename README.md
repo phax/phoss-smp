@@ -1,30 +1,18 @@
 # peppol-smp-server
 A complete PEPPOL SMP server
 
-Please provide the classpath to your smp keystore and the required passwords updating the config.propertied file
-under the src/main/resource. Typically you will place the keystore.jks file in a foder that you will add to your
-applications server classpath. 
+Please provide the classpath to your PEPPOL SMP keystore and the required passwords updating the config.properties file under the src/main/resource. Typically you will place the keystore.jks file in a foder that you will add to your applications server classpath. 
 
-Setting up tomcat:
+#Setting up Apache Tomcat
 Tomcat must be set up with the following java system property:
-org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH = true
+`org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH = true`
 
 This can be done by adding:
--Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH="true"
-as a JVM argument. (Tomcat Properties -> Java -> Java Options) or
-put it into the catalina.sh in linux.
-
-Edit the catalina.sh with the following: 
+`-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH="true"`
+as a JVM argument (Tomcat Properties -> Java -> Java Options) or
+put it into the `catalina.sh` in Linux: 
 ```
 JAVA_OPTS="$JAVA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"
 ```
 
-Dependencies:
-If the ServiceMetadataPublishingCommonLibrary project has been updated then
-export the ServiceMetadataPublishingCommonLibrary project as a jar file to 
-WebContent/lib/peppol-smp-common.jar
-
-Sql file to create  the database from a backup  is available under the src/etc folder
-
-If the deployed package is missing the metro framework; install it on the
-tomcat server.
+SQL file to create the database from a backup is available in the `database_backups` folder.
