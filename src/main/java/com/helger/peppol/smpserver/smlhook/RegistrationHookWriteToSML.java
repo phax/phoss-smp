@@ -75,7 +75,7 @@ import com.helger.web.https.HostnameVerifierAlwaysTrue;
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @NotThreadSafe
-public final class RegistrationServiceRegistrationHook implements IRegistrationHook
+public final class RegistrationHookWriteToSML implements IRegistrationHook
 {
   private static enum EAction
   {
@@ -88,7 +88,7 @@ public final class RegistrationServiceRegistrationHook implements IRegistrationH
   private static final String CONFIG_HOOK_KEYSTORE_CLASSPATH = "regServiceRegistrationHook.keystore.classpath";
   private static final String CONFIG_HOOK_KEYSTORE_PASSWORD = "regServiceRegistrationHook.keystore.password";
 
-  private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationServiceRegistrationHook.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationHookWriteToSML.class);
   private static final URL s_aSMLEndpointURL;
   private static final String s_sSMPID;
   private static final ThreadLocal <IRegistrationHook> s_aPostUpdateCallback = new ThreadLocal <IRegistrationHook> ();
@@ -117,7 +117,7 @@ public final class RegistrationServiceRegistrationHook implements IRegistrationH
   private SimpleParticipantIdentifier m_aBusinessIdentifier;
   private EAction m_eAction;
 
-  public RegistrationServiceRegistrationHook ()
+  public RegistrationHookWriteToSML ()
   {}
 
   @Nullable

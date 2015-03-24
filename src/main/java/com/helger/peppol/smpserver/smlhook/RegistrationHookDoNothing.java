@@ -51,7 +51,7 @@ import com.helger.peppol.identifier.IParticipantIdentifier;
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Immutable
-public final class DoNothingRegistrationHook implements IRegistrationHook
+public final class RegistrationHookDoNothing implements IRegistrationHook
 {
   public void create (final IParticipantIdentifier aPI)
   {}

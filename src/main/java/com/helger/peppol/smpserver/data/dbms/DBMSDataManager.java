@@ -112,7 +112,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
 
   public DBMSDataManager ()
   {
-    this (RegistrationHookFactory.createInstance ());
+    this (RegistrationHookFactory.getOrCreateInstance ());
   }
 
   public DBMSDataManager (@Nonnull final IRegistrationHook aHook)

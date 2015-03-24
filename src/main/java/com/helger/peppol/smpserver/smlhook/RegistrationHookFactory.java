@@ -46,7 +46,6 @@ import javax.annotation.concurrent.Immutable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.lang.GenericReflection;
 import com.helger.peppol.smpserver.CSMPServer;
 
 /**
@@ -56,7 +55,7 @@ import com.helger.peppol.smpserver.CSMPServer;
 public final class RegistrationHookFactory
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationHookFactory.class);
-  private static final String CONFIG_REGISTRATION_HOOK_CLASS = "registrationHook.class";
+  private static final String CONFIG_WRITE_TO_SML = "writeToSML";
 
   // The cached instance
   private static IRegistrationHook s_aInstance;
@@ -75,13 +74,9 @@ public final class RegistrationHookFactory
   @Nonnull
   public static IRegistrationHook createInstance ()
   {
-    // Create only once
-    final String sRegHookName = CSMPServer.getConfigFile ().getString (CONFIG_REGISTRATION_HOOK_CLASS);
-    final IRegistrationHook aHook = GenericReflection.newInstance (sRegHookName, IRegistrationHook.class);
-    if (aHook == null)
-      throw new IllegalStateException ("Failed to create registration hook instance from class '" + sRegHookName + "'");
-    s_aLogger.info ("Registration hook class '" + sRegHookName + "' instantiated");
-    return aHook;
+    final boolean bWriteToSML = CSMPServer.getConfigFile ().getBoolean (CONFIG_WRITE_TO_SML, false);
+    s_aLogger.info ("Access to the SML is " + (bWriteToSML ? "enabled" : "disabled") + " in this SMP server!");
+    return bWriteToSML ? new RegistrationHookWriteToSML () : new RegistrationHookDoNothing ();
   }
 
   /**

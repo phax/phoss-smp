@@ -44,10 +44,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.smlhook.RegistrationServiceRegistrationHook;
+import com.helger.peppol.smpserver.smlhook.RegistrationHookWriteToSML;
 
 /**
- * Test class for class {@link RegistrationServiceRegistrationHook}.
+ * Test class for class {@link RegistrationHookWriteToSML}.
  * 
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
@@ -57,7 +57,7 @@ public final class RegistrationServiceRegistrationHookTest
   @Ignore ("Potentially modifies the DNS!")
   public void testCreateAndDelete ()
   {
-    final RegistrationServiceRegistrationHook aHook = new RegistrationServiceRegistrationHook ();
+    final RegistrationHookWriteToSML aHook = new RegistrationHookWriteToSML ();
     final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:12345test");
     aHook.create (aPI);
     aHook.delete (aPI);

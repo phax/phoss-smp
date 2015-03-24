@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is used for logging startup and shutdown
- * 
+ *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Immutable
@@ -60,11 +60,11 @@ public final class LogStartupListener implements ServletContextListener
 
   public void contextInitialized (@Nonnull final ServletContextEvent aServletContextEvent)
   {
-    s_aLogger.info ("SMP context started");
+    s_aLogger.info ("SMP server started");
   }
 
   public void contextDestroyed (@Nonnull final ServletContextEvent aServletContextEvent)
   {
-    s_aLogger.info ("SMP context stopped");
+    s_aLogger.info ("SMP server stopped");
   }
 }
