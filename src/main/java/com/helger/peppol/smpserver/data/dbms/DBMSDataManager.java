@@ -99,7 +99,7 @@ import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * A Hibernate implementation of the DataManager interface.
+ * A EclipseLink based implementation of the {@link IDataManager} interface.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
