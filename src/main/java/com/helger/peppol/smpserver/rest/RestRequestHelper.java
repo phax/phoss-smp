@@ -64,9 +64,9 @@ final class RestRequestHelper
   {}
 
   @Nonnull
-  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders headers) throws SMPUnauthorizedException
+  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders aHttpHeaders) throws SMPUnauthorizedException
   {
-    final List <String> aHeaders = headers.getRequestHeader (HttpHeaders.AUTHORIZATION);
+    final List <String> aHeaders = aHttpHeaders.getRequestHeader (HttpHeaders.AUTHORIZATION);
     if (CollectionHelper.isEmpty (aHeaders))
       throw new SMPUnauthorizedException ("Missing required HTTP header '" +
                                        HttpHeaders.AUTHORIZATION +

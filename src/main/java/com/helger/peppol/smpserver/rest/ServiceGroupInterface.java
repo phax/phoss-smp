@@ -40,8 +40,6 @@
  */
 package com.helger.peppol.smpserver.rest;
 
-import java.util.List;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -56,20 +54,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
-import org.busdox.servicemetadata.publishing._1.ObjectFactory;
 import org.busdox.servicemetadata.publishing._1.ServiceGroupType;
-import org.busdox.servicemetadata.publishing._1.ServiceMetadataReferenceCollectionType;
-import org.busdox.servicemetadata.publishing._1.ServiceMetadataReferenceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.helger.peppol.identifier.DocumentIdentifierType;
-import com.helger.peppol.identifier.IdentifierUtils;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.data.DataManagerFactory;
-import com.helger.peppol.smpserver.data.IDataManager;
-import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 
 /**
  * This class implements the REST interface for getting ServiceGroup's. PUT and
@@ -80,12 +67,10 @@ import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 @Path ("/{ServiceGroupId}")
 public final class ServiceGroupInterface
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceGroupInterface.class);
-
   @Context
-  private HttpHeaders headers;
+  private HttpHeaders m_aHttpHeaders;
   @Context
-  private UriInfo uriInfo;
+  private UriInfo m_aUriInfo;
 
   public ServiceGroupInterface ()
   {}
@@ -94,129 +79,28 @@ public final class ServiceGroupInterface
   @Produces (MediaType.TEXT_XML)
   public JAXBElement <ServiceGroupType> getServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    s_aLogger.info ("GET /" + sServiceGroupID);
-
-    final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse participant identifier '" + sServiceGroupID + "'");
-      return null;
-    }
-
-    try
-    {
-      final ObjectFactory aObjFactory = new ObjectFactory ();
-
-      // Retrieve the service group
-      final IDataManager aDataManager = DataManagerFactory.getInstance ();
-      final ServiceGroupType aServiceGroup = aDataManager.getServiceGroup (aServiceGroupID);
-      if (aServiceGroup == null)
-      {
-        // No such service group
-        throw new SMPNotFoundException ("serviceGroup", uriInfo.getAbsolutePath ());
-      }
-
-      // Then add the service metadata references
-      final ServiceMetadataReferenceCollectionType aCollectionType = aObjFactory.createServiceMetadataReferenceCollectionType ();
-      final List <ServiceMetadataReferenceType> aMetadataReferences = aCollectionType.getServiceMetadataReference ();
-
-      final List <DocumentIdentifierType> aDocTypeIds = aDataManager.getDocumentTypes (aServiceGroupID);
-      for (final DocumentIdentifierType aDocTypeId : aDocTypeIds)
-      {
-        final ServiceMetadataReferenceType aMetadataReference = aObjFactory.createServiceMetadataReferenceType ();
-        // Ensure that no context is emitted by using "replacePath" first!
-        aMetadataReference.setHref (uriInfo.getBaseUriBuilder ()
-                                           .replacePath ("")
-                                           .path (ServiceGroupInterface.class)
-                                           .buildFromEncoded (IdentifierUtils.getIdentifierURIPercentEncoded (aServiceGroupID),
-                                                              IdentifierUtils.getIdentifierURIPercentEncoded (aDocTypeId))
-                                           .toString ());
-        aMetadataReferences.add (aMetadataReference);
-      }
-      aServiceGroup.setServiceMetadataReferenceCollection (aCollectionType);
-
-      s_aLogger.info ("Finished getServiceGroup(" + sServiceGroupID + ")");
-
-      /*
-       * Finally return it
-       */
-      return aObjFactory.createServiceGroup (aServiceGroup);
-    }
-    catch (final SMPNotFoundException ex)
-    {
-      // No logging needed here - already logged in DB
-      throw ex;
-    }
-    catch (final Throwable ex)
-    {
-      s_aLogger.error ("Error getting service group " + aServiceGroupID, ex);
-      throw ex;
-    }
+    return new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroup (sServiceGroupID);
   }
 
   @PUT
   public Response saveServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                     final ServiceGroupType aServiceGroup) throws Throwable
   {
-    s_aLogger.info ("PUT /" + sServiceGroupID + " ==> " + aServiceGroup);
-
-    final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse participant identifier '" + sServiceGroupID + "'");
+    if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).saveServiceGroup (sServiceGroupID,
+                                                                                       aServiceGroup,
+                                                                                       RestRequestHelper.getAuth (m_aHttpHeaders))
+                                                                    .isFailure ())
       return Response.status (Status.BAD_REQUEST).build ();
-    }
-
-    try
-    {
-      if (!IdentifierUtils.areIdentifiersEqual (aServiceGroupID, aServiceGroup.getParticipantIdentifier ()))
-      {
-        // Business identifier must equal path
-        return Response.status (Status.BAD_REQUEST).build ();
-      }
-
-      final IDataManager aDataManager = DataManagerFactory.getInstance ();
-      aDataManager.saveServiceGroup (aServiceGroup, RestRequestHelper.getAuth (headers));
-
-      s_aLogger.info ("Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ")");
-
-      return Response.ok ().build ();
-    }
-    catch (final Throwable ex)
-    {
-      s_aLogger.error ("Error saving service group " + aServiceGroupID, ex);
-      throw ex;
-    }
+    return Response.ok ().build ();
   }
 
   @DELETE
   public Response deleteServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    s_aLogger.info ("DELETE /" + sServiceGroupID);
-
-    final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse participant identifier '" + sServiceGroupID + "'");
+    if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).deleteServiceGroup (sServiceGroupID,
+                                                                                         RestRequestHelper.getAuth (m_aHttpHeaders))
+                                                                    .isFailure ())
       return Response.status (Status.BAD_REQUEST).build ();
-    }
-
-    try
-    {
-      final IDataManager aDataManager = DataManagerFactory.getInstance ();
-      aDataManager.deleteServiceGroup (aServiceGroupID, RestRequestHelper.getAuth (headers));
-
-      s_aLogger.info ("Finished deleteServiceGroup(" + sServiceGroupID + ")");
-
-      return Response.ok ().build ();
-    }
-    catch (final Throwable ex)
-    {
-      s_aLogger.error ("Error deleting service group " + aServiceGroupID, ex);
-      throw ex;
-    }
+    return Response.ok ().build ();
   }
 }

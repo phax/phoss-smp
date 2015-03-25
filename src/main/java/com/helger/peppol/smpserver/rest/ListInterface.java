@@ -40,9 +40,6 @@
  */
 package com.helger.peppol.smpserver.rest;
 
-import java.util.Collection;
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -53,84 +50,33 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
-import org.busdox.servicemetadata.publishing._1.ObjectFactory;
 import org.busdox.servicemetadata.publishing._1.ServiceGroupReferenceListType;
-import org.busdox.servicemetadata.publishing._1.ServiceGroupReferenceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.helger.peppol.identifier.IdentifierUtils;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
-import com.helger.peppol.smpserver.data.DataManagerFactory;
-import com.helger.peppol.smpserver.data.IDataManager;
-import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
-import com.helger.web.http.basicauth.BasicAuthClientCredentials;
+import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 
 /**
  * This class implements a REST frontend for getting the list of service groups
- * for a given user.
+ * for a given user. This REST service is not part of the official
+ * specifications!
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Path ("/list/{UserId}")
 public final class ListInterface
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (ListInterface.class);
-
   @Context
-  private HttpHeaders headers;
+  private HttpHeaders m_aHttpHeaders;
   @Context
-  private UriInfo uriInfo;
+  private UriInfo m_aUriInfo;
 
   public ListInterface ()
   {}
 
   @GET
   @Produces (MediaType.TEXT_XML)
-  public JAXBElement <ServiceGroupReferenceListType> getServiceGroup (@PathParam ("UserId") final String sUserId) throws Throwable
+  public JAXBElement <ServiceGroupReferenceListType> getServiceGroupReferenceList (@PathParam ("UserId") final String sUserID) throws Throwable
   {
-    s_aLogger.info ("GET /list/" + sUserId);
-
-    try
-    {
-      final ObjectFactory aObjFactory = new ObjectFactory ();
-      final BasicAuthClientCredentials aCredentials = RestRequestHelper.getAuth (headers);
-      if (!aCredentials.getUserName ().equals (sUserId))
-      {
-        throw new SMPUnauthorizedException ("URL user name '" +
-                                         sUserId +
-                                         "' does not match HTTP Basic Auth user name '" +
-                                         aCredentials.getUserName () +
-                                         "'");
-      }
-
-      final IDataManager aDataManager = DataManagerFactory.getInstance ();
-      final Collection <ParticipantIdentifierType> aServiceGroupList = aDataManager.getServiceGroupList (aCredentials);
-
-      final ServiceGroupReferenceListType aRefList = aObjFactory.createServiceGroupReferenceListType ();
-      final List <ServiceGroupReferenceType> aReferenceTypes = aRefList.getServiceGroupReference ();
-      for (final ParticipantIdentifierType aServiceGroupID : aServiceGroupList)
-      {
-        // Ensure that no context is emitted by using "replacePath" first!
-        final String sHref = uriInfo.getBaseUriBuilder ()
-                                    .replacePath ("")
-                                    .path (CompleteServiceGroupInterface.class)
-                                    .buildFromEncoded (IdentifierUtils.getIdentifierURIPercentEncoded (aServiceGroupID))
-                                    .toString ();
-
-        final ServiceGroupReferenceType aServGroupRefType = aObjFactory.createServiceGroupReferenceType ();
-        aServGroupRefType.setHref (sHref);
-        aReferenceTypes.add (aServGroupRefType);
-      }
-
-      s_aLogger.info ("Finished getServiceGroup(" + sUserId + ")");
-
-      return aObjFactory.createServiceGroupReferenceList (aRefList);
-    }
-    catch (final Throwable ex)
-    {
-      s_aLogger.error ("A error occured when listing service groups for user: " + sUserId, ex);
-      throw ex;
-    }
+    return new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroupReferenceList (sUserID,
+                                                                                                      RestRequestHelper.getAuth (m_aHttpHeaders));
   }
 }

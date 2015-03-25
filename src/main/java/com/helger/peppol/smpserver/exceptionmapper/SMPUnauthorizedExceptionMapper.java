@@ -38,26 +38,27 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.exception;
+package com.helger.peppol.smpserver.exceptionmapper;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
+import com.helger.commons.mime.CMimeType;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 
 /**
- * Exception to be thrown if there is an ownership mismatch between object. This
- * exception is only thrown if the provided user credentials are valid.
- *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public class SMPUnauthorizedException extends SMPServerException
+@Provider
+public class SMPUnauthorizedExceptionMapper implements ExceptionMapper <SMPUnauthorizedException>
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPUnauthorizedException.class);
-
-  public SMPUnauthorizedException (final String sMsg)
+  public Response toResponse (final SMPUnauthorizedException e)
   {
-    super (sMsg);
-
-    // Always log!
-    s_aLogger.warn (sMsg);
+    return Response.status (Status.FORBIDDEN)
+                   .entity (e.getMessage ())
+                   .type (CMimeType.TEXT_PLAIN.getAsString ())
+                   .build ();
   }
 }

@@ -40,8 +40,6 @@
  */
 package com.helger.peppol.smpserver.rest;
 
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -52,36 +50,21 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
 import org.busdox.servicemetadata.publishing._1.CompleteServiceGroupType;
-import org.busdox.servicemetadata.publishing._1.ObjectFactory;
-import org.busdox.servicemetadata.publishing._1.ServiceGroupType;
-import org.busdox.servicemetadata.publishing._1.ServiceMetadataReferenceCollectionType;
-import org.busdox.servicemetadata.publishing._1.ServiceMetadataReferenceType;
-import org.busdox.servicemetadata.publishing._1.ServiceMetadataType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.helger.peppol.identifier.DocumentIdentifierType;
-import com.helger.peppol.identifier.IdentifierUtils;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.data.DataManagerFactory;
-import com.helger.peppol.smpserver.data.IDataManager;
-import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 
 /**
  * This class implements a REST frontend for getting the ServiceGroup as well as
  * all the corresponding ServiceMetadata's given a service group id. This
  * interface is not part of the official specification. The interface makes it
  * much faster to fetch the complete data about a service group and its service
- * metadata. The interface is used by the registration web site.
+ * metadata.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Path ("/complete/{ServiceGroupId}")
 public final class CompleteServiceGroupInterface
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (CompleteServiceGroupInterface.class);
-
   @Context
   private UriInfo m_aUriInfo;
 
@@ -90,64 +73,8 @@ public final class CompleteServiceGroupInterface
 
   @GET
   @Produces (MediaType.TEXT_XML)
-  public JAXBElement <CompleteServiceGroupType> getServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
+  public JAXBElement <CompleteServiceGroupType> getCompleteServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    s_aLogger.info ("GET /complete/" + sServiceGroupID);
-
-    final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse participant identifier '" + sServiceGroupID + "'");
-      return null;
-    }
-
-    try
-    {
-      final ObjectFactory aObjFactory = new ObjectFactory ();
-
-      final IDataManager aDataManager = DataManagerFactory.getInstance ();
-      final ServiceGroupType aServiceGroup = aDataManager.getServiceGroup (aServiceGroupID);
-      if (aServiceGroup == null)
-      {
-        // No such service group
-        throw new SMPNotFoundException ("serviceGroup", m_aUriInfo.getAbsolutePath ());
-      }
-
-      /*
-       * Then add the service metadata references
-       */
-      final ServiceMetadataReferenceCollectionType aRefCollection = aObjFactory.createServiceMetadataReferenceCollectionType ();
-      final List <ServiceMetadataReferenceType> aMetadataReferences = aRefCollection.getServiceMetadataReference ();
-
-      final List <DocumentIdentifierType> aDocTypeIds = aDataManager.getDocumentTypes (aServiceGroupID);
-      for (final DocumentIdentifierType aDocTypeId : aDocTypeIds)
-      {
-        final ServiceMetadataReferenceType aMetadataReference = aObjFactory.createServiceMetadataReferenceType ();
-        // Ensure that no context is emitted by using "replacePath" first!
-        aMetadataReference.setHref (m_aUriInfo.getBaseUriBuilder ()
-                                              .replacePath ("")
-                                              .path (ServiceMetadataInterface.class)
-                                              .buildFromEncoded (IdentifierUtils.getIdentifierURIPercentEncoded (aServiceGroupID),
-                                                                 IdentifierUtils.getIdentifierURIPercentEncoded (aDocTypeId))
-                                              .toString ());
-        aMetadataReferences.add (aMetadataReference);
-      }
-      aServiceGroup.setServiceMetadataReferenceCollection (aRefCollection);
-
-      final CompleteServiceGroupType aCompleteServiceGroup = aObjFactory.createCompleteServiceGroupType ();
-      aCompleteServiceGroup.setServiceGroup (aServiceGroup);
-      for (final ServiceMetadataType aService : aDataManager.getServices (aServiceGroupID))
-        aCompleteServiceGroup.getServiceMetadata ().add (aService);
-
-      s_aLogger.info ("Finished getServiceGroup(" + sServiceGroupID + ")");
-
-      return aObjFactory.createCompleteServiceGroup (aCompleteServiceGroup);
-    }
-    catch (final Throwable ex)
-    {
-      s_aLogger.error ("Error getting service group", ex);
-      throw ex;
-    }
+    return new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getCompleteServiceGroup (sServiceGroupID);
   }
 }
