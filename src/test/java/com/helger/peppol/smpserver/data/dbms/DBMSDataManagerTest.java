@@ -145,7 +145,7 @@ public class DBMSDataManagerTest
   @Before
   public void beforeTest () throws Throwable
   {
-    final ExtensionType aExtension = ExtensionConverter.convert ("<root><any>value</any></root>");
+    final ExtensionType aExtension = ExtensionConverter.convertOrNull ("<root><any>value</any></root>");
     assertNotNull (aExtension);
     assertNotNull (aExtension.getAny ());
 
