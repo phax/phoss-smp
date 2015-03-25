@@ -95,6 +95,8 @@ import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
+import com.helger.peppol.utils.CertificateUtils;
+import com.helger.peppol.utils.ExtensionConverter;
 import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
@@ -260,7 +262,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         // Convert service group DB to service group service
         final ServiceGroupType aServiceGroup = m_aObjFactory.createServiceGroupType ();
         aServiceGroup.setParticipantIdentifier (aServiceGroupID);
-        aServiceGroup.setExtension (SMPDBUtils.getAsExtensionSafe (aDBServiceGroup.getExtension ()));
+        aServiceGroup.setExtension (ExtensionConverter.convertOrNull (aDBServiceGroup.getExtension ()));
         // This is set by the REST interface:
         // ret.setServiceMetadataReferenceCollection(value)
         return aServiceGroup;
@@ -590,7 +592,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         final RedirectType aRedirect = m_aObjFactory.createRedirectType ();
         aRedirect.setCertificateUID (aDBServiceMetadataRedirection.getCertificateUid ());
         aRedirect.setHref (aDBServiceMetadataRedirection.getRedirectionUrl ());
-        aRedirect.setExtension (SMPDBUtils.getAsExtensionSafe (aDBServiceMetadataRedirection.getExtension ()));
+        aRedirect.setExtension (ExtensionConverter.convertOrNull (aDBServiceMetadataRedirection.getExtension ()));
         aServiceMetadata.setRedirect (aRedirect);
 
         return aServiceMetadata;
@@ -603,7 +605,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
                                         @Nonnull final ServiceMetadataType aServiceMetadata)
   {
     final ParticipantIdentifierType aBusinessID = aDBServiceMetadata.getId ().asBusinessIdentifier ();
-    final ExtensionType aExtension = SMPDBUtils.getAsExtensionSafe (aDBServiceMetadata.getExtension ());
+    final ExtensionType aExtension = ExtensionConverter.convertOrNull (aDBServiceMetadata.getExtension ());
 
     final DocumentIdentifierType aDocTypeID = aDBServiceMetadata.getId ().asDocumentTypeIdentifier ();
 
@@ -626,7 +628,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         final EndpointType aEndpointType = m_aObjFactory.createEndpointType ();
 
         aEndpointType.setTransportProfile (aDBEndpoint.getId ().getTransportProfile ());
-        aEndpointType.setExtension (SMPDBUtils.getAsExtensionSafe (aDBEndpoint.getExtension ()));
+        aEndpointType.setExtension (ExtensionConverter.convertOrNull (aDBEndpoint.getExtension ()));
 
         final W3CEndpointReference endpointRef = W3CEndpointReferenceUtils.createEndpointReference (aDBEndpoint.getId ()
                                                                                                                .getEndpointReference ());
@@ -637,7 +639,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         aEndpointType.setServiceExpirationDate (aDBEndpoint.getServiceExpirationDate ());
         aEndpointType.setTechnicalContactUrl (aDBEndpoint.getTechnicalContactUrl ());
         aEndpointType.setTechnicalInformationUrl (aDBEndpoint.getTechnicalInformationUrl ());
-        aEndpointType.setCertificate (SMPDBUtils.getRFC1421CompliantString (aDBEndpoint.getCertificate ()));
+        aEndpointType.setCertificate (CertificateUtils.getRFC1421CompliantString (aDBEndpoint.getCertificate ()));
         aEndpointType.setMinimumAuthenticationLevel (aDBEndpoint.getMinimumAuthenticationLevel ());
         aEndpointType.setRequireBusinessLevelSignature (aDBEndpoint.isRequireBusinessLevelSignature ());
 
@@ -645,7 +647,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
       }
 
       aProcessType.setServiceEndpointList (endpoints);
-      aProcessType.setExtension (SMPDBUtils.getAsExtensionSafe (aDBProcess.getExtension ()));
+      aProcessType.setExtension (ExtensionConverter.convertOrNull (aDBProcess.getExtension ()));
       aProcessType.setProcessIdentifier (aDBProcess.getId ().asProcessIdentifier ());
 
       aProcessList.getProcess ().add (aProcessType);
