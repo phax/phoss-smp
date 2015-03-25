@@ -46,14 +46,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Exception to be thrown if there is an ownership mismatch between object. This
  * exception is only thrown if the provided user credentials are valid.
- * 
+ *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public class UnauthorizedException extends RuntimeException
+public class SMPUnauthorizedException extends SMPServerException
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (UnauthorizedException.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPUnauthorizedException.class);
 
-  public UnauthorizedException (final String sMsg)
+  public SMPUnauthorizedException (final String sMsg)
   {
     super (sMsg);
 

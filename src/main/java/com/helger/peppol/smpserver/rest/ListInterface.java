@@ -63,7 +63,7 @@ import com.helger.peppol.identifier.IdentifierUtils;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManager;
-import com.helger.peppol.smpserver.exception.UnauthorizedException;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
@@ -97,7 +97,7 @@ public final class ListInterface
       final BasicAuthClientCredentials aCredentials = RestRequestHelper.getAuth (headers);
       if (!aCredentials.getUserName ().equals (sUserId))
       {
-        throw new UnauthorizedException ("URL user name '" +
+        throw new SMPUnauthorizedException ("URL user name '" +
                                          sUserId +
                                          "' does not match HTTP Basic Auth user name '" +
                                          aCredentials.getUserName () +

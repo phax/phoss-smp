@@ -47,7 +47,7 @@ import javax.annotation.concurrent.Immutable;
 import javax.ws.rs.core.HttpHeaders;
 
 import com.helger.commons.collections.CollectionHelper;
-import com.helger.peppol.smpserver.exception.UnauthorizedException;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 import com.helger.web.http.basicauth.HTTPBasicAuth;
 
@@ -64,11 +64,11 @@ final class RestRequestHelper
   {}
 
   @Nonnull
-  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders headers) throws UnauthorizedException
+  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders headers) throws SMPUnauthorizedException
   {
     final List <String> aHeaders = headers.getRequestHeader (HttpHeaders.AUTHORIZATION);
     if (CollectionHelper.isEmpty (aHeaders))
-      throw new UnauthorizedException ("Missing required HTTP header '" +
+      throw new SMPUnauthorizedException ("Missing required HTTP header '" +
                                        HttpHeaders.AUTHORIZATION +
                                        "' for user authentication");
 

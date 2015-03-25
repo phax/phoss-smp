@@ -66,7 +66,7 @@ import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManager;
-import com.sun.jersey.api.NotFoundException;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 
 /**
  * This class implements a REST frontend for getting the ServiceGroup as well as
@@ -111,7 +111,7 @@ public final class CompleteServiceGroupInterface
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new NotFoundException ("serviceGroup", m_aUriInfo.getAbsolutePath ());
+        throw new SMPNotFoundException ("serviceGroup", m_aUriInfo.getAbsolutePath ());
       }
 
       /*

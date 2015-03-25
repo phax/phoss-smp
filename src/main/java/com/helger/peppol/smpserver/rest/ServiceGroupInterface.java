@@ -69,7 +69,7 @@ import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManager;
-import com.sun.jersey.api.NotFoundException;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 
 /**
  * This class implements the REST interface for getting ServiceGroup's. PUT and
@@ -114,7 +114,7 @@ public final class ServiceGroupInterface
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new NotFoundException ("serviceGroup", uriInfo.getAbsolutePath ());
+        throw new SMPNotFoundException ("serviceGroup", uriInfo.getAbsolutePath ());
       }
 
       // Then add the service metadata references
@@ -143,7 +143,7 @@ public final class ServiceGroupInterface
        */
       return aObjFactory.createServiceGroup (aServiceGroup);
     }
-    catch (final NotFoundException ex)
+    catch (final SMPNotFoundException ex)
     {
       // No logging needed here - already logged in DB
       throw ex;

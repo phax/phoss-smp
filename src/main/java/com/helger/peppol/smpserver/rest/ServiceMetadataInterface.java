@@ -68,7 +68,7 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManager;
-import com.sun.jersey.api.NotFoundException;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 
 /**
  * This class implements the REST interface for getting SignedServiceMetadata's.
@@ -124,7 +124,7 @@ public final class ServiceMetadataInterface
       {
         aService = aDataManager.getService (aServiceGroupID, aDocTypeID);
         if (aService == null)
-          throw new NotFoundException ("service", uriInfo.getAbsolutePath ());
+          throw new SMPNotFoundException ("service", uriInfo.getAbsolutePath ());
       }
 
       final SignedServiceMetadataType aSignedServiceMetadata = aObjFactory.createSignedServiceMetadataType ();

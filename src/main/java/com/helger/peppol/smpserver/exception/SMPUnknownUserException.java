@@ -50,13 +50,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public class UnknownUserException extends RuntimeException
+public class SMPUnknownUserException extends SMPServerException
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (UnknownUserException.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPUnknownUserException.class);
 
   private final String m_sUserName;
 
-  public UnknownUserException (@Nullable final String sUserName)
+  public SMPUnknownUserException (@Nullable final String sUserName)
   {
     super ("Unknown user '" + sUserName + "'");
     if (s_aLogger.isDebugEnabled ())

@@ -72,15 +72,13 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppol.smpserver.data.dbms.DBMSDataManager;
-import com.helger.peppol.smpserver.data.dbms.SMPEntityManagerFactory;
-import com.helger.peppol.smpserver.exception.UnauthorizedException;
-import com.helger.peppol.smpserver.exception.UnknownUserException;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
+import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookDoNothing;
 import com.helger.peppol.utils.ExtensionConverter;
 import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
-import com.sun.jersey.api.NotFoundException;
 
 /**
  * @author PEPPOL.AT, BRZ, Philip Helger
@@ -160,7 +158,7 @@ public class DBMSDataManagerTest
     {
       s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, CREDENTIALS);
     }
-    catch (final NotFoundException ex)
+    catch (final SMPNotFoundException ex)
     {}
 
     // Create a new one
@@ -230,7 +228,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.saveServiceGroup (m_aServiceGroup, aCredentials);
       fail ();
     }
-    catch (final UnauthorizedException ex)
+    catch (final SMPUnauthorizedException ex)
     {}
   }
 
@@ -245,7 +243,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.saveServiceGroup (m_aServiceGroup, aCredentials);
       fail ();
     }
-    catch (final UnknownUserException ex)
+    catch (final SMPUnknownUserException ex)
     {}
   }
 
@@ -265,7 +263,7 @@ public class DBMSDataManagerTest
     {
       s_aDataMgr.deleteServiceGroup (aServiceGroupID2, CREDENTIALS);
     }
-    catch (final NotFoundException ex)
+    catch (final SMPNotFoundException ex)
     {}
     assertNull (s_aDataMgr.getServiceGroup (aServiceGroupID2));
   }
@@ -279,7 +277,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aCredentials);
       fail ();
     }
-    catch (final UnknownUserException ex)
+    catch (final SMPUnknownUserException ex)
     {}
   }
 
@@ -292,7 +290,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aCredentials);
       fail ();
     }
-    catch (final UnauthorizedException ex)
+    catch (final SMPUnauthorizedException ex)
     {}
   }
 
@@ -344,7 +342,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.saveService (m_aServiceMetadata, aCredentials);
       fail ();
     }
-    catch (final UnknownUserException ex)
+    catch (final SMPUnknownUserException ex)
     {}
   }
 
@@ -357,7 +355,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.saveService (m_aServiceMetadata, aCredentials);
       fail ();
     }
-    catch (final UnauthorizedException ex)
+    catch (final SMPUnauthorizedException ex)
     {}
   }
 
@@ -383,7 +381,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, CREDENTIALS);
       fail ();
     }
-    catch (final NotFoundException ex)
+    catch (final SMPNotFoundException ex)
     {}
   }
 
@@ -396,7 +394,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aCredentials);
       fail ();
     }
-    catch (final UnknownUserException ex)
+    catch (final SMPUnknownUserException ex)
     {}
   }
 
@@ -409,7 +407,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aCredentials);
       fail ();
     }
-    catch (final UnauthorizedException ex)
+    catch (final SMPUnauthorizedException ex)
     {}
   }
 }

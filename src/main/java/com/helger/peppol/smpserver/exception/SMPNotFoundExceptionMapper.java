@@ -51,11 +51,11 @@ import com.helger.commons.mime.CMimeType;
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Provider
-public class UnauthorizedExceptionMapper implements ExceptionMapper <UnauthorizedException>
+public class SMPNotFoundExceptionMapper implements ExceptionMapper <SMPNotFoundException>
 {
-  public Response toResponse (final UnauthorizedException e)
+  public Response toResponse (final SMPNotFoundException e)
   {
-    return Response.status (Status.FORBIDDEN)
+    return Response.status (Status.NOT_FOUND)
                    .entity (e.getMessage ())
                    .type (CMimeType.TEXT_PLAIN.getAsString ())
                    .build ();

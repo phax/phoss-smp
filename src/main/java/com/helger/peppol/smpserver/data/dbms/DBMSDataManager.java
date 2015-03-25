@@ -90,13 +90,13 @@ import com.helger.peppol.smpserver.data.dbms.model.DBServiceMetadataID;
 import com.helger.peppol.smpserver.data.dbms.model.DBServiceMetadataRedirection;
 import com.helger.peppol.smpserver.data.dbms.model.DBServiceMetadataRedirectionID;
 import com.helger.peppol.smpserver.data.dbms.model.DBUser;
-import com.helger.peppol.smpserver.exception.UnauthorizedException;
-import com.helger.peppol.smpserver.exception.UnknownUserException;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
+import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
-import com.sun.jersey.api.NotFoundException;
 
 /**
  * A Hibernate implementation of the DataManager interface.
@@ -147,26 +147,26 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
    * @param aCredentials
    *        The credentials to be validated. May not be <code>null</code>.
    * @return The matching non-<code>null</code> {@link DBUser}.
-   * @throws UnknownUserException
+   * @throws SMPUnknownUserException
    *         If no user matching the passed user name is present
-   * @throws UnauthorizedException
+   * @throws SMPUnauthorizedException
    *         If the password in the credentials does not match the stored
    *         password
    */
   @Nonnull
-  private DBUser _verifyUser (@Nonnull final BasicAuthClientCredentials aCredentials) throws UnknownUserException,
-                                                                                     UnauthorizedException
+  private DBUser _verifyUser (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnknownUserException,
+                                                                                     SMPUnauthorizedException
   {
     final String sUsername = aCredentials.getUserName ();
     final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUsername);
 
     // Check that the user exists
     if (aDBUser == null)
-      throw new UnknownUserException (sUsername);
+      throw new SMPUnknownUserException (sUsername);
 
     // Check that the password is correct
     if (!aDBUser.getPassword ().equals (aCredentials.getPassword ()))
-      throw new UnauthorizedException ("Illegal password for user '" + sUsername + "'");
+      throw new SMPUnauthorizedException ("Illegal password for user '" + sUsername + "'");
 
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("Verified credentials of user '" + sUsername + "' successfully");
@@ -182,22 +182,22 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
    * @param aCredentials
    *        The credentials to be checked
    * @return The non-<code>null</code> ownership object
-   * @throws UnauthorizedException
+   * @throws SMPUnauthorizedException
    *         If the participant identifier is not owned by the user specified in
    *         the credentials
    */
   @Nonnull
   private DBOwnership _verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                                        @Nonnull final BasicAuthClientCredentials aCredentials) throws UnauthorizedException
+                                        @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException
   {
     final DBOwnershipID aOwnershipID = new DBOwnershipID (aCredentials.getUserName (), aServiceGroupID);
     final DBOwnership aOwnership = getEntityManager ().find (DBOwnership.class, aOwnershipID);
     if (aOwnership == null)
     {
-      throw new UnauthorizedException ("User '" +
-                                       aCredentials.getUserName () +
-                                       "' does not own " +
-                                       IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID));
+      throw new SMPUnauthorizedException ("User '" +
+                                          aCredentials.getUserName () +
+                                          "' does not own " +
+                                          IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID));
     }
 
     if (s_aLogger.isDebugEnabled ())
@@ -292,11 +292,11 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
           // The business did exist. So it must be owned by the passed user.
           if (aEM.find (DBOwnership.class, aDBOwnershipID) == null)
           {
-            throw new UnauthorizedException ("The passed service group " +
-                                             IdentifierUtils.getIdentifierURIEncoded (aServiceGroup.getParticipantIdentifier ()) +
-                                             " is not owned by '" +
-                                             aCredentials.getUserName () +
-                                             "'");
+            throw new SMPUnauthorizedException ("The passed service group " +
+                                                IdentifierUtils.getIdentifierURIEncoded (aServiceGroup.getParticipantIdentifier ()) +
+                                                " is not owned by '" +
+                                                aCredentials.getUserName () +
+                                                "'");
           }
 
           // Simply update the extension
@@ -359,7 +359,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
     if (ret.hasThrowable ())
       throw ret.getThrowable ();
     if (ret.get ().isUnchanged ())
-      throw new NotFoundException (IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID));
+      throw new SMPNotFoundException (IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID));
   }
 
   @Nonnull
@@ -555,9 +555,9 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
 
     final EChange eChange = _deleteService (aServiceGroupID, aDocTypeID);
     if (eChange.isUnchanged ())
-      throw new NotFoundException (IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID) +
-                                   " / " +
-                                   IdentifierUtils.getIdentifierURIEncoded (aDocTypeID));
+      throw new SMPNotFoundException (IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID) +
+                                      " / " +
+                                      IdentifierUtils.getIdentifierURIEncoded (aDocTypeID));
   }
 
   @Nullable

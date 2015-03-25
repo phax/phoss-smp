@@ -51,9 +51,9 @@ import com.helger.commons.mime.CMimeType;
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Provider
-public class UnknownUserExceptionMapper implements ExceptionMapper <UnknownUserException>
+public class SMPUnauthorizedExceptionMapper implements ExceptionMapper <SMPUnauthorizedException>
 {
-  public Response toResponse (final UnknownUserException e)
+  public Response toResponse (final SMPUnauthorizedException e)
   {
     return Response.status (Status.FORBIDDEN)
                    .entity (e.getMessage ())

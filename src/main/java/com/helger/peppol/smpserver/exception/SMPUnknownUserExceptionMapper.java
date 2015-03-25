@@ -41,19 +41,23 @@
 package com.helger.peppol.smpserver.exception;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import com.sun.jersey.api.NotFoundException;
+import com.helger.commons.mime.CMimeType;
 
 /**
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Provider
-public class NotFoundExceptionMapper implements ExceptionMapper <NotFoundException>
+public class SMPUnknownUserExceptionMapper implements ExceptionMapper <SMPUnknownUserException>
 {
-  public Response toResponse (final NotFoundException aEx)
+  public Response toResponse (final SMPUnknownUserException e)
   {
-    return aEx.getResponse ();
+    return Response.status (Status.FORBIDDEN)
+                   .entity (e.getMessage ())
+                   .type (CMimeType.TEXT_PLAIN.getAsString ())
+                   .build ();
   }
 }
