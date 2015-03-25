@@ -54,6 +54,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
+import org.busdox.servicemetadata.publishing._1.ObjectFactory;
 import org.busdox.servicemetadata.publishing._1.ServiceGroupType;
 
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
@@ -72,6 +73,8 @@ public final class ServiceGroupInterface
   @Context
   private UriInfo m_aUriInfo;
 
+  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
+
   public ServiceGroupInterface ()
   {}
 
@@ -79,7 +82,8 @@ public final class ServiceGroupInterface
   @Produces (MediaType.TEXT_XML)
   public JAXBElement <ServiceGroupType> getServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    return new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroup (sServiceGroupID);
+    final ServiceGroupType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroup (sServiceGroupID);
+    return m_aObjFactory.createServiceGroup (ret);
   }
 
   @PUT

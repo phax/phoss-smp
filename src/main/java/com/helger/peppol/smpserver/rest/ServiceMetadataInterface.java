@@ -54,6 +54,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
+import org.busdox.servicemetadata.publishing._1.ObjectFactory;
 import org.busdox.servicemetadata.publishing._1.ServiceMetadataType;
 import org.busdox.servicemetadata.publishing._1.SignedServiceMetadataType;
 
@@ -74,14 +75,17 @@ public final class ServiceMetadataInterface
   @Context
   private UriInfo m_aUriInfo;
 
+  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
+
   @GET
   // changed Produced media type to match the smp specification.
   @Produces (MediaType.TEXT_XML)
   public JAXBElement <SignedServiceMetadataType> getServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                                                          @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
   {
-    return new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceRegistration (sServiceGroupID,
-                                                                                                sDocumentTypeID);
+    final SignedServiceMetadataType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceRegistration (sServiceGroupID,
+                                                                                                                               sDocumentTypeID);
+    return m_aObjFactory.createSignedServiceMetadata (ret);
   }
 
   @PUT

@@ -50,6 +50,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
+import org.busdox.servicemetadata.publishing._1.ObjectFactory;
 import org.busdox.servicemetadata.publishing._1.ServiceGroupReferenceListType;
 
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
@@ -69,6 +70,8 @@ public final class ListInterface
   @Context
   private UriInfo m_aUriInfo;
 
+  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
+
   public ListInterface ()
   {}
 
@@ -76,7 +79,8 @@ public final class ListInterface
   @Produces (MediaType.TEXT_XML)
   public JAXBElement <ServiceGroupReferenceListType> getServiceGroupReferenceList (@PathParam ("UserId") final String sUserID) throws Throwable
   {
-    return new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroupReferenceList (sUserID,
-                                                                                                      RestRequestHelper.getAuth (m_aHttpHeaders));
+    final ServiceGroupReferenceListType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroupReferenceList (sUserID,
+                                                                                                                                         RestRequestHelper.getAuth (m_aHttpHeaders));
+    return m_aObjFactory.createServiceGroupReferenceList (ret);
   }
 }
