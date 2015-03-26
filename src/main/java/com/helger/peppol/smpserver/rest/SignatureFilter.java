@@ -53,7 +53,6 @@ import com.helger.commons.charset.CCharset;
 import com.helger.commons.exceptions.InitializationException;
 import com.helger.commons.io.streams.StringInputStream;
 import com.helger.peppol.smpserver.CSMPServer;
-import com.helger.peppol.utils.ConfigFile;
 import com.helger.peppol.utils.KeyStoreUtils;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -67,11 +66,6 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
  */
 public final class SignatureFilter implements ContainerResponseFilter
 {
-  public static final String CONFIG_XMLDSIG_KEYSTORE_CLASSPATH = "xmldsig.keystore.classpath";
-  public static final String CONFIG_XMLDSIG_KEYSTORE_PASSWORD = "xmldsig.keystore.password";
-  public static final String CONFIG_XMLDSIG_KEYSTORE_KEY_ALIAS = "xmldsig.keystore.key.alias";
-  public static final String CONFIG_XMLDSIG_KEYSTORE_KEY_PASSWORD = "xmldsig.keystore.key.password";
-
   private static final Logger s_aLogger = LoggerFactory.getLogger (SignatureFilter.class);
 
   private KeyStore.PrivateKeyEntry m_aKeyEntry;
@@ -82,11 +76,10 @@ public final class SignatureFilter implements ContainerResponseFilter
     // Load the KeyStore and get the signing key and certificate.
     try
     {
-      final ConfigFile aConfigFile = CSMPServer.getConfigFile ();
-      final String sKeyStoreClassPath = aConfigFile.getString (CONFIG_XMLDSIG_KEYSTORE_CLASSPATH);
-      final String sKeyStorePassword = aConfigFile.getString (CONFIG_XMLDSIG_KEYSTORE_PASSWORD);
-      final String sKeyStoreKeyAlias = aConfigFile.getString (CONFIG_XMLDSIG_KEYSTORE_KEY_ALIAS);
-      final char [] aKeyStoreKeyPassword = aConfigFile.getCharArray (CONFIG_XMLDSIG_KEYSTORE_KEY_PASSWORD);
+      final String sKeyStoreClassPath = CSMPServer.getKeystorePath ();
+      final String sKeyStorePassword = CSMPServer.getKeystorePassword ();
+      final String sKeyStoreKeyAlias = CSMPServer.getKeystoreKeyAlias ();
+      final char [] aKeyStoreKeyPassword = CSMPServer.getKeystoreKeyPassword ();
 
       final KeyStore aKeyStore = KeyStoreUtils.loadKeyStore (sKeyStoreClassPath, sKeyStorePassword);
       final KeyStore.Entry aEntry = aKeyStore.getEntry (sKeyStoreKeyAlias,
