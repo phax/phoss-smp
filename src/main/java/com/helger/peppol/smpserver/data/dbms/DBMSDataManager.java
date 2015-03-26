@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.GlobalDebug;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotations.ReturnsMutableCopy;
+import com.helger.commons.callback.IThrowingRunnable;
 import com.helger.commons.callback.LoggingExceptionHandler;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.IEntityManagerProvider;
@@ -275,9 +276,9 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
                                 @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
     JPAExecutionResult <?> ret;
-    ret = doInTransaction (new Runnable ()
+    ret = doInTransaction (new IThrowingRunnable ()
     {
-      public void run ()
+      public void run () throws Exception
       {
         final DBUser aDBUser = _verifyUser (aCredentials);
 
@@ -307,8 +308,8 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         }
         else
         {
-          // It's a new service group
-          m_aHook.create (aServiceGroup.getParticipantIdentifier ());
+          // It's a new service group - throws exception in case of an error
+          m_aHook.createServiceGroup (aServiceGroup.getParticipantIdentifier ());
 
           // Did not exist. Create it.
           aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID);
@@ -336,7 +337,8 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
       {
         _verifyUser (aCredentials);
 
-        m_aHook.delete (aServiceGroupID);
+        // Delete in SML - throws exception in case of error
+        m_aHook.deleteServiceGroup (aServiceGroupID);
 
         // Check if the service group is existing
         final EntityManager aEM = getEntityManager ();
