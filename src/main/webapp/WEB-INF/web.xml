@@ -47,9 +47,6 @@
   <display-name>PEPPOL SMP REST service (read &amp; write)</display-name>
 
   <listener>
-    <listener-class>com.helger.peppol.smpserver.servlet.LogStartupListener</listener-class>
-  </listener>
-  <listener>
     <listener-class>com.helger.peppol.smpserver.servlet.TimeZoneCorrectorListener</listener-class>
   </listener>
 

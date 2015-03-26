@@ -43,9 +43,7 @@ package com.helger.peppol.smpserver.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -83,30 +81,27 @@ import com.helger.commons.xml.serialize.IXMLWriterSettings;
 import com.helger.commons.xml.serialize.XMLWriter;
 import com.helger.commons.xml.serialize.XMLWriterSettings;
 import com.helger.commons.xml.transform.XMLTransformerFactory;
+import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 
 final class SigningContainerResponseWriter implements ContainerResponseWriter
 {
   private final ContainerResponseWriter m_aCRW;
-  private final PrivateKeyEntry m_aKeyEntry;
-  private final X509Certificate m_aCert;
   private NonBlockingByteArrayOutputStream m_aBAOS;
   private ContainerResponse m_aResponse;
 
-  SigningContainerResponseWriter (@Nonnull final ContainerResponseWriter crw,
-                                  @Nonnull final PrivateKeyEntry aKeyEntry,
-                                  @Nonnull final X509Certificate aCert)
+  SigningContainerResponseWriter (@Nonnull final ContainerResponseWriter aCRW)
   {
-    m_aCRW = crw;
-    m_aKeyEntry = aKeyEntry;
-    m_aCert = aCert;
+    m_aCRW = aCRW;
   }
 
+  @Nonnull
   public OutputStream writeStatusAndHeaders (final long nContentLength, final ContainerResponse aResponse) throws IOException
   {
     m_aResponse = aResponse;
-    return m_aBAOS = new NonBlockingByteArrayOutputStream ();
+    m_aBAOS = new NonBlockingByteArrayOutputStream ();
+    return m_aBAOS;
   }
 
   private void _signXML (final Element aElementToSign) throws NoSuchAlgorithmException,
@@ -114,6 +109,8 @@ final class SigningContainerResponseWriter implements ContainerResponseWriter
                                                       MarshalException,
                                                       XMLSignatureException
   {
+    final SMPKeyManager aKeyMgr = SMPKeyManager.getInstance ();
+
     // Create a DOM XMLSignatureFactory that will be used to
     // generate the enveloped signature.
     final XMLSignatureFactory aSignatureFactory = XMLSignatureFactory.getInstance ("DOM");
@@ -140,14 +137,14 @@ final class SigningContainerResponseWriter implements ContainerResponseWriter
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
     final List <Object> aX509Content = new ArrayList <Object> ();
-    aX509Content.add (m_aCert.getSubjectX500Principal ().getName ());
-    aX509Content.add (m_aCert);
+    aX509Content.add (aKeyMgr.getCertificate ().getSubjectX500Principal ().getName ());
+    aX509Content.add (aKeyMgr.getCertificate ());
     final X509Data aX509Data = aKeyInfoFactory.newX509Data (aX509Content);
     final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (Collections.singletonList (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and
     // location of the resulting XMLSignature's parent element.
-    final DOMSignContext dsc = new DOMSignContext (m_aKeyEntry.getPrivateKey (), aElementToSign);
+    final DOMSignContext dsc = new DOMSignContext (aKeyMgr.getPrivateKey (), aElementToSign);
 
     // Create the XMLSignature, but don't sign it yet.
     final XMLSignature signature = aSignatureFactory.newXMLSignature (aSingedInfo, aKeyInfo);

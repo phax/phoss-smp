@@ -67,6 +67,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.GlobalDebug;
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotations.IsSPIImplementation;
 import com.helger.commons.annotations.ReturnsMutableCopy;
 import com.helger.commons.callback.LoggingExceptionHandler;
 import com.helger.commons.state.EChange;
@@ -77,7 +78,7 @@ import com.helger.peppol.identifier.DocumentIdentifierType;
 import com.helger.peppol.identifier.IdentifierUtils;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.smp.SMPExtensionConverter;
-import com.helger.peppol.smpserver.data.IDataManager;
+import com.helger.peppol.smpserver.data.IDataManagerSPI;
 import com.helger.peppol.smpserver.data.dbms.model.DBEndpoint;
 import com.helger.peppol.smpserver.data.dbms.model.DBEndpointID;
 import com.helger.peppol.smpserver.data.dbms.model.DBOwnership;
@@ -101,11 +102,12 @@ import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * A EclipseLink based implementation of the {@link IDataManager} interface.
+ * A EclipseLink based implementation of the {@link IDataManagerSPI} interface.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public final class DBMSDataManager extends JPAEnabledManager implements IDataManager
+@IsSPIImplementation
+public final class DBMSDataManager extends JPAEnabledManager implements IDataManagerSPI
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (DBMSDataManager.class);
 
