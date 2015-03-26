@@ -68,7 +68,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.GlobalDebug;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotations.ReturnsMutableCopy;
-import com.helger.commons.callback.IThrowingRunnable;
 import com.helger.commons.callback.LoggingExceptionHandler;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.IEntityManagerProvider;
@@ -276,9 +275,9 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
                                 @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
     JPAExecutionResult <?> ret;
-    ret = doInTransaction (new IThrowingRunnable ()
+    ret = doInTransaction (new Runnable ()
     {
-      public void run () throws Exception
+      public void run ()
       {
         final DBUser aDBUser = _verifyUser (aCredentials);
 
@@ -311,14 +310,23 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
           // It's a new service group - throws exception in case of an error
           m_aHook.createServiceGroup (aServiceGroup.getParticipantIdentifier ());
 
-          // Did not exist. Create it.
-          aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID);
-          aDBServiceGroup.setExtension (aServiceGroup.getExtension ());
-          aEM.persist (aDBServiceGroup);
+          try
+          {
+            // Did not exist. Create it.
+            aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID);
+            aDBServiceGroup.setExtension (aServiceGroup.getExtension ());
+            aEM.persist (aDBServiceGroup);
 
-          // Save the ownership information
-          final DBOwnership aDBOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
-          aEM.persist (aDBOwnership);
+            // Save the ownership information
+            final DBOwnership aDBOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
+            aEM.persist (aDBOwnership);
+          }
+          catch (final RuntimeException ex)
+          {
+            // An error occurred - remove from SML again
+            m_aHook.undoCreateServiceGroup (aServiceGroup.getParticipantIdentifier ());
+            throw ex;
+          }
         }
       }
     });
@@ -337,9 +345,6 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
       {
         _verifyUser (aCredentials);
 
-        // Delete in SML - throws exception in case of error
-        m_aHook.deleteServiceGroup (aServiceGroupID);
-
         // Check if the service group is existing
         final EntityManager aEM = getEntityManager ();
         final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aServiceGroupID);
@@ -355,9 +360,20 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         // are checked
         final DBOwnership aDBOwnership = _verifyOwnership (aServiceGroupID, aCredentials);
 
-        aEM.remove (aDBOwnership);
-        aEM.remove (aDBServiceGroup);
-        return EChange.CHANGED;
+        // Delete in SML - throws exception in case of error
+        m_aHook.deleteServiceGroup (aServiceGroupID);
+        try
+        {
+          aEM.remove (aDBOwnership);
+          aEM.remove (aDBServiceGroup);
+          return EChange.CHANGED;
+        }
+        catch (final RuntimeException ex)
+        {
+          // An error occurred - remove from SML again
+          m_aHook.undoDeleteServiceGroup (aServiceGroupID);
+          throw ex;
+        }
       }
     });
     if (ret.hasThrowable ())
