@@ -72,11 +72,11 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookDoNothing;
-import com.helger.peppol.utils.ExtensionConverter;
 import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
@@ -145,7 +145,7 @@ public class DBMSDataManagerTest
   @Before
   public void beforeTest () throws Throwable
   {
-    final ExtensionType aExtension = ExtensionConverter.convertOrNull ("<root><any>value</any></root>");
+    final ExtensionType aExtension = SMPExtensionConverter.convertOrNull ("<root><any>value</any></root>");
     assertNotNull (aExtension);
     assertNotNull (aExtension.getAny ());
 

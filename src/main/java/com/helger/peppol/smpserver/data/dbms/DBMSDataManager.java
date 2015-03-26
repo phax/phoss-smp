@@ -76,6 +76,7 @@ import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.DocumentIdentifierType;
 import com.helger.peppol.identifier.IdentifierUtils;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
+import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smpserver.data.IDataManager;
 import com.helger.peppol.smpserver.data.dbms.model.DBEndpoint;
 import com.helger.peppol.smpserver.data.dbms.model.DBEndpointID;
@@ -96,7 +97,6 @@ import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.utils.CertificateUtils;
-import com.helger.peppol.utils.ExtensionConverter;
 import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
@@ -262,7 +262,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         // Convert service group DB to service group service
         final ServiceGroupType aServiceGroup = m_aObjFactory.createServiceGroupType ();
         aServiceGroup.setParticipantIdentifier (aServiceGroupID);
-        aServiceGroup.setExtension (ExtensionConverter.convertOrNull (aDBServiceGroup.getExtension ()));
+        aServiceGroup.setExtension (SMPExtensionConverter.convertOrNull (aDBServiceGroup.getExtension ()));
         // This is set by the REST interface:
         // ret.setServiceMetadataReferenceCollection(value)
         return aServiceGroup;
@@ -592,7 +592,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         final RedirectType aRedirect = m_aObjFactory.createRedirectType ();
         aRedirect.setCertificateUID (aDBServiceMetadataRedirection.getCertificateUid ());
         aRedirect.setHref (aDBServiceMetadataRedirection.getRedirectionUrl ());
-        aRedirect.setExtension (ExtensionConverter.convertOrNull (aDBServiceMetadataRedirection.getExtension ()));
+        aRedirect.setExtension (SMPExtensionConverter.convertOrNull (aDBServiceMetadataRedirection.getExtension ()));
         aServiceMetadata.setRedirect (aRedirect);
 
         return aServiceMetadata;
@@ -605,7 +605,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
                                         @Nonnull final ServiceMetadataType aServiceMetadata)
   {
     final ParticipantIdentifierType aBusinessID = aDBServiceMetadata.getId ().asBusinessIdentifier ();
-    final ExtensionType aExtension = ExtensionConverter.convertOrNull (aDBServiceMetadata.getExtension ());
+    final ExtensionType aExtension = SMPExtensionConverter.convertOrNull (aDBServiceMetadata.getExtension ());
 
     final DocumentIdentifierType aDocTypeID = aDBServiceMetadata.getId ().asDocumentTypeIdentifier ();
 
@@ -628,7 +628,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         final EndpointType aEndpointType = m_aObjFactory.createEndpointType ();
 
         aEndpointType.setTransportProfile (aDBEndpoint.getId ().getTransportProfile ());
-        aEndpointType.setExtension (ExtensionConverter.convertOrNull (aDBEndpoint.getExtension ()));
+        aEndpointType.setExtension (SMPExtensionConverter.convertOrNull (aDBEndpoint.getExtension ()));
 
         final W3CEndpointReference endpointRef = W3CEndpointReferenceUtils.createEndpointReference (aDBEndpoint.getId ()
                                                                                                                .getEndpointReference ());
@@ -647,7 +647,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
       }
 
       aProcessType.setServiceEndpointList (endpoints);
-      aProcessType.setExtension (ExtensionConverter.convertOrNull (aDBProcess.getExtension ()));
+      aProcessType.setExtension (SMPExtensionConverter.convertOrNull (aDBProcess.getExtension ()));
       aProcessType.setProcessIdentifier (aDBProcess.getId ().asProcessIdentifier ());
 
       aProcessList.getProcess ().add (aProcessType);
