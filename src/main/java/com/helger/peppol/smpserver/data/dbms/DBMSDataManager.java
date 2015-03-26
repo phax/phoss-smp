@@ -455,12 +455,11 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
     return ret.getOrThrow ();
   }
 
-  public void saveService (@Nonnull final ServiceMetadataType aServiceMetadata,
+  public void saveService (@Nonnull final ServiceInformationType aServiceMetadata,
                            @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    final ParticipantIdentifierType aServiceGroupID = aServiceMetadata.getServiceInformation ()
-                                                                      .getParticipantIdentifier ();
-    final DocumentIdentifierType aDocTypeID = aServiceMetadata.getServiceInformation ().getDocumentIdentifier ();
+    final ParticipantIdentifierType aServiceGroupID = aServiceMetadata.getParticipantIdentifier ();
+    final DocumentIdentifierType aDocTypeID = aServiceMetadata.getDocumentIdentifier ();
 
     _verifyUser (aCredentials);
     _verifyOwnership (aServiceGroupID, aCredentials);
@@ -656,11 +655,10 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
     aServiceInformation.setProcessList (aProcessList);
   }
 
-  private static void _convertFromServiceToDB (@Nonnull final ServiceMetadataType aServiceMetadata,
+  private static void _convertFromServiceToDB (@Nonnull final ServiceInformationType aServiceInformation,
                                                @Nonnull final DBServiceMetadata aDBServiceMetadata)
   {
     // Update it.
-    final ServiceInformationType aServiceInformation = aServiceMetadata.getServiceInformation ();
     aDBServiceMetadata.setExtension (aServiceInformation.getExtension ());
 
     final Set <DBProcess> aDBProcesses = new HashSet <DBProcess> ();

@@ -198,7 +198,7 @@ public class DBEndpoint implements Serializable
   @Transient
   public void setExtension (@Nullable final ExtensionType aExtension)
   {
-    setExtension (SMPExtensionConverter.convert (aExtension));
+    setExtension (SMPExtensionConverter.convertToString (aExtension));
   }
 
   @Column (name = "requireBusinessLevelSignature", nullable = false)

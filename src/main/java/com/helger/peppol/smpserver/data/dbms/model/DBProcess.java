@@ -145,7 +145,7 @@ public class DBProcess implements Serializable
   @Transient
   public void setExtension (@Nullable final ExtensionType aExtension)
   {
-    setExtension (SMPExtensionConverter.convert (aExtension));
+    setExtension (SMPExtensionConverter.convertToString (aExtension));
   }
 
   @OneToMany (fetch = FetchType.LAZY, mappedBy = "process", cascade = { CascadeType.ALL })
