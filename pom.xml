@@ -107,12 +107,12 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-smp-server-library</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-web</artifactId>
-      <version>6.4.1</version>
+      <version>6.4.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
