@@ -97,12 +97,12 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-commons</artifactId>
-      <version>3.0.1</version>
+      <version>3.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-sml-client</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
@@ -153,7 +153,7 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-smp-client</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>

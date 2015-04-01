@@ -49,7 +49,7 @@ import javax.ws.rs.core.UriInfo;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierUtils;
-import com.helger.peppol.smpserver.CSMPServer;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 
 final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
@@ -71,7 +71,7 @@ final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
   public String getServiceGroupHref (@Nonnull final IParticipantIdentifier aServiceGroupID)
   {
     UriBuilder aBuilder = m_aUriInfo.getBaseUriBuilder ();
-    if (CSMPServer.isForceRoot ())
+    if (SMPServerConfiguration.isForceRoot ())
     {
       // Ensure that no context is emitted by using "replacePath" first!
       aBuilder = aBuilder.replacePath ("");
@@ -86,7 +86,7 @@ final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
                                                  @Nonnull final IDocumentTypeIdentifier aDocTypeID)
   {
     UriBuilder aBuilder = m_aUriInfo.getBaseUriBuilder ();
-    if (CSMPServer.isForceRoot ())
+    if (SMPServerConfiguration.isForceRoot ())
     {
       // Ensure that no context is emitted by using "replacePath" first!
       aBuilder = aBuilder.replacePath ("");
