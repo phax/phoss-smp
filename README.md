@@ -1,7 +1,7 @@
 # peppol-smp-server
 A complete PEPPOL SMP server with a database backend (MySQL by default).
 
-Current version: *3.0.0*
+Current version: *3.1.0*
 
 Please provide the classpath to your PEPPOL SMP keystore and the required passwords updating the `smp-server.properties` in the `src/main/resource` folder. Typically you will place the keystore.jks file in a folder that you will add to your applications server classpath. 
 

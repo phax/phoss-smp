@@ -127,12 +127,12 @@
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
-      <version>1.17.1</version>
+      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-servlet</artifactId>
-      <version>1.17.1</version>
+      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
