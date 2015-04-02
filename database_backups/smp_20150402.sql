@@ -72,7 +72,7 @@ DROP TABLE IF EXISTS `smp_process`;
 CREATE TABLE `smp_process` (
   `processIdentifier` varchar(256) NOT NULL,
   `processIdentifierType` varchar(256) NOT NULL,
-  `extension` BLOB,
+  `extension` TEXT NULL DEFAULT NULL,
   `businessIdentifier` varchar(256) NOT NULL,
   `businessIdentifierScheme` varchar(256) NOT NULL,
   `documentIdentifier` varchar(256) NOT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE `smp_service_metadata_redirection` (
   `documentIdentifier` varchar(256) NOT NULL,
   `documentIdentifierScheme` varchar(256) NOT NULL,
   `redirectionUrl` varchar(256) NOT NULL,
-  `extension` TEXT,
+  `extension` TEXT NULL DEFAULT NULL,
   `certificateUID` varchar(256) NOT NULL,
   PRIMARY KEY  (`businessIdentifier`,`businessIdentifierScheme`,`documentIdentifier`,`documentIdentifierScheme`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -154,7 +154,7 @@ DROP TABLE IF EXISTS `smp_endpoint`;
 CREATE TABLE `smp_endpoint` (
   `transportProfile` varchar(256) NOT NULL,
   `endpointReference` varchar(256) NOT NULL,
-  `extension` BLOB,
+  `extension` TEXT NULL DEFAULT NULL,
   `processIdentifier` varchar(256) NOT NULL,
   `processIdentifierType` varchar(256) NOT NULL,
   `businessIdentifier` varchar(256) NOT NULL,
@@ -223,7 +223,7 @@ CREATE TABLE `smp_service_metadata` (
   `documentIdentifierScheme` varchar(256) NOT NULL,
   `businessIdentifier` varchar(256) NOT NULL,
   `businessIdentifierScheme` varchar(256) NOT NULL,
-  `extension` TEXT,
+  `extension` TEXT NULL DEFAULT NULL,
   PRIMARY KEY  (`documentIdentifier`,`documentIdentifierScheme`,`businessIdentifier`,`businessIdentifierScheme`),
   KEY `FK_service_metadata_1` (`businessIdentifier`,`businessIdentifierScheme`),
   CONSTRAINT `FK_service_metadata_1` FOREIGN KEY (`businessIdentifier`, `businessIdentifierScheme`) REFERENCES `smp_service_group` (`businessIdentifier`, `businessIdentifierScheme`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -249,7 +249,7 @@ DROP TABLE IF EXISTS `smp_service_group`;
 CREATE TABLE `smp_service_group` (
   `businessIdentifier` varchar(256) NOT NULL,
   `businessIdentifierScheme` varchar(256) NOT NULL,
-  `extension` BLOB,
+  `extension` TEXT NULL DEFAULT NULL,
   PRIMARY KEY  (`businessIdentifier`,`businessIdentifierScheme`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
