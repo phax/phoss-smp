@@ -39,14 +39,14 @@ The service is configured using a single configuration file `src/main/resources/
   * **`sml.url`**: The URL of the SML manage business identifier service. For production purposes (SML) use `https://sml.peppolcentral.org/manageparticipantidentifier`. For the test-SML (SMK) use the URL `https://smk.peppolcentral.org/manageparticipantidentifier`.
     **Note:** is only required if the entry `sml.active` is set to `true`.
     **Note:** this is the field that needs to be changed for the SML migration on June 9th 2015! 
-  * **jdbc.driver**: The JDBC driver class to be used by JPA. For MySQL use `com.mysql.jdbc.Driver`.
-  * **jdbc.url**: The JDBC URL of the database to connect to. For a local MySQL database called "smp" the string would look like this: `jdbc:mysql://localhost:3306/smp?autoReconnect=true`
+  * **`jdbc.driver`**: The JDBC driver class to be used by JPA. For MySQL use `com.mysql.jdbc.Driver`.
+  * **`jdbc.url`**: The JDBC URL of the database to connect to. For a local MySQL database called "smp" the string would look like this: `jdbc:mysql://localhost:3306/smp?autoReconnect=true`
     **Note:** the URL depends on the JDBC driver used!
-  * **jdbc.user:** The database user to be used when connecting to the database.
-  * **jdbc.password:** The password of the JDBC user to be used when connecting to the DB
-  * **target-database:** The JPA target database type to be used. For MySQL this value should be MySQL
+  * **`jdbc.user`**: The database user to be used when connecting to the database.
+  * **`jdbc.password`**: The password of the JDBC user to be used when connecting to the DB
+  * **`target-database`**: The JPA target database type to be used. For MySQL this value should be MySQL
     **Note:** Please see the documentation of EclipseLink for other target database systems!
-  * **jdbc.read-connections.max:** The maximum number of JDBC connections to be used for reading. Usually 10 should be suitable for most use cases. 
+  * **`jdbc.read-connections.max`**: The maximum number of JDBC connections to be used for reading. Usually 10 should be suitable for most use cases. 
 
 Example of a development `smp-server.properties` file using a local MySQL database called smp without an SML connector (for easy testing):
 ```
