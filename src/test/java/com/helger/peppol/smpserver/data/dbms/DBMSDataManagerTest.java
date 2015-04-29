@@ -313,16 +313,16 @@ public class DBMSDataManagerTest
     final ProcessType aDBProcess = aDBServiceMetadata.getServiceInformation ().getProcessList ().getProcess ().get (0);
     final EndpointType aDBEndpoint = aDBProcess.getServiceEndpointList ().getEndpoint ().get (0);
 
-    assertTrue (IdentifierUtils.areIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
-                                                                       .getDocumentIdentifier (),
-                                                     aDBServiceMetadata.getServiceInformation ()
-                                                                       .getDocumentIdentifier ()));
-    assertTrue (IdentifierUtils.areIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
-                                                                       .getParticipantIdentifier (),
-                                                     aDBServiceMetadata.getServiceInformation ()
-                                                                       .getParticipantIdentifier ()));
-    assertTrue (IdentifierUtils.areIdentifiersEqual (aOrigProcess.getProcessIdentifier (),
-                                                     aDBProcess.getProcessIdentifier ()));
+    assertTrue (IdentifierUtils.areDocumentTypeIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
+                                                                                   .getDocumentIdentifier (),
+                                                                 aDBServiceMetadata.getServiceInformation ()
+                                                                                   .getDocumentIdentifier ()));
+    assertTrue (IdentifierUtils.areParticipantIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
+                                                                                  .getParticipantIdentifier (),
+                                                                aDBServiceMetadata.getServiceInformation ()
+                                                                                  .getParticipantIdentifier ()));
+    assertTrue (IdentifierUtils.areProcessIdentifiersEqual (aOrigProcess.getProcessIdentifier (),
+                                                            aDBProcess.getProcessIdentifier ()));
     assertEquals (aOrigEndpoint.getCertificate (), aDBEndpoint.getCertificate ());
     assertEquals (aOrigEndpoint.getMinimumAuthenticationLevel (), aDBEndpoint.getMinimumAuthenticationLevel ());
     assertEquals (aOrigEndpoint.getServiceDescription (), aDBEndpoint.getServiceDescription ());
