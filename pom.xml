@@ -97,12 +97,12 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-commons</artifactId>
-      <version>3.1.2-SNAPSHOT</version>
+      <version>3.1.2</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-sml-client</artifactId>
-      <version>3.1.2-SNAPSHOT</version>
+      <version>3.1.2</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
@@ -112,7 +112,7 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-web</artifactId>
-      <version>6.4.3-SNAPSHOT</version>
+      <version>6.4.3</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
@@ -122,7 +122,7 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-db-jpa</artifactId>
-      <version>3.3.2-SNAPSHOT</version>
+      <version>3.3.2</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
