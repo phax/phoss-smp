@@ -38,56 +38,27 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.servlet;
+package com.helger.peppol.smpserver.exceptionmapper;
 
-import java.util.TimeZone;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.helger.commons.collections.ArrayHelper;
-import com.helger.commons.exceptions.InitializationException;
-import com.helger.datetime.config.PDTConfig;
+import com.helger.commons.mime.CMimeType;
+import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 
 /**
- * This class is used for setting the timezone so that dates saved to the
- * database are always in UTC.
- *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-@Immutable
-public final class TimeZoneCorrectorListener implements ServletContextListener
+@Provider
+public class SMPUnknownUserExceptionMapper implements ExceptionMapper <SMPUnknownUserException>
 {
-  public static final String DEFAULT_TIMEZONE = "UTC";
-
-  private static final Logger s_aLogger = LoggerFactory.getLogger (TimeZoneCorrectorListener.class);
-
-  public void contextInitialized (@Nonnull final ServletContextEvent aServletContextEvent)
+  public Response toResponse (final SMPUnknownUserException e)
   {
-    // CHeck if the timezone is supported
-    if (!ArrayHelper.contains (TimeZone.getAvailableIDs (), DEFAULT_TIMEZONE))
-    {
-      final String sErrorMsg = "The default time zone '" + DEFAULT_TIMEZONE + "' is not supported!";
-      s_aLogger.error (sErrorMsg);
-      throw new InitializationException (sErrorMsg);
-    }
-
-    // Set the default timezone both in joda as well as in java util Timezone
-    if (PDTConfig.setDefaultDateTimeZoneID (DEFAULT_TIMEZONE).isFailure ())
-    {
-      final String sErrorMsg = "Failed to set default time zone to '" + DEFAULT_TIMEZONE + "'!";
-      s_aLogger.error (sErrorMsg);
-      throw new InitializationException (sErrorMsg);
-    }
-  }
-
-  public void contextDestroyed (@Nonnull final ServletContextEvent aServletContextEvent)
-  {
-    // empty
+    return Response.status (Status.FORBIDDEN)
+                   .entity (e.getMessage ())
+                   .type (CMimeType.TEXT_PLAIN.getAsString ())
+                   .build ();
   }
 }

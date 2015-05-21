@@ -38,25 +38,27 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver;
+package com.helger.peppol.smpserver.exceptionmapper;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-import com.helger.peppol.utils.ConfigFile;
+import com.helger.commons.mime.CMimeType;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 
-@Immutable
-public final class CSMPServer
+/**
+ * @author PEPPOL.AT, BRZ, Philip Helger
+ */
+@Provider
+public class SMPUnauthorizedExceptionMapper implements ExceptionMapper <SMPUnauthorizedException>
 {
-  private static final ConfigFile s_aConfigFile = new ConfigFile ("private-smp-server.properties",
-                                                                  "smp-server.properties");
-
-  private CSMPServer ()
-  {}
-
-  @Nonnull
-  public static ConfigFile getConfigFile ()
+  public Response toResponse (final SMPUnauthorizedException e)
   {
-    return s_aConfigFile;
+    return Response.status (Status.FORBIDDEN)
+                   .entity (e.getMessage ())
+                   .type (CMimeType.TEXT_PLAIN.getAsString ())
+                   .build ();
   }
 }

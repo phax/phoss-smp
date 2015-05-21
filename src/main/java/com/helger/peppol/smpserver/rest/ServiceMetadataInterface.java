@@ -55,20 +55,10 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
 import org.busdox.servicemetadata.publishing._1.ObjectFactory;
-import org.busdox.servicemetadata.publishing._1.ServiceInformationType;
 import org.busdox.servicemetadata.publishing._1.ServiceMetadataType;
 import org.busdox.servicemetadata.publishing._1.SignedServiceMetadataType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.helger.peppol.identifier.DocumentIdentifierType;
-import com.helger.peppol.identifier.IdentifierUtils;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
-import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.data.DataManagerFactory;
-import com.helger.peppol.smpserver.data.IDataManager;
-import com.sun.jersey.api.NotFoundException;
+import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 
 /**
  * This class implements the REST interface for getting SignedServiceMetadata's.
@@ -79,15 +69,13 @@ import com.sun.jersey.api.NotFoundException;
 @Path ("/{ServiceGroupId}/services/{DocumentTypeId}")
 public final class ServiceMetadataInterface
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceMetadataInterface.class);
+  @Context
+  private HttpHeaders m_aHttpHeaders;
 
   @Context
-  private HttpHeaders headers;
-  @Context
-  private UriInfo uriInfo;
+  private UriInfo m_aUriInfo;
 
-  public ServiceMetadataInterface ()
-  {}
+  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
 
   @GET
   // changed Produced media type to match the smp specification.
@@ -95,50 +83,9 @@ public final class ServiceMetadataInterface
   public JAXBElement <SignedServiceMetadataType> getServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                                                          @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
   {
-    s_aLogger.info ("GET /" + sServiceGroupID + "/services/" + sDocumentTypeID);
-
-    final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse participant identifier '" + sServiceGroupID + "'");
-      return null;
-    }
-
-    final DocumentIdentifierType aDocTypeID = IdentifierUtils.createDocumentTypeIdentifierFromURIPartOrNull (sDocumentTypeID);
-    if (aDocTypeID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse document type identifier '" + sDocumentTypeID + "'");
-      return null;
-    }
-
-    try
-    {
-      final ObjectFactory aObjFactory = new ObjectFactory ();
-      final IDataManager aDataManager = DataManagerFactory.getInstance ();
-
-      // First check for redirection, then for actual service
-      ServiceMetadataType aService = aDataManager.getRedirection (aServiceGroupID, aDocTypeID);
-      if (aService == null)
-      {
-        aService = aDataManager.getService (aServiceGroupID, aDocTypeID);
-        if (aService == null)
-          throw new NotFoundException ("service", uriInfo.getAbsolutePath ());
-      }
-
-      final SignedServiceMetadataType aSignedServiceMetadata = aObjFactory.createSignedServiceMetadataType ();
-      aSignedServiceMetadata.setServiceMetadata (aService);
-      // Signature is added by a handler
-
-      s_aLogger.info ("Finished getServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
-      return aObjFactory.createSignedServiceMetadata (aSignedServiceMetadata);
-    }
-    catch (final Throwable ex)
-    {
-      s_aLogger.error ("Error in returning service metadata.", ex);
-      throw ex;
-    }
+    final SignedServiceMetadataType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceRegistration (sServiceGroupID,
+                                                                                                                               sDocumentTypeID);
+    return m_aObjFactory.createSignedServiceMetadata (ret);
   }
 
   @PUT
@@ -146,105 +93,24 @@ public final class ServiceMetadataInterface
                                            @PathParam ("DocumentTypeId") final String sDocumentTypeID,
                                            final ServiceMetadataType aServiceMetadata) throws Throwable
   {
-    s_aLogger.info ("PUT /" + sServiceGroupID + "/services/" + sDocumentTypeID + " ==> " + aServiceMetadata);
-
-    final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse participant identifier '" + sServiceGroupID + "'");
+    if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).saveServiceRegistration (sServiceGroupID,
+                                                                                              sDocumentTypeID,
+                                                                                              aServiceMetadata,
+                                                                                              RestRequestHelper.getAuth (m_aHttpHeaders))
+                                                                    .isFailure ())
       return Response.status (Status.BAD_REQUEST).build ();
-    }
-
-    final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
-    if (aDocTypeID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse document type identifier '" + sDocumentTypeID + "'");
-      return null;
-    }
-
-    try
-    {
-      final ServiceInformationType aServiceInformationType = aServiceMetadata.getServiceInformation ();
-
-      // Business identifiers from path (ServiceGroupID) and from service
-      // metadata (body) must equal path
-      if (!IdentifierUtils.areIdentifiersEqual (aServiceInformationType.getParticipantIdentifier (), aServiceGroupID))
-      {
-        s_aLogger.info ("Save service metadata was called with bad parameters. serviceInfo:" +
-                        IdentifierUtils.getIdentifierURIEncoded (aServiceInformationType.getParticipantIdentifier ()) +
-                        " param:" +
-                        aServiceGroupID);
-        return Response.status (Status.BAD_REQUEST).build ();
-      }
-
-      if (!IdentifierUtils.areIdentifiersEqual (aServiceInformationType.getDocumentIdentifier (), aDocTypeID))
-      {
-        s_aLogger.info ("Save service metadata was called with bad parameters. serviceInfo:" +
-                        IdentifierUtils.getIdentifierURIEncoded (aServiceInformationType.getDocumentIdentifier ()) +
-                        " param:" +
-                        aDocTypeID);
-        // Document type must equal path
-        return Response.status (Status.BAD_REQUEST).build ();
-      }
-
-      // Main save
-      final IDataManager aDataManager = DataManagerFactory.getInstance ();
-      aDataManager.saveService (aServiceMetadata, RestRequestHelper.getAuth (headers));
-
-      s_aLogger.info ("Finished saveServiceRegistration(" +
-                      sServiceGroupID +
-                      "," +
-                      sDocumentTypeID +
-                      "," +
-                      aServiceMetadata +
-                      ")");
-
-      return Response.ok ().build ();
-    }
-    catch (final Throwable ex)
-    {
-      s_aLogger.error ("Error in saving Service metadata.", ex);
-      throw ex;
-    }
+    return Response.ok ().build ();
   }
 
   @DELETE
   public Response deleteServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                              @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
   {
-    s_aLogger.info ("DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID);
-
-    final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse participant identifier '" + sServiceGroupID + "'");
+    if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).deleteServiceRegistration (sServiceGroupID,
+                                                                                                sDocumentTypeID,
+                                                                                                RestRequestHelper.getAuth (m_aHttpHeaders))
+                                                                    .isFailure ())
       return Response.status (Status.BAD_REQUEST).build ();
-    }
-
-    final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
-    if (aDocTypeID == null)
-    {
-      // Invalid identifier
-      s_aLogger.info ("Failed to parse document type identifier '" + sDocumentTypeID + "'");
-      return null;
-    }
-
-    try
-    {
-      final IDataManager aDataManager = DataManagerFactory.getInstance ();
-      aDataManager.deleteService (aServiceGroupID, aDocTypeID, RestRequestHelper.getAuth (headers));
-
-      s_aLogger.info ("Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID);
-
-      return Response.ok ().build ();
-    }
-    catch (final Throwable ex)
-    {
-      s_aLogger.error ("Error in deleting Service metadata.", ex);
-      throw ex;
-    }
+    return Response.ok ().build ();
   }
 }

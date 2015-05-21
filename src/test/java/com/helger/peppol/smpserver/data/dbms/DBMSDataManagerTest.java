@@ -72,15 +72,13 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppol.smpserver.data.dbms.DBMSDataManager;
-import com.helger.peppol.smpserver.data.dbms.SMPEntityManagerFactory;
-import com.helger.peppol.smpserver.exception.UnauthorizedException;
-import com.helger.peppol.smpserver.exception.UnknownUserException;
+import com.helger.peppol.smp.SMPExtensionConverter;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
+import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookDoNothing;
-import com.helger.peppol.utils.ExtensionConverter;
 import com.helger.peppol.utils.W3CEndpointReferenceUtils;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
-import com.sun.jersey.api.NotFoundException;
 
 /**
  * @author PEPPOL.AT, BRZ, Philip Helger
@@ -147,7 +145,7 @@ public class DBMSDataManagerTest
   @Before
   public void beforeTest () throws Throwable
   {
-    final ExtensionType aExtension = ExtensionConverter.convert ("<root><any>value</any></root>");
+    final ExtensionType aExtension = SMPExtensionConverter.convertOrNull ("<root><any>value</any></root>");
     assertNotNull (aExtension);
     assertNotNull (aExtension.getAny ());
 
@@ -160,7 +158,7 @@ public class DBMSDataManagerTest
     {
       s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, CREDENTIALS);
     }
-    catch (final NotFoundException ex)
+    catch (final SMPNotFoundException ex)
     {}
 
     // Create a new one
@@ -230,7 +228,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.saveServiceGroup (m_aServiceGroup, aCredentials);
       fail ();
     }
-    catch (final UnauthorizedException ex)
+    catch (final SMPUnauthorizedException ex)
     {}
   }
 
@@ -245,7 +243,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.saveServiceGroup (m_aServiceGroup, aCredentials);
       fail ();
     }
-    catch (final UnknownUserException ex)
+    catch (final SMPUnknownUserException ex)
     {}
   }
 
@@ -265,7 +263,7 @@ public class DBMSDataManagerTest
     {
       s_aDataMgr.deleteServiceGroup (aServiceGroupID2, CREDENTIALS);
     }
-    catch (final NotFoundException ex)
+    catch (final SMPNotFoundException ex)
     {}
     assertNull (s_aDataMgr.getServiceGroup (aServiceGroupID2));
   }
@@ -279,7 +277,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aCredentials);
       fail ();
     }
-    catch (final UnknownUserException ex)
+    catch (final SMPUnknownUserException ex)
     {}
   }
 
@@ -292,7 +290,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aCredentials);
       fail ();
     }
-    catch (final UnauthorizedException ex)
+    catch (final SMPUnauthorizedException ex)
     {}
   }
 
@@ -300,7 +298,7 @@ public class DBMSDataManagerTest
   public void testCreateServiceMetadata () throws Throwable
   {
     // Save to DB
-    s_aDataMgr.saveService (m_aServiceMetadata, CREDENTIALS);
+    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), CREDENTIALS);
 
     // Retrieve from DB
     final ServiceMetadataType aDBServiceMetadata = s_aDataMgr.getService (SERVICEGROUP_ID, DOCTYPE_ID);
@@ -315,16 +313,16 @@ public class DBMSDataManagerTest
     final ProcessType aDBProcess = aDBServiceMetadata.getServiceInformation ().getProcessList ().getProcess ().get (0);
     final EndpointType aDBEndpoint = aDBProcess.getServiceEndpointList ().getEndpoint ().get (0);
 
-    assertTrue (IdentifierUtils.areIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
-                                                                       .getDocumentIdentifier (),
-                                                     aDBServiceMetadata.getServiceInformation ()
-                                                                       .getDocumentIdentifier ()));
-    assertTrue (IdentifierUtils.areIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
-                                                                       .getParticipantIdentifier (),
-                                                     aDBServiceMetadata.getServiceInformation ()
-                                                                       .getParticipantIdentifier ()));
-    assertTrue (IdentifierUtils.areIdentifiersEqual (aOrigProcess.getProcessIdentifier (),
-                                                     aDBProcess.getProcessIdentifier ()));
+    assertTrue (IdentifierUtils.areDocumentTypeIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
+                                                                                   .getDocumentIdentifier (),
+                                                                 aDBServiceMetadata.getServiceInformation ()
+                                                                                   .getDocumentIdentifier ()));
+    assertTrue (IdentifierUtils.areParticipantIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
+                                                                                  .getParticipantIdentifier (),
+                                                                aDBServiceMetadata.getServiceInformation ()
+                                                                                  .getParticipantIdentifier ()));
+    assertTrue (IdentifierUtils.areProcessIdentifiersEqual (aOrigProcess.getProcessIdentifier (),
+                                                            aDBProcess.getProcessIdentifier ()));
     assertEquals (aOrigEndpoint.getCertificate (), aDBEndpoint.getCertificate ());
     assertEquals (aOrigEndpoint.getMinimumAuthenticationLevel (), aDBEndpoint.getMinimumAuthenticationLevel ());
     assertEquals (aOrigEndpoint.getServiceDescription (), aDBEndpoint.getServiceDescription ());
@@ -341,10 +339,10 @@ public class DBMSDataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials ("Unknown_User", PASSWORD);
     try
     {
-      s_aDataMgr.saveService (m_aServiceMetadata, aCredentials);
+      s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aCredentials);
       fail ();
     }
-    catch (final UnknownUserException ex)
+    catch (final SMPUnknownUserException ex)
     {}
   }
 
@@ -354,10 +352,10 @@ public class DBMSDataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials (USERNAME, "WrongPassword");
     try
     {
-      s_aDataMgr.saveService (m_aServiceMetadata, aCredentials);
+      s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aCredentials);
       fail ();
     }
-    catch (final UnauthorizedException ex)
+    catch (final SMPUnauthorizedException ex)
     {}
   }
 
@@ -365,7 +363,7 @@ public class DBMSDataManagerTest
   public void testPrintServiceMetadata () throws Throwable
   {
     // Ensure something is present :)
-    s_aDataMgr.saveService (m_aServiceMetadata, CREDENTIALS);
+    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), CREDENTIALS);
     System.out.println (s_aDataMgr.getService (SERVICEGROUP_ID, DOCTYPE_ID));
   }
 
@@ -373,7 +371,7 @@ public class DBMSDataManagerTest
   public void testDeleteServiceMetadata () throws Throwable
   {
     // Ensure something is present :)
-    s_aDataMgr.saveService (m_aServiceMetadata, CREDENTIALS);
+    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), CREDENTIALS);
 
     // First deletion succeeds
     s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, CREDENTIALS);
@@ -383,7 +381,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, CREDENTIALS);
       fail ();
     }
-    catch (final NotFoundException ex)
+    catch (final SMPNotFoundException ex)
     {}
   }
 
@@ -396,7 +394,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aCredentials);
       fail ();
     }
-    catch (final UnknownUserException ex)
+    catch (final SMPUnknownUserException ex)
     {}
   }
 
@@ -409,7 +407,7 @@ public class DBMSDataManagerTest
       s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aCredentials);
       fail ();
     }
-    catch (final UnauthorizedException ex)
+    catch (final SMPUnauthorizedException ex)
     {}
   }
 }

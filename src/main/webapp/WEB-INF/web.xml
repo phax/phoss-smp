@@ -47,9 +47,6 @@
   <display-name>PEPPOL SMP REST service (read &amp; write)</display-name>
 
   <listener>
-    <listener-class>com.helger.peppol.smpserver.servlet.LogStartupListener</listener-class>
-  </listener>
-  <listener>
     <listener-class>com.helger.peppol.smpserver.servlet.TimeZoneCorrectorListener</listener-class>
   </listener>
 
@@ -66,16 +63,6 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
-  <!-- SML handling: filter -->
-  <filter>
-    <filter-name>registrationhook</filter-name>
-    <filter-class>com.helger.peppol.smpserver.servlet.PostRegistrationFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>registrationhook</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
   <filter>
     <filter-name>RestFilter</filter-name>
     <filter-class>com.sun.jersey.spi.container.servlet.ServletContainer</filter-class>
@@ -86,7 +73,7 @@
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
       <!-- add package separated by ";" -->
-      <param-value>com.helger.peppol.smpserver.rest;com.helger.peppol.smpserver.exception</param-value>
+      <param-value>com.helger.peppol.smpserver.rest;com.helger.peppol.smpserver.exceptionmapper</param-value>
     </init-param>
     <init-param>
       <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>

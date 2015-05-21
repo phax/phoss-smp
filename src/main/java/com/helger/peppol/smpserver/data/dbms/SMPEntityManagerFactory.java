@@ -50,7 +50,7 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 import com.helger.commons.annotations.ReturnsMutableCopy;
 import com.helger.commons.annotations.UsedViaReflection;
 import com.helger.db.jpa.AbstractGlobalEntityManagerFactory;
-import com.helger.peppol.smpserver.CSMPServer;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.ConfigFile;
 
 /**
@@ -65,7 +65,7 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
   private static Map <String, Object> _createPropertiesMap ()
   {
     // Standard configuration file
-    final ConfigFile aConfigFile = CSMPServer.getConfigFile ();
+    final ConfigFile aConfigFile = SMPServerConfiguration.getConfigFile ();
 
     final Map <String, Object> ret = new HashMap <String, Object> ();
     // Read all properties from the standard configuration file
@@ -93,11 +93,11 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
   @UsedViaReflection
   public SMPEntityManagerFactory ()
   {
-    super (CSMPServer.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_JDBC_DRIVER),
-           CSMPServer.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_JDBC_URL),
-           CSMPServer.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_JDBC_USER),
-           CSMPServer.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_JDBC_PASSWORD),
-           CSMPServer.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_TARGET_DATABASE),
+    super (SMPServerConfiguration.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_JDBC_DRIVER),
+           SMPServerConfiguration.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_JDBC_URL),
+           SMPServerConfiguration.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_JDBC_USER),
+           SMPServerConfiguration.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_JDBC_PASSWORD),
+           SMPServerConfiguration.getConfigFile ().getString (SMPJPAConfiguration.CONFIG_TARGET_DATABASE),
            "peppol-smp",
            _createPropertiesMap ());
   }

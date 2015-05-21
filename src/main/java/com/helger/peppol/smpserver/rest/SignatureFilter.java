@@ -40,21 +40,12 @@
  */
 package com.helger.peppol.smpserver.rest;
 
-import java.security.KeyStore;
-import java.security.cert.X509Certificate;
-
 import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.charset.CCharset;
-import com.helger.commons.exceptions.InitializationException;
-import com.helger.commons.io.streams.StringInputStream;
-import com.helger.peppol.smpserver.CSMPServer;
-import com.helger.peppol.utils.ConfigFile;
-import com.helger.peppol.utils.KeyStoreUtils;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -67,79 +58,10 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
  */
 public final class SignatureFilter implements ContainerResponseFilter
 {
-  public static final String CONFIG_XMLDSIG_KEYSTORE_CLASSPATH = "xmldsig.keystore.classpath";
-  public static final String CONFIG_XMLDSIG_KEYSTORE_PASSWORD = "xmldsig.keystore.password";
-  public static final String CONFIG_XMLDSIG_KEYSTORE_KEY_ALIAS = "xmldsig.keystore.key.alias";
-  public static final String CONFIG_XMLDSIG_KEYSTORE_KEY_PASSWORD = "xmldsig.keystore.key.password";
-
   private static final Logger s_aLogger = LoggerFactory.getLogger (SignatureFilter.class);
 
-  private KeyStore.PrivateKeyEntry m_aKeyEntry;
-  private X509Certificate m_aCert;
-
   public SignatureFilter ()
-  {
-    // Load the KeyStore and get the signing key and certificate.
-    try
-    {
-      final ConfigFile aConfigFile = CSMPServer.getConfigFile ();
-      final String sKeyStoreClassPath = aConfigFile.getString (CONFIG_XMLDSIG_KEYSTORE_CLASSPATH);
-      final String sKeyStorePassword = aConfigFile.getString (CONFIG_XMLDSIG_KEYSTORE_PASSWORD);
-      final String sKeyStoreKeyAlias = aConfigFile.getString (CONFIG_XMLDSIG_KEYSTORE_KEY_ALIAS);
-      final char [] aKeyStoreKeyPassword = aConfigFile.getCharArray (CONFIG_XMLDSIG_KEYSTORE_KEY_PASSWORD);
-
-      final KeyStore aKeyStore = KeyStoreUtils.loadKeyStore (sKeyStoreClassPath, sKeyStorePassword);
-      final KeyStore.Entry aEntry = aKeyStore.getEntry (sKeyStoreKeyAlias,
-                                                        new KeyStore.PasswordProtection (aKeyStoreKeyPassword));
-      if (aEntry == null)
-      {
-        // Alias not found
-        throw new IllegalStateException ("Failed to find key store alias '" +
-                                         sKeyStoreKeyAlias +
-                                         "' in keystore '" +
-                                         sKeyStorePassword +
-                                         "'. Does the alias exist? Is the password correct?");
-      }
-      if (!(aEntry instanceof KeyStore.PrivateKeyEntry))
-      {
-        // Not a private key
-        throw new IllegalStateException ("The keystore alias '" +
-                                         sKeyStoreKeyAlias +
-                                         "' was found in keystore '" +
-                                         sKeyStorePassword +
-                                         "' but it is not a private key! The internal type is " +
-                                         aEntry.getClass ().getName ());
-      }
-      m_aKeyEntry = (KeyStore.PrivateKeyEntry) aEntry;
-      m_aCert = (X509Certificate) m_aKeyEntry.getCertificate ();
-      s_aLogger.info ("Signature filter initialized with keystore '" +
-                      sKeyStoreClassPath +
-                      "' and alias '" +
-                      sKeyStoreKeyAlias +
-                      "'");
-
-      if (false)
-      {
-        // Enable XMLDsig debugging
-        java.util.logging.LogManager.getLogManager ()
-                                    .readConfiguration (new StringInputStream ("handlers=java.util.logging.ConsoleHandler\r\n"
-                                                                                   + ".level=FINEST\r\n"
-                                                                                   + "java.util.logging.ConsoleHandler.level=FINEST\r\n"
-                                                                                   + "java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter",
-                                                                               CCharset.CHARSET_ISO_8859_1_OBJ));
-        java.util.logging.Logger.getLogger ("org.jcp.xml.dsig.internal.level").setLevel (java.util.logging.Level.FINER);
-        java.util.logging.Logger.getLogger ("org.apache.xml.internal.security.level")
-                                .setLevel (java.util.logging.Level.FINER);
-        java.util.logging.Logger.getLogger ("com.sun.org.apache.xml.internal.security.level")
-                                .setLevel (java.util.logging.Level.FINER);
-      }
-    }
-    catch (final Throwable t)
-    {
-      s_aLogger.error ("Error in constructor of SignatureFilter", t);
-      throw new InitializationException ("Error in constructor of SignatureFilter", t);
-    }
-  }
+  {}
 
   @Nonnull
   public ContainerResponse filter (@Nonnull final ContainerRequest aRequest, @Nonnull final ContainerResponse aResponse)
@@ -154,9 +76,7 @@ public final class SignatureFilter implements ContainerResponseFilter
         if (s_aLogger.isDebugEnabled ())
           s_aLogger.debug ("Will sign response to " + sRequestPath);
 
-        aResponse.setContainerResponseWriter (new SigningContainerResponseWriter (aResponse.getContainerResponseWriter (),
-                                                                                  m_aKeyEntry,
-                                                                                  m_aCert));
+        aResponse.setContainerResponseWriter (new SigningContainerResponseWriter (aResponse.getContainerResponseWriter ()));
       }
     }
 

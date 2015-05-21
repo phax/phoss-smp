@@ -40,39 +40,60 @@
  */
 package com.helger.peppol.smpserver.rest;
 
-import java.util.List;
+import java.net.URI;
 
 import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
-import com.helger.commons.collections.CollectionHelper;
-import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
-import com.helger.web.http.basicauth.BasicAuthClientCredentials;
-import com.helger.web.http.basicauth.HTTPBasicAuth;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.IdentifierUtils;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 
-/**
- * This class is used for retrieving the HTTP BASIC AUTH header from the HTTP
- * Authorization Header.
- *
- * @author PEPPOL.AT, BRZ, Philip Helger
- */
-@Immutable
-final class RestRequestHelper
+final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
 {
-  private RestRequestHelper ()
-  {}
+  private final UriInfo m_aUriInfo;
+
+  public SMPServerAPIDataProvider (@Nonnull final UriInfo aUriInfo)
+  {
+    m_aUriInfo = aUriInfo;
+  }
 
   @Nonnull
-  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders aHttpHeaders) throws SMPUnauthorizedException
+  public URI getCurrentURI ()
   {
-    final List <String> aHeaders = aHttpHeaders.getRequestHeader (HttpHeaders.AUTHORIZATION);
-    if (CollectionHelper.isEmpty (aHeaders))
-      throw new SMPUnauthorizedException ("Missing required HTTP header '" +
-                                       HttpHeaders.AUTHORIZATION +
-                                       "' for user authentication");
+    return m_aUriInfo.getAbsolutePath ();
+  }
 
-    final String sAuthHeader = CollectionHelper.getFirstElement (aHeaders);
-    return HTTPBasicAuth.getBasicAuthClientCredentials (sAuthHeader);
+  @Nonnull
+  public String getServiceGroupHref (@Nonnull final IParticipantIdentifier aServiceGroupID)
+  {
+    UriBuilder aBuilder = m_aUriInfo.getBaseUriBuilder ();
+    if (SMPServerConfiguration.isForceRoot ())
+    {
+      // Ensure that no context is emitted by using "replacePath" first!
+      aBuilder = aBuilder.replacePath ("");
+    }
+    return aBuilder.path (ServiceGroupInterface.class)
+                   .buildFromEncoded (IdentifierUtils.getIdentifierURIPercentEncoded (aServiceGroupID))
+                   .toString ();
+  }
+
+  @Nonnull
+  public String getServiceMetadataReferenceHref (@Nonnull final IParticipantIdentifier aServiceGroupID,
+                                                 @Nonnull final IDocumentTypeIdentifier aDocTypeID)
+  {
+    UriBuilder aBuilder = m_aUriInfo.getBaseUriBuilder ();
+    if (SMPServerConfiguration.isForceRoot ())
+    {
+      // Ensure that no context is emitted by using "replacePath" first!
+      aBuilder = aBuilder.replacePath ("");
+    }
+    return aBuilder.path (ServiceMetadataInterface.class)
+                   .buildFromEncoded (IdentifierUtils.getIdentifierURIPercentEncoded (aServiceGroupID),
+                                      IdentifierUtils.getIdentifierURIPercentEncoded (aDocTypeID))
+                   .toString ();
   }
 }
