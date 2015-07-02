@@ -45,8 +45,8 @@ import javax.annotation.concurrent.Immutable;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
-import com.helger.commons.GlobalDebug;
-import com.helger.commons.annotations.PresentForCodeCoverage;
+import com.helger.commons.annotation.PresentForCodeCoverage;
+import com.helger.commons.debug.GlobalDebug;
 
 /**
  * Default JPA configuration file properties

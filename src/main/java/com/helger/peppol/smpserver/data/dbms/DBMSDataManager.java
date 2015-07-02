@@ -65,13 +65,13 @@ import org.busdox.servicemetadata.publishing._1.ServiceMetadataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.GlobalDebug;
 import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.annotations.ReturnsMutableCopy;
-import com.helger.commons.callback.LoggingExceptionHandler;
+import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.callback.exception.LoggingExceptionCallback;
+import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.state.EChange;
-import com.helger.db.jpa.IEntityManagerProvider;
+import com.helger.db.jpa.IHasEntityManager;
 import com.helger.db.jpa.JPAEnabledManager;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.DocumentIdentifierType;
@@ -121,7 +121,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
 
   public DBMSDataManager (@Nonnull final IRegistrationHook aHook)
   {
-    super (new IEntityManagerProvider ()
+    super (new IHasEntityManager ()
     {
       // This additional indirection level is required!!!
       // So that for every request the correct getInstance is invoked!
@@ -135,7 +135,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
     ValueEnforcer.notNull (aHook, "Hook");
 
     // Exceptions are handled by logging them
-    setCustomExceptionHandler (new LoggingExceptionHandler ());
+    setCustomExceptionCallback (new LoggingExceptionCallback ());
 
     // To avoid some EclipseLink logging issues
     setUseTransactionsForSelect (true);
@@ -159,7 +159,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
    */
   @Nonnull
   private DBUser _verifyUser (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnknownUserException,
-                                                                                     SMPUnauthorizedException
+                                                                                      SMPUnauthorizedException
   {
     final String sUsername = aCredentials.getUserName ();
     final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUsername);

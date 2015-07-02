@@ -42,15 +42,20 @@ package com.helger.peppol.smpserver;
 
 import org.junit.Test;
 
-import com.helger.commons.mock.PHTestUtils;
-import com.helger.webbasics.mock.WebBasicValidator;
+import com.helger.commons.mock.CommonsTestHelper;
+import com.helger.photon.core.mock.PhotonCoreValidator;
 
+/**
+ * Test SPI definitions and web.xml content
+ * 
+ * @author Philip Helger
+ */
 public final class SPITest
 {
   @Test
   public void testBasic () throws Exception
   {
-    PHTestUtils.testIfAllSPIImplementationsAreValid ();
-    WebBasicValidator.validateExternalResources ();
+    CommonsTestHelper.testIfAllSPIImplementationsAreValid ();
+    PhotonCoreValidator.validateExternalResources ();
   }
 }

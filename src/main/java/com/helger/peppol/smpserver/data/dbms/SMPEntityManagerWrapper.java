@@ -43,7 +43,7 @@ package com.helger.peppol.smpserver.data.dbms;
 import javax.annotation.Nonnull;
 import javax.persistence.EntityManager;
 
-import com.helger.commons.annotations.UsedViaReflection;
+import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.db.jpa.AbstractPerRequestEntityManager;
 
 /**

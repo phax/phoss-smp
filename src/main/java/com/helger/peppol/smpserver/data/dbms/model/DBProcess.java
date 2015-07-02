@@ -60,7 +60,7 @@ import javax.persistence.Transient;
 
 import org.busdox.servicemetadata.publishing._1.ExtensionType;
 
-import com.helger.commons.annotations.UsedViaReflection;
+import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.peppol.smp.SMPExtensionConverter;
 
 /**

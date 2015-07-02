@@ -47,9 +47,9 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Transient;
 
-import com.helger.commons.annotations.UsedViaReflection;
-import com.helger.commons.equals.EqualsUtils;
-import com.helger.commons.hash.HashCodeGenerator;
+import com.helger.commons.annotation.UsedViaReflection;
+import com.helger.commons.equals.EqualsHelper;
+import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.IReadonlyDocumentTypeIdentifier;
@@ -209,14 +209,14 @@ public class DBEndpointID implements Serializable
     if (o == null || !getClass ().equals (o.getClass ()))
       return false;
     final DBEndpointID rhs = (DBEndpointID) o;
-    return EqualsUtils.equals (m_sParticipantIdentifierScheme, rhs.m_sParticipantIdentifierScheme) &&
-           EqualsUtils.equals (m_sParticipantIdentifier, rhs.m_sParticipantIdentifier) &&
-           EqualsUtils.equals (m_sDocumentTypeIdentifierScheme, rhs.m_sDocumentTypeIdentifierScheme) &&
-           EqualsUtils.equals (m_sDocumentTypeIdentifier, rhs.m_sDocumentTypeIdentifier) &&
-           EqualsUtils.equals (m_sProcessIdentifierScheme, rhs.m_sProcessIdentifierScheme) &&
-           EqualsUtils.equals (m_sProcessIdentifier, rhs.m_sProcessIdentifier) &&
-           EqualsUtils.equals (m_sEndpointReference, rhs.m_sEndpointReference) &&
-           EqualsUtils.equals (m_sTransportProfile, rhs.m_sTransportProfile);
+    return EqualsHelper.equals (m_sParticipantIdentifierScheme, rhs.m_sParticipantIdentifierScheme) &&
+           EqualsHelper.equals (m_sParticipantIdentifier, rhs.m_sParticipantIdentifier) &&
+           EqualsHelper.equals (m_sDocumentTypeIdentifierScheme, rhs.m_sDocumentTypeIdentifierScheme) &&
+           EqualsHelper.equals (m_sDocumentTypeIdentifier, rhs.m_sDocumentTypeIdentifier) &&
+           EqualsHelper.equals (m_sProcessIdentifierScheme, rhs.m_sProcessIdentifierScheme) &&
+           EqualsHelper.equals (m_sProcessIdentifier, rhs.m_sProcessIdentifier) &&
+           EqualsHelper.equals (m_sEndpointReference, rhs.m_sEndpointReference) &&
+           EqualsHelper.equals (m_sTransportProfile, rhs.m_sTransportProfile);
   }
 
   @Override

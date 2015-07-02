@@ -46,7 +46,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import javax.ws.rs.core.HttpHeaders;
 
-import com.helger.commons.collections.CollectionHelper;
+import com.helger.commons.collection.CollectionHelper;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 import com.helger.web.http.basicauth.HTTPBasicAuth;

@@ -61,8 +61,8 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import com.helger.commons.annotations.DevelopersNote;
-import com.helger.commons.scopes.mock.ScopeTestRule;
+import com.helger.commons.annotation.DevelopersNote;
+import com.helger.commons.scope.mock.ScopeTestRule;
 import com.helger.datetime.PDTFactory;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.DocumentIdentifierType;

@@ -48,7 +48,7 @@
     <version>1.4.0</version>
   </parent>
   <artifactId>peppol-smp-server</artifactId>
-  <version>3.1.3-SNAPSHOT</version>
+  <version>4.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>peppol-smp-server</name>
   <description>SMP webapp with all available features (read &amp; write)</description>
@@ -90,39 +90,39 @@
   </developers>
   
   <properties>
-    <log4j.version>2.2</log4j.version>
+    <log4j.version>2.3</log4j.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-commons</artifactId>
-      <version>3.1.3</version>
+      <version>4.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-sml-client</artifactId>
-      <version>3.1.3</version>
+      <version>4.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-smp-server-library</artifactId>
-      <version>3.1.3</version>
+      <version>4.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-web</artifactId>
-      <version>6.4.3</version>
+      <version>7.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-db-api</artifactId>
-      <version>1.1.0</version>
+      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-db-jpa</artifactId>
-      <version>3.3.2</version>
+      <version>4.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
@@ -153,35 +153,31 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-smp-client</artifactId>
-      <version>3.1.3</version>
+      <version>4.0.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
-    <!-- Must be 1.6 for SMP -->
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-webbasics</artifactId>
-      <version>4.0.2</version>
+      <artifactId>ph-oton-core</artifactId>
+      <version>6.0.0-SNAPSHOT</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>8.1.16.v20140903</version>
+      <version>9.2.11.v20150529</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mortbay.jetty</groupId>
-      <artifactId>jsp-2.1-glassfish</artifactId>
-      <version>2.1.v20100127</version>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-jsp</artifactId>
+      <version>9.2.11.v20150529</version>
       <scope>test</scope>
-    </dependency>
-   
-    <!-- Must be after Jetty -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.0.1</version><!--$NO-MVN-MAN-VER$-->
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -200,5 +196,15 @@
         <targetPath>${project.build.directory}/webapp-classes</targetPath>
       </resource>
     </resources>
-  </build>  
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+    </plugins>  
+  </build>
 </project>

@@ -50,14 +50,14 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 
-import com.helger.commons.io.streams.NonBlockingByteArrayOutputStream;
-import com.helger.commons.io.streams.StreamUtils;
-import com.helger.commons.xml.EXMLIncorrectCharacterHandling;
-import com.helger.commons.xml.serialize.DOMReader;
-import com.helger.commons.xml.serialize.EXMLSerializeIndent;
-import com.helger.commons.xml.serialize.IXMLWriterSettings;
-import com.helger.commons.xml.serialize.XMLWriter;
-import com.helger.commons.xml.serialize.XMLWriterSettings;
+import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
+import com.helger.commons.io.stream.StreamHelper;
+import com.helger.commons.xml.serialize.read.DOMReader;
+import com.helger.commons.xml.serialize.write.EXMLIncorrectCharacterHandling;
+import com.helger.commons.xml.serialize.write.EXMLSerializeIndent;
+import com.helger.commons.xml.serialize.write.IXMLWriterSettings;
+import com.helger.commons.xml.serialize.write.XMLWriter;
+import com.helger.commons.xml.serialize.write.XMLWriterSettings;
 import com.helger.commons.xml.transform.XMLTransformerFactory;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -75,7 +75,8 @@ final class SigningContainerResponseWriter implements ContainerResponseWriter
   }
 
   @Nonnull
-  public OutputStream writeStatusAndHeaders (final long nContentLength, final ContainerResponse aResponse) throws IOException
+  public OutputStream writeStatusAndHeaders (final long nContentLength,
+                                             final ContainerResponse aResponse) throws IOException
   {
     m_aResponse = aResponse;
     m_aBAOS = new NonBlockingByteArrayOutputStream ();
@@ -134,7 +135,7 @@ final class SigningContainerResponseWriter implements ContainerResponseWriter
       }
       finally
       {
-        StreamUtils.close (aOS);
+        StreamHelper.close (aOS);
       }
     }
   }

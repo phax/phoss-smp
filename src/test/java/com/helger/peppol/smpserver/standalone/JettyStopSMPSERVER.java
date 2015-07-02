@@ -58,16 +58,14 @@ public final class JettyStopSMPSERVER
 
   public static void main (final String [] args) throws IOException
   {
-    try
+    try (final Socket s = new Socket (InetAddress.getByName (null), JettyMonitor.STOP_PORT))
     {
-      final Socket s = new Socket (InetAddress.getByName (null), JettyMonitor.STOP_PORT);
       s.setSoLinger (false, 0);
 
       final OutputStream out = s.getOutputStream ();
       s_aLogger.info ("Sending jetty stop request");
       out.write ((JettyMonitor.STOP_KEY + "\r\nstop\r\n").getBytes ());
       out.flush ();
-      s.close ();
     }
     catch (final ConnectException ex)
     {

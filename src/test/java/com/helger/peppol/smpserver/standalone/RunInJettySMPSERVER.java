@@ -44,13 +44,13 @@ import java.io.File;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.SystemProperties;
+import com.helger.commons.system.SystemProperties;
 
 /**
  * Run this as an application and your SML will be up and running on port 8080
@@ -74,11 +74,11 @@ public final class RunInJettySMPSERVER
 
     // Create main server
     final Server aServer = new Server ();
-    // Create connector on Port 80 - must be 80 according to PEPPOL specs!
-    final Connector aConnector = new SelectChannelConnector ();
+    // Create connector on Port
+    final ServerConnector aConnector = new ServerConnector (aServer);
     aConnector.setPort (80);
-    aConnector.setMaxIdleTime (30000);
-    aConnector.setStatsOn (true);
+    aConnector.setIdleTimeout (30000);
+    // aConnector.setStatsOn (true);
     aServer.setConnectors (new Connector [] { aConnector });
 
     final WebAppContext aWebAppCtx = new WebAppContext ();
@@ -94,12 +94,6 @@ public final class RunInJettySMPSERVER
     // Stops the server when ctrl+c is pressed (registers to
     // Runtime.addShutdownHook)
     aServer.setStopAtShutdown (true);
-    // Send the server version in the response header?
-    aServer.setSendServerVersion (true);
-    // Send the date header in the response header?
-    aServer.setSendDateHeader (true);
-    // Allows requests (prior to shutdown) to finish gracefully
-    aServer.setGracefulShutdown (1000);
     // Starting shutdown listener thread
     new JettyMonitor ().start ();
     try

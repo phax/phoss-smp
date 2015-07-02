@@ -84,11 +84,8 @@ public final class JettyMonitor extends Thread
   {
     while (true)
     {
-      Socket aSocket = null;
-      try
+      try (final Socket aSocket = m_aServerSocket.accept ())
       {
-        aSocket = m_aServerSocket.accept ();
-
         final LineNumberReader lin = new LineNumberReader (new InputStreamReader (aSocket.getInputStream ()));
         final String sKey = lin.readLine ();
         if (!m_sKey.equals (sKey))
@@ -112,17 +109,6 @@ public final class JettyMonitor extends Thread
       catch (final Exception e)
       {
         s_aLogger.error ("Error reading from socket", e);
-      }
-      finally
-      {
-        if (aSocket != null)
-          try
-          {
-            aSocket.close ();
-          }
-          catch (final IOException e)
-          {}
-        aSocket = null;
       }
     }
   }

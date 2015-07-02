@@ -47,8 +47,8 @@ import javax.annotation.Nonnull;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
-import com.helger.commons.annotations.ReturnsMutableCopy;
-import com.helger.commons.annotations.UsedViaReflection;
+import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.db.jpa.AbstractGlobalEntityManagerFactory;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.ConfigFile;
