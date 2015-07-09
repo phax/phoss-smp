@@ -84,9 +84,10 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 // @Ignore
-// ("Cannot be enabled by default, because it would fail without the correct configuration")
+// ("Cannot be enabled by default, because it would fail without the correct
+// configuration")
 @DevelopersNote ("You need to adjust your local config.properties file to run this test")
-public class DBMSDataManagerTest
+public final class DBMSDataManagerTest
 {
   private static final String PARTICIPANT_IDENTIFIER_SCHEME = CIdentifier.DEFAULT_PARTICIPANT_IDENTIFIER_SCHEME;
   private static final String DOCUMENT_SCHEME = CIdentifier.DEFAULT_DOCUMENT_TYPE_IDENTIFIER_SCHEME;
@@ -101,8 +102,8 @@ public class DBMSDataManagerTest
   private static final String USERNAME = "peppol_user";
   private static final String PASSWORD = "Test1234";
 
-  private static final String CERTIFICATE = "VGhpcyBpcyBzdXJlbHkgbm90IGEgdmFsaWQgY2VydGlmaWNhdGUsIGJ1dCBpdCBo\r\n"
-                                            + "YXMgbW9yZSB0aGFuIDY0IGNoYXJhY3RlcnM=";
+  private static final String CERTIFICATE = "VGhpcyBpcyBzdXJlbHkgbm90IGEgdmFsaWQgY2VydGlmaWNhdGUsIGJ1dCBpdCBo\r\n" +
+                                            "YXMgbW9yZSB0aGFuIDY0IGNoYXJhY3RlcnM=";
   private static final String ADDRESS = "http://test.eu/accesspoint.svc";
   private static final boolean REQUIRE_SIGNATURE = true;
   private static final String MINIMUM_AUTH_LEVEL = "1";
