@@ -46,8 +46,8 @@ import javax.annotation.Nonnull;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import com.helger.peppol.identifier.IMutableDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IMutableParticipantIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
@@ -68,7 +68,7 @@ final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
   }
 
   @Nonnull
-  public String getServiceGroupHref (@Nonnull final IMutableParticipantIdentifier aServiceGroupID)
+  public String getServiceGroupHref (@Nonnull final IParticipantIdentifier aServiceGroupID)
   {
     UriBuilder aBuilder = m_aUriInfo.getBaseUriBuilder ();
     if (SMPServerConfiguration.isForceRoot ())
@@ -82,8 +82,8 @@ final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
   }
 
   @Nonnull
-  public String getServiceMetadataReferenceHref (@Nonnull final IMutableParticipantIdentifier aServiceGroupID,
-                                                 @Nonnull final IMutableDocumentTypeIdentifier aDocTypeID)
+  public String getServiceMetadataReferenceHref (@Nonnull final IParticipantIdentifier aServiceGroupID,
+                                                 @Nonnull final IDocumentTypeIdentifier aDocTypeID)
   {
     UriBuilder aBuilder = m_aUriInfo.getBaseUriBuilder ();
     if (SMPServerConfiguration.isForceRoot ())
