@@ -66,7 +66,7 @@ import com.helger.commons.scope.mock.ScopeTestRule;
 import com.helger.datetime.PDTFactory;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.DocumentIdentifierType;
-import com.helger.peppol.identifier.IdentifierUtils;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
@@ -77,7 +77,7 @@ import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookDoNothing;
-import com.helger.peppol.utils.W3CEndpointReferenceUtils;
+import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
@@ -181,7 +181,7 @@ public final class DBMSDataManagerTest
           {
             final EndpointType endpoint = aObjFactory.createEndpointType ();
             endpoint.setCertificate (CERTIFICATE);
-            endpoint.setEndpointReference (W3CEndpointReferenceUtils.createEndpointReference (ADDRESS));
+            endpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (ADDRESS));
             endpoint.setMinimumAuthenticationLevel (MINIMUM_AUTH_LEVEL);
             endpoint.setRequireBusinessLevelSignature (REQUIRE_SIGNATURE);
             endpoint.setServiceActivationDate (ACTIVIATION_DATE);
@@ -214,7 +214,7 @@ public final class DBMSDataManagerTest
 
     assertNull (result.getServiceMetadataReferenceCollection ());
     assertEquals (PARTICIPANT_IDENTIFIER_SCHEME, result.getParticipantIdentifier ().getScheme ());
-    assertTrue (IdentifierUtils.areParticipantIdentifierValuesEqual (PARTICIPANT_IDENTIFIER2,
+    assertTrue (IdentifierHelper.areParticipantIdentifierValuesEqual (PARTICIPANT_IDENTIFIER2,
                                                                      result.getParticipantIdentifier ().getValue ()));
   }
 
@@ -314,15 +314,15 @@ public final class DBMSDataManagerTest
     final ProcessType aDBProcess = aDBServiceMetadata.getServiceInformation ().getProcessList ().getProcess ().get (0);
     final EndpointType aDBEndpoint = aDBProcess.getServiceEndpointList ().getEndpoint ().get (0);
 
-    assertTrue (IdentifierUtils.areDocumentTypeIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
+    assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
                                                                                    .getDocumentIdentifier (),
                                                                  aDBServiceMetadata.getServiceInformation ()
                                                                                    .getDocumentIdentifier ()));
-    assertTrue (IdentifierUtils.areParticipantIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
+    assertTrue (IdentifierHelper.areParticipantIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
                                                                                   .getParticipantIdentifier (),
                                                                 aDBServiceMetadata.getServiceInformation ()
                                                                                   .getParticipantIdentifier ()));
-    assertTrue (IdentifierUtils.areProcessIdentifiersEqual (aOrigProcess.getProcessIdentifier (),
+    assertTrue (IdentifierHelper.areProcessIdentifiersEqual (aOrigProcess.getProcessIdentifier (),
                                                             aDBProcess.getProcessIdentifier ()));
     assertEquals (aOrigEndpoint.getCertificate (), aDBEndpoint.getCertificate ());
     assertEquals (aOrigEndpoint.getMinimumAuthenticationLevel (), aDBEndpoint.getMinimumAuthenticationLevel ());
@@ -330,8 +330,8 @@ public final class DBMSDataManagerTest
     assertEquals (aOrigEndpoint.getTechnicalContactUrl (), aDBEndpoint.getTechnicalContactUrl ());
     assertEquals (aOrigEndpoint.getTechnicalInformationUrl (), aDBEndpoint.getTechnicalInformationUrl ());
     assertEquals (aOrigEndpoint.getTransportProfile (), aDBEndpoint.getTransportProfile ());
-    assertEquals (W3CEndpointReferenceUtils.getAddress (aOrigEndpoint.getEndpointReference ()),
-                  W3CEndpointReferenceUtils.getAddress (aDBEndpoint.getEndpointReference ()));
+    assertEquals (W3CEndpointReferenceHelper.getAddress (aOrigEndpoint.getEndpointReference ()),
+                  W3CEndpointReferenceHelper.getAddress (aDBEndpoint.getEndpointReference ()));
   }
 
   @Test

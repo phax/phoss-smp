@@ -52,8 +52,8 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.identifier.CIdentifier;
-import com.helger.peppol.identifier.IReadonlyParticipantIdentifier;
-import com.helger.peppol.identifier.IdentifierUtils;
+import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 
 /**
@@ -72,7 +72,7 @@ public class DBServiceGroupID implements Serializable
   public DBServiceGroupID ()
   {}
 
-  public DBServiceGroupID (@Nonnull final IReadonlyParticipantIdentifier aBusinessID)
+  public DBServiceGroupID (@Nonnull final IParticipantIdentifier aBusinessID)
   {
     setBusinessIdentifierScheme (aBusinessID.getScheme ());
     setBusinessIdentifier (aBusinessID.getValue ());
@@ -86,7 +86,7 @@ public class DBServiceGroupID implements Serializable
 
   public void setBusinessIdentifierScheme (final String sBusinessIdentifierScheme)
   {
-    m_sParticipantIdentifierScheme = IdentifierUtils.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
+    m_sParticipantIdentifierScheme = IdentifierHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
   }
 
   @Column (name = "businessIdentifier", nullable = false, length = CIdentifier.MAX_PARTICIPANT_IDENTIFIER_VALUE_LENGTH)
@@ -97,7 +97,7 @@ public class DBServiceGroupID implements Serializable
 
   public void setBusinessIdentifier (final String sBusinessIdentifier)
   {
-    m_sParticipantIdentifier = IdentifierUtils.getUnifiedParticipantDBValue (sBusinessIdentifier);
+    m_sParticipantIdentifier = IdentifierHelper.getUnifiedParticipantDBValue (sBusinessIdentifier);
   }
 
   @Transient

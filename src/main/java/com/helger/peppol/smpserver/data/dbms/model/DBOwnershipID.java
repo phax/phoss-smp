@@ -52,8 +52,8 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.identifier.CIdentifier;
-import com.helger.peppol.identifier.IReadonlyParticipantIdentifier;
-import com.helger.peppol.identifier.IdentifierUtils;
+import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 
 /**
@@ -73,7 +73,7 @@ public class DBOwnershipID implements Serializable
   public DBOwnershipID ()
   {}
 
-  public DBOwnershipID (final String sUserName, @Nonnull final IReadonlyParticipantIdentifier aBusinessIdentifier)
+  public DBOwnershipID (final String sUserName, @Nonnull final IParticipantIdentifier aBusinessIdentifier)
   {
     m_sUsername = sUserName;
     setBusinessIdentifier (aBusinessIdentifier);
@@ -98,7 +98,7 @@ public class DBOwnershipID implements Serializable
 
   public void setBusinessIdentifierScheme (final String sBusinessIdentifierScheme)
   {
-    m_sParticipantIdentifierScheme = IdentifierUtils.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
+    m_sParticipantIdentifierScheme = IdentifierHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
   }
 
   @Column (name = "businessIdentifier", nullable = false, length = CIdentifier.MAX_PARTICIPANT_IDENTIFIER_VALUE_LENGTH)
@@ -109,11 +109,11 @@ public class DBOwnershipID implements Serializable
 
   public void setBusinessIdentifier (final String sBusinessIdentifier)
   {
-    m_sParticipantIdentifier = IdentifierUtils.getUnifiedParticipantDBValue (sBusinessIdentifier);
+    m_sParticipantIdentifier = IdentifierHelper.getUnifiedParticipantDBValue (sBusinessIdentifier);
   }
 
   @Transient
-  public void setBusinessIdentifier (@Nonnull final IReadonlyParticipantIdentifier aPI)
+  public void setBusinessIdentifier (@Nonnull final IParticipantIdentifier aPI)
   {
     setBusinessIdentifierScheme (aPI.getScheme ());
     setBusinessIdentifier (aPI.getValue ());

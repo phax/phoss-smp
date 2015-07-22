@@ -53,10 +53,10 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.DocumentIdentifierType;
-import com.helger.peppol.identifier.IReadonlyDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IReadonlyParticipantIdentifier;
-import com.helger.peppol.identifier.IReadonlyProcessIdentifier;
-import com.helger.peppol.identifier.IdentifierUtils;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.IProcessIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.ProcessIdentifierType;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
@@ -83,7 +83,7 @@ public class DBProcessID implements Serializable
   public DBProcessID ()
   {}
 
-  public DBProcessID (@Nonnull final DBServiceMetadataID aSMID, @Nonnull final IReadonlyProcessIdentifier aPrI)
+  public DBProcessID (@Nonnull final DBServiceMetadataID aSMID, @Nonnull final IProcessIdentifier aPrI)
   {
     setBusinessIdentifier (aSMID.asBusinessIdentifier ());
     setDocumentTypeIdentifier (aSMID.asDocumentTypeIdentifier ());
@@ -98,7 +98,7 @@ public class DBProcessID implements Serializable
 
   public void setBusinessIdentifierScheme (final String sBusinessIdentifierScheme)
   {
-    m_sParticipantIdentifierScheme = IdentifierUtils.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
+    m_sParticipantIdentifierScheme = IdentifierHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
   }
 
   @Column (name = "businessIdentifier", nullable = false, length = CIdentifier.MAX_PARTICIPANT_IDENTIFIER_VALUE_LENGTH)
@@ -109,11 +109,11 @@ public class DBProcessID implements Serializable
 
   public void setBusinessIdentifier (final String sBusinessIdentifier)
   {
-    m_sParticipantIdentifier = IdentifierUtils.getUnifiedParticipantDBValue (sBusinessIdentifier);
+    m_sParticipantIdentifier = IdentifierHelper.getUnifiedParticipantDBValue (sBusinessIdentifier);
   }
 
   @Transient
-  public void setBusinessIdentifier (@Nonnull final IReadonlyParticipantIdentifier aBusinessIdentifier)
+  public void setBusinessIdentifier (@Nonnull final IParticipantIdentifier aBusinessIdentifier)
   {
     setBusinessIdentifierScheme (aBusinessIdentifier.getScheme ());
     setBusinessIdentifier (aBusinessIdentifier.getValue ());
@@ -144,7 +144,7 @@ public class DBProcessID implements Serializable
   }
 
   @Transient
-  public void setDocumentTypeIdentifier (@Nonnull final IReadonlyDocumentTypeIdentifier aDocumentTypeID)
+  public void setDocumentTypeIdentifier (@Nonnull final IDocumentTypeIdentifier aDocumentTypeID)
   {
     setDocumentIdentifierScheme (aDocumentTypeID.getScheme ());
     setDocumentIdentifier (aDocumentTypeID.getValue ());
@@ -173,7 +173,7 @@ public class DBProcessID implements Serializable
   }
 
   @Transient
-  public void setProcessIdentifier (@Nonnull final IReadonlyProcessIdentifier aProcessID)
+  public void setProcessIdentifier (@Nonnull final IProcessIdentifier aProcessID)
   {
     setProcessIdentifierScheme (aProcessID.getScheme ());
     setProcessIdentifier (aProcessID.getValue ());

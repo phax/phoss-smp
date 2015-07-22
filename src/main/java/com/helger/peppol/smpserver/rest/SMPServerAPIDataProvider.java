@@ -46,9 +46,9 @@ import javax.annotation.Nonnull;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.IdentifierUtils;
+import com.helger.peppol.identifier.IMutableDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IMutableParticipantIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 
@@ -68,7 +68,7 @@ final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
   }
 
   @Nonnull
-  public String getServiceGroupHref (@Nonnull final IParticipantIdentifier aServiceGroupID)
+  public String getServiceGroupHref (@Nonnull final IMutableParticipantIdentifier aServiceGroupID)
   {
     UriBuilder aBuilder = m_aUriInfo.getBaseUriBuilder ();
     if (SMPServerConfiguration.isForceRoot ())
@@ -77,13 +77,13 @@ final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
       aBuilder = aBuilder.replacePath ("");
     }
     return aBuilder.path (ServiceGroupInterface.class)
-                   .buildFromEncoded (IdentifierUtils.getIdentifierURIPercentEncoded (aServiceGroupID))
+                   .buildFromEncoded (IdentifierHelper.getIdentifierURIPercentEncoded (aServiceGroupID))
                    .toString ();
   }
 
   @Nonnull
-  public String getServiceMetadataReferenceHref (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                                 @Nonnull final IDocumentTypeIdentifier aDocTypeID)
+  public String getServiceMetadataReferenceHref (@Nonnull final IMutableParticipantIdentifier aServiceGroupID,
+                                                 @Nonnull final IMutableDocumentTypeIdentifier aDocTypeID)
   {
     UriBuilder aBuilder = m_aUriInfo.getBaseUriBuilder ();
     if (SMPServerConfiguration.isForceRoot ())
@@ -92,8 +92,8 @@ final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
       aBuilder = aBuilder.replacePath ("");
     }
     return aBuilder.path (ServiceMetadataInterface.class)
-                   .buildFromEncoded (IdentifierUtils.getIdentifierURIPercentEncoded (aServiceGroupID),
-                                      IdentifierUtils.getIdentifierURIPercentEncoded (aDocTypeID))
+                   .buildFromEncoded (IdentifierHelper.getIdentifierURIPercentEncoded (aServiceGroupID),
+                                      IdentifierHelper.getIdentifierURIPercentEncoded (aDocTypeID))
                    .toString ();
   }
 }

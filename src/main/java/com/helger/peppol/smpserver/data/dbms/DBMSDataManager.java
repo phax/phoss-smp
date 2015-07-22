@@ -75,7 +75,7 @@ import com.helger.db.jpa.IHasEntityManager;
 import com.helger.db.jpa.JPAEnabledManager;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.DocumentIdentifierType;
-import com.helger.peppol.identifier.IdentifierUtils;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smpserver.data.IDataManagerSPI;
@@ -97,8 +97,8 @@ import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
-import com.helger.peppol.utils.CertificateUtils;
-import com.helger.peppol.utils.W3CEndpointReferenceUtils;
+import com.helger.peppol.utils.CertificateHelper;
+import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
@@ -201,12 +201,12 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
       throw new SMPUnauthorizedException ("User '" +
                                           aCredentials.getUserName () +
                                           "' does not own " +
-                                          IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID));
+                                          IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
     }
 
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("Verified service group ID " +
-                       IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID) +
+                       IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
                        " is owned by user '" +
                        aCredentials.getUserName () +
                        "'");
@@ -257,7 +257,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         if (aDBServiceGroup == null)
         {
           s_aLogger.warn ("No such service group to retrieve: " +
-                          IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID));
+                          IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
           return null;
         }
 
@@ -297,7 +297,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
           if (aEM.find (DBOwnership.class, aDBOwnershipID) == null)
           {
             throw new SMPUnauthorizedException ("The passed service group " +
-                                                IdentifierUtils.getIdentifierURIEncoded (aServiceGroup.getParticipantIdentifier ()) +
+                                                IdentifierHelper.getIdentifierURIEncoded (aServiceGroup.getParticipantIdentifier ()) +
                                                 " is not owned by '" +
                                                 aCredentials.getUserName () +
                                                 "'");
@@ -354,7 +354,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         if (aDBServiceGroup == null)
         {
           s_aLogger.warn ("No such service group to delete: " +
-                          IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID));
+                          IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
           return EChange.UNCHANGED;
         }
 
@@ -381,7 +381,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
     if (ret.hasThrowable ())
       throw ret.getThrowable ();
     if (ret.get ().isUnchanged ())
-      throw new SMPNotFoundException (IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID));
+      throw new SMPNotFoundException (IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
   }
 
   @Nonnull
@@ -460,9 +460,9 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         if (aDBServiceMetadata == null)
         {
           s_aLogger.info ("Service metadata with ID " +
-                          IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID) +
+                          IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
                           " / " +
-                          IdentifierUtils.getIdentifierURIEncoded (aDocTypeID) +
+                          IdentifierHelper.getIdentifierURIEncoded (aDocTypeID) +
                           " not found");
           return null;
         }
@@ -501,7 +501,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         DBServiceMetadata aDBServiceMetadata = aEM.find (DBServiceMetadata.class, aDBServiceMetadataID);
         if (aDBServiceMetadata != null)
           throw new IllegalStateException ("No DB ServiceMeta data with ID " +
-                                           IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID) +
+                                           IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
                                            " should be present!");
 
         // Create a new entry
@@ -542,9 +542,9 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         {
           // There were no service to delete.
           s_aLogger.warn ("No such service to delete: " +
-                          IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID) +
+                          IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
                           " / " +
-                          IdentifierUtils.getIdentifierURIEncoded (aDocTypeID));
+                          IdentifierHelper.getIdentifierURIEncoded (aDocTypeID));
           return EChange.UNCHANGED;
         }
 
@@ -576,9 +576,9 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
 
     final EChange eChange = _deleteService (aServiceGroupID, aDocTypeID);
     if (eChange.isUnchanged ())
-      throw new SMPNotFoundException (IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID) +
+      throw new SMPNotFoundException (IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
                                       " / " +
-                                      IdentifierUtils.getIdentifierURIEncoded (aDocTypeID));
+                                      IdentifierHelper.getIdentifierURIEncoded (aDocTypeID));
   }
 
   @Nullable
@@ -600,7 +600,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         {
           if (GlobalDebug.isDebugMode ())
             s_aLogger.info ("No redirection service group id: " +
-                            IdentifierUtils.getIdentifierURIEncoded (aServiceGroupID));
+                            IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
           return null;
         }
 
@@ -649,7 +649,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         aEndpointType.setTransportProfile (aDBEndpoint.getId ().getTransportProfile ());
         aEndpointType.setExtension (SMPExtensionConverter.convertOrNull (aDBEndpoint.getExtension ()));
 
-        final W3CEndpointReference endpointRef = W3CEndpointReferenceUtils.createEndpointReference (aDBEndpoint.getId ()
+        final W3CEndpointReference endpointRef = W3CEndpointReferenceHelper.createEndpointReference (aDBEndpoint.getId ()
                                                                                                                .getEndpointReference ());
         aEndpointType.setEndpointReference (endpointRef);
 
@@ -658,7 +658,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         aEndpointType.setServiceExpirationDate (aDBEndpoint.getServiceExpirationDate ());
         aEndpointType.setTechnicalContactUrl (aDBEndpoint.getTechnicalContactUrl ());
         aEndpointType.setTechnicalInformationUrl (aDBEndpoint.getTechnicalInformationUrl ());
-        aEndpointType.setCertificate (CertificateUtils.getRFC1421CompliantString (aDBEndpoint.getCertificate ()));
+        aEndpointType.setCertificate (CertificateHelper.getRFC1421CompliantString (aDBEndpoint.getCertificate ()));
         aEndpointType.setMinimumAuthenticationLevel (aDBEndpoint.getMinimumAuthenticationLevel ());
         aEndpointType.setRequireBusinessLevelSignature (aDBEndpoint.isRequireBusinessLevelSignature ());
 
@@ -691,7 +691,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
       for (final EndpointType aEndpoint : aProcess.getServiceEndpointList ().getEndpoint ())
       {
         final DBEndpointID aDBEndpointID = new DBEndpointID (aDBProcessID,
-                                                             W3CEndpointReferenceUtils.getAddress (aEndpoint.getEndpointReference ()),
+                                                             W3CEndpointReferenceHelper.getAddress (aEndpoint.getEndpointReference ()),
                                                              aEndpoint.getTransportProfile ());
 
         final DBEndpoint aDBEndpoint = new DBEndpoint ();
