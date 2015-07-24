@@ -50,6 +50,8 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.charset.CCharset;
+
 /**
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
@@ -86,7 +88,8 @@ public final class JettyMonitor extends Thread
     {
       try (final Socket aSocket = m_aServerSocket.accept ())
       {
-        final LineNumberReader lin = new LineNumberReader (new InputStreamReader (aSocket.getInputStream ()));
+        final LineNumberReader lin = new LineNumberReader (new InputStreamReader (aSocket.getInputStream (),
+                                                                                  CCharset.CHARSET_ISO_8859_1_OBJ));
         final String sKey = lin.readLine ();
         if (!m_sKey.equals (sKey))
           continue;
