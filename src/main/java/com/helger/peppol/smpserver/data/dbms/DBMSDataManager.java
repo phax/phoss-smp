@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.callback.exception.LoggingExceptionCallback;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.state.EChange;
@@ -114,6 +115,8 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
   private final IRegistrationHook m_aHook;
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
 
+  @Deprecated
+  @UsedViaReflection
   public DBMSDataManager ()
   {
     this (RegistrationHookFactory.getOrCreateInstance ());
@@ -650,7 +653,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         aEndpointType.setExtension (SMPExtensionConverter.convertOrNull (aDBEndpoint.getExtension ()));
 
         final W3CEndpointReference endpointRef = W3CEndpointReferenceHelper.createEndpointReference (aDBEndpoint.getId ()
-                                                                                                               .getEndpointReference ());
+                                                                                                                .getEndpointReference ());
         aEndpointType.setEndpointReference (endpointRef);
 
         aEndpointType.setServiceActivationDate (aDBEndpoint.getServiceActivationDate ());
