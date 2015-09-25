@@ -52,11 +52,11 @@
 
   <!-- Scope handling: listener + filter must be first -->
   <listener>
-    <listener-class>com.helger.web.scopes.servlet.WebScopeListener</listener-class>
+    <listener-class>com.helger.web.servlets.scope.WebScopeListener</listener-class>
   </listener>
   <filter>
     <filter-name>ScopeFilter</filter-name>
-    <filter-class>com.helger.web.scopes.servlet.DefaultScopeAwareFilter</filter-class>
+    <filter-class>com.helger.web.servlets.scope.DefaultScopeAwareFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>ScopeFilter</filter-name>
