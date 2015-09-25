@@ -58,8 +58,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.busdox.servicemetadata.publishing._1.ExtensionType;
-
+import com.helger.peppol.smp.ExtensionType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 
 /**

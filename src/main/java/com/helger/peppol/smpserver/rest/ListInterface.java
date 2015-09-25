@@ -50,9 +50,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
-import org.busdox.servicemetadata.publishing._1.ObjectFactory;
-import org.busdox.servicemetadata.publishing._1.ServiceGroupReferenceListType;
-
+import com.helger.peppol.smp.ObjectFactory;
+import com.helger.peppol.smp.ServiceGroupReferenceListType;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 
 /**

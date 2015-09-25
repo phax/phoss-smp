@@ -56,12 +56,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.busdox.servicemetadata.publishing._1.ExtensionType;
 import org.eclipse.persistence.annotations.Convert;
 import org.eclipse.persistence.annotations.Converter;
 import org.joda.time.LocalDateTime;
 
 import com.helger.db.jpa.eclipselink.converter.JPAJodaLocalDateTimeConverter;
+import com.helger.peppol.smp.ExtensionType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 
 /**

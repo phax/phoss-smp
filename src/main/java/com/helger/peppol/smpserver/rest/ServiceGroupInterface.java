@@ -54,9 +54,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
-import org.busdox.servicemetadata.publishing._1.ObjectFactory;
-import org.busdox.servicemetadata.publishing._1.ServiceGroupType;
-
+import com.helger.peppol.smp.ObjectFactory;
+import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 
 /**

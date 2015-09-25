@@ -46,15 +46,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.busdox.servicemetadata.publishing._1.EndpointType;
-import org.busdox.servicemetadata.publishing._1.ExtensionType;
-import org.busdox.servicemetadata.publishing._1.ObjectFactory;
-import org.busdox.servicemetadata.publishing._1.ProcessListType;
-import org.busdox.servicemetadata.publishing._1.ProcessType;
-import org.busdox.servicemetadata.publishing._1.ServiceEndpointList;
-import org.busdox.servicemetadata.publishing._1.ServiceGroupType;
-import org.busdox.servicemetadata.publishing._1.ServiceInformationType;
-import org.busdox.servicemetadata.publishing._1.ServiceMetadataType;
 import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -72,7 +63,16 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.EndpointType;
+import com.helger.peppol.smp.ExtensionType;
+import com.helger.peppol.smp.ObjectFactory;
+import com.helger.peppol.smp.ProcessListType;
+import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
+import com.helger.peppol.smp.ServiceEndpointList;
+import com.helger.peppol.smp.ServiceGroupType;
+import com.helger.peppol.smp.ServiceInformationType;
+import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
@@ -215,7 +215,7 @@ public final class DBMSDataManagerTest
     assertNull (result.getServiceMetadataReferenceCollection ());
     assertEquals (PARTICIPANT_IDENTIFIER_SCHEME, result.getParticipantIdentifier ().getScheme ());
     assertTrue (IdentifierHelper.areParticipantIdentifierValuesEqual (PARTICIPANT_IDENTIFIER2,
-                                                                     result.getParticipantIdentifier ().getValue ()));
+                                                                      result.getParticipantIdentifier ().getValue ()));
   }
 
   @Test
@@ -315,15 +315,15 @@ public final class DBMSDataManagerTest
     final EndpointType aDBEndpoint = aDBProcess.getServiceEndpointList ().getEndpoint ().get (0);
 
     assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
-                                                                                   .getDocumentIdentifier (),
-                                                                 aDBServiceMetadata.getServiceInformation ()
-                                                                                   .getDocumentIdentifier ()));
+                                                                                    .getDocumentIdentifier (),
+                                                                  aDBServiceMetadata.getServiceInformation ()
+                                                                                    .getDocumentIdentifier ()));
     assertTrue (IdentifierHelper.areParticipantIdentifiersEqual (m_aServiceMetadata.getServiceInformation ()
-                                                                                  .getParticipantIdentifier (),
-                                                                aDBServiceMetadata.getServiceInformation ()
-                                                                                  .getParticipantIdentifier ()));
+                                                                                   .getParticipantIdentifier (),
+                                                                 aDBServiceMetadata.getServiceInformation ()
+                                                                                   .getParticipantIdentifier ()));
     assertTrue (IdentifierHelper.areProcessIdentifiersEqual (aOrigProcess.getProcessIdentifier (),
-                                                            aDBProcess.getProcessIdentifier ()));
+                                                             aDBProcess.getProcessIdentifier ()));
     assertEquals (aOrigEndpoint.getCertificate (), aDBEndpoint.getCertificate ());
     assertEquals (aOrigEndpoint.getMinimumAuthenticationLevel (), aDBEndpoint.getMinimumAuthenticationLevel ());
     assertEquals (aOrigEndpoint.getServiceDescription (), aDBEndpoint.getServiceDescription ());
