@@ -112,7 +112,7 @@ public final class DBMSDataManagerTest
   private static final LocalDateTime EXPIRATION_DATE = PDTFactory.getCurrentLocalDateTime ().plusYears (1);
   private static final String TECH_CONTACT = "fake@peppol.eu";
   private static final String TECH_INFO = "http://fake.peppol.eu/";
-  private static final String TRANSPORT_PROFILE = ESMPTransportProfile.TRANSPORT_PROFILE_START.getID ();
+  private static final String TRANSPORT_PROFILE = ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ();
 
   private static final ParticipantIdentifierType PARTY_ID = SimpleParticipantIdentifier.createWithDefaultScheme (PARTICIPANT_IDENTIFIER1);
   private static final ParticipantIdentifierType SERVICEGROUP_ID = PARTY_ID;
