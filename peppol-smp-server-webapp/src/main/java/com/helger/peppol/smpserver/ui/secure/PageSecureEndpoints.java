@@ -358,9 +358,6 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       if (URLHelper.getAsURL (sEndpointReference) == null)
         aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "The Endpoint Reference is not a valid URL!");
 
-    if (StringHelper.isEmpty (sMinimumAuthenticationLevel))
-      aFormErrors.addFieldError (FIELD_MINIMUM_AUTHENTICATION_LEVEL, "Minimum Authentication Level must not be empty!");
-
     if (aNotBeforeDate != null && aNotAfterDate != null)
       if (aNotBeforeDate.isAfter (aNotAfterDate))
         aFormErrors.addFieldError (FIELD_NOT_BEFORE, "Not Before Date must not be after Not After Date!");
@@ -389,8 +386,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aEndpoint.setEndpointReference (sEndpointReference);
         aEndpoint.setRequireBusinessLevelSignature (bRequireBusinessLevelSignature);
         aEndpoint.setMinimumAuthenticationLevel (sMinimumAuthenticationLevel);
-        aEndpoint.setServiceActivationDateTime (aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME));
-        aEndpoint.setServiceExpirationDateTime (aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME));
+        aEndpoint.setServiceActivationDateTime (aNotBeforeDate == null ? null
+                                                                       : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME));
+        aEndpoint.setServiceExpirationDateTime (aNotAfterDate == null ? null
+                                                                      : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME));
         aEndpoint.setCertificate (sCertificate);
         aEndpoint.setServiceDescription (sServiceDescription);
         aEndpoint.setTechnicalContactUrl (sTechnicalContact);
@@ -407,8 +406,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                        sEndpointReference,
                                                        bRequireBusinessLevelSignature,
                                                        sMinimumAuthenticationLevel,
-                                                       aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
-                                                       aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
+                                                       aNotBeforeDate == null ? null
+                                                                              : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
+                                                       aNotAfterDate == null ? null
+                                                                             : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
                                                        sCertificate,
                                                        sServiceDescription,
                                                        sTechnicalContact,
