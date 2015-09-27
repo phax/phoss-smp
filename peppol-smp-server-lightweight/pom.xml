@@ -55,6 +55,14 @@
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
+      <artifactId>peppol-smp-server-library</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>peppol-smp-server-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
       <artifactId>ph-commons</artifactId>
     </dependency>
     <dependency>
@@ -64,10 +72,6 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-sml-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>peppol-smp-server-library</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>

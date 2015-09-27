@@ -21,9 +21,9 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.peppol.smpserver.data.dao.MetaManager;
-import com.helger.peppol.smpserver.domain.servicegroup.ComparatorSMPServiceGroup;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.data.xml.MetaManager;
+import com.helger.peppol.smpserver.data.xml.domain.servicegroup.ComparatorSMPServiceGroup;
+import com.helger.peppol.smpserver.data.xml.domain.servicegroup.ISMPServiceGroup;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 

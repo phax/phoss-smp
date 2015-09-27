@@ -119,6 +119,11 @@
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
+        <artifactId>ph-oton-basic</artifactId>
+        <version>${photon.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
         <artifactId>ph-oton-core</artifactId>
         <version>${photon.version}</version>
       </dependency>
@@ -191,6 +196,11 @@
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
+        <artifactId>peppol-smp-server-xml</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
         <artifactId>peppol-smp-server</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -212,6 +222,7 @@
   <modules>
     <module>peppol-smp-server-library</module>
     <module>peppol-smp-server-sql</module>
+    <module>peppol-smp-server-xml</module>
     <module>peppol-smp-server</module>
     <module>peppol-smp-server-lightweight</module>
   </modules>
