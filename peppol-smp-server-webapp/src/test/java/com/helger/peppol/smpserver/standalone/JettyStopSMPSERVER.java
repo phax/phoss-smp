@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public final class JettyStopSMPSERVERLIGHTWEIGHT
+public final class JettyStopSMPSERVER
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (JettyStopSMPSERVERLIGHTWEIGHT.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (JettyStopSMPSERVER.class);
 
   public static void main (final String [] args) throws IOException
   {

@@ -40,14 +40,14 @@ import com.helger.commons.system.SystemProperties;
  * of your local machine. Please ensure that you have adopted the Hibernate
  * configuration file.<br>
  * To stop the running Jetty simply invoke the
- * {@link JettyStopSMPSERVERLIGHTWEIGHT} application in this package. It
+ * {@link JettyStopSMPSERVER} application in this package. It
  * performs a graceful shutdown of the App Server.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public final class RunInJettySMPSERVERLIGHTWEIGHT
+public final class RunInJettySMPSERVER
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (RunInJettySMPSERVERLIGHTWEIGHT.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (RunInJettySMPSERVER.class);
   private static final String RESOURCE_PREFIX = "target/webapp-classes";
 
   public static void main (final String... args) throws Exception
@@ -70,7 +70,7 @@ public final class RunInJettySMPSERVERLIGHTWEIGHT
     aWebAppCtx.setContextPath ("/");
     aWebAppCtx.setTempDirectory (new File (SystemProperties.getTmpDir () +
                                            '/' +
-                                           RunInJettySMPSERVERLIGHTWEIGHT.class.getName ()));
+                                           RunInJettySMPSERVER.class.getName ()));
     aWebAppCtx.setParentLoaderPriority (true);
     // Important to add the AnnotationConfiguration!
     aWebAppCtx.setConfigurations (new Configuration [] { new WebInfConfiguration (),
