@@ -186,6 +186,11 @@
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
+        <artifactId>peppol-smp-server-sql</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
         <artifactId>peppol-smp-server</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -202,16 +207,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   
   <modules>
     <module>peppol-smp-server-library</module>
+    <module>peppol-smp-server-sql</module>
     <module>peppol-smp-server</module>
     <module>peppol-smp-server-lightweight</module>
   </modules>

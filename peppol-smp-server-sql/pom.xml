@@ -115,7 +115,7 @@
         <configuration>
           <instructions>
             <Export-Package>
-              com.helger.peppol.smpserver.*
+              com.helger.peppol.smpserver.data.sql.*
             </Export-Package>
             <Import-Package>
               !javax.annotation.*,*
