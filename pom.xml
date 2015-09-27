@@ -201,12 +201,7 @@
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
-        <artifactId>peppol-smp-server</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.helger</groupId>
-        <artifactId>peppol-smp-server-lightweight</artifactId>
+        <artifactId>peppol-smp-server-webapp</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
@@ -223,8 +218,7 @@
     <module>peppol-smp-server-library</module>
     <module>peppol-smp-server-sql</module>
     <module>peppol-smp-server-xml</module>
-    <module>peppol-smp-server</module>
-    <module>peppol-smp-server-lightweight</module>
+    <module>peppol-smp-server-webapp</module>
   </modules>
   
   <build>

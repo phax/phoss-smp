@@ -23,11 +23,11 @@
     <artifactId>peppol-smp-server-parent-pom</artifactId>
     <version>4.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>peppol-smp-server-lightweight</artifactId>
+  <artifactId>peppol-smp-server-webapp</artifactId>
   <packaging>war</packaging>
   <name>peppol-smp-server</name>
   <description>SMP webapp with all available features (read &amp; write)</description>
-  <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-lightweight</url>
+  <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-webapp</url>
   <inceptionYear>2015</inceptionYear>
 
   <licenses>
