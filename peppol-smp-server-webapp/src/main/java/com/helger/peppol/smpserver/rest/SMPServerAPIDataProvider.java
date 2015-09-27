@@ -28,6 +28,12 @@ import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 
+/**
+ * {@link ISMPServerAPIDataProvider} implementation based on {@link UriInfo}
+ * data.
+ * 
+ * @author Philip Helger
+ */
 final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
 {
   private final UriInfo m_aUriInfo;

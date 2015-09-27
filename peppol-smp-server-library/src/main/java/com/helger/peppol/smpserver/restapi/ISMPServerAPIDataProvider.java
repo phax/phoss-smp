@@ -49,7 +49,8 @@ import com.helger.peppol.identifier.IParticipantIdentifier;
 
 /**
  * This interface must be implemented by all real SMP implementations, so that
- * the REST API can easily be used.
+ * the REST API can easily be used. It provides information only available in
+ * the web application.
  *
  * @author Philip Helger
  */
