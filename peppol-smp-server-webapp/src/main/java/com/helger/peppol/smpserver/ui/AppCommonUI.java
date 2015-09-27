@@ -29,6 +29,7 @@ import javax.annotation.concurrent.Immutable;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.css.property.CCSSProperties;
 import com.helger.datetime.PDTFactory;
@@ -61,6 +62,8 @@ import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.peppol.smpserver.ui.ajax.CActionPublic;
 import com.helger.peppol.smpserver.ui.ajax.CAjaxPublic;
+import com.helger.photon.basic.security.AccessManager;
+import com.helger.photon.basic.security.user.IUser;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
@@ -287,5 +290,19 @@ public final class AppCommonUI
        .addChild (new HCCode ().addChild (aParts.getAsUBLCustomizationID ()));
     aUL.addItem ().addChild ("Version: ").addChild (new HCCode ().addChild (aParts.getVersion ()));
     return aUL;
+  }
+
+  @Nonnull
+  public static String getOwnerName (@Nonnull @Nonempty final String sOwnerID)
+  {
+    final IUser aOwner = AccessManager.getInstance ().getUserOfID (sOwnerID);
+    return aOwner == null ? sOwnerID : aOwner.getLoginName () + " (" + aOwner.getDisplayName () + ")";
+  }
+
+  @Nullable
+  public static String getOwnerLoginName (@Nonnull @Nonempty final String sOwnerID)
+  {
+    final IUser aOwner = AccessManager.getInstance ().getUserOfID (sOwnerID);
+    return aOwner == null ? null : aOwner.getLoginName ();
   }
 }

@@ -25,7 +25,7 @@ import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.uicore.page.WebPageExecutionContext;

@@ -41,14 +41,14 @@ import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManagerSPI;
-import com.helger.peppol.smpserver.data.xml.domain.SMPHelper;
-import com.helger.peppol.smpserver.data.xml.domain.redirect.ISMPRedirect;
-import com.helger.peppol.smpserver.data.xml.domain.redirect.SMPRedirectManager;
-import com.helger.peppol.smpserver.data.xml.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.data.xml.domain.servicegroup.SMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.ISMPServiceInformation;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPServiceInformation;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.data.xml.domain.SMPRedirectManager;
+import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
+import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.SMPHelper;
+import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
@@ -144,8 +144,19 @@ public final class DAODataManager implements IDataManagerSPI
   private static ISMPServiceGroup _verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
                                                     @Nonnull final String sUserName) throws SMPUnauthorizedException
   {
+    // Resolve user group
     final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
-    if (aServiceGroup == null || !aServiceGroup.getOwner ().getLoginName ().equals (sUserName))
+    if (aServiceGroup == null)
+    {
+      throw new SMPUnauthorizedException ("Service group " +
+                                          IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
+                                          " does not exist");
+    }
+
+    // Resolve user
+    final String sOwnerID = aServiceGroup.getOwnerID ();
+    final IUser aOwner = AccessManager.getInstance ().getUserOfID (sOwnerID);
+    if (aOwner == null || !aOwner.getLoginName ().equals (sUserName))
     {
       throw new SMPUnauthorizedException ("User '" +
                                           sUserName +
@@ -163,12 +174,12 @@ public final class DAODataManager implements IDataManagerSPI
   @ReturnsMutableCopy
   public Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull final BasicAuthClientCredentials aCredentials)
   {
-    _validateCredentials (aCredentials);
+    final IUser aUser = _validateCredentials (aCredentials);
 
     final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final List <ParticipantIdentifierType> ret = new ArrayList <ParticipantIdentifierType> ();
     for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
-      if (aServiceGroup.getOwner ().getLoginName ().equals (aCredentials.getUserName ()))
+      if (aServiceGroup.getOwnerID ().equals (aUser.getID ()))
         ret.add (new SimpleParticipantIdentifier (aServiceGroup.getParticpantIdentifier ()));
     return ret;
   }
@@ -194,7 +205,7 @@ public final class DAODataManager implements IDataManagerSPI
       _verifyOwnership (aParticipantID, aOwningUser.getLoginName ());
 
       // Update existing service group (don't change the owner)
-      aServiceGroupMgr.updateSMPServiceGroup (aSG.getID (), aSG.getOwner (), sExtension);
+      aServiceGroupMgr.updateSMPServiceGroup (aSG.getID (), aSG.getOwnerID (), sExtension);
     }
     else
     {

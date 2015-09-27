@@ -22,8 +22,9 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.servicegroup.ComparatorSMPServiceGroup;
-import com.helger.peppol.smpserver.data.xml.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ComparatorSMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 
@@ -41,11 +42,11 @@ public class HCServiceGroupSelect extends HCExtSelect
     for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (MetaManager.getServiceGroupMgr ()
                                                                                        .getAllSMPServiceGroups (),
                                                                             new ComparatorSMPServiceGroup ()))
+    {
+      final String sOwnerName = AppCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
       addOption (aServiceGroup.getID (),
-                 aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                                         " [" +
-                                         aServiceGroup.getOwner ().getLoginName () +
-                                         "]");
+                 aServiceGroup.getParticpantIdentifier ().getURIEncoded () + " [" + sOwnerName + "]");
+    }
 
     if (!hasSelectedOption ())
       addOptionPleaseSelect (aDisplayLocale);

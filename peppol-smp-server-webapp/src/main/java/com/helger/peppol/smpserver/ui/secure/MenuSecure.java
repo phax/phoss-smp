@@ -41,23 +41,22 @@ public final class MenuSecure
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID);
 
     aMenuTree.createRootItem (new PageSecureServiceGroups (CMenuSecure.MENU_SERVICE_GROUPS));
-    aMenuTree.createRootItem (new PageSecureDocumentTypes (CMenuSecure.MENU_DOCTYPES))
-             .setDisplayFilter (aFilterAdministrators);
-    aMenuTree.createRootItem (new PageSecureProcesses (CMenuSecure.MENU_PROCESSES))
-             .setDisplayFilter (aFilterAdministrators);
     aMenuTree.createRootItem (new PageSecureEndpoints (CMenuSecure.MENU_ENDPOINTS));
     aMenuTree.createRootItem (new PageSecureRedirects (CMenuSecure.MENU_REDIRECTS));
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
     aMenuTree.createRootSeparator ();
-    aMenuTree.createRootItem (new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
 
     // Administrator
     {
       final IMenuItemPage aAdmin = aMenuTree.createRootItem (new BasePageShowChildren <WebPageExecutionContext> (CMenuSecure.MENU_ADMIN,
                                                                                                                  "Administration",
-                                                                                                                 aMenuTree))
-                                            .setDisplayFilter (aFilterAdministrators);
-
+                                                                                                                 aMenuTree));
+      aMenuTree.createItem (aAdmin,
+                            new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
+      aMenuTree.createItem (aAdmin, new PageSecureDocumentTypes (CMenuSecure.MENU_DOCTYPES))
+               .setDisplayFilter (aFilterAdministrators);
+      aMenuTree.createItem (aAdmin, new PageSecureProcesses (CMenuSecure.MENU_PROCESSES))
+               .setDisplayFilter (aFilterAdministrators);
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CApp.DEFAULT_LOCALE);
     }
 

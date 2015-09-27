@@ -21,16 +21,16 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.microdom.convert.IMicroTypeConverterRegistrarSPI;
 import com.helger.commons.microdom.convert.IMicroTypeConverterRegistry;
-import com.helger.peppol.smpserver.data.xml.domain.redirect.SMPRedirect;
-import com.helger.peppol.smpserver.data.xml.domain.redirect.SMPRedirectMicroTypeConverter;
-import com.helger.peppol.smpserver.data.xml.domain.servicegroup.SMPServiceGroup;
-import com.helger.peppol.smpserver.data.xml.domain.servicegroup.SMPServiceGroupMicroTypeConverter;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPEndpoint;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPEndpointMicroTypeConverter;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPProcess;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPProcessMicroTypeConverter;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPServiceInformation;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPServiceInformationMicroTypeConverter;
+import com.helger.peppol.smpserver.data.xml.domain.SMPEndpointMicroTypeConverter;
+import com.helger.peppol.smpserver.data.xml.domain.SMPProcessMicroTypeConverter;
+import com.helger.peppol.smpserver.data.xml.domain.SMPRedirectMicroTypeConverter;
+import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupMicroTypeConverter;
+import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationMicroTypeConverter;
+import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
+import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
+import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
+import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
+import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 
 /**
  * Special micro type converter for this project.

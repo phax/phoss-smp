@@ -41,11 +41,12 @@ import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.xml.DAODataManager;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.data.xml.domain.servicegroup.SMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.ISMPServiceInformation;
-import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
+import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
+import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.basic.security.AccessManager;
 import com.helger.photon.basic.security.login.LoggedInUserManager;
 import com.helger.photon.basic.security.user.IUser;
@@ -105,10 +106,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                  .setCtrl (aSelectedObject.getParticpantIdentifier ()
                                                                           .getURIEncoded ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
-                                                 .setCtrl (aSelectedObject.getOwner ().getLoginName () +
-                                                           " (" +
-                                                           aSelectedObject.getOwner ().getDisplayName () +
-                                                           ")"));
+                                                 .setCtrl (AppCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
     if (aSelectedObject.hasExtension ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (new HCPrismJS (EPrismLanguage.MARKUP).addChild (aSelectedObject.getExtension ())));
@@ -161,7 +159,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
       {
         // Edit only the internal data objects because no change to the SML is
         // necessary. Only the owner and the extension can be edited!
-        aServiceGroupMgr.updateSMPServiceGroup (aSelectedObject.getID (), aOwningUser, sExtension);
+        aServiceGroupMgr.updateSMPServiceGroup (aSelectedObject.getID (), aOwningUser.getID (), sExtension);
         aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
                                                                  sParticipantID +
                                                                  "' was successfully edited."));
@@ -244,7 +242,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     // Create the service group both locally and on the SML!
     DAODataManager.getInstance ().deleteServiceGroup (
                                                       new SimpleParticipantIdentifier (aSelectedObject.getParticpantIdentifier ()),
-                                                      aSelectedObject.getOwner ().getLoginName ());
+                                                      AppCommonUI.getOwnerLoginName (aSelectedObject.getOwnerID ()));
     aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
                                                              aSelectedObject.getParticpantIdentifier ()
                                                                             .getURIEncoded () +
@@ -293,7 +291,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-      aRow.addCell (aCurObject.getOwner ().getLoginName ());
+      aRow.addCell (AppCommonUI.getOwnerName (aCurObject.getOwnerID ()));
       aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.hasExtension (), aDisplayLocale));
       aRow.addCell (Integer.toString (aSIs.size ()));
       aRow.addCell (Integer.toString (nProcesses));
