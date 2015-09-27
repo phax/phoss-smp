@@ -113,6 +113,7 @@ public final class SMPRendererSecure implements ILayoutAreaContentProvider <Layo
     aOuterContainer.addChild (_getNavbar (aLEC));
 
     // Breadcrumbs
+    if (false)
     {
       final BootstrapBreadcrumbs aBreadcrumbs = BootstrapBreadcrumbsProvider.createBreadcrumbs (aLEC);
       aBreadcrumbs.addClass (CBootstrapCSS.HIDDEN_XS);

@@ -41,6 +41,7 @@ import com.helger.datetime.CPDT;
 import com.helger.datetime.PDTFactory;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
+import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -217,14 +218,16 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                  .setCtrl (aSelectedEndpoint.getTransportProfile ()));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
-                                                 .setCtrl (aSelectedEndpoint.getEndpointReference ()));
+                                                 .setCtrl (HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),
+                                                                                    HC_Target.BLANK)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires business level signature")
                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedEndpoint.isRequireBusinessLevelSignature (),
                                                                                        aDisplayLocale)));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Minimum authentication level")
-                                                 .setCtrl (aSelectedEndpoint.getMinimumAuthenticationLevel ()));
+    if (StringHelper.hasText (aSelectedEndpoint.getMinimumAuthenticationLevel ()))
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Minimum authentication level")
+                                                   .setCtrl (aSelectedEndpoint.getMinimumAuthenticationLevel ()));
 
     if (aSelectedEndpoint.getServiceActivationDateTime () != null)
     {
@@ -261,8 +264,9 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical contact")
                                                  .setCtrl (aSelectedEndpoint.getTechnicalContactUrl ()));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical information")
-                                                 .setCtrl (aSelectedEndpoint.getTechnicalInformationUrl ()));
+    if (StringHelper.hasText (aSelectedEndpoint.getTechnicalInformationUrl ()))
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical information")
+                                                   .setCtrl (aSelectedEndpoint.getTechnicalInformationUrl ()));
 
     aNodeList.addChild (aForm);
 
@@ -364,6 +368,21 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
     if (StringHelper.isEmpty (sCertificate))
       aFormErrors.addFieldError (FIELD_CERTIFICATE, "Certificate must not be empty!");
+    else
+    {
+      X509Certificate aCert = null;
+      try
+      {
+        aCert = CertificateHelper.convertStringToCertficate (sCertificate);
+      }
+      catch (final CertificateException ex)
+      {
+        // Fall through
+      }
+      if (aCert == null)
+        aFormErrors.addFieldError (FIELD_CERTIFICATE,
+                                   "The provided certificate string is not a valid X509 certificate!");
+    }
 
     if (StringHelper.isEmpty (sServiceDescription))
       aFormErrors.addFieldError (FIELD_SERVICE_DESCRIPTION, "Service Description must not be empty!");

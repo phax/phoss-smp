@@ -28,7 +28,7 @@ public class SMPTransportProfileSelect extends HCSelect
   {
     super (aRF);
 
-    for (final ESMPTransportProfile aField : ESMPTransportProfile.values ())
-      addOption (aField.getID ());
+    for (final ESMPTransportProfile eTP : ESMPTransportProfile.values ())
+      addOption (eTP.getID (), eTP.getName ());
   }
 }

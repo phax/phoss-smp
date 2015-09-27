@@ -37,7 +37,7 @@ public final class CApp
 {
   public static final Locale DEFAULT_LOCALE = LocaleCache.getInstance ().getLocale ("en", "US");
 
-  private static final String APPLICATION_TITLE = "PEPPOL lightweight SMP server";
+  private static final String APPLICATION_TITLE = "PEPPOL SMP server";
 
   // Security roles
   public static final String ROLE_CONFIG_ID = "config";

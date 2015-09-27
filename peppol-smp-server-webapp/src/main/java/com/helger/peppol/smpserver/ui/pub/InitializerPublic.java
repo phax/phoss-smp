@@ -19,6 +19,8 @@ package com.helger.peppol.smpserver.ui.pub;
 import javax.annotation.Nonnull;
 
 import com.helger.peppol.smpserver.ui.CApp;
+import com.helger.peppol.smpserver.ui.ajax.CActionPublic;
+import com.helger.peppol.smpserver.ui.ajax.CAjaxPublic;
 import com.helger.photon.basic.app.locale.ILocaleManager;
 import com.helger.photon.basic.app.menu.IMenuTree;
 import com.helger.photon.core.action.IActionInvoker;

@@ -41,6 +41,7 @@ import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPServiceInf
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.button.BootstrapButton;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
@@ -62,7 +63,7 @@ public final class PageSecureDocumentTypes extends AbstractSMPWebPageForm <ISMPS
 
   public PageSecureDocumentTypes (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "Document types (SU)");
+    super (sID, "Document types");
   }
 
   @Override
@@ -167,6 +168,8 @@ public final class PageSecureDocumentTypes extends AbstractSMPWebPageForm <ISMPS
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final SMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+
+    aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page is informational only. You cannot do anything in here."));
 
     final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING)
                                                                    .setDataSort (0, 1),
