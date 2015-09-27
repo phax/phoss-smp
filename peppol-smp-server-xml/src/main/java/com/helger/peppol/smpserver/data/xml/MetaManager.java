@@ -34,6 +34,7 @@ import com.helger.commons.microdom.serialize.MicroWriter;
 import com.helger.commons.scope.IScope;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.commons.state.SuccessWithValue;
+import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.xml.domain.redirect.SMPRedirectManager;
 import com.helger.peppol.smpserver.data.xml.domain.servicegroup.SMPServiceGroupManager;
 import com.helger.peppol.smpserver.data.xml.domain.servicemetadata.SMPServiceInformationManager;
@@ -103,7 +104,7 @@ public final class MetaManager extends AbstractGlobalSingleton
       m_aServiceGroupMgr = new SMPServiceGroupManager (SMP_SERVICE_GROUP_XML);
       m_aRedirectMgr = new SMPRedirectManager (SMP_REDIRECT_XML);
       m_aServiceInformationMgr = new SMPServiceInformationManager (SMP_SERVICE_INFORMATION_XML);
-      DAODataManager.getInstance ();
+      DataManagerFactory.getInstance ();
 
       s_aLogger.info ("MetaManager was initialized");
     }
