@@ -44,15 +44,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.helger</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>1.4.1</version>
+    <artifactId>peppol-smp-server-parent-pom</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>peppol-smp-server-library</artifactId>
-  <version>4.0.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <name>peppol-smp-server-library</name>
   <description>SMP library with all common parts used for a full SMP server web application</description>
-  <url>https://github.com/phax/peppol-smp-server-library</url>
+  <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-library</url>
   <inceptionYear>2015</inceptionYear>
 
   <licenses>
@@ -67,13 +66,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-     
-  <scm>
-    <connection>scm:git:git@github.com:phax/peppol-smp-server-library.git</connection>
-    <developerConnection>scm:git:git@github.com:phax/peppol-smp-server-library.git</developerConnection>
-    <url>http://github.com/phax/peppol-smp-server-library</url>
-    <tag>HEAD</tag>
-  </scm>
  
   <organization>
     <name>Philip Helger</name>
@@ -97,24 +89,19 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-commons</artifactId>
-      <version>4.1.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-sml-client</artifactId>
-      <version>4.1.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-web</artifactId>
-      <version>7.0.2</version>
     </dependency>
 
-    <!-- 3.0.1 for JDK 1.6 -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>3.0.1</version><!--$NO-MVN-MAN-VER$-->
       <scope>provided</scope>
     </dependency>
 

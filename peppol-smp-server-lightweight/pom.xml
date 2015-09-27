@@ -20,15 +20,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.helger</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>1.4.1</version>
+    <artifactId>peppol-smp-server-parent-pom</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>peppol-smp-server-lightweight</artifactId>
-  <version>4.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>peppol-smp-server</name>
   <description>SMP webapp with all available features (read &amp; write)</description>
-  <url>https://github.com/phax/peppol-smp-server-lightweight</url>
+  <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-lightweight</url>
   <inceptionYear>2015</inceptionYear>
 
   <licenses>
@@ -38,13 +37,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-     
-  <scm>
-    <connection>scm:git:git@github.com:phax/peppol-smp-server-lightweight.git</connection>
-    <developerConnection>scm:git:git@github.com:phax/peppol-smp-server-lightweight.git</developerConnection>
-    <url>http://github.com/phax/peppol-smp-server-lightweight</url>
-    <tag>HEAD</tag>
-  </scm>
  
   <organization>
     <name>Philip Helger</name>
@@ -60,51 +52,39 @@
     </developer>
   </developers>
   
-  <properties>
-    <jetty.version>9.2.13.v20150730</jetty.version>
-  </properties>
-  
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-commons</artifactId>
-      <version>6.2.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-commons</artifactId>
-      <version>4.1.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-sml-client</artifactId>
-      <version>4.1.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-smp-server-library</artifactId>
-      <version>4.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-oton-bootstrap3-stub</artifactId>
-      <version>6.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-settings</artifactId>
-      <version>2.0.0</version>
     </dependency>
     
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
-      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-servlet</artifactId>
-      <version>1.19</version>
     </dependency>
    
     <dependency>
@@ -116,19 +96,16 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-smp-client</artifactId>
-      <version>4.1.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>${jetty.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-annotations</artifactId>
-      <version>${jetty.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -151,17 +128,8 @@
     
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>com.helger.maven</groupId>
         <artifactId>ph-jscompress-maven-plugin</artifactId>
-        <version>2.1.0</version><!--$NO-MVN-MAN-VER$-->
         <executions>
           <execution>
             <goals>
@@ -177,7 +145,6 @@
       <plugin>
         <groupId>com.helger.maven</groupId>
         <artifactId>ph-csscompress-maven-plugin</artifactId>
-        <version>1.5.0</version><!--$NO-MVN-MAN-VER$-->
         <executions>
           <execution>
             <goals>

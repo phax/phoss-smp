@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2014-2015 Philip Helger (www.helger.com)
+    philip[at]helger[dot]com
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.helger</groupId>
+    <artifactId>parent-pom</artifactId>
+    <version>1.4.1</version>
+  </parent>
+  <artifactId>peppol-smp-server-parent-pom</artifactId>
+  <version>4.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>peppol-smp-server-parent-pom</name>
+  <description>Base POM to build the peppol-smp-server projects</description>
+  <url>https://github.com/phax/peppol-smp-server</url>
+  <inceptionYear>2015</inceptionYear>
+ 
+  <licenses>
+    <license>
+      <name>MPL 1.1</name>
+      <url>https://www.mozilla.org/MPL/1.1/</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+      <name>EUPL v.1.1</name>
+      <url>https://joinup.ec.europa.eu/software/page/eupl/licence-eupl</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:git:git@github.com:phax/peppol-smp-server.git</connection>
+    <developerConnection>scm:git:git@github.com:phax/peppol-smp-server.git</developerConnection>
+    <url>http://github.com/phax/peppol-smp-server</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <organization>
+    <name>Philip Helger</name>
+    <url>http://www.helger.com</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>philip</id>
+      <name>Philip Helger</name>
+      <email>ph(at)helger.com</email>
+      <url>http://www.helger.com</url>
+    </developer>
+  </developers>
+
+  <properties>
+    <jaxws-plugin.version>2.3.1-b20150201.1248</jaxws-plugin.version>
+    <!-- Must correspond to jaxws-tools.version in jaxws-maven-plugin POM -->
+    <jaxws.version>2.2.9-b14002</jaxws.version>
+    <jetty.version>9.2.13.v20150730</jetty.version>
+    <log4j.version>2.3</log4j.version>
+    <photon.version>6.0.0</photon.version>
+  </properties>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-commons</artifactId>
+        <version>6.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-jaxb</artifactId>
+        <version>6.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-datetime</artifactId>
+        <version>4.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>peppol-commons</artifactId>
+        <version>4.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>peppol-sml-client</artifactId>
+        <version>4.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>peppol-smp-client</artifactId>
+        <version>4.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-web</artifactId>
+        <version>7.0.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-oton-core</artifactId>
+        <version>${photon.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-oton-bootstrap3-pages</artifactId>
+        <version>${photon.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-oton-bootstrap3-stub</artifactId>
+        <version>${photon.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-settings</artifactId>
+        <version>2.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-db-jpa</artifactId>
+        <version>4.1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>1.19</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-servlet</artifactId>
+        <version>1.19</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j-impl</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.36</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-webapp</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-annotations</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>peppol-smp-server-library</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>peppol-smp-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>peppol-smp-server-lightweight</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <modules>
+    <module>peppol-smp-server-library</module>
+    <module>peppol-smp-server</module>
+    <module>peppol-smp-server-lightweight</module>
+  </modules>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.helger.maven</groupId>
+          <artifactId>ph-jscompress-maven-plugin</artifactId>
+          <version>2.1.0</version><!--$NO-MVN-MAN-VER$-->
+        </plugin>
+        <plugin>
+          <groupId>com.helger.maven</groupId>
+          <artifactId>ph-csscompress-maven-plugin</artifactId>
+          <version>1.5.0</version><!--$NO-MVN-MAN-VER$-->
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

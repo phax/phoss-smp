@@ -44,15 +44,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.helger</groupId>
-    <artifactId>parent-pom</artifactId>
-    <version>1.4.1</version>
+    <artifactId>peppol-smp-server-parent-pom</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>peppol-smp-server</artifactId>
-  <version>4.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>peppol-smp-server</name>
   <description>SMP webapp with all available features (read &amp; write)</description>
-  <url>https://github.com/phax/peppol-smp-server</url>
+  <url>https://github.com/phax/peppol-smp-server/peppol-smp-server</url>
   <inceptionYear>2015</inceptionYear>
 
   <licenses>
@@ -67,13 +66,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-     
-  <scm>
-    <connection>scm:git:git@github.com:phax/peppol-smp-server.git</connection>
-    <developerConnection>scm:git:git@github.com:phax/peppol-smp-server.git</developerConnection>
-    <url>http://github.com/phax/peppol-smp-server</url>
-    <tag>HEAD</tag>
-  </scm>
  
   <organization>
     <name>Philip Helger</name>
@@ -88,61 +80,48 @@
       <url>http://www.helger.com</url>
     </developer>
   </developers>
-  
-  <properties>
-    <log4j.version>2.3</log4j.version>
-  </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-commons</artifactId>
-      <version>4.1.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-sml-client</artifactId>
-      <version>4.1.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-smp-server-library</artifactId>
-      <version>4.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-web</artifactId>
-      <version>7.0.2</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-db-jpa</artifactId>
-      <version>4.1.1</version>
     </dependency>
+    
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
-      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-servlet</artifactId>
-      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.36</version>
     </dependency>
 
     <dependency>
@@ -154,19 +133,16 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-smp-client</artifactId>
-      <version>4.1.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-oton-core</artifactId>
-      <version>6.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>9.2.13.v20150730</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -186,15 +162,5 @@
         <targetPath>${project.build.directory}/webapp-classes</targetPath>
       </resource>
     </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-    </plugins>  
   </build>
 </project>
