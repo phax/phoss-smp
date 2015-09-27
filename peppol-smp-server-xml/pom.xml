@@ -80,10 +80,6 @@
       <url>http://www.helger.com</url>
     </developer>
   </developers>
-  
-  <properties>
-    <log4j.version>2.3</log4j.version>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -117,7 +113,7 @@
         <configuration>
           <instructions>
             <Export-Package>
-              com.helger.peppol.smpserver.data.sql.*
+              com.helger.peppol.smpserver.data.xml.*
             </Export-Package>
             <Import-Package>
               !javax.annotation.*,*
