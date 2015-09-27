@@ -31,6 +31,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.SMPExtensionConverter;
+import com.helger.peppol.utils.CertificateHelper;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 
 /**
@@ -234,7 +235,7 @@ public class SMPEndpoint implements ISMPEndpoint
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
     ret.setServiceActivationDate (m_aServiceActivationDT);
     ret.setServiceExpirationDate (m_aServiceExpirationDT);
-    ret.setCertificate (m_sCertificate);
+    ret.setCertificate (CertificateHelper.getRFC1421CompliantString (m_sCertificate));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
