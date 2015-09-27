@@ -28,6 +28,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.data.xml.DAODataManager;
 import com.helger.peppol.smpserver.ui.CApp;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
@@ -71,7 +72,11 @@ public final class SMPRendererSecure implements ILayoutAreaContentProvider <Layo
 
     final BootstrapNavbar aNavbar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
     ((BootstrapContainer) aNavbar.getContainer ()).setFluid (true);
-    aNavbar.addBrand (new HCSpan ().addChild (CApp.getApplicationTitle () + " Administration"), aLinkToStartPage);
+    aNavbar.addBrand (new HCSpan ().addChild (CApp.getApplicationTitle () +
+                                              " Administration [" +
+                                              SMPServerConfiguration.getSMLSMPID () +
+                                              "]"),
+                      aLinkToStartPage);
 
     final BootstrapNav aNav = new BootstrapNav ();
     final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
