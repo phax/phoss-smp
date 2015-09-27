@@ -20,21 +20,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.annotation.Nonnull;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
-import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.xml.serialize.read.DOMReader;
 import com.helger.commons.xml.serialize.write.EXMLIncorrectCharacterHandling;
 import com.helger.commons.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.commons.xml.serialize.write.IXMLWriterSettings;
 import com.helger.commons.xml.serialize.write.XMLWriter;
 import com.helger.commons.xml.serialize.write.XMLWriterSettings;
-import com.helger.commons.xml.transform.XMLTransformerFactory;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
@@ -88,31 +83,11 @@ final class SigningContainerResponseWriter implements ContainerResponseWriter
       throw new RuntimeException ("Error in signing xml", e);
     }
 
-    if (false)
-    {
-      // And write the result to the main output stream
-      // IMPORTANT: no indent and no align!
-      final IXMLWriterSettings aSettings = new XMLWriterSettings ().setIncorrectCharacterHandling (EXMLIncorrectCharacterHandling.THROW_EXCEPTION)
-                                                                   .setIndent (EXMLSerializeIndent.NONE);
-      if (XMLWriter.writeToStream (aDoc, aOS, aSettings).isFailure ())
-        throw new RuntimeException ("Failed to serialize node!");
-    }
-    else
-    {
-      // Use this because it correctly serializes &#13; which is important for
-      // validating the signature!
-      try
-      {
-        XMLTransformerFactory.newTransformer ().transform (new DOMSource (aDoc), new StreamResult (aOS));
-      }
-      catch (final TransformerException ex)
-      {
-        throw new IllegalStateException ("Failed to save to XML", ex);
-      }
-      finally
-      {
-        StreamHelper.close (aOS);
-      }
-    }
+    // And write the result to the main output stream
+    // IMPORTANT: no indent and no align!
+    final IXMLWriterSettings aSettings = new XMLWriterSettings ().setIncorrectCharacterHandling (EXMLIncorrectCharacterHandling.THROW_EXCEPTION)
+                                                                 .setIndent (EXMLSerializeIndent.NONE);
+    if (XMLWriter.writeToStream (aDoc, aOS, aSettings).isFailure ())
+      throw new RuntimeException ("Failed to serialize node!");
   }
 }
