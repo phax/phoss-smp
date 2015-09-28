@@ -56,8 +56,16 @@ public final class MetaManager extends AbstractGlobalSingleton
 
       // Service group manager must be the first one!
       m_aServiceGroupMgr = aFactory.createServiceGroupMgr ();
+      if (m_aServiceGroupMgr == null)
+        throw new IllegalStateException ("Failed to create ServiceGroup manager!");
       m_aRedirectMgr = aFactory.createRedirectMgr ();
+      if (m_aRedirectMgr == null)
+        throw new IllegalStateException ("Failed to create Redirect manager!");
       m_aServiceInformationMgr = aFactory.createServiceInformationMgr ();
+      if (m_aServiceInformationMgr == null)
+        throw new IllegalStateException ("Failed to create ServiceInformation manager!");
+
+      // Ensure Data manager is installed
       DataManagerFactory.getInstance ();
 
       s_aLogger.info (ClassHelper.getClassLocalName (this) + " was initialized");
