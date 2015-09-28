@@ -37,8 +37,8 @@ import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
-import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.EndpointType;
+import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smp.ServiceEndpointList;
@@ -86,7 +86,7 @@ public class SMPProcess implements ISMPProcess
   }
 
   @Nullable
-  public SMPEndpoint getEndpointOfTransportProfile (@Nullable final ESMPTransportProfile eTransportProfile)
+  public SMPEndpoint getEndpointOfTransportProfile (@Nullable final ISMPTransportProfile eTransportProfile)
   {
     return getEndpointOfTransportProfile (eTransportProfile == null ? null : eTransportProfile.getID ());
   }

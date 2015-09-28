@@ -42,7 +42,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
-import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
@@ -194,10 +194,11 @@ public final class SMPServiceInformationManager extends AbstractWALDAO <SMPServi
     return createSMPServiceInformation (aSMPServiceInformation);
   }
 
+  @Nullable
   public ISMPServiceInformation findServiceInformation (@Nullable final String sServiceGroupID,
                                                         @Nullable final IPeppolDocumentTypeIdentifier aDocTypeID,
                                                         @Nullable final IPeppolProcessIdentifier aProcessID,
-                                                        @Nullable final ESMPTransportProfile eTransportProfile)
+                                                        @Nullable final ISMPTransportProfile aTransportProfile)
   {
     final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (sServiceGroupID,
                                                                                                           aDocTypeID);
@@ -206,7 +207,7 @@ public final class SMPServiceInformationManager extends AbstractWALDAO <SMPServi
       final ISMPProcess aProcess = aOldInformation.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
-        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (eTransportProfile);
+        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (aTransportProfile);
         if (aEndpoint != null)
           return aOldInformation;
       }

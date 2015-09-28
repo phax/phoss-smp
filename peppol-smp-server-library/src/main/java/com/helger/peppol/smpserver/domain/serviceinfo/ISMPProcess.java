@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
-import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
 
@@ -52,7 +52,7 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
   int getEndpointCount ();
 
   @Nullable
-  ISMPEndpoint getEndpointOfTransportProfile (@Nullable ESMPTransportProfile eTransportProfile);
+  ISMPEndpoint getEndpointOfTransportProfile (@Nullable ISMPTransportProfile aTransportProfile);
 
   @Nullable
   ISMPEndpoint getEndpointOfTransportProfile (@Nullable String sTransportProfile);

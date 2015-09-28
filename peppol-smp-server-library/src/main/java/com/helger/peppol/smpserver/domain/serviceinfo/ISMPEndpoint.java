@@ -41,7 +41,7 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    *         points, e.g. the BUSDOX START profile ("busdox-transport-start").
    *         The list of valid transport protocols is found in
    *         ICT-Transport-Policy_for_using_Identifiers.
-   * @see com.helger.peppol.smp.ESMPTransportProfile
+   * @see com.helger.peppol.smp.ISMPTransportProfile
    */
   @Nonnull
   @Nonempty

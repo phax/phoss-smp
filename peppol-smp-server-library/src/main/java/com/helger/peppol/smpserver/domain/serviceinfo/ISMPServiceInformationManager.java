@@ -3,6 +3,7 @@ package com.helger.peppol.smpserver.domain.serviceinfo;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -11,25 +12,28 @@ import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
-import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 public interface ISMPServiceInformationManager
 {
+  @Nonnull
   ISMPServiceInformation updateSMPServiceInformation (@Nullable String sServiceInfoID);
 
-  ISMPServiceInformation createSMPServiceInformation (ISMPServiceGroup aServiceGroup,
-                                                      IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                                      List <SMPProcess> aProcesses,
+  @Nonnull
+  ISMPServiceInformation createSMPServiceInformation (@Nonnull ISMPServiceGroup aServiceGroup,
+                                                      @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
+                                                      @Nonnull List <SMPProcess> aProcesses,
                                                       @Nullable String sExtension);
 
+  @Nullable
   ISMPServiceInformation findServiceInformation (@Nullable String sServiceGroupID,
                                                  @Nullable IPeppolDocumentTypeIdentifier aDocTypeID,
                                                  @Nullable IPeppolProcessIdentifier aProcessID,
-                                                 @Nullable ESMPTransportProfile eTransportProfile);
+                                                 @Nullable ISMPTransportProfile eTransportProfile);
 
   @Nonnull
-  ISMPServiceInformation createSMPServiceInformation (SMPServiceInformation aServiceInformation);
+  ISMPServiceInformation createSMPServiceInformation (@Nonnull SMPServiceInformation aServiceInformation);
 
   @Nonnull
   EChange deleteSMPServiceInformation (@Nullable ISMPServiceInformation aSMPServiceInformation);
@@ -44,6 +48,7 @@ public interface ISMPServiceInformationManager
   @ReturnsMutableCopy
   Collection <? extends ISMPServiceInformation> getAllSMPServiceInformations ();
 
+  @Nonnegative
   int getSMPServiceInformationCount ();
 
   @Nonnull
