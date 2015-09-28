@@ -51,14 +51,16 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.helger.peppol.smpserver.data.IDataUser;
+
 /**
  * Represents a single user within the SMP database.
- * 
+ *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Entity
 @Table (name = "smp_user")
-public class DBUser implements Serializable
+public class DBUser implements Serializable, IDataUser
 {
   private String m_sUserName;
   private String m_sPassword;
@@ -69,12 +71,12 @@ public class DBUser implements Serializable
 
   @Id
   @Column (name = "username", unique = true, nullable = false, length = 256)
-  public String getUsername ()
+  public String getUserName ()
   {
     return m_sUserName;
   }
 
-  public void setUsername (final String sUserName)
+  public void setUserName (final String sUserName)
   {
     m_sUserName = sUserName;
   }

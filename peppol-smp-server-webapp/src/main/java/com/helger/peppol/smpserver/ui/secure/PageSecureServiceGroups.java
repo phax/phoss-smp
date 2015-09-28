@@ -39,7 +39,10 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.data.xml.DAODataManager;
+import com.helger.peppol.smp.SMPExtensionConverter;
+import com.helger.peppol.smp.ServiceGroupType;
+import com.helger.peppol.smpserver.data.DataManagerFactory;
+import com.helger.peppol.smpserver.data.IDataManagerSPI;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -50,6 +53,7 @@ import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.basic.security.AccessManager;
 import com.helger.photon.basic.security.login.LoggedInUserManager;
 import com.helger.photon.basic.security.user.IUser;
+import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
@@ -166,19 +170,26 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
       }
       else
       {
-        if (true)
+        // Create the service group both locally and on the SML (if active)!
+        final ServiceGroupType aSG = new ServiceGroupType ();
+        aSG.setParticipantIdentifier (aParticipantID);
+        aSG.setExtension (SMPExtensionConverter.convert (sExtension));
+        try
         {
-          // Create the service group both locally and on the SML!
-          DAODataManager.getInstance ().saveServiceGroup (aParticipantID, sExtension, aOwningUser);
+          final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
+          aDataManager.saveServiceGroup (aSG, aDataManager.createPreAuthenticatedUser (aOwningUser.getLoginName ()));
         }
-        else
+        catch (final Throwable t)
         {
-          // Create the service group only locally but NOT on the SML!
-          aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension);
+          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error creating the new SMP ServiceGroup for participant '" +
+                                                                    sParticipantID +
+                                                                    "'. Technical details: " +
+                                                                    t.getMessage ()));
         }
-        aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
-                                                                 sParticipantID +
-                                                                 "' was successfully created."));
+
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
+                                                                    sParticipantID +
+                                                                    "' was successfully created."));
       }
     }
   }
@@ -238,15 +249,27 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nonnull final ISMPServiceGroup aSelectedObject)
   {
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
-    // Create the service group both locally and on the SML!
-    DAODataManager.getInstance ().deleteServiceGroup (
-                                                      new SimpleParticipantIdentifier (aSelectedObject.getParticpantIdentifier ()),
-                                                      AppCommonUI.getOwnerLoginName (aSelectedObject.getOwnerID ()));
-    aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
-                                                             aSelectedObject.getParticpantIdentifier ()
-                                                                            .getURIEncoded () +
-                                                             "' was successfully deleted!"));
+    try
+    {
+      // Delete the service group both locally and on the SML (if active)!
+      final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
+      aDataManager.deleteServiceGroup (new SimpleParticipantIdentifier (aSelectedObject.getParticpantIdentifier ()),
+                                       aDataManager.createPreAuthenticatedUser (AccessManager.getInstance ()
+                                                                                             .getUserOfID (aSelectedObject.getOwnerID ())
+                                                                                             .getLoginName ()));
+    }
+    catch (final Throwable t)
+    {
+      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error deleting the SMP ServiceGroup for participant '" +
+                                                                aSelectedObject.getParticpantIdentifier ()
+                                                                               .getURIEncoded () +
+                                                                "'. Technical details: " +
+                                                                t.getMessage ()));
+    }
+    aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
+                                                                aSelectedObject.getParticpantIdentifier ()
+                                                                               .getURIEncoded () +
+                                                                "' was successfully deleted!"));
   }
 
   @Override

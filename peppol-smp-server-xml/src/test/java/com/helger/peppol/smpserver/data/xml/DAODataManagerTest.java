@@ -48,7 +48,7 @@ import com.helger.peppol.smp.ServiceEndpointList;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
-import com.helger.peppol.smpserver.data.xml.DAODataManager;
+import com.helger.peppol.smpserver.data.IDataUser;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
@@ -114,17 +114,18 @@ public final class DAODataManagerTest
     final ObjectFactory aObjFactory = new ObjectFactory ();
     m_aServiceGroup = aObjFactory.createServiceGroupType ();
     m_aServiceGroup.setParticipantIdentifier (PARTY_ID);
+    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
 
     // Be sure to delete if it exists.
     try
     {
-      s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, CREDENTIALS);
+      s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aDataUser);
     }
     catch (final SMPNotFoundException ex)
     {}
 
     // Create a new one
-    s_aDataMgr.saveServiceGroup (m_aServiceGroup, CREDENTIALS);
+    s_aDataMgr.saveServiceGroup (m_aServiceGroup, aDataUser);
 
     m_aServiceMetadata = aObjFactory.createServiceMetadataType ();
     final ServiceInformationType aServiceInformation = aObjFactory.createServiceInformationType ();
@@ -167,7 +168,8 @@ public final class DAODataManagerTest
   public void testCreateServiceGroup () throws Throwable
   {
     m_aServiceGroup.getParticipantIdentifier ().setValue (PARTICIPANT_IDENTIFIER2);
-    s_aDataMgr.saveServiceGroup (m_aServiceGroup, CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    s_aDataMgr.saveServiceGroup (m_aServiceGroup, aDataUser);
 
     final ParticipantIdentifierType aParticipantIdentifier2 = SimpleParticipantIdentifier.createWithDefaultScheme (PARTICIPANT_IDENTIFIER2);
     final ServiceGroupType result = s_aDataMgr.getServiceGroup (aParticipantIdentifier2);
@@ -187,7 +189,8 @@ public final class DAODataManagerTest
     m_aServiceGroup.getParticipantIdentifier ().setValue (PARTICIPANT_IDENTIFIER2);
     try
     {
-      s_aDataMgr.saveServiceGroup (m_aServiceGroup, aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      s_aDataMgr.saveServiceGroup (m_aServiceGroup, aDataUser);
       fail ();
     }
     catch (final SMPUnauthorizedException ex)
@@ -202,7 +205,8 @@ public final class DAODataManagerTest
     m_aServiceGroup.getParticipantIdentifier ().setValue (PARTICIPANT_IDENTIFIER2);
     try
     {
-      s_aDataMgr.saveServiceGroup (m_aServiceGroup, aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      s_aDataMgr.saveServiceGroup (m_aServiceGroup, aDataUser);
       fail ();
     }
     catch (final SMPUnknownUserException ex)
@@ -212,7 +216,8 @@ public final class DAODataManagerTest
   @Test
   public void testDeleteServiceGroup () throws Throwable
   {
-    s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aDataUser);
 
     assertNull (s_aDataMgr.getServiceGroup (SERVICEGROUP_ID));
   }
@@ -223,7 +228,9 @@ public final class DAODataManagerTest
     final ParticipantIdentifierType aServiceGroupID2 = SimpleParticipantIdentifier.createWithDefaultScheme (PARTICIPANT_IDENTIFIER2);
     try
     {
-      s_aDataMgr.deleteServiceGroup (aServiceGroupID2, CREDENTIALS);
+      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+      s_aDataMgr.deleteServiceGroup (aServiceGroupID2, aDataUser);
+      // May not fail
     }
     catch (final SMPNotFoundException ex)
     {}
@@ -236,7 +243,8 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials ("Unknown_User", PASSWORD);
     try
     {
-      s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aDataUser);
       fail ();
     }
     catch (final SMPUnknownUserException ex)
@@ -249,7 +257,8 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials (USERNAME, "WrongPassword");
     try
     {
-      s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aDataUser);
       fail ();
     }
     catch (final SMPUnauthorizedException ex)
@@ -260,7 +269,8 @@ public final class DAODataManagerTest
   public void testCreateServiceMetadata () throws Throwable
   {
     // Save to DB
-    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
 
     // Retrieve from DB
     final ServiceMetadataType aDBServiceMetadata = s_aDataMgr.getService (SERVICEGROUP_ID, DOCTYPE_ID);
@@ -301,7 +311,8 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials ("Unknown_User", PASSWORD);
     try
     {
-      s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
       fail ();
     }
     catch (final SMPUnknownUserException ex)
@@ -314,7 +325,8 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials (USERNAME, "WrongPassword");
     try
     {
-      s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
       fail ();
     }
     catch (final SMPUnauthorizedException ex)
@@ -325,7 +337,8 @@ public final class DAODataManagerTest
   public void testPrintServiceMetadata () throws Throwable
   {
     // Ensure something is present :)
-    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
     assertNotNull (s_aDataMgr.getService (SERVICEGROUP_ID, DOCTYPE_ID));
   }
 
@@ -333,14 +346,15 @@ public final class DAODataManagerTest
   public void testDeleteServiceMetadata () throws Throwable
   {
     // Ensure something is present :)
-    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
 
     // First deletion succeeds
-    s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, CREDENTIALS);
+    s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
     try
     {
       // Second deletion fails
-      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, CREDENTIALS);
+      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
       fail ();
     }
     catch (final SMPNotFoundException ex)
@@ -353,7 +367,8 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials ("Unknown_User", PASSWORD);
     try
     {
-      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
       fail ();
     }
     catch (final SMPUnknownUserException ex)
@@ -366,7 +381,8 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials (USERNAME, "WrongPassword");
     try
     {
-      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
       fail ();
     }
     catch (final SMPUnauthorizedException ex)

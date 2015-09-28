@@ -93,4 +93,9 @@ public final class RegistrationHookFactory
       s_aInstance = createInstance ();
     return s_aInstance;
   }
+
+  public static boolean isSMLConnectionActive ()
+  {
+    return getOrCreateInstance () instanceof RegistrationHookWriteToSML;
+  }
 }

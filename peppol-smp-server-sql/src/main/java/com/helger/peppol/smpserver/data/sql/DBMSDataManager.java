@@ -57,8 +57,10 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
+import com.helger.commons.callback.IThrowingCallable;
 import com.helger.commons.callback.exception.LoggingExceptionCallback;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.state.EChange;
@@ -80,6 +82,7 @@ import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.data.IDataManagerSPI;
+import com.helger.peppol.smpserver.data.IDataUser;
 import com.helger.peppol.smpserver.data.sql.model.DBEndpoint;
 import com.helger.peppol.smpserver.data.sql.model.DBEndpointID;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
@@ -94,6 +97,7 @@ import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirectionID;
 import com.helger.peppol.smpserver.data.sql.model.DBUser;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
@@ -135,49 +139,59 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
       }
     });
 
-    ValueEnforcer.notNull (aHook, "Hook");
-
     // Exceptions are handled by logging them
     setCustomExceptionCallback (new LoggingExceptionCallback ());
 
     // To avoid some EclipseLink logging issues
     setUseTransactionsForSelect (true);
 
-    m_aHook = aHook;
+    m_aHook = ValueEnforcer.notNull (aHook, "Hook");
   }
 
-  /**
-   * Check if an SMP user matching the user name of the BasicAuth credentials
-   * exists, and that the passwords match. So this method verifies that the
-   * BasicAuth credentials are valid.
-   *
-   * @param aCredentials
-   *        The credentials to be validated. May not be <code>null</code>.
-   * @return The matching non-<code>null</code> {@link DBUser}.
-   * @throws SMPUnknownUserException
-   *         If no user matching the passed user name is present
-   * @throws SMPUnauthorizedException
-   *         If the password in the credentials does not match the stored
-   *         password
-   */
   @Nonnull
-  private DBUser _verifyUser (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnknownUserException,
-                                                                                      SMPUnauthorizedException
+  public DBUser getUserFromCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    final String sUsername = aCredentials.getUserName ();
-    final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUsername);
+    JPAExecutionResult <DBUser> ret;
+    ret = doSelect (new IThrowingCallable <DBUser, SMPServerException> ()
+    {
+      @Nonnull
+      @ReturnsMutableCopy
+      public DBUser call () throws SMPServerException
+      {
+        final String sUserName = aCredentials.getUserName ();
+        final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUserName);
 
-    // Check that the user exists
-    if (aDBUser == null)
-      throw new SMPUnknownUserException (sUsername);
+        // Check that the user exists
+        if (aDBUser == null)
+          throw new SMPUnknownUserException (sUserName);
 
-    // Check that the password is correct
-    if (!aDBUser.getPassword ().equals (aCredentials.getPassword ()))
-      throw new SMPUnauthorizedException ("Illegal password for user '" + sUsername + "'");
+        // Check that the password is correct
+        if (!aDBUser.getPassword ().equals (aCredentials.getPassword ()))
+          throw new SMPUnauthorizedException ("Illegal password for user '" + sUserName + "'");
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Verified credentials of user '" + sUsername + "' successfully");
-    return aDBUser;
+        if (s_aLogger.isDebugEnabled ())
+          s_aLogger.debug ("Verified credentials of user '" + sUserName + "' successfully");
+        return aDBUser;
+      }
+    });
+    return ret.getOrThrow ();
+  }
+
+  @Nonnull
+  public DBUser createPreAuthenticatedUser (@Nonnull @Nonempty final String sUserName)
+  {
+    final DBUser ret = doSelect (new Callable <DBUser> ()
+    {
+      @Nonnull
+      @ReturnsMutableCopy
+      public DBUser call ()
+      {
+        return getEntityManager ().find (DBUser.class, sUserName);
+      }
+    }).getIfSuccessOrNull ();
+    if (ret == null)
+      throw new IllegalArgumentException ("Invalid DB user '" + sUserName + "' provided!");
+    return ret;
   }
 
   /**
@@ -195,7 +209,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
    */
   @Nonnull
   private DBOwnership _verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                                        @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException
+                                        @Nonnull final IDataUser aCredentials) throws SMPUnauthorizedException
   {
     final DBOwnershipID aOwnershipID = new DBOwnershipID (aCredentials.getUserName (), aServiceGroupID);
     final DBOwnership aOwnership = getEntityManager ().find (DBOwnership.class, aOwnershipID);
@@ -218,8 +232,10 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
+  public Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull final IDataUser aDataUser) throws Throwable
   {
+    final DBUser aDBUser = (DBUser) aDataUser;
+
     JPAExecutionResult <Collection <ParticipantIdentifierType>> ret;
     ret = doSelect (new Callable <Collection <ParticipantIdentifierType>> ()
     {
@@ -227,8 +243,6 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
       @ReturnsMutableCopy
       public Collection <ParticipantIdentifierType> call () throws Exception
       {
-        final DBUser aDBUser = _verifyUser (aCredentials);
-
         final List <DBOwnership> aDBOwnerships = getEntityManager ().createQuery ("SELECT p FROM DBOwnership p WHERE p.user = :user",
                                                                                   DBOwnership.class)
                                                                     .setParameter ("user", aDBUser)
@@ -277,17 +291,17 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
   }
 
   public void saveServiceGroup (@Nonnull final ServiceGroupType aServiceGroup,
-                                @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
+                                @Nonnull final IDataUser aDataUser) throws Throwable
   {
+    final DBUser aDBUser = (DBUser) aDataUser;
+
     JPAExecutionResult <?> ret;
     ret = doInTransaction (new Runnable ()
     {
       public void run ()
       {
-        final DBUser aDBUser = _verifyUser (aCredentials);
-
         final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aServiceGroup.getParticipantIdentifier ());
-        final DBOwnershipID aDBOwnershipID = new DBOwnershipID (aCredentials.getUserName (),
+        final DBOwnershipID aDBOwnershipID = new DBOwnershipID (aDBUser.getUserName (),
                                                                 aServiceGroup.getParticipantIdentifier ());
 
         // Check if the passed service group ID is already in use
@@ -302,7 +316,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
             throw new SMPUnauthorizedException ("The passed service group " +
                                                 IdentifierHelper.getIdentifierURIEncoded (aServiceGroup.getParticipantIdentifier ()) +
                                                 " is not owned by '" +
-                                                aCredentials.getUserName () +
+                                                aDBUser.getUserName () +
                                                 "'");
           }
 
@@ -340,7 +354,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
   }
 
   public void deleteServiceGroup (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                                  @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
+                                  @Nonnull final IDataUser aDataUser) throws Throwable
   {
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction (new Callable <EChange> ()
@@ -348,8 +362,6 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
       @Nonnull
       public EChange call ()
       {
-        _verifyUser (aCredentials);
-
         // Check if the service group is existing
         final EntityManager aEM = getEntityManager ();
         final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aServiceGroupID);
@@ -363,7 +375,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
 
         // Check the ownership afterwards, so that only existing serviceGroups
         // are checked
-        final DBOwnership aDBOwnership = _verifyOwnership (aServiceGroupID, aCredentials);
+        final DBOwnership aDBOwnership = _verifyOwnership (aServiceGroupID, aDataUser);
 
         // Delete in SML - throws exception in case of error
         m_aHook.deleteServiceGroup (aServiceGroupID);
@@ -479,13 +491,12 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
   }
 
   public void saveService (@Nonnull final ServiceInformationType aServiceMetadata,
-                           @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
+                           @Nonnull final IDataUser aDataUser) throws Throwable
   {
     final ParticipantIdentifierType aServiceGroupID = aServiceMetadata.getParticipantIdentifier ();
     final DocumentIdentifierType aDocTypeID = aServiceMetadata.getDocumentIdentifier ();
 
-    _verifyUser (aCredentials);
-    _verifyOwnership (aServiceGroupID, aCredentials);
+    _verifyOwnership (aServiceGroupID, aDataUser);
 
     // Delete an eventually contained previous service in a separate transaction
     _deleteService (aServiceGroupID, aDocTypeID);
@@ -572,10 +583,9 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
 
   public void deleteService (@Nonnull final ParticipantIdentifierType aServiceGroupID,
                              @Nonnull final DocumentIdentifierType aDocTypeID,
-                             @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
+                             @Nonnull final IDataUser aDataUser) throws Throwable
   {
-    _verifyUser (aCredentials);
-    _verifyOwnership (aServiceGroupID, aCredentials);
+    _verifyOwnership (aServiceGroupID, aDataUser);
 
     final EChange eChange = _deleteService (aServiceGroupID, aDocTypeID);
     if (eChange.isUnchanged ())

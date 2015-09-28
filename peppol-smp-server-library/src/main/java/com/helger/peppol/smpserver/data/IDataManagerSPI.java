@@ -47,6 +47,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.IsSPIInterface;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.peppol.identifier.DocumentIdentifierType;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
@@ -65,16 +66,35 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 public interface IDataManagerSPI
 {
   /**
-   * Gets the service group ids owned by the given credentials.
+   * Check if an SMP user matching the user name of the BasicAuth credentials
+   * exists, and that the passwords match. So this method verifies that the
+   * BasicAuth credentials are valid.
    *
    * @param aCredentials
-   *        The credentials to get service groups id for.
+   *        The credentials to be validated. May not be <code>null</code>.
+   * @return The matching non-<code>null</code> {@link IDataUser}.
+   * @throws Throwable
+   *         If no user matching the passed user name is present or if the
+   *         password in the credentials does not match the stored password
+   *         (hash).
+   */
+  @Nonnull
+  IDataUser getUserFromCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+
+  @Nonnull
+  IDataUser createPreAuthenticatedUser (@Nonnull @Nonempty String sUserName);
+
+  /**
+   * Gets the service group ids owned by the given credentials.
+   *
+   * @param aDataUser
+   *        The current, verified user. Never <code>null</code>.
    * @return A collection of service group id's.
    * @throws Throwable
    */
   @Nonnull
   @ReturnsMutableCopy
-  Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+  Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull IDataUser aDataUser) throws Throwable;
 
   /**
    * This method returns a ServiceGroup given its id.
@@ -93,23 +113,23 @@ public interface IDataManagerSPI
    *
    * @param aServiceGroup
    *        The service group to save.
-   * @param aCredentials
-   *        The credentials to use.
+   * @param aDataUser
+   *        The current, verified user. Never <code>null</code>.
    * @throws Throwable
    */
-  void saveServiceGroup (@Nonnull ServiceGroupType aServiceGroup, @Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+  void saveServiceGroup (@Nonnull ServiceGroupType aServiceGroup, @Nonnull IDataUser aDataUser) throws Throwable;
 
   /**
    * Deletes the service group having the specified id.
    *
    * @param aServiceGroupID
    *        The ID of the service group to delete.
-   * @param aCredentials
-   *        The credentials to use.
+   * @param aDataUser
+   *        The current, verified user. Never <code>null</code>.
    * @throws Throwable
    */
   void deleteServiceGroup (@Nonnull ParticipantIdentifierType aServiceGroupID,
-                           @Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+                           @Nonnull IDataUser aDataUser) throws Throwable;
 
   /**
    * Gets a list of the document id's of the given service group.
@@ -156,11 +176,11 @@ public interface IDataManagerSPI
    *
    * @param aServiceMetadata
    *        The service information to save.
-   * @param aCredentials
-   *        The credentials to use.
+   * @param aDataUser
+   *        The current, verified user. Never <code>null</code>.
    * @throws Throwable
    */
-  void saveService (@Nonnull ServiceInformationType aServiceMetadata, @Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+  void saveService (@Nonnull ServiceInformationType aServiceMetadata, @Nonnull IDataUser aDataUser) throws Throwable;
 
   /**
    * Deletes a service metadata object given by its service group id and
@@ -170,13 +190,13 @@ public interface IDataManagerSPI
    *        The service group id of the service metadata.
    * @param aDocTypeID
    *        The document id of the service metadata.
-   * @param aCredentials
-   *        The credentials to use.
+   * @param aDataUser
+   *        The current, verified user. Never <code>null</code>.
    * @throws Throwable
    */
   void deleteService (@Nonnull ParticipantIdentifierType aServiceGroupID,
                       @Nonnull DocumentIdentifierType aDocTypeID,
-                      @Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+                      @Nonnull IDataUser aDataUser) throws Throwable;
 
   /**
    * Checks whether the ServiceMetadata should be found elsewhere.

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml;
+package com.helger.peppol.smpserver.data.xml.config;
 
 import java.io.File;
 
@@ -25,9 +25,9 @@ import com.helger.commons.microdom.MicroDocument;
 import com.helger.commons.microdom.serialize.MicroReader;
 import com.helger.commons.microdom.serialize.MicroWriter;
 import com.helger.commons.state.SuccessWithValue;
-import com.helger.peppol.smpserver.data.xml.domain.SMPRedirectManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.data.xml.SMPRedirectManager;
+import com.helger.peppol.smpserver.data.xml.SMPServiceGroupManager;
+import com.helger.peppol.smpserver.data.xml.SMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.ISMPManagerProviderSPI;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;

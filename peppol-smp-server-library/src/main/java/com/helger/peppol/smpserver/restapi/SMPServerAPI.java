@@ -70,6 +70,7 @@ import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManagerSPI;
+import com.helger.peppol.smpserver.data.IDataUser;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
@@ -166,7 +167,8 @@ public final class SMPServerAPI
     }
 
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    final Collection <ParticipantIdentifierType> aServiceGroupList = aDataManager.getServiceGroupList (aCredentials);
+    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
+    final Collection <ParticipantIdentifierType> aServiceGroupList = aDataManager.getServiceGroupList (aDataUser);
 
     final ServiceGroupReferenceListType aRefList = aObjFactory.createServiceGroupReferenceListType ();
     final List <ServiceGroupReferenceType> aReferenceTypes = aRefList.getServiceGroupReference ();
@@ -257,7 +259,8 @@ public final class SMPServerAPI
     }
 
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    aDataManager.saveServiceGroup (aServiceGroup, aCredentials);
+    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
+    aDataManager.saveServiceGroup (aServiceGroup, aDataUser);
 
     s_aLogger.info ("Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ")");
     s_aStatsCounterSuccess.increment ("saveServiceGroup");
@@ -280,7 +283,8 @@ public final class SMPServerAPI
     }
 
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    aDataManager.deleteServiceGroup (aServiceGroupID, aCredentials);
+    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
+    aDataManager.deleteServiceGroup (aServiceGroupID, aDataUser);
 
     s_aLogger.info ("Finished deleteServiceGroup(" + sServiceGroupID + ")");
     s_aStatsCounterSuccess.increment ("deleteServiceGroup");
@@ -399,7 +403,8 @@ public final class SMPServerAPI
 
     // Main save
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    aDataManager.saveService (aServiceMetadata.getServiceInformation (), aCredentials);
+    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
+    aDataManager.saveService (aServiceMetadata.getServiceInformation (), aDataUser);
 
     s_aLogger.info ("Finished saveServiceRegistration(" +
                     sServiceGroupID +
@@ -437,7 +442,8 @@ public final class SMPServerAPI
     }
 
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    aDataManager.deleteService (aServiceGroupID, aDocTypeID, aCredentials);
+    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
+    aDataManager.deleteService (aServiceGroupID, aDocTypeID, aDataUser);
 
     s_aLogger.info ("Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID);
     s_aStatsCounterSuccess.increment ("deleteServiceRegistration");

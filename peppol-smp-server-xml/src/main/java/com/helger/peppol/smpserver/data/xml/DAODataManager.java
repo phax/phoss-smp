@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.annotation.VisibleForTesting;
@@ -39,8 +40,8 @@ import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
-import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManagerSPI;
+import com.helger.peppol.smpserver.data.IDataUser;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
@@ -56,7 +57,6 @@ import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookException;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
-import com.helger.peppol.smpserver.smlhook.RegistrationHookWriteToSML;
 import com.helger.photon.basic.security.AccessManager;
 import com.helger.photon.basic.security.user.IUser;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
@@ -85,13 +85,9 @@ public final class DAODataManager implements IDataManagerSPI
     m_aHook = ValueEnforcer.notNull (aHook, "Hook");
   }
 
-  public boolean isSMLConnectionActive ()
-  {
-    return m_aHook instanceof RegistrationHookWriteToSML;
-  }
-
   @Nonnull
-  private static IUser _validateCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException
+  public DAODataUser getUserFromCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException,
+                                                                                                     SMPUnknownUserException
   {
     final AccessManager aAccessMgr = AccessManager.getInstance ();
     final IUser aUser = aAccessMgr.getUserOfLoginName (aCredentials.getUserName ());
@@ -105,27 +101,13 @@ public final class DAODataManager implements IDataManagerSPI
       s_aLogger.info ("Invalid password provided for '" + aCredentials.getUserName () + "'");
       throw new SMPUnauthorizedException ("Username and/or password are invalid!");
     }
-    return aUser;
+    return new DAODataUser (aUser);
   }
 
-  /**
-   * Verify that the passed service group is owned by the user specified in the
-   * credentials.
-   *
-   * @param aServiceGroupID
-   *        The service group to be verified
-   * @param aCredentials
-   *        The credentials to be checked
-   * @return The owning service group and never <code>null</code>.
-   * @throws SMPUnauthorizedException
-   *         If the participant identifier is not owned by the user specified in
-   *         the credentials
-   */
   @Nonnull
-  private static ISMPServiceGroup _verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                                                    @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException
+  public DAODataUser createPreAuthenticatedUser (@Nonnull @Nonempty final String sUserName)
   {
-    return _verifyOwnership (aServiceGroupID, aCredentials.getUserName ());
+    return new DAODataUser (AccessManager.getInstance ().getUserOfLoginName (sUserName));
   }
 
   /**
@@ -134,8 +116,8 @@ public final class DAODataManager implements IDataManagerSPI
    *
    * @param aServiceGroupID
    *        The service group to be verified
-   * @param sUserName
-   *        The user name to be checked.
+   * @param sUserLoginName
+   *        The user login name to be checked.
    * @return The owning service group and never <code>null</code>.
    * @throws SMPUnauthorizedException
    *         If the participant identifier is not owned by the user specified in
@@ -143,7 +125,7 @@ public final class DAODataManager implements IDataManagerSPI
    */
   @Nonnull
   private static ISMPServiceGroup _verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                                                    @Nonnull final String sUserName) throws SMPUnauthorizedException
+                                                    @Nonnull final String sUserLoginName) throws SMPUnauthorizedException
   {
     // Resolve user group
     final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
@@ -157,25 +139,29 @@ public final class DAODataManager implements IDataManagerSPI
     // Resolve user
     final String sOwnerID = aServiceGroup.getOwnerID ();
     final IUser aOwner = AccessManager.getInstance ().getUserOfID (sOwnerID);
-    if (aOwner == null || !aOwner.getLoginName ().equals (sUserName))
+    if (aOwner == null || !aOwner.getLoginName ().equals (sUserLoginName))
     {
       throw new SMPUnauthorizedException ("User '" +
-                                          sUserName +
+                                          sUserLoginName +
                                           "' does not own " +
                                           IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
     }
 
     if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Verified service group ID " + aServiceGroup.getID () + " is owned by user '" + sUserName + "'");
+      s_aLogger.debug ("Verified service group ID " +
+                       aServiceGroup.getID () +
+                       " is owned by user '" +
+                       sUserLoginName +
+                       "'");
 
     return aServiceGroup;
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull final BasicAuthClientCredentials aCredentials)
+  public Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull final IDataUser aDataUser)
   {
-    final IUser aUser = _validateCredentials (aCredentials);
+    final DAODataUser aUser = (DAODataUser) aDataUser;
 
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final List <ParticipantIdentifierType> ret = new ArrayList <ParticipantIdentifierType> ();
@@ -193,17 +179,17 @@ public final class DAODataManager implements IDataManagerSPI
     return aSG == null ? null : aSG.getAsJAXBObject ();
   }
 
-  public void saveServiceGroup (@Nonnull final ParticipantIdentifierType aParticipantID,
-                                @Nullable final String sExtension,
-                                @Nonnull final IUser aOwningUser) throws SMPUnauthorizedException,
-                                                                  RegistrationHookException
+  public void saveServiceGroupInternal (@Nonnull final ParticipantIdentifierType aParticipantID,
+                                        @Nullable final String sExtension,
+                                        @Nonnull final String sOwningUserID) throws SMPUnauthorizedException,
+                                                                             RegistrationHookException
   {
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aSG = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
     if (aSG != null)
     {
       // Check that existing ServiceGroup can be updated
-      _verifyOwnership (aParticipantID, aOwningUser.getLoginName ());
+      _verifyOwnership (aParticipantID, AccessManager.getInstance ().getUserOfID (sOwningUserID).getLoginName ());
 
       // Update existing service group (don't change the owner)
       aServiceGroupMgr.updateSMPServiceGroup (aSG.getID (), aSG.getOwnerID (), sExtension);
@@ -216,7 +202,7 @@ public final class DAODataManager implements IDataManagerSPI
       try
       {
         // Create new
-        aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension);
+        aServiceGroupMgr.createSMPServiceGroup (sOwningUserID, aParticipantID, sExtension);
       }
       catch (final RuntimeException ex)
       {
@@ -228,18 +214,18 @@ public final class DAODataManager implements IDataManagerSPI
   }
 
   public void saveServiceGroup (@Nonnull final ServiceGroupType aServiceGroup,
-                                @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException,
-                                                                                        RegistrationHookException
+                                @Nonnull final IDataUser aDataUser) throws SMPUnauthorizedException,
+                                                                    RegistrationHookException
   {
-    final IUser aUser = _validateCredentials (aCredentials);
-    saveServiceGroup (aServiceGroup.getParticipantIdentifier (),
-                      SMPExtensionConverter.convertToString (aServiceGroup.getExtension ()),
-                      aUser);
+    final DAODataUser aUser = (DAODataUser) aDataUser;
+    saveServiceGroupInternal (aServiceGroup.getParticipantIdentifier (),
+                              SMPExtensionConverter.convertToString (aServiceGroup.getExtension ()),
+                              aUser.getID ());
   }
 
   public void deleteServiceGroup (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                                  @Nonnull final String sUserName) throws SMPUnauthorizedException,
-                                                                   RegistrationHookException
+                                  @Nonnull final IDataUser aDataUser) throws SMPUnauthorizedException,
+                                                                      RegistrationHookException
   {
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
@@ -247,7 +233,7 @@ public final class DAODataManager implements IDataManagerSPI
       throw new SMPNotFoundException (SMPHelper.createSMPServiceGroupID (aServiceGroupID));
 
     // Check that the passed user is really the owner
-    _verifyOwnership (aServiceGroupID, sUserName);
+    _verifyOwnership (aServiceGroupID, aDataUser.getUserName ());
 
     // delete in SML first - throws an exception in case of error
     m_aHook.deleteServiceGroup (aServiceGroupID);
@@ -269,14 +255,6 @@ public final class DAODataManager implements IDataManagerSPI
     // as well
     MetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aServiceGroup);
     MetaManager.getServiceInformationMgr ().deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup);
-  }
-
-  public void deleteServiceGroup (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                                  @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException,
-                                                                                          RegistrationHookException
-  {
-    _validateCredentials (aCredentials);
-    deleteServiceGroup (aServiceGroupID, aCredentials.getUserName ());
   }
 
   @Nonnull
@@ -324,12 +302,10 @@ public final class DAODataManager implements IDataManagerSPI
   }
 
   public void saveService (@Nonnull final ServiceInformationType aServiceInformation,
-                           @Nonnull final BasicAuthClientCredentials aCredentials)
+                           @Nonnull final IDataUser aDataUser)
   {
-
-    _validateCredentials (aCredentials);
     final ISMPServiceGroup aServiceGroup = _verifyOwnership (aServiceInformation.getParticipantIdentifier (),
-                                                             aCredentials);
+                                                             aDataUser.getUserName ());
 
     final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
     aServiceInformationMgr.createSMPServiceInformation (SMPServiceInformation.createFromJAXB (aServiceGroup,
@@ -338,10 +314,9 @@ public final class DAODataManager implements IDataManagerSPI
 
   public void deleteService (@Nonnull final ParticipantIdentifierType aServiceGroupID,
                              @Nonnull final DocumentIdentifierType aDocTypeID,
-                             @Nonnull final BasicAuthClientCredentials aCredentials)
+                             @Nonnull final IDataUser aDataUser)
   {
-    _validateCredentials (aCredentials);
-    _verifyOwnership (aServiceGroupID, aCredentials);
+    _verifyOwnership (aServiceGroupID, aDataUser.getUserName ());
 
     final ISMPServiceInformation aMatch = _getMatchingServiceMetadata (aServiceGroupID, aDocTypeID);
     final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
@@ -357,16 +332,5 @@ public final class DAODataManager implements IDataManagerSPI
     final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (SMPHelper.createSMPServiceGroupID (aServiceGroupID),
                                                                                              aDocTypeID);
     return aRedirect == null ? null : aRedirect.getAsJAXBObject ();
-  }
-
-  /**
-   * @return The singleton instance of this class. This returns a casted
-   *         instance of {@link DataManagerFactory#getInstance()}. Never
-   *         <code>null</code>.
-   */
-  @Nonnull
-  public static DAODataManager getInstance ()
-  {
-    return (DAODataManager) DataManagerFactory.getInstance ();
   }
 }

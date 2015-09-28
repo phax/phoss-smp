@@ -298,11 +298,4 @@ public final class AppCommonUI
     final IUser aOwner = AccessManager.getInstance ().getUserOfID (sOwnerID);
     return aOwner == null ? sOwnerID : aOwner.getLoginName () + " (" + aOwner.getDisplayName () + ")";
   }
-
-  @Nullable
-  public static String getOwnerLoginName (@Nonnull @Nonempty final String sOwnerID)
-  {
-    final IUser aOwner = AccessManager.getInstance ().getUserOfID (sOwnerID);
-    return aOwner == null ? null : aOwner.getLoginName ();
-  }
 }
