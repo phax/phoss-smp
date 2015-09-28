@@ -1,10 +1,12 @@
-# peppol-smp-server-lightweight
+# peppol-smp-server-webapp
 
-A complete PEPPOL SMP server. Compared to the regular PEPPOL SMP server implementation, this implementation does not use a database as its backend but a file-based store. This makes it much simpler to deploy. The reason to do this is that the data amount in an SMP is usually very small (at last a few thousand entries) and that amount can easily be kept in main memory.
+A complete PEPPOL SMP server. Compared to the regular PEPPOL SMP server implementation, this implementation offers a management GUI and a selection of backends.
 
-Current version: *3.1.0* but version *4.0.0-SNAPSHOT* provides many advantages and should be considered!
+Additionally to the SQL backend an XML based backend can be used. This makes it much simpler to deploy. The reason to do this is that the data amount in an SMP is usually very small (at last a few thousand entries) and that amount can easily be kept in main memory.
 
-Please provide the classpath to your PEPPOL SMP keystore and the required passwords updating the `smp-server.properties` file in the `src/main/resource` folder. Typically you will place the keystore.jks file in a folder that you will add to your applications server classpath.
+Current version: *4.0.0-SNAPSHOT*
+
+Please provide the classpath to your PEPPOL SMP keystore and the required passwords updating the `smp-server.properties` file in the `src/main/resource` folder. Typically you will place the `keystore.jks` file in a folder that you will add to your applications server classpath.
 
 #Functionality
 Besides the required SMP REST service (as specified by PEPPOL) this application offers (since version 4) a nice user interface where you can maintain your service groups, service information and redirects.
