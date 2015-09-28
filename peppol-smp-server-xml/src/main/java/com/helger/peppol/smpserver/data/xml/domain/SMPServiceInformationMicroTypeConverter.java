@@ -72,7 +72,7 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   @Nonnull
   public ISMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement)
   {
-    final SMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
     final String sID = aElement.getAttributeValue (ATTR_ID);
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);
     final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (sServiceGroupID);

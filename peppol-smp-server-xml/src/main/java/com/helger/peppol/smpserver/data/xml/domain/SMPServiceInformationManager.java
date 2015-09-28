@@ -60,7 +60,7 @@ import com.helger.photon.basic.security.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManager extends AbstractWALDAO <SMPServiceInformation>
+public final class SMPServiceInformationManager extends AbstractWALDAO <SMPServiceInformation>implements ISMPServiceInformationManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServiceInformationManager.class);
   private static final String ELEMENT_ROOT = "serviceinformationlist";
@@ -171,7 +171,7 @@ public final class SMPServiceInformationManager extends AbstractWALDAO <SMPServi
   }
 
   @Nonnull
-  public ISMPServiceInformation updateSMPServiceInformation (@Nullable final String sServiceInfoID)
+  public ISMPServiceInformation updateSMPServiceInformation (final String sServiceInfoID)
   {
     final SMPServiceInformation aServiceInfo = (SMPServiceInformation) getSMPServiceInformationOfID (sServiceInfoID);
     if (aServiceInfo == null)
@@ -398,7 +398,6 @@ public final class SMPServiceInformationManager extends AbstractWALDAO <SMPServi
     return ret.get (0);
   }
 
-  @Nullable
   public ISMPServiceInformation getSMPServiceInformationOfID (@Nullable final String sID)
   {
     if (StringHelper.hasNoText (sID))

@@ -59,9 +59,9 @@ import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPRedirectManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPRedirectManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
@@ -127,7 +127,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
     if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to create an endpoint for it."));
@@ -174,7 +174,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   protected ISMPServiceInformation getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                                       @Nullable final String sID)
   {
-    final SMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
     return aServiceInfoMgr.getSMPServiceInformationOfID (sID);
   }
 
@@ -283,9 +283,9 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
-    final SMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
-    final SMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
-    final SMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
@@ -587,7 +587,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);

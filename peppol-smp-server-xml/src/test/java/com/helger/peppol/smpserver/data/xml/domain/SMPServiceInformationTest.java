@@ -34,7 +34,6 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
@@ -60,7 +59,7 @@ public final class SMPServiceInformationTest
     final IUser aTestUser = AccessManager.getInstance ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
     assertNotNull (aTestUser);
     final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
-    final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     aServiceGroupMgr.deleteSMPServiceGroup (aPI);
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser, aPI, null);
 
@@ -114,7 +113,7 @@ public final class SMPServiceInformationTest
     final IUser aTestUser = AccessManager.getInstance ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
     assertNotNull (aTestUser);
     final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
-    final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     aServiceGroupMgr.deleteSMPServiceGroup (aPI);
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser, aPI, null);
 

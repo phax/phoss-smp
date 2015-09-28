@@ -41,9 +41,9 @@ import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManagerSPI;
-import com.helger.peppol.smpserver.data.xml.domain.SMPRedirectManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPRedirectManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -176,7 +176,7 @@ public final class DAODataManager implements IDataManagerSPI
   {
     final IUser aUser = _validateCredentials (aCredentials);
 
-    final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final List <ParticipantIdentifierType> ret = new ArrayList <ParticipantIdentifierType> ();
     for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
       if (aServiceGroup.getOwnerID ().equals (aUser.getID ()))
@@ -187,7 +187,7 @@ public final class DAODataManager implements IDataManagerSPI
   @Nullable
   public ServiceGroupType getServiceGroup (@Nonnull final ParticipantIdentifierType aServiceGroupID)
   {
-    final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aSG = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
     return aSG == null ? null : aSG.getAsJAXBObject ();
   }
@@ -197,7 +197,7 @@ public final class DAODataManager implements IDataManagerSPI
                                 @Nonnull final IUser aOwningUser) throws SMPUnauthorizedException,
                                                                   RegistrationHookException
   {
-    final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aSG = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
     if (aSG != null)
     {
@@ -240,7 +240,7 @@ public final class DAODataManager implements IDataManagerSPI
                                   @Nonnull final String sUserName) throws SMPUnauthorizedException,
                                                                    RegistrationHookException
   {
-    final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
       throw new SMPNotFoundException (SMPHelper.createSMPServiceGroupID (aServiceGroupID));
@@ -284,7 +284,7 @@ public final class DAODataManager implements IDataManagerSPI
   {
     final String sServiceGroupID = SMPHelper.createSMPServiceGroupID (aServiceGroupID);
 
-    final SMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
     final List <DocumentIdentifierType> ret = new ArrayList <DocumentIdentifierType> ();
     for (final ISMPServiceInformation aServiceInformation : aServiceInformationMgr.getAllSMPServiceInformationsOfServiceGroup (sServiceGroupID))
       ret.add (new SimpleDocumentTypeIdentifier (aServiceInformation.getDocumentTypeIdentifier ()));
@@ -297,7 +297,7 @@ public final class DAODataManager implements IDataManagerSPI
   {
     final String sServiceGroupID = SMPHelper.createSMPServiceGroupID (aServiceGroupID);
 
-    final SMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
     final List <ServiceMetadataType> ret = new ArrayList <ServiceMetadataType> ();
     for (final ISMPServiceInformation aServiceInformation : aServiceInformationMgr.getAllSMPServiceInformationsOfServiceGroup (sServiceGroupID))
       ret.add (aServiceInformation.getAsJAXBObject ());
@@ -310,7 +310,7 @@ public final class DAODataManager implements IDataManagerSPI
   {
     final String sServiceGroupID = SMPHelper.createSMPServiceGroupID (aServiceGroupID);
 
-    final SMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
     return aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (sServiceGroupID, aDocTypeID);
   }
 
@@ -330,7 +330,7 @@ public final class DAODataManager implements IDataManagerSPI
     final ISMPServiceGroup aServiceGroup = _verifyOwnership (aServiceInformation.getParticipantIdentifier (),
                                                              aCredentials);
 
-    final SMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
     aServiceInformationMgr.createSMPServiceInformation (SMPServiceInformation.createFromJAXB (aServiceGroup,
                                                                                               aServiceInformation));
   }
@@ -343,7 +343,7 @@ public final class DAODataManager implements IDataManagerSPI
     _verifyOwnership (aServiceGroupID, aCredentials);
 
     final ISMPServiceInformation aMatch = _getMatchingServiceMetadata (aServiceGroupID, aDocTypeID);
-    final SMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
     if (aMatch == null || aServiceInformationMgr.deleteSMPServiceInformation (aMatch).isUnchanged ())
       throw new SMPNotFoundException (SMPHelper.createSMPServiceGroupID (aServiceGroupID));
   }
@@ -352,7 +352,7 @@ public final class DAODataManager implements IDataManagerSPI
   public ServiceMetadataType getRedirection (@Nonnull final ParticipantIdentifierType aServiceGroupID,
                                              @Nonnull final DocumentIdentifierType aDocTypeID)
   {
-    final SMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
     final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (SMPHelper.createSMPServiceGroupID (aServiceGroupID),
                                                                                              aDocTypeID);
     return aRedirect == null ? null : aRedirect.getAsJAXBObject ();

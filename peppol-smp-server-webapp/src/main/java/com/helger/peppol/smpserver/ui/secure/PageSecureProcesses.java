@@ -36,8 +36,8 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
@@ -76,7 +76,7 @@ public final class PageSecureProcesses extends AbstractSMPWebPageForm <ISMPServi
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
     if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to create a process for it."));
@@ -119,7 +119,7 @@ public final class PageSecureProcesses extends AbstractSMPWebPageForm <ISMPServi
   protected ISMPServiceInformation getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                                       @Nullable final String sID)
   {
-    final SMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
     return aServiceInfoMgr.getSMPServiceInformationOfID (sID);
   }
 
@@ -191,7 +191,7 @@ public final class PageSecureProcesses extends AbstractSMPWebPageForm <ISMPServi
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
 
     aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page is informational only. You cannot do anything in here."));
 

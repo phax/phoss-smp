@@ -35,6 +35,9 @@ import com.helger.commons.scope.IScope;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.commons.state.SuccessWithValue;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPRedirectManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.data.xml.domain.SMPRedirectManager;
 import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
 import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
@@ -50,9 +53,9 @@ public final class MetaManager extends AbstractGlobalSingleton
 
   private static final Logger s_aLogger = LoggerFactory.getLogger (MetaManager.class);
 
-  private SMPServiceGroupManager m_aServiceGroupMgr;
-  private SMPRedirectManager m_aRedirectMgr;
-  private SMPServiceInformationManager m_aServiceInformationMgr;
+  private ISMPServiceGroupManager m_aServiceGroupMgr;
+  private ISMPRedirectManager m_aRedirectMgr;
+  private ISMPServiceInformationManager m_aServiceInformationMgr;
 
   @Deprecated
   @UsedViaReflection
@@ -121,19 +124,19 @@ public final class MetaManager extends AbstractGlobalSingleton
   }
 
   @Nonnull
-  public static SMPServiceGroupManager getServiceGroupMgr ()
+  public static ISMPServiceGroupManager getServiceGroupMgr ()
   {
     return getInstance ().m_aServiceGroupMgr;
   }
 
   @Nonnull
-  public static SMPRedirectManager getRedirectMgr ()
+  public static ISMPRedirectManager getRedirectMgr ()
   {
     return getInstance ().m_aRedirectMgr;
   }
 
   @Nonnull
-  public static SMPServiceInformationManager getServiceInformationMgr ()
+  public static ISMPServiceInformationManager getServiceInformationMgr ()
   {
     return getInstance ().m_aServiceInformationMgr;
   }

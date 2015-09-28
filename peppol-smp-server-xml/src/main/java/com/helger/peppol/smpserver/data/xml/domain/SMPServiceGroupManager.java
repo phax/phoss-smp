@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -43,7 +44,7 @@ import com.helger.photon.basic.app.dao.impl.EDAOActionType;
 import com.helger.photon.basic.security.audit.AuditHelper;
 import com.helger.photon.basic.security.user.IUser;
 
-public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGroup>
+public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGroup>implements ISMPServiceGroupManager
 {
   private static final String ELEMENT_ROOT = "servicegroups";
   private static final String ELEMENT_ITEM = "servicegroup";
@@ -106,8 +107,8 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
 
   @Nonnull
   public SMPServiceGroup createSMPServiceGroup (@Nonnull final IUser aOwner,
-                                                @Nonnull final IParticipantIdentifier aParticipantIdentifier,
-                                                @Nullable final String sExtension)
+                                                @Nullable @Nonnull final IParticipantIdentifier aParticipantIdentifier,
+                                                final String sExtension)
   {
     final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (aOwner.getID (), aParticipantIdentifier, sExtension);
 
@@ -206,7 +207,6 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     }
   }
 
-  @Nullable
   public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
     if (aParticipantIdentifier == null)
@@ -215,7 +215,6 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     return getSMPServiceGroupOfID (SMPHelper.createSMPServiceGroupID (aParticipantIdentifier));
   }
 
-  @Nullable
   public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final String sID)
   {
     if (StringHelper.hasNoText (sID))
@@ -248,6 +247,7 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     }
   }
 
+  @Nonnegative
   public int getSMPServiceGroupCount ()
   {
     m_aRWLock.readLock ().lock ();

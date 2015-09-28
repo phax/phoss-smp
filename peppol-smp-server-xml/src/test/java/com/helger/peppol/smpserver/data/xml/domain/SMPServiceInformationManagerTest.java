@@ -30,9 +30,7 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
-import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
@@ -53,15 +51,15 @@ public final class SMPServiceInformationManagerTest
   @Test
   public void testServiceRegistration ()
   {
-    final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    final SMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
     assertEquals (0, aServiceInformationMgr.getSMPServiceInformationCount ());
 
     final IUser aTestUser = AccessManager.getInstance ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
     assertNotNull (aTestUser);
     final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     aServiceGroupMgr.deleteSMPServiceGroup (aPI);
-    final SMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser, aPI, null);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser, aPI, null);
     try
     {
       final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();

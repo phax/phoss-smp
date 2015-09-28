@@ -30,8 +30,6 @@ import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPRedirectManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -59,12 +57,12 @@ public final class SMPRedirectTest
     final SimpleParticipantIdentifier aPI2 = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy2");
     final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
 
-    final SMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
     // Ensure it is not present
     aSGMgr.deleteSMPServiceGroup (aPI);
     final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (aTestUser, aPI, null);
 
-    final SMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
 
     // Create new one
     ISMPRedirect aRedirect = aRedirectMgr.createSMPRedirect (aSG, aDocTypeID, "target", "suid", "extredirect");

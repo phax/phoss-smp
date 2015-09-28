@@ -42,9 +42,9 @@ import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPRedirectManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPRedirectManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
@@ -92,7 +92,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
     if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to create a redirect for it."));
@@ -116,7 +116,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   @Nullable
   protected ISMPRedirect getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
   {
-    final SMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
     return aRedirectMgr.getSMPRedirectOfID (sID);
   }
 
@@ -156,9 +156,9 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   {
     final boolean bEdit = eFormAction.isEdit ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
-    final SMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
-    final SMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
@@ -293,7 +293,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                 @Nonnull final ISMPRedirect aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
     if (aRedirectMgr.deleteSMPRedirect (aSelectedObject).isChanged ())
       aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The selected redirect was successfully deleted!"));
     else
@@ -305,7 +305,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Redirect", createCreateURL (aWPEC), EDefaultIcon.NEW);

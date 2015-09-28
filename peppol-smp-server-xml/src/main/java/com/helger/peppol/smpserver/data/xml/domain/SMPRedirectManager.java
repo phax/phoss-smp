@@ -54,7 +54,7 @@ import com.helger.photon.basic.security.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>
+public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>implements ISMPRedirectManager
 {
   private static final String ELEMENT_ROOT = "redirects";
   private static final String ELEMENT_ITEM = "redirect";
@@ -166,7 +166,7 @@ public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>
 
   /**
    * Create or update a redirect for a service group.
-   * 
+   *
    * @param aServiceGroup
    *        Service group
    * @param aDocumentTypeIdentifier
@@ -318,7 +318,6 @@ public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>
     }
   }
 
-  @Nullable
   public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
@@ -327,7 +326,6 @@ public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>
     return getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup.getID (), aDocTypeID);
   }
 
-  @Nullable
   public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final String sServiceGroupID,
                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
@@ -351,7 +349,6 @@ public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>
     return null;
   }
 
-  @Nullable
   public ISMPRedirect getSMPRedirectOfID (@Nullable final String sID)
   {
     if (StringHelper.hasNoText (sID))

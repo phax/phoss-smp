@@ -41,8 +41,8 @@ import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.xml.DAODataManager;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
@@ -89,7 +89,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   protected ISMPServiceGroup getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                                 @Nullable final String sID)
   {
-    final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     return aServiceGroupMgr.getSMPServiceGroupOfID (sID);
   }
 
@@ -154,7 +154,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
     if (aFormErrors.isEmpty ())
     {
-      final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
       if (bEdit)
       {
         // Edit only the internal data objects because no change to the SML is
@@ -261,8 +261,8 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    final SMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
