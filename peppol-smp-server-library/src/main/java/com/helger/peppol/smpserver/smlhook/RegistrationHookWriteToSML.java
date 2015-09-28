@@ -162,15 +162,15 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     catch (final UnauthorizedFault ex)
     {
       final String sMsg = "Seems like this SMP is not registered to the SML, or you're providing invalid credentials!";
-      s_aLogger.warn (sMsg);
+      s_aLogger.error (sMsg);
       throw new RegistrationHookException (sMsg, ex);
     }
     catch (final Throwable t)
     {
       final String sMsg = "Could not create business " +
                           IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                          " in Business Identifier Manager Service";
-      s_aLogger.warn (sMsg, t);
+                          " in SML";
+      s_aLogger.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
   }
@@ -180,14 +180,17 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     try
     {
       // Undo create
-      s_aLogger.warn ("CREATE failed in database, so deleting " +
+      s_aLogger.warn ("CREATE failed in backend, so deleting " +
                       IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
                       " from SML.");
       _createSMLCaller ().delete (aBusinessIdentifier);
     }
     catch (final Throwable t)
     {
-      throw new RegistrationHookException ("Unable to rollback update business " + aBusinessIdentifier, t);
+      final String sMsg = "Unable to rollback create business " +
+                          IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+      s_aLogger.error (sMsg, t);
+      throw new RegistrationHookException (sMsg, t);
     }
   }
 
@@ -212,8 +215,8 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     {
       final String sMsg = "Could not delete business " +
                           IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                          " in Business Identifier Manager Service";
-      s_aLogger.warn (sMsg, t);
+                          " in SML";
+      s_aLogger.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
   }
@@ -223,15 +226,17 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     try
     {
       // Undo delete
-      s_aLogger.warn ("DELETE failed in database, so creating " +
+      s_aLogger.warn ("DELETE failed in backend, so creating " +
                       IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
                       " in SML.");
       _createSMLCaller ().create (s_sSMPID, aBusinessIdentifier);
     }
     catch (final Throwable t)
     {
-      throw new RegistrationHookException ("Unable to rollback update business " +
-                                           IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier), t);
+      final String sMsg = "Unable to rollback delete business " +
+                          IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+      s_aLogger.error (sMsg, t);
+      throw new RegistrationHookException (sMsg, t);
     }
   }
 }
