@@ -83,7 +83,7 @@ public interface IDataManagerSPI
 
   /**
    * Create a pre-authenticated user (e.g. for the management GUI).
-   * 
+   *
    * @param sUserName
    *        The user name to use.
    * @return Never <code>null</code>.
@@ -98,6 +98,7 @@ public interface IDataManagerSPI
    *        The current, verified user. Never <code>null</code>.
    * @return A collection of service group id's.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   @Nonnull
   @ReturnsMutableCopy
@@ -110,6 +111,7 @@ public interface IDataManagerSPI
    *        The service group id.
    * @return The service group corresponding to the id.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   @Nullable
   ServiceGroupType getServiceGroup (@Nonnull ParticipantIdentifierType aServiceGroupID) throws Throwable;
@@ -123,6 +125,7 @@ public interface IDataManagerSPI
    * @param aDataUser
    *        The current, verified user. Never <code>null</code>.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   void saveServiceGroup (@Nonnull ServiceGroupType aServiceGroup, @Nonnull IDataUser aDataUser) throws Throwable;
 
@@ -134,6 +137,7 @@ public interface IDataManagerSPI
    * @param aDataUser
    *        The current, verified user. Never <code>null</code>.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   void deleteServiceGroup (@Nonnull ParticipantIdentifierType aServiceGroupID,
                            @Nonnull IDataUser aDataUser) throws Throwable;
@@ -145,6 +149,7 @@ public interface IDataManagerSPI
    *        The id of the service group.
    * @return The corresponding document id's.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   @Nonnull
   @ReturnsMutableCopy
@@ -158,6 +163,7 @@ public interface IDataManagerSPI
    *        The service group id.
    * @return A list of service metadata objects.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   @Nonnull
   @ReturnsMutableCopy
@@ -171,8 +177,10 @@ public interface IDataManagerSPI
    *        The service group id of the service metadata.
    * @param aDocTypeID
    *        The document id of the service metadata.
-   * @return The corresponding service metadata.
+   * @return The corresponding service metadata. It's either a service
+   *         information or a redirect.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   @Nullable
   ServiceMetadataType getService (@Nonnull ParticipantIdentifierType aServiceGroupID,
@@ -186,6 +194,7 @@ public interface IDataManagerSPI
    * @param aDataUser
    *        The current, verified user. Never <code>null</code>.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   void saveService (@Nonnull ServiceInformationType aServiceMetadata, @Nonnull IDataUser aDataUser) throws Throwable;
 
@@ -200,6 +209,7 @@ public interface IDataManagerSPI
    * @param aDataUser
    *        The current, verified user. Never <code>null</code>.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   void deleteService (@Nonnull ParticipantIdentifierType aServiceGroupID,
                       @Nonnull DocumentIdentifierType aDocTypeID,
@@ -217,6 +227,7 @@ public interface IDataManagerSPI
    * @return The URI to be redirected to. null if no redirection should take
    *         place.
    * @throws Throwable
+   *         In case something goes wrong.
    */
   @Nullable
   ServiceMetadataType getRedirection (@Nonnull ParticipantIdentifierType aServiceGroupID,
