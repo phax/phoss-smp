@@ -29,6 +29,7 @@ import com.helger.css.property.CCSSProperties;
 import com.helger.html.css.DefaultCSSClassProvider;
 import com.helger.html.css.ICSSClassProvider;
 import com.helger.html.hc.IHCNode;
+import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.IHCElement;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCP;
@@ -111,7 +112,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
       final Locale aDisplayLocale = aLEC.getDisplayLocale ();
       final BootstrapNav aNav = new BootstrapNav ();
       aNavbar.addButton (EBootstrapNavbarPosition.COLLAPSIBLE_DEFAULT,
-                         new BootstrapButton ().addChild ("Goto secure area")
+                         new BootstrapButton ().addChild ("Goto manager")
                                                .setOnClick (LinkHelper.getURLWithContext (AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH +
                                                                                           "/")));
       aNav.addItem (new HCSpan ().addClass (CBootstrapCSS.NAVBAR_TEXT)
@@ -176,7 +177,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
 
   @SuppressWarnings ("unchecked")
   @Nonnull
-  public static IHCNode _getMainContent (@Nonnull final LayoutExecutionContext aLEC)
+  public static IHCNode getPageContent (@Nonnull final LayoutExecutionContext aLEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
 
@@ -228,6 +229,22 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   }
 
   @Nonnull
+  public static BootstrapContainer createDefaultFooter ()
+  {
+    final BootstrapContainer aDiv = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
+    aDiv.addChild (new HCP ().addChild ("PEPPOL SMP server"));
+    aDiv.addChild (new HCP ().addChild ("Created by ")
+                             .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"))
+                             .addChild (" - Twitter: ")
+                             .addChild (new HCA ("https://twitter.com/philiphelger").setTargetBlank ()
+                                                                                    .addChild ("@philiphelger"))
+                             .addChild (" - ")
+                             .addChild (new HCA ("https://github.com/phax/peppol-smp-server").setTargetBlank ()
+                                                                                             .addChild ("Source on GitHub")));
+    return aDiv;
+  }
+
+  @Nonnull
   public IHCNode getContent (@Nonnull final LayoutExecutionContext aLEC, @Nonnull final HCHead aHead)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
@@ -236,9 +253,10 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
     // Header
     ret.addChild (_getNavbar (aLEC));
 
-    final BootstrapContainer aOuterContainer = ret.addAndReturnChild (new BootstrapContainer ());
+    final BootstrapContainer aOuterContainer = ret.addAndReturnChild (new BootstrapContainer ().setFluid (true));
 
     // Breadcrumbs
+    if (false)
     {
       final BootstrapBreadcrumbs aBreadcrumbs = BootstrapBreadcrumbsProvider.createBreadcrumbs (aLEC);
       aBreadcrumbs.addClass (CBootstrapCSS.HIDDEN_XS);
@@ -257,15 +275,12 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
       aCol1.addChild (new HCDiv ().setID (CLayout.LAYOUT_AREAID_SPECIAL));
 
       // content
-      aCol2.addChild (_getMainContent (aLEC));
+      aCol2.addChild (getPageContent (aLEC));
     }
 
     // Footer
     {
-      final BootstrapContainer aDiv = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER);
-
-      aDiv.addChild (new HCP ().addChild ("PEPPOL lightweight SMP server"));
-      aDiv.addChild (new HCP ().addChild ("Created by Philip Helger - Twitter: @philiphelger"));
+      final BootstrapContainer aDiv = createDefaultFooter ();
 
       final BootstrapMenuItemRendererHorz aRenderer = new BootstrapMenuItemRendererHorz (aDisplayLocale);
       final HCUL aUL = aDiv.addAndReturnChild (new HCUL ().addClass (CSS_CLASS_FOOTER_LINKS));
