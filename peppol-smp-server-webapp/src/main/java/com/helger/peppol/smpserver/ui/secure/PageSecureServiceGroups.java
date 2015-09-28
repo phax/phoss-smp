@@ -41,10 +41,10 @@ import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.xml.DAODataManager;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
-import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.basic.security.AccessManager;
@@ -174,7 +174,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         else
         {
           // Create the service group only locally but NOT on the SML!
-          aServiceGroupMgr.createSMPServiceGroup (aOwningUser, aParticipantID, sExtension);
+          aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension);
         }
         aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
                                                                  sParticipantID +

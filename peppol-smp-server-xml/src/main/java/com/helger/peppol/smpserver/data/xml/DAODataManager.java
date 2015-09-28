@@ -41,13 +41,13 @@ import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManagerSPI;
-import com.helger.peppol.smpserver.data.xml.domain.ISMPRedirectManager;
-import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.data.xml.domain.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
+import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
@@ -215,7 +215,7 @@ public final class DAODataManager implements IDataManagerSPI
       try
       {
         // Create new
-        aServiceGroupMgr.createSMPServiceGroup (aOwningUser, aParticipantID, sExtension);
+        aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension);
       }
       catch (final RuntimeException ex)
       {

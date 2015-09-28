@@ -1,4 +1,4 @@
-package com.helger.peppol.smpserver.data.xml.domain;
+package com.helger.peppol.smpserver.domain.redirect;
 
 import java.util.Collection;
 
@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 public interface ISMPRedirectManager

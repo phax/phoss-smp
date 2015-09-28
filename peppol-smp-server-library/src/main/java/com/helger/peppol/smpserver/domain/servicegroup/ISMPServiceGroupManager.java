@@ -1,4 +1,4 @@
-package com.helger.peppol.smpserver.data.xml.domain;
+package com.helger.peppol.smpserver.domain.servicegroup;
 
 import java.util.Collection;
 
@@ -6,21 +6,22 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.photon.basic.security.user.IUser;
 
 public interface ISMPServiceGroupManager
 {
   @Nonnull
-  ISMPServiceGroup createSMPServiceGroup (IUser aOwner,
-                                          IParticipantIdentifier aParticipantIdentifier,
+  ISMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty String sOwnerID,
+                                          @Nonnull IParticipantIdentifier aParticipantIdentifier,
                                           @Nullable String sExtension);
 
   @Nonnull
-  EChange updateSMPServiceGroup (@Nullable String sSMPServiceGroupID, String sOwnerID, @Nullable String sExtension);
+  EChange updateSMPServiceGroup (@Nullable String sSMPServiceGroupID,
+                                 @Nonnull String sOwnerID,
+                                 @Nullable String sExtension);
 
   @Nonnull
   EChange deleteSMPServiceGroup (@Nullable IParticipantIdentifier aParticipantIdentifier);

@@ -30,6 +30,7 @@ import com.helger.peppol.smpserver.data.xml.MetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 
 /**
  * This class is internally used to convert {@link SMPRedirect} from and to XML.

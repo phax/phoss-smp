@@ -37,12 +37,12 @@ import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.photon.basic.app.dao.impl.EDAOActionType;
 import com.helger.photon.basic.security.audit.AuditHelper;
-import com.helger.photon.basic.security.user.IUser;
 
 public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGroup>implements ISMPServiceGroupManager
 {
@@ -106,11 +106,11 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   }
 
   @Nonnull
-  public SMPServiceGroup createSMPServiceGroup (@Nonnull final IUser aOwner,
+  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
                                                 @Nullable @Nonnull final IParticipantIdentifier aParticipantIdentifier,
                                                 final String sExtension)
   {
-    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (aOwner.getID (), aParticipantIdentifier, sExtension);
+    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
 
     m_aRWLock.writeLock ().lock ();
     try
@@ -124,7 +124,7 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     }
     AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
                                       aSMPServiceGroup.getID (),
-                                      aOwner.getID (),
+                                      sOwnerID,
                                       aParticipantIdentifier,
                                       sExtension);
     return aSMPServiceGroup;

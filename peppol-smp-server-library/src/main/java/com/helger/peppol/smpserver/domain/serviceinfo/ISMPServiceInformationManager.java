@@ -1,4 +1,4 @@
-package com.helger.peppol.smpserver.data.xml.domain;
+package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,9 +13,6 @@ import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 
 public interface ISMPServiceInformationManager
 {

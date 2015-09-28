@@ -31,8 +31,10 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
+import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 import com.helger.photon.basic.security.AccessManager;
 import com.helger.photon.basic.security.CSecurity;
@@ -60,7 +62,7 @@ public final class SMPRedirectTest
     final ISMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
     // Ensure it is not present
     aSGMgr.deleteSMPServiceGroup (aPI);
-    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (aTestUser, aPI, null);
+    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
 
     final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
 
@@ -87,7 +89,7 @@ public final class SMPRedirectTest
     CommonsTestHelper.testMicroTypeConversion (aRedirect);
 
     // Add second one
-    final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (aTestUser, aPI2, null);
+    final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (aTestUser.getID (), aPI2, null);
     aRedirect = aRedirectMgr.createSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", "extredirect2");
     assertSame (aSG2, aRedirect.getServiceGroup ());
     assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID, aRedirect.getDocumentTypeIdentifier ()));

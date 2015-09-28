@@ -31,6 +31,8 @@ import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
@@ -59,7 +61,7 @@ public final class SMPServiceInformationManagerTest
     assertNotNull (aTestUser);
     final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     aServiceGroupMgr.deleteSMPServiceGroup (aPI);
-    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser, aPI, null);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
     try
     {
       final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();

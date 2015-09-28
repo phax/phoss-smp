@@ -31,6 +31,7 @@ import com.helger.commons.microdom.util.MicroHelper;
 import com.helger.peppol.identifier.IMutableDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.data.xml.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
