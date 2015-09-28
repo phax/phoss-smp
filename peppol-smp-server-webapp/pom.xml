@@ -25,7 +25,7 @@
   </parent>
   <artifactId>peppol-smp-server-webapp</artifactId>
   <packaging>war</packaging>
-  <name>peppol-smp-server</name>
+  <name>peppol-smp-server-webapp</name>
   <description>SMP webapp with all available features (read &amp; write)</description>
   <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-webapp</url>
   <inceptionYear>2015</inceptionYear>
