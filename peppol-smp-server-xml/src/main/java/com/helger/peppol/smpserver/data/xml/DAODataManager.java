@@ -179,17 +179,20 @@ public final class DAODataManager implements IDataManagerSPI
     return aSG == null ? null : aSG.getAsJAXBObject ();
   }
 
-  public void saveServiceGroupInternal (@Nonnull final ParticipantIdentifierType aParticipantID,
-                                        @Nullable final String sExtension,
-                                        @Nonnull final String sOwningUserID) throws SMPUnauthorizedException,
-                                                                             RegistrationHookException
+  public void saveServiceGroup (@Nonnull final ServiceGroupType aServiceGroup,
+                                @Nonnull final IDataUser aDataUser) throws SMPUnauthorizedException,
+                                                                    RegistrationHookException
   {
+    final DAODataUser aUser = (DAODataUser) aDataUser;
+    final ParticipantIdentifierType aParticipantID = aServiceGroup.getParticipantIdentifier ();
+    final String sExtension = SMPExtensionConverter.convertToString (aServiceGroup.getExtension ());
+
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aSG = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
     if (aSG != null)
     {
       // Check that existing ServiceGroup can be updated
-      _verifyOwnership (aParticipantID, AccessManager.getInstance ().getUserOfID (sOwningUserID).getLoginName ());
+      _verifyOwnership (aParticipantID, aUser.getUserName ());
 
       // Update existing service group (don't change the owner)
       aServiceGroupMgr.updateSMPServiceGroup (aSG.getID (), aSG.getOwnerID (), sExtension);
@@ -202,7 +205,7 @@ public final class DAODataManager implements IDataManagerSPI
       try
       {
         // Create new
-        aServiceGroupMgr.createSMPServiceGroup (sOwningUserID, aParticipantID, sExtension);
+        aServiceGroupMgr.createSMPServiceGroup (aUser.getID (), aParticipantID, sExtension);
       }
       catch (final RuntimeException ex)
       {
@@ -211,16 +214,6 @@ public final class DAODataManager implements IDataManagerSPI
         throw ex;
       }
     }
-  }
-
-  public void saveServiceGroup (@Nonnull final ServiceGroupType aServiceGroup,
-                                @Nonnull final IDataUser aDataUser) throws SMPUnauthorizedException,
-                                                                    RegistrationHookException
-  {
-    final DAODataUser aUser = (DAODataUser) aDataUser;
-    saveServiceGroupInternal (aServiceGroup.getParticipantIdentifier (),
-                              SMPExtensionConverter.convertToString (aServiceGroup.getExtension ()),
-                              aUser.getID ());
   }
 
   public void deleteServiceGroup (@Nonnull final ParticipantIdentifierType aServiceGroupID,
