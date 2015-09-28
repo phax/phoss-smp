@@ -65,6 +65,7 @@ import com.helger.photon.bootstrap3.navbar.BootstrapNavbar;
 import com.helger.photon.bootstrap3.navbar.EBootstrapNavbarPosition;
 import com.helger.photon.bootstrap3.navbar.EBootstrapNavbarType;
 import com.helger.photon.bootstrap3.pageheader.BootstrapPageHeader;
+import com.helger.photon.bootstrap3.pages.settings.SystemMessageUIHelper;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapMenuItemRenderer;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapMenuItemRendererHorz;
 import com.helger.photon.core.EPhotonCoreText;
@@ -201,6 +202,9 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
 
     // Build page content: header + content
     final HCNodeList aPageContainer = new HCNodeList ();
+
+    // First add the system message
+    aPageContainer.addChild (SystemMessageUIHelper.createDefaultBox ());
 
     // Handle 404 case here (see error404.jsp)
     if ("true".equals (aRequestScope.getAttributeAsString ("httpError")))
