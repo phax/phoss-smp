@@ -59,7 +59,6 @@ import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.CompleteServiceGroupType;
-import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupReferenceListType;
 import com.helger.peppol.smp.ServiceGroupReferenceType;
 import com.helger.peppol.smp.ServiceGroupType;
@@ -101,7 +100,7 @@ public final class SMPServerAPI
     s_aLogger.info ("getCompleteServiceGroup - GET /complete/" + sServiceGroupID);
     s_aStatsCounterCall.increment ("getCompleteServiceGroup");
 
-    final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+    final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     if (aServiceGroupID == null)
     {
       // Invalid identifier
@@ -110,8 +109,6 @@ public final class SMPServerAPI
                                       "'",
                                       m_aDataProvider.getCurrentURI ());
     }
-
-    final ObjectFactory aObjFactory = new ObjectFactory ();
 
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
     final ServiceGroupType aServiceGroup = aDataManager.getServiceGroup (aServiceGroupID);
@@ -127,19 +124,19 @@ public final class SMPServerAPI
     /*
      * Then add the service metadata references
      */
-    final ServiceMetadataReferenceCollectionType aRefCollection = aObjFactory.createServiceMetadataReferenceCollectionType ();
+    final ServiceMetadataReferenceCollectionType aRefCollection = new ServiceMetadataReferenceCollectionType ();
     final List <ServiceMetadataReferenceType> aMetadataReferences = aRefCollection.getServiceMetadataReference ();
 
     final List <DocumentIdentifierType> aDocTypeIDs = aDataManager.getDocumentTypes (aServiceGroupID);
     for (final DocumentIdentifierType aDocTypeID : aDocTypeIDs)
     {
-      final ServiceMetadataReferenceType aMetadataReference = aObjFactory.createServiceMetadataReferenceType ();
+      final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
       aMetadataReference.setHref (m_aDataProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
       aMetadataReferences.add (aMetadataReference);
     }
     aServiceGroup.setServiceMetadataReferenceCollection (aRefCollection);
 
-    final CompleteServiceGroupType aCompleteServiceGroup = aObjFactory.createCompleteServiceGroupType ();
+    final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
     aCompleteServiceGroup.setServiceGroup (aServiceGroup);
     for (final ServiceMetadataType aService : aDataManager.getServices (aServiceGroupID))
       aCompleteServiceGroup.getServiceMetadata ().add (aService);
@@ -156,7 +153,6 @@ public final class SMPServerAPI
     s_aLogger.info ("getServiceGroupReferenceList - GET /list/" + sUserID);
     s_aStatsCounterCall.increment ("getServiceGroupReferenceList");
 
-    final ObjectFactory aObjFactory = new ObjectFactory ();
     if (!aCredentials.getUserName ().equals (sUserID))
     {
       throw new SMPUnauthorizedException ("URL user name '" +
@@ -170,13 +166,13 @@ public final class SMPServerAPI
     final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
     final Collection <ParticipantIdentifierType> aServiceGroupList = aDataManager.getServiceGroupList (aDataUser);
 
-    final ServiceGroupReferenceListType aRefList = aObjFactory.createServiceGroupReferenceListType ();
+    final ServiceGroupReferenceListType aRefList = new ServiceGroupReferenceListType ();
     final List <ServiceGroupReferenceType> aReferenceTypes = aRefList.getServiceGroupReference ();
     for (final IParticipantIdentifier aServiceGroupID : aServiceGroupList)
     {
       final String sHref = m_aDataProvider.getServiceGroupHref (aServiceGroupID);
 
-      final ServiceGroupReferenceType aServGroupRefType = aObjFactory.createServiceGroupReferenceType ();
+      final ServiceGroupReferenceType aServGroupRefType = new ServiceGroupReferenceType ();
       aServGroupRefType.setHref (sHref);
       aReferenceTypes.add (aServGroupRefType);
     }
@@ -202,8 +198,6 @@ public final class SMPServerAPI
                                       m_aDataProvider.getCurrentURI ());
     }
 
-    final ObjectFactory aObjFactory = new ObjectFactory ();
-
     // Retrieve the service group
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
     final ServiceGroupType aServiceGroup = aDataManager.getServiceGroup (aServiceGroupID);
@@ -217,13 +211,13 @@ public final class SMPServerAPI
     }
 
     // Then add the service metadata references
-    final ServiceMetadataReferenceCollectionType aCollectionType = aObjFactory.createServiceMetadataReferenceCollectionType ();
+    final ServiceMetadataReferenceCollectionType aCollectionType = new ServiceMetadataReferenceCollectionType ();
     final List <ServiceMetadataReferenceType> aMetadataReferences = aCollectionType.getServiceMetadataReference ();
 
     final List <DocumentIdentifierType> aDocTypeIDs = aDataManager.getDocumentTypes (aServiceGroupID);
     for (final DocumentIdentifierType aDocTypeID : aDocTypeIDs)
     {
-      final ServiceMetadataReferenceType aMetadataReference = aObjFactory.createServiceMetadataReferenceType ();
+      final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
       aMetadataReference.setHref (m_aDataProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
       aMetadataReferences.add (aMetadataReference);
     }
@@ -316,7 +310,6 @@ public final class SMPServerAPI
                                       m_aDataProvider.getCurrentURI ());
     }
 
-    final ObjectFactory aObjFactory = new ObjectFactory ();
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
 
     // First check for redirection, then for actual service
@@ -337,7 +330,7 @@ public final class SMPServerAPI
       }
     }
 
-    final SignedServiceMetadataType aSignedServiceMetadata = aObjFactory.createSignedServiceMetadataType ();
+    final SignedServiceMetadataType aSignedServiceMetadata = new SignedServiceMetadataType ();
     aSignedServiceMetadata.setServiceMetadata (aService);
     // Signature is added by a handler
 

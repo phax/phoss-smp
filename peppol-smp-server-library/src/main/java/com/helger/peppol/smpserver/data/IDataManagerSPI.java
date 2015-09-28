@@ -81,6 +81,13 @@ public interface IDataManagerSPI
   @Nonnull
   IDataUser getUserFromCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
 
+  /**
+   * Create a pre-authenticated user (e.g. for the management GUI).
+   * 
+   * @param sUserName
+   *        The user name to use.
+   * @return Never <code>null</code>.
+   */
   @Nonnull
   IDataUser createPreAuthenticatedUser (@Nonnull @Nonempty String sUserName);
 

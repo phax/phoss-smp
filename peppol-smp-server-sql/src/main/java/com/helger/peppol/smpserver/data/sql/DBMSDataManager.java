@@ -72,7 +72,6 @@ import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ExtensionType;
-import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ProcessListType;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.RedirectType;
@@ -117,7 +116,6 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
   private static final Logger s_aLogger = LoggerFactory.getLogger (DBMSDataManager.class);
 
   private final IRegistrationHook m_aHook;
-  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
 
   @Deprecated
   @UsedViaReflection
@@ -279,7 +277,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         }
 
         // Convert service group DB to service group service
-        final ServiceGroupType aServiceGroup = m_aObjFactory.createServiceGroupType ();
+        final ServiceGroupType aServiceGroup = new ServiceGroupType ();
         aServiceGroup.setParticipantIdentifier (aServiceGroupID);
         aServiceGroup.setExtension (SMPExtensionConverter.convertOrNull (aDBServiceGroup.getExtension ()));
         // This is set by the REST interface:
@@ -449,7 +447,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         final List <ServiceMetadataType> aList = new ArrayList <ServiceMetadataType> ();
         for (final DBServiceMetadata aService : aServices)
         {
-          final ServiceMetadataType aServiceMetadata = m_aObjFactory.createServiceMetadataType ();
+          final ServiceMetadataType aServiceMetadata = new ServiceMetadataType ();
           _convertFromDBToService (aService, aServiceMetadata);
           aList.add (aServiceMetadata);
         }
@@ -482,7 +480,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
           return null;
         }
 
-        final ServiceMetadataType serviceMetadata = m_aObjFactory.createServiceMetadataType ();
+        final ServiceMetadataType serviceMetadata = new ServiceMetadataType ();
         _convertFromDBToService (aDBServiceMetadata, serviceMetadata);
         return serviceMetadata;
       }
@@ -618,10 +616,10 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
         }
 
         // First check whether an redirect exists.
-        final ServiceMetadataType aServiceMetadata = m_aObjFactory.createServiceMetadataType ();
+        final ServiceMetadataType aServiceMetadata = new ServiceMetadataType ();
 
         // Then return a redirect instead.
-        final RedirectType aRedirect = m_aObjFactory.createRedirectType ();
+        final RedirectType aRedirect = new RedirectType ();
         aRedirect.setCertificateUID (aDBServiceMetadataRedirection.getCertificateUid ());
         aRedirect.setHref (aDBServiceMetadataRedirection.getRedirectionUrl ());
         aRedirect.setExtension (SMPExtensionConverter.convertOrNull (aDBServiceMetadataRedirection.getExtension ()));
@@ -641,7 +639,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
 
     final DocumentIdentifierType aDocTypeID = aDBServiceMetadata.getId ().asDocumentTypeIdentifier ();
 
-    final ServiceInformationType aServiceInformation = m_aObjFactory.createServiceInformationType ();
+    final ServiceInformationType aServiceInformation = new ServiceInformationType ();
     aServiceInformation.setParticipantIdentifier (aBusinessID);
     // serviceInformationType.setCertificateUID(serviceMetadataDB.g));
     aServiceInformation.setExtension (aExtension);
@@ -649,15 +647,15 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
 
     aServiceMetadata.setServiceInformation (aServiceInformation);
 
-    final ProcessListType aProcessList = m_aObjFactory.createProcessListType ();
+    final ProcessListType aProcessList = new ProcessListType ();
     for (final DBProcess aDBProcess : aDBServiceMetadata.getProcesses ())
     {
-      final ProcessType aProcessType = m_aObjFactory.createProcessType ();
+      final ProcessType aProcessType = new ProcessType ();
 
-      final ServiceEndpointList endpoints = m_aObjFactory.createServiceEndpointList ();
+      final ServiceEndpointList endpoints = new ServiceEndpointList ();
       for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
       {
-        final EndpointType aEndpointType = m_aObjFactory.createEndpointType ();
+        final EndpointType aEndpointType = new EndpointType ();
 
         aEndpointType.setTransportProfile (aDBEndpoint.getId ().getTransportProfile ());
         aEndpointType.setExtension (SMPExtensionConverter.convertOrNull (aDBEndpoint.getExtension ()));

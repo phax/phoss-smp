@@ -40,7 +40,6 @@ import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ExtensionType;
-import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ProcessListType;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
@@ -111,8 +110,7 @@ public final class DAODataManagerTest
     assertNotNull (aExtension);
     assertNotNull (aExtension.getAny ());
 
-    final ObjectFactory aObjFactory = new ObjectFactory ();
-    m_aServiceGroup = aObjFactory.createServiceGroupType ();
+    m_aServiceGroup = new ServiceGroupType ();
     m_aServiceGroup.setParticipantIdentifier (PARTY_ID);
     final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
 
@@ -127,21 +125,21 @@ public final class DAODataManagerTest
     // Create a new one
     s_aDataMgr.saveServiceGroup (m_aServiceGroup, aDataUser);
 
-    m_aServiceMetadata = aObjFactory.createServiceMetadataType ();
-    final ServiceInformationType aServiceInformation = aObjFactory.createServiceInformationType ();
+    m_aServiceMetadata = new ServiceMetadataType ();
+    final ServiceInformationType aServiceInformation = new ServiceInformationType ();
     aServiceInformation.setDocumentIdentifier (DOCTYPE_ID);
     aServiceInformation.setParticipantIdentifier (PARTY_ID);
     aServiceInformation.setExtension (aExtension);
     {
-      final ProcessListType processList = aObjFactory.createProcessListType ();
+      final ProcessListType processList = new ProcessListType ();
       {
-        final ProcessType process = aObjFactory.createProcessType ();
+        final ProcessType process = new ProcessType ();
         process.setProcessIdentifier (new SimpleProcessIdentifier (PROCESS_SCHEME, TEST_PROCESS_ID));
         process.setExtension (aExtension);
         {
-          final ServiceEndpointList serviceEndpointList = aObjFactory.createServiceEndpointList ();
+          final ServiceEndpointList serviceEndpointList = new ServiceEndpointList ();
           {
-            final EndpointType endpoint = aObjFactory.createEndpointType ();
+            final EndpointType endpoint = new EndpointType ();
             endpoint.setCertificate (CERTIFICATE);
             endpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (ADDRESS));
             endpoint.setMinimumAuthenticationLevel (MINIMUM_AUTH_LEVEL);
