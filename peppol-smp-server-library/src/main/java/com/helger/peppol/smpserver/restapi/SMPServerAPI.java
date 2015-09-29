@@ -72,9 +72,9 @@ import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
 import com.helger.peppol.smp.ServiceMetadataReferenceType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
-import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
-import com.helger.peppol.smpserver.data.ISMPUserManagerSPI;
 import com.helger.peppol.smpserver.data.IDataUser;
+import com.helger.peppol.smpserver.data.ISMPUserManagerSPI;
+import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
@@ -306,7 +306,8 @@ public final class SMPServerAPI
     }
 
     final ISMPUserManagerSPI aDataManager = SMPUserManagerFactory.getInstance ();
-    aDataManager.validateUserCredentials (aCredentials);
+    final IDataUser aDataUser = aDataManager.validateUserCredentials (aCredentials);
+    aDataManager.verifyOwnership (aServiceGroupID, aDataUser);
 
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
@@ -410,34 +411,37 @@ public final class SMPServerAPI
       return ESuccess.FAILURE;
     }
 
-    final ServiceInformationType aServiceInformationType = aServiceMetadata.getServiceInformation ();
-
-    // Business identifiers from path (ServiceGroupID) and from service
-    // metadata (body) must equal path
-    if (!IdentifierHelper.areParticipantIdentifiersEqual (aServiceInformationType.getParticipantIdentifier (),
-                                                          aServiceGroupID))
+    // May be null for a Redirect!
+    final ServiceInformationType aServiceInformation = aServiceMetadata.getServiceInformation ();
+    if (aServiceInformation != null)
     {
-      s_aLogger.info ("Save service metadata was called with bad parameters. serviceInfo:" +
-                      IdentifierHelper.getIdentifierURIEncoded (aServiceInformationType.getParticipantIdentifier ()) +
-                      " param:" +
-                      aServiceGroupID);
-      return ESuccess.FAILURE;
-    }
+      // Business identifiers from path (ServiceGroupID) and from service
+      // metadata (body) must equal path
+      if (!IdentifierHelper.areParticipantIdentifiersEqual (aServiceInformation.getParticipantIdentifier (),
+                                                            aServiceGroupID))
+      {
+        s_aLogger.info ("Save service metadata was called with bad parameters. serviceInfo:" +
+                        IdentifierHelper.getIdentifierURIEncoded (aServiceInformation.getParticipantIdentifier ()) +
+                        " param:" +
+                        aServiceGroupID);
+        return ESuccess.FAILURE;
+      }
 
-    if (!IdentifierHelper.areDocumentTypeIdentifiersEqual (aServiceInformationType.getDocumentIdentifier (),
-                                                           aDocTypeID))
-    {
-      s_aLogger.info ("Save service metadata was called with bad parameters. serviceInfo:" +
-                      IdentifierHelper.getIdentifierURIEncoded (aServiceInformationType.getDocumentIdentifier ()) +
-                      " param:" +
-                      aDocTypeID);
-      // Document type must equal path
-      return ESuccess.FAILURE;
+      if (!IdentifierHelper.areDocumentTypeIdentifiersEqual (aServiceInformation.getDocumentIdentifier (), aDocTypeID))
+      {
+        s_aLogger.info ("Save service metadata was called with bad parameters. serviceInfo:" +
+                        IdentifierHelper.getIdentifierURIEncoded (aServiceInformation.getDocumentIdentifier ()) +
+                        " param:" +
+                        aDocTypeID);
+        // Document type must equal path
+        return ESuccess.FAILURE;
+      }
     }
 
     // Main save
-    final ISMPUserManagerSPI aDataManager = SMPUserManagerFactory.getInstance ();
-    aDataManager.validateUserCredentials (aCredentials);
+    final ISMPUserManagerSPI aUserManager = SMPUserManagerFactory.getInstance ();
+    final IDataUser aDataUser = aUserManager.validateUserCredentials (aCredentials);
+    aUserManager.verifyOwnership (aServiceGroupID, aDataUser);
 
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (sServiceGroupID);
@@ -529,6 +533,10 @@ public final class SMPServerAPI
       return ESuccess.FAILURE;
     }
 
+    final ISMPUserManagerSPI aUserManager = SMPUserManagerFactory.getInstance ();
+    final IDataUser aDataUser = aUserManager.validateUserCredentials (aCredentials);
+    aUserManager.verifyOwnership (aServiceGroupID, aDataUser);
+
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
@@ -536,9 +544,6 @@ public final class SMPServerAPI
       s_aLogger.info ("Service group '" + sServiceGroupID + "' not on this SMP");
       return ESuccess.FAILURE;
     }
-
-    final ISMPUserManagerSPI aDataManager = SMPUserManagerFactory.getInstance ();
-    aDataManager.validateUserCredentials (aCredentials);
 
     final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
     final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (sServiceGroupID,

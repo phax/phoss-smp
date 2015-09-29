@@ -31,6 +31,7 @@ import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.security.SMPKeyManager;
 
 public final class MetaManager extends AbstractGlobalSingleton
 {
@@ -65,8 +66,18 @@ public final class MetaManager extends AbstractGlobalSingleton
       if (m_aServiceInformationMgr == null)
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 
-      // Ensure Data manager is installed
+      // Ensure user manager is installed
       SMPUserManagerFactory.getInstance ();
+
+      try
+      {
+        SMPKeyManager.getInstance ();
+        SMPKeyManager.markCertificateValid ();
+      }
+      catch (final Exception ex)
+      {
+        // fall through. Certificate stays invalid
+      }
 
       s_aLogger.info (ClassHelper.getClassLocalName (this) + " was initialized");
     }

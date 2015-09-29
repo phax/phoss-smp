@@ -29,6 +29,7 @@ import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.CApp;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
@@ -36,6 +37,7 @@ import com.helger.photon.basic.security.login.LoggedInUserManager;
 import com.helger.photon.basic.security.user.IUser;
 import com.helger.photon.basic.security.util.SecurityHelper;
 import com.helger.photon.bootstrap3.CBootstrapCSS;
+import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
@@ -103,6 +105,10 @@ public final class SMPRendererSecure implements ILayoutAreaContentProvider <Layo
       ret.addChild (new BootstrapInfoBox ().addChild ("SML connection active!"));
     else
       ret.addChild (new BootstrapWarnBox ().addChild ("SML connection NOT active!"));
+
+    // Information on certificate
+    if (!SMPKeyManager.isCertificateValid ())
+      ret.addChild (new BootstrapErrorBox ().addChild ("Certificate configuration is invalid. REST queries will not work!"));
 
     return ret;
   }

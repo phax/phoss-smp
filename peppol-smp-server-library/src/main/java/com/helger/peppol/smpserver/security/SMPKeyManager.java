@@ -50,6 +50,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
 import javax.xml.crypto.MarshalException;
@@ -88,6 +89,8 @@ import com.helger.peppol.utils.KeyStoreHelper;
 public final class SMPKeyManager extends AbstractGlobalSingleton
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPKeyManager.class);
+
+  private static final AtomicBoolean s_aCertificateValid = new AtomicBoolean (false);
 
   private final KeyStore.PrivateKeyEntry m_aKeyEntry;
 
@@ -205,5 +208,15 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
     // Marshal, generate, and sign the enveloped signature.
     aSignature.sign (aSignContext);
+  }
+
+  public static void markCertificateValid ()
+  {
+    s_aCertificateValid.set (true);
+  }
+
+  public static boolean isCertificateValid ()
+  {
+    return s_aCertificateValid.get ();
   }
 }

@@ -44,7 +44,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.IsSPIInterface;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
+import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
@@ -81,11 +82,13 @@ public interface ISMPUserManagerSPI
    * @param aCurrentUser
    *        The user to verify.
    * @return Implementation specific return value.
+   * @throws SMPNotFoundException
+   *         If the passed service group does not exist on this SMP.
    * @throws SMPUnauthorizedException
    *         If the participant identifier is not owned by the user specified in
    *         the credentials
    */
   @Nullable
-  Object verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                          @Nonnull final IDataUser aCurrentUser) throws SMPUnauthorizedException;
+  Object verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
+                          @Nonnull final IDataUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException;
 }

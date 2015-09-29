@@ -76,7 +76,6 @@ import com.helger.peppol.smpserver.data.IDataUser;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
-import com.helger.peppol.smpserver.smlhook.RegistrationHookDoNothing;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
@@ -132,7 +131,7 @@ public final class SQLDataManagerTest
       {
         // Do it only once :)
         SMPEntityManagerFactory.getInstance ();
-        s_aDataMgr = new SQLUserManagerSPI (new RegistrationHookDoNothing ());
+        s_aDataMgr = new SQLUserManagerSPI ();
       }
     }
   }

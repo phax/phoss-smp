@@ -147,6 +147,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
     final ISimpleURL aLinkToStartPage = aLEC.getLinkToMenuItem (aLEC.getMenuTree ().getDefaultMenuItemID ());
 
     final BootstrapNavbar aNavbar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
+    ((BootstrapContainer) aNavbar.getContainer ()).setFluid (true);
     aNavbar.addBrand (new HCSpan ().addChild (CApp.getApplicationTitle ()), aLinkToStartPage);
 
     _addNavbarLoginLogout (aLEC, aNavbar);

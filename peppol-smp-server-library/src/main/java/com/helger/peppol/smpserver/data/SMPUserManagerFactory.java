@@ -46,8 +46,7 @@ import javax.annotation.concurrent.Immutable;
 import com.helger.commons.lang.ServiceLoaderHelper;
 
 /**
- * Factory for creating new DataManagers. This implementation retrieves the name
- * of the data manager from a configuration file.
+ * Factory for retrieving {@link ISMPUserManagerSPI} implementation.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */

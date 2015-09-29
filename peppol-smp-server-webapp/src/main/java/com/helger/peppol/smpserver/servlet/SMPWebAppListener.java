@@ -25,6 +25,7 @@ import javax.servlet.ServletContext;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.AppSecurity;
 import com.helger.peppol.smpserver.ui.AppSettings;
@@ -101,5 +102,7 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
 
     // Set all security related stuff
     AppSecurity.init ();
+
+    MetaManager.getInstance ();
   }
 }

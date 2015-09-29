@@ -55,9 +55,7 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.callback.IThrowingCallable;
@@ -68,6 +66,7 @@ import com.helger.db.jpa.IHasEntityManager;
 import com.helger.db.jpa.JPAEnabledManager;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.DocumentIdentifierType;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.smp.EndpointType;
@@ -99,8 +98,6 @@ import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
-import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
-import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.utils.CertificateHelper;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
@@ -116,16 +113,9 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (SQLUserManagerSPI.class);
 
-  private final IRegistrationHook m_aHook;
-
   @Deprecated
   @UsedViaReflection
   public SQLUserManagerSPI ()
-  {
-    this (RegistrationHookFactory.getOrCreateInstance ());
-  }
-
-  public SQLUserManagerSPI (@Nonnull final IRegistrationHook aHook)
   {
     super (new IHasEntityManager ()
     {
@@ -143,8 +133,6 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
 
     // To avoid some EclipseLink logging issues
     setUseTransactionsForSelect (true);
-
-    m_aHook = ValueEnforcer.notNull (aHook, "Hook");
   }
 
   @Nonnull
@@ -177,37 +165,7 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
   }
 
   @Nonnull
-  public DBUser createPreAuthenticatedUser (@Nonnull @Nonempty final String sUserName)
-  {
-    final DBUser ret = doSelect (new Callable <DBUser> ()
-    {
-      @Nonnull
-      @ReturnsMutableCopy
-      public DBUser call ()
-      {
-        return getEntityManager ().find (DBUser.class, sUserName);
-      }
-    }).getIfSuccessOrNull ();
-    if (ret == null)
-      throw new IllegalArgumentException ("Invalid DB user '" + sUserName + "' provided!");
-    return ret;
-  }
-
-  /**
-   * Verify that the passed service group is owned by the user specified in the
-   * credentials.
-   *
-   * @param aServiceGroupID
-   *        The service group to be verified
-   * @param aCredentials
-   *        The credentials to be checked
-   * @return The non-<code>null</code> ownership object
-   * @throws SMPUnauthorizedException
-   *         If the participant identifier is not owned by the user specified in
-   *         the credentials
-   */
-  @Nonnull
-  public DBOwnership verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
+  public DBOwnership verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
                                       @Nonnull final IDataUser aCredentials) throws SMPUnauthorizedException
   {
     final DBOwnershipID aOwnershipID = new DBOwnershipID (aCredentials.getUserName (), aServiceGroupID);
@@ -325,26 +283,14 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
         }
         else
         {
-          // It's a new service group - throws exception in case of an error
-          m_aHook.createServiceGroup (aServiceGroup.getParticipantIdentifier ());
+          // Did not exist. Create it.
+          aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID);
+          aDBServiceGroup.setExtension (aServiceGroup.getExtension ());
+          aEM.persist (aDBServiceGroup);
 
-          try
-          {
-            // Did not exist. Create it.
-            aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID);
-            aDBServiceGroup.setExtension (aServiceGroup.getExtension ());
-            aEM.persist (aDBServiceGroup);
-
-            // Save the ownership information
-            final DBOwnership aDBOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
-            aEM.persist (aDBOwnership);
-          }
-          catch (final RuntimeException ex)
-          {
-            // An error occurred - remove from SML again
-            m_aHook.undoCreateServiceGroup (aServiceGroup.getParticipantIdentifier ());
-            throw ex;
-          }
+          // Save the ownership information
+          final DBOwnership aDBOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
+          aEM.persist (aDBOwnership);
         }
       }
     });
@@ -376,20 +322,9 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
         // are checked
         final DBOwnership aDBOwnership = verifyOwnership (aServiceGroupID, aDataUser);
 
-        // Delete in SML - throws exception in case of error
-        m_aHook.deleteServiceGroup (aServiceGroupID);
-        try
-        {
-          aEM.remove (aDBOwnership);
-          aEM.remove (aDBServiceGroup);
-          return EChange.CHANGED;
-        }
-        catch (final RuntimeException ex)
-        {
-          // An error occurred - remove from SML again
-          m_aHook.undoDeleteServiceGroup (aServiceGroupID);
-          throw ex;
-        }
+        aEM.remove (aDBOwnership);
+        aEM.remove (aDBServiceGroup);
+        return EChange.CHANGED;
       }
     });
     if (ret.hasThrowable ())
@@ -495,8 +430,6 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
     final ParticipantIdentifierType aServiceGroupID = aServiceMetadata.getParticipantIdentifier ();
     final DocumentIdentifierType aDocTypeID = aServiceMetadata.getDocumentIdentifier ();
 
-    verifyOwnership (aServiceGroupID, aDataUser);
-
     // Delete an eventually contained previous service in a separate transaction
     _deleteService (aServiceGroupID, aDocTypeID);
 
@@ -584,8 +517,6 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
                              @Nonnull final DocumentIdentifierType aDocTypeID,
                              @Nonnull final IDataUser aDataUser) throws Throwable
   {
-    verifyOwnership (aServiceGroupID, aDataUser);
-
     final EChange eChange = _deleteService (aServiceGroupID, aDocTypeID);
     if (eChange.isUnchanged ())
       throw new SMPNotFoundException (IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
