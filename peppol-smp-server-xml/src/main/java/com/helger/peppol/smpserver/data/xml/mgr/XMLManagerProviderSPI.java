@@ -18,6 +18,7 @@ package com.helger.peppol.smpserver.data.xml.mgr;
 
 import java.io.File;
 
+import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.callback.INonThrowingCallable;
 import com.helger.commons.microdom.IMicroDocument;
 import com.helger.commons.microdom.IMicroElement;
@@ -33,6 +34,7 @@ import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.photon.basic.app.io.WebFileIO;
 import com.helger.photon.basic.mgr.PhotonBasicManager;
 
+@IsSPIImplementation
 public final class XMLManagerProviderSPI implements ISMPManagerProviderSPI
 {
   private static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";

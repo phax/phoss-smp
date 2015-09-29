@@ -32,9 +32,6 @@ public interface ISMPServiceInformationManager
   EChange deleteSMPServiceInformation (@Nullable ISMPServiceInformation aSMPServiceInformation);
 
   @Nonnull
-  EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
-
-  @Nonnull
   EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable String sServiceGroupID);
 
   @Nonnull

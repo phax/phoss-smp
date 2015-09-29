@@ -120,7 +120,7 @@ public final class SQLDataManagerTest
                                                                                              TEST_DOCTYPE_ID);
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (USERNAME, PASSWORD);
 
-  private static SQLDataManager s_aDataMgr;
+  private static SQLUserManagerSPI s_aDataMgr;
 
   private static final class SMPTestRule extends ScopeTestRule
   {
@@ -132,7 +132,7 @@ public final class SQLDataManagerTest
       {
         // Do it only once :)
         SMPEntityManagerFactory.getInstance ();
-        s_aDataMgr = new SQLDataManager (new RegistrationHookDoNothing ());
+        s_aDataMgr = new SQLUserManagerSPI (new RegistrationHookDoNothing ());
       }
     }
   }

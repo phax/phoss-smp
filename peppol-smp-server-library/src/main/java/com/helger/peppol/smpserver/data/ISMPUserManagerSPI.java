@@ -41,37 +41,51 @@
 package com.helger.peppol.smpserver.data;
 
 import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.Nullable;
 
-import com.helger.commons.lang.ServiceLoaderHelper;
+import com.helger.commons.annotation.IsSPIInterface;
+import com.helger.peppol.identifier.ParticipantIdentifierType;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
+import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * Factory for creating new DataManagers. This implementation retrieves the name
- * of the data manager from a configuration file.
+ * Abstraction interface for the user management depending on the used backend.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-@Immutable
-public final class DataManagerFactory
+@IsSPIInterface
+public interface ISMPUserManagerSPI
 {
-  private static final IDataManagerSPI s_aInstance;
-
-  static
-  {
-    s_aInstance = ServiceLoaderHelper.getFirstSPIImplementation (IDataManagerSPI.class);
-    if (s_aInstance == null)
-      throw new IllegalStateException ("Failed to find any IDataManagerSPI implementation!");
-  }
-
-  private DataManagerFactory ()
-  {}
-
   /**
-   * @return The same instance over and over again. Never <code>null</code>.
+   * Check if an SMP user matching the user name of the BasicAuth credentials
+   * exists, and that the passwords match. So this method verifies that the
+   * BasicAuth credentials are valid.
+   *
+   * @param aCredentials
+   *        The credentials to be validated. May not be <code>null</code>.
+   * @return The matching non-<code>null</code> {@link IDataUser}.
+   * @throws Throwable
+   *         If no user matching the passed user name is present or if the
+   *         password in the credentials does not match the stored password
+   *         (hash).
    */
   @Nonnull
-  public static IDataManagerSPI getInstance ()
-  {
-    return s_aInstance;
-  }
+  IDataUser validateUserCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+
+  /**
+   * Verify that the passed service group is owned by the user specified in the
+   * credentials.
+   *
+   * @param aServiceGroupID
+   *        The service group to be verified
+   * @param aCurrentUser
+   *        The user to verify.
+   * @return Implementation specific return value.
+   * @throws SMPUnauthorizedException
+   *         If the participant identifier is not owned by the user specified in
+   *         the credentials
+   */
+  @Nullable
+  Object verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
+                          @Nonnull final IDataUser aCurrentUser) throws SMPUnauthorizedException;
 }

@@ -27,7 +27,7 @@ import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.lang.ServiceLoaderHelper;
 import com.helger.commons.scope.IScope;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
-import com.helger.peppol.smpserver.data.DataManagerFactory;
+import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
@@ -66,7 +66,7 @@ public final class MetaManager extends AbstractGlobalSingleton
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 
       // Ensure Data manager is installed
-      DataManagerFactory.getInstance ();
+      SMPUserManagerFactory.getInstance ();
 
       s_aLogger.info (ClassHelper.getClassLocalName (this) + " was initialized");
     }

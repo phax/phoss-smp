@@ -37,6 +37,7 @@ import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -199,6 +200,11 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
         AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aSMPServiceGroup.getID ());
         return EChange.UNCHANGED;
       }
+
+      // Delete all redirects and all service information of this service group
+      // as well
+      MetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
+      MetaManager.getServiceInformationMgr ().deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup.getID ());
 
       markAsChanged (aRealServiceGroup, EDAOActionType.DELETE);
     }

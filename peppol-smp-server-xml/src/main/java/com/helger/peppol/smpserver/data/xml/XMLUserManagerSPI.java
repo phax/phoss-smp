@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
@@ -39,8 +40,8 @@ import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
-import com.helger.peppol.smpserver.data.IDataManagerSPI;
 import com.helger.peppol.smpserver.data.IDataUser;
+import com.helger.peppol.smpserver.data.ISMPUserManagerSPI;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
@@ -61,25 +62,26 @@ import com.helger.photon.basic.security.user.IUser;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * The DAO based {@link IDataManagerSPI}.
+ * The DAO based {@link ISMPUserManagerSPI}.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public final class XMLDataManager implements IDataManagerSPI
+@IsSPIImplementation
+public final class XMLUserManagerSPI implements ISMPUserManagerSPI
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLDataManager.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLUserManagerSPI.class);
 
   private final IRegistrationHook m_aHook;
 
   @Deprecated
   @UsedViaReflection
-  public XMLDataManager ()
+  public XMLUserManagerSPI ()
   {
     this (RegistrationHookFactory.getOrCreateInstance ());
   }
 
   @VisibleForTesting
-  XMLDataManager (@Nonnull final IRegistrationHook aHook)
+  XMLUserManagerSPI (@Nonnull final IRegistrationHook aHook)
   {
     m_aHook = ValueEnforcer.notNull (aHook, "Hook");
   }
@@ -109,22 +111,9 @@ public final class XMLDataManager implements IDataManagerSPI
     return new XMLDataUser (AccessManager.getInstance ().getUserOfLoginName (sUserName));
   }
 
-  /**
-   * Verify that the passed service group is owned by the user specified in the
-   * credentials.
-   *
-   * @param aServiceGroupID
-   *        The service group to be verified
-   * @param sUserLoginName
-   *        The user login name to be checked.
-   * @return The owning service group and never <code>null</code>.
-   * @throws SMPUnauthorizedException
-   *         If the participant identifier is not owned by the user specified in
-   *         the credentials
-   */
   @Nonnull
-  private static ISMPServiceGroup _verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                                                    @Nonnull final String sUserLoginName) throws SMPUnauthorizedException
+  public ISMPServiceGroup verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
+                                           @Nonnull final IDataUser aCurrentUser) throws SMPUnauthorizedException
   {
     // Resolve user group
     final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
@@ -137,20 +126,19 @@ public final class XMLDataManager implements IDataManagerSPI
 
     // Resolve user
     final String sOwnerID = aServiceGroup.getOwnerID ();
-    final IUser aOwner = AccessManager.getInstance ().getUserOfID (sOwnerID);
-    if (aOwner == null || !aOwner.getLoginName ().equals (sUserLoginName))
+    if (!sOwnerID.equals (aCurrentUser.getID ()))
     {
       throw new SMPUnauthorizedException ("User '" +
-                                          sUserLoginName +
+                                          aCurrentUser.getUserName () +
                                           "' does not own " +
                                           IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
     }
 
     if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Verified service group ID " +
+      s_aLogger.debug ("Verified service group " +
                        aServiceGroup.getID () +
                        " is owned by user '" +
-                       sUserLoginName +
+                       aCurrentUser.getUserName () +
                        "'");
 
     return aServiceGroup;
@@ -177,7 +165,7 @@ public final class XMLDataManager implements IDataManagerSPI
     if (aSG != null)
     {
       // Check that existing ServiceGroup can be updated
-      _verifyOwnership (aParticipantID, aUser.getUserName ());
+      verifyOwnership (aParticipantID, aUser);
 
       // Update existing service group (don't change the owner)
       aServiceGroupMgr.updateSMPServiceGroup (aSG.getID (), aSG.getOwnerID (), sExtension);
@@ -211,7 +199,7 @@ public final class XMLDataManager implements IDataManagerSPI
       throw new SMPNotFoundException (SMPHelper.createSMPServiceGroupID (aServiceGroupID));
 
     // Check that the passed user is really the owner
-    _verifyOwnership (aServiceGroupID, aDataUser.getUserName ());
+    verifyOwnership (aServiceGroupID, aDataUser);
 
     // delete in SML first - throws an exception in case of error
     m_aHook.deleteServiceGroup (aServiceGroupID);
@@ -228,11 +216,6 @@ public final class XMLDataManager implements IDataManagerSPI
       m_aHook.undoDeleteServiceGroup (aServiceGroupID);
       throw ex;
     }
-
-    // Delete all redirects and all service information of this service group
-    // as well
-    MetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aServiceGroup);
-    MetaManager.getServiceInformationMgr ().deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup);
   }
 
   @Nonnull
@@ -282,19 +265,18 @@ public final class XMLDataManager implements IDataManagerSPI
   public void saveService (@Nonnull final ServiceInformationType aServiceInformation,
                            @Nonnull final IDataUser aDataUser)
   {
-    final ISMPServiceGroup aServiceGroup = _verifyOwnership (aServiceInformation.getParticipantIdentifier (),
-                                                             aDataUser.getUserName ());
+    final ISMPServiceGroup aServiceGroup = verifyOwnership (aServiceInformation.getParticipantIdentifier (), aDataUser);
 
     final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
     aServiceInformationMgr.createOrUpdateSMPServiceInformation (SMPServiceInformation.createFromJAXB (aServiceGroup,
-                                                                                              aServiceInformation));
+                                                                                                      aServiceInformation));
   }
 
   public void deleteService (@Nonnull final ParticipantIdentifierType aServiceGroupID,
                              @Nonnull final DocumentIdentifierType aDocTypeID,
                              @Nonnull final IDataUser aDataUser)
   {
-    _verifyOwnership (aServiceGroupID, aDataUser.getUserName ());
+    verifyOwnership (aServiceGroupID, aDataUser);
 
     final ISMPServiceInformation aMatch = _getMatchingServiceMetadata (aServiceGroupID, aDocTypeID);
     final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();

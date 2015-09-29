@@ -80,8 +80,8 @@ import com.helger.peppol.smp.ServiceEndpointList;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
-import com.helger.peppol.smpserver.data.IDataManagerSPI;
 import com.helger.peppol.smpserver.data.IDataUser;
+import com.helger.peppol.smpserver.data.ISMPUserManagerSPI;
 import com.helger.peppol.smpserver.data.sql.model.DBEndpoint;
 import com.helger.peppol.smpserver.data.sql.model.DBEndpointID;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
@@ -106,25 +106,26 @@ import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * A EclipseLink based implementation of the {@link IDataManagerSPI} interface.
+ * A EclipseLink based implementation of the {@link ISMPUserManagerSPI}
+ * interface.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @IsSPIImplementation
-public final class SQLDataManager extends JPAEnabledManager implements IDataManagerSPI
+public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUserManagerSPI
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SQLDataManager.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (SQLUserManagerSPI.class);
 
   private final IRegistrationHook m_aHook;
 
   @Deprecated
   @UsedViaReflection
-  public SQLDataManager ()
+  public SQLUserManagerSPI ()
   {
     this (RegistrationHookFactory.getOrCreateInstance ());
   }
 
-  public SQLDataManager (@Nonnull final IRegistrationHook aHook)
+  public SQLUserManagerSPI (@Nonnull final IRegistrationHook aHook)
   {
     super (new IHasEntityManager ()
     {
@@ -206,8 +207,8 @@ public final class SQLDataManager extends JPAEnabledManager implements IDataMana
    *         the credentials
    */
   @Nonnull
-  private DBOwnership _verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                                        @Nonnull final IDataUser aCredentials) throws SMPUnauthorizedException
+  public DBOwnership verifyOwnership (@Nonnull final ParticipantIdentifierType aServiceGroupID,
+                                      @Nonnull final IDataUser aCredentials) throws SMPUnauthorizedException
   {
     final DBOwnershipID aOwnershipID = new DBOwnershipID (aCredentials.getUserName (), aServiceGroupID);
     final DBOwnership aOwnership = getEntityManager ().find (DBOwnership.class, aOwnershipID);
@@ -373,7 +374,7 @@ public final class SQLDataManager extends JPAEnabledManager implements IDataMana
 
         // Check the ownership afterwards, so that only existing serviceGroups
         // are checked
-        final DBOwnership aDBOwnership = _verifyOwnership (aServiceGroupID, aDataUser);
+        final DBOwnership aDBOwnership = verifyOwnership (aServiceGroupID, aDataUser);
 
         // Delete in SML - throws exception in case of error
         m_aHook.deleteServiceGroup (aServiceGroupID);
@@ -494,7 +495,7 @@ public final class SQLDataManager extends JPAEnabledManager implements IDataMana
     final ParticipantIdentifierType aServiceGroupID = aServiceMetadata.getParticipantIdentifier ();
     final DocumentIdentifierType aDocTypeID = aServiceMetadata.getDocumentIdentifier ();
 
-    _verifyOwnership (aServiceGroupID, aDataUser);
+    verifyOwnership (aServiceGroupID, aDataUser);
 
     // Delete an eventually contained previous service in a separate transaction
     _deleteService (aServiceGroupID, aDocTypeID);
@@ -583,7 +584,7 @@ public final class SQLDataManager extends JPAEnabledManager implements IDataMana
                              @Nonnull final DocumentIdentifierType aDocTypeID,
                              @Nonnull final IDataUser aDataUser) throws Throwable
   {
-    _verifyOwnership (aServiceGroupID, aDataUser);
+    verifyOwnership (aServiceGroupID, aDataUser);
 
     final EChange eChange = _deleteService (aServiceGroupID, aDocTypeID);
     if (eChange.isUnchanged ())

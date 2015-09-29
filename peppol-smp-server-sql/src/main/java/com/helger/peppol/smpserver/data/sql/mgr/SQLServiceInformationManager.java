@@ -200,14 +200,6 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
   }
 
   @Nonnull
-  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
-  {
-    if (aServiceGroup == null)
-      return EChange.UNCHANGED;
-    return deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup.getID ());
-  }
-
-  @Nonnull
   public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final String sServiceGroupID)
   {
     EChange eChange = EChange.UNCHANGED;

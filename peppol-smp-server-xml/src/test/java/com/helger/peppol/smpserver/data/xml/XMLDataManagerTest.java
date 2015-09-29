@@ -58,7 +58,7 @@ import com.helger.photon.basic.security.CSecurity;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * Test case for class {@link XMLDataManager}
+ * Test case for class {@link XMLUserManagerSPI}
  *
  * @author Philip Helger
  */
@@ -99,7 +99,7 @@ public final class XMLDataManagerTest
   @Rule
   public final TestRule m_aTestRule = new PhotonBasicWebTestRule ();
 
-  private final XMLDataManager s_aDataMgr = new XMLDataManager (new RegistrationHookDoNothing ());
+  private final XMLUserManagerSPI s_aDataMgr = new XMLUserManagerSPI (new RegistrationHookDoNothing ());
   private ServiceGroupType m_aServiceGroup;
   private ServiceMetadataType m_aServiceMetadata;
 

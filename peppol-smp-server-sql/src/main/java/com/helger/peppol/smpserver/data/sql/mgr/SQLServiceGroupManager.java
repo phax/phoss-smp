@@ -35,6 +35,7 @@ import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -137,6 +138,11 @@ public final class SQLServiceGroupManager implements ISMPServiceGroupManager
       final SMPServiceGroup aRealServiceGroup = m_aMap.remove (aSMPServiceGroup.getID ());
       if (aRealServiceGroup == null)
         return EChange.UNCHANGED;
+
+      // Delete all redirects and all service information of this service group
+      // as well
+      MetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
+      MetaManager.getServiceInformationMgr ().deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup.getID ());
     }
     catch (final RuntimeException ex)
     {

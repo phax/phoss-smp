@@ -72,8 +72,8 @@ import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
 import com.helger.peppol.smp.ServiceMetadataReferenceType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
-import com.helger.peppol.smpserver.data.DataManagerFactory;
-import com.helger.peppol.smpserver.data.IDataManagerSPI;
+import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
+import com.helger.peppol.smpserver.data.ISMPUserManagerSPI;
 import com.helger.peppol.smpserver.data.IDataUser;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
@@ -183,7 +183,7 @@ public final class SMPServerAPI
                                           "'");
     }
 
-    final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
+    final ISMPUserManagerSPI aDataManager = SMPUserManagerFactory.getInstance ();
     final IDataUser aDataUser = aDataManager.validateUserCredentials (aCredentials);
     final Collection <? extends ISMPServiceGroup> aServiceGroups = MetaManager.getServiceGroupMgr ()
                                                                               .getAllSMPServiceGroupsOfOwner (aDataUser.getID ());
@@ -275,7 +275,7 @@ public final class SMPServerAPI
       throw new SMPNotFoundException ("ServiceGroup inconsistency", m_aAPIProvider.getCurrentURI ());
     }
 
-    final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
+    final ISMPUserManagerSPI aDataManager = SMPUserManagerFactory.getInstance ();
     final IDataUser aDataUser = aDataManager.validateUserCredentials (aCredentials);
 
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
@@ -305,7 +305,7 @@ public final class SMPServerAPI
       return ESuccess.FAILURE;
     }
 
-    final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
+    final ISMPUserManagerSPI aDataManager = SMPUserManagerFactory.getInstance ();
     aDataManager.validateUserCredentials (aCredentials);
 
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
@@ -436,7 +436,7 @@ public final class SMPServerAPI
     }
 
     // Main save
-    final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
+    final ISMPUserManagerSPI aDataManager = SMPUserManagerFactory.getInstance ();
     aDataManager.validateUserCredentials (aCredentials);
 
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
@@ -529,11 +529,32 @@ public final class SMPServerAPI
       return ESuccess.FAILURE;
     }
 
-    final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    final IDataUser aDataUser = aDataManager.validateUserCredentials (aCredentials);
-    aDataManager.deleteService (aServiceGroupID, aDocTypeID, aDataUser);
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+    if (aServiceGroup == null)
+    {
+      s_aLogger.info ("Service group '" + sServiceGroupID + "' not on this SMP");
+      return ESuccess.FAILURE;
+    }
 
-    s_aLogger.info ("Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID);
+    final ISMPUserManagerSPI aDataManager = SMPUserManagerFactory.getInstance ();
+    aDataManager.validateUserCredentials (aCredentials);
+
+    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (sServiceGroupID,
+                                                                                                                       aDocTypeID);
+    if (aServiceInfo == null)
+    {
+      s_aLogger.info ("Service group '" +
+                      sServiceGroupID +
+                      "' has no document type '" +
+                      sDocumentTypeID +
+                      "' on this SMP!");
+      return ESuccess.FAILURE;
+    }
+    aServiceInfoMgr.deleteSMPServiceInformation (aServiceInfo);
+
+    s_aLogger.info ("Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
     s_aStatsCounterSuccess.increment ("deleteServiceRegistration");
     return ESuccess.SUCCESS;
   }
