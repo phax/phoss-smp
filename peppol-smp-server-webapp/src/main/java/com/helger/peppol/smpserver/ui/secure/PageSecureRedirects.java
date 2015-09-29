@@ -41,6 +41,7 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -175,7 +176,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A service group must be selected!");
     else
     {
-      aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (sServiceGroupID);
+      aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID));
       if (aServiceGroup == null)
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided service group does not exist!");
     }
@@ -215,7 +216,11 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
 
     if (aFormErrors.isEmpty ())
     {
-      aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup, aDocTypeID, sRedirectTo, sSubjectUniqueIdentifier, sExtension);
+      aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
+                                              aDocTypeID,
+                                              sRedirectTo,
+                                              sSubjectUniqueIdentifier,
+                                              sExtension);
       aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The redirect for service group '" +
                                                                sServiceGroupID +
                                                                "' was successfully saved."));

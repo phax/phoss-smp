@@ -26,6 +26,7 @@ import com.helger.commons.microdom.convert.IMicroTypeConverter;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.microdom.util.MicroHelper;
 import com.helger.peppol.identifier.IMutableDocumentTypeIdentifier;
+import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
@@ -71,7 +72,7 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
     final ISMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
     final String sID = aElement.getAttributeValue (ATTR_ID);
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUPD_ID);
-    final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (sServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPart (sServiceGroupID));
     if (aServiceGroup == null)
       throw new IllegalStateException ("Failed to resolve service group with ID '" + sServiceGroupID + "'");
 

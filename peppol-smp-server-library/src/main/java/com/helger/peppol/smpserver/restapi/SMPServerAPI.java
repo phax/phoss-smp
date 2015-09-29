@@ -210,7 +210,7 @@ public final class SMPServerAPI
     s_aLogger.info ("getServiceGroup - GET /" + sServiceGroupID);
     s_aStatsCounterCall.increment ("getServiceGroup");
 
-    final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+    final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     if (aServiceGroupID == null)
     {
       // Invalid identifier
@@ -224,7 +224,7 @@ public final class SMPServerAPI
     final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
 
     // Retrieve the service group
-    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (sServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
       // No such service group
@@ -280,7 +280,7 @@ public final class SMPServerAPI
 
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final String sExtension = SMPExtensionConverter.convertToString (aServiceGroup.getExtension ());
-    if (aServiceGroupMgr.containsSMPServiceGroupWithID (sServiceGroupID))
+    if (aServiceGroupMgr.containsSMPServiceGroupWithID (aServiceGroupID))
       aServiceGroupMgr.updateSMPServiceGroup (sServiceGroupID, aDataUser.getID (), sExtension);
     else
       aServiceGroupMgr.createSMPServiceGroup (aDataUser.getID (), aServiceGroupID, sExtension);
@@ -444,7 +444,7 @@ public final class SMPServerAPI
     aUserManager.verifyOwnership (aServiceGroupID, aDataUser);
 
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (sServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
       // Service group not found

@@ -37,10 +37,7 @@ public interface ISMPServiceGroupManager
   @Nullable
   ISMPServiceGroup getSMPServiceGroupOfID (@Nullable IParticipantIdentifier aParticipantIdentifier);
 
-  @Nullable
-  ISMPServiceGroup getSMPServiceGroupOfID (@Nullable String sID);
-
-  boolean containsSMPServiceGroupWithID (@Nullable String sID);
+  boolean containsSMPServiceGroupWithID (@Nullable IParticipantIdentifier aParticipantIdentifier);
 
   @Nonnegative
   int getSMPServiceGroupCount ();

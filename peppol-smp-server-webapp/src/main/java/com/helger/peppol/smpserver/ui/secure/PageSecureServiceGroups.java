@@ -90,7 +90,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                 @Nullable final String sID)
   {
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    return aServiceGroupMgr.getSMPServiceGroupOfID (sID);
+    return aServiceGroupMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sID));
   }
 
   @Override
