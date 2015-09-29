@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml.mgr;
+package com.helger.peppol.smpserver.data.sql.mgr;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -28,10 +32,6 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.microdom.IMicroDocument;
-import com.helger.commons.microdom.IMicroElement;
-import com.helger.commons.microdom.MicroDocument;
-import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IParticipantIdentifier;
@@ -39,61 +39,14 @@ import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
-import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
-import com.helger.photon.basic.app.dao.impl.DAOException;
-import com.helger.photon.basic.app.dao.impl.EDAOActionType;
-import com.helger.photon.basic.security.audit.AuditHelper;
 
-public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGroup>implements ISMPServiceGroupManager
+public final class SQLServiceGroupManager implements ISMPServiceGroupManager
 {
-  private static final String ELEMENT_ROOT = "servicegroups";
-  private static final String ELEMENT_ITEM = "servicegroup";
-
+  private final ReadWriteLock m_aRWLock = new ReentrantReadWriteLock ();
   private final Map <String, SMPServiceGroup> m_aMap = new HashMap <String, SMPServiceGroup> ();
 
-  public SMPServiceGroupManager (@Nonnull @Nonempty final String sFilename) throws DAOException
-  {
-    super (SMPServiceGroup.class, sFilename);
-    initialRead ();
-  }
-
-  @Override
-  protected void onRecoveryCreate (final SMPServiceGroup aElement)
-  {
-    _addSMPServiceGroup (aElement);
-  }
-
-  @Override
-  protected void onRecoveryUpdate (final SMPServiceGroup aElement)
-  {
-    _addSMPServiceGroup (aElement);
-  }
-
-  @Override
-  protected void onRecoveryDelete (final SMPServiceGroup aElement)
-  {
-    m_aMap.remove (aElement.getID ());
-  }
-
-  @Override
-  @Nonnull
-  protected EChange onRead (@Nonnull final IMicroDocument aDoc)
-  {
-    for (final IMicroElement eSMPServiceGroup : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
-      _addSMPServiceGroup (MicroTypeConverter.convertToNative (eSMPServiceGroup, SMPServiceGroup.class));
-    return EChange.UNCHANGED;
-  }
-
-  @Override
-  @Nonnull
-  protected IMicroDocument createWriteData ()
-  {
-    final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.appendElement (ELEMENT_ROOT);
-    for (final ISMPServiceGroup aSMPServiceGroup : CollectionHelper.getSortedByKey (m_aMap).values ())
-      eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aSMPServiceGroup, ELEMENT_ITEM));
-    return aDoc;
-  }
+  public SQLServiceGroupManager ()
+  {}
 
   private void _addSMPServiceGroup (@Nonnull final SMPServiceGroup aSMPServiceGroup)
   {
@@ -116,17 +69,11 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     try
     {
       _addSMPServiceGroup (aSMPServiceGroup);
-      markAsChanged (aSMPServiceGroup, EDAOActionType.CREATE);
     }
     finally
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
-                                      aSMPServiceGroup.getID (),
-                                      sOwnerID,
-                                      aParticipantIdentifier,
-                                      sExtension);
     return aSMPServiceGroup;
   }
 
@@ -140,23 +87,18 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     {
       final SMPServiceGroup aSMPServiceGroup = m_aMap.get (sSMPServiceGroupID);
       if (aSMPServiceGroup == null)
-      {
-        AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, sSMPServiceGroupID, "no-such-id");
         return EChange.UNCHANGED;
-      }
 
       EChange eChange = EChange.UNCHANGED;
       eChange = eChange.or (aSMPServiceGroup.setOwnerID (sOwnerID));
       eChange = eChange.or (aSMPServiceGroup.setExtension (sExtension));
       if (eChange.isUnchanged ())
         return EChange.UNCHANGED;
-      markAsChanged (aSMPServiceGroup, EDAOActionType.UPDATE);
     }
     finally
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sSMPServiceGroupID, sOwnerID, sExtension);
     return EChange.CHANGED;
   }
 
@@ -177,18 +119,12 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     {
       final SMPServiceGroup aRealServiceGroup = m_aMap.remove (aSMPServiceGroup.getID ());
       if (aRealServiceGroup == null)
-      {
-        AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aSMPServiceGroup.getID ());
         return EChange.UNCHANGED;
-      }
-
-      markAsChanged (aRealServiceGroup, EDAOActionType.DELETE);
     }
     finally
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID ());
     return EChange.CHANGED;
   }
 
@@ -205,6 +141,25 @@ public final class SMPServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     {
       m_aRWLock.readLock ().unlock ();
     }
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
+  {
+    final List <ISMPServiceGroup> ret = new ArrayList <> ();
+    m_aRWLock.readLock ().lock ();
+    try
+    {
+      for (final ISMPServiceGroup aSG : m_aMap.values ())
+        if (aSG.getOwnerID ().equals (sOwnerID))
+          ret.add (aSG);
+    }
+    finally
+    {
+      m_aRWLock.readLock ().unlock ();
+    }
+    return ret;
   }
 
   public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)

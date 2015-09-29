@@ -29,7 +29,7 @@ import com.helger.datetime.PDTFactory;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
-import com.helger.peppol.smpserver.data.xml.mgr.SMPServiceInformationManager;
+import com.helger.peppol.smpserver.data.xml.mgr.XMLServiceInformationManager;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -42,11 +42,11 @@ import com.helger.photon.basic.security.CSecurity;
 import com.helger.photon.basic.security.user.IUser;
 
 /**
- * Test class for class {@link SMPServiceInformationManager}.
+ * Test class for class {@link XMLServiceInformationManager}.
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManagerTest
+public final class XMLServiceInformationManagerTest
 {
   @Rule
   public final TestRule m_aTestRule = new PhotonBasicWebTestRule ();

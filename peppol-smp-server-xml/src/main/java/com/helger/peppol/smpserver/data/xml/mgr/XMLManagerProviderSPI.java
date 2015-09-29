@@ -33,13 +33,13 @@ import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.photon.basic.app.io.WebFileIO;
 import com.helger.photon.basic.mgr.PhotonBasicManager;
 
-public final class XMLSMPManagerProviderSPI implements ISMPManagerProviderSPI
+public final class XMLManagerProviderSPI implements ISMPManagerProviderSPI
 {
   private static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";
   private static final String SMP_REDIRECT_XML = "smp-redirect.xml";
   private static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
 
-  public XMLSMPManagerProviderSPI ()
+  public XMLManagerProviderSPI ()
   {
     PhotonBasicManager.getSystemMigrationMgr ()
                       .performMigrationIfNecessary ("service-metadata-2-information",
@@ -82,7 +82,7 @@ public final class XMLSMPManagerProviderSPI implements ISMPManagerProviderSPI
   {
     try
     {
-      return new SMPServiceGroupManager (SMP_SERVICE_GROUP_XML);
+      return new XMLServiceGroupManager (SMP_SERVICE_GROUP_XML);
     }
     catch (final DAOException ex)
     {
@@ -94,7 +94,7 @@ public final class XMLSMPManagerProviderSPI implements ISMPManagerProviderSPI
   {
     try
     {
-      return new SMPRedirectManager (SMP_REDIRECT_XML);
+      return new XMLRedirectManager (SMP_REDIRECT_XML);
     }
     catch (final DAOException ex)
     {
@@ -106,7 +106,7 @@ public final class XMLSMPManagerProviderSPI implements ISMPManagerProviderSPI
   {
     try
     {
-      return new SMPServiceInformationManager (SMP_SERVICE_INFORMATION_XML);
+      return new XMLServiceInformationManager (SMP_SERVICE_INFORMATION_XML);
     }
     catch (final DAOException ex)
     {

@@ -14,13 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml.mgr;
+package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -33,10 +35,6 @@ import com.helger.commons.annotation.MustBeLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.microdom.IMicroDocument;
-import com.helger.commons.microdom.IMicroElement;
-import com.helger.commons.microdom.MicroDocument;
-import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
@@ -45,66 +43,19 @@ import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
-import com.helger.photon.basic.app.dao.impl.DAOException;
-import com.helger.photon.basic.app.dao.impl.EDAOActionType;
-import com.helger.photon.basic.security.audit.AuditHelper;
 
 /**
  * Manager for all {@link SMPRedirect} objects.
  *
  * @author Philip Helger
  */
-public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>implements ISMPRedirectManager
+public final class SQLRedirectManager implements ISMPRedirectManager
 {
-  private static final String ELEMENT_ROOT = "redirects";
-  private static final String ELEMENT_ITEM = "redirect";
-
+  private final ReadWriteLock m_aRWLock = new ReentrantReadWriteLock ();
   private final Map <String, SMPRedirect> m_aMap = new HashMap <String, SMPRedirect> ();
 
-  public SMPRedirectManager (@Nonnull @Nonempty final String sFilename) throws DAOException
-  {
-    super (SMPRedirect.class, sFilename);
-    initialRead ();
-  }
-
-  @Override
-  protected void onRecoveryCreate (final SMPRedirect aElement)
-  {
-    _addSMPRedirect (aElement);
-  }
-
-  @Override
-  protected void onRecoveryUpdate (final SMPRedirect aElement)
-  {
-    _addSMPRedirect (aElement);
-  }
-
-  @Override
-  protected void onRecoveryDelete (final SMPRedirect aElement)
-  {
-    m_aMap.remove (aElement.getID ());
-  }
-
-  @Override
-  @Nonnull
-  protected EChange onRead (@Nonnull final IMicroDocument aDoc)
-  {
-    for (final IMicroElement eSMPRedirect : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
-      _addSMPRedirect (MicroTypeConverter.convertToNative (eSMPRedirect, SMPRedirect.class));
-    return EChange.UNCHANGED;
-  }
-
-  @Override
-  @Nonnull
-  protected IMicroDocument createWriteData ()
-  {
-    final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.appendElement (ELEMENT_ROOT);
-    for (final ISMPRedirect aSMPRedirect : CollectionHelper.getSortedByKey (m_aMap).values ())
-      eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aSMPRedirect, ELEMENT_ITEM));
-    return aDoc;
-  }
+  public SQLRedirectManager ()
+  {}
 
   @MustBeLocked (ELockType.WRITE)
   private void _addSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
@@ -125,19 +76,11 @@ public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>implem
     try
     {
       _addSMPRedirect (aSMPRedirect);
-      markAsChanged (aSMPRedirect, EDAOActionType.CREATE);
     }
     finally
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
-                                      aSMPRedirect.getID (),
-                                      aSMPRedirect.getServiceGroupID (),
-                                      aSMPRedirect.getDocumentTypeIdentifier (),
-                                      aSMPRedirect.getTargetHref (),
-                                      aSMPRedirect.getSubjectUniqueIdentifier (),
-                                      aSMPRedirect.getExtension ());
     return aSMPRedirect;
   }
 
@@ -149,19 +92,11 @@ public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>implem
     try
     {
       m_aMap.put (aSMPRedirect.getID (), aSMPRedirect);
-      markAsChanged (aSMPRedirect, EDAOActionType.UPDATE);
     }
     finally
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
-                                      aSMPRedirect.getID (),
-                                      aSMPRedirect.getServiceGroupID (),
-                                      aSMPRedirect.getDocumentTypeIdentifier (),
-                                      aSMPRedirect.getTargetHref (),
-                                      aSMPRedirect.getSubjectUniqueIdentifier (),
-                                      aSMPRedirect.getExtension ());
     return aSMPRedirect;
   }
 
@@ -228,21 +163,12 @@ public final class SMPRedirectManager extends AbstractWALDAO <SMPRedirect>implem
     {
       final SMPRedirect aRealServiceMetadata = m_aMap.remove (aSMPRedirect.getID ());
       if (aRealServiceMetadata == null)
-      {
-        AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
         return EChange.UNCHANGED;
-      }
-
-      markAsChanged (aRealServiceMetadata, EDAOActionType.DELETE);
     }
     finally
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT,
-                                      aSMPRedirect.getID (),
-                                      aSMPRedirect.getServiceGroupID (),
-                                      aSMPRedirect.getDocumentTypeIdentifier ());
     return EChange.CHANGED;
   }
 

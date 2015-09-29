@@ -54,13 +54,13 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManager implements ISMPServiceInformationManager
+public final class SQLServiceInformationManager implements ISMPServiceInformationManager
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServiceInformationManager.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (SQLServiceInformationManager.class);
   private final ReadWriteLock m_aRWLock = new ReentrantReadWriteLock ();
   private final Map <String, SMPServiceInformation> m_aMap = new HashMap <String, SMPServiceInformation> ();
 
-  public SMPServiceInformationManager ()
+  public SQLServiceInformationManager ()
   {}
 
   private void _addSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)

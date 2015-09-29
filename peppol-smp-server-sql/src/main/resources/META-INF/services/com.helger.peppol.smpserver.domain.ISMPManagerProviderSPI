@@ -1,1 +1,1 @@
-com.helger.peppol.smpserver.data.sql.mgr.SQLSMPManagerProviderSPI
+com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProviderSPI

@@ -79,7 +79,7 @@ public interface IDataManagerSPI
    *         (hash).
    */
   @Nonnull
-  IDataUser getUserFromCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+  IDataUser validateUserCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
 
   /**
    * Create a pre-authenticated user (e.g. for the management GUI).
@@ -90,19 +90,6 @@ public interface IDataManagerSPI
    */
   @Nonnull
   IDataUser createPreAuthenticatedUser (@Nonnull @Nonempty String sUserName);
-
-  /**
-   * Gets the service group ids owned by the given credentials.
-   *
-   * @param aDataUser
-   *        The current, verified user. Never <code>null</code>.
-   * @return A collection of service group id's.
-   * @throws Throwable
-   *         In case something goes wrong.
-   */
-  @Nonnull
-  @ReturnsMutableCopy
-  Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull IDataUser aDataUser) throws Throwable;
 
   /**
    * This method returns a ServiceGroup given its id.

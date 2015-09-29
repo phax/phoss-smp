@@ -1,20 +1,44 @@
 /**
- * Copyright (C) 2014-2015 Philip Helger (www.helger.com)
+ * Copyright (C) 2015 Philip Helger (www.helger.com)
  * philip[at]helger[dot]com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Version: MPL 1.1/EUPL 1.1
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ *
+ * Alternatively, the contents of this file may be used under the
+ * terms of the EUPL, Version 1.1 or - as soon they will be approved
+ * by the European Commission - subsequent versions of the EUPL
+ * (the "Licence"); You may not use this work except in compliance
+ * with the Licence.
+ * You may obtain a copy of the Licence at:
+ * http://joinup.ec.europa.eu/software/page/eupl/licence-eupl
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * See the Licence for the specific language governing permissions and
+ * limitations under the Licence.
+ *
+ * If you wish to allow use of your version of this file only
+ * under the terms of the EUPL License and not to allow others to use
+ * your version of this file under the MPL, indicate your decision by
+ * deleting the provisions above and replace them with the notice and
+ * other provisions required by the EUPL License. If you do not delete
+ * the provisions above, a recipient may use your version of this file
+ * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.data.xml;
+package com.helger.peppol.smpserver.data.sql;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -24,11 +48,12 @@ import static org.junit.Assert.fail;
 
 import org.joda.time.LocalDateTime;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import com.helger.commons.annotation.DevelopersNote;
+import com.helger.commons.scope.mock.ScopeTestRule;
 import com.helger.datetime.PDTFactory;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.DocumentIdentifierType;
@@ -53,17 +78,16 @@ import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookDoNothing;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
-import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
-import com.helger.photon.basic.security.CSecurity;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * Test case for class {@link DAODataManager}
- *
- * @author Philip Helger
+ * @author PEPPOL.AT, BRZ, Philip Helger
  */
+// @Ignore
+// ("Cannot be enabled by default, because it would fail without the correct
+// configuration")
 @DevelopersNote ("You need to adjust your local config.properties file to run this test")
-public final class DAODataManagerTest
+public final class SQLDataManagerTest
 {
   private static final String PARTICIPANT_IDENTIFIER_SCHEME = CIdentifier.DEFAULT_PARTICIPANT_IDENTIFIER_SCHEME;
   private static final String DOCUMENT_SCHEME = CIdentifier.DEFAULT_DOCUMENT_TYPE_IDENTIFIER_SCHEME;
@@ -75,8 +99,8 @@ public final class DAODataManagerTest
   private static final String TEST_DOCTYPE_ID = "doc1";
   private static final String TEST_PROCESS_ID = "bis4";
 
-  private static final String USERNAME = CSecurity.USER_ADMINISTRATOR_LOGIN;
-  private static final String PASSWORD = CSecurity.USER_ADMINISTRATOR_PASSWORD;
+  private static final String USERNAME = "peppol_user";
+  private static final String PASSWORD = "Test1234";
 
   private static final String CERTIFICATE = "VGhpcyBpcyBzdXJlbHkgbm90IGEgdmFsaWQgY2VydGlmaWNhdGUsIGJ1dCBpdCBo\r\n" +
                                             "YXMgbW9yZSB0aGFuIDY0IGNoYXJhY3RlcnM=";
@@ -96,23 +120,39 @@ public final class DAODataManagerTest
                                                                                              TEST_DOCTYPE_ID);
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (USERNAME, PASSWORD);
 
-  @Rule
-  public final TestRule m_aTestRule = new PhotonBasicWebTestRule ();
+  private static SQLDataManager s_aDataMgr;
 
-  private final DAODataManager s_aDataMgr = new DAODataManager (new RegistrationHookDoNothing ());
+  private static final class SMPTestRule extends ScopeTestRule
+  {
+    @Override
+    public void before ()
+    {
+      super.before ();
+      if (s_aDataMgr == null)
+      {
+        // Do it only once :)
+        SMPEntityManagerFactory.getInstance ();
+        s_aDataMgr = new SQLDataManager (new RegistrationHookDoNothing ());
+      }
+    }
+  }
+
+  @ClassRule
+  public static TestRule s_aTestRule = new SMPTestRule ();
+
   private ServiceGroupType m_aServiceGroup;
   private ServiceMetadataType m_aServiceMetadata;
 
   @Before
   public void beforeTest () throws Throwable
   {
-    final ExtensionType aExtension = SMPExtensionConverter.convert ("<root><any>value</any></root>");
+    final ExtensionType aExtension = SMPExtensionConverter.convertOrNull ("<root><any>value</any></root>");
     assertNotNull (aExtension);
     assertNotNull (aExtension.getAny ());
 
     m_aServiceGroup = new ServiceGroupType ();
     m_aServiceGroup.setParticipantIdentifier (PARTY_ID);
-    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
 
     // Be sure to delete if it exists.
     try
@@ -166,7 +206,7 @@ public final class DAODataManagerTest
   public void testCreateServiceGroup () throws Throwable
   {
     m_aServiceGroup.getParticipantIdentifier ().setValue (PARTICIPANT_IDENTIFIER2);
-    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
     s_aDataMgr.saveServiceGroup (m_aServiceGroup, aDataUser);
 
     final ParticipantIdentifierType aParticipantIdentifier2 = SimpleParticipantIdentifier.createWithDefaultScheme (PARTICIPANT_IDENTIFIER2);
@@ -187,7 +227,7 @@ public final class DAODataManagerTest
     m_aServiceGroup.getParticipantIdentifier ().setValue (PARTICIPANT_IDENTIFIER2);
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
       s_aDataMgr.saveServiceGroup (m_aServiceGroup, aDataUser);
       fail ();
     }
@@ -203,7 +243,7 @@ public final class DAODataManagerTest
     m_aServiceGroup.getParticipantIdentifier ().setValue (PARTICIPANT_IDENTIFIER2);
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
       s_aDataMgr.saveServiceGroup (m_aServiceGroup, aDataUser);
       fail ();
     }
@@ -214,7 +254,7 @@ public final class DAODataManagerTest
   @Test
   public void testDeleteServiceGroup () throws Throwable
   {
-    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
     s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aDataUser);
 
     assertNull (s_aDataMgr.getServiceGroup (SERVICEGROUP_ID));
@@ -226,7 +266,7 @@ public final class DAODataManagerTest
     final ParticipantIdentifierType aServiceGroupID2 = SimpleParticipantIdentifier.createWithDefaultScheme (PARTICIPANT_IDENTIFIER2);
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
       s_aDataMgr.deleteServiceGroup (aServiceGroupID2, aDataUser);
       // May not fail
     }
@@ -241,7 +281,7 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials ("Unknown_User", PASSWORD);
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
       s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aDataUser);
       fail ();
     }
@@ -255,7 +295,7 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials (USERNAME, "WrongPassword");
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
       s_aDataMgr.deleteServiceGroup (SERVICEGROUP_ID, aDataUser);
       fail ();
     }
@@ -267,7 +307,7 @@ public final class DAODataManagerTest
   public void testCreateServiceMetadata () throws Throwable
   {
     // Save to DB
-    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
     s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
 
     // Retrieve from DB
@@ -309,7 +349,7 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials ("Unknown_User", PASSWORD);
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
       s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
       fail ();
     }
@@ -323,7 +363,7 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials (USERNAME, "WrongPassword");
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
       s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
       fail ();
     }
@@ -335,16 +375,16 @@ public final class DAODataManagerTest
   public void testPrintServiceMetadata () throws Throwable
   {
     // Ensure something is present :)
-    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
     s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
-    assertNotNull (s_aDataMgr.getService (SERVICEGROUP_ID, DOCTYPE_ID));
+    System.out.println (s_aDataMgr.getService (SERVICEGROUP_ID, DOCTYPE_ID));
   }
 
   @Test
   public void testDeleteServiceMetadata () throws Throwable
   {
     // Ensure something is present :)
-    final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (CREDENTIALS);
+    final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
     s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
 
     // First deletion succeeds
@@ -365,7 +405,7 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials ("Unknown_User", PASSWORD);
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
       s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
       fail ();
     }
@@ -379,7 +419,7 @@ public final class DAODataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials (USERNAME, "WrongPassword");
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.getUserFromCredentials (aCredentials);
+      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
       s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
       fail ();
     }

@@ -53,7 +53,6 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.peppol.identifier.DocumentIdentifierType;
-import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
@@ -70,6 +69,8 @@ import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.smpserver.data.DataManagerFactory;
 import com.helger.peppol.smpserver.data.IDataManagerSPI;
 import com.helger.peppol.smpserver.data.IDataUser;
+import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
@@ -163,14 +164,15 @@ public final class SMPServerAPI
     }
 
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
-    final Collection <ParticipantIdentifierType> aServiceGroupList = aDataManager.getServiceGroupList (aDataUser);
+    final IDataUser aDataUser = aDataManager.validateUserCredentials (aCredentials);
+    final Collection <? extends ISMPServiceGroup> aServiceGroups = MetaManager.getServiceGroupMgr ()
+                                                                              .getAllSMPServiceGroupsOfOwner (aDataUser.getID ());
 
     final ServiceGroupReferenceListType aRefList = new ServiceGroupReferenceListType ();
     final List <ServiceGroupReferenceType> aReferenceTypes = aRefList.getServiceGroupReference ();
-    for (final IParticipantIdentifier aServiceGroupID : aServiceGroupList)
+    for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
     {
-      final String sHref = m_aDataProvider.getServiceGroupHref (aServiceGroupID);
+      final String sHref = m_aDataProvider.getServiceGroupHref (aServiceGroup.getParticpantIdentifier ());
 
       final ServiceGroupReferenceType aServGroupRefType = new ServiceGroupReferenceType ();
       aServGroupRefType.setHref (sHref);
@@ -253,7 +255,7 @@ public final class SMPServerAPI
     }
 
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
+    final IDataUser aDataUser = aDataManager.validateUserCredentials (aCredentials);
     aDataManager.saveServiceGroup (aServiceGroup, aDataUser);
 
     s_aLogger.info ("Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ")");
@@ -277,7 +279,7 @@ public final class SMPServerAPI
     }
 
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
+    final IDataUser aDataUser = aDataManager.validateUserCredentials (aCredentials);
     aDataManager.deleteServiceGroup (aServiceGroupID, aDataUser);
 
     s_aLogger.info ("Finished deleteServiceGroup(" + sServiceGroupID + ")");
@@ -396,7 +398,7 @@ public final class SMPServerAPI
 
     // Main save
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
+    final IDataUser aDataUser = aDataManager.validateUserCredentials (aCredentials);
     aDataManager.saveService (aServiceMetadata.getServiceInformation (), aDataUser);
 
     s_aLogger.info ("Finished saveServiceRegistration(" +
@@ -435,7 +437,7 @@ public final class SMPServerAPI
     }
 
     final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-    final IDataUser aDataUser = aDataManager.getUserFromCredentials (aCredentials);
+    final IDataUser aDataUser = aDataManager.validateUserCredentials (aCredentials);
     aDataManager.deleteService (aServiceGroupID, aDocTypeID, aDataUser);
 
     s_aLogger.info ("Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID);

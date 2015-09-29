@@ -61,15 +61,15 @@ import com.helger.photon.basic.security.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManager extends AbstractWALDAO <SMPServiceInformation>implements ISMPServiceInformationManager
+public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServiceInformation>implements ISMPServiceInformationManager
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServiceInformationManager.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceInformationManager.class);
   private static final String ELEMENT_ROOT = "serviceinformationlist";
   private static final String ELEMENT_ITEM = "serviceinformation";
 
   private final Map <String, SMPServiceInformation> m_aMap = new HashMap <String, SMPServiceInformation> ();
 
-  public SMPServiceInformationManager (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public XMLServiceInformationManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceInformation.class, sFilename);
     initialRead ();

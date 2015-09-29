@@ -111,20 +111,20 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @IsSPIImplementation
-public final class DBMSDataManager extends JPAEnabledManager implements IDataManagerSPI
+public final class SQLDataManager extends JPAEnabledManager implements IDataManagerSPI
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (DBMSDataManager.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (SQLDataManager.class);
 
   private final IRegistrationHook m_aHook;
 
   @Deprecated
   @UsedViaReflection
-  public DBMSDataManager ()
+  public SQLDataManager ()
   {
     this (RegistrationHookFactory.getOrCreateInstance ());
   }
 
-  public DBMSDataManager (@Nonnull final IRegistrationHook aHook)
+  public SQLDataManager (@Nonnull final IRegistrationHook aHook)
   {
     super (new IHasEntityManager ()
     {
@@ -147,7 +147,7 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
   }
 
   @Nonnull
-  public DBUser getUserFromCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
+  public DBUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
     JPAExecutionResult <DBUser> ret;
     ret = doSelect (new IThrowingCallable <DBUser, SMPServerException> ()
@@ -226,36 +226,6 @@ public final class DBMSDataManager extends JPAEnabledManager implements IDataMan
                        aCredentials.getUserName () +
                        "'");
     return aOwnership;
-  }
-
-  @Nonnull
-  @ReturnsMutableCopy
-  public Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull final IDataUser aDataUser) throws Throwable
-  {
-    final DBUser aDBUser = (DBUser) aDataUser;
-
-    JPAExecutionResult <Collection <ParticipantIdentifierType>> ret;
-    ret = doSelect (new Callable <Collection <ParticipantIdentifierType>> ()
-    {
-      @Nonnull
-      @ReturnsMutableCopy
-      public Collection <ParticipantIdentifierType> call () throws Exception
-      {
-        final List <DBOwnership> aDBOwnerships = getEntityManager ().createQuery ("SELECT p FROM DBOwnership p WHERE p.user = :user",
-                                                                                  DBOwnership.class)
-                                                                    .setParameter ("user", aDBUser)
-                                                                    .getResultList ();
-
-        final Collection <ParticipantIdentifierType> aList = new ArrayList <ParticipantIdentifierType> ();
-        for (final DBOwnership aDBOwnership : aDBOwnerships)
-        {
-          final DBServiceGroupID aDBServiceGroupID = aDBOwnership.getServiceGroup ().getId ();
-          aList.add (aDBServiceGroupID.asBusinessIdentifier ());
-        }
-        return aList;
-      }
-    });
-    return ret.getOrThrow ();
   }
 
   @Nullable

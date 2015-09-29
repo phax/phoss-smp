@@ -50,6 +50,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.helger.peppol.smpserver.data.IDataUser;
 
@@ -68,6 +69,12 @@ public class DBUser implements Serializable, IDataUser
 
   public DBUser ()
   {}
+
+  @Transient
+  public String getID ()
+  {
+    return getUserName ();
+  }
 
   @Id
   @Column (name = "username", unique = true, nullable = false, length = 256)

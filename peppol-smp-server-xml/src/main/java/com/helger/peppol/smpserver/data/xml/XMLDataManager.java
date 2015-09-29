@@ -35,7 +35,6 @@ import com.helger.peppol.identifier.DocumentIdentifierType;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
@@ -66,28 +65,28 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public final class DAODataManager implements IDataManagerSPI
+public final class XMLDataManager implements IDataManagerSPI
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (DAODataManager.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLDataManager.class);
 
   private final IRegistrationHook m_aHook;
 
   @Deprecated
   @UsedViaReflection
-  public DAODataManager ()
+  public XMLDataManager ()
   {
     this (RegistrationHookFactory.getOrCreateInstance ());
   }
 
   @VisibleForTesting
-  DAODataManager (@Nonnull final IRegistrationHook aHook)
+  XMLDataManager (@Nonnull final IRegistrationHook aHook)
   {
     m_aHook = ValueEnforcer.notNull (aHook, "Hook");
   }
 
   @Nonnull
-  public DAODataUser getUserFromCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException,
-                                                                                                     SMPUnknownUserException
+  public XMLDataUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException,
+                                                                                                      SMPUnknownUserException
   {
     final AccessManager aAccessMgr = AccessManager.getInstance ();
     final IUser aUser = aAccessMgr.getUserOfLoginName (aCredentials.getUserName ());
@@ -101,13 +100,13 @@ public final class DAODataManager implements IDataManagerSPI
       s_aLogger.info ("Invalid password provided for '" + aCredentials.getUserName () + "'");
       throw new SMPUnauthorizedException ("Username and/or password are invalid!");
     }
-    return new DAODataUser (aUser);
+    return new XMLDataUser (aUser);
   }
 
   @Nonnull
-  public DAODataUser createPreAuthenticatedUser (@Nonnull @Nonempty final String sUserName)
+  public XMLDataUser createPreAuthenticatedUser (@Nonnull @Nonempty final String sUserName)
   {
-    return new DAODataUser (AccessManager.getInstance ().getUserOfLoginName (sUserName));
+    return new XMLDataUser (AccessManager.getInstance ().getUserOfLoginName (sUserName));
   }
 
   /**
@@ -157,20 +156,6 @@ public final class DAODataManager implements IDataManagerSPI
     return aServiceGroup;
   }
 
-  @Nonnull
-  @ReturnsMutableCopy
-  public Collection <ParticipantIdentifierType> getServiceGroupList (@Nonnull final IDataUser aDataUser)
-  {
-    final DAODataUser aUser = (DAODataUser) aDataUser;
-
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    final List <ParticipantIdentifierType> ret = new ArrayList <ParticipantIdentifierType> ();
-    for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
-      if (aServiceGroup.getOwnerID ().equals (aUser.getID ()))
-        ret.add (new SimpleParticipantIdentifier (aServiceGroup.getParticpantIdentifier ()));
-    return ret;
-  }
-
   @Nullable
   public ServiceGroupType getServiceGroup (@Nonnull final ParticipantIdentifierType aServiceGroupID)
   {
@@ -183,7 +168,7 @@ public final class DAODataManager implements IDataManagerSPI
                                 @Nonnull final IDataUser aDataUser) throws SMPUnauthorizedException,
                                                                     RegistrationHookException
   {
-    final DAODataUser aUser = (DAODataUser) aDataUser;
+    final XMLDataUser aUser = (XMLDataUser) aDataUser;
     final ParticipantIdentifierType aParticipantID = aServiceGroup.getParticipantIdentifier ();
     final String sExtension = SMPExtensionConverter.convertToString (aServiceGroup.getExtension ());
 
