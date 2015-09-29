@@ -424,8 +424,7 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
     return ret.getOrThrow ();
   }
 
-  public void saveService (@Nonnull final ServiceInformationType aServiceMetadata,
-                           @Nonnull final IDataUser aDataUser) throws Throwable
+  public void saveService (@Nonnull final ServiceInformationType aServiceMetadata) throws Throwable
   {
     final ParticipantIdentifierType aServiceGroupID = aServiceMetadata.getParticipantIdentifier ();
     final DocumentIdentifierType aDocTypeID = aServiceMetadata.getDocumentIdentifier ();
@@ -514,8 +513,7 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
   }
 
   public void deleteService (@Nonnull final ParticipantIdentifierType aServiceGroupID,
-                             @Nonnull final DocumentIdentifierType aDocTypeID,
-                             @Nonnull final IDataUser aDataUser) throws Throwable
+                             @Nonnull final DocumentIdentifierType aDocTypeID) throws Throwable
   {
     final EChange eChange = _deleteService (aServiceGroupID, aDocTypeID);
     if (eChange.isUnchanged ())

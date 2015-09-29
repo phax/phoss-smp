@@ -27,9 +27,6 @@ public interface ISMPServiceGroupManager
   EChange deleteSMPServiceGroup (@Nullable IParticipantIdentifier aParticipantIdentifier);
 
   @Nonnull
-  EChange deleteSMPServiceGroup (@Nullable ISMPServiceGroup aSMPServiceGroup);
-
-  @Nonnull
   @ReturnsMutableCopy
   Collection <? extends ISMPServiceGroup> getAllSMPServiceGroups ();
 

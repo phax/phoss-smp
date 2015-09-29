@@ -208,8 +208,7 @@ public final class XMLServiceInformationManagerTest
     }
     finally
     {
-      aServiceInformationMgr.deleteAllSMPServiceInformationOfServiceGroup (aSG.getID ());
-      aServiceGroupMgr.deleteSMPServiceGroup (aSG);
+      aServiceGroupMgr.deleteSMPServiceGroup (aPI);
     }
   }
 }

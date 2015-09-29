@@ -306,8 +306,8 @@ public final class SQLDataManagerTest
   public void testCreateServiceMetadata () throws Throwable
   {
     // Save to DB
-    final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
-    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
+    s_aDataMgr.validateUserCredentials (CREDENTIALS);
+    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation ());
 
     // Retrieve from DB
     final ServiceMetadataType aDBServiceMetadata = s_aDataMgr.getService (SERVICEGROUP_ID, DOCTYPE_ID);
@@ -348,8 +348,7 @@ public final class SQLDataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials ("Unknown_User", PASSWORD);
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
-      s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
+      s_aDataMgr.validateUserCredentials (aCredentials);
       fail ();
     }
     catch (final SMPUnknownUserException ex)
@@ -362,8 +361,7 @@ public final class SQLDataManagerTest
     final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials (USERNAME, "WrongPassword");
     try
     {
-      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
-      s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
+      s_aDataMgr.validateUserCredentials (aCredentials);
       fail ();
     }
     catch (final SMPUnauthorizedException ex)
@@ -374,8 +372,8 @@ public final class SQLDataManagerTest
   public void testPrintServiceMetadata () throws Throwable
   {
     // Ensure something is present :)
-    final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
-    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
+    s_aDataMgr.validateUserCredentials (CREDENTIALS);
+    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation ());
     System.out.println (s_aDataMgr.getService (SERVICEGROUP_ID, DOCTYPE_ID));
   }
 
@@ -383,46 +381,18 @@ public final class SQLDataManagerTest
   public void testDeleteServiceMetadata () throws Throwable
   {
     // Ensure something is present :)
-    final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (CREDENTIALS);
-    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation (), aDataUser);
+    s_aDataMgr.validateUserCredentials (CREDENTIALS);
+    s_aDataMgr.saveService (m_aServiceMetadata.getServiceInformation ());
 
     // First deletion succeeds
-    s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
+    s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID);
     try
     {
       // Second deletion fails
-      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
+      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID);
       fail ();
     }
     catch (final SMPNotFoundException ex)
-    {}
-  }
-
-  @Test
-  public void testDeleteServiceMetadataUnknownUser () throws Throwable
-  {
-    final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials ("Unknown_User", PASSWORD);
-    try
-    {
-      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
-      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
-      fail ();
-    }
-    catch (final SMPUnknownUserException ex)
-    {}
-  }
-
-  @Test
-  public void testDeleteServiceMetadataWrongPass () throws Throwable
-  {
-    final BasicAuthClientCredentials aCredentials = new BasicAuthClientCredentials (USERNAME, "WrongPassword");
-    try
-    {
-      final IDataUser aDataUser = s_aDataMgr.validateUserCredentials (aCredentials);
-      s_aDataMgr.deleteService (SERVICEGROUP_ID, DOCTYPE_ID, aDataUser);
-      fail ();
-    }
-    catch (final SMPUnauthorizedException ex)
     {}
   }
 }

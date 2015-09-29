@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml;
+package com.helger.peppol.smpserver.domain.redirect;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -105,7 +105,7 @@ public final class SMPRedirectTest
     assertEquals (1, aRedirectMgr.getSMPRedirectCount ());
     assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG).isChanged ());
     assertEquals (0, aRedirectMgr.getSMPRedirectCount ());
-    assertTrue (aSGMgr.deleteSMPServiceGroup (aSG2).isChanged ());
-    assertTrue (aSGMgr.deleteSMPServiceGroup (aSG).isChanged ());
+    assertTrue (aSGMgr.deleteSMPServiceGroup (aPI2).isChanged ());
+    assertTrue (aSGMgr.deleteSMPServiceGroup (aPI).isChanged ());
   }
 }
