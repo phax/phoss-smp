@@ -215,7 +215,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
 
     if (aFormErrors.isEmpty ())
     {
-      aRedirectMgr.createSMPRedirect (aServiceGroup, aDocTypeID, sRedirectTo, sSubjectUniqueIdentifier, sExtension);
+      aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup, aDocTypeID, sRedirectTo, sSubjectUniqueIdentifier, sExtension);
       aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The redirect for service group '" +
                                                                sServiceGroupID +
                                                                "' was successfully saved."));

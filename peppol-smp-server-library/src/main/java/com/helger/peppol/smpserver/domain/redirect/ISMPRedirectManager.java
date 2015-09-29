@@ -30,7 +30,7 @@ public interface ISMPRedirectManager
    * @return The new or updated {@link ISMPRedirect}. Never <code>null</code>.
    */
   @Nonnull
-  ISMPRedirect createSMPRedirect (@Nonnull ISMPServiceGroup aServiceGroup,
+  ISMPRedirect createOrUpdateSMPRedirect (@Nonnull ISMPServiceGroup aServiceGroup,
                                   @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                   @Nonnull String sTargetHref,
                                   @Nonnull String sSubjectUniqueIdentifier,

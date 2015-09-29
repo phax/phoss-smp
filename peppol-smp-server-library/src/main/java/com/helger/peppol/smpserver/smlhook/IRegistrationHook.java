@@ -42,7 +42,7 @@ package com.helger.peppol.smpserver.smlhook;
 
 import javax.annotation.Nonnull;
 
-import com.helger.peppol.identifier.ParticipantIdentifierType;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 
 /**
  * Base interface for the callback to modify the SML.
@@ -59,7 +59,7 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void createServiceGroup (@Nonnull ParticipantIdentifierType aPI) throws RegistrationHookException;
+  void createServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
    * Delete a participant in the SML because the internal adding in the SMP
@@ -70,7 +70,7 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void undoCreateServiceGroup (@Nonnull ParticipantIdentifierType aPI) throws RegistrationHookException;
+  void undoCreateServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
    * Delete a participant in the SML.
@@ -80,7 +80,7 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void deleteServiceGroup (@Nonnull ParticipantIdentifierType aPI) throws RegistrationHookException;
+  void deleteServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
    * Create a participant in the SML because the deletion.
@@ -90,5 +90,5 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void undoDeleteServiceGroup (@Nonnull ParticipantIdentifierType aPI) throws RegistrationHookException;
+  void undoDeleteServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
 }

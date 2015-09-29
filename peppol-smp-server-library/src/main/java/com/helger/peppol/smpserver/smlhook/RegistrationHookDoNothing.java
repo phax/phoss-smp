@@ -43,7 +43,7 @@ package com.helger.peppol.smpserver.smlhook;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.peppol.identifier.ParticipantIdentifierType;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 
 /**
  * An implementation of {@link IRegistrationHook} that does nothing.
@@ -53,15 +53,15 @@ import com.helger.peppol.identifier.ParticipantIdentifierType;
 @Immutable
 public final class RegistrationHookDoNothing implements IRegistrationHook
 {
-  public void createServiceGroup (@Nonnull final ParticipantIdentifierType aPI)
+  public void createServiceGroup (@Nonnull final IParticipantIdentifier aPI)
   {}
 
-  public void undoCreateServiceGroup (@Nonnull final ParticipantIdentifierType aPI)
+  public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aPI)
   {}
 
-  public void deleteServiceGroup (@Nonnull final ParticipantIdentifierType aPI)
+  public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aPI)
   {}
 
-  public void undoDeleteServiceGroup (@Nonnull final ParticipantIdentifierType aPI)
+  public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aPI)
   {}
 }

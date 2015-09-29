@@ -415,7 +415,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aEndpoint.setTechnicalInformationUrl (sTechnicalInformation);
         aEndpoint.setExtension (sExtension);
 
-        aServiceInfoMgr.updateSMPServiceInformation (aSelectedObject.getID ());
+        aServiceInfoMgr.markSMPServiceInformationChanged (aSelectedObject.getID ());
 
         aNodeList.addChild (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint"));
       }
@@ -439,7 +439,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                                               aDocTypeID,
                                                                               CollectionHelper.newList (aProcess),
                                                                               null);
-        aServiceInfoMgr.createSMPServiceInformation (aServiceInfo);
+        aServiceInfoMgr.createOrUpdateSMPServiceInformation (aServiceInfo);
 
         aNodeList.addChild (new BootstrapSuccessBox ().addChild ("Successfully created the new endpoint"));
       }

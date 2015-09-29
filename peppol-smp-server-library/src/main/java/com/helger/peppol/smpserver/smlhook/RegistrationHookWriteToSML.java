@@ -57,8 +57,9 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.random.VerySecureRandom;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
+import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.NotFoundFault;
 import com.helger.peppol.smlclient.participant.UnauthorizedFault;
@@ -146,7 +147,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     return ret;
   }
 
-  public void createServiceGroup (@Nonnull final ParticipantIdentifierType aBusinessIdentifier) throws RegistrationHookException
+  public void createServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     s_aLogger.info ("Trying to create business " +
                     IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
@@ -154,7 +155,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
     try
     {
-      _createSMLCaller ().create (s_sSMPID, aBusinessIdentifier);
+      _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       s_aLogger.info ("Succeeded in creating business " +
                       IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
                       " using Business Identifier Manager Service");
@@ -175,7 +176,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     }
   }
 
-  public void undoCreateServiceGroup (@Nonnull final ParticipantIdentifierType aBusinessIdentifier) throws RegistrationHookException
+  public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     try
     {
@@ -183,7 +184,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
       s_aLogger.warn ("CREATE failed in backend, so deleting " +
                       IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
                       " from SML.");
-      _createSMLCaller ().delete (aBusinessIdentifier);
+      _createSMLCaller ().delete (new SimpleParticipantIdentifier (aBusinessIdentifier));
     }
     catch (final Throwable t)
     {
@@ -194,7 +195,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     }
   }
 
-  public void deleteServiceGroup (@Nonnull final ParticipantIdentifierType aBusinessIdentifier) throws RegistrationHookException
+  public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     s_aLogger.info ("Trying to delete business " +
                     IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
@@ -202,7 +203,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
     try
     {
-      _createSMLCaller ().delete (aBusinessIdentifier);
+      _createSMLCaller ().delete (new SimpleParticipantIdentifier (aBusinessIdentifier));
       s_aLogger.info ("Succeded in deleting business " +
                       IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
                       " using Business Identifier Manager Service");
@@ -221,7 +222,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     }
   }
 
-  public void undoDeleteServiceGroup (@Nonnull final ParticipantIdentifierType aBusinessIdentifier) throws RegistrationHookException
+  public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     try
     {
@@ -229,7 +230,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
       s_aLogger.warn ("DELETE failed in backend, so creating " +
                       IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
                       " in SML.");
-      _createSMLCaller ().create (s_sSMPID, aBusinessIdentifier);
+      _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
     }
     catch (final Throwable t)
     {

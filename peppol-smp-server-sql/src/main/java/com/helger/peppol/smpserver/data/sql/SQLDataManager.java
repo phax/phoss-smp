@@ -228,6 +228,36 @@ public final class SQLDataManager extends JPAEnabledManager implements IDataMana
     return aOwnership;
   }
 
+  @Nonnull
+  @ReturnsMutableCopy
+  public Collection <ParticipantIdentifierType> getAllSMPServiceGroupsOfOwner (@Nonnull final IDataUser aDataUser) throws Throwable
+  {
+    final DBUser aDBUser = (DBUser) aDataUser;
+
+    JPAExecutionResult <Collection <ParticipantIdentifierType>> ret;
+    ret = doSelect (new Callable <Collection <ParticipantIdentifierType>> ()
+    {
+      @Nonnull
+      @ReturnsMutableCopy
+      public Collection <ParticipantIdentifierType> call () throws Exception
+      {
+        final List <DBOwnership> aDBOwnerships = getEntityManager ().createQuery ("SELECT p FROM DBOwnership p WHERE p.user = :user",
+                                                                                  DBOwnership.class)
+                                                                    .setParameter ("user", aDBUser)
+                                                                    .getResultList ();
+
+        final Collection <ParticipantIdentifierType> aList = new ArrayList <ParticipantIdentifierType> ();
+        for (final DBOwnership aDBOwnership : aDBOwnerships)
+        {
+          final DBServiceGroupID aDBServiceGroupID = aDBOwnership.getServiceGroup ().getId ();
+          aList.add (aDBServiceGroupID.asBusinessIdentifier ());
+        }
+        return aList;
+      }
+    });
+    return ret.getOrThrow ();
+  }
+
   @Nullable
   public ServiceGroupType getServiceGroup (@Nonnull final ParticipantIdentifierType aServiceGroupID) throws Throwable
   {
@@ -397,7 +427,7 @@ public final class SQLDataManager extends JPAEnabledManager implements IDataMana
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <ServiceMetadataType> getServices (@Nonnull final ParticipantIdentifierType aServiceGroupID) throws Throwable
+  public Collection <ServiceMetadataType> getAllServices (@Nonnull final ParticipantIdentifierType aServiceGroupID) throws Throwable
   {
     JPAExecutionResult <Collection <ServiceMetadataType>> ret;
     ret = doSelect (new Callable <Collection <ServiceMetadataType>> ()

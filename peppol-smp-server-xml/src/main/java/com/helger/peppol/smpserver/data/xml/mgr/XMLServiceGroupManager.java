@@ -41,6 +41,8 @@ import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
+import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
+import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.photon.basic.app.dao.impl.EDAOActionType;
@@ -52,10 +54,12 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   private static final String ELEMENT_ITEM = "servicegroup";
 
   private final Map <String, SMPServiceGroup> m_aMap = new HashMap <String, SMPServiceGroup> ();
+  private final IRegistrationHook m_aHook;
 
   public XMLServiceGroupManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceGroup.class, sFilename);
+    m_aHook = RegistrationHookFactory.getOrCreateInstance ();
     initialRead ();
   }
 
@@ -110,15 +114,24 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   @Nonnull
   public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
                                                 @Nullable @Nonnull final IParticipantIdentifier aParticipantIdentifier,
-                                                final String sExtension)
+                                                @Nullable final String sExtension)
   {
     final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
+
+    // It's a new service group - throws exception in case of an error
+    m_aHook.createServiceGroup (aParticipantIdentifier);
 
     m_aRWLock.writeLock ().lock ();
     try
     {
       _addSMPServiceGroup (aSMPServiceGroup);
       markAsChanged (aSMPServiceGroup, EDAOActionType.CREATE);
+    }
+    catch (final RuntimeException ex)
+    {
+      // An error occurred - remove from SML again
+      m_aHook.undoCreateServiceGroup (aParticipantIdentifier);
+      throw ex;
     }
     finally
     {
@@ -174,6 +187,9 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     if (aSMPServiceGroup == null)
       return EChange.UNCHANGED;
 
+    // Delete in SML - throws exception in case of error
+    m_aHook.deleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
+
     m_aRWLock.writeLock ().lock ();
     try
     {
@@ -185,6 +201,12 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
       }
 
       markAsChanged (aRealServiceGroup, EDAOActionType.DELETE);
+    }
+    catch (final RuntimeException ex)
+    {
+      // An error occurred - remove from SML again
+      m_aHook.undoDeleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
+      throw ex;
     }
     finally
     {

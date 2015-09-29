@@ -39,10 +39,6 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smp.SMPExtensionConverter;
-import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smpserver.data.DataManagerFactory;
-import com.helger.peppol.smpserver.data.IDataManagerSPI;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -171,13 +167,9 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
       else
       {
         // Create the service group both locally and on the SML (if active)!
-        final ServiceGroupType aSG = new ServiceGroupType ();
-        aSG.setParticipantIdentifier (aParticipantID);
-        aSG.setExtension (SMPExtensionConverter.convert (sExtension));
         try
         {
-          final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-          aDataManager.saveServiceGroup (aSG, aDataManager.createPreAuthenticatedUser (aOwningUser.getLoginName ()));
+          aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension);
         }
         catch (final Throwable t)
         {
@@ -252,11 +244,8 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     try
     {
       // Delete the service group both locally and on the SML (if active)!
-      final IDataManagerSPI aDataManager = DataManagerFactory.getInstance ();
-      aDataManager.deleteServiceGroup (new SimpleParticipantIdentifier (aSelectedObject.getParticpantIdentifier ()),
-                                       aDataManager.createPreAuthenticatedUser (AccessManager.getInstance ()
-                                                                                             .getUserOfID (aSelectedObject.getOwnerID ())
-                                                                                             .getLoginName ()));
+      final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+      aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier ());
     }
     catch (final Throwable t)
     {

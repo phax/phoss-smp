@@ -117,7 +117,7 @@ public final class SQLRedirectManager implements ISMPRedirectManager
    * @return The new or updated {@link ISMPRedirect}. Never <code>null</code>.
    */
   @Nonnull
-  public ISMPRedirect createSMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
                                          @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                          @Nonnull @Nonempty final String sTargetHref,
                                          @Nonnull @Nonempty final String sSubjectUniqueIdentifier,

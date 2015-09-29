@@ -172,26 +172,13 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   }
 
   @Nonnull
-  public ISMPServiceInformation updateSMPServiceInformation (final String sServiceInfoID)
+  public ISMPServiceInformation markSMPServiceInformationChanged (final String sServiceInfoID)
   {
-    final SMPServiceInformation aServiceInfo = (SMPServiceInformation) getSMPServiceInformationOfID (sServiceInfoID);
+    final SMPServiceInformation aServiceInfo = _getSMPServiceInformationOfID (sServiceInfoID);
     if (aServiceInfo == null)
       return null;
 
     return _updateSMPServiceInformation (aServiceInfo);
-  }
-
-  @Nonnull
-  public ISMPServiceInformation createSMPServiceInformation (@Nonnull final ISMPServiceGroup aServiceGroup,
-                                                             @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                                             @Nonnull final List <SMPProcess> aProcesses,
-                                                             @Nullable final String sExtension)
-  {
-    final SMPServiceInformation aSMPServiceInformation = new SMPServiceInformation (aServiceGroup,
-                                                                                    aDocumentTypeIdentifier,
-                                                                                    aProcesses,
-                                                                                    sExtension);
-    return createSMPServiceInformation (aSMPServiceInformation);
   }
 
   @Nullable
@@ -216,7 +203,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   }
 
   @Nonnull
-  public ISMPServiceInformation createSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
+  public ISMPServiceInformation createOrUpdateSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
   {
     ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
     ValueEnforcer.isTrue (aServiceInformation.getProcessCount () == 1, "ServiceGroup must contain a single process");
@@ -363,6 +350,28 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     return ret;
   }
 
+  @Nonnull
+  @ReturnsMutableCopy
+  public Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  {
+    final Collection <IDocumentTypeIdentifier> ret = new ArrayList <> ();
+    if (aServiceGroup != null)
+    {
+      m_aRWLock.readLock ().lock ();
+      try
+      {
+        for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
+          if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()))
+            ret.add (aServiceInformation.getDocumentTypeIdentifier ());
+      }
+      finally
+      {
+        m_aRWLock.readLock ().unlock ();
+      }
+    }
+    return ret;
+  }
+
   @Nullable
   public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final String sServiceGroupID,
                                                                                        @Nullable final IDocumentTypeIdentifier aDocumentTypeIdentifier)
@@ -400,7 +409,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     return ret.get (0);
   }
 
-  public ISMPServiceInformation getSMPServiceInformationOfID (@Nullable final String sID)
+  private SMPServiceInformation _getSMPServiceInformationOfID (@Nullable final String sID)
   {
     if (StringHelper.hasNoText (sID))
       return null;
@@ -414,6 +423,12 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     {
       m_aRWLock.readLock ().unlock ();
     }
+  }
+
+  public ISMPServiceInformation getSMPServiceInformationOfID (@Nullable final String sID)
+  {
+    // Change return type
+    return _getSMPServiceInformationOfID (sID);
   }
 
   public boolean containsSMPServiceInformationWithID (@Nullable final String sID)

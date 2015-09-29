@@ -39,14 +39,19 @@ import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
+import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
+import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 
 public final class SQLServiceGroupManager implements ISMPServiceGroupManager
 {
   private final ReadWriteLock m_aRWLock = new ReentrantReadWriteLock ();
   private final Map <String, SMPServiceGroup> m_aMap = new HashMap <String, SMPServiceGroup> ();
+  private final IRegistrationHook m_aHook;
 
   public SQLServiceGroupManager ()
-  {}
+  {
+    m_aHook = RegistrationHookFactory.getOrCreateInstance ();
+  }
 
   private void _addSMPServiceGroup (@Nonnull final SMPServiceGroup aSMPServiceGroup)
   {
@@ -65,10 +70,19 @@ public final class SQLServiceGroupManager implements ISMPServiceGroupManager
   {
     final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
 
+    // It's a new service group - throws exception in case of an error
+    m_aHook.createServiceGroup (aParticipantIdentifier);
+
     m_aRWLock.writeLock ().lock ();
     try
     {
       _addSMPServiceGroup (aSMPServiceGroup);
+    }
+    catch (final RuntimeException ex)
+    {
+      // An error occurred - remove from SML again
+      m_aHook.undoCreateServiceGroup (aParticipantIdentifier);
+      throw ex;
     }
     finally
     {
@@ -114,12 +128,21 @@ public final class SQLServiceGroupManager implements ISMPServiceGroupManager
     if (aSMPServiceGroup == null)
       return EChange.UNCHANGED;
 
+    // Delete in SML - throws exception in case of error
+    m_aHook.deleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
+
     m_aRWLock.writeLock ().lock ();
     try
     {
       final SMPServiceGroup aRealServiceGroup = m_aMap.remove (aSMPServiceGroup.getID ());
       if (aRealServiceGroup == null)
         return EChange.UNCHANGED;
+    }
+    catch (final RuntimeException ex)
+    {
+      // An error occurred - remove from SML again
+      m_aHook.undoDeleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
+      throw ex;
     }
     finally
     {

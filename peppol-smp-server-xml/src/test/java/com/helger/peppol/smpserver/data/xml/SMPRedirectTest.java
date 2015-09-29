@@ -67,7 +67,7 @@ public final class SMPRedirectTest
     final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
 
     // Create new one
-    ISMPRedirect aRedirect = aRedirectMgr.createSMPRedirect (aSG, aDocTypeID, "target", "suid", "extredirect");
+    ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target", "suid", "extredirect");
     assertSame (aSG, aRedirect.getServiceGroup ());
     assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID, aRedirect.getDocumentTypeIdentifier ()));
     assertEquals ("target", aRedirect.getTargetHref ());
@@ -78,7 +78,7 @@ public final class SMPRedirectTest
     CommonsTestHelper.testMicroTypeConversion (aRedirect);
 
     // Update existing
-    aRedirect = aRedirectMgr.createSMPRedirect (aSG, aDocTypeID, "target2", "suid2", "extredirect2");
+    aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target2", "suid2", "extredirect2");
     assertSame (aSG, aRedirect.getServiceGroup ());
     assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID, aRedirect.getDocumentTypeIdentifier ()));
     assertEquals ("target2", aRedirect.getTargetHref ());
@@ -90,7 +90,7 @@ public final class SMPRedirectTest
 
     // Add second one
     final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (aTestUser.getID (), aPI2, null);
-    aRedirect = aRedirectMgr.createSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", "extredirect2");
+    aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", "extredirect2");
     assertSame (aSG2, aRedirect.getServiceGroup ());
     assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID, aRedirect.getDocumentTypeIdentifier ()));
     assertEquals ("target2", aRedirect.getTargetHref ());

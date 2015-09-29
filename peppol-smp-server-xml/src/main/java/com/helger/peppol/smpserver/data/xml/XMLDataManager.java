@@ -250,7 +250,7 @@ public final class XMLDataManager implements IDataManagerSPI
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <ServiceMetadataType> getServices (@Nonnull final ParticipantIdentifierType aServiceGroupID)
+  public Collection <ServiceMetadataType> getAllServices (@Nonnull final ParticipantIdentifierType aServiceGroupID)
   {
     final String sServiceGroupID = SMPHelper.createSMPServiceGroupID (aServiceGroupID);
 
@@ -286,7 +286,7 @@ public final class XMLDataManager implements IDataManagerSPI
                                                              aDataUser.getUserName ());
 
     final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
-    aServiceInformationMgr.createSMPServiceInformation (SMPServiceInformation.createFromJAXB (aServiceGroup,
+    aServiceInformationMgr.createOrUpdateSMPServiceInformation (SMPServiceInformation.createFromJAXB (aServiceGroup,
                                                                                               aServiceInformation));
   }
 

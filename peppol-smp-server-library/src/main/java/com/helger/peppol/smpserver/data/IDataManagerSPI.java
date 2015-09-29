@@ -40,20 +40,13 @@
  */
 package com.helger.peppol.smpserver.data;
 
-import java.util.Collection;
-import java.util.List;
-
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.IsSPIInterface;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.peppol.identifier.DocumentIdentifierType;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
-import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
-import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
@@ -92,88 +85,6 @@ public interface IDataManagerSPI
   IDataUser createPreAuthenticatedUser (@Nonnull @Nonempty String sUserName);
 
   /**
-   * This method returns a ServiceGroup given its id.
-   *
-   * @param aServiceGroupID
-   *        The service group id.
-   * @return The service group corresponding to the id.
-   * @throws Throwable
-   *         In case something goes wrong.
-   */
-  @Nullable
-  ServiceGroupType getServiceGroup (@Nonnull ParticipantIdentifierType aServiceGroupID) throws Throwable;
-
-  /**
-   * Persists the service group in the underlying data layer. This operation
-   * requires credentials.
-   *
-   * @param aServiceGroup
-   *        The service group to save.
-   * @param aDataUser
-   *        The current, verified user. Never <code>null</code>.
-   * @throws Throwable
-   *         In case something goes wrong.
-   */
-  void saveServiceGroup (@Nonnull ServiceGroupType aServiceGroup, @Nonnull IDataUser aDataUser) throws Throwable;
-
-  /**
-   * Deletes the service group having the specified id.
-   *
-   * @param aServiceGroupID
-   *        The ID of the service group to delete.
-   * @param aDataUser
-   *        The current, verified user. Never <code>null</code>.
-   * @throws Throwable
-   *         In case something goes wrong.
-   */
-  void deleteServiceGroup (@Nonnull ParticipantIdentifierType aServiceGroupID,
-                           @Nonnull IDataUser aDataUser) throws Throwable;
-
-  /**
-   * Gets a list of the document id's of the given service group.
-   *
-   * @param aServiceGroupID
-   *        The id of the service group.
-   * @return The corresponding document id's.
-   * @throws Throwable
-   *         In case something goes wrong.
-   */
-  @Nonnull
-  @ReturnsMutableCopy
-  List <DocumentIdentifierType> getDocumentTypes (@Nonnull ParticipantIdentifierType aServiceGroupID) throws Throwable;
-
-  /**
-   * Gets the list of service metadata objects corresponding to a given service
-   * group id.
-   *
-   * @param aServiceGroupID
-   *        The service group id.
-   * @return A list of service metadata objects.
-   * @throws Throwable
-   *         In case something goes wrong.
-   */
-  @Nonnull
-  @ReturnsMutableCopy
-  Collection <ServiceMetadataType> getServices (@Nonnull ParticipantIdentifierType aServiceGroupID) throws Throwable;
-
-  /**
-   * Gets the service metadata corresponding to the service group id and
-   * document id.
-   *
-   * @param aServiceGroupID
-   *        The service group id of the service metadata.
-   * @param aDocTypeID
-   *        The document id of the service metadata.
-   * @return The corresponding service metadata. It's either a service
-   *         information or a redirect.
-   * @throws Throwable
-   *         In case something goes wrong.
-   */
-  @Nullable
-  ServiceMetadataType getService (@Nonnull ParticipantIdentifierType aServiceGroupID,
-                                  @Nonnull DocumentIdentifierType aDocTypeID) throws Throwable;
-
-  /**
    * Saves the given service metadata in the underlying data layer.
    *
    * @param aServiceMetadata
@@ -201,22 +112,4 @@ public interface IDataManagerSPI
   void deleteService (@Nonnull ParticipantIdentifierType aServiceGroupID,
                       @Nonnull DocumentIdentifierType aDocTypeID,
                       @Nonnull IDataUser aDataUser) throws Throwable;
-
-  /**
-   * Checks whether the ServiceMetadata should be found elsewhere.
-   *
-   * @param aServiceGroupID
-   *        The service group id of the service metadata. May not be
-   *        <code>null</code>.
-   * @param aDocTypeID
-   *        The document id of the service metadata. May not be
-   *        <code>null</code>.
-   * @return The URI to be redirected to. null if no redirection should take
-   *         place.
-   * @throws Throwable
-   *         In case something goes wrong.
-   */
-  @Nullable
-  ServiceMetadataType getRedirection (@Nonnull ParticipantIdentifierType aServiceGroupID,
-                                      @Nonnull DocumentIdentifierType aDocTypeID) throws Throwable;
 }

@@ -36,6 +36,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
+import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 import com.helger.photon.basic.security.AccessManager;
 import com.helger.photon.basic.security.CSecurity;
@@ -83,10 +84,10 @@ public final class XMLServiceInformationManagerTest
                                                  "ti",
                                                  "extep");
         final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-        aServiceInformationMgr.createSMPServiceInformation (aSG,
-                                                            aDocTypeID,
-                                                            CollectionHelper.newList (aProcess),
-                                                            "extsi");
+        aServiceInformationMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aSG,
+                                                                                               aDocTypeID,
+                                                                                               CollectionHelper.newList (aProcess),
+                                                                                               "extsi"));
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -113,10 +114,10 @@ public final class XMLServiceInformationManagerTest
                                                  "ti",
                                                  "extep");
         final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-        aServiceInformationMgr.createSMPServiceInformation (aSG,
-                                                            aDocTypeID,
-                                                            CollectionHelper.newList (aProcess),
-                                                            "extsi");
+        aServiceInformationMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aSG,
+                                                                                               aDocTypeID,
+                                                                                               CollectionHelper.newList (aProcess),
+                                                                                               "extsi"));
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -151,10 +152,10 @@ public final class XMLServiceInformationManagerTest
                                                  "ti",
                                                  "extep");
         final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-        aServiceInformationMgr.createSMPServiceInformation (aSG,
-                                                            aDocTypeID,
-                                                            CollectionHelper.newList (aProcess),
-                                                            "extsi");
+        aServiceInformationMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aSG,
+                                                                                               aDocTypeID,
+                                                                                               CollectionHelper.newList (aProcess),
+                                                                                               "extsi"));
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -184,10 +185,10 @@ public final class XMLServiceInformationManagerTest
         final SMPProcess aProcess = new SMPProcess (SimpleProcessIdentifier.createWithDefaultScheme ("testproc2"),
                                                     CollectionHelper.newList (aEP),
                                                     "extproc");
-        aServiceInformationMgr.createSMPServiceInformation (aSG,
-                                                            aDocTypeID,
-                                                            CollectionHelper.newList (aProcess),
-                                                            "extsi");
+        aServiceInformationMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aSG,
+                                                                                               aDocTypeID,
+                                                                                               CollectionHelper.newList (aProcess),
+                                                                                               "extsi"));
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (2,

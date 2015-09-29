@@ -104,26 +104,13 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
   }
 
   @Nonnull
-  public ISMPServiceInformation updateSMPServiceInformation (final String sServiceInfoID)
+  public ISMPServiceInformation markSMPServiceInformationChanged (final String sServiceInfoID)
   {
     final SMPServiceInformation aServiceInfo = (SMPServiceInformation) getSMPServiceInformationOfID (sServiceInfoID);
     if (aServiceInfo == null)
       return null;
 
     return _updateSMPServiceInformation (aServiceInfo);
-  }
-
-  @Nonnull
-  public ISMPServiceInformation createSMPServiceInformation (@Nonnull final ISMPServiceGroup aServiceGroup,
-                                                             @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                                             @Nonnull final List <SMPProcess> aProcesses,
-                                                             @Nullable final String sExtension)
-  {
-    final SMPServiceInformation aSMPServiceInformation = new SMPServiceInformation (aServiceGroup,
-                                                                                    aDocumentTypeIdentifier,
-                                                                                    aProcesses,
-                                                                                    sExtension);
-    return createSMPServiceInformation (aSMPServiceInformation);
   }
 
   @Nullable
@@ -148,7 +135,7 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
   }
 
   @Nonnull
-  public ISMPServiceInformation createSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
+  public ISMPServiceInformation createOrUpdateSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
   {
     ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
     ValueEnforcer.isTrue (aServiceInformation.getProcessCount () == 1, "ServiceGroup must contain a single process");
@@ -278,6 +265,28 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
         for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
           if (aServiceInformation.getServiceGroupID ().equals (sServiceGroupID))
             ret.add (aServiceInformation);
+      }
+      finally
+      {
+        m_aRWLock.readLock ().unlock ();
+      }
+    }
+    return ret;
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  {
+    final Collection <IDocumentTypeIdentifier> ret = new ArrayList <> ();
+    if (aServiceGroup != null)
+    {
+      m_aRWLock.readLock ().lock ();
+      try
+      {
+        for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
+          if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()))
+            ret.add (aServiceInformation.getDocumentTypeIdentifier ());
       }
       finally
       {

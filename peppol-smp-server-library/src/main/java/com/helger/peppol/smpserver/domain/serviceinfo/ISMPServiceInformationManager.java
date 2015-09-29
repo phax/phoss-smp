@@ -1,7 +1,6 @@
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -18,22 +17,16 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 public interface ISMPServiceInformationManager
 {
   @Nonnull
-  ISMPServiceInformation updateSMPServiceInformation (@Nullable String sServiceInfoID);
+  ISMPServiceInformation markSMPServiceInformationChanged (@Nullable String sServiceInfoID);
 
   @Nonnull
-  ISMPServiceInformation createSMPServiceInformation (@Nonnull ISMPServiceGroup aServiceGroup,
-                                                      @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                                      @Nonnull List <SMPProcess> aProcesses,
-                                                      @Nullable String sExtension);
+  ISMPServiceInformation createOrUpdateSMPServiceInformation (@Nonnull SMPServiceInformation aServiceInformation);
 
   @Nullable
   ISMPServiceInformation findServiceInformation (@Nullable String sServiceGroupID,
                                                  @Nullable IPeppolDocumentTypeIdentifier aDocTypeID,
                                                  @Nullable IPeppolProcessIdentifier aProcessID,
                                                  @Nullable ISMPTransportProfile eTransportProfile);
-
-  @Nonnull
-  ISMPServiceInformation createSMPServiceInformation (@Nonnull SMPServiceInformation aServiceInformation);
 
   @Nonnull
   EChange deleteSMPServiceInformation (@Nullable ISMPServiceInformation aSMPServiceInformation);
@@ -58,6 +51,10 @@ public interface ISMPServiceInformationManager
   @Nonnull
   @ReturnsMutableCopy
   Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable String sServiceGroupID);
+
+  @Nonnull
+  @ReturnsMutableCopy
+  Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   @Nullable
   ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable String sServiceGroupID,
