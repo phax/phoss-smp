@@ -86,6 +86,8 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
     // (http://code.google.com/p/peppol-silicone/issues/detail?id=6)
     ret.put (PersistenceUnitProperties.CACHE_SHARED_DEFAULT, "false");
 
+    ret.put (PersistenceUnitProperties.LOGGING_LEVEL, "finer");
+
     return ret;
   }
 

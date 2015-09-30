@@ -57,6 +57,10 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 @IsSPIInterface
 public interface ISMPUserManagerSPI
 {
+  void createUser (@Nonnull String sUserName, @Nonnull String sPassword);
+
+  void deleteUser (@Nullable String sUserName);
+
   /**
    * Check if an SMP user matching the user name of the BasicAuth credentials
    * exists, and that the passwords match. So this method verifies that the

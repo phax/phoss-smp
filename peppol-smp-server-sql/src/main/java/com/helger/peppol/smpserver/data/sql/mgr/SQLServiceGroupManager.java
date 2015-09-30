@@ -18,34 +18,34 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.persistence.EntityManager;
 
-import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.state.EChange;
+import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.smpserver.domain.MetaManager;
-import com.helger.peppol.smpserver.domain.SMPHelper;
+import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
+import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
+import com.helger.peppol.smpserver.data.sql.model.DBOwnershipID;
+import com.helger.peppol.smpserver.data.sql.model.DBServiceGroup;
+import com.helger.peppol.smpserver.data.sql.model.DBServiceGroupID;
+import com.helger.peppol.smpserver.data.sql.model.DBUser;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 
-public final class SQLServiceGroupManager implements ISMPServiceGroupManager
+public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager implements ISMPServiceGroupManager
 {
-  private final ReadWriteLock m_aRWLock = new ReentrantReadWriteLock ();
-  private final Map <String, SMPServiceGroup> m_aMap = new HashMap <String, SMPServiceGroup> ();
   private final IRegistrationHook m_aHook;
 
   public SQLServiceGroupManager ()
@@ -53,153 +53,242 @@ public final class SQLServiceGroupManager implements ISMPServiceGroupManager
     m_aHook = RegistrationHookFactory.getOrCreateInstance ();
   }
 
-  private void _addSMPServiceGroup (@Nonnull final SMPServiceGroup aSMPServiceGroup)
-  {
-    ValueEnforcer.notNull (aSMPServiceGroup, "SMPServiceGroup");
-
-    final String sSMPServiceGroupID = aSMPServiceGroup.getID ();
-    if (m_aMap.containsKey (sSMPServiceGroupID))
-      throw new IllegalArgumentException ("SMPServiceGroup ID '" + sSMPServiceGroupID + "' is already in use!");
-    m_aMap.put (aSMPServiceGroup.getID (), aSMPServiceGroup);
-  }
-
   @Nonnull
   public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
-                                                @Nullable @Nonnull final IParticipantIdentifier aParticipantIdentifier,
-                                                final String sExtension)
+                                                @Nonnull final IParticipantIdentifier aParticipantIdentifier,
+                                                @Nullable final String sExtension)
   {
-    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
+    JPAExecutionResult <?> ret;
+    ret = doInTransaction (new Runnable ()
+    {
+      public void run ()
+      {
+        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantIdentifier);
+        final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantIdentifier);
 
-    // It's a new service group - throws exception in case of an error
-    m_aHook.createServiceGroup (aParticipantIdentifier);
+        // Check if the passed service group ID is already in use
+        final EntityManager aEM = getEntityManager ();
+        DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
+        if (aDBServiceGroup != null)
+          throw new IllegalStateException ("The service group with ID " +
+                                           IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier) +
+                                           " already exists!");
 
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      _addSMPServiceGroup (aSMPServiceGroup);
-    }
-    catch (final RuntimeException ex)
-    {
-      // An error occurred - remove from SML again
-      m_aHook.undoCreateServiceGroup (aParticipantIdentifier);
-      throw ex;
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
-    return aSMPServiceGroup;
+        final DBUser aDBUser = aEM.find (DBUser.class, sOwnerID);
+        if (aDBUser == null)
+          throw new IllegalStateException ("User '" + sOwnerID + "' does not exist!");
+
+        // It's a new service group - throws exception in case of an error
+        m_aHook.createServiceGroup (aParticipantIdentifier);
+
+        try
+        {
+          // Did not exist. Create it.
+          aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID);
+          aDBServiceGroup.setExtension (sExtension);
+          aEM.persist (aDBServiceGroup);
+
+          // Save the ownership information
+          final DBOwnership aDBOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
+          aEM.persist (aDBOwnership);
+        }
+        catch (final RuntimeException ex)
+        {
+          // An error occurred - remove from SML again
+          m_aHook.undoCreateServiceGroup (aParticipantIdentifier);
+          throw ex;
+        }
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
   }
 
   @Nonnull
   public EChange updateSMPServiceGroup (@Nullable final String sSMPServiceGroupID,
-                                        @Nonnull @Nonempty final String sOwnerID,
+                                        @Nonnull @Nonempty final String sNewOwnerID,
                                         @Nullable final String sExtension)
   {
-    m_aRWLock.writeLock ().lock ();
-    try
+    final IParticipantIdentifier aParticipantIdentifier = IdentifierHelper.createParticipantIdentifierFromURIPartOrNull (sSMPServiceGroupID);
+    JPAExecutionResult <EChange> ret;
+    ret = doInTransaction (new Callable <EChange> ()
     {
-      final SMPServiceGroup aSMPServiceGroup = m_aMap.get (sSMPServiceGroupID);
-      if (aSMPServiceGroup == null)
-        return EChange.UNCHANGED;
+      @Nonnull
+      public EChange call ()
+      {
+        // Check if the passed service group ID is already in use
+        final EntityManager aEM = getEntityManager ();
+        final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class,
+                                                         new DBServiceGroupID (aParticipantIdentifier));
+        if (aDBServiceGroup == null)
+          return EChange.UNCHANGED;
 
-      EChange eChange = EChange.UNCHANGED;
-      eChange = eChange.or (aSMPServiceGroup.setOwnerID (sOwnerID));
-      eChange = eChange.or (aSMPServiceGroup.setExtension (sExtension));
-      if (eChange.isUnchanged ())
-        return EChange.UNCHANGED;
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
-    return EChange.CHANGED;
+        final DBOwnership aOldOwnership = aDBServiceGroup.getOwnership ();
+        if (!aOldOwnership.getId ().getUsername ().equals (sNewOwnerID))
+        {
+          // Update ownership
+
+          // Is new owner existing?
+          final DBUser aNewUser = aEM.find (DBUser.class, sNewOwnerID);
+          if (aNewUser == null)
+            throw new IllegalStateException ("User '" + sNewOwnerID + "' does not exist!");
+
+          aEM.remove (aOldOwnership);
+
+          // The business did exist. So it must be owned by the passed user.
+          final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sNewOwnerID, aParticipantIdentifier);
+          aDBServiceGroup.setOwnership (new DBOwnership (aDBOwnershipID, aNewUser, aDBServiceGroup));
+        }
+
+        // Simply update the extension
+        aDBServiceGroup.setExtension (sExtension);
+        aEM.merge (aDBServiceGroup);
+        return EChange.CHANGED;
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
   }
 
   @Nonnull
-  public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantIdentifier)
+  public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aServiceGroupID)
   {
-    final ISMPServiceGroup aSMPServiceGroup = getSMPServiceGroupOfID (aParticipantIdentifier);
-    if (aSMPServiceGroup == null)
-      return EChange.UNCHANGED;
-
-    // Delete in SML - throws exception in case of error
-    m_aHook.deleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
-
-    m_aRWLock.writeLock ().lock ();
-    try
+    JPAExecutionResult <EChange> ret;
+    ret = doInTransaction (new Callable <EChange> ()
     {
-      final SMPServiceGroup aRealServiceGroup = m_aMap.remove (aSMPServiceGroup.getID ());
-      if (aRealServiceGroup == null)
-        return EChange.UNCHANGED;
+      @Nonnull
+      public EChange call ()
+      {
+        // Check if the service group is existing
+        final EntityManager aEM = getEntityManager ();
+        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aServiceGroupID);
+        final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
+        if (aDBServiceGroup == null)
+        {
+          s_aLogger.warn ("No such service group to delete: " +
+                          IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
+          return EChange.UNCHANGED;
+        }
 
-      // Delete all redirects and all service information of this service group
-      // as well
-      MetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
-      MetaManager.getServiceInformationMgr ().deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup.getID ());
-    }
-    catch (final RuntimeException ex)
-    {
-      // An error occurred - remove from SML again
-      m_aHook.undoDeleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
-      throw ex;
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
-    return EChange.CHANGED;
+        // Check the ownership afterwards, so that only existing serviceGroups
+        // are checked
+        aEM.createQuery ("DELETE from DBOwnership p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value")
+           .setParameter ("scheme", aServiceGroupID.getScheme ())
+           .setParameter ("value", aServiceGroupID.getValue ())
+           .executeUpdate ();
+
+        aEM.remove (aDBServiceGroup);
+        return EChange.CHANGED;
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
+    JPAExecutionResult <Collection <ISMPServiceGroup>> ret;
+    ret = doSelect (new Callable <Collection <ISMPServiceGroup>> ()
     {
-      return CollectionHelper.newList (m_aMap.values ());
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+      @Nonnull
+      @ReturnsMutableCopy
+      public Collection <ISMPServiceGroup> call () throws Exception
+      {
+        final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p",
+                                                                                        DBServiceGroup.class)
+                                                                          .getResultList ();
+
+        final Collection <ISMPServiceGroup> aList = new ArrayList <> ();
+        for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
+        {
+          final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
+          if (aDBOwnership == null)
+            throw new IllegalStateException ("Service group " +
+                                             aDBServiceGroup.getId ().getAsBusinessIdentifier ().getURIEncoded () +
+                                             " has no owner");
+
+          final SMPServiceGroup aServiceGroup = new SMPServiceGroup (aDBOwnership.getId ().getUsername (),
+                                                                     aDBServiceGroup.getId ()
+                                                                                    .getAsBusinessIdentifier (),
+                                                                     aDBServiceGroup.getExtension ());
+          aList.add (aServiceGroup);
+        }
+        return aList;
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
-    final List <ISMPServiceGroup> ret = new ArrayList <> ();
-    m_aRWLock.readLock ().lock ();
-    try
+    JPAExecutionResult <Collection <ISMPServiceGroup>> ret;
+    ret = doSelect (new Callable <Collection <ISMPServiceGroup>> ()
     {
-      for (final ISMPServiceGroup aSG : m_aMap.values ())
-        if (aSG.getOwnerID ().equals (sOwnerID))
-          ret.add (aSG);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
-    return ret;
+      @Nonnull
+      @ReturnsMutableCopy
+      public Collection <ISMPServiceGroup> call () throws Exception
+      {
+        final List <DBOwnership> aDBOwnerships = getEntityManager ().createQuery ("SELECT p FROM DBOwnership p WHERE p.user.userName = :user",
+                                                                                  DBOwnership.class)
+                                                                    .setParameter ("user", sOwnerID)
+                                                                    .getResultList ();
+
+        final Collection <ISMPServiceGroup> aList = new ArrayList <> ();
+        for (final DBOwnership aDBOwnership : aDBOwnerships)
+        {
+          final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,
+                                                                     aDBOwnership.getServiceGroup ()
+                                                                                 .getId ()
+                                                                                 .getAsBusinessIdentifier (),
+                                                                     aDBOwnership.getServiceGroup ().getExtension ());
+          aList.add (aServiceGroup);
+        }
+        return aList;
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
   }
 
+  @Nullable
   public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
     if (aParticipantIdentifier == null)
       return null;
 
-    final String sID = SMPHelper.createSMPServiceGroupID (aParticipantIdentifier);
-    m_aRWLock.readLock ().lock ();
-    try
+    JPAExecutionResult <ISMPServiceGroup> ret;
+    ret = doSelect (new Callable <ISMPServiceGroup> ()
     {
-      return m_aMap.get (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+      @Nonnull
+      @ReturnsMutableCopy
+      public ISMPServiceGroup call () throws Exception
+      {
+        final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
+                                                                         new DBServiceGroupID (aParticipantIdentifier));
+        if (aDBServiceGroup == null)
+          return null;
+
+        final SMPServiceGroup aServiceGroup = new SMPServiceGroup (aDBServiceGroup.getOwnership ()
+                                                                                  .getId ()
+                                                                                  .getUsername (),
+                                                                   aDBServiceGroup.getId ().getAsBusinessIdentifier (),
+                                                                   aDBServiceGroup.getExtension ());
+        return aServiceGroup;
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
   }
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
@@ -207,28 +296,39 @@ public final class SQLServiceGroupManager implements ISMPServiceGroupManager
     if (aParticipantIdentifier == null)
       return false;
 
-    m_aRWLock.readLock ().lock ();
-    try
+    JPAExecutionResult <Boolean> ret;
+    ret = doSelect (new Callable <Boolean> ()
     {
-      return m_aMap.containsKey (SMPHelper.createSMPServiceGroupID (aParticipantIdentifier));
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+      @Nonnull
+      @ReturnsMutableCopy
+      public Boolean call () throws Exception
+      {
+        final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
+                                                                         new DBServiceGroupID (aParticipantIdentifier));
+        return Boolean.valueOf (aDBServiceGroup != null);
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ().booleanValue ();
   }
 
   @Nonnegative
   public int getSMPServiceGroupCount ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
+    JPAExecutionResult <Long> ret;
+    ret = doSelect (new Callable <Long> ()
     {
-      return m_aMap.size ();
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+      @Nonnull
+      @ReturnsMutableCopy
+      public Long call () throws Exception
+      {
+        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceGroup p"));
+        return Long.valueOf (nCount);
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ().intValue ();
   }
 }

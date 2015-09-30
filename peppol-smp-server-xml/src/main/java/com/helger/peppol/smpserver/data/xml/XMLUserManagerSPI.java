@@ -52,6 +52,16 @@ public final class XMLUserManagerSPI implements ISMPUserManagerSPI
   public XMLUserManagerSPI ()
   {}
 
+  public void createUser (final String sUserName, final String sPassword)
+  {
+    // not needed
+  }
+
+  public void deleteUser (final String sUserName)
+  {
+    // not needed
+  }
+
   @Nonnull
   public XMLDataUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException,
                                                                                                       SMPUnknownUserException

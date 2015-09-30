@@ -52,18 +52,13 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.callback.IThrowingCallable;
-import com.helger.commons.callback.exception.LoggingExceptionCallback;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.state.EChange;
-import com.helger.db.jpa.IHasEntityManager;
-import com.helger.db.jpa.JPAEnabledManager;
+import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.DocumentIdentifierType;
 import com.helger.peppol.identifier.IParticipantIdentifier;
@@ -109,30 +104,37 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @IsSPIImplementation
-public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUserManagerSPI
+public final class SQLUserManagerSPI extends AbstractSMPJPAEnabledManager implements ISMPUserManagerSPI
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SQLUserManagerSPI.class);
-
   @Deprecated
   @UsedViaReflection
   public SQLUserManagerSPI ()
+  {}
+
+  public void createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
-    super (new IHasEntityManager ()
+    doInTransaction (new Runnable ()
     {
-      // This additional indirection level is required!!!
-      // So that for every request the correct getInstance is invoked!
-      @Nonnull
-      public EntityManager getEntityManager ()
+      public void run ()
       {
-        return SMPEntityManagerWrapper.getInstance ().getEntityManager ();
+        final DBUser aDBUser = new DBUser ();
+        aDBUser.setUserName (sUserName);
+        aDBUser.setPassword (sPassword);
+        getEntityManager ().persist (aDBUser);
       }
     });
+  }
 
-    // Exceptions are handled by logging them
-    setCustomExceptionCallback (new LoggingExceptionCallback ());
-
-    // To avoid some EclipseLink logging issues
-    setUseTransactionsForSelect (true);
+  public void deleteUser (@Nullable final String sUserName)
+  {
+    if (StringHelper.hasText (sUserName))
+      doInTransaction (new Runnable ()
+      {
+        public void run ()
+        {
+          getEntityManager ().remove (getEntityManager ().find (DBUser.class, sUserName));
+        }
+      });
   }
 
   @Nonnull
@@ -209,11 +211,12 @@ public final class SQLUserManagerSPI extends JPAEnabledManager implements ISMPUs
         for (final DBOwnership aDBOwnership : aDBOwnerships)
         {
           final DBServiceGroupID aDBServiceGroupID = aDBOwnership.getServiceGroup ().getId ();
-          aList.add (aDBServiceGroupID.asBusinessIdentifier ());
+          aList.add (aDBServiceGroupID.getAsBusinessIdentifier ());
         }
         return aList;
       }
     });
+
     return ret.getOrThrow ();
   }
 

@@ -59,7 +59,7 @@
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>peppol-smp-server-xml</artifactId>
+      <artifactId>peppol-smp-server-sql</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>

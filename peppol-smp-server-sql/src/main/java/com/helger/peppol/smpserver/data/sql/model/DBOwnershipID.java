@@ -54,7 +54,6 @@ import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 
 /**
  * ID for the ownership
@@ -117,13 +116,6 @@ public class DBOwnershipID implements Serializable
   {
     setBusinessIdentifierScheme (aPI.getScheme ());
     setBusinessIdentifier (aPI.getValue ());
-  }
-
-  @Transient
-  @Nonnull
-  public SimpleParticipantIdentifier asBusinessIdentifier ()
-  {
-    return new SimpleParticipantIdentifier (m_sParticipantIdentifierScheme, m_sParticipantIdentifier);
   }
 
   @Override
