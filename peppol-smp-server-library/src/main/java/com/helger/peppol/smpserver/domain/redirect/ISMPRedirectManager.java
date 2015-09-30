@@ -31,16 +31,13 @@ public interface ISMPRedirectManager
    */
   @Nonnull
   ISMPRedirect createOrUpdateSMPRedirect (@Nonnull ISMPServiceGroup aServiceGroup,
-                                  @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                  @Nonnull String sTargetHref,
-                                  @Nonnull String sSubjectUniqueIdentifier,
-                                  @Nullable String sExtension);
+                                          @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
+                                          @Nonnull String sTargetHref,
+                                          @Nonnull String sSubjectUniqueIdentifier,
+                                          @Nullable String sExtension);
 
   @Nonnull
   EChange deleteSMPRedirect (@Nullable ISMPRedirect aSMPRedirect);
-
-  @Nonnull
-  EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   @Nonnull
   EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable String sServiceGroupID);
@@ -51,18 +48,10 @@ public interface ISMPRedirectManager
 
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
-
-  @Nonnull
-  @ReturnsMutableCopy
   Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable String sServiceGroupID);
 
   @Nonnegative
   int getSMPRedirectCount ();
-
-  @Nullable
-  ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable ISMPServiceGroup aServiceGroup,
-                                                            @Nullable IDocumentTypeIdentifier aDocTypeID);
 
   @Nullable
   ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable String sServiceGroupID,
@@ -70,6 +59,4 @@ public interface ISMPRedirectManager
 
   @Nullable
   ISMPRedirect getSMPRedirectOfID (@Nullable String sID);
-
-  boolean containsSMPRedirectWithID (@Nullable String sID);
 }

@@ -31,7 +31,6 @@ import javax.annotation.Nullable;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ELockType;
 import com.helger.commons.annotation.IsLocked;
-import com.helger.commons.annotation.MustBeLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
@@ -57,31 +56,22 @@ public final class SQLRedirectManager implements ISMPRedirectManager
   public SQLRedirectManager ()
   {}
 
-  @MustBeLocked (ELockType.WRITE)
-  private void _addSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
-  {
-    ValueEnforcer.notNull (aSMPRedirect, "SMPRedirect");
-
-    final String sSMPRedirectID = aSMPRedirect.getID ();
-    if (m_aMap.containsKey (sSMPRedirectID))
-      throw new IllegalArgumentException ("SMPRedirect ID '" + sSMPRedirectID + "' is already in use!");
-    m_aMap.put (aSMPRedirect.getID (), aSMPRedirect);
-  }
-
   @Nonnull
   @IsLocked (ELockType.WRITE)
-  private ISMPRedirect _createSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
+  private void _createSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
   {
     m_aRWLock.writeLock ().lock ();
     try
     {
-      _addSMPRedirect (aSMPRedirect);
+      final String sSMPRedirectID = aSMPRedirect.getID ();
+      if (m_aMap.containsKey (sSMPRedirectID))
+        throw new IllegalArgumentException ("SMPRedirect ID '" + sSMPRedirectID + "' is already in use!");
+      m_aMap.put (aSMPRedirect.getID (), aSMPRedirect);
     }
     finally
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    return aSMPRedirect;
   }
 
   @Nonnull
@@ -118,14 +108,14 @@ public final class SQLRedirectManager implements ISMPRedirectManager
    */
   @Nonnull
   public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
-                                         @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                         @Nonnull @Nonempty final String sTargetHref,
-                                         @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
-                                         @Nullable final String sExtension)
+                                                 @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
+                                                 @Nonnull @Nonempty final String sTargetHref,
+                                                 @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
+                                                 @Nullable final String sExtension)
   {
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
 
-    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
+    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup.getID (),
                                                                                    aDocumentTypeIdentifier);
     SMPRedirect aNewRedirect;
     if (aOldRedirect != null)
@@ -170,12 +160,6 @@ public final class SQLRedirectManager implements ISMPRedirectManager
       m_aRWLock.writeLock ().unlock ();
     }
     return EChange.CHANGED;
-  }
-
-  @Nonnull
-  public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
-  {
-    return deleteAllSMPRedirectsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
   }
 
   @Nonnull
@@ -245,14 +229,6 @@ public final class SQLRedirectManager implements ISMPRedirectManager
     }
   }
 
-  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
-                                                                   @Nullable final IDocumentTypeIdentifier aDocTypeID)
-  {
-    if (aServiceGroup == null)
-      return null;
-    return getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup.getID (), aDocTypeID);
-  }
-
   public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final String sServiceGroupID,
                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
@@ -285,22 +261,6 @@ public final class SQLRedirectManager implements ISMPRedirectManager
     try
     {
       return m_aMap.get (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
-  }
-
-  public boolean containsSMPRedirectWithID (@Nullable final String sID)
-  {
-    if (StringHelper.hasNoText (sID))
-      return false;
-
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.containsKey (sID);
     }
     finally
     {

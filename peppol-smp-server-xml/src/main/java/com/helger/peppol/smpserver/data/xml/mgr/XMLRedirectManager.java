@@ -183,14 +183,14 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect>implem
    */
   @Nonnull
   public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
-                                         @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                         @Nonnull @Nonempty final String sTargetHref,
-                                         @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
-                                         @Nullable final String sExtension)
+                                                 @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
+                                                 @Nonnull @Nonempty final String sTargetHref,
+                                                 @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
+                                                 @Nullable final String sExtension)
   {
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
 
-    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
+    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup.getID (),
                                                                                    aDocumentTypeIdentifier);
     SMPRedirect aNewRedirect;
     if (aOldRedirect != null)
@@ -244,12 +244,6 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect>implem
                                       aSMPRedirect.getServiceGroupID (),
                                       aSMPRedirect.getDocumentTypeIdentifier ());
     return EChange.CHANGED;
-  }
-
-  @Nonnull
-  public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
-  {
-    return deleteAllSMPRedirectsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
   }
 
   @Nonnull
@@ -319,14 +313,6 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect>implem
     }
   }
 
-  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
-                                                                   @Nullable final IDocumentTypeIdentifier aDocTypeID)
-  {
-    if (aServiceGroup == null)
-      return null;
-    return getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup.getID (), aDocTypeID);
-  }
-
   public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final String sServiceGroupID,
                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
@@ -359,22 +345,6 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect>implem
     try
     {
       return m_aMap.get (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
-  }
-
-  public boolean containsSMPRedirectWithID (@Nullable final String sID)
-  {
-    if (StringHelper.hasNoText (sID))
-      return false;
-
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.containsKey (sID);
     }
     finally
     {

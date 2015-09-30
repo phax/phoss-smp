@@ -102,9 +102,9 @@ public final class ISMPRedirectManagerTest
       assertSame (aRedirect, aRedirectMgr.getSMPRedirectOfID (aRedirect.getID ()));
 
       // Cleanup
-      assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG2).isChanged ());
+      assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG2.getID ()).isChanged ());
       assertEquals (1, aRedirectMgr.getSMPRedirectCount ());
-      assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG).isChanged ());
+      assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG.getID ()).isChanged ());
       assertEquals (0, aRedirectMgr.getSMPRedirectCount ());
       assertTrue (aSGMgr.deleteSMPServiceGroup (aPI2).isChanged ());
       assertTrue (aSGMgr.deleteSMPServiceGroup (aPI).isChanged ());
