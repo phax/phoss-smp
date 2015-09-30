@@ -108,6 +108,11 @@ public final class SQLUserManagerSPI extends AbstractSMPJPAEnabledManager implem
   public SQLUserManagerSPI ()
   {}
 
+  public boolean isSpecialUserManagementNeeded ()
+  {
+    return true;
+  }
+
   public void createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
     doInTransaction (new Runnable ()

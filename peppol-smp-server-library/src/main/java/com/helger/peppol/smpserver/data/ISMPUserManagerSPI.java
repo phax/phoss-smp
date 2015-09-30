@@ -60,6 +60,11 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 @IsSPIInterface
 public interface ISMPUserManagerSPI
 {
+  /**
+   * @return <code>true</code> for SQL, <code>false</code> for XML
+   */
+  boolean isSpecialUserManagementNeeded ();
+
   void createUser (@Nonnull String sUserName, @Nonnull String sPassword);
 
   void deleteUser (@Nullable String sUserName);

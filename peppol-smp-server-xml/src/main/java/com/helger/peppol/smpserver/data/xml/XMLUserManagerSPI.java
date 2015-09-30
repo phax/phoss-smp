@@ -58,6 +58,11 @@ public final class XMLUserManagerSPI implements ISMPUserManagerSPI
   public XMLUserManagerSPI ()
   {}
 
+  public boolean isSpecialUserManagementNeeded ()
+  {
+    return false;
+  }
+
   public void createUser (final String sUserName, final String sPassword)
   {
     // not needed
