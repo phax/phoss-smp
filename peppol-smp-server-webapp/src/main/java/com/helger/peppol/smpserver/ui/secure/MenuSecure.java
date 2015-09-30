@@ -53,10 +53,6 @@ public final class MenuSecure
                                                                                                                  aMenuTree));
       aMenuTree.createItem (aAdmin,
                             new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
-      aMenuTree.createItem (aAdmin, new PageSecureDocumentTypes (CMenuSecure.MENU_DOCTYPES))
-               .setDisplayFilter (aFilterAdministrators);
-      aMenuTree.createItem (aAdmin, new PageSecureProcesses (CMenuSecure.MENU_PROCESSES))
-               .setDisplayFilter (aFilterAdministrators);
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CApp.DEFAULT_LOCALE);
     }
 

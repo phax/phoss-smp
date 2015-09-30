@@ -150,8 +150,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         eFormAction == EWebPageFormAction.DELETE)
     {
       final String sProcessID = aWPEC.getAttributeAsString (FIELD_PROCESS_ID);
-      final SimpleProcessIdentifier aProcessID = sProcessID == null ? null
-                                                                    : SimpleProcessIdentifier.createFromURIPartOrNull (sProcessID);
+      final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createFromURIPartOrNull (sProcessID);
       final String sTransportProfile = aWPEC.getAttributeAsString (FIELD_TRANSPORT_PROFILE);
 
       final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);

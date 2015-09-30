@@ -23,7 +23,7 @@ public interface ISMPServiceInformationManager
   ISMPServiceInformation createOrUpdateSMPServiceInformation (@Nonnull SMPServiceInformation aServiceInformation);
 
   @Nullable
-  ISMPServiceInformation findServiceInformation (@Nullable String sServiceGroupID,
+  ISMPServiceInformation findServiceInformation (@Nullable ISMPServiceGroup aServiceGroup,
                                                  @Nullable IPeppolDocumentTypeIdentifier aDocTypeID,
                                                  @Nullable IPeppolProcessIdentifier aProcessID,
                                                  @Nullable ISMPTransportProfile eTransportProfile);
@@ -32,7 +32,7 @@ public interface ISMPServiceInformationManager
   EChange deleteSMPServiceInformation (@Nullable ISMPServiceInformation aSMPServiceInformation);
 
   @Nonnull
-  EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable String sServiceGroupID);
+  EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   @Nonnull
   @ReturnsMutableCopy
@@ -47,18 +47,12 @@ public interface ISMPServiceInformationManager
 
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable String sServiceGroupID);
-
-  @Nonnull
-  @ReturnsMutableCopy
   Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   @Nullable
-  ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable String sServiceGroupID,
+  ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable ISMPServiceGroup aServiceGroup,
                                                                                 @Nullable IDocumentTypeIdentifier aDocumentTypeIdentifier);
 
   @Nullable
   ISMPServiceInformation getSMPServiceInformationOfID (@Nullable String sID);
-
-  boolean containsSMPServiceInformationWithID (@Nullable String sID);
 }

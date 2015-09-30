@@ -182,12 +182,12 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   }
 
   @Nullable
-  public ISMPServiceInformation findServiceInformation (@Nullable final String sServiceGroupID,
+  public ISMPServiceInformation findServiceInformation (@Nullable final ISMPServiceGroup aServiceGroup,
                                                         @Nullable final IPeppolDocumentTypeIdentifier aDocTypeID,
                                                         @Nullable final IPeppolProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (sServiceGroupID,
+    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                           aDocTypeID);
     if (aOldInformation != null)
     {
@@ -213,7 +213,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
 
     // Check for an update
     boolean bChangedExisting = false;
-    final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceInformation.getServiceGroupID (),
+    final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceInformation.getServiceGroup (),
                                                                                                                                  aServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
     {
@@ -276,10 +276,10 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   }
 
   @Nonnull
-  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final String sServiceGroupID)
+  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
     EChange eChange = EChange.UNCHANGED;
-    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationsOfServiceGroup (sServiceGroupID))
+    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
       eChange = eChange.or (deleteSMPServiceInformation (aSMPServiceInformation));
     return eChange;
   }
@@ -317,21 +317,14 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    return getAllSMPServiceInformationsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
-  }
-
-  @Nonnull
-  @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final String sServiceGroupID)
-  {
     final Collection <ISMPServiceInformation> ret = new ArrayList <ISMPServiceInformation> ();
-    if (StringHelper.hasText (sServiceGroupID))
+    if (aServiceGroup != null)
     {
       m_aRWLock.readLock ().lock ();
       try
       {
         for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
-          if (aServiceInformation.getServiceGroupID ().equals (sServiceGroupID))
+          if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()))
             ret.add (aServiceInformation);
       }
       finally
@@ -365,10 +358,10 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   }
 
   @Nullable
-  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final String sServiceGroupID,
+  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
                                                                                        @Nullable final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
-    if (StringHelper.hasNoText (sServiceGroupID))
+    if (aServiceGroup == null)
       return null;
     if (aDocumentTypeIdentifier == null)
       return null;
@@ -379,7 +372,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     try
     {
       for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
-        if (aServiceInformation.getServiceGroupID ().equals (sServiceGroupID) &&
+        if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
             aServiceInformation.getDocumentTypeIdentifier ().equals (aDocumentTypeIdentifier))
         {
           ret.add (aServiceInformation);
@@ -394,7 +387,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
       return null;
     if (ret.size () > 1)
       s_aLogger.warn ("Found more than one entry for service group '" +
-                      sServiceGroupID +
+                      aServiceGroup.getID () +
                       "' and document type '" +
                       aDocumentTypeIdentifier.getValue () +
                       "'. This seems to be a bug! Using the first one.");

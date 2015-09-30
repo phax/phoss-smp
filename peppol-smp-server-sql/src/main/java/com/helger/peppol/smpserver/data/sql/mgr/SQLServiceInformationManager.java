@@ -21,8 +21,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -57,7 +55,6 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 public final class SQLServiceInformationManager implements ISMPServiceInformationManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (SQLServiceInformationManager.class);
-  private final ReadWriteLock m_aRWLock = new ReentrantReadWriteLock ();
   private final Map <String, SMPServiceInformation> m_aMap = new HashMap <String, SMPServiceInformation> ();
 
   public SQLServiceInformationManager ()
@@ -78,28 +75,13 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
   @Nonnull
   private ISMPServiceInformation _createSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
   {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      _addSMPServiceInformation (aSMPServiceInformation);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
+    _addSMPServiceInformation (aSMPServiceInformation);
     return aSMPServiceInformation;
   }
 
   @Nonnull
   private ISMPServiceInformation _updateSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
   {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {}
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
     return aSMPServiceInformation;
   }
 
@@ -114,12 +96,12 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
   }
 
   @Nullable
-  public ISMPServiceInformation findServiceInformation (@Nullable final String sServiceGroupID,
+  public ISMPServiceInformation findServiceInformation (@Nullable final ISMPServiceGroup aServiceGroup,
                                                         @Nullable final IPeppolDocumentTypeIdentifier aDocTypeID,
                                                         @Nullable final IPeppolProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (sServiceGroupID,
+    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                           aDocTypeID);
     if (aOldInformation != null)
     {
@@ -145,7 +127,7 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
 
     // Check for an update
     boolean bChangedExisting = false;
-    final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceInformation.getServiceGroupID (),
+    final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceInformation.getServiceGroup (),
                                                                                                                                  aServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
     {
@@ -185,25 +167,17 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
     if (aSMPServiceInformation == null)
       return EChange.UNCHANGED;
 
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      final SMPServiceInformation aRealServiceInformation = m_aMap.remove (aSMPServiceInformation.getID ());
-      if (aRealServiceInformation == null)
-        return EChange.UNCHANGED;
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
+    final SMPServiceInformation aRealServiceInformation = m_aMap.remove (aSMPServiceInformation.getID ());
+    if (aRealServiceInformation == null)
+      return EChange.UNCHANGED;
     return EChange.CHANGED;
   }
 
   @Nonnull
-  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final String sServiceGroupID)
+  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
     EChange eChange = EChange.UNCHANGED;
-    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationsOfServiceGroup (sServiceGroupID))
+    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
       eChange = eChange.or (deleteSMPServiceInformation (aSMPServiceInformation));
     return eChange;
   }
@@ -212,56 +186,25 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformations ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return CollectionHelper.newList (m_aMap.values ());
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return CollectionHelper.newList (m_aMap.values ());
   }
 
   @Nonnegative
   public int getSMPServiceInformationCount ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.size ();
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return m_aMap.size ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    return getAllSMPServiceInformationsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
-  }
-
-  @Nonnull
-  @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final String sServiceGroupID)
-  {
     final Collection <ISMPServiceInformation> ret = new ArrayList <ISMPServiceInformation> ();
-    if (StringHelper.hasText (sServiceGroupID))
+    if (aServiceGroup != null)
     {
-      m_aRWLock.readLock ().lock ();
-      try
-      {
-        for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
-          if (aServiceInformation.getServiceGroupID ().equals (sServiceGroupID))
-            ret.add (aServiceInformation);
-      }
-      finally
-      {
-        m_aRWLock.readLock ().unlock ();
-      }
+      for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
+        if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()))
+          ret.add (aServiceInformation);
     }
     return ret;
   }
@@ -273,52 +216,36 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
     final Collection <IDocumentTypeIdentifier> ret = new ArrayList <> ();
     if (aServiceGroup != null)
     {
-      m_aRWLock.readLock ().lock ();
-      try
-      {
-        for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
-          if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()))
-            ret.add (aServiceInformation.getDocumentTypeIdentifier ());
-      }
-      finally
-      {
-        m_aRWLock.readLock ().unlock ();
-      }
+      for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
+        if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()))
+          ret.add (aServiceInformation.getDocumentTypeIdentifier ());
     }
     return ret;
   }
 
   @Nullable
-  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final String sServiceGroupID,
+  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
                                                                                        @Nullable final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
-    if (StringHelper.hasNoText (sServiceGroupID))
+    if (aServiceGroup == null)
       return null;
     if (aDocumentTypeIdentifier == null)
       return null;
 
     final List <ISMPServiceInformation> ret = new ArrayList <ISMPServiceInformation> ();
 
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
-        if (aServiceInformation.getServiceGroupID ().equals (sServiceGroupID) &&
-            aServiceInformation.getDocumentTypeIdentifier ().equals (aDocumentTypeIdentifier))
-        {
-          ret.add (aServiceInformation);
-        }
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
+      if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
+          aServiceInformation.getDocumentTypeIdentifier ().equals (aDocumentTypeIdentifier))
+      {
+        ret.add (aServiceInformation);
+      }
 
     if (ret.isEmpty ())
       return null;
     if (ret.size () > 1)
       s_aLogger.warn ("Found more than one entry for service group '" +
-                      sServiceGroupID +
+                      aServiceGroup.getID () +
                       "' and document type '" +
                       aDocumentTypeIdentifier.getValue () +
                       "'. This seems to be a bug! Using the first one.");
@@ -330,15 +257,7 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
     if (StringHelper.hasNoText (sID))
       return null;
 
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.get (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return m_aMap.get (sID);
   }
 
   public boolean containsSMPServiceInformationWithID (@Nullable final String sID)
@@ -346,14 +265,6 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
     if (StringHelper.hasNoText (sID))
       return false;
 
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.containsKey (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return m_aMap.containsKey (sID);
   }
 }

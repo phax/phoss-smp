@@ -73,7 +73,6 @@ import com.helger.peppol.smp.ServiceMetadataReferenceType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.smpserver.domain.MetaManager;
-import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -158,7 +157,7 @@ public final class SMPServerAPI
     final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
     aCompleteServiceGroup.setServiceGroup (aSG);
 
-    for (final ISMPServiceInformation aService : aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (SMPHelper.createSMPServiceGroupID (aServiceGroupID)))
+    for (final ISMPServiceInformation aService : aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
       aCompleteServiceGroup.addServiceMetadata (aService.getAsJAXBObject ());
 
     s_aLogger.info ("Finished getCompleteServiceGroup(" + sServiceGroupID + ")");
@@ -363,7 +362,7 @@ public final class SMPServerAPI
     {
       // Get as regular service information
       final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
-      final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (sServiceGroupID,
+      final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                          aDocTypeID);
       if (aServiceInfo != null)
       {
@@ -553,7 +552,7 @@ public final class SMPServerAPI
     }
 
     final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
-    final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (sServiceGroupID,
+    final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                        aDocTypeID);
     if (aServiceInfo == null)
     {

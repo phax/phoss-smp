@@ -218,8 +218,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
       else
       {
         if (aServiceGroup != null)
-          if (aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup.getID (),
-                                                                                     aDocTypeID) != null)
+          if (aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID) != null)
             aFormErrors.addFieldError (FIELD_DOCTYPE_ID,
                                        "At least one endpoint is registered for this document type. Delete the endpoint before you can create a redirect.");
       }

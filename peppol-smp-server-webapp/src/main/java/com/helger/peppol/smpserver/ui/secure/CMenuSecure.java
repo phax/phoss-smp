@@ -23,8 +23,6 @@ public final class CMenuSecure
 {
   // Menu item IDs
   public static final String MENU_SERVICE_GROUPS = "service_groups";
-  public static final String MENU_DOCTYPES = "doctypes";
-  public static final String MENU_PROCESSES = "processes";
   public static final String MENU_ENDPOINTS = "endpoints";
   public static final String MENU_REDIRECTS = "redirects";
   public static final String MENU_CERTIFICATE_INFORMATION = "certificate_information";
