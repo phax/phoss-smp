@@ -10,10 +10,12 @@ import com.helger.photon.basic.security.user.IUser;
 public class XMLDataUser implements IDataUser
 {
   private final IUser m_aUser;
+  private final String m_sName;
 
   public XMLDataUser (@Nonnull final IUser aUser)
   {
     m_aUser = ValueEnforcer.notNull (aUser, "User");
+    m_sName = aUser.getLoginName () + " (" + aUser.getDisplayName () + ")";
   }
 
   @Nonnull
@@ -33,6 +35,6 @@ public class XMLDataUser implements IDataUser
   @Nonempty
   public String getUserName ()
   {
-    return m_aUser.getLoginName ();
+    return m_sName;
   }
 }

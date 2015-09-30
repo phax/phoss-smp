@@ -21,9 +21,9 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.name.CollatingComparatorHasDisplayName;
-import com.helger.photon.basic.security.AccessManager;
-import com.helger.photon.basic.security.user.IUser;
+import com.helger.commons.compare.AbstractCollatingComparator;
+import com.helger.peppol.smpserver.data.IDataUser;
+import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 
@@ -38,9 +38,16 @@ public class HCUserSelect extends HCExtSelect
   {
     super (aRF);
 
-    for (final IUser aUser : CollectionHelper.getSorted (AccessManager.getInstance ().getAllActiveUsers (),
-                                                         new CollatingComparatorHasDisplayName <> (aDisplayLocale)))
-      addOption (aUser.getID (), aUser.getLoginName () + " (" + aUser.getDisplayName () + ")");
+    for (final IDataUser aUser : CollectionHelper.getSorted (SMPUserManagerFactory.getInstance ().getAllUsers (),
+                                                             new AbstractCollatingComparator <IDataUser> (aDisplayLocale)
+                                                             {
+                                                               @Override
+                                                               protected String getPart (@Nonnull final IDataUser aUser)
+                                                               {
+                                                                 return aUser.getUserName ();
+                                                               }
+                                                             }))
+      addOption (aUser.getID (), aUser.getUserName ());
 
     if (!hasSelectedOption ())
       addOptionPleaseSelect (aDisplayLocale);

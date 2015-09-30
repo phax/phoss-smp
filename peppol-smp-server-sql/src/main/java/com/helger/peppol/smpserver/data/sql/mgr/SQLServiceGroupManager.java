@@ -28,6 +28,7 @@ import javax.persistence.EntityManager;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.IParticipantIdentifier;
@@ -86,11 +87,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
           // Did not exist. Create it.
           aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID);
           aDBServiceGroup.setExtension (sExtension);
-          aEM.persist (aDBServiceGroup);
-
           // Save the ownership information
-          final DBOwnership aDBOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
-          aEM.persist (aDBOwnership);
+          aDBServiceGroup.setOwnership (new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup));
+          aEM.persist (aDBServiceGroup);
         }
         catch (final RuntimeException ex)
         {
@@ -124,6 +123,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
         if (aDBServiceGroup == null)
           return EChange.UNCHANGED;
 
+        EChange eChange = EChange.UNCHANGED;
         final DBOwnership aOldOwnership = aDBServiceGroup.getOwnership ();
         if (!aOldOwnership.getId ().getUsername ().equals (sNewOwnerID))
         {
@@ -139,12 +139,17 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
           // The business did exist. So it must be owned by the passed user.
           final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sNewOwnerID, aParticipantIdentifier);
           aDBServiceGroup.setOwnership (new DBOwnership (aDBOwnershipID, aNewUser, aDBServiceGroup));
+
+          eChange = EChange.CHANGED;
         }
 
         // Simply update the extension
+        if (!EqualsHelper.equals (aDBServiceGroup.getExtension (), sExtension))
+          eChange = EChange.CHANGED;
+
         aDBServiceGroup.setExtension (sExtension);
         aEM.merge (aDBServiceGroup);
-        return EChange.CHANGED;
+        return eChange;
       }
     });
     if (ret.hasThrowable ())

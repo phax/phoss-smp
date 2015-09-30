@@ -16,13 +16,19 @@
  */
 package com.helger.peppol.smpserver.data.xml;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
@@ -60,6 +66,24 @@ public final class XMLUserManagerSPI implements ISMPUserManagerSPI
   public void deleteUser (final String sUserName)
   {
     // not needed
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public Collection <XMLDataUser> getAllUsers ()
+  {
+    final List <XMLDataUser> ret = new ArrayList <> ();
+    for (final IUser aUser : AccessManager.getInstance ().getAllActiveUsers ())
+      ret.add (new XMLDataUser (aUser));
+    return ret;
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public XMLDataUser getUserOfID (@Nullable final String sUserID)
+  {
+    final IUser aUser = AccessManager.getInstance ().getUserOfID (sUserID);
+    return aUser == null ? null : new XMLDataUser (aUser);
   }
 
   @Nonnull

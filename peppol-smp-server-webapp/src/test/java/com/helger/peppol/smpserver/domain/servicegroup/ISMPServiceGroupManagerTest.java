@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
@@ -64,7 +63,7 @@ public final class ISMPServiceGroupManagerTest
       assertTrue (aSGMgr.updateSMPServiceGroup (sSG2, sOwner2ID, sExtension).isUnchanged ());
 
       // Register first and check state
-      final ISMPServiceGroup aSG1 = aSGMgr.createSMPServiceGroup (sOwner1ID, aPI1, sExtension);
+      ISMPServiceGroup aSG1 = aSGMgr.createSMPServiceGroup (sOwner1ID, aPI1, sExtension);
       assertNotNull (aSG1);
       assertEquals (aPI1, aSG1.getParticpantIdentifier ());
       assertEquals (sSG1, aSG1.getID ());
@@ -77,7 +76,7 @@ public final class ISMPServiceGroupManagerTest
       assertTrue (aSGMgr.getAllSMPServiceGroups ().contains (aSG1));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI1));
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI2));
-      assertSame (aSG1, aSGMgr.getSMPServiceGroupOfID (aPI1));
+      assertEquals (aSG1, aSGMgr.getSMPServiceGroupOfID (aPI1));
       assertNull (aSGMgr.getSMPServiceGroupOfID (aPI2));
       assertEquals (1, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner1ID).size ());
       assertTrue (aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner1ID).contains (aSG1));
@@ -91,6 +90,7 @@ public final class ISMPServiceGroupManagerTest
       assertTrue (aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).contains (aSG1));
       assertTrue (aSGMgr.updateSMPServiceGroup (sSG2, sOwner1ID, sExtension).isUnchanged ());
       assertTrue (aSGMgr.updateSMPServiceGroup (sSG2, sOwner2ID, sExtension).isUnchanged ());
+      aSG1 = aSGMgr.getSMPServiceGroupOfID (aPI1);
       assertEquals (sOwner2ID, aSG1.getOwnerID ());
 
       final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sOwner2ID, aPI2, sExtension);
@@ -107,8 +107,8 @@ public final class ISMPServiceGroupManagerTest
       assertTrue (aSGMgr.getAllSMPServiceGroups ().contains (aSG2));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI1));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI2));
-      assertSame (aSG1, aSGMgr.getSMPServiceGroupOfID (aPI1));
-      assertSame (aSG2, aSGMgr.getSMPServiceGroupOfID (aPI2));
+      assertEquals (aSG1, aSGMgr.getSMPServiceGroupOfID (aPI1));
+      assertEquals (aSG2, aSGMgr.getSMPServiceGroupOfID (aPI2));
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner1ID).size ());
       assertEquals (2, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).size ());
       assertTrue (aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).contains (aSG1));
@@ -125,7 +125,7 @@ public final class ISMPServiceGroupManagerTest
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI1));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI2));
       assertNull (aSGMgr.getSMPServiceGroupOfID (aPI1));
-      assertSame (aSG2, aSGMgr.getSMPServiceGroupOfID (aPI2));
+      assertEquals (aSG2, aSGMgr.getSMPServiceGroupOfID (aPI2));
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner1ID).size ());
       assertEquals (1, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).size ());
       assertTrue (aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).contains (aSG2));

@@ -40,10 +40,13 @@
  */
 package com.helger.peppol.smpserver.data;
 
+import java.util.Collection;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.IsSPIInterface;
+import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
@@ -60,6 +63,13 @@ public interface ISMPUserManagerSPI
   void createUser (@Nonnull String sUserName, @Nonnull String sPassword);
 
   void deleteUser (@Nullable String sUserName);
+
+  @Nonnull
+  @ReturnsMutableCopy
+  Collection <? extends IDataUser> getAllUsers ();
+
+  @Nullable
+  IDataUser getUserOfID (String sUserID);
 
   /**
    * Check if an SMP user matching the user name of the BasicAuth credentials

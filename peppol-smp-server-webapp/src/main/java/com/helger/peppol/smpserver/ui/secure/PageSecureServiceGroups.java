@@ -39,6 +39,8 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.smpserver.data.IDataUser;
+import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -46,9 +48,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
-import com.helger.photon.basic.security.AccessManager;
 import com.helger.photon.basic.security.login.LoggedInUserManager;
-import com.helger.photon.basic.security.user.IUser;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
@@ -90,6 +90,8 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                 @Nullable final String sID)
   {
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    if (sID == null)
+      return null;
     return aServiceGroupMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sID));
   }
 
@@ -126,7 +128,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final String sParticipantID = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID);
     SimpleParticipantIdentifier aParticipantID = null;
     final String sOwningUserID = aWPEC.getAttributeAsString (FIELD_OWNING_USER_ID);
-    final IUser aOwningUser = AccessManager.getInstance ().getUserOfID (sOwningUserID);
+    final IDataUser aOwningUser = SMPUserManagerFactory.getInstance ().getUserOfID (sOwningUserID);
     final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
 
     // validations
