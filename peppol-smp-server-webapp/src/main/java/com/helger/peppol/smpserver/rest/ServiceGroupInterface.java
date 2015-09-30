@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.rest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -33,6 +34,9 @@ import javax.xml.bind.JAXBElement;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
+import com.helger.photon.core.app.CApplication;
+import com.helger.web.mock.MockHttpServletResponse;
+import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
  * This class implements the REST interface for getting ServiceGroup's. PUT and
@@ -44,7 +48,11 @@ import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 public final class ServiceGroupInterface
 {
   @Context
+  private HttpServletRequest m_aHttpRequest;
+
+  @Context
   private HttpHeaders m_aHttpHeaders;
+
   @Context
   private UriInfo m_aUriInfo;
 
@@ -57,29 +65,53 @@ public final class ServiceGroupInterface
   @Produces (MediaType.TEXT_XML)
   public JAXBElement <ServiceGroupType> getServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    final ServiceGroupType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroup (sServiceGroupID);
-    return m_aObjFactory.createServiceGroup (ret);
+    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    try
+    {
+      final ServiceGroupType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroup (sServiceGroupID);
+      return m_aObjFactory.createServiceGroup (ret);
+    }
+    finally
+    {
+      WebScopeManager.onRequestEnd ();
+    }
   }
 
   @PUT
   public Response saveServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                     final ServiceGroupType aServiceGroup) throws Throwable
   {
-    if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).saveServiceGroup (sServiceGroupID,
-                                                                                       aServiceGroup,
-                                                                                       RestRequestHelper.getAuth (m_aHttpHeaders))
-                                                                    .isFailure ())
-      return Response.status (Status.BAD_REQUEST).build ();
-    return Response.ok ().build ();
+    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    try
+    {
+      if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).saveServiceGroup (sServiceGroupID,
+                                                                                         aServiceGroup,
+                                                                                         RestRequestHelper.getAuth (m_aHttpHeaders))
+                                                                      .isFailure ())
+        return Response.status (Status.BAD_REQUEST).build ();
+      return Response.ok ().build ();
+    }
+    finally
+    {
+      WebScopeManager.onRequestEnd ();
+    }
   }
 
   @DELETE
   public Response deleteServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).deleteServiceGroup (sServiceGroupID,
-                                                                                         RestRequestHelper.getAuth (m_aHttpHeaders))
-                                                                    .isFailure ())
-      return Response.status (Status.BAD_REQUEST).build ();
-    return Response.ok ().build ();
+    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    try
+    {
+      if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).deleteServiceGroup (sServiceGroupID,
+                                                                                           RestRequestHelper.getAuth (m_aHttpHeaders))
+                                                                      .isFailure ())
+        return Response.status (Status.BAD_REQUEST).build ();
+      return Response.ok ().build ();
+    }
+    finally
+    {
+      WebScopeManager.onRequestEnd ();
+    }
   }
 }

@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.rest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -34,6 +35,9 @@ import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
+import com.helger.photon.core.app.CApplication;
+import com.helger.web.mock.MockHttpServletResponse;
+import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
  * This class implements the REST interface for getting SignedServiceMetadata's.
@@ -44,6 +48,9 @@ import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 @Path ("/{ServiceGroupId}/services/{DocumentTypeId}")
 public final class ServiceMetadataInterface
 {
+  @Context
+  private HttpServletRequest m_aHttpRequest;
+
   @Context
   private HttpHeaders m_aHttpHeaders;
 
@@ -58,9 +65,17 @@ public final class ServiceMetadataInterface
   public JAXBElement <SignedServiceMetadataType> getServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                                                          @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
   {
-    final SignedServiceMetadataType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceRegistration (sServiceGroupID,
-                                                                                                                               sDocumentTypeID);
-    return m_aObjFactory.createSignedServiceMetadata (ret);
+    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    try
+    {
+      final SignedServiceMetadataType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceRegistration (sServiceGroupID,
+                                                                                                                                 sDocumentTypeID);
+      return m_aObjFactory.createSignedServiceMetadata (ret);
+    }
+    finally
+    {
+      WebScopeManager.onRequestEnd ();
+    }
   }
 
   @PUT
@@ -68,24 +83,40 @@ public final class ServiceMetadataInterface
                                            @PathParam ("DocumentTypeId") final String sDocumentTypeID,
                                            final ServiceMetadataType aServiceMetadata) throws Throwable
   {
-    if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).saveServiceRegistration (sServiceGroupID,
-                                                                                              sDocumentTypeID,
-                                                                                              aServiceMetadata,
-                                                                                              RestRequestHelper.getAuth (m_aHttpHeaders))
-                                                                    .isFailure ())
-      return Response.status (Status.BAD_REQUEST).build ();
-    return Response.ok ().build ();
+    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    try
+    {
+      if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).saveServiceRegistration (sServiceGroupID,
+                                                                                                sDocumentTypeID,
+                                                                                                aServiceMetadata,
+                                                                                                RestRequestHelper.getAuth (m_aHttpHeaders))
+                                                                      .isFailure ())
+        return Response.status (Status.BAD_REQUEST).build ();
+      return Response.ok ().build ();
+    }
+    finally
+    {
+      WebScopeManager.onRequestEnd ();
+    }
   }
 
   @DELETE
   public Response deleteServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                              @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
   {
-    if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).deleteServiceRegistration (sServiceGroupID,
-                                                                                                sDocumentTypeID,
-                                                                                                RestRequestHelper.getAuth (m_aHttpHeaders))
-                                                                    .isFailure ())
-      return Response.status (Status.BAD_REQUEST).build ();
-    return Response.ok ().build ();
+    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    try
+    {
+      if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).deleteServiceRegistration (sServiceGroupID,
+                                                                                                  sDocumentTypeID,
+                                                                                                  RestRequestHelper.getAuth (m_aHttpHeaders))
+                                                                      .isFailure ())
+        return Response.status (Status.BAD_REQUEST).build ();
+      return Response.ok ().build ();
+    }
+    finally
+    {
+      WebScopeManager.onRequestEnd ();
+    }
   }
 }

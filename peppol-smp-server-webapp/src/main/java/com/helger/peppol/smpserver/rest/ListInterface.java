@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.rest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -29,6 +30,9 @@ import javax.xml.bind.JAXBElement;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupReferenceListType;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
+import com.helger.photon.core.app.CApplication;
+import com.helger.web.mock.MockHttpServletResponse;
+import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
  * This class implements a REST frontend for getting the list of service groups
@@ -41,7 +45,11 @@ import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 public final class ListInterface
 {
   @Context
+  private HttpServletRequest m_aHttpRequest;
+
+  @Context
   private HttpHeaders m_aHttpHeaders;
+
   @Context
   private UriInfo m_aUriInfo;
 
@@ -54,8 +62,16 @@ public final class ListInterface
   @Produces (MediaType.TEXT_XML)
   public JAXBElement <ServiceGroupReferenceListType> getServiceGroupReferenceList (@PathParam ("UserId") final String sUserID) throws Throwable
   {
-    final ServiceGroupReferenceListType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroupReferenceList (sUserID,
-                                                                                                                                         RestRequestHelper.getAuth (m_aHttpHeaders));
-    return m_aObjFactory.createServiceGroupReferenceList (ret);
+    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    try
+    {
+      final ServiceGroupReferenceListType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroupReferenceList (sUserID,
+                                                                                                                                           RestRequestHelper.getAuth (m_aHttpHeaders));
+      return m_aObjFactory.createServiceGroupReferenceList (ret);
+    }
+    finally
+    {
+      WebScopeManager.onRequestEnd ();
+    }
   }
 }

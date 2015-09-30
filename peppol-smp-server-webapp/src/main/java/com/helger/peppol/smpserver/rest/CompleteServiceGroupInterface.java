@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.rest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,6 +29,9 @@ import javax.xml.bind.JAXBElement;
 import com.helger.peppol.smp.CompleteServiceGroupType;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
+import com.helger.photon.core.app.CApplication;
+import com.helger.web.mock.MockHttpServletResponse;
+import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
  * This class implements a REST frontend for getting the ServiceGroup as well as
@@ -42,6 +46,9 @@ import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 public final class CompleteServiceGroupInterface
 {
   @Context
+  private HttpServletRequest m_aHttpRequest;
+
+  @Context
   private UriInfo m_aUriInfo;
 
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
@@ -53,7 +60,15 @@ public final class CompleteServiceGroupInterface
   @Produces (MediaType.TEXT_XML)
   public JAXBElement <CompleteServiceGroupType> getCompleteServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    final CompleteServiceGroupType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getCompleteServiceGroup (sServiceGroupID);
-    return m_aObjFactory.createCompleteServiceGroup (ret);
+    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    try
+    {
+      final CompleteServiceGroupType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getCompleteServiceGroup (sServiceGroupID);
+      return m_aObjFactory.createCompleteServiceGroup (ret);
+    }
+    finally
+    {
+      WebScopeManager.onRequestEnd ();
+    }
   }
 }
