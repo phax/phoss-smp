@@ -40,7 +40,6 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
  */
 public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
 {
-  private static final String ATTR_ID = "id";
   private static final String ATTR_SERVICE_GROUPD_ID = "servicegroupid";
   private static final String ELEMENT_DOCUMENT_TYPE_IDENTIFIER = "doctypeidentifier";
   private static final String ATTR_TARGET_HREF = "targethref";
@@ -54,7 +53,6 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
   {
     final SMPRedirect aValue = (SMPRedirect) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
-    aElement.setAttribute (ATTR_ID, aValue.getID ());
     aElement.setAttribute (ATTR_SERVICE_GROUPD_ID, aValue.getServiceGroupID ());
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),
                                                                     sNamespaceURI,
@@ -70,7 +68,6 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
   public ISMPRedirect convertToNative (@Nonnull final IMicroElement aElement)
   {
     final ISMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
-    final String sID = aElement.getAttributeValue (ATTR_ID);
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUPD_ID);
     final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPart (sServiceGroupID));
     if (aServiceGroup == null)
@@ -82,6 +79,6 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
     final String sSubjectUniqueIdentifier = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE_SUID);
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPRedirect (sID, aServiceGroup, aDocTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, sExtension);
+    return new SMPRedirect (aServiceGroup, aDocTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, sExtension);
   }
 }

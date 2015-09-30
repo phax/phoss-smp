@@ -11,6 +11,11 @@ import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
+/**
+ * Manage all SMP redirects
+ *
+ * @author Philip Helger
+ */
 public interface ISMPRedirectManager
 {
   /**
@@ -40,7 +45,7 @@ public interface ISMPRedirectManager
   EChange deleteSMPRedirect (@Nullable ISMPRedirect aSMPRedirect);
 
   @Nonnull
-  EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable String sServiceGroupID);
+  EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   @Nonnull
   @ReturnsMutableCopy
@@ -48,15 +53,12 @@ public interface ISMPRedirectManager
 
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable String sServiceGroupID);
+  Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   @Nonnegative
   int getSMPRedirectCount ();
 
   @Nullable
-  ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable String sServiceGroupID,
+  ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable ISMPServiceGroup aServiceGroup,
                                                             @Nullable IDocumentTypeIdentifier aDocTypeID);
-
-  @Nullable
-  ISMPRedirect getSMPRedirectOfID (@Nullable String sID);
 }

@@ -18,77 +18,39 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.persistence.EntityManager;
 
 import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.ELockType;
-import com.helger.commons.annotation.IsLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.state.EChange;
-import com.helger.commons.string.StringHelper;
+import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
+import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection;
+import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirectionID;
+import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 
 /**
  * Manager for all {@link SMPRedirect} objects.
  *
  * @author Philip Helger
  */
-public final class SQLRedirectManager implements ISMPRedirectManager
+public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager implements ISMPRedirectManager
 {
-  private final ReadWriteLock m_aRWLock = new ReentrantReadWriteLock ();
-  private final Map <String, SMPRedirect> m_aMap = new HashMap <String, SMPRedirect> ();
-
   public SQLRedirectManager ()
   {}
-
-  @Nonnull
-  @IsLocked (ELockType.WRITE)
-  private void _createSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
-  {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      final String sSMPRedirectID = aSMPRedirect.getID ();
-      if (m_aMap.containsKey (sSMPRedirectID))
-        throw new IllegalArgumentException ("SMPRedirect ID '" + sSMPRedirectID + "' is already in use!");
-      m_aMap.put (aSMPRedirect.getID (), aSMPRedirect);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
-  }
-
-  @Nonnull
-  @IsLocked (ELockType.WRITE)
-  private ISMPRedirect _updateSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
-  {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      m_aMap.put (aSMPRedirect.getID (), aSMPRedirect);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
-    return aSMPRedirect;
-  }
 
   /**
    * Create or update a redirect for a service group.
@@ -114,32 +76,40 @@ public final class SQLRedirectManager implements ISMPRedirectManager
                                                  @Nullable final String sExtension)
   {
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
 
-    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup.getID (),
-                                                                                   aDocumentTypeIdentifier);
-    SMPRedirect aNewRedirect;
-    if (aOldRedirect != null)
+    JPAExecutionResult <?> ret;
+    ret = doInTransaction (new Runnable ()
     {
-      // Reuse old ID
-      aNewRedirect = new SMPRedirect (aOldRedirect.getID (),
-                                      aServiceGroup,
-                                      aDocumentTypeIdentifier,
-                                      sTargetHref,
-                                      sSubjectUniqueIdentifier,
-                                      sExtension);
-      _updateSMPRedirect (aNewRedirect);
-    }
-    else
-    {
-      // Create new ID
-      aNewRedirect = new SMPRedirect (aServiceGroup,
-                                      aDocumentTypeIdentifier,
-                                      sTargetHref,
-                                      sSubjectUniqueIdentifier,
-                                      sExtension);
-      _createSMPRedirect (aNewRedirect);
-    }
-    return aNewRedirect;
+      public void run ()
+      {
+        final EntityManager aEM = getEntityManager ();
+        final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
+                                                                                                 aDocumentTypeIdentifier);
+        DBServiceMetadataRedirection aDBRedirect = aEM.find (DBServiceMetadataRedirection.class, aDBRedirectID);
+
+        if (aDBRedirect == null)
+        {
+          // Create a new one
+          aDBRedirect = new DBServiceMetadataRedirection (aDBRedirectID,
+                                                          sTargetHref,
+                                                          sSubjectUniqueIdentifier,
+                                                          sExtension);
+          aEM.persist (aDBRedirect);
+        }
+        else
+        {
+          // Edit the existing one
+          aDBRedirect.setRedirectionUrl (sTargetHref);
+          aDBRedirect.setCertificateUid (sSubjectUniqueIdentifier);
+          aDBRedirect.setExtension (sExtension);
+          aEM.merge (aDBRedirect);
+        }
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return new SMPRedirect (aServiceGroup, aDocumentTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, sExtension);
   }
 
   @Nonnull
@@ -148,123 +118,167 @@ public final class SQLRedirectManager implements ISMPRedirectManager
     if (aSMPRedirect == null)
       return EChange.UNCHANGED;
 
-    m_aRWLock.writeLock ().lock ();
-    try
+    JPAExecutionResult <EChange> ret;
+    ret = doInTransaction (new Callable <EChange> ()
     {
-      final SMPRedirect aRealServiceMetadata = m_aMap.remove (aSMPRedirect.getID ());
-      if (aRealServiceMetadata == null)
-        return EChange.UNCHANGED;
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
-    return EChange.CHANGED;
+      @Nonnull
+      public EChange call ()
+      {
+        final EntityManager aEM = getEntityManager ();
+        final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aSMPRedirect.getServiceGroup ()
+                                                                                                             .getParticpantIdentifier (),
+                                                                                                 aSMPRedirect.getDocumentTypeIdentifier ());
+        final DBServiceMetadataRedirection aDBRedirect = aEM.find (DBServiceMetadataRedirection.class, aDBRedirectID);
+        if (aDBRedirect == null)
+          return EChange.UNCHANGED;
+
+        aEM.remove (aDBRedirect);
+        return EChange.CHANGED;
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
   }
 
   @Nonnull
-  public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
+  public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    EChange eChange = EChange.UNCHANGED;
-    for (final ISMPRedirect aRedirect : getAllSMPRedirectsOfServiceGroup (sServiceGroupID))
-      eChange = eChange.or (deleteSMPRedirect (aRedirect));
-    return eChange;
+    if (aServiceGroup == null)
+      return EChange.UNCHANGED;
+
+    JPAExecutionResult <EChange> ret;
+    ret = doInTransaction (new Callable <EChange> ()
+    {
+      @Nonnull
+      public EChange call ()
+      {
+        final int nCnt = getEntityManager ().createQuery ("DELETE p FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+                                                          DBServiceMetadataRedirection.class)
+                                            .setParameter ("scheme",
+                                                           aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                            .setParameter ("value",
+                                                           aServiceGroup.getParticpantIdentifier ().getValue ())
+                                            .executeUpdate ();
+        return EChange.valueOf (nCnt > 0);
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public Collection <? extends ISMPRedirect> getAllSMPRedirects ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
+    JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
+    ret = doInTransaction (new Callable <List <DBServiceMetadataRedirection>> ()
     {
-      return CollectionHelper.newList (m_aMap.values ());
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+      @Nonnull
+      public List <DBServiceMetadataRedirection> call ()
+      {
+        return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p",
+                                                DBServiceMetadataRedirection.class)
+                                  .getResultList ();
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+
+    final List <SMPRedirect> aRedirects = new ArrayList <> ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
+      aRedirects.add (new SMPRedirect (aServiceGroupMgr.getSMPServiceGroupOfID (aDBRedirect.getId ()
+                                                                                           .getAsBusinessIdentifier ()),
+                                       aDBRedirect.getId ().getAsDocumentTypeIdentifier (),
+                                       aDBRedirect.getRedirectionUrl (),
+                                       aDBRedirect.getCertificateUid (),
+                                       aDBRedirect.getExtension ()));
+    return aRedirects;
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    return getAllSMPRedirectsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
-  }
-
-  @Nonnull
-  @ReturnsMutableCopy
-  public Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
-  {
-    final List <ISMPRedirect> ret = new ArrayList <ISMPRedirect> ();
-    if (StringHelper.hasText (sServiceGroupID))
+    JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
+    ret = doInTransaction (new Callable <List <DBServiceMetadataRedirection>> ()
     {
-      m_aRWLock.readLock ().lock ();
-      try
+      public List <DBServiceMetadataRedirection> call ()
       {
-        for (final ISMPRedirect aRedirect : m_aMap.values ())
-          if (aRedirect.getServiceGroupID ().equals (sServiceGroupID))
-            ret.add (aRedirect);
+        return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+                                                DBServiceMetadataRedirection.class)
+                                  .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                  .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
+                                  .getResultList ();
       }
-      finally
-      {
-        m_aRWLock.readLock ().unlock ();
-      }
-    }
-    return ret;
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+
+    final List <SMPRedirect> aRedirects = new ArrayList <> ();
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
+      aRedirects.add (new SMPRedirect (aServiceGroupMgr.getSMPServiceGroupOfID (aDBRedirect.getId ()
+                                                                                           .getAsBusinessIdentifier ()),
+                                       aDBRedirect.getId ().getAsDocumentTypeIdentifier (),
+                                       aDBRedirect.getRedirectionUrl (),
+                                       aDBRedirect.getCertificateUid (),
+                                       aDBRedirect.getExtension ()));
+    return aRedirects;
   }
 
   @Nonnegative
   public int getSMPRedirectCount ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
+    JPAExecutionResult <Long> ret;
+    ret = doSelect (new Callable <Long> ()
     {
-      return m_aMap.size ();
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+      @Nonnull
+      @ReturnsMutableCopy
+      public Long call () throws Exception
+      {
+        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadataRedirection p"));
+        return Long.valueOf (nCount);
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ().intValue ();
   }
 
-  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final String sServiceGroupID,
+  @Nullable
+  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
-    if (StringHelper.hasNoText (sServiceGroupID))
+    if (aServiceGroup == null)
       return null;
     if (aDocTypeID == null)
       return null;
 
-    m_aRWLock.readLock ().lock ();
-    try
+    JPAExecutionResult <DBServiceMetadataRedirection> ret;
+    ret = doInTransaction (new Callable <DBServiceMetadataRedirection> ()
     {
-      for (final ISMPRedirect aRedirect : m_aMap.values ())
-        if (aRedirect.getServiceGroupID ().equals (sServiceGroupID) &&
-            IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID, aRedirect.getDocumentTypeIdentifier ()))
-          return aRedirect;
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
-    return null;
-  }
-
-  public ISMPRedirect getSMPRedirectOfID (@Nullable final String sID)
-  {
-    if (StringHelper.hasNoText (sID))
+      @Nonnull
+      public DBServiceMetadataRedirection call ()
+      {
+        final EntityManager aEM = getEntityManager ();
+        final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
+                                                                                                 aDocTypeID);
+        return aEM.find (DBServiceMetadataRedirection.class, aDBRedirectID);
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    final DBServiceMetadataRedirection aDBRedirect = ret.get ();
+    if (aDBRedirect == null)
       return null;
 
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.get (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return new SMPRedirect (aServiceGroup,
+                            aDocTypeID,
+                            aDBRedirect.getRedirectionUrl (),
+                            aDBRedirect.getCertificateUid (),
+                            aDBRedirect.getExtension ());
   }
 }

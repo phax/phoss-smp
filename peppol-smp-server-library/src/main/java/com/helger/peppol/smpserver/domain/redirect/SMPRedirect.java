@@ -22,11 +22,11 @@ import javax.annotation.Nullable;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.hashcode.HashCodeGenerator;
-import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.smp.RedirectType;
@@ -56,27 +56,12 @@ public class SMPRedirect implements ISMPRedirect
                       @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
                       @Nullable final String sExtension)
   {
-    this (GlobalIDFactory.getNewPersistentStringID (),
-          aServiceGroup,
-          aDocumentTypeIdentifier,
-          sTargetHref,
-          sSubjectUniqueIdentifier,
-          sExtension);
-  }
-
-  public SMPRedirect (@Nonnull @Nonempty final String sID,
-                      @Nonnull final ISMPServiceGroup aServiceGroup,
-                      @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                      @Nonnull @Nonempty final String sTargetHref,
-                      @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
-                      @Nullable final String sExtension)
-  {
-    m_sID = ValueEnforcer.notEmpty (sID, "ID");
     m_aServiceGroup = ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     setDocumentTypeIdentifier (aDocumentTypeIdentifier);
     setTargetHref (sTargetHref);
     setSubjectUniqueIdentifier (sSubjectUniqueIdentifier);
     setExtension (sExtension);
+    m_sID = aServiceGroup.getID () + "-" + IdentifierHelper.getIdentifierURIEncoded (aDocumentTypeIdentifier);
   }
 
   @Nonnull

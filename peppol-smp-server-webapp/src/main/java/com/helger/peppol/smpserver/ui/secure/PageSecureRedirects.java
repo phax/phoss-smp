@@ -30,6 +30,7 @@ import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
+import com.helger.commons.url.SMap;
 import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCEdit;
@@ -77,11 +78,14 @@ import com.helger.validation.error.FormErrors;
 @WorkInProgress
 public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedirect>
 {
-  private final static String FIELD_SERVICE_GROUP_ID = "sgid";
-  private final static String FIELD_DOCTYPE_ID = "doctypeid";
-  private final static String FIELD_REDIRECT_TO = "redirectto";
-  private final static String FIELD_SUBJECT_UNIQUE_IDENTIFIER = "suidentifier";
-  private final static String FIELD_EXTENSION = "extension";
+  private static final String FIELD_SERVICE_GROUP_ID = "sgid";
+  private static final String FIELD_DOCTYPE_ID = "doctypeid";
+  private static final String FIELD_REDIRECT_TO = "redirectto";
+  private static final String FIELD_SUBJECT_UNIQUE_IDENTIFIER = "suidentifier";
+  private static final String FIELD_EXTENSION = "extension";
+
+  private static final String ATTR_SERVICE_GROUP = "$servicegroup";
+  private static final String ATTR_DOCTYPE_ID = "$doctypeid";
 
   public PageSecureRedirects (@Nonnull @Nonempty final String sID)
   {
@@ -110,6 +114,26 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                      @Nonnull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMPRedirect aSelectedObject)
   {
+    if (eFormAction == EWebPageFormAction.VIEW ||
+        eFormAction == EWebPageFormAction.EDIT ||
+        eFormAction == EWebPageFormAction.DELETE)
+    {
+      final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
+      final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+      if (aServiceGroup != null)
+      {
+        final String sDocTypeID = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID);
+        final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
+        if (aDocTypeID != null)
+        {
+          aWPEC.getRequestScope ().setAttribute (ATTR_SERVICE_GROUP, aServiceGroup);
+          aWPEC.getRequestScope ().setAttribute (ATTR_DOCTYPE_ID, aDocTypeID);
+          return true;
+        }
+      }
+      return false;
+    }
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
   }
 
@@ -117,8 +141,11 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   @Nullable
   protected ISMPRedirect getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
   {
+    final ISMPServiceGroup aServiceGroup = aWPEC.getRequestScope ().getCastedAttribute (ATTR_SERVICE_GROUP);
+    final IDocumentTypeIdentifier aDocTypeID = aWPEC.getRequestScope ().getCastedAttribute (ATTR_DOCTYPE_ID);
+
     final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
-    return aRedirectMgr.getSMPRedirectOfID (sID);
+    return aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
   }
 
   @Override
@@ -322,18 +349,21 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPRedirect aCurObject : aRedirectMgr.getAllSMPRedirects ())
     {
-      final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
+      final SMap aParams = new SMap ().add (FIELD_SERVICE_GROUP_ID, aCurObject.getServiceGroupID ())
+                                      .add (FIELD_DOCTYPE_ID, aCurObject.getDocumentTypeIdentifier ().getURIEncoded ());
+      final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject, aParams);
       final String sDisplayName = aCurObject.getServiceGroupID ();
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
       aRow.addCell (AppCommonUI.getDocumentTypeID (aCurObject.getDocumentTypeIdentifier ()));
       aRow.addCell (aCurObject.getTargetHref ());
-      aRow.addCell (createEditLink (aWPEC, aCurObject, "Edit " + sDisplayName),
+
+      aRow.addCell (createEditLink (aWPEC, aCurObject, "Edit " + sDisplayName, aParams),
                     new HCTextNode (" "),
-                    createCopyLink (aWPEC, aCurObject, "Create a copy of " + sDisplayName),
+                    createCopyLink (aWPEC, aCurObject, "Create a copy of " + sDisplayName, aParams),
                     new HCTextNode (" "),
-                    createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
+                    createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName, aParams),
                     new HCTextNode (" "),
                     new HCA (LinkHelper.getURIWithServerAndContext (aCurObject.getServiceGroup ()
                                                                               .getParticpantIdentifier ()

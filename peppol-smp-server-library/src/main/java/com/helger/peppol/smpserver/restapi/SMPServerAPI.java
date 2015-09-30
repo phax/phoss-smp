@@ -333,6 +333,15 @@ public final class SMPServerAPI
                                       m_aAPIProvider.getCurrentURI ());
     }
 
+    final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+    if (aServiceGroup == null)
+    {
+      throw new SMPNotFoundException ("No such serviceGroup '" +
+                                      sServiceGroupID +
+                                      "'",
+                                      m_aAPIProvider.getCurrentURI ());
+    }
+
     final DocumentIdentifierType aDocTypeID = IdentifierHelper.createDocumentTypeIdentifierFromURIPartOrNull (sDocumentTypeID);
     if (aDocTypeID == null)
     {
@@ -344,8 +353,7 @@ public final class SMPServerAPI
 
     // First check for redirection, then for actual service
     final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
-    final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (sServiceGroupID,
-                                                                                             aDocTypeID);
+    final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
 
     final SignedServiceMetadataType aSignedServiceMetadata = new SignedServiceMetadataType ();
     if (aRedirect != null)

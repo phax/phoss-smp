@@ -19,12 +19,13 @@ package com.helger.peppol.smpserver.ui.secure;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.io.resource.ClassPathResource;
+import com.helger.commons.io.resource.IReadableResource;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.ui.CApp;
 import com.helger.photon.basic.app.locale.ILocaleManager;
 import com.helger.photon.basic.app.menu.IMenuTree;
 import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFile;
 import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFileManager;
-import com.helger.photon.core.action.IActionInvoker;
 import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.DefaultApplicationInitializer;
@@ -63,10 +64,6 @@ public final class InitializerSecure extends DefaultApplicationInitializer <Layo
   {}
 
   @Override
-  public void initActions (@Nonnull final IActionInvoker aActionInvoker)
-  {}
-
-  @Override
   public void initRest ()
   {
     final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
@@ -74,7 +71,10 @@ public final class InitializerSecure extends DefaultApplicationInitializer <Layo
                                                                                                 .setSyntaxHighlightLanguage (EPrismLanguage.MARKUP));
     aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("webapp.properties")).setDescription ("SMP web application configuration")
                                                                                                        .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
-    aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("smp-server.properties")).setDescription ("SMP server configuration")
-                                                                                                           .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+
+    final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
+    if (aConfigRes != null)
+      aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
+                                                                        .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
   }
 }

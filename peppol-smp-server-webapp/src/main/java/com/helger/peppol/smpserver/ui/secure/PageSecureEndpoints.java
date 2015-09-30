@@ -335,7 +335,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       else
       {
         if (aServiceGroup != null)
-          if (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup.getID (), aDocTypeID) != null)
+          if (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID) != null)
             aFormErrors.addFieldError (FIELD_DOCTYPE_ID,
                                        "At least one redirect is registered for this document type. Delete the redirect before you can create an endpoint.");
       }
@@ -611,7 +611,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
           final HCRow aRow = aTable.addBodyRow ();
           aRow.addCell (new HCA (createViewURL (aWPEC,
-                                                aServiceInfo).addAll (aParams)).addChild (aServiceInfo.getServiceGroupID ()));
+                                                aServiceInfo,
+                                                aParams)).addChild (aServiceInfo.getServiceGroupID ()));
           aRow.addCell (AppCommonUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()));
           aRow.addCell (AppCommonUI.getProcessID (aProcess.getProcessIdentifier ()));
           aRow.addCell (aEndpoint.getTransportProfile ());

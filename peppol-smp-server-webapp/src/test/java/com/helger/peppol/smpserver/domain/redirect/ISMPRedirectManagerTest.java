@@ -76,7 +76,6 @@ public final class ISMPRedirectManagerTest
       assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
       assertEquals ("extredirect", aRedirect.getExtension ());
       assertEquals (1, aRedirectMgr.getSMPRedirectCount ());
-      assertSame (aRedirect, aRedirectMgr.getSMPRedirectOfID (aRedirect.getID ()));
 
       // Update existing
       aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target2", "suid2", "extredirect2");
@@ -87,7 +86,6 @@ public final class ISMPRedirectManagerTest
       assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
       assertEquals ("extredirect2", aRedirect.getExtension ());
       assertEquals (1, aRedirectMgr.getSMPRedirectCount ());
-      assertSame (aRedirect, aRedirectMgr.getSMPRedirectOfID (aRedirect.getID ()));
 
       // Add second one
       final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI2, null);
@@ -99,12 +97,11 @@ public final class ISMPRedirectManagerTest
       assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
       assertEquals ("extredirect2", aRedirect.getExtension ());
       assertEquals (2, aRedirectMgr.getSMPRedirectCount ());
-      assertSame (aRedirect, aRedirectMgr.getSMPRedirectOfID (aRedirect.getID ()));
 
       // Cleanup
-      assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG2.getID ()).isChanged ());
+      assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG2).isChanged ());
       assertEquals (1, aRedirectMgr.getSMPRedirectCount ());
-      assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG.getID ()).isChanged ());
+      assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG).isChanged ());
       assertEquals (0, aRedirectMgr.getSMPRedirectCount ());
       assertTrue (aSGMgr.deleteSMPServiceGroup (aPI2).isChanged ());
       assertTrue (aSGMgr.deleteSMPServiceGroup (aPI).isChanged ());

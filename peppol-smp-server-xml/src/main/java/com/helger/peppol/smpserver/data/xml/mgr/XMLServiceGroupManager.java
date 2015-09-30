@@ -197,7 +197,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
 
       // Delete all redirects and all service information of this service group
       // as well
-      MetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup.getID ());
+      MetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
       MetaManager.getServiceInformationMgr ().deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup.getID ());
 
       markAsChanged (aRealServiceGroup, EDAOActionType.DELETE);
