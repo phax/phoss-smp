@@ -17,7 +17,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 public interface ISMPServiceInformationManager
 {
   @Nonnull
-  ISMPServiceInformation markSMPServiceInformationChanged (@Nullable String sServiceInfoID);
+  ISMPServiceInformation markSMPServiceInformationChanged (@Nonnull ISMPServiceInformation aServiceInfo);
 
   @Nonnull
   ISMPServiceInformation createOrUpdateSMPServiceInformation (@Nonnull SMPServiceInformation aServiceInformation);
@@ -52,7 +52,4 @@ public interface ISMPServiceInformationManager
   @Nullable
   ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable ISMPServiceGroup aServiceGroup,
                                                                                 @Nullable IDocumentTypeIdentifier aDocumentTypeIdentifier);
-
-  @Nullable
-  ISMPServiceInformation getSMPServiceInformationOfID (@Nullable String sID);
 }

@@ -141,6 +141,22 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   }
 
   @Override
+  @Nullable
+  protected ISMPServiceInformation getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+                                                      @Nullable final String sID)
+  {
+    final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
+    final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+
+    final String sDocTypeID = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID);
+    final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
+
+    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
+  }
+
+  @Override
   protected boolean isActionAllowed (@Nonnull final WebPageExecutionContext aWPEC,
                                      @Nonnull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMPServiceInformation aSelectedObject)
@@ -167,15 +183,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       return false;
     }
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
-  }
 
-  @Override
-  @Nullable
-  protected ISMPServiceInformation getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                                      @Nullable final String sID)
-  {
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
-    return aServiceInfoMgr.getSMPServiceInformationOfID (sID);
   }
 
   @Override
@@ -415,7 +423,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aEndpoint.setTechnicalInformationUrl (sTechnicalInformation);
         aEndpoint.setExtension (sExtension);
 
-        aServiceInfoMgr.markSMPServiceInformationChanged (aSelectedObject.getID ());
+        aServiceInfoMgr.markSMPServiceInformationChanged (aSelectedObject);
 
         aNodeList.addChild (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint"));
       }
@@ -603,7 +611,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
-          final SMap aParams = new SMap ().add (FIELD_DOCTYPE_ID,
+          final SMap aParams = new SMap ().add (FIELD_SERVICE_GROUP_ID, aServiceInfo.getServiceGroupID ())
+                                          .add (FIELD_DOCTYPE_ID,
                                                 aServiceInfo.getDocumentTypeIdentifier ().getURIPercentEncoded ())
                                           .add (FIELD_PROCESS_ID, aProcess.getProcessIdentifier ().getURIEncoded ())
                                           .add (FIELD_TRANSPORT_PROFILE, aEndpoint.getTransportProfile ());

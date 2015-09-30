@@ -172,13 +172,14 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   }
 
   @Nonnull
-  public ISMPServiceInformation markSMPServiceInformationChanged (final String sServiceInfoID)
+  public ISMPServiceInformation markSMPServiceInformationChanged (@Nonnull final ISMPServiceInformation aServiceInfo)
   {
-    final SMPServiceInformation aServiceInfo = _getSMPServiceInformationOfID (sServiceInfoID);
-    if (aServiceInfo == null)
-      return null;
+    ValueEnforcer.notNull (aServiceInfo, "ServiceInfo");
+    final SMPServiceInformation aRealServiceInfo = _getSMPServiceInformationOfID (aServiceInfo.getID ());
+    if (aRealServiceInfo == null)
+      throw new IllegalArgumentException ("ServiceInformation " + aServiceInfo.getID () + " was not found");
 
-    return _updateSMPServiceInformation (aServiceInfo);
+    return _updateSMPServiceInformation (aRealServiceInfo);
   }
 
   @Nullable

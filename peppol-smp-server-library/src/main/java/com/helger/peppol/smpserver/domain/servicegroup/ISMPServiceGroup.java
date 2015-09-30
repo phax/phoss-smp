@@ -29,6 +29,13 @@ import com.helger.peppol.smpserver.domain.ISMPHasExtension;
 public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHasExtension
 {
   /**
+   * @return the URI encoded participant identifier is the ID.
+   */
+  @Nonnull
+  @Nonempty
+  String getID ();
+
+  /**
    * @return The ID of the owner of this service group. Never <code>null</code>.
    */
   @Nonnull

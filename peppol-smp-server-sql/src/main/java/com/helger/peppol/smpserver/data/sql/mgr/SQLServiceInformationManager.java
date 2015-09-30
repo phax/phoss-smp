@@ -60,7 +60,8 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
   public SQLServiceInformationManager ()
   {}
 
-  private void _addSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
+  @Nonnull
+  private ISMPServiceInformation _createSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
   {
     ValueEnforcer.notNull (aSMPServiceInformation, "SMPServiceInformation");
 
@@ -70,27 +71,19 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
                                           sSMPServiceInformationID +
                                           "' is already in use!");
     m_aMap.put (aSMPServiceInformation.getID (), aSMPServiceInformation);
-  }
-
-  @Nonnull
-  private ISMPServiceInformation _createSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
-  {
-    _addSMPServiceInformation (aSMPServiceInformation);
     return aSMPServiceInformation;
   }
 
   @Nonnull
-  private ISMPServiceInformation _updateSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
+  private ISMPServiceInformation _updateSMPServiceInformation (@Nonnull final ISMPServiceInformation aSMPServiceInformation)
   {
     return aSMPServiceInformation;
   }
 
   @Nonnull
-  public ISMPServiceInformation markSMPServiceInformationChanged (final String sServiceInfoID)
+  public ISMPServiceInformation markSMPServiceInformationChanged (@Nonnull final ISMPServiceInformation aServiceInfo)
   {
-    final SMPServiceInformation aServiceInfo = (SMPServiceInformation) getSMPServiceInformationOfID (sServiceInfoID);
-    if (aServiceInfo == null)
-      return null;
+    ValueEnforcer.notNull (aServiceInfo, "ServiceInfo");
 
     return _updateSMPServiceInformation (aServiceInfo);
   }

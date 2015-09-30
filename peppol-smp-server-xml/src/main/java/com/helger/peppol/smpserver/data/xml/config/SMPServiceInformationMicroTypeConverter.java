@@ -46,7 +46,6 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
  */
 public final class SMPServiceInformationMicroTypeConverter implements IMicroTypeConverter
 {
-  private static final String ATTR_ID = "id";
   private static final String ATTR_SERVICE_GROUP_ID = "servicegroupid";
   private static final String ELEMENT_DOCUMENT_TYPE_IDENTIFIER = "doctypeidentifier";
   private static final String ELEMENT_PROCESS = "process";
@@ -59,7 +58,6 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   {
     final SMPServiceInformation aValue = (SMPServiceInformation) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
-    aElement.setAttribute (ATTR_ID, aValue.getID ());
     aElement.setAttribute (ATTR_SERVICE_GROUP_ID, aValue.getServiceGroupID ());
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),
                                                                     sNamespaceURI,
@@ -75,7 +73,6 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   public ISMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement)
   {
     final ISMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
-    final String sID = aElement.getAttributeValue (ATTR_ID);
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);
     final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPart (sServiceGroupID));
     if (aServiceGroup == null)
@@ -88,6 +85,6 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
       aProcesses.add (MicroTypeConverter.convertToNative (aProcess, SMPProcess.class));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPServiceInformation (sID, aServiceGroup, aDocTypeIdentifier, aProcesses, sExtension);
+    return new SMPServiceInformation (aServiceGroup, aDocTypeIdentifier, aProcesses, sExtension);
   }
 }

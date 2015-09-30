@@ -30,11 +30,11 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
-import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
@@ -79,22 +79,13 @@ public class SMPServiceInformation implements ISMPServiceInformation
                                 @Nonnull final List <SMPProcess> aProcesses,
                                 @Nullable final String sExtension)
   {
-    this (GlobalIDFactory.getNewPersistentStringID (), aServiceGroup, aDocumentTypeIdentifier, aProcesses, sExtension);
-  }
-
-  public SMPServiceInformation (@Nonnull @Nonempty final String sID,
-                                @Nonnull final ISMPServiceGroup aServiceGroup,
-                                @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                @Nonnull final List <SMPProcess> aProcesses,
-                                @Nullable final String sExtension)
-  {
-    m_sID = ValueEnforcer.notEmpty (sID, "ID");
     m_aServiceGroup = ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     setDocumentTypeIdentifier (aDocumentTypeIdentifier);
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
     for (final SMPProcess aProcess : aProcesses)
       addProcess (aProcess);
     setExtension (sExtension);
+    m_sID = aServiceGroup.getID () + "-" + IdentifierHelper.getIdentifierURIEncoded (aDocumentTypeIdentifier);
   }
 
   @Nonnull
