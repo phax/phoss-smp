@@ -153,7 +153,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       @Nonnull
       public EChange call ()
       {
-        final int nCnt = getEntityManager ().createQuery ("DELETE p FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+        final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
                                                           DBServiceMetadataRedirection.class)
                                             .setParameter ("scheme",
                                                            aServiceGroup.getParticpantIdentifier ().getScheme ())
