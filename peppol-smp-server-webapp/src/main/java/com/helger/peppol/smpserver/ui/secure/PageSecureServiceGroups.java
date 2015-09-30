@@ -39,13 +39,12 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.data.IDataUser;
-import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.basic.security.login.LoggedInUserManager;
@@ -128,7 +127,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final String sParticipantID = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID);
     SimpleParticipantIdentifier aParticipantID = null;
     final String sOwningUserID = aWPEC.getAttributeAsString (FIELD_OWNING_USER_ID);
-    final IDataUser aOwningUser = SMPUserManagerFactory.getInstance ().getUserOfID (sOwningUserID);
+    final ISMPUser aOwningUser = MetaManager.getUserMgr ().getUserOfID (sOwningUserID);
     final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
 
     // validations

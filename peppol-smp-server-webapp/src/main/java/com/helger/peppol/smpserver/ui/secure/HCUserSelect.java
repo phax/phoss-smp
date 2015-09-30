@@ -22,8 +22,8 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.compare.AbstractCollatingComparator;
-import com.helger.peppol.smpserver.data.IDataUser;
-import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
+import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 
@@ -38,15 +38,15 @@ public class HCUserSelect extends HCExtSelect
   {
     super (aRF);
 
-    for (final IDataUser aUser : CollectionHelper.getSorted (SMPUserManagerFactory.getInstance ().getAllUsers (),
-                                                             new AbstractCollatingComparator <IDataUser> (aDisplayLocale)
-                                                             {
-                                                               @Override
-                                                               protected String getPart (@Nonnull final IDataUser aUser)
-                                                               {
-                                                                 return aUser.getUserName ();
-                                                               }
-                                                             }))
+    for (final ISMPUser aUser : CollectionHelper.getSorted (MetaManager.getUserMgr ().getAllUsers (),
+                                                            new AbstractCollatingComparator <ISMPUser> (aDisplayLocale)
+                                                            {
+                                                              @Override
+                                                              protected String getPart (@Nonnull final ISMPUser aUser)
+                                                              {
+                                                                return aUser.getUserName ();
+                                                              }
+                                                            }))
       addOption (aUser.getID (), aUser.getUserName ());
 
     if (!hasSelectedOption ())

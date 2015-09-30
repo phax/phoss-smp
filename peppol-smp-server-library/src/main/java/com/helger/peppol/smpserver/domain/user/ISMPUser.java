@@ -1,4 +1,4 @@
-package com.helger.peppol.smpserver.data;
+package com.helger.peppol.smpserver.domain.user;
 
 import javax.annotation.Nonnull;
 
@@ -10,7 +10,7 @@ import com.helger.commons.id.IHasID;
  *
  * @author Philip Helger
  */
-public interface IDataUser extends IHasID <String>
+public interface ISMPUser extends IHasID <String>
 {
   @Nonnull
   @Nonempty

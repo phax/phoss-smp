@@ -11,10 +11,9 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.data.ISMPUserManagerSPI;
-import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
+import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 
 /**
@@ -38,7 +37,7 @@ public final class ISMPServiceGroupManagerTest
     final String sOwner2ID = "o2";
     final String sExtension = "<ext val='a' />";
 
-    final ISMPUserManagerSPI aUserMgr = SMPUserManagerFactory.getInstance ();
+    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
     aUserMgr.createUser (sOwner1ID, "any");
     aUserMgr.createUser (sOwner2ID, "any");
     try

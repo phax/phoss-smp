@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml;
+package com.helger.peppol.smpserver.data.xml.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,16 +26,15 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.smpserver.data.IDataUser;
-import com.helger.peppol.smpserver.data.ISMPUserManagerSPI;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.user.ISMPUser;
+import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.domain.user.XMLDataUser;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
@@ -44,18 +43,15 @@ import com.helger.photon.basic.security.user.IUser;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * The DAO based {@link ISMPUserManagerSPI}.
+ * The DAO based {@link ISMPUserManager}.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-@IsSPIImplementation
-public final class XMLUserManagerSPI implements ISMPUserManagerSPI
+public final class XMLUserManager implements ISMPUserManager
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLUserManagerSPI.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLUserManager.class);
 
-  @Deprecated
-  @UsedViaReflection
-  public XMLUserManagerSPI ()
+  public XMLUserManager ()
   {}
 
   public boolean isSpecialUserManagementNeeded ()
@@ -118,8 +114,8 @@ public final class XMLUserManagerSPI implements ISMPUserManagerSPI
 
   @Nonnull
   public ISMPServiceGroup verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                           @Nonnull final IDataUser aCurrentUser) throws SMPNotFoundException,
-                                                                                  SMPUnauthorizedException
+                                           @Nonnull final ISMPUser aCurrentUser) throws SMPNotFoundException,
+                                                                                 SMPUnauthorizedException
   {
     // Resolve user group
     final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);

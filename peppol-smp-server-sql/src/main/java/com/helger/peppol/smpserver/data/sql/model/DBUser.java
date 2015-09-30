@@ -52,7 +52,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.helger.peppol.smpserver.data.IDataUser;
+import com.helger.peppol.smpserver.domain.user.ISMPUser;
 
 /**
  * Represents a single user within the SMP database.
@@ -61,7 +61,7 @@ import com.helger.peppol.smpserver.data.IDataUser;
  */
 @Entity
 @Table (name = "smp_user")
-public class DBUser implements Serializable, IDataUser
+public class DBUser implements Serializable, ISMPUser
 {
   private String m_sUserName;
   private String m_sPassword;

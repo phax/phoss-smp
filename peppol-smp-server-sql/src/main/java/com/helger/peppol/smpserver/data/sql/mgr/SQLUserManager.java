@@ -38,7 +38,7 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.data.sql;
+package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,9 +52,7 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.callback.IThrowingCallable;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.state.EChange;
@@ -73,8 +71,7 @@ import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smp.ServiceEndpointList;
 import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
-import com.helger.peppol.smpserver.data.IDataUser;
-import com.helger.peppol.smpserver.data.ISMPUserManagerSPI;
+import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBEndpoint;
 import com.helger.peppol.smpserver.data.sql.model.DBEndpointID;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
@@ -86,6 +83,8 @@ import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataID;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirectionID;
 import com.helger.peppol.smpserver.data.sql.model.DBUser;
+import com.helger.peppol.smpserver.domain.user.ISMPUser;
+import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
@@ -95,17 +94,13 @@ import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * A EclipseLink based implementation of the {@link ISMPUserManagerSPI}
- * interface.
+ * A EclipseLink based implementation of the {@link ISMPUserManager} interface.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-@IsSPIImplementation
-public final class SQLUserManagerSPI extends AbstractSMPJPAEnabledManager implements ISMPUserManagerSPI
+public final class SQLUserManager extends AbstractSMPJPAEnabledManager implements ISMPUserManager
 {
-  @Deprecated
-  @UsedViaReflection
-  public SQLUserManagerSPI ()
+  public SQLUserManager ()
   {}
 
   public boolean isSpecialUserManagementNeeded ()
@@ -210,7 +205,7 @@ public final class SQLUserManagerSPI extends AbstractSMPJPAEnabledManager implem
 
   @Nonnull
   public DBOwnership verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                      @Nonnull final IDataUser aCredentials) throws SMPUnauthorizedException
+                                      @Nonnull final ISMPUser aCredentials) throws SMPUnauthorizedException
   {
     final DBOwnershipID aOwnershipID = new DBOwnershipID (aCredentials.getID (), aServiceGroupID);
     final DBOwnership aOwnership = getEntityManager ().find (DBOwnership.class, aOwnershipID);

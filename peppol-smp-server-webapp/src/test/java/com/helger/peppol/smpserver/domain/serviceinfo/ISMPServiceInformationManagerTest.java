@@ -26,11 +26,10 @@ import com.helger.datetime.PDTFactory;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
-import com.helger.peppol.smpserver.data.ISMPUserManagerSPI;
-import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 import com.helger.photon.basic.security.CSecurity;
 
@@ -47,40 +46,46 @@ public final class ISMPServiceInformationManagerTest
   @Test
   public void testAll ()
   {
-    final ISMPUserManagerSPI aUserMgr = SMPUserManagerFactory.getInstance ();
+    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
 
     aUserMgr.createUser (CSecurity.USER_ADMINISTRATOR_ID, "bla");
     try
     {
-      final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
       aServiceGroupMgr.deleteSMPServiceGroup (aPI);
       final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
+      try
+      {
+        final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
+        final LocalDateTime aEndDT = aStartDT.plusYears (1);
+        final SMPEndpoint aEP = new SMPEndpoint ("tp",
+                                                 "http://localhost/as2",
+                                                 false,
+                                                 "minauth",
+                                                 aStartDT,
+                                                 aEndDT,
+                                                 "cert",
+                                                 "sd",
+                                                 "tc",
+                                                 "ti",
+                                                 "extep");
 
-      final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
-      final LocalDateTime aEndDT = aStartDT.plusYears (1);
-      final SMPEndpoint aEP = new SMPEndpoint ("tp",
-                                               "http://localhost/as2",
-                                               false,
-                                               "minauth",
-                                               aStartDT,
-                                               aEndDT,
-                                               "cert",
-                                               "sd",
-                                               "tc",
-                                               "ti",
-                                               "extep");
+        final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createWithDefaultScheme ("testproc");
+        final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
 
-      final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createWithDefaultScheme ("testproc");
-      final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-
-      final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
-      final SMPServiceInformation aServiceInformation = new SMPServiceInformation (aSG,
-                                                                                   aDocTypeID,
-                                                                                   CollectionHelper.newList (aProcess),
-                                                                                   "extsi");
-      aServiceInfoMgr.createOrUpdateSMPServiceInformation (aServiceInformation);
+        final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
+        final SMPServiceInformation aServiceInformation = new SMPServiceInformation (aSG,
+                                                                                     aDocTypeID,
+                                                                                     CollectionHelper.newList (aProcess),
+                                                                                     "extsi");
+        aServiceInfoMgr.createOrUpdateSMPServiceInformation (aServiceInformation);
+      }
+      finally
+      {
+        aServiceGroupMgr.deleteSMPServiceGroup (aPI);
+      }
     }
     finally
     {

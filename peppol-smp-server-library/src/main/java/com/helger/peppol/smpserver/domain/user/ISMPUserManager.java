@@ -38,14 +38,13 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.data;
+package com.helger.peppol.smpserver.domain.user;
 
 import java.util.Collection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.commons.annotation.IsSPIInterface;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
@@ -57,8 +56,7 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-@IsSPIInterface
-public interface ISMPUserManagerSPI
+public interface ISMPUserManager
 {
   /**
    * @return <code>true</code> for SQL, <code>false</code> for XML
@@ -71,10 +69,10 @@ public interface ISMPUserManagerSPI
 
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends IDataUser> getAllUsers ();
+  Collection <? extends ISMPUser> getAllUsers ();
 
   @Nullable
-  IDataUser getUserOfID (String sUserID);
+  ISMPUser getUserOfID (String sUserID);
 
   /**
    * Check if an SMP user matching the user name of the BasicAuth credentials
@@ -83,14 +81,14 @@ public interface ISMPUserManagerSPI
    *
    * @param aCredentials
    *        The credentials to be validated. May not be <code>null</code>.
-   * @return The matching non-<code>null</code> {@link IDataUser}.
+   * @return The matching non-<code>null</code> {@link ISMPUser}.
    * @throws Throwable
    *         If no user matching the passed user name is present or if the
    *         password in the credentials does not match the stored password
    *         (hash).
    */
   @Nonnull
-  IDataUser validateUserCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+  ISMPUser validateUserCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
 
   /**
    * Verify that the passed service group is owned by the user specified in the
@@ -109,5 +107,5 @@ public interface ISMPUserManagerSPI
    */
   @Nullable
   Object verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                          @Nonnull final IDataUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException;
+                          @Nonnull final ISMPUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException;
 }

@@ -27,16 +27,17 @@ import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.lang.ServiceLoaderHelper;
 import com.helger.commons.scope.IScope;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
-import com.helger.peppol.smpserver.data.SMPUserManagerFactory;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 
 public final class MetaManager extends AbstractGlobalSingleton
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (MetaManager.class);
 
+  private ISMPUserManager m_aUserMgr;
   private ISMPServiceGroupManager m_aServiceGroupMgr;
   private ISMPRedirectManager m_aRedirectMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
@@ -55,7 +56,11 @@ public final class MetaManager extends AbstractGlobalSingleton
       if (aFactory == null)
         throw new IllegalStateException ("Found no ISMPManagerProviderSPI implementation");
 
-      // Service group manager must be the first one!
+      m_aUserMgr = aFactory.createUserMgr ();
+      if (m_aUserMgr == null)
+        throw new IllegalStateException ("Failed to create User manager!");
+
+      // Service group manager must be before redirect and service information!
       m_aServiceGroupMgr = aFactory.createServiceGroupMgr ();
       if (m_aServiceGroupMgr == null)
         throw new IllegalStateException ("Failed to create ServiceGroup manager!");
@@ -65,9 +70,6 @@ public final class MetaManager extends AbstractGlobalSingleton
       m_aServiceInformationMgr = aFactory.createServiceInformationMgr ();
       if (m_aServiceInformationMgr == null)
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
-
-      // Ensure user manager is installed
-      SMPUserManagerFactory.getInstance ();
 
       try
       {
@@ -91,6 +93,12 @@ public final class MetaManager extends AbstractGlobalSingleton
   public static MetaManager getInstance ()
   {
     return getGlobalSingleton (MetaManager.class);
+  }
+
+  @Nonnull
+  public static ISMPUserManager getUserMgr ()
+  {
+    return getInstance ().m_aUserMgr;
   }
 
   @Nonnull

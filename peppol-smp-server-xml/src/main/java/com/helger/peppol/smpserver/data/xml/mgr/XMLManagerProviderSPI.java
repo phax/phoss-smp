@@ -18,6 +18,8 @@ package com.helger.peppol.smpserver.data.xml.mgr;
 
 import java.io.File;
 
+import javax.annotation.Nonnull;
+
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.callback.INonThrowingCallable;
 import com.helger.commons.microdom.IMicroDocument;
@@ -30,6 +32,7 @@ import com.helger.peppol.smpserver.domain.ISMPManagerProviderSPI;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.photon.basic.app.io.WebFileIO;
 import com.helger.photon.basic.mgr.PhotonBasicManager;
@@ -80,6 +83,13 @@ public final class XMLManagerProviderSPI implements ISMPManagerProviderSPI
                                                     });
   }
 
+  @Nonnull
+  public ISMPUserManager createUserMgr ()
+  {
+    return new XMLUserManager ();
+  }
+
+  @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
     try
@@ -92,6 +102,7 @@ public final class XMLManagerProviderSPI implements ISMPManagerProviderSPI
     }
   }
 
+  @Nonnull
   public ISMPRedirectManager createRedirectMgr ()
   {
     try
@@ -104,6 +115,7 @@ public final class XMLManagerProviderSPI implements ISMPManagerProviderSPI
     }
   }
 
+  @Nonnull
   public ISMPServiceInformationManager createServiceInformationMgr ()
   {
     try
