@@ -169,6 +169,17 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
   }
 
   @Nonnull
+  private static SMPRedirect _convert (@Nonnull final DBServiceMetadataRedirection aDBRedirect)
+  {
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    return new SMPRedirect (aServiceGroupMgr.getSMPServiceGroupOfID (aDBRedirect.getId ().getAsBusinessIdentifier ()),
+                            aDBRedirect.getId ().getAsDocumentTypeIdentifier (),
+                            aDBRedirect.getRedirectionUrl (),
+                            aDBRedirect.getCertificateUid (),
+                            aDBRedirect.getExtension ());
+  }
+
+  @Nonnull
   @ReturnsMutableCopy
   public Collection <? extends ISMPRedirect> getAllSMPRedirects ()
   {
@@ -187,14 +198,8 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       throw new RuntimeException (ret.getThrowable ());
 
     final List <SMPRedirect> aRedirects = new ArrayList <> ();
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
-      aRedirects.add (new SMPRedirect (aServiceGroupMgr.getSMPServiceGroupOfID (aDBRedirect.getId ()
-                                                                                           .getAsBusinessIdentifier ()),
-                                       aDBRedirect.getId ().getAsDocumentTypeIdentifier (),
-                                       aDBRedirect.getRedirectionUrl (),
-                                       aDBRedirect.getCertificateUid (),
-                                       aDBRedirect.getExtension ()));
+      aRedirects.add (_convert (aDBRedirect));
     return aRedirects;
   }
 
@@ -218,14 +223,8 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       throw new RuntimeException (ret.getThrowable ());
 
     final List <SMPRedirect> aRedirects = new ArrayList <> ();
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
     for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
-      aRedirects.add (new SMPRedirect (aServiceGroupMgr.getSMPServiceGroupOfID (aDBRedirect.getId ()
-                                                                                           .getAsBusinessIdentifier ()),
-                                       aDBRedirect.getId ().getAsDocumentTypeIdentifier (),
-                                       aDBRedirect.getRedirectionUrl (),
-                                       aDBRedirect.getCertificateUid (),
-                                       aDBRedirect.getExtension ()));
+      aRedirects.add (_convert (aDBRedirect));
     return aRedirects;
   }
 
@@ -263,10 +262,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       @Nonnull
       public DBServiceMetadataRedirection call ()
       {
-        final EntityManager aEM = getEntityManager ();
         final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
                                                                                                  aDocTypeID);
-        return aEM.find (DBServiceMetadataRedirection.class, aDBRedirectID);
+        return getEntityManager ().find (DBServiceMetadataRedirection.class, aDBRedirectID);
       }
     });
     if (ret.hasThrowable ())
