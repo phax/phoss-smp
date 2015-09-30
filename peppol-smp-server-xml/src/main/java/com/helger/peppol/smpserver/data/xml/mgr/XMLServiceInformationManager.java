@@ -171,6 +171,23 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     return aSMPServiceInformation;
   }
 
+  @Nullable
+  private SMPServiceInformation _getSMPServiceInformationOfID (@Nullable final String sID)
+  {
+    if (StringHelper.hasNoText (sID))
+      return null;
+
+    m_aRWLock.readLock ().lock ();
+    try
+    {
+      return m_aMap.get (sID);
+    }
+    finally
+    {
+      m_aRWLock.readLock ().unlock ();
+    }
+  }
+
   @Nonnull
   public ISMPServiceInformation markSMPServiceInformationChanged (@Nonnull final ISMPServiceInformation aServiceInfo)
   {
@@ -393,43 +410,5 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
                       aDocumentTypeIdentifier.getValue () +
                       "'. This seems to be a bug! Using the first one.");
     return ret.get (0);
-  }
-
-  private SMPServiceInformation _getSMPServiceInformationOfID (@Nullable final String sID)
-  {
-    if (StringHelper.hasNoText (sID))
-      return null;
-
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.get (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
-  }
-
-  public ISMPServiceInformation getSMPServiceInformationOfID (@Nullable final String sID)
-  {
-    // Change return type
-    return _getSMPServiceInformationOfID (sID);
-  }
-
-  public boolean containsSMPServiceInformationWithID (@Nullable final String sID)
-  {
-    if (StringHelper.hasNoText (sID))
-      return false;
-
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.containsKey (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
   }
 }

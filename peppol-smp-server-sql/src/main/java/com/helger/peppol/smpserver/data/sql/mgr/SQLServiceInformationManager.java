@@ -33,7 +33,6 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.state.EChange;
-import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
@@ -243,21 +242,5 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
                       aDocumentTypeIdentifier.getValue () +
                       "'. This seems to be a bug! Using the first one.");
     return ret.get (0);
-  }
-
-  public ISMPServiceInformation getSMPServiceInformationOfID (@Nullable final String sID)
-  {
-    if (StringHelper.hasNoText (sID))
-      return null;
-
-    return m_aMap.get (sID);
-  }
-
-  public boolean containsSMPServiceInformationWithID (@Nullable final String sID)
-  {
-    if (StringHelper.hasNoText (sID))
-      return false;
-
-    return m_aMap.containsKey (sID);
   }
 }
