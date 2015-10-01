@@ -152,11 +152,10 @@ public final class AppCommonUI
       final JSPackage aOnClick = new JSPackage ();
       final JSAnonymousFunction aJSSuccess = new JSAnonymousFunction ();
       final JSVar aJSData = aJSSuccess.param ("data");
-      aJSSuccess.body ()._if (aJSData.ref ("value").ref (AjaxExecutorPublicLogin.JSON_LOGGEDIN),
-                              JSHtml.windowLocationReload (),
-                              JQuery.idRef (sIDErrorField)
-                                    .empty ()
-                                    .append (aJSData.ref ("value").ref (AjaxExecutorPublicLogin.JSON_HTML)));
+      aJSSuccess.body ()
+                ._if (aJSData.ref (AjaxExecutorPublicLogin.JSON_LOGGEDIN),
+                      JSHtml.windowLocationReload (),
+                      JQuery.idRef (sIDErrorField).empty ().append (aJSData.ref (AjaxExecutorPublicLogin.JSON_HTML)));
       aOnClick.add (new JQueryAjaxBuilder ().url (CAjaxPublic.LOGIN.getInvocationURI (aRequestScope))
                                             .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID,
                                                                             JQuery.idRef (sIDUserName).val ())

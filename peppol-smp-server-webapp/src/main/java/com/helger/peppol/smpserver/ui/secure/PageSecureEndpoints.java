@@ -35,6 +35,7 @@ import com.helger.commons.microdom.serialize.MicroReader;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SMap;
 import com.helger.commons.url.URLHelper;
 import com.helger.datetime.CPDT;
@@ -608,7 +609,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           aRow.addCell (AppCommonUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()));
           aRow.addCell (AppCommonUI.getProcessID (aProcess.getProcessIdentifier ()));
           aRow.addCell (aEndpoint.getTransportProfile ());
-          aRow.addCell (createEditLink (aWPEC, aServiceInfo, "Edit endpoint", aParams),
+
+          final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
+          aRow.addCell (new HCA (aEditURL.getAsStringWithEncodedParameters ()).setTitle ("Edit endpoint")
+                                                                              .addChild (EDefaultIcon.EDIT.getAsNode ()),
                         new HCTextNode (" "),
                         new HCA (LinkHelper.getURIWithServerAndContext (aServiceInfo.getServiceGroup ()
                                                                                     .getParticpantIdentifier ()
