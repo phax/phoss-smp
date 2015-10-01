@@ -50,10 +50,12 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.helger.db.jpa.annotation.UsedOnlyByJPA;
+
 /**
  * Define the ownership of a service group -&gt; relates DB user to DB service
  * group.
- * 
+ *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Entity
@@ -64,6 +66,8 @@ public class DBOwnership implements Serializable
   private DBUser m_aUser;
   private DBServiceGroup m_aServiceGroup;
 
+  @Deprecated
+  @UsedOnlyByJPA
   public DBOwnership ()
   {}
 
@@ -103,11 +107,11 @@ public class DBOwnership implements Serializable
                                nullable = false,
                                insertable = false,
                                updatable = false),
-                 @JoinColumn (name = "businessIdentifier",
-                              referencedColumnName = "businessIdentifier",
-                              nullable = false,
-                              insertable = false,
-                              updatable = false) })
+                  @JoinColumn (name = "businessIdentifier",
+                               referencedColumnName = "businessIdentifier",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false) })
   public DBServiceGroup getServiceGroup ()
   {
     return m_aServiceGroup;

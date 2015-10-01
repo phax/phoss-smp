@@ -60,6 +60,7 @@ import org.eclipse.persistence.annotations.Convert;
 import org.eclipse.persistence.annotations.Converter;
 import org.joda.time.LocalDateTime;
 
+import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.db.jpa.eclipselink.converter.JPAJodaLocalDateTimeConverter;
 import com.helger.peppol.smp.ExtensionType;
 import com.helger.peppol.smp.SMPExtensionConverter;
@@ -86,6 +87,8 @@ public class DBEndpoint implements Serializable
   private String m_sTechnicalContactUrl;
   private String m_sTechnicalInformationUrl;
 
+  @Deprecated
+  @UsedOnlyByJPA
   public DBEndpoint ()
   {}
 
@@ -148,31 +151,31 @@ public class DBEndpoint implements Serializable
                                nullable = false,
                                insertable = false,
                                updatable = false),
-                 @JoinColumn (name = "processIdentifierType",
-                              referencedColumnName = "processIdentifierType",
-                              nullable = false,
-                              insertable = false,
-                              updatable = false),
-                 @JoinColumn (name = "businessIdentifier",
-                              referencedColumnName = "businessIdentifier",
-                              nullable = false,
-                              insertable = false,
-                              updatable = false),
-                 @JoinColumn (name = "businessIdentifierScheme",
-                              referencedColumnName = "businessIdentifierScheme",
-                              nullable = false,
-                              insertable = false,
-                              updatable = false),
-                 @JoinColumn (name = "documentIdentifier",
-                              referencedColumnName = "documentIdentifier",
-                              nullable = false,
-                              insertable = false,
-                              updatable = false),
-                 @JoinColumn (name = "documentIdentifierScheme",
-                              referencedColumnName = "documentIdentifierScheme",
-                              nullable = false,
-                              insertable = false,
-                              updatable = false) })
+                  @JoinColumn (name = "processIdentifierType",
+                               referencedColumnName = "processIdentifierType",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "businessIdentifier",
+                               referencedColumnName = "businessIdentifier",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "businessIdentifierScheme",
+                               referencedColumnName = "businessIdentifierScheme",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "documentIdentifier",
+                               referencedColumnName = "documentIdentifier",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "documentIdentifierScheme",
+                               referencedColumnName = "documentIdentifierScheme",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false) })
   public DBProcess getProcess ()
   {
     return m_aProcess;

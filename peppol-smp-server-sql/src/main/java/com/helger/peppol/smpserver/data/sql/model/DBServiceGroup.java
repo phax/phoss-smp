@@ -55,6 +55,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.smp.ExtensionType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 
@@ -72,13 +73,10 @@ public class DBServiceGroup implements Serializable
   private DBOwnership m_aOwnership;
   private Set <DBServiceMetadata> m_aServiceMetadatas;
 
+  @Deprecated
+  @UsedOnlyByJPA
   public DBServiceGroup ()
   {}
-
-  public DBServiceGroup (final DBServiceGroupID aID)
-  {
-    m_aID = aID;
-  }
 
   public DBServiceGroup (final DBServiceGroupID aID,
                          final String sExtension,

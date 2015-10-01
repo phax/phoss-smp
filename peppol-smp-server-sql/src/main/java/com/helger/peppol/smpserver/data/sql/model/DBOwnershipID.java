@@ -47,10 +47,10 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Transient;
 
-import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
@@ -68,7 +68,7 @@ public class DBOwnershipID implements Serializable
   private String m_sParticipantIdentifier;
 
   @Deprecated
-  @UsedViaReflection
+  @UsedOnlyByJPA
   public DBOwnershipID ()
   {}
 

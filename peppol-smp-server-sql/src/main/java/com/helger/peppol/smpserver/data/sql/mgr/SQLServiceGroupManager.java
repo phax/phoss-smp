@@ -64,11 +64,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     {
       public void run ()
       {
-        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantIdentifier);
-        final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantIdentifier);
+        final EntityManager aEM = getEntityManager ();
 
         // Check if the passed service group ID is already in use
-        final EntityManager aEM = getEntityManager ();
+        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantIdentifier);
         DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
         if (aDBServiceGroup != null)
           throw new IllegalStateException ("The service group with ID " +
@@ -85,10 +84,11 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
         try
         {
           // Did not exist. Create it.
-          aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID);
-          aDBServiceGroup.setExtension (sExtension);
-          // Save the ownership information
-          aDBServiceGroup.setOwnership (new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup));
+          final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantIdentifier);
+          aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID,
+                                                sExtension,
+                                                new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup),
+                                                null);
           aEM.persist (aDBServiceGroup);
         }
         catch (final RuntimeException ex)
@@ -146,8 +146,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
         // Simply update the extension
         if (!EqualsHelper.equals (aDBServiceGroup.getExtension (), sExtension))
           eChange = EChange.CHANGED;
-
         aDBServiceGroup.setExtension (sExtension);
+
         aEM.merge (aDBServiceGroup);
         return eChange;
       }

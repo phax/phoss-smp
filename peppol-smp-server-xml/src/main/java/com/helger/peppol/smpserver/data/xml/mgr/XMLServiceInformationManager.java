@@ -128,45 +128,6 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     m_aMap.put (aSMPServiceInformation.getID (), aSMPServiceInformation);
   }
 
-  private void _createSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
-  {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      _addSMPServiceInformation (aSMPServiceInformation);
-      markAsChanged (aSMPServiceInformation, EDAOActionType.CREATE);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
-    AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
-                                      aSMPServiceInformation.getID (),
-                                      aSMPServiceInformation.getServiceGroupID (),
-                                      aSMPServiceInformation.getDocumentTypeIdentifier (),
-                                      aSMPServiceInformation.getAllProcesses (),
-                                      aSMPServiceInformation.getExtension ());
-  }
-
-  private void _updateSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
-  {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      markAsChanged (aSMPServiceInformation, EDAOActionType.UPDATE);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
-    AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
-                                      aSMPServiceInformation.getID (),
-                                      aSMPServiceInformation.getServiceGroupID (),
-                                      aSMPServiceInformation.getDocumentTypeIdentifier (),
-                                      aSMPServiceInformation.getAllProcesses (),
-                                      aSMPServiceInformation.getExtension ());
-  }
-
   @Nullable
   private SMPServiceInformation _getSMPServiceInformationOfID (@Nullable final String sID)
   {
@@ -182,16 +143,6 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     {
       m_aRWLock.readLock ().unlock ();
     }
-  }
-
-  public void markSMPServiceInformationChanged (@Nonnull final ISMPServiceInformation aServiceInfo)
-  {
-    ValueEnforcer.notNull (aServiceInfo, "ServiceInfo");
-    final SMPServiceInformation aRealServiceInfo = _getSMPServiceInformationOfID (aServiceInfo.getID ());
-    if (aRealServiceInfo == null)
-      throw new IllegalArgumentException ("ServiceInformation " + aServiceInfo.getID () + " was not found");
-
-    _updateSMPServiceInformation (aRealServiceInfo);
   }
 
   @Nullable
@@ -215,18 +166,18 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     return null;
   }
 
-  public void createOrUpdateSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
+  public void createOrUpdateSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
   {
-    ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
-    ValueEnforcer.isTrue (aServiceInformation.getProcessCount () == 1, "ServiceGroup must contain a single process");
-    final SMPProcess aNewProcess = aServiceInformation.getAllProcesses ().get (0);
+    ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
+    ValueEnforcer.isTrue (aSMPServiceInformation.getProcessCount () == 1, "ServiceGroup must contain a single process");
+    final SMPProcess aNewProcess = aSMPServiceInformation.getAllProcesses ().get (0);
     ValueEnforcer.isTrue (aNewProcess.getEndpointCount () == 1,
                           "ServiceGroup must contain a single endpoint in the process");
 
     // Check for an update
     boolean bChangedExisting = false;
-    final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceInformation.getServiceGroup (),
-                                                                                                                                 aServiceInformation.getDocumentTypeIdentifier ());
+    final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroup (),
+                                                                                                                                 aSMPServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
     {
       final SMPProcess aOldProcess = aOldInformation.getProcessOfID (aNewProcess.getProcessIdentifier ());
@@ -254,9 +205,42 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     }
 
     if (bChangedExisting)
-      _updateSMPServiceInformation (aOldInformation);
-
-    _createSMPServiceInformation (aServiceInformation);
+    {
+      m_aRWLock.writeLock ().lock ();
+      try
+      {
+        markAsChanged (aOldInformation, EDAOActionType.UPDATE);
+      }
+      finally
+      {
+        m_aRWLock.writeLock ().unlock ();
+      }
+      AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
+                                        aOldInformation.getID (),
+                                        aOldInformation.getServiceGroupID (),
+                                        aOldInformation.getDocumentTypeIdentifier (),
+                                        aOldInformation.getAllProcesses (),
+                                        aOldInformation.getExtension ());
+    }
+    else
+    {
+      m_aRWLock.writeLock ().lock ();
+      try
+      {
+        _addSMPServiceInformation (aSMPServiceInformation);
+        markAsChanged (aSMPServiceInformation, EDAOActionType.CREATE);
+      }
+      finally
+      {
+        m_aRWLock.writeLock ().unlock ();
+      }
+      AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
+                                        aSMPServiceInformation.getID (),
+                                        aSMPServiceInformation.getServiceGroupID (),
+                                        aSMPServiceInformation.getDocumentTypeIdentifier (),
+                                        aSMPServiceInformation.getAllProcesses (),
+                                        aSMPServiceInformation.getExtension ());
+    }
   }
 
   @Nonnull

@@ -50,6 +50,7 @@ import javax.persistence.Transient;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IParticipantIdentifier;
@@ -70,6 +71,8 @@ public class DBServiceMetadataRedirectionID implements Serializable
   private String m_sDocumentTypeIdentifierScheme;
   private String m_sDocumentTypeIdentifier;
 
+  @Deprecated
+  @UsedOnlyByJPA
   public DBServiceMetadataRedirectionID ()
   {}
 

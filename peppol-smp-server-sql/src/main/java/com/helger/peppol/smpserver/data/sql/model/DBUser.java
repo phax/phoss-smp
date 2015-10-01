@@ -52,6 +52,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 
 /**
@@ -67,8 +68,16 @@ public class DBUser implements Serializable, ISMPUser
   private String m_sPassword;
   private Set <DBOwnership> m_aOwnerships = new HashSet <DBOwnership> ();
 
+  @Deprecated
+  @UsedOnlyByJPA
   public DBUser ()
   {}
+
+  public DBUser (final String sUserName, final String sPassword)
+  {
+    m_sUserName = sUserName;
+    m_sPassword = sPassword;
+  }
 
   @Transient
   public String getID ()

@@ -407,50 +407,30 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
     if (aFormErrors.isEmpty ())
     {
+      final SMPEndpoint aEndpoint = new SMPEndpoint (sTransportProfile,
+                                                     sEndpointReference,
+                                                     bRequireBusinessLevelSignature,
+                                                     sMinimumAuthenticationLevel,
+                                                     aNotBeforeDate == null ? null
+                                                                            : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
+                                                     aNotAfterDate == null ? null
+                                                                           : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
+                                                     sCertificate,
+                                                     sServiceDescription,
+                                                     sTechnicalContact,
+                                                     sTechnicalInformation,
+                                                     sExtension);
+      final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEndpoint), null);
+      final SMPServiceInformation aServiceInfo = new SMPServiceInformation (aServiceGroup,
+                                                                            aDocTypeID,
+                                                                            CollectionHelper.newList (aProcess),
+                                                                            null);
+      aServiceInfoMgr.createOrUpdateSMPServiceInformation (aServiceInfo);
+
       if (bEdit)
-      {
-        final SMPEndpoint aEndpoint = (SMPEndpoint) aSelectedEndpoint;
-        aEndpoint.setEndpointReference (sEndpointReference);
-        aEndpoint.setRequireBusinessLevelSignature (bRequireBusinessLevelSignature);
-        aEndpoint.setMinimumAuthenticationLevel (sMinimumAuthenticationLevel);
-        aEndpoint.setServiceActivationDateTime (aNotBeforeDate == null ? null
-                                                                       : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME));
-        aEndpoint.setServiceExpirationDateTime (aNotAfterDate == null ? null
-                                                                      : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME));
-        aEndpoint.setCertificate (sCertificate);
-        aEndpoint.setServiceDescription (sServiceDescription);
-        aEndpoint.setTechnicalContactUrl (sTechnicalContact);
-        aEndpoint.setTechnicalInformationUrl (sTechnicalInformation);
-        aEndpoint.setExtension (sExtension);
-
-        aServiceInfoMgr.markSMPServiceInformationChanged (aSelectedObject);
-
-        aNodeList.addChild (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint"));
-      }
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint"));
       else
-      {
-        final SMPEndpoint aEndpoint = new SMPEndpoint (sTransportProfile,
-                                                       sEndpointReference,
-                                                       bRequireBusinessLevelSignature,
-                                                       sMinimumAuthenticationLevel,
-                                                       aNotBeforeDate == null ? null
-                                                                              : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
-                                                       aNotAfterDate == null ? null
-                                                                             : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
-                                                       sCertificate,
-                                                       sServiceDescription,
-                                                       sTechnicalContact,
-                                                       sTechnicalInformation,
-                                                       sExtension);
-        final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEndpoint), null);
-        final SMPServiceInformation aServiceInfo = new SMPServiceInformation (aServiceGroup,
-                                                                              aDocTypeID,
-                                                                              CollectionHelper.newList (aProcess),
-                                                                              null);
-        aServiceInfoMgr.createOrUpdateSMPServiceInformation (aServiceInfo);
-
-        aNodeList.addChild (new BootstrapSuccessBox ().addChild ("Successfully created the new endpoint"));
-      }
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully created the new endpoint"));
     }
   }
 

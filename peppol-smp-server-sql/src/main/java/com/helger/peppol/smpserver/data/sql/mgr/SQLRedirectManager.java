@@ -207,24 +207,27 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
   @ReturnsMutableCopy
   public Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
-    ret = doInTransaction (new Callable <List <DBServiceMetadataRedirection>> ()
-    {
-      public List <DBServiceMetadataRedirection> call ()
-      {
-        return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
-                                                DBServiceMetadataRedirection.class)
-                                  .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
-                                  .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
-                                  .getResultList ();
-      }
-    });
-    if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
-
     final List <SMPRedirect> aRedirects = new ArrayList <> ();
-    for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
-      aRedirects.add (_convert (aDBRedirect));
+    if (aServiceGroup != null)
+    {
+      JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
+      ret = doInTransaction (new Callable <List <DBServiceMetadataRedirection>> ()
+      {
+        public List <DBServiceMetadataRedirection> call ()
+        {
+          return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+                                                  DBServiceMetadataRedirection.class)
+                                    .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                    .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
+                                    .getResultList ();
+        }
+      });
+      if (ret.hasThrowable ())
+        throw new RuntimeException (ret.getThrowable ());
+
+      for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
+        aRedirects.add (_convert (aDBRedirect));
+    }
     return aRedirects;
   }
 

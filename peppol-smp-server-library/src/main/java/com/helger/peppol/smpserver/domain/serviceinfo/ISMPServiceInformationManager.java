@@ -16,8 +16,6 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 public interface ISMPServiceInformationManager
 {
-  void markSMPServiceInformationChanged (@Nonnull ISMPServiceInformation aServiceInfo);
-
   void createOrUpdateSMPServiceInformation (@Nonnull SMPServiceInformation aServiceInformation);
 
   @Nullable

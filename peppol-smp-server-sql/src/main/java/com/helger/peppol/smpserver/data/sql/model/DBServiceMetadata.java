@@ -44,6 +44,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -58,6 +59,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.smp.ExtensionType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 
@@ -73,20 +77,20 @@ public class DBServiceMetadata implements Serializable
   private DBServiceMetadataID m_aID;
   private DBServiceGroup m_aServiceGroup;
   private String m_sExtension;
-  private Set <DBProcess> m_aProcesses = new HashSet <DBProcess> (0);
+  private Set <DBProcess> m_aProcesses = new HashSet <DBProcess> ();
 
+  @Deprecated
+  @UsedOnlyByJPA
   public DBServiceMetadata ()
   {}
 
-  public DBServiceMetadata (final DBServiceMetadataID aID,
-                            final DBServiceGroup aServiceGroup,
-                            final String sExtension,
-                            final Set <DBProcess> aProcesses)
+  public DBServiceMetadata (@Nonnull final DBServiceMetadataID aID,
+                            @Nonnull final DBServiceGroup aServiceGroup,
+                            @Nullable final String sExtension)
   {
     m_aID = aID;
     m_aServiceGroup = aServiceGroup;
     m_sExtension = sExtension;
-    m_aProcesses = aProcesses;
   }
 
   @EmbeddedId
@@ -139,14 +143,17 @@ public class DBServiceMetadata implements Serializable
     setExtension (SMPExtensionConverter.convertToString (aExtension));
   }
 
+  @Nonnull
+  @ReturnsMutableObject ("design")
   @OneToMany (fetch = FetchType.LAZY, mappedBy = "serviceMetadata", cascade = { CascadeType.ALL })
   public Set <DBProcess> getProcesses ()
   {
     return m_aProcesses;
   }
 
-  public void setProcesses (final Set <DBProcess> aProcesses)
+  public void setProcesses (@Nonnull final Set <DBProcess> aProcesses)
   {
+    ValueEnforcer.notNull (aProcesses, "Processes");
     m_aProcesses = aProcesses;
   }
 }
