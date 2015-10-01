@@ -95,6 +95,7 @@ public class DBEndpoint implements Serializable
 
   public DBEndpoint (final DBEndpointID aID,
                      final DBProcess aProcess,
+                     final String sEndpointReference,
                      final boolean bRequireBusinessLevelSignature,
                      final String sMinimumAuthenticationLevel,
                      final LocalDateTime aServiceActivationDate,
@@ -107,6 +108,7 @@ public class DBEndpoint implements Serializable
   {
     m_aID = aID;
     m_aProcess = aProcess;
+    m_sEndpointReference = sEndpointReference;
     m_bRequireBusinessLevelSignature = bRequireBusinessLevelSignature;
     m_sMinimumAuthenticationLevel = sMinimumAuthenticationLevel;
     m_aServiceActivationDate = aServiceActivationDate;
