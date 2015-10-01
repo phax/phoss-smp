@@ -166,7 +166,7 @@ CREATE TABLE `smp_endpoint` (
   `serviceActivationDate` datetime default NULL,
   `serviceExpirationDate` datetime NOT NULL,
   `certificate` TEXT NOT NULL,
-  `serviceDescription` BLOB NOT NULL,
+  `serviceDescription` TEXT NOT NULL,
   `technicalContactUrl` varchar(256) NOT NULL,
   `technicalInformationUrl` varchar(256) default NULL,
   PRIMARY KEY  (`businessIdentifierScheme`,`businessIdentifier`,`processIdentifierType`,`processIdentifier`,`documentIdentifier`,`documentIdentifierScheme`,`endpointReference`,`transportProfile`),
