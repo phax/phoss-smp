@@ -85,8 +85,8 @@ public class DBProcessID implements Serializable
 
   public DBProcessID (@Nonnull final DBServiceMetadataID aSMID, @Nonnull final IProcessIdentifier aPrI)
   {
-    setBusinessIdentifier (aSMID.asBusinessIdentifier ());
-    setDocumentTypeIdentifier (aSMID.asDocumentTypeIdentifier ());
+    setBusinessIdentifier (aSMID.getAsBusinessIdentifier ());
+    setDocumentTypeIdentifier (aSMID.getAsDocumentTypeIdentifier ());
     setProcessIdentifier (aPrI);
   }
 
@@ -181,21 +181,21 @@ public class DBProcessID implements Serializable
 
   @Transient
   @Nonnull
-  public ParticipantIdentifierType asBusinessIdentifier ()
+  public ParticipantIdentifierType getAsBusinessIdentifier ()
   {
     return new SimpleParticipantIdentifier (m_sParticipantIdentifierScheme, m_sParticipantIdentifier);
   }
 
   @Transient
   @Nonnull
-  public DocumentIdentifierType asDocumentTypeIdentifier ()
+  public DocumentIdentifierType getAsDocumentTypeIdentifier ()
   {
     return new SimpleDocumentTypeIdentifier (m_sDocumentTypeIdentifierScheme, m_sDocumentTypeIdentifier);
   }
 
   @Transient
   @Nonnull
-  public ProcessIdentifierType asProcessIdentifier ()
+  public ProcessIdentifierType getAsProcessIdentifier ()
   {
     return new SimpleProcessIdentifier (m_sProcessIdentifierScheme, m_sProcessIdentifier);
   }

@@ -247,7 +247,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
         final List <DocumentIdentifierType> aList = new ArrayList <DocumentIdentifierType> ();
         for (final DBServiceMetadata aService : aServices)
-          aList.add (aService.getId ().asDocumentTypeIdentifier ());
+          aList.add (aService.getId ().getAsDocumentTypeIdentifier ());
         return aList;
       }
     });
@@ -457,10 +457,10 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   private void _convertFromDBToService (@Nonnull final DBServiceMetadata aDBServiceMetadata,
                                         @Nonnull final ServiceMetadataType aServiceMetadata)
   {
-    final ParticipantIdentifierType aBusinessID = aDBServiceMetadata.getId ().asBusinessIdentifier ();
+    final ParticipantIdentifierType aBusinessID = aDBServiceMetadata.getId ().getAsBusinessIdentifier ();
     final ExtensionType aExtension = SMPExtensionConverter.convertOrNull (aDBServiceMetadata.getExtension ());
 
-    final DocumentIdentifierType aDocTypeID = aDBServiceMetadata.getId ().asDocumentTypeIdentifier ();
+    final DocumentIdentifierType aDocTypeID = aDBServiceMetadata.getId ().getAsDocumentTypeIdentifier ();
 
     final ServiceInformationType aServiceInformation = new ServiceInformationType ();
     aServiceInformation.setParticipantIdentifier (aBusinessID);
@@ -501,7 +501,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
       aProcessType.setServiceEndpointList (endpoints);
       aProcessType.setExtension (SMPExtensionConverter.convertOrNull (aDBProcess.getExtension ()));
-      aProcessType.setProcessIdentifier (aDBProcess.getId ().asProcessIdentifier ());
+      aProcessType.setProcessIdentifier (aDBProcess.getId ().getAsProcessIdentifier ());
 
       aProcessList.getProcess ().add (aProcessType);
     }

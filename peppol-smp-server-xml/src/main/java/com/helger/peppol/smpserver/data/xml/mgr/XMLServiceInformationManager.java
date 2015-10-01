@@ -128,8 +128,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     m_aMap.put (aSMPServiceInformation.getID (), aSMPServiceInformation);
   }
 
-  @Nonnull
-  private ISMPServiceInformation _createSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
+  private void _createSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
   {
     m_aRWLock.writeLock ().lock ();
     try
@@ -147,11 +146,9 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
                                       aSMPServiceInformation.getDocumentTypeIdentifier (),
                                       aSMPServiceInformation.getAllProcesses (),
                                       aSMPServiceInformation.getExtension ());
-    return aSMPServiceInformation;
   }
 
-  @Nonnull
-  private ISMPServiceInformation _updateSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
+  private void _updateSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
   {
     m_aRWLock.writeLock ().lock ();
     try
@@ -168,7 +165,6 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
                                       aSMPServiceInformation.getDocumentTypeIdentifier (),
                                       aSMPServiceInformation.getAllProcesses (),
                                       aSMPServiceInformation.getExtension ());
-    return aSMPServiceInformation;
   }
 
   @Nullable
@@ -188,15 +184,14 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     }
   }
 
-  @Nonnull
-  public ISMPServiceInformation markSMPServiceInformationChanged (@Nonnull final ISMPServiceInformation aServiceInfo)
+  public void markSMPServiceInformationChanged (@Nonnull final ISMPServiceInformation aServiceInfo)
   {
     ValueEnforcer.notNull (aServiceInfo, "ServiceInfo");
     final SMPServiceInformation aRealServiceInfo = _getSMPServiceInformationOfID (aServiceInfo.getID ());
     if (aRealServiceInfo == null)
       throw new IllegalArgumentException ("ServiceInformation " + aServiceInfo.getID () + " was not found");
 
-    return _updateSMPServiceInformation (aRealServiceInfo);
+    _updateSMPServiceInformation (aRealServiceInfo);
   }
 
   @Nullable
@@ -220,8 +215,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     return null;
   }
 
-  @Nonnull
-  public ISMPServiceInformation createOrUpdateSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
+  public void createOrUpdateSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
   {
     ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
     ValueEnforcer.isTrue (aServiceInformation.getProcessCount () == 1, "ServiceGroup must contain a single process");
@@ -260,9 +254,9 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     }
 
     if (bChangedExisting)
-      return _updateSMPServiceInformation (aOldInformation);
+      _updateSMPServiceInformation (aOldInformation);
 
-    return _createSMPServiceInformation (aServiceInformation);
+    _createSMPServiceInformation (aServiceInformation);
   }
 
   @Nonnull

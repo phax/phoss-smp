@@ -83,9 +83,9 @@ public class DBEndpointID implements Serializable
                        final String sEndpointReference,
                        final String sTransportProfile)
   {
-    setBusinessIdentifier (aProcessID.asBusinessIdentifier ());
-    setDocumentTypeIdentifier (aProcessID.asDocumentTypeIdentifier ());
-    setProcessIdentifier (aProcessID.asProcessIdentifier ());
+    setBusinessIdentifier (aProcessID.getAsBusinessIdentifier ());
+    setDocumentTypeIdentifier (aProcessID.getAsDocumentTypeIdentifier ());
+    setProcessIdentifier (aProcessID.getAsProcessIdentifier ());
     setEndpointReference (sEndpointReference);
     setTransportProfile (sTransportProfile);
   }

@@ -145,14 +145,14 @@ public class DBServiceMetadataID implements Serializable
 
   @Nonnull
   @Transient
-  public SimpleParticipantIdentifier asBusinessIdentifier ()
+  public SimpleParticipantIdentifier getAsBusinessIdentifier ()
   {
     return new SimpleParticipantIdentifier (m_sParticipantIdentifierScheme, m_sParticipantIdentifier);
   }
 
   @Nonnull
   @Transient
-  public SimpleDocumentTypeIdentifier asDocumentTypeIdentifier ()
+  public SimpleDocumentTypeIdentifier getAsDocumentTypeIdentifier ()
   {
     return new SimpleDocumentTypeIdentifier (m_sDocumentTypeIdentifierScheme, m_sDocumentTypeIdentifier);
   }

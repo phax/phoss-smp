@@ -21,23 +21,30 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.persistence.EntityManager;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.state.EChange;
+import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
+import com.helger.peppol.smpserver.data.sql.model.DBEndpoint;
+import com.helger.peppol.smpserver.data.sql.model.DBProcess;
+import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadata;
+import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataID;
+import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection;
+import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
@@ -51,9 +58,8 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
  *
  * @author Philip Helger
  */
-public final class SQLServiceInformationManager implements ISMPServiceInformationManager
+public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledManager implements ISMPServiceInformationManager
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SQLServiceInformationManager.class);
   private final Map <String, SMPServiceInformation> m_aMap = new HashMap <String, SMPServiceInformation> ();
 
   public SQLServiceInformationManager ()
@@ -79,37 +85,23 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
     return aSMPServiceInformation;
   }
 
-  @Nonnull
-  public ISMPServiceInformation markSMPServiceInformationChanged (@Nonnull final ISMPServiceInformation aServiceInfo)
+  public void markSMPServiceInformationChanged (@Nonnull final ISMPServiceInformation aServiceInfo)
   {
     ValueEnforcer.notNull (aServiceInfo, "ServiceInfo");
 
-    return _updateSMPServiceInformation (aServiceInfo);
-  }
-
-  @Nullable
-  public ISMPServiceInformation findServiceInformation (@Nullable final ISMPServiceGroup aServiceGroup,
-                                                        @Nullable final IPeppolDocumentTypeIdentifier aDocTypeID,
-                                                        @Nullable final IPeppolProcessIdentifier aProcessID,
-                                                        @Nullable final ISMPTransportProfile aTransportProfile)
-  {
-    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                          aDocTypeID);
-    if (aOldInformation != null)
+    JPAExecutionResult <?> ret;
+    ret = doInTransaction (new Runnable ()
     {
-      final ISMPProcess aProcess = aOldInformation.getProcessOfID (aProcessID);
-      if (aProcess != null)
+      public void run ()
       {
-        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (aTransportProfile);
-        if (aEndpoint != null)
-          return aOldInformation;
+        // TODO
       }
-    }
-    return null;
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
   }
 
-  @Nonnull
-  public ISMPServiceInformation createOrUpdateSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
+  public void createOrUpdateSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
   {
     ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
     ValueEnforcer.isTrue (aServiceInformation.getProcessCount () == 1, "ServiceGroup must contain a single process");
@@ -148,9 +140,30 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
     }
 
     if (bChangedExisting)
-      return _updateSMPServiceInformation (aOldInformation);
+      _updateSMPServiceInformation (aOldInformation);
 
-    return _createSMPServiceInformation (aServiceInformation);
+    _createSMPServiceInformation (aServiceInformation);
+  }
+
+  @Nullable
+  public ISMPServiceInformation findServiceInformation (@Nullable final ISMPServiceGroup aServiceGroup,
+                                                        @Nullable final IPeppolDocumentTypeIdentifier aDocTypeID,
+                                                        @Nullable final IPeppolProcessIdentifier aProcessID,
+                                                        @Nullable final ISMPTransportProfile aTransportProfile)
+  {
+    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                          aDocTypeID);
+    if (aOldInformation != null)
+    {
+      final ISMPProcess aProcess = aOldInformation.getProcessOfID (aProcessID);
+      if (aProcess != null)
+      {
+        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (aTransportProfile);
+        if (aEndpoint != null)
+          return aOldInformation;
+      }
+    }
+    return null;
   }
 
   @Nonnull
@@ -159,46 +172,156 @@ public final class SQLServiceInformationManager implements ISMPServiceInformatio
     if (aSMPServiceInformation == null)
       return EChange.UNCHANGED;
 
-    final SMPServiceInformation aRealServiceInformation = m_aMap.remove (aSMPServiceInformation.getID ());
-    if (aRealServiceInformation == null)
-      return EChange.UNCHANGED;
-    return EChange.CHANGED;
+    JPAExecutionResult <EChange> ret;
+    ret = doInTransaction (new Callable <EChange> ()
+    {
+      @Nonnull
+      public EChange call ()
+      {
+        final EntityManager aEM = getEntityManager ();
+        final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aSMPServiceInformation.getServiceGroup ()
+                                                                                                 .getParticpantIdentifier (),
+                                                                           aSMPServiceInformation.getDocumentTypeIdentifier ());
+        final DBServiceMetadata aDBMetadata = aEM.find (DBServiceMetadata.class, aDBMetadataID);
+        if (aDBMetadata == null)
+          return EChange.UNCHANGED;
+
+        aEM.remove (aDBMetadata);
+        return EChange.CHANGED;
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
   }
 
   @Nonnull
   public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    EChange eChange = EChange.UNCHANGED;
-    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
-      eChange = eChange.or (deleteSMPServiceInformation (aSMPServiceInformation));
-    return eChange;
+    if (aServiceGroup == null)
+      return EChange.UNCHANGED;
+
+    JPAExecutionResult <EChange> ret;
+    ret = doInTransaction (new Callable <EChange> ()
+    {
+      @Nonnull
+      public EChange call ()
+      {
+        final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadata p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+                                                          DBServiceMetadataRedirection.class)
+                                            .setParameter ("scheme",
+                                                           aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                            .setParameter ("value",
+                                                           aServiceGroup.getParticpantIdentifier ().getValue ())
+                                            .executeUpdate ();
+        return EChange.valueOf (nCnt > 0);
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
+  }
+
+  @Nonnull
+  private static SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
+  {
+    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final List <SMPProcess> aProcesses = new ArrayList <> ();
+    for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
+    {
+      final List <SMPEndpoint> aEndpoints = new ArrayList <> ();
+      for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
+      {
+        final SMPEndpoint aEndpoint = new SMPEndpoint (aDBEndpoint.getId ().getTransportProfile (),
+                                                       aDBEndpoint.getId ().getEndpointReference (),
+                                                       aDBEndpoint.isRequireBusinessLevelSignature (),
+                                                       aDBEndpoint.getMinimumAuthenticationLevel (),
+                                                       aDBEndpoint.getServiceActivationDate (),
+                                                       aDBEndpoint.getServiceExpirationDate (),
+                                                       aDBEndpoint.getCertificate (),
+                                                       aDBEndpoint.getServiceDescription (),
+                                                       aDBEndpoint.getTechnicalContactUrl (),
+                                                       aDBEndpoint.getTechnicalInformationUrl (),
+                                                       aDBEndpoint.getExtension ());
+        aEndpoints.add (aEndpoint);
+      }
+      final SMPProcess aProcess = new SMPProcess (aDBProcess.getId ().getAsProcessIdentifier (),
+                                                  aEndpoints,
+                                                  aDBProcess.getExtension ());
+      aProcesses.add (aProcess);
+    }
+    return new SMPServiceInformation (aServiceGroupMgr.getSMPServiceGroupOfID (aDBMetadata.getId ()
+                                                                                          .getAsBusinessIdentifier ()),
+                                      aDBMetadata.getId ().getAsDocumentTypeIdentifier (),
+                                      aProcesses,
+                                      aDBMetadata.getExtension ());
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformations ()
   {
-    return CollectionHelper.newList (m_aMap.values ());
+    JPAExecutionResult <List <DBServiceMetadata>> ret;
+    ret = doInTransaction (new Callable <List <DBServiceMetadata>> ()
+    {
+      @Nonnull
+      public List <DBServiceMetadata> call ()
+      {
+        return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p", DBServiceMetadata.class)
+                                  .getResultList ();
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+
+    final List <SMPServiceInformation> aServiceInformations = new ArrayList <> ();
+    for (final DBServiceMetadata aDBMetadata : ret.get ())
+      aServiceInformations.add (_convert (aDBMetadata));
+    return aServiceInformations;
   }
 
   @Nonnegative
   public int getSMPServiceInformationCount ()
   {
-    return m_aMap.size ();
+    JPAExecutionResult <Long> ret;
+    ret = doSelect (new Callable <Long> ()
+    {
+      @Nonnull
+      @ReturnsMutableCopy
+      public Long call () throws Exception
+      {
+        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadata p"));
+        return Long.valueOf (nCount);
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ().intValue ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final Collection <ISMPServiceInformation> ret = new ArrayList <ISMPServiceInformation> ();
-    if (aServiceGroup != null)
+    JPAExecutionResult <List <DBServiceMetadata>> ret;
+    ret = doInTransaction (new Callable <List <DBServiceMetadata>> ()
     {
-      for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
-        if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()))
-          ret.add (aServiceInformation);
-    }
-    return ret;
+      public List <DBServiceMetadata> call ()
+      {
+        return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+                                                DBServiceMetadata.class)
+                                  .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                  .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
+                                  .getResultList ();
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+
+    final List <SMPServiceInformation> aServiceInformations = new ArrayList <> ();
+    for (final DBServiceMetadata aDBMetadata : ret.get ())
+      aServiceInformations.add (_convert (aDBMetadata));
+    return aServiceInformations;
   }
 
   @Nonnull
