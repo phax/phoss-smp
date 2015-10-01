@@ -77,7 +77,7 @@ public class DBEndpoint implements Serializable
 {
   private DBEndpointID m_aID;
   private DBProcess m_aProcess;
-  private String m_sExtension;
+  private String m_sEndpointReference;
   private boolean m_bRequireBusinessLevelSignature;
   private String m_sMinimumAuthenticationLevel;
   private LocalDateTime m_aServiceActivationDate;
@@ -86,6 +86,7 @@ public class DBEndpoint implements Serializable
   private String m_sServiceDescription;
   private String m_sTechnicalContactUrl;
   private String m_sTechnicalInformationUrl;
+  private String m_sExtension;
 
   @Deprecated
   @UsedOnlyByJPA
@@ -94,19 +95,23 @@ public class DBEndpoint implements Serializable
 
   public DBEndpoint (final DBEndpointID aID,
                      final DBProcess aProcess,
+                     final String sEndpointReference,
                      final boolean bRequireBusinessLevelSignature,
                      final LocalDateTime aServiceExpirationDate,
                      final String sCertificate,
                      final String sServiceDescription,
-                     final String sTechnicalContactUrl)
+                     final String sTechnicalContactUrl,
+                     final String sExtension)
   {
     m_aID = aID;
     m_aProcess = aProcess;
+    m_sEndpointReference = sEndpointReference;
     m_bRequireBusinessLevelSignature = bRequireBusinessLevelSignature;
     m_aServiceExpirationDate = aServiceExpirationDate;
     m_sCertificate = sCertificate;
     m_sServiceDescription = sServiceDescription;
     m_sTechnicalContactUrl = sTechnicalContactUrl;
+    m_sExtension = sExtension;
   }
 
   public DBEndpoint (final DBEndpointID aID,
@@ -202,6 +207,17 @@ public class DBEndpoint implements Serializable
   public void setExtension (@Nullable final ExtensionType aExtension)
   {
     setExtension (SMPExtensionConverter.convertToString (aExtension));
+  }
+
+  @Column (name = "endpointReference", nullable = false, length = 256)
+  public String getEndpointReference ()
+  {
+    return m_sEndpointReference;
+  }
+
+  public void setEndpointReference (final String sEndpointReference)
+  {
+    m_sEndpointReference = sEndpointReference;
   }
 
   @Column (name = "requireBusinessLevelSignature", nullable = false)

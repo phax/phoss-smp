@@ -71,7 +71,6 @@ public class DBEndpointID implements Serializable
   private String m_sDocumentTypeIdentifier;
   private String m_sProcessIdentifierScheme;
   private String m_sProcessIdentifier;
-  private String m_sEndpointReference;
   private String m_sTransportProfile;
 
   @Deprecated
@@ -79,14 +78,11 @@ public class DBEndpointID implements Serializable
   public DBEndpointID ()
   {}
 
-  public DBEndpointID (@Nonnull final DBProcessID aProcessID,
-                       final String sEndpointReference,
-                       final String sTransportProfile)
+  public DBEndpointID (@Nonnull final DBProcessID aProcessID, final String sTransportProfile)
   {
     setBusinessIdentifier (aProcessID.getAsBusinessIdentifier ());
     setDocumentTypeIdentifier (aProcessID.getAsDocumentTypeIdentifier ());
     setProcessIdentifier (aProcessID.getAsProcessIdentifier ());
-    setEndpointReference (sEndpointReference);
     setTransportProfile (sTransportProfile);
   }
 
@@ -179,17 +175,6 @@ public class DBEndpointID implements Serializable
     setDocumentIdentifier (aDocumentTypeID.getValue ());
   }
 
-  @Column (name = "endpointReference", nullable = false, length = 256)
-  public String getEndpointReference ()
-  {
-    return m_sEndpointReference;
-  }
-
-  public void setEndpointReference (final String sEndpointReference)
-  {
-    m_sEndpointReference = sEndpointReference;
-  }
-
   @Column (name = "transportProfile", nullable = false, length = 256)
   public String getTransportProfile ()
   {
@@ -215,7 +200,6 @@ public class DBEndpointID implements Serializable
            EqualsHelper.equals (m_sDocumentTypeIdentifier, rhs.m_sDocumentTypeIdentifier) &&
            EqualsHelper.equals (m_sProcessIdentifierScheme, rhs.m_sProcessIdentifierScheme) &&
            EqualsHelper.equals (m_sProcessIdentifier, rhs.m_sProcessIdentifier) &&
-           EqualsHelper.equals (m_sEndpointReference, rhs.m_sEndpointReference) &&
            EqualsHelper.equals (m_sTransportProfile, rhs.m_sTransportProfile);
   }
 
@@ -228,7 +212,6 @@ public class DBEndpointID implements Serializable
                                        .append (m_sDocumentTypeIdentifier)
                                        .append (m_sProcessIdentifierScheme)
                                        .append (m_sProcessIdentifier)
-                                       .append (m_sEndpointReference)
                                        .append (m_sTransportProfile)
                                        .getHashCode ();
   }
@@ -242,7 +225,6 @@ public class DBEndpointID implements Serializable
                                        .append ("documentTypeIDValue", m_sDocumentTypeIdentifier)
                                        .append ("processIDScheme", m_sProcessIdentifierScheme)
                                        .append ("processIDValue", m_sProcessIdentifier)
-                                       .append ("endpointReference", m_sEndpointReference)
                                        .append ("transportProfile", m_sTransportProfile)
                                        .toString ();
   }

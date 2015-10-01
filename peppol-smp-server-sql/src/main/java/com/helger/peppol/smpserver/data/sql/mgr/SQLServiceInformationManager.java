@@ -18,9 +18,7 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
@@ -63,8 +61,6 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
  */
 public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledManager implements ISMPServiceInformationManager
 {
-  private final Map <String, SMPServiceInformation> m_aMap = new HashMap <String, SMPServiceInformation> ();
-
   public SQLServiceInformationManager ()
   {}
 
@@ -223,7 +219,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
       {
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBEndpoint.getId ().getTransportProfile (),
-                                                       aDBEndpoint.getId ().getEndpointReference (),
+                                                       aDBEndpoint.getEndpointReference (),
                                                        aDBEndpoint.isRequireBusinessLevelSignature (),
                                                        aDBEndpoint.getMinimumAuthenticationLevel (),
                                                        aDBEndpoint.getServiceActivationDate (),

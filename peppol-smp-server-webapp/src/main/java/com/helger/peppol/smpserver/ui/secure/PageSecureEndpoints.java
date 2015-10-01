@@ -41,6 +41,7 @@ import com.helger.datetime.CPDT;
 import com.helger.datetime.PDTFactory;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
+import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
@@ -270,11 +271,12 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                  .setCtrl (aSelectedEndpoint.getServiceDescription ()));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical contact")
-                                                 .setCtrl (aSelectedEndpoint.getTechnicalContactUrl ()));
+                                                 .setCtrl (HCA_MailTo.createLinkedEmail (aSelectedEndpoint.getTechnicalContactUrl ())));
 
     if (StringHelper.hasText (aSelectedEndpoint.getTechnicalInformationUrl ()))
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical information")
-                                                   .setCtrl (aSelectedEndpoint.getTechnicalInformationUrl ()));
+                                                   .setCtrl (HCA.createLinkedWebsite (aSelectedEndpoint.getTechnicalInformationUrl (),
+                                                                                      HC_Target.BLANK)));
 
     aNodeList.addChild (aForm);
 
@@ -287,7 +289,6 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                  @Nonnull final EWebPageFormAction eFormAction)
   {
     final boolean bEdit = eFormAction.isEdit ();
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
@@ -591,16 +592,19 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
-          final SMap aParams = new SMap ().add (FIELD_SERVICE_GROUP_ID, aServiceInfo.getServiceGroupID ())
+          final SMap aParams = new SMap ().add (FIELD_SERVICE_GROUP_ID,
+                                                aServiceInfo.getServiceGroup ()
+                                                            .getParticpantIdentifier ()
+                                                            .getURIEncoded ())
                                           .add (FIELD_DOCTYPE_ID,
-                                                aServiceInfo.getDocumentTypeIdentifier ().getURIPercentEncoded ())
+                                                aServiceInfo.getDocumentTypeIdentifier ().getURIEncoded ())
                                           .add (FIELD_PROCESS_ID, aProcess.getProcessIdentifier ().getURIEncoded ())
                                           .add (FIELD_TRANSPORT_PROFILE, aEndpoint.getTransportProfile ());
 
           final HCRow aRow = aTable.addBodyRow ();
           aRow.addCell (new HCA (createViewURL (aWPEC,
                                                 aServiceInfo,
-                                                aParams)).addChild (aServiceInfo.getServiceGroupID ()));
+                                                aParams).getAsStringWithEncodedParameters ()).addChild (aServiceInfo.getServiceGroupID ()));
           aRow.addCell (AppCommonUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()));
           aRow.addCell (AppCommonUI.getProcessID (aProcess.getProcessIdentifier ()));
           aRow.addCell (aEndpoint.getTransportProfile ());
