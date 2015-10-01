@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
@@ -31,7 +32,7 @@ import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 /**
  * {@link ISMPServerAPIDataProvider} implementation based on {@link UriInfo}
  * data.
- * 
+ *
  * @author Philip Helger
  */
 final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
@@ -40,7 +41,7 @@ final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
 
   public SMPServerAPIDataProvider (@Nonnull final UriInfo aUriInfo)
   {
-    m_aUriInfo = aUriInfo;
+    m_aUriInfo = ValueEnforcer.notNull (aUriInfo, "UriInfo");
   }
 
   @Nonnull

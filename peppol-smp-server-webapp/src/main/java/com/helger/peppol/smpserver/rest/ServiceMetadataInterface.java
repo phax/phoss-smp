@@ -38,7 +38,6 @@ import com.helger.commons.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.commons.xml.serialize.write.IXMLWriterSettings;
 import com.helger.commons.xml.serialize.write.XMLWriter;
 import com.helger.commons.xml.serialize.write.XMLWriterSettings;
-import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
@@ -65,8 +64,6 @@ public final class ServiceMetadataInterface
   @Context
   private UriInfo m_aUriInfo;
 
-  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
-
   @GET
   @Produces (MediaType.TEXT_XML)
   public byte [] getServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
@@ -91,11 +88,11 @@ public final class ServiceMetadataInterface
         throw new RuntimeException ("Error in signing xml", ex);
       }
 
-      // And write the result to the main output stream
       // IMPORTANT: no indent and no align!
       final IXMLWriterSettings aSettings = new XMLWriterSettings ().setIncorrectCharacterHandling (EXMLIncorrectCharacterHandling.THROW_EXCEPTION)
                                                                    .setIndent (EXMLSerializeIndent.NONE);
 
+      // Write the result to a byte array
       final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ();
       if (XMLWriter.writeToStream (aDoc, aBAOS, aSettings).isFailure ())
         throw new RuntimeException ("Failed to serialize signed node!");

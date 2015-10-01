@@ -53,7 +53,7 @@ import com.helger.peppol.smp.SignedServiceMetadataType;
  *
  * @author Philip Helger
  */
-public final class MarshallerSignedServiceMetadataType extends AbstractJAXBMarshaller <SignedServiceMetadataType>
+final class MarshallerSignedServiceMetadataType extends AbstractJAXBMarshaller <SignedServiceMetadataType>
 {
   public MarshallerSignedServiceMetadataType ()
   {
