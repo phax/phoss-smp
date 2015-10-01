@@ -31,26 +31,17 @@
 
   <filter>
     <filter-name>RestFilter</filter-name>
-    <filter-class>com.sun.jersey.spi.container.servlet.ServletContainer</filter-class>
+    <filter-class>org.glassfish.jersey.servlet.ServletContainer</filter-class>
     <init-param>
-      <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
-      <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
-    </init-param>
-    <init-param>
-      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-name>jersey.config.server.provider.packages</param-name>
       <!-- add package separated by ";" -->
       <param-value>com.helger.peppol.smpserver.rest;com.helger.peppol.smpserver.exceptionmapper</param-value>
     </init-param>
     <init-param>
-      <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-      <param-value>com.helger.peppol.smpserver.rest.SignatureFilter</param-value>
-    </init-param>
-    <init-param>
-      <param-name>com.sun.jersey.config.property.WebPageContentRegex</param-name>
+      <param-name>jersey.config.servlet.filter.staticContentRegex</param-name>
       <param-value>/(js|css|stream|public|secure|publicajax|secureajax|publicaction|secureaction|resbundle)/.*|/favicon.ico|/logout</param-value>
     </init-param>
   </filter>
-
   <filter-mapping>
     <filter-name>RestFilter</filter-name>
     <url-pattern>/*</url-pattern>

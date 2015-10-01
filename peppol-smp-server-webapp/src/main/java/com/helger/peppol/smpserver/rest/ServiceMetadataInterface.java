@@ -29,12 +29,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBElement;
 
+import org.w3c.dom.Document;
+
+import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
+import com.helger.commons.xml.serialize.write.EXMLIncorrectCharacterHandling;
+import com.helger.commons.xml.serialize.write.EXMLSerializeIndent;
+import com.helger.commons.xml.serialize.write.IXMLWriterSettings;
+import com.helger.commons.xml.serialize.write.XMLWriter;
+import com.helger.commons.xml.serialize.write.XMLWriterSettings;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
+import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.photon.core.app.CApplication;
 import com.helger.web.mock.MockHttpServletResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
@@ -60,17 +68,39 @@ public final class ServiceMetadataInterface
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
 
   @GET
-  // changed Produced media type to match the smp specification.
   @Produces (MediaType.TEXT_XML)
-  public JAXBElement <SignedServiceMetadataType> getServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
-                                                                         @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
+  public byte [] getServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
+                                         @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
   {
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
       final SignedServiceMetadataType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceRegistration (sServiceGroupID,
                                                                                                                                  sDocumentTypeID);
-      return m_aObjFactory.createSignedServiceMetadata (ret);
+      // Convert to DOM document
+      final MarshallerSignedServiceMetadataType aMarshaller = new MarshallerSignedServiceMetadataType ();
+      final Document aDoc = aMarshaller.write (ret);
+
+      // Sign the document
+      try
+      {
+        SMPKeyManager.getInstance ().signXML (aDoc.getDocumentElement ());
+      }
+      catch (final Exception ex)
+      {
+        throw new RuntimeException ("Error in signing xml", ex);
+      }
+
+      // And write the result to the main output stream
+      // IMPORTANT: no indent and no align!
+      final IXMLWriterSettings aSettings = new XMLWriterSettings ().setIncorrectCharacterHandling (EXMLIncorrectCharacterHandling.THROW_EXCEPTION)
+                                                                   .setIndent (EXMLSerializeIndent.NONE);
+
+      final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ();
+      if (XMLWriter.writeToStream (aDoc, aBAOS, aSettings).isFailure ())
+        throw new RuntimeException ("Failed to serialize signed node!");
+
+      return aBAOS.toByteArray ();
     }
     finally
     {
