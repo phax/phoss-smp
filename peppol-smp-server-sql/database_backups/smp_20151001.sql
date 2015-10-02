@@ -164,7 +164,7 @@ CREATE TABLE `smp_endpoint` (
   `requireBusinessLevelSignature` bit(1) NOT NULL,
   `minimumAuthenticationLevel` varchar(256) default NULL,
   `serviceActivationDate` datetime default NULL,
-  `serviceExpirationDate` datetime NOT NULL,
+  `serviceExpirationDate` datetime default NULL,
   `certificate` TEXT NOT NULL,
   `serviceDescription` TEXT NOT NULL,
   `technicalContactUrl` varchar(256) NOT NULL,
