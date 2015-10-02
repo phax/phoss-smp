@@ -26,7 +26,7 @@
   <artifactId>peppol-smp-server-webapp</artifactId>
   <packaging>war</packaging>
   <name>peppol-smp-server-webapp</name>
-  <description>SMP webapp with all available features (read &amp; write)</description>
+  <description>SMP webapp with management GUI</description>
   <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-webapp</url>
   <inceptionYear>2015</inceptionYear>
 
@@ -164,6 +164,7 @@
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
           <excludes>
+            <exclude>conf/**</exclude>
             <exclude>src/main/webapp/*.jsp</exclude>
             <exclude>**/*.min.js</exclude>
             <exclude>**/*.min.css</exclude>
