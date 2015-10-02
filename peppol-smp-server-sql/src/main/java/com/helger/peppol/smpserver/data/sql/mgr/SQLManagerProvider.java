@@ -38,28 +38,44 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.domain;
+package com.helger.peppol.smpserver.data.sql.mgr;
 
 import javax.annotation.Nonnull;
 
-import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 
-@IsSPIImplementation
-public interface ISMPManagerProviderSPI
+/**
+ * {@link ISMPManagerProvider} implementation for this backend.
+ * 
+ * @author Philip Helger
+ */
+public final class SQLManagerProvider implements ISMPManagerProvider
 {
   @Nonnull
-  ISMPUserManager createUserMgr ();
+  public ISMPUserManager createUserMgr ()
+  {
+    return new SQLUserManager ();
+  }
 
   @Nonnull
-  ISMPServiceGroupManager createServiceGroupMgr ();
+  public ISMPServiceGroupManager createServiceGroupMgr ()
+  {
+    return new SQLServiceGroupManager ();
+  }
 
   @Nonnull
-  ISMPRedirectManager createRedirectMgr ();
+  public ISMPRedirectManager createRedirectMgr ()
+  {
+    return new SQLRedirectManager ();
+  }
 
   @Nonnull
-  ISMPServiceInformationManager createServiceInformationMgr ();
+  public ISMPServiceInformationManager createServiceInformationMgr ()
+  {
+    return new SQLServiceInformationManager ();
+  }
 }

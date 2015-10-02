@@ -46,6 +46,12 @@ import javax.annotation.concurrent.Immutable;
 
 import com.helger.peppol.utils.ConfigFile;
 
+/**
+ * The central configuration for the SMP server. This class manages the content
+ * of the "smp-server.properties" file.
+ *
+ * @author Philip Helger
+ */
 @Immutable
 public final class SMPServerConfiguration
 {
@@ -59,6 +65,16 @@ public final class SMPServerConfiguration
   public static ConfigFile getConfigFile ()
   {
     return s_aConfigFile;
+  }
+
+  /**
+   * @return The backend to be used. Depends on the different possible
+   *         implementations. Should not be <code>null</code>.
+   */
+  @Nullable
+  public static String getBackend ()
+  {
+    return s_aConfigFile.getString ("smp.backend");
   }
 
   @Nullable
@@ -94,17 +110,29 @@ public final class SMPServerConfiguration
     return s_aConfigFile.getBoolean ("smp.forceroot", false);
   }
 
+  /**
+   * @return <code>true</code> if the SML connection is active,
+   *         <code>false</code> if not.
+   */
   public static boolean isWriteToSML ()
   {
     return s_aConfigFile.getBoolean ("sml.active", false);
   }
 
+  /**
+   * @return The SML URL to use. Only relevant when {@link #isWriteToSML()} is
+   *         <code>true</code>.
+   */
   @Nullable
   public static String getSMLURL ()
   {
     return s_aConfigFile.getString ("sml.url");
   }
 
+  /**
+   * @return The SMP-ID to be used in the SML. Only relevant when
+   *         {@link #isWriteToSML()} is <code>true</code>.
+   */
   @Nullable
   public static String getSMLSMPID ()
   {

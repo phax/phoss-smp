@@ -20,7 +20,6 @@ import java.io.File;
 
 import javax.annotation.Nonnull;
 
-import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.callback.INonThrowingCallable;
 import com.helger.commons.microdom.IMicroDocument;
 import com.helger.commons.microdom.IMicroElement;
@@ -28,7 +27,7 @@ import com.helger.commons.microdom.MicroDocument;
 import com.helger.commons.microdom.serialize.MicroReader;
 import com.helger.commons.microdom.serialize.MicroWriter;
 import com.helger.commons.state.SuccessWithValue;
-import com.helger.peppol.smpserver.domain.ISMPManagerProviderSPI;
+import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
@@ -37,14 +36,18 @@ import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.photon.basic.app.io.WebFileIO;
 import com.helger.photon.basic.mgr.PhotonBasicManager;
 
-@IsSPIImplementation
-public final class XMLManagerProviderSPI implements ISMPManagerProviderSPI
+/**
+ * {@link ISMPManagerProvider} implementation for this backend.
+ *
+ * @author Philip Helger
+ */
+public final class XMLManagerProvider implements ISMPManagerProvider
 {
   private static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";
   private static final String SMP_REDIRECT_XML = "smp-redirect.xml";
   private static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
 
-  public XMLManagerProviderSPI ()
+  public XMLManagerProvider ()
   {
     PhotonBasicManager.getSystemMigrationMgr ()
                       .performMigrationIfNecessary ("service-metadata-2-information",

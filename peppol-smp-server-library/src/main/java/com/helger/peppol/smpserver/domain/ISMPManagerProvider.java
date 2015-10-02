@@ -38,41 +38,47 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.data.sql.mgr;
+package com.helger.peppol.smpserver.domain;
 
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.peppol.smpserver.domain.ISMPManagerProviderSPI;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 
+/**
+ * An abstract manager provider interface. This must be implemented for each
+ * supported backend. The correct implementation must be set in the MetaManager
+ * before instantiating it.
+ *
+ * @author Philip Helger
+ */
 @IsSPIImplementation
-public class SQLManagerProviderSPI implements ISMPManagerProviderSPI
+public interface ISMPManagerProvider
 {
+  /**
+   * @return A new user manager. May not be <code>null</code>.
+   */
   @Nonnull
-  public ISMPUserManager createUserMgr ()
-  {
-    return new SQLUserManager ();
-  }
+  ISMPUserManager createUserMgr ();
 
+  /**
+   * @return A new service group manager. May not be <code>null</code>.
+   */
   @Nonnull
-  public ISMPServiceGroupManager createServiceGroupMgr ()
-  {
-    return new SQLServiceGroupManager ();
-  }
+  ISMPServiceGroupManager createServiceGroupMgr ();
 
+  /**
+   * @return A new redirect manager. May not be <code>null</code>.
+   */
   @Nonnull
-  public ISMPRedirectManager createRedirectMgr ()
-  {
-    return new SQLRedirectManager ();
-  }
+  ISMPRedirectManager createRedirectMgr ();
 
+  /**
+   * @return A new service information manager. May not be <code>null</code>.
+   */
   @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr ()
-  {
-    return new SQLServiceInformationManager ();
-  }
+  ISMPServiceInformationManager createServiceInformationMgr ();
 }

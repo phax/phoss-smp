@@ -45,10 +45,10 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
-import com.helger.commons.lang.ServiceLoaderHelper;
 import com.helger.commons.scope.IScope;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -61,10 +61,30 @@ public final class MetaManager extends AbstractGlobalSingleton
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (MetaManager.class);
 
+  private static ISMPManagerProvider s_aManagerProvider = null;
+
   private ISMPUserManager m_aUserMgr;
   private ISMPServiceGroupManager m_aServiceGroupMgr;
   private ISMPRedirectManager m_aRedirectMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
+
+  /**
+   * Set the manager factory to be used. This must be called exactly once before
+   * {@link #getInstance()} is called.
+   *
+   * @param aManagerFactory
+   *        The manager factory to be used. May not be <code>null</code>.
+   * @throws IllegalStateException
+   *         If another manager factory is already present.
+   */
+  public static void setManagerFactory (@Nonnull final ISMPManagerProvider aManagerFactory)
+  {
+    ValueEnforcer.notNull (aManagerFactory, "ManagerFactory");
+    if (s_aManagerProvider != null)
+      throw new IllegalStateException ("A manager factory is already set. You cannot set this twice!");
+    s_aManagerProvider = aManagerFactory;
+    s_aLogger.info ("Using " + aManagerFactory + " as the backend");
+  }
 
   @Deprecated
   @UsedViaReflection
@@ -74,24 +94,23 @@ public final class MetaManager extends AbstractGlobalSingleton
   @Override
   protected void onAfterInstantiation (@Nonnull final IScope aScope)
   {
+    if (s_aManagerProvider == null)
+      throw new InitializationException ("No ManagerProvider is set. Please call setManagerProvider before you call getInstance!");
+
     try
     {
-      final ISMPManagerProviderSPI aFactory = ServiceLoaderHelper.getFirstSPIImplementation (ISMPManagerProviderSPI.class);
-      if (aFactory == null)
-        throw new IllegalStateException ("Found no ISMPManagerProviderSPI implementation");
-
-      m_aUserMgr = aFactory.createUserMgr ();
+      m_aUserMgr = s_aManagerProvider.createUserMgr ();
       if (m_aUserMgr == null)
         throw new IllegalStateException ("Failed to create User manager!");
 
       // Service group manager must be before redirect and service information!
-      m_aServiceGroupMgr = aFactory.createServiceGroupMgr ();
+      m_aServiceGroupMgr = s_aManagerProvider.createServiceGroupMgr ();
       if (m_aServiceGroupMgr == null)
         throw new IllegalStateException ("Failed to create ServiceGroup manager!");
-      m_aRedirectMgr = aFactory.createRedirectMgr ();
+      m_aRedirectMgr = s_aManagerProvider.createRedirectMgr ();
       if (m_aRedirectMgr == null)
         throw new IllegalStateException ("Failed to create Redirect manager!");
-      m_aServiceInformationMgr = aFactory.createServiceInformationMgr ();
+      m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr ();
       if (m_aServiceInformationMgr == null)
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 

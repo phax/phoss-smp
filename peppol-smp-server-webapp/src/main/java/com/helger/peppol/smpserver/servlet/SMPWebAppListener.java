@@ -24,7 +24,10 @@ import javax.servlet.ServletContext;
 
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import com.helger.commons.exception.InitializationException;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
+import com.helger.peppol.smpserver.data.xml.mgr.XMLManagerProvider;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.AppSecurity;
@@ -103,6 +106,17 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     // Set all security related stuff
     AppSecurity.init ();
 
+    // Determine backend
+    final String sBackend = SMPServerConfiguration.getBackend ();
+    if ("sql".equalsIgnoreCase (sBackend))
+      MetaManager.setManagerFactory (new SQLManagerProvider ());
+    else
+      if ("xml".equalsIgnoreCase (sBackend))
+        MetaManager.setManagerFactory (new XMLManagerProvider ());
+      else
+        throw new InitializationException ("Invalid backend provided. Only 'sql' and 'xml' are supported!");
+
+    // Now we can call getInstance
     MetaManager.getInstance ();
   }
 }

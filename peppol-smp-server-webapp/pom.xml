@@ -63,6 +63,10 @@
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
+      <artifactId>peppol-smp-server-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
       <artifactId>ph-commons</artifactId>
     </dependency>
     <dependency>
@@ -114,14 +118,17 @@
       <resource>
         <directory>${basedir}/src/main/resources</directory>
         <targetPath>${project.build.directory}/classes</targetPath>
+        <filtering>false</filtering>
       </resource>
       <resource>
         <directory>${basedir}/src/test/resources</directory>
         <targetPath>${project.build.directory}/test-classes</targetPath>
+        <filtering>false</filtering>
       </resource>
       <resource>
         <directory>${basedir}/src/main/webapp</directory>
         <targetPath>${project.build.directory}/webapp-classes</targetPath>
+        <filtering>false</filtering>
       </resource>
     </resources>
     
