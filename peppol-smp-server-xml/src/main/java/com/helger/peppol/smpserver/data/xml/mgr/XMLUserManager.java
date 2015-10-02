@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -72,6 +73,12 @@ public final class XMLUserManager implements ISMPUserManager
   public void deleteUser (@Nonnull final String sUserName)
   {
     // not needed
+  }
+
+  @Nonnegative
+  public int getUserCount ()
+  {
+    return AccessManager.getInstance ().getAllActiveUsers ().size ();
   }
 
   @Nonnull

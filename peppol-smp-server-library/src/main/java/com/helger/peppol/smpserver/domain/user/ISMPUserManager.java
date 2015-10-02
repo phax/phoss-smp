@@ -42,6 +42,7 @@ package com.helger.peppol.smpserver.domain.user;
 
 import java.util.Collection;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -68,6 +69,9 @@ public interface ISMPUserManager
   void updateUser (@Nonnull String sUserName, @Nonnull String sPassword);
 
   void deleteUser (@Nullable String sUserName);
+
+  @Nonnegative
+  int getUserCount ();
 
   @Nonnull
   @ReturnsMutableCopy

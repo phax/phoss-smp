@@ -27,6 +27,8 @@ import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.microdom.IMicroDocument;
 import com.helger.commons.microdom.serialize.MicroReader;
+import com.helger.commons.state.EValidity;
+import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.type.EBaseType;
 import com.helger.commons.url.ISimpleURL;
@@ -45,12 +47,15 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
+import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.basic.security.login.LoggedInUserManager;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap3.button.BootstrapButton;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
@@ -81,6 +86,23 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   public PageSecureServiceGroups (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Service groups");
+  }
+
+  @Override
+  @Nonnull
+  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
+  {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final ISMPUserManager aUserManager = MetaManager.getUserMgr ();
+    if (aUserManager.getUserCount () == 0)
+    {
+      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No user is present! At least one user must be present to create a service group."));
+      aNodeList.addChild (new BootstrapButton ().addChild ("Create new user")
+                                                .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_USERS))
+                                                .setIcon (EDefaultIcon.YES));
+      return EValidity.INVALID;
+    }
+    return super.isValidToDisplayPage (aWPEC);
   }
 
   @Override

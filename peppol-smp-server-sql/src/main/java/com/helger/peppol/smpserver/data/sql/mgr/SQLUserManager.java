@@ -43,6 +43,7 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -116,6 +117,25 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
           getEntityManager ().remove (getEntityManager ().find (DBUser.class, sUserName));
         }
       });
+  }
+
+  @Nonnegative
+  public int getUserCount ()
+  {
+    JPAExecutionResult <Long> ret;
+    ret = doSelect (new Callable <Long> ()
+    {
+      @Nonnull
+      @ReturnsMutableCopy
+      public Long call () throws Exception
+      {
+        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p) FROM DBUser p"));
+        return Long.valueOf (nCount);
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ().intValue ();
   }
 
   @Nonnull
