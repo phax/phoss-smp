@@ -519,7 +519,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                                "are not yet activated.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_NOT_BEFORE)));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not After")
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not after")
                                                  .setCtrl (new BootstrapDateTimePicker (new RequestFieldDate (FIELD_NOT_AFTER,
                                                                                                               aSelectedEndpoint != null ? aSelectedEndpoint.getServiceExpirationDate ()
                                                                                                                                         : null,
