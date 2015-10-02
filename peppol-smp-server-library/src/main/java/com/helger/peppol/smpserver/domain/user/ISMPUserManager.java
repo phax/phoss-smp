@@ -65,6 +65,8 @@ public interface ISMPUserManager
 
   void createUser (@Nonnull String sUserName, @Nonnull String sPassword);
 
+  void updateUser (@Nonnull String sUserName, @Nonnull String sPassword);
+
   void deleteUser (@Nullable String sUserName);
 
   @Nonnull

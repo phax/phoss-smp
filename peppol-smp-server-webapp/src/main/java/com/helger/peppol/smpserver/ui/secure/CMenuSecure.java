@@ -22,6 +22,7 @@ import javax.annotation.concurrent.Immutable;
 public final class CMenuSecure
 {
   // Menu item IDs
+  public static final String MENU_USERS = "users";
   public static final String MENU_SERVICE_GROUPS = "service_groups";
   public static final String MENU_ENDPOINTS = "endpoints";
   public static final String MENU_REDIRECTS = "redirects";

@@ -250,6 +250,24 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     return ret;
   }
 
+  @Nonnegative
+  public int getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
+  {
+    int ret = 0;
+    m_aRWLock.readLock ().lock ();
+    try
+    {
+      for (final ISMPServiceGroup aSG : m_aMap.values ())
+        if (aSG.getOwnerID ().equals (sOwnerID))
+          ++ret;
+    }
+    finally
+    {
+      m_aRWLock.readLock ().unlock ();
+    }
+    return ret;
+  }
+
   public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
     if (aParticipantIdentifier == null)

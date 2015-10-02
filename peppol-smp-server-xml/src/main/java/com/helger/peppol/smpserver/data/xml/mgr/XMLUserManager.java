@@ -59,12 +59,17 @@ public final class XMLUserManager implements ISMPUserManager
     return false;
   }
 
-  public void createUser (final String sUserName, final String sPassword)
+  public void createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
     // not needed
   }
 
-  public void deleteUser (final String sUserName)
+  public void updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
+  {
+    // not needed
+  }
+
+  public void deleteUser (@Nonnull final String sUserName)
   {
     // not needed
   }

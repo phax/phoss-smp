@@ -90,6 +90,22 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
     });
   }
 
+  public void updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
+  {
+    doInTransaction (new Runnable ()
+    {
+      public void run ()
+      {
+        final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUserName);
+        if (aDBUser != null)
+        {
+          aDBUser.setPassword (sPassword);
+          getEntityManager ().merge (aDBUser);
+        }
+      }
+    });
+  }
+
   public void deleteUser (@Nullable final String sUserName)
   {
     if (StringHelper.hasText (sUserName))

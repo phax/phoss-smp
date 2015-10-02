@@ -265,6 +265,27 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     return ret.get ();
   }
 
+  @Nonnegative
+  public int getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
+  {
+    JPAExecutionResult <Long> ret;
+    ret = doSelect (new Callable <Long> ()
+    {
+      @Nonnull
+      @ReturnsMutableCopy
+      public Long call () throws Exception
+      {
+        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p) FROM DBOwnership p WHERE p.user.userName = :user",
+                                                                                   DBOwnership.class)
+                                                                     .setParameter ("user", sOwnerID));
+        return Long.valueOf (nCount);
+      }
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ().intValue ();
+  }
+
   @Nullable
   public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {

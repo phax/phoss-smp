@@ -40,10 +40,10 @@
  */
 package com.helger.peppol.smpserver.data.sql.model;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -53,7 +53,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
-import com.helger.peppol.smpserver.domain.user.ISMPUser;
+import com.helger.peppol.smpserver.domain.user.ISMPUserEditable;
 
 /**
  * Represents a single user within the SMP database.
@@ -62,7 +62,7 @@ import com.helger.peppol.smpserver.domain.user.ISMPUser;
  */
 @Entity
 @Table (name = "smp_user")
-public class DBUser implements Serializable, ISMPUser
+public class DBUser implements ISMPUserEditable
 {
   private String m_sUserName;
   private String m_sPassword;
@@ -73,10 +73,10 @@ public class DBUser implements Serializable, ISMPUser
   public DBUser ()
   {}
 
-  public DBUser (final String sUserName, final String sPassword)
+  public DBUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
-    m_sUserName = sUserName;
-    m_sPassword = sPassword;
+    setUserName (sUserName);
+    setPassword (sPassword);
   }
 
   @Transient
@@ -92,7 +92,7 @@ public class DBUser implements Serializable, ISMPUser
     return m_sUserName;
   }
 
-  public void setUserName (final String sUserName)
+  public void setUserName (@Nonnull final String sUserName)
   {
     m_sUserName = sUserName;
   }
@@ -103,7 +103,7 @@ public class DBUser implements Serializable, ISMPUser
     return m_sPassword;
   }
 
-  public void setPassword (final String sPassword)
+  public void setPassword (@Nonnull final String sPassword)
   {
     m_sPassword = sPassword;
   }

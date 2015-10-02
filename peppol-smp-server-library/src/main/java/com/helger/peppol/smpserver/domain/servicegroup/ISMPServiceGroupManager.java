@@ -34,6 +34,9 @@ public interface ISMPServiceGroupManager
   @ReturnsMutableCopy
   Collection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull String sOwnerID);
 
+  @Nonnegative
+  int getSMPServiceGroupCountOfOwner (@Nonnull String sOwnerID);
+
   @Nullable
   ISMPServiceGroup getSMPServiceGroupOfID (@Nullable IParticipantIdentifier aParticipantIdentifier);
 

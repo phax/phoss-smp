@@ -38,7 +38,6 @@ import com.helger.commons.microdom.IMicroElement;
 import com.helger.commons.microdom.MicroDocument;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
-import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
@@ -126,23 +125,6 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
                                           sSMPServiceInformationID +
                                           "' is already in use!");
     m_aMap.put (aSMPServiceInformation.getID (), aSMPServiceInformation);
-  }
-
-  @Nullable
-  private SMPServiceInformation _getSMPServiceInformationOfID (@Nullable final String sID)
-  {
-    if (StringHelper.hasNoText (sID))
-      return null;
-
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.get (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
   }
 
   @Nullable
