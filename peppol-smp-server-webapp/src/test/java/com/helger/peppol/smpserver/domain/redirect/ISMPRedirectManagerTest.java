@@ -27,11 +27,11 @@ import org.junit.rules.TestRule;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.smpserver.SMPServerTestRule;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
-import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 import com.helger.photon.basic.security.CSecurity;
 
 /**
@@ -42,7 +42,7 @@ import com.helger.photon.basic.security.CSecurity;
 public final class ISMPRedirectManagerTest
 {
   @Rule
-  public final TestRule m_aTestRule = new PhotonBasicWebTestRule ();
+  public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
   public void testRedirect ()

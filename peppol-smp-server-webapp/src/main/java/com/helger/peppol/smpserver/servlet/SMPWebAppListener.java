@@ -82,6 +82,22 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     return ret;
   }
 
+  public static void initBackendFromConfiguration ()
+  {
+    // Determine backend
+    final String sBackend = SMPServerConfiguration.getBackend ();
+    if ("sql".equalsIgnoreCase (sBackend))
+      MetaManager.setManagerFactory (new SQLManagerProvider ());
+    else
+      if ("xml".equalsIgnoreCase (sBackend))
+        MetaManager.setManagerFactory (new XMLManagerProvider ());
+      else
+        throw new InitializationException ("Invalid backend provided. Only 'sql' and 'xml' are supported!");
+
+    // Now we can call getInstance
+    MetaManager.getInstance ();
+  }
+
   @Override
   protected void initGlobals ()
   {
@@ -107,16 +123,6 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     AppSecurity.init ();
 
     // Determine backend
-    final String sBackend = SMPServerConfiguration.getBackend ();
-    if ("sql".equalsIgnoreCase (sBackend))
-      MetaManager.setManagerFactory (new SQLManagerProvider ());
-    else
-      if ("xml".equalsIgnoreCase (sBackend))
-        MetaManager.setManagerFactory (new XMLManagerProvider ());
-      else
-        throw new InitializationException ("Invalid backend provided. Only 'sql' and 'xml' are supported!");
-
-    // Now we can call getInstance
-    MetaManager.getInstance ();
+    initBackendFromConfiguration ();
   }
 }
