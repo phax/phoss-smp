@@ -40,23 +40,50 @@
  */
 package com.helger.peppol.smpserver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
+import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.string.StringHelper;
+import com.helger.commons.system.SystemProperties;
 import com.helger.peppol.utils.ConfigFile;
 
 /**
  * The central configuration for the SMP server. This class manages the content
- * of the "smp-server.properties" file.
+ * of the "smp-server.properties" file. The order of the properties file
+ * resolving is as follows:
+ * <ol>
+ * <li>Check for the value of the system property
+ * <code>smpserver.properties.path</code></li>
+ * <li>The filename <code>private-smp-server.properties</code> in the root of
+ * the classpath</li>
+ * <li>The filename <code>smp-server.properties</code> in the root of the
+ * classpath</li>
+ * </ol>
  *
  * @author Philip Helger
  */
 @Immutable
 public final class SMPServerConfiguration
 {
-  private static final ConfigFile s_aConfigFile = new ConfigFile ("private-smp-server.properties",
-                                                                  "smp-server.properties");
+  private static final ConfigFile s_aConfigFile;
+
+  static
+  {
+    final List <String> aFilePaths = new ArrayList <> ();
+    // Check if the
+    final String sPropertyPath = SystemProperties.getPropertyValue ("smpserver.properties.path");
+    if (StringHelper.hasText (sPropertyPath))
+      aFilePaths.add (sPropertyPath);
+    aFilePaths.add ("private-smp-server.properties");
+    aFilePaths.add ("smp-server.properties");
+
+    s_aConfigFile = new ConfigFile (ArrayHelper.newArray (aFilePaths, String.class));
+  }
 
   private SMPServerConfiguration ()
   {}
