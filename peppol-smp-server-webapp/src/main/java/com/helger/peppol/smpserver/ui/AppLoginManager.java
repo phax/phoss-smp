@@ -21,6 +21,7 @@ import java.util.Collection;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.ReturnsImmutableObject;
+import com.helger.peppol.smpserver.app.CApp;
 import com.helger.photon.basic.security.login.ELoginResult;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginHTMLProvider;
 import com.helger.photon.core.app.html.IHTMLProvider;

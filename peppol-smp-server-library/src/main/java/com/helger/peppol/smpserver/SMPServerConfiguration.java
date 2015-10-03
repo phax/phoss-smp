@@ -58,7 +58,7 @@ import com.helger.peppol.utils.ConfigFile;
  * resolving is as follows:
  * <ol>
  * <li>Check for the value of the system property
- * <code>smpserver.properties.path</code></li>
+ * <code>smp.server.properties.path</code></li>
  * <li>The filename <code>private-smp-server.properties</code> in the root of
  * the classpath</li>
  * <li>The filename <code>smp-server.properties</code> in the root of the
@@ -76,7 +76,7 @@ public final class SMPServerConfiguration
   {
     final List <String> aFilePaths = new ArrayList <> ();
     // Check if the
-    final String sPropertyPath = SystemProperties.getPropertyValue ("smpserver.properties.path");
+    final String sPropertyPath = SystemProperties.getPropertyValue ("smp.server.properties.path");
     if (StringHelper.hasText (sPropertyPath))
       aFilePaths.add (sPropertyPath);
     aFilePaths.add ("private-smp-server.properties");

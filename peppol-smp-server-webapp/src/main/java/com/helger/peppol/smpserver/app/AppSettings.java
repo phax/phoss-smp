@@ -14,33 +14,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.ui;
+package com.helger.peppol.smpserver.app;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.io.resource.ClassPathResource;
+import com.helger.commons.io.resource.FileSystemResource;
+import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
+import com.helger.commons.string.StringHelper;
+import com.helger.commons.system.SystemProperties;
 import com.helger.settings.ISettings;
 import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
 
 /**
- * This class provides access to the settings as contained in the
- * <code>webapp.properties</code> file.
+ * This class provides access to the web application settings. If the system
+ * property <code>smp.webapp.properties.path</code> is defined, the
+ * configuration file is read from the absolute path stated there. Otherwise (by
+ * default) the configuration settings contained in the
+ * <code>src/main/resources/webapp.properties</code> file are read.
  *
  * @author Philip Helger
  */
 public final class AppSettings extends AbstractGlobalSingleton
 {
-  /** The name of the file containing the settings */
+  /** The name of the classpath resource containing the settings */
   public static final String FILENAME = "webapp.properties";
+
+  private static final Logger s_aLogger = LoggerFactory.getLogger (AppSettings.class);
+
+  private static final IReadableResource s_aRes;
   private static final ISettings s_aSettings;
 
   static
   {
-    s_aSettings = new SettingsPersistenceProperties ().readSettings (new ClassPathResource (FILENAME));
+    final String sPropertyPath = SystemProperties.getPropertyValue ("smp.webapp.properties.path");
+    if (StringHelper.hasText (sPropertyPath))
+      s_aRes = new FileSystemResource (sPropertyPath);
+    else
+      s_aRes = new ClassPathResource (FILENAME);
+
+    s_aLogger.info ("Reading webapp.properties from " + s_aRes.getPath ());
+    final SettingsPersistenceProperties aSPP = new SettingsPersistenceProperties ();
+    s_aSettings = aSPP.readSettings (s_aRes);
   }
 
   @Deprecated
@@ -52,6 +74,12 @@ public final class AppSettings extends AbstractGlobalSingleton
   public static ISettings getSettingsObject ()
   {
     return s_aSettings;
+  }
+
+  @Nonnull
+  public static IReadableResource getSettingsResource ()
+  {
+    return s_aRes;
   }
 
   @Nullable

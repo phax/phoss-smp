@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.state.EContinue;
+import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.ui.AppLoginManager;
-import com.helger.peppol.smpserver.ui.CApp;
 import com.helger.photon.basic.security.AccessManager;
 import com.helger.photon.basic.security.login.LoggedInUserManager;
 import com.helger.photon.core.app.CApplication;

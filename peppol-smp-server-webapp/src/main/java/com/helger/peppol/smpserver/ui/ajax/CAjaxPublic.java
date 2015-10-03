@@ -18,7 +18,7 @@ package com.helger.peppol.smpserver.ui.ajax;
 
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.peppol.smpserver.ui.CApp;
+import com.helger.peppol.smpserver.app.CApp;
 import com.helger.photon.core.ajax.IAjaxFunctionDeclaration;
 import com.helger.photon.core.ajax.decl.PublicApplicationAjaxFunctionDeclaration;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;

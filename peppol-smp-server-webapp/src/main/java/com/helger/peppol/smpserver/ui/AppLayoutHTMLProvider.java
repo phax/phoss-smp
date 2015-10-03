@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.OverrideOnDemand;
 import com.helger.html.hc.html.root.HCHtml;
+import com.helger.peppol.smpserver.app.CApp;
 import com.helger.photon.basic.app.request.IRequestManager;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;

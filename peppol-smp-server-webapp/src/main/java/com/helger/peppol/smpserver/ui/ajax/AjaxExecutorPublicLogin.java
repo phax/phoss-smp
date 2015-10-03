@@ -27,7 +27,7 @@ import com.helger.commons.debug.GlobalDebug;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.render.HCRenderer;
 import com.helger.json.JsonObject;
-import com.helger.peppol.smpserver.ui.CApp;
+import com.helger.peppol.smpserver.app.CApp;
 import com.helger.photon.basic.security.login.ELoginResult;
 import com.helger.photon.basic.security.login.LoggedInUserManager;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;

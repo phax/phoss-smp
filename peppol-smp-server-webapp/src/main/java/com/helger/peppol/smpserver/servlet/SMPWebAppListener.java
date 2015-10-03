@@ -26,12 +26,12 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.helger.commons.exception.InitializationException;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.app.AppSecurity;
+import com.helger.peppol.smpserver.app.AppSettings;
 import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
 import com.helger.peppol.smpserver.data.xml.mgr.XMLManagerProvider;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
-import com.helger.peppol.smpserver.ui.AppSecurity;
-import com.helger.peppol.smpserver.ui.AppSettings;
 import com.helger.peppol.smpserver.ui.pub.InitializerPublic;
 import com.helger.peppol.smpserver.ui.secure.InitializerSecure;
 import com.helger.photon.basic.app.request.ApplicationRequestManager;
