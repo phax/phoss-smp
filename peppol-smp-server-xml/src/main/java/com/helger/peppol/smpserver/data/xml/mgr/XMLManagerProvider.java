@@ -16,25 +16,15 @@
  */
 package com.helger.peppol.smpserver.data.xml.mgr;
 
-import java.io.File;
-
 import javax.annotation.Nonnull;
 
-import com.helger.commons.callback.INonThrowingCallable;
-import com.helger.commons.microdom.IMicroDocument;
-import com.helger.commons.microdom.IMicroElement;
-import com.helger.commons.microdom.MicroDocument;
-import com.helger.commons.microdom.serialize.MicroReader;
-import com.helger.commons.microdom.serialize.MicroWriter;
-import com.helger.commons.state.SuccessWithValue;
+import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.photon.basic.app.dao.impl.DAOException;
-import com.helger.photon.basic.app.io.WebFileIO;
-import com.helger.photon.basic.mgr.PhotonBasicManager;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.
@@ -43,48 +33,12 @@ import com.helger.photon.basic.mgr.PhotonBasicManager;
  */
 public final class XMLManagerProvider implements ISMPManagerProvider
 {
-  private static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";
-  private static final String SMP_REDIRECT_XML = "smp-redirect.xml";
-  private static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
+  public static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";
+  public static final String SMP_REDIRECT_XML = "smp-redirect.xml";
+  public static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
 
   public XMLManagerProvider ()
-  {
-    PhotonBasicManager.getSystemMigrationMgr ()
-                      .performMigrationIfNecessary ("service-metadata-2-information",
-                                                    new INonThrowingCallable <SuccessWithValue <String>> ()
-                                                    {
-                                                      public SuccessWithValue <String> call ()
-                                                      {
-                                                        final File aOldFile = WebFileIO.getDataIO ()
-                                                                                       .getFile ("smp-servicemetadata.xml");
-                                                        final IMicroDocument aOldDoc = MicroReader.readMicroXML (aOldFile);
-                                                        if (aOldDoc != null)
-                                                        {
-                                                          final IMicroDocument aNewDoc = new MicroDocument ();
-                                                          final IMicroElement eNewRoot = aNewDoc.appendElement ("serviceinformationlist");
-                                                          for (final IMicroElement eOldMetadata : aOldDoc.getDocumentElement ()
-                                                                                                         .getAllChildElements ("servicemetadata"))
-                                                          {
-                                                            final String sID = eOldMetadata.getAttributeValue ("id");
-                                                            final String sSGID = eOldMetadata.getAttributeValue ("sgid");
-                                                            final IMicroElement eOldSI = eOldMetadata.getFirstChildElement ("serviceinfo");
-                                                            final IMicroElement eNewSI = eNewRoot.appendElement ("serviceinformation");
-                                                            eNewSI.setAttribute ("id", sID);
-                                                            eNewSI.setAttribute ("servicegroupid", sSGID);
-                                                            for (final IMicroElement eChild : eOldSI.getAllChildElements ())
-                                                              eNewSI.appendChild (eChild.detachFromParent ());
-                                                          }
-                                                          if (MicroWriter.writeToFile (aNewDoc,
-                                                                                       WebFileIO.getDataIO ()
-                                                                                                .getFile (SMP_SERVICE_INFORMATION_XML))
-                                                                         .isFailure ())
-                                                            return SuccessWithValue.createFailure ("Failed to write new file");
-                                                          WebFileIO.getFileOpMgr ().deleteFile (aOldFile);
-                                                        }
-                                                        return SuccessWithValue.createSuccess (null);
-                                                      }
-                                                    });
-  }
+  {}
 
   @Nonnull
   public ISMPUserManager createUserMgr ()
@@ -129,5 +83,11 @@ public final class XMLManagerProvider implements ISMPManagerProvider
     {
       throw new RuntimeException (ex.getMessage (), ex);
     }
+  }
+
+  @Override
+  public String toString ()
+  {
+    return new ToStringGenerator (this).toString ();
   }
 }

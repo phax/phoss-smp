@@ -42,6 +42,7 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -50,11 +51,14 @@ import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.
- * 
+ *
  * @author Philip Helger
  */
 public final class SQLManagerProvider implements ISMPManagerProvider
 {
+  public SQLManagerProvider ()
+  {}
+
   @Nonnull
   public ISMPUserManager createUserMgr ()
   {
@@ -77,5 +81,11 @@ public final class SQLManagerProvider implements ISMPManagerProvider
   public ISMPServiceInformationManager createServiceInformationMgr ()
   {
     return new SQLServiceInformationManager ();
+  }
+
+  @Override
+  public String toString ()
+  {
+    return new ToStringGenerator (this).toString ();
   }
 }

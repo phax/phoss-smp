@@ -55,7 +55,7 @@ import com.helger.photon.basic.security.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect>implements ISMPRedirectManager
+public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> implements ISMPRedirectManager
 {
   private static final String ELEMENT_ROOT = "redirects";
   private static final String ELEMENT_ITEM = "redirect";
@@ -134,7 +134,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect>implem
     AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
-                                      aSMPRedirect.getDocumentTypeIdentifier (),
+                                      aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
                                       aSMPRedirect.getExtension ());
@@ -158,7 +158,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect>implem
     AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
-                                      aSMPRedirect.getDocumentTypeIdentifier (),
+                                      aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
                                       aSMPRedirect.getExtension ());
@@ -241,7 +241,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect>implem
     AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
-                                      aSMPRedirect.getDocumentTypeIdentifier ());
+                                      aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded ());
     return EChange.CHANGED;
   }
 

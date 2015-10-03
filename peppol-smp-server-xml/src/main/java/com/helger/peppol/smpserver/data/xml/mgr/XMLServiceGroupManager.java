@@ -36,6 +36,7 @@ import com.helger.commons.microdom.MicroDocument;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.domain.MetaManager;
 import com.helger.peppol.smpserver.domain.SMPHelper;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -48,7 +49,7 @@ import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.photon.basic.app.dao.impl.EDAOActionType;
 import com.helger.photon.basic.security.audit.AuditHelper;
 
-public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGroup>implements ISMPServiceGroupManager
+public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGroup> implements ISMPServiceGroupManager
 {
   private static final String ELEMENT_ROOT = "servicegroups";
   private static final String ELEMENT_ITEM = "servicegroup";
@@ -140,7 +141,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
                                       aSMPServiceGroup.getID (),
                                       sOwnerID,
-                                      aParticipantIdentifier,
+                                      IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier),
                                       sExtension);
     return aSMPServiceGroup;
   }

@@ -60,7 +60,7 @@ import com.helger.photon.basic.security.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServiceInformation>implements ISMPServiceInformationManager
+public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServiceInformation> implements ISMPServiceInformationManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceInformationManager.class);
   private static final String ELEMENT_ROOT = "serviceinformationlist";
@@ -200,7 +200,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
                                         aOldInformation.getID (),
                                         aOldInformation.getServiceGroupID (),
-                                        aOldInformation.getDocumentTypeIdentifier (),
+                                        aOldInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aOldInformation.getAllProcesses (),
                                         aOldInformation.getExtension ());
     }
@@ -219,7 +219,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
       AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
                                         aSMPServiceInformation.getID (),
                                         aSMPServiceInformation.getServiceGroupID (),
-                                        aSMPServiceInformation.getDocumentTypeIdentifier (),
+                                        aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aSMPServiceInformation.getAllProcesses (),
                                         aSMPServiceInformation.getExtension ());
     }
@@ -249,7 +249,8 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     }
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
                                       aSMPServiceInformation.getID (),
-                                      aSMPServiceInformation.getServiceGroupID ());
+                                      aSMPServiceInformation.getServiceGroupID (),
+                                      aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded ());
     return EChange.CHANGED;
   }
 
