@@ -92,7 +92,9 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
       if ("xml".equalsIgnoreCase (sBackend))
         MetaManager.setManagerFactory (new XMLManagerProvider ());
       else
-        throw new InitializationException ("Invalid backend provided. Only 'sql' and 'xml' are supported!");
+        throw new InitializationException ("Invalid backend '" +
+                                           sBackend +
+                                           "' provided. Only 'sql' and 'xml' are supported!");
 
     // Now we can call getInstance
     MetaManager.getInstance ();
