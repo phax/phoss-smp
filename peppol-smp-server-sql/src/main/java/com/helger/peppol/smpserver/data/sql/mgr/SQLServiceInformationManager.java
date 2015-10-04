@@ -42,9 +42,7 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
@@ -97,30 +95,27 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                @Nonnull final DBServiceMetadata aDBMetadata,
                                @Nonnull final ISMPServiceInformation aServiceInfo)
   {
-    // Mutable object
-    final Set <DBProcess> aDBProcesses = aDBMetadata.getProcesses ();
-
-    // For all existing processes
-    for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
+    // For all DB processes
+    // Create a copy to avoid concurrent modification
+    for (final DBProcess aDBProcess : CollectionHelper.newList (aDBMetadata.getProcesses ()))
     {
-      DBProcess aUpdateDBProcess = null;
-      for (final DBProcess aDBProcess : aDBProcesses)
+      boolean bProcessFound = false;
+      for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
         if (IdentifierHelper.areProcessIdentifiersEqual (aDBProcess.getId ().getAsProcessIdentifier (),
                                                          aProcess.getProcessIdentifier ()))
         {
-          // Found a matching DB process for updating
-          aUpdateDBProcess = aDBProcess;
+          bProcessFound = true;
 
-          // Search for process to be edited or deleted
+          // Check for endpoint update
           // Create a copy to avoid concurrent modification
           for (final DBEndpoint aDBEndpoint : CollectionHelper.newList (aDBProcess.getEndpoints ()))
           {
-            boolean bFound = false;
+            boolean bEndpointFound = false;
             for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
               if (aDBEndpoint.getId ().getTransportProfile ().equals (aEndpoint.getTransportProfile ()))
               {
                 // And endpoint for updating was found
-                bFound = true;
+                bEndpointFound = true;
                 aDBEndpoint.setEndpointReference (aEndpoint.getEndpointReference ());
                 aDBEndpoint.setRequireBusinessLevelSignature (aEndpoint.isRequireBusinessLevelSignature ());
                 aDBEndpoint.setMinimumAuthenticationLevel (aEndpoint.getMinimumAuthenticationLevel ());
@@ -134,7 +129,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                 break;
               }
 
-            if (!bFound)
+            if (!bEndpointFound)
             {
               // Not contained in new set
               aDBProcess.getEndpoints ().remove (aDBEndpoint);
@@ -145,15 +140,15 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
           // Search for new endpoints
           for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
           {
-            boolean bFound = false;
+            boolean bEndpointFound = false;
             for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
               if (aDBEndpoint.getId ().getTransportProfile ().equals (aEndpoint.getTransportProfile ()))
               {
-                bFound = true;
+                bEndpointFound = true;
                 break;
               }
 
-            if (!bFound)
+            if (!bEndpointFound)
             {
               // Create a new endpoint
               final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (),
@@ -170,6 +165,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                              aEndpoint.getTechnicalInformationUrl (),
                                                              aEndpoint.getExtension ());
               aDBProcess.getEndpoints ().add (aDBEndpoint);
+              aEM.persist (aDBEndpoint);
             }
           }
 
@@ -178,14 +174,33 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
           break;
         }
 
-      if (aUpdateDBProcess == null)
+      if (!bProcessFound)
+      {
+        // Not contained in new set
+        aDBMetadata.getProcesses ().remove (aDBProcess);
+        aEM.remove (aDBProcess);
+      }
+    }
+
+    // Search for new processes
+    for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
+    {
+      boolean bProcessFound = false;
+      for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
+        if (IdentifierHelper.areProcessIdentifiersEqual (aDBProcess.getId ().getAsProcessIdentifier (),
+                                                         aProcess.getProcessIdentifier ()))
+        {
+          bProcessFound = true;
+          break;
+        }
+
+      if (!bProcessFound)
       {
         // Create a new process with new endpoints
         final DBProcess aDBProcess = new DBProcess (new DBProcessID (aDBMetadata.getId (),
                                                                      aProcess.getProcessIdentifier ()),
                                                     aDBMetadata,
                                                     aProcess.getExtension ());
-        final Set <DBEndpoint> aDBEndpoints = new HashSet <> ();
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
           final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (),
@@ -201,10 +216,11 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                          aEndpoint.getTechnicalContactUrl (),
                                                          aEndpoint.getTechnicalInformationUrl (),
                                                          aEndpoint.getExtension ());
-          aDBEndpoints.add (aDBEndpoint);
+          aDBProcess.getEndpoints ().add (aDBEndpoint);
+          aEM.persist (aDBEndpoint);
         }
-        aDBProcess.setEndpoints (aDBEndpoints);
-        aDBProcesses.add (aDBProcess);
+        aDBMetadata.getProcesses ().add (aDBProcess);
+        aEM.persist (aDBProcess);
       }
     }
 

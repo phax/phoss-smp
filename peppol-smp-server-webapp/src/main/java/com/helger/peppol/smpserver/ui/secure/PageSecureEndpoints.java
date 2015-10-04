@@ -412,29 +412,32 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
     if (aFormErrors.isEmpty ())
     {
-      ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                                   aDocTypeID);
+      SMPServiceInformation aServiceInfo = (SMPServiceInformation) aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                                                          aDocTypeID);
       if (aServiceInfo == null)
         aServiceInfo = new SMPServiceInformation (aServiceGroup, aDocTypeID, null, null);
 
-      ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
+      SMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
       if (aProcess == null)
+      {
         aProcess = new SMPProcess (aProcessID, null, null);
+        aServiceInfo.addProcess (aProcess);
+      }
 
       aProcess.deleteEndpoint (sTransportProfile);
-      ((SMPProcess) aProcess).addEndpoint (new SMPEndpoint (sTransportProfile,
-                                                            sEndpointReference,
-                                                            bRequireBusinessLevelSignature,
-                                                            sMinimumAuthenticationLevel,
-                                                            aNotBeforeDate == null ? null
-                                                                                   : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
-                                                            aNotAfterDate == null ? null
-                                                                                  : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
-                                                            sCertificate,
-                                                            sServiceDescription,
-                                                            sTechnicalContact,
-                                                            sTechnicalInformation,
-                                                            sExtension));
+      aProcess.addEndpoint (new SMPEndpoint (sTransportProfile,
+                                             sEndpointReference,
+                                             bRequireBusinessLevelSignature,
+                                             sMinimumAuthenticationLevel,
+                                             aNotBeforeDate == null ? null
+                                                                    : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
+                                             aNotAfterDate == null ? null
+                                                                   : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
+                                             sCertificate,
+                                             sServiceDescription,
+                                             sTechnicalContact,
+                                             sTechnicalInformation,
+                                             sExtension));
 
       aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfo);
       if (bEdit)
