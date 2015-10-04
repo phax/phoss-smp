@@ -500,10 +500,10 @@ public final class SMPServerAPI
 
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
-                                                                                      aDocTypeID,
-                                                                                      aProcesses,
-                                                                                      SMPExtensionConverter.convertToString (aServiceMetadata.getServiceInformation ()
-                                                                                                                                             .getExtension ())));
+                                                                             aDocTypeID,
+                                                                             aProcesses,
+                                                                             SMPExtensionConverter.convertToString (aServiceMetadata.getServiceInformation ()
+                                                                                                                                    .getExtension ())));
     }
 
     s_aLogger.info ("Finished saveServiceRegistration(" +

@@ -49,7 +49,6 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.debug.GlobalDebug;
 import com.helger.db.jpa.AbstractGlobalEntityManagerFactory;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.ConfigFile;
@@ -88,7 +87,7 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
     ret.put (PersistenceUnitProperties.CACHE_SHARED_DEFAULT, "false");
 
     // Enable this line for SQL debug logging
-    if (GlobalDebug.isDebugMode ())
+    if (false)
       ret.put (PersistenceUnitProperties.LOGGING_LEVEL, "finer");
 
     return ret;

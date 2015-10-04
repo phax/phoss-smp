@@ -29,6 +29,6 @@ public class SMPTransportProfileSelect extends HCSelect
     super (aRF);
 
     for (final ESMPTransportProfile eTP : ESMPTransportProfile.values ())
-      addOption (eTP.getID (), eTP.getName ());
+      addOption (eTP.getID (), eTP.getID () + " [" + eTP.getName () + "]");
   }
 }

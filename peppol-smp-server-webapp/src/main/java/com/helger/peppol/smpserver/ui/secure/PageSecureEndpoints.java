@@ -368,6 +368,14 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       if (eTransportProfile == null)
         aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE,
                                    "Transport Profile of type '" + sTransportProfile + "' does not exist!");
+    if (!bEdit &&
+        aServiceGroup != null &&
+        aDocTypeID != null &&
+        aProcessID != null &&
+        eTransportProfile != null &&
+        aServiceInfoMgr.findServiceInformation (aServiceGroup, aDocTypeID, aProcessID, eTransportProfile) != null)
+      aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE,
+                                 "Another endpoint for the provided service group, document type, process and transport profile is already present.");
 
     if (StringHelper.isEmpty (sEndpointReference))
       aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "Endpoint Reference must not be empty!");

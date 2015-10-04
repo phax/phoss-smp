@@ -145,6 +145,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final boolean bEdit = eFormAction.isEdit ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
     final String sParticipantID = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID);
     SimpleParticipantIdentifier aParticipantID = null;
@@ -160,6 +161,10 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
       aParticipantID = SimpleParticipantIdentifier.createFromURIPartOrNull (sParticipantID);
       if (aParticipantID == null)
         aFormErrors.addFieldError (FIELD_PARTICIPANT_ID, "The provided participant ID has an invalid syntax!");
+      else
+        if (!bEdit && aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID) != null)
+          aFormErrors.addFieldError (FIELD_PARTICIPANT_ID,
+                                     "Another service group for the same participant ID is already present!");
     }
 
     if (StringHelper.isEmpty (sOwningUserID))
@@ -177,7 +182,6 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
     if (aFormErrors.isEmpty ())
     {
-      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       if (bEdit)
       {
         // Edit only the internal data objects because no change to the SML is
