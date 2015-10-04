@@ -61,8 +61,8 @@ public final class ISMPServiceGroupManagerTest
       assertNotNull (aSGMgr);
 
       // Check empty state
-      assertEquals (0, aSGMgr.getSMPServiceGroupCount ());
-      assertEquals (0, aSGMgr.getAllSMPServiceGroups ().size ());
+      final int nCount = aSGMgr.getSMPServiceGroupCount ();
+      assertEquals (nCount, aSGMgr.getAllSMPServiceGroups ().size ());
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI1));
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI2));
       assertNull (aSGMgr.getSMPServiceGroupOfID (aPI1));
@@ -85,8 +85,8 @@ public final class ISMPServiceGroupManagerTest
       assertEquals (sExtension, aSG1.getExtension ());
 
       // Check manager state
-      assertEquals (1, aSGMgr.getSMPServiceGroupCount ());
-      assertEquals (1, aSGMgr.getAllSMPServiceGroups ().size ());
+      assertEquals (nCount + 1, aSGMgr.getSMPServiceGroupCount ());
+      assertEquals (nCount + 1, aSGMgr.getAllSMPServiceGroups ().size ());
       assertTrue (aSGMgr.getAllSMPServiceGroups ().contains (aSG1));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI1));
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI2));
@@ -115,8 +115,8 @@ public final class ISMPServiceGroupManagerTest
       assertEquals (sExtension, aSG2.getExtension ());
 
       // Check manager state
-      assertEquals (2, aSGMgr.getSMPServiceGroupCount ());
-      assertEquals (2, aSGMgr.getAllSMPServiceGroups ().size ());
+      assertEquals (nCount + 2, aSGMgr.getSMPServiceGroupCount ());
+      assertEquals (nCount + 2, aSGMgr.getAllSMPServiceGroups ().size ());
       assertTrue (aSGMgr.getAllSMPServiceGroups ().contains (aSG1));
       assertTrue (aSGMgr.getAllSMPServiceGroups ().contains (aSG2));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI1));

@@ -74,7 +74,7 @@ public final class ISMPRedirectManagerTest
       assertEquals ("target", aRedirect.getTargetHref ());
       assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
       assertEquals ("extredirect", aRedirect.getExtension ());
-      assertEquals (1, aRedirectMgr.getSMPRedirectCount ());
+      final int nCount = aRedirectMgr.getSMPRedirectCount ();
 
       // Update existing
       aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target2", "suid2", "extredirect2");
@@ -84,7 +84,7 @@ public final class ISMPRedirectManagerTest
       assertEquals ("target2", aRedirect.getTargetHref ());
       assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
       assertEquals ("extredirect2", aRedirect.getExtension ());
-      assertEquals (1, aRedirectMgr.getSMPRedirectCount ());
+      assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
 
       // Add second one
       final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI2, null);
@@ -95,13 +95,13 @@ public final class ISMPRedirectManagerTest
       assertEquals ("target2", aRedirect.getTargetHref ());
       assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
       assertEquals ("extredirect2", aRedirect.getExtension ());
-      assertEquals (2, aRedirectMgr.getSMPRedirectCount ());
+      assertEquals (nCount + 1, aRedirectMgr.getSMPRedirectCount ());
 
       // Cleanup
       assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG2).isChanged ());
-      assertEquals (1, aRedirectMgr.getSMPRedirectCount ());
+      assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
       assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG).isChanged ());
-      assertEquals (0, aRedirectMgr.getSMPRedirectCount ());
+      assertEquals (nCount - 1, aRedirectMgr.getSMPRedirectCount ());
       assertTrue (aSGMgr.deleteSMPServiceGroup (aPI2).isChanged ());
       assertTrue (aSGMgr.deleteSMPServiceGroup (aPI).isChanged ());
     }
