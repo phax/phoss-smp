@@ -81,13 +81,13 @@ public class SMPProcess implements ISMPProcess
   private String m_sExtension;
 
   public SMPProcess (@Nonnull final IProcessIdentifier aProcessIdentifier,
-                     @Nonnull final List <SMPEndpoint> aEndpoints,
+                     @Nullable final List <SMPEndpoint> aEndpoints,
                      @Nullable final String sExtension)
   {
     setProcessIdentifier (aProcessIdentifier);
-    ValueEnforcer.notEmptyNoNullValue (aEndpoints, "Endpoints");
-    for (final SMPEndpoint aEndpoint : aEndpoints)
-      addEndpoint (aEndpoint);
+    if (aEndpoints != null)
+      for (final SMPEndpoint aEndpoint : aEndpoints)
+        addEndpoint (aEndpoint);
     setExtension (sExtension);
   }
 

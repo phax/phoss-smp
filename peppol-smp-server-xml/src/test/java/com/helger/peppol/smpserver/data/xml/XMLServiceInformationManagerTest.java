@@ -84,7 +84,7 @@ public final class XMLServiceInformationManagerTest
                                                  "ti",
                                                  "extep");
         final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-        aServiceInformationMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aSG,
+        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
                                                                                                aDocTypeID,
                                                                                                CollectionHelper.newList (aProcess),
                                                                                                "extsi"));
@@ -114,7 +114,7 @@ public final class XMLServiceInformationManagerTest
                                                  "ti",
                                                  "extep");
         final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-        aServiceInformationMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aSG,
+        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
                                                                                                aDocTypeID,
                                                                                                CollectionHelper.newList (aProcess),
                                                                                                "extsi"));
@@ -152,7 +152,7 @@ public final class XMLServiceInformationManagerTest
                                                  "ti",
                                                  "extep");
         final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-        aServiceInformationMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aSG,
+        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
                                                                                                aDocTypeID,
                                                                                                CollectionHelper.newList (aProcess),
                                                                                                "extsi"));
@@ -185,7 +185,7 @@ public final class XMLServiceInformationManagerTest
         final SMPProcess aProcess = new SMPProcess (SimpleProcessIdentifier.createWithDefaultScheme ("testproc2"),
                                                     CollectionHelper.newList (aEP),
                                                     "extproc");
-        aServiceInformationMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aSG,
+        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
                                                                                                aDocTypeID,
                                                                                                CollectionHelper.newList (aProcess),
                                                                                                "extsi"));

@@ -499,7 +499,7 @@ public final class SMPServerAPI
       }
 
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-      aServiceInfoMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
+      aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
                                                                                       aDocTypeID,
                                                                                       aProcesses,
                                                                                       SMPExtensionConverter.convertToString (aServiceMetadata.getServiceInformation ()

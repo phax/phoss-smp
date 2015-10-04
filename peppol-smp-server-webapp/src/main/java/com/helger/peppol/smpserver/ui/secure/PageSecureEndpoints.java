@@ -28,7 +28,6 @@ import org.joda.time.LocalDateTime;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.microdom.IMicroDocument;
 import com.helger.commons.microdom.serialize.MicroReader;
@@ -413,30 +412,39 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
     if (aFormErrors.isEmpty ())
     {
-      final SMPEndpoint aEndpoint = new SMPEndpoint (sTransportProfile,
-                                                     sEndpointReference,
-                                                     bRequireBusinessLevelSignature,
-                                                     sMinimumAuthenticationLevel,
-                                                     aNotBeforeDate == null ? null
-                                                                            : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
-                                                     aNotAfterDate == null ? null
-                                                                           : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
-                                                     sCertificate,
-                                                     sServiceDescription,
-                                                     sTechnicalContact,
-                                                     sTechnicalInformation,
-                                                     sExtension);
-      final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEndpoint), null);
-      final SMPServiceInformation aServiceInfo = new SMPServiceInformation (aServiceGroup,
-                                                                            aDocTypeID,
-                                                                            CollectionHelper.newList (aProcess),
-                                                                            null);
-      aServiceInfoMgr.createOrUpdateSMPServiceInformation (aServiceInfo);
+      ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                                   aDocTypeID);
+      if (aServiceInfo == null)
+        aServiceInfo = new SMPServiceInformation (aServiceGroup, aDocTypeID, null, null);
 
+      ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
+      if (aProcess == null)
+        aProcess = new SMPProcess (aProcessID, null, null);
+
+      aProcess.deleteEndpoint (sTransportProfile);
+      ((SMPProcess) aProcess).addEndpoint (new SMPEndpoint (sTransportProfile,
+                                                            sEndpointReference,
+                                                            bRequireBusinessLevelSignature,
+                                                            sMinimumAuthenticationLevel,
+                                                            aNotBeforeDate == null ? null
+                                                                                   : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
+                                                            aNotAfterDate == null ? null
+                                                                                  : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
+                                                            sCertificate,
+                                                            sServiceDescription,
+                                                            sTechnicalContact,
+                                                            sTechnicalInformation,
+                                                            sExtension));
+
+      aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfo);
       if (bEdit)
+      {
         aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint"));
+      }
       else
+      {
         aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully created the new endpoint"));
+      }
     }
   }
 
@@ -601,7 +609,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
     if (aSelectedProcess.deleteEndpoint (aSelectedEndpoint.getTransportProfile ()).isChanged ())
     {
-      aServiceInfoMgr.createOrUpdateSMPServiceInformation (aSelectedObject);
+      aServiceInfoMgr.mergeSMPServiceInformation (aSelectedObject);
       aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected endpoint was successfully deleted!"));
     }
     else

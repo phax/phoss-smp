@@ -148,7 +148,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     return null;
   }
 
-  public void createOrUpdateSMPServiceInformation (@Nonnull final ISMPServiceInformation aSMPServiceInformationObj)
+  public void mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aSMPServiceInformationObj)
   {
     final SMPServiceInformation aSMPServiceInformation = (SMPServiceInformation) aSMPServiceInformationObj;
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");

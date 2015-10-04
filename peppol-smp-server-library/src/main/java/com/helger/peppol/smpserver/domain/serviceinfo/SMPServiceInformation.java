@@ -94,20 +94,20 @@ public class SMPServiceInformation implements ISMPServiceInformation
    * @param aDocumentTypeIdentifier
    *        Document type ID
    * @param aProcesses
-   *        process ID list
+   *        processes list. May be <code>null</code>.
    * @param sExtension
    *        Optional extension
    */
   public SMPServiceInformation (@Nonnull final ISMPServiceGroup aServiceGroup,
                                 @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                @Nonnull final List <SMPProcess> aProcesses,
+                                @Nullable final List <SMPProcess> aProcesses,
                                 @Nullable final String sExtension)
   {
     m_aServiceGroup = ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     setDocumentTypeIdentifier (aDocumentTypeIdentifier);
-    ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
-    for (final SMPProcess aProcess : aProcesses)
-      addProcess (aProcess);
+    if (aProcesses != null)
+      for (final SMPProcess aProcess : aProcesses)
+        addProcess (aProcess);
     setExtension (sExtension);
     m_sID = aServiceGroup.getID () + "-" + IdentifierHelper.getIdentifierURIEncoded (aDocumentTypeIdentifier);
   }

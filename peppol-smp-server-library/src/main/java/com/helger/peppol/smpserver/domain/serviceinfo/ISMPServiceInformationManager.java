@@ -71,7 +71,7 @@ public interface ISMPServiceInformationManager
    *        The service information object to handle. May not be
    *        <code>null</code>.
    */
-  void createOrUpdateSMPServiceInformation (@Nonnull ISMPServiceInformation aServiceInformation);
+  void mergeSMPServiceInformation (@Nonnull ISMPServiceInformation aServiceInformation);
 
   @Nullable
   ISMPServiceInformation findServiceInformation (@Nullable ISMPServiceGroup aServiceGroup,

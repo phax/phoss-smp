@@ -80,7 +80,7 @@ public final class ISMPServiceInformationManagerTest
                                                                                      aDocTypeID,
                                                                                      CollectionHelper.newList (aProcess),
                                                                                      "extsi");
-        aServiceInfoMgr.createOrUpdateSMPServiceInformation (aServiceInformation);
+        aServiceInfoMgr.mergeSMPServiceInformation (aServiceInformation);
       }
       finally
       {

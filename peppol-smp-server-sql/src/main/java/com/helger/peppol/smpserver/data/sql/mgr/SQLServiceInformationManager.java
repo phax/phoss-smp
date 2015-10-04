@@ -211,7 +211,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     aDBMetadata.setExtension (aServiceInfo.getExtension ());
   }
 
-  public void createOrUpdateSMPServiceInformation (@Nonnull final ISMPServiceInformation aServiceInformation)
+  public void mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aServiceInformation)
   {
     ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
 
