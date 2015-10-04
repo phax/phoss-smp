@@ -76,6 +76,6 @@ public final class SMPJPAConfiguration
   public static String getDefaultDDLGenerationMode ()
   {
     return GlobalDebug.isDebugMode () ? PersistenceUnitProperties.DDL_SQL_SCRIPT_GENERATION
-                                     : PersistenceUnitProperties.NONE;
+                                      : PersistenceUnitProperties.NONE;
   }
 }

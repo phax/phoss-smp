@@ -184,7 +184,7 @@ public final class SMPServerAPI
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
     final Collection <? extends ISMPServiceGroup> aServiceGroups = SMPMetaManager.getServiceGroupMgr ()
-                                                                              .getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
+                                                                                 .getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
 
     final ServiceGroupReferenceListType aRefList = new ServiceGroupReferenceListType ();
     final List <ServiceGroupReferenceType> aReferenceTypes = aRefList.getServiceGroupReference ();
@@ -331,7 +331,8 @@ public final class SMPServerAPI
                                       m_aAPIProvider.getCurrentURI ());
     }
 
-    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
+                                                         .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
       throw new SMPNotFoundException ("No such serviceGroup '" +

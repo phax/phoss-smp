@@ -149,7 +149,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   {
     final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
+                                                         .getSMPServiceGroupOfID (aServiceGroupID);
 
     final String sDocTypeID = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID);
     final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);

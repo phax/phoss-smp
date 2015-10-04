@@ -130,7 +130,8 @@ public final class XMLUserManager implements ISMPUserManager
                                                                                  SMPUnauthorizedException
   {
     // Resolve user group
-    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
+                                                         .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
       throw new SMPNotFoundException ("Service group " +

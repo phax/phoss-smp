@@ -40,7 +40,7 @@ public class HCServiceGroupSelect extends HCExtSelect
     super (aRF);
 
     for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (SMPMetaManager.getServiceGroupMgr ()
-                                                                                       .getAllSMPServiceGroups (),
+                                                                                          .getAllSMPServiceGroups (),
                                                                             new ComparatorSMPServiceGroup ()))
     {
       final String sOwnerName = AppCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
