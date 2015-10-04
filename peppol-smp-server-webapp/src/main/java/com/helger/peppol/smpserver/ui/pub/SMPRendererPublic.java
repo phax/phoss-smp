@@ -269,6 +269,12 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
     }
 
     // Content
+    if (true)
+    {
+      // Show no menu
+      aOuterContainer.addChild (getPageContent (aLEC));
+    }
+    else
     {
       final BootstrapRow aRow = aOuterContainer.addAndReturnChild (new BootstrapRow ());
       final HCDiv aCol1 = aRow.createColumn (12, 4, 4, 3);

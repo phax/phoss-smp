@@ -20,7 +20,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import com.helger.photon.basic.app.menu.IMenuTree;
-import com.helger.photon.basic.app.menu.filter.MenuObjectFilterNoUserLoggedIn;
 
 @Immutable
 public final class MenuPublic
@@ -31,11 +30,6 @@ public final class MenuPublic
   public static void init (@Nonnull final IMenuTree aMenuTree)
   {
     aMenuTree.createRootItem (new PagePublicStart (CMenuPublic.MENU_START));
-
-    // Not logged in
-    aMenuTree.createRootSeparator ().setDisplayFilter (new MenuObjectFilterNoUserLoggedIn ());
-    aMenuTree.createRootItem (new PagePublicLogin (CMenuPublic.MENU_LOGIN))
-             .setDisplayFilter (new MenuObjectFilterNoUserLoggedIn ());
 
     // Set default
     aMenuTree.setDefaultMenuItemID (CMenuPublic.MENU_START);

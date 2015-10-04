@@ -16,6 +16,8 @@
  */
 package com.helger.peppol.smpserver.ui.pub;
 
+import java.util.Locale;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -28,6 +30,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
@@ -43,19 +46,23 @@ public final class PagePublicStart extends AbstractSMPWebPage
   @Nullable
   public String getHeaderText (@Nonnull final WebPageExecutionContext aWPEC)
   {
-    return "Managed participants on this server";
+    return "Managed participants on this SMP";
   }
 
   @Override
   protected void fillContent (final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
-    final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING)).setID (getID ());
-    aTable.addHeaderRow ().addCell ();
+    final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
+                                        new DTCol ("Extension?")).setID (getID ());
     for (final ISMPServiceGroup aServiceGroup : SMPMetaManager.getServiceGroupMgr ().getAllSMPServiceGroups ())
+    {
       aTable.addBodyRow ()
-            .addCell (IdentifierHelper.getIdentifierURIEncoded (aServiceGroup.getParticpantIdentifier ()));
+            .addCell (IdentifierHelper.getIdentifierURIEncoded (aServiceGroup.getParticpantIdentifier ()))
+            .addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
+    }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
 

@@ -22,7 +22,6 @@ import javax.annotation.concurrent.Immutable;
 public final class CMenuPublic
 {
   public static final String MENU_START = "start";
-  public static final String MENU_LOGIN = "login";
 
   // flags
   public static final String FLAG_FOOTER = "footer";
