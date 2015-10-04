@@ -90,6 +90,7 @@ public class DBOwnership implements Serializable
     m_aID = aID;
   }
 
+  // No Cascade here!
   @ManyToOne (fetch = FetchType.LAZY)
   @JoinColumn (name = "username", nullable = false, insertable = false, updatable = false)
   public DBUser getUser ()
@@ -102,6 +103,7 @@ public class DBOwnership implements Serializable
     m_aUser = aUser;
   }
 
+  // No Cascade here!
   @OneToOne (fetch = FetchType.LAZY)
   @JoinColumns ({ @JoinColumn (name = "businessIdentifierScheme",
                                referencedColumnName = "businessIdentifierScheme",

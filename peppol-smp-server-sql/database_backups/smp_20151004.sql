@@ -32,7 +32,7 @@ CREATE TABLE `smp_endpoint` (
   `requireBusinessLevelSignature` tinyint(1) NOT NULL DEFAULT '0',
   `serviceActivationDate` datetime DEFAULT NULL,
   `serviceDescription` longtext NOT NULL,
-  `serviceExpirationDate` datetime NOT NULL,
+  `serviceExpirationDate` datetime DEFAULT NULL,
   `technicalContactUrl` varchar(256) NOT NULL,
   `technicalInformationUrl` varchar(256) DEFAULT NULL,
   `documentIdentifierScheme` varchar(25) NOT NULL,

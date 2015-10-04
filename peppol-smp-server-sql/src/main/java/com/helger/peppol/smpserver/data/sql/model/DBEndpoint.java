@@ -237,7 +237,7 @@ public class DBEndpoint implements Serializable
   }
 
   @Temporal (TemporalType.TIMESTAMP)
-  @Column (name = "serviceExpirationDate", nullable = false, length = 19)
+  @Column (name = "serviceExpirationDate", length = 19)
   @Convert ("localdatetime")
   public LocalDateTime getServiceExpirationDate ()
   {
