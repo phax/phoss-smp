@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
+import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.peppol.identifier.DocumentIdentifierType;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
@@ -98,8 +99,8 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 public final class SMPServerAPI
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServerAPI.class);
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterCall = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
-                                                                                                                             "$call");
+  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterInvocation = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
+                                                                                                                                   "$call");
   private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
                                                                                                                                 "$success");
   private final ISMPServerAPIDataProvider m_aAPIProvider;
@@ -113,7 +114,7 @@ public final class SMPServerAPI
   public CompleteServiceGroupType getCompleteServiceGroup (final String sServiceGroupID) throws Throwable
   {
     s_aLogger.info ("getCompleteServiceGroup - GET /complete/" + sServiceGroupID);
-    s_aStatsCounterCall.increment ("getCompleteServiceGroup");
+    s_aStatsCounterInvocation.increment ("getCompleteServiceGroup");
 
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     if (aServiceGroupID == null)
@@ -170,7 +171,7 @@ public final class SMPServerAPI
                                                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
     s_aLogger.info ("getServiceGroupReferenceList - GET /list/" + sUserID);
-    s_aStatsCounterCall.increment ("getServiceGroupReferenceList");
+    s_aStatsCounterInvocation.increment ("getServiceGroupReferenceList");
 
     if (!aCredentials.getUserName ().equals (sUserID))
     {
@@ -206,7 +207,7 @@ public final class SMPServerAPI
   public ServiceGroupType getServiceGroup (final String sServiceGroupID) throws Throwable
   {
     s_aLogger.info ("getServiceGroup - GET /" + sServiceGroupID);
-    s_aStatsCounterCall.increment ("getServiceGroup");
+    s_aStatsCounterInvocation.increment ("getServiceGroup");
 
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     if (aServiceGroupID == null)
@@ -255,7 +256,7 @@ public final class SMPServerAPI
                                     @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
     s_aLogger.info ("saveServiceGroup - PUT /" + sServiceGroupID + " ==> " + aServiceGroup);
-    s_aStatsCounterCall.increment ("saveServiceGroup");
+    s_aStatsCounterInvocation.increment ("saveServiceGroup");
 
     final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     if (aServiceGroupID == null)
@@ -293,7 +294,7 @@ public final class SMPServerAPI
                                       @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
     s_aLogger.info ("deleteServiceGroup - DELETE /" + sServiceGroupID);
-    s_aStatsCounterCall.increment ("deleteServiceGroup");
+    s_aStatsCounterInvocation.increment ("deleteServiceGroup");
 
     final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     if (aServiceGroupID == null)
@@ -320,7 +321,7 @@ public final class SMPServerAPI
                                                            @Nonnull final String sDocumentTypeID) throws Throwable
   {
     s_aLogger.info ("getServiceRegistration - GET /" + sServiceGroupID + "/services/" + sDocumentTypeID);
-    s_aStatsCounterCall.increment ("getServiceRegistration");
+    s_aStatsCounterInvocation.increment ("getServiceRegistration");
 
     final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     if (aServiceGroupID == null)
@@ -381,7 +382,7 @@ public final class SMPServerAPI
       }
     }
 
-    // Signature is added by a handler
+    // Signature must be added by the rest service
 
     s_aLogger.info ("Finished getServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
     s_aStatsCounterSuccess.increment ("getServiceRegistration");
@@ -400,7 +401,7 @@ public final class SMPServerAPI
                     sDocumentTypeID +
                     " ==> " +
                     aServiceMetadata);
-    s_aStatsCounterCall.increment ("saveServiceRegistration");
+    s_aStatsCounterInvocation.increment ("saveServiceRegistration");
 
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     if (aServiceGroupID == null)
@@ -522,7 +523,7 @@ public final class SMPServerAPI
                                              @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
     s_aLogger.info ("deleteServiceRegistration - DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID);
-    s_aStatsCounterCall.increment ("deleteServiceRegistration");
+    s_aStatsCounterInvocation.increment ("deleteServiceRegistration");
 
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     if (aServiceGroupID == null)
@@ -569,5 +570,23 @@ public final class SMPServerAPI
     s_aLogger.info ("Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
     s_aStatsCounterSuccess.increment ("deleteServiceRegistration");
     return ESuccess.SUCCESS;
+  }
+
+  /**
+   * @return The statistics data with the invocation counter.
+   */
+  @Nonnull
+  public static IStatisticsHandlerKeyedCounter getInvocationCounter ()
+  {
+    return s_aStatsCounterInvocation;
+  }
+
+  /**
+   * @return The statistics data with the successful invocation counter.
+   */
+  @Nonnull
+  public static IStatisticsHandlerKeyedCounter getSuccessCounter ()
+  {
+    return s_aStatsCounterSuccess;
   }
 }
