@@ -33,11 +33,12 @@ import com.helger.peppol.smpserver.data.xml.mgr.XMLServiceInformationManager;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
-import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 import com.helger.photon.basic.security.AccessManager;
 import com.helger.photon.basic.security.CSecurity;
 import com.helger.photon.basic.security.user.IUser;
@@ -50,7 +51,7 @@ import com.helger.photon.basic.security.user.IUser;
 public final class XMLServiceInformationManagerTest
 {
   @Rule
-  public final TestRule m_aTestRule = new PhotonBasicWebTestRule ();
+  public final TestRule m_aTestRule = new SMPXMLTestRule ();
 
   @Test
   public void testServiceRegistration ()
@@ -72,6 +73,7 @@ public final class XMLServiceInformationManagerTest
       final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
 
       {
+        // Create a new service information
         final SMPEndpoint aEP = new SMPEndpoint ("tp",
                                                  "http://localhost/as2",
                                                  false,
@@ -85,9 +87,9 @@ public final class XMLServiceInformationManagerTest
                                                  "extep");
         final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
         aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
-                                                                                               aDocTypeID,
-                                                                                               CollectionHelper.newList (aProcess),
-                                                                                               "extsi"));
+                                                                                      aDocTypeID,
+                                                                                      CollectionHelper.newList (aProcess),
+                                                                                      "extsi"));
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -102,22 +104,23 @@ public final class XMLServiceInformationManagerTest
 
       {
         // Replace endpoint URL with equal transport profile -> replace
-        final SMPEndpoint aEP = new SMPEndpoint ("tp",
-                                                 "http://localhost/as2-ver2",
-                                                 false,
-                                                 "minauth",
-                                                 aStartDT,
-                                                 aEndDT,
-                                                 "cert",
-                                                 "sd",
-                                                 "tc",
-                                                 "ti",
-                                                 "extep");
-        final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
-                                                                                               aDocTypeID,
-                                                                                               CollectionHelper.newList (aProcess),
-                                                                                               "extsi"));
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+                                                                                                                         aDocTypeID);
+        assertNotNull (aSI);
+        final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
+        assertNotNull (aProcess);
+        aProcess.setEndpoint (new SMPEndpoint ("tp",
+                                               "http://localhost/as2-ver2",
+                                               false,
+                                               "minauth",
+                                               aStartDT,
+                                               aEndDT,
+                                               "cert",
+                                               "sd",
+                                               "tc",
+                                               "ti",
+                                               "extep"));
+        aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -140,22 +143,23 @@ public final class XMLServiceInformationManagerTest
       {
         // Add endpoint with different transport profile -> added to existing
         // process
-        final SMPEndpoint aEP = new SMPEndpoint ("tp2",
-                                                 "http://localhost/as2-tp2",
-                                                 false,
-                                                 "minauth",
-                                                 aStartDT,
-                                                 aEndDT,
-                                                 "cert",
-                                                 "sd",
-                                                 "tc",
-                                                 "ti",
-                                                 "extep");
-        final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
-                                                                                               aDocTypeID,
-                                                                                               CollectionHelper.newList (aProcess),
-                                                                                               "extsi"));
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+                                                                                                                         aDocTypeID);
+        assertNotNull (aSI);
+        final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
+        assertNotNull (aProcess);
+        aProcess.addEndpoint (new SMPEndpoint ("tp2",
+                                               "http://localhost/as2-tp2",
+                                               false,
+                                               "minauth",
+                                               aStartDT,
+                                               aEndDT,
+                                               "cert",
+                                               "sd",
+                                               "tc",
+                                               "ti",
+                                               "extep"));
+        aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -171,6 +175,9 @@ public final class XMLServiceInformationManagerTest
       {
         // Add endpoint with different process - add to existing
         // serviceGroup+docType part
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+                                                                                                                         aDocTypeID);
+        assertNotNull (aSI);
         final SMPEndpoint aEP = new SMPEndpoint ("tp",
                                                  "http://localhost/as2",
                                                  false,
@@ -182,13 +189,10 @@ public final class XMLServiceInformationManagerTest
                                                  "tc",
                                                  "ti",
                                                  "extep");
-        final SMPProcess aProcess = new SMPProcess (SimpleProcessIdentifier.createWithDefaultScheme ("testproc2"),
-                                                    CollectionHelper.newList (aEP),
-                                                    "extproc");
-        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
-                                                                                               aDocTypeID,
-                                                                                               CollectionHelper.newList (aProcess),
-                                                                                               "extsi"));
+        aSI.addProcess (new SMPProcess (SimpleProcessIdentifier.createWithDefaultScheme ("testproc2"),
+                                        CollectionHelper.newList (aEP),
+                                        "extproc"));
+        aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (2,
