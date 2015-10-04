@@ -51,7 +51,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.equals.EqualsHelper;
@@ -136,16 +135,16 @@ public class SMPProcess implements ISMPProcess
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();
     if (m_aEndpoints.containsKey (sTransportProfile))
-      throw new IllegalStateException ("No such key present: '" + sTransportProfile + "'");
+      throw new IllegalStateException ("Another endpoint with transport profile '" +
+                                       sTransportProfile +
+                                       "' is already present");
     m_aEndpoints.put (sTransportProfile, aEndpoint);
   }
 
-  public void setEndpoint (@Nonnull @Nonempty final String sTransportProfile, @Nonnull final SMPEndpoint aEndpoint)
+  public void setEndpoint (@Nonnull final SMPEndpoint aEndpoint)
   {
-    ValueEnforcer.notEmpty (sTransportProfile, "TransportProfile");
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
-    if (!m_aEndpoints.containsKey (sTransportProfile))
-      throw new IllegalStateException ("No such key present: '" + sTransportProfile + "'");
+    final String sTransportProfile = aEndpoint.getTransportProfile ();
     m_aEndpoints.put (sTransportProfile, aEndpoint);
   }
 

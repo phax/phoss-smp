@@ -119,6 +119,16 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
   @Nonnegative
   int getTotalEndpointCount ();
 
+  /**
+   * Add the passed process.
+   * 
+   * @param aProcess
+   *        The process to be added. May not be <code>null</code>.
+   * @throws IllegalArgumentException
+   *         If a process with the same process ID is already registered.
+   */
+  void addProcess (@Nonnull SMPProcess aProcess);
+
   @Nonnull
   ServiceMetadataType getAsJAXBObject ();
 }

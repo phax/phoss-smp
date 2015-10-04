@@ -420,20 +420,19 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
     if (aFormErrors.isEmpty ())
     {
-      SMPServiceInformation aServiceInfo = (SMPServiceInformation) aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                                                          aDocTypeID);
+      ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                                   aDocTypeID);
       if (aServiceInfo == null)
         aServiceInfo = new SMPServiceInformation (aServiceGroup, aDocTypeID, null, null);
 
-      SMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
+      ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
       if (aProcess == null)
       {
         aProcess = new SMPProcess (aProcessID, null, null);
-        aServiceInfo.addProcess (aProcess);
+        aServiceInfo.addProcess ((SMPProcess) aProcess);
       }
 
-      aProcess.deleteEndpoint (sTransportProfile);
-      aProcess.addEndpoint (new SMPEndpoint (sTransportProfile,
+      aProcess.setEndpoint (new SMPEndpoint (sTransportProfile,
                                              sEndpointReference,
                                              bRequireBusinessLevelSignature,
                                              sMinimumAuthenticationLevel,

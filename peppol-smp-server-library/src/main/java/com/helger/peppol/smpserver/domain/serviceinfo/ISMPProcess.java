@@ -89,8 +89,27 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
   @Nullable
   ISMPEndpoint getEndpointOfTransportProfile (@Nullable String sTransportProfile);
 
+  /**
+   * Add a new endpoint.
+   *
+   * @param aEndpoint
+   *        The endpoint to be added. May not be <code>null</code>.
+   * @throws IllegalArgumentException
+   *         If another endpoint with the same transport profile already exists-
+   */
+  void addEndpoint (@Nonnull SMPEndpoint aEndpoint);
+
+  /**
+   * Add a new endpoint overwriting any eventually present endpoint with the
+   * same transport profile.
+   *
+   * @param aEndpoint
+   *        The endpoint to be added. May not be <code>null</code>.
+   */
+  void setEndpoint (@Nonnull SMPEndpoint aEndpoint);
+
   @Nonnull
-  EChange deleteEndpoint (@Nullable final String sTransportProfile);
+  EChange deleteEndpoint (@Nullable String sTransportProfile);
 
   @Nonnull
   ProcessType getAsJAXBObject ();
