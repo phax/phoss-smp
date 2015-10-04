@@ -143,7 +143,6 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                  @Nonnull final FormErrors aFormErrors,
                                                  @Nonnull final EWebPageFormAction eFormAction)
   {
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
     final boolean bEdit = eFormAction.isEdit ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
@@ -187,9 +186,9 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         // Edit only the internal data objects because no change to the SML is
         // necessary. Only the owner and the extension can be edited!
         aServiceGroupMgr.updateSMPServiceGroup (aSelectedObject.getID (), aOwningUser.getID (), sExtension);
-        aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
-                                                                 sParticipantID +
-                                                                 "' was successfully edited."));
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
+                                                                    sParticipantID +
+                                                                    "' was successfully edited."));
       }
       else
       {
@@ -311,7 +310,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
-                                        new DTCol ("Has extension?"),
+                                        new DTCol ("Extension?"),
                                         new DTCol ("DocTypes").setDisplayType (EBaseType.INT, aDisplayLocale),
                                         new DTCol ("Processes").setDisplayType (EBaseType.INT, aDisplayLocale),
                                         new DTCol ("Endpoints").setDisplayType (EBaseType.INT, aDisplayLocale),

@@ -56,7 +56,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("Extension?")).setID (getID ());
+                                        new DTCol ("Extension?").setDataSort (1, 0)).setID (getID ());
     for (final ISMPServiceGroup aServiceGroup : SMPMetaManager.getServiceGroupMgr ().getAllSMPServiceGroups ())
     {
       aTable.addBodyRow ()

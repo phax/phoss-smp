@@ -450,11 +450,17 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfo);
       if (bEdit)
       {
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint"));
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint for service group '" +
+                                                                    aServiceGroup.getParticpantIdentifier ()
+                                                                                 .getURIEncoded () +
+                                                                    "'."));
       }
       else
       {
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully created the new endpoint"));
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully created a new endpoint for service group '" +
+                                                                    aServiceGroup.getParticpantIdentifier ()
+                                                                                 .getURIEncoded () +
+                                                                    "'."));
       }
     }
   }

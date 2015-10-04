@@ -47,8 +47,6 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
@@ -152,10 +150,6 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   {
     final SMPServiceInformation aSMPServiceInformation = (SMPServiceInformation) aSMPServiceInformationObj;
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
-    ValueEnforcer.isTrue (aSMPServiceInformation.getProcessCount () == 1, "ServiceGroup must contain a single process");
-    final SMPProcess aNewProcess = aSMPServiceInformation.getAllProcesses ().get (0);
-    ValueEnforcer.isTrue (aNewProcess.getEndpointCount () == 1,
-                          "ServiceGroup must contain a single endpoint in the process");
 
     // Check for an update
     boolean bChangedExisting = false;
@@ -163,27 +157,9 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
                                                                                                                                  aSMPServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
     {
-      final SMPProcess aOldProcess = aOldInformation.getProcessOfID (aNewProcess.getProcessIdentifier ());
-      if (aOldProcess != null)
-      {
-        final SMPEndpoint aNewEndpoint = aNewProcess.getAllEndpoints ().get (0);
-        final ISMPEndpoint aOldEndpoint = aOldProcess.getEndpointOfTransportProfile (aNewEndpoint.getTransportProfile ());
-        if (aOldEndpoint != null)
-        {
-          // Overwrite existing endpoint
-          aOldProcess.setEndpoint (aNewEndpoint.getTransportProfile (), aNewEndpoint);
-        }
-        else
-        {
-          // Add endpoint to existing process
-          aOldProcess.addEndpoint (aNewEndpoint);
-        }
-      }
-      else
-      {
-        // Add process to existing service information
-        aOldInformation.addProcess (aNewProcess);
-      }
+      // If a service information is present, it must be the provided object!
+      if (aOldInformation != aSMPServiceInformation)
+        throw new IllegalStateException ("Internal inconsistency!");
       bChangedExisting = true;
     }
 

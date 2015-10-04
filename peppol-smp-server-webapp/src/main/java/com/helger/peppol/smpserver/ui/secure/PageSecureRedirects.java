@@ -196,7 +196,6 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                                  @Nonnull final EWebPageFormAction eFormAction)
   {
     final boolean bEdit = eFormAction.isEdit ();
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
@@ -266,9 +265,9 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                               sRedirectTo,
                                               sSubjectUniqueIdentifier,
                                               sExtension);
-      aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The redirect for service group '" +
-                                                               sServiceGroupID +
-                                                               "' was successfully saved."));
+      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The redirect for service group '" +
+                                                                  sServiceGroupID +
+                                                                  "' was successfully saved."));
     }
   }
 
@@ -365,8 +364,9 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
     aToolbar.addButton ("Create new Redirect", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aNodeList.addChild (aToolbar);
 
-    final HCTable aTable = new HCTable (new DTCol ("Service Group").setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("Document type ID"),
+    final HCTable aTable = new HCTable (new DTCol ("Service Group").setDataSort (0, 1)
+                                                                   .setInitialSorting (ESortOrder.ASCENDING),
+                                        new DTCol ("Document type ID").setDataSort (1, 0),
                                         new DTCol ("Target URL"),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPRedirect aCurObject : aRedirectMgr.getAllSMPRedirects ())
