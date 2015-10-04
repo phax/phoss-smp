@@ -31,7 +31,6 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
-import com.helger.photon.basic.security.CSecurity;
 
 /**
  * Test class for class {@link ISMPServiceInformationManager}.
@@ -49,13 +48,16 @@ public final class ISMPServiceInformationManagerTest
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final SimpleParticipantIdentifier aPI1 = SimpleParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
+    final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("junit::testdoc#ext:1.0");
+    final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createWithDefaultScheme ("junit-proc");
 
-    aUserMgr.createUser (CSecurity.USER_ADMINISTRATOR_ID, "bla");
+    final String sUserID = "junitserviceinfo";
+    aUserMgr.createUser (sUserID, "bla");
     try
     {
-      aServiceGroupMgr.deleteSMPServiceGroup (aPI);
-      final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
+      aServiceGroupMgr.deleteSMPServiceGroup (aPI1);
+      final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (sUserID, aPI1, null);
       try
       {
         final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
@@ -72,10 +74,8 @@ public final class ISMPServiceInformationManagerTest
                                                  "ti",
                                                  "extep");
 
-        final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createWithDefaultScheme ("testproc");
         final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
 
-        final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
         final SMPServiceInformation aServiceInformation = new SMPServiceInformation (aSG,
                                                                                      aDocTypeID,
                                                                                      CollectionHelper.newList (aProcess),
@@ -84,12 +84,12 @@ public final class ISMPServiceInformationManagerTest
       }
       finally
       {
-        aServiceGroupMgr.deleteSMPServiceGroup (aPI);
+        aServiceGroupMgr.deleteSMPServiceGroup (aPI1);
       }
     }
     finally
     {
-      aUserMgr.deleteUser (CSecurity.USER_ADMINISTRATOR_ID);
+      aUserMgr.deleteUser (sUserID);
     }
   }
 }

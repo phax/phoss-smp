@@ -44,12 +44,12 @@ public final class ISMPServiceGroupManagerTest
   @Test
   public void testBasic ()
   {
-    final SimpleParticipantIdentifier aPI1 = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:a");
-    final SimpleParticipantIdentifier aPI2 = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:b");
+    final SimpleParticipantIdentifier aPI1 = SimpleParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
+    final SimpleParticipantIdentifier aPI2 = SimpleParticipantIdentifier.createWithDefaultScheme ("9999:junittest2");
     final String sSG1 = SMPServiceGroup.createSMPServiceGroupID (aPI1);
     final String sSG2 = SMPServiceGroup.createSMPServiceGroupID (aPI2);
-    final String sOwner1ID = "o1";
-    final String sOwner2ID = "o2";
+    final String sOwner1ID = "junitsg1";
+    final String sOwner2ID = "junitsg2";
     final String sExtension = "<ext val='a' />";
 
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
@@ -133,8 +133,8 @@ public final class ISMPServiceGroupManagerTest
       assertTrue (aSGMgr.deleteSMPServiceGroup (aPI1).isUnchanged ());
 
       // Check manager state
-      assertEquals (1, aSGMgr.getSMPServiceGroupCount ());
-      assertEquals (1, aSGMgr.getAllSMPServiceGroups ().size ());
+      assertEquals (nCount + 1, aSGMgr.getSMPServiceGroupCount ());
+      assertEquals (nCount + 1, aSGMgr.getAllSMPServiceGroups ().size ());
       assertTrue (aSGMgr.getAllSMPServiceGroups ().contains (aSG2));
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI1));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI2));
@@ -149,8 +149,8 @@ public final class ISMPServiceGroupManagerTest
       assertTrue (aSGMgr.deleteSMPServiceGroup (aPI2).isUnchanged ());
 
       // Check empty state
-      assertEquals (0, aSGMgr.getSMPServiceGroupCount ());
-      assertEquals (0, aSGMgr.getAllSMPServiceGroups ().size ());
+      assertEquals (nCount, aSGMgr.getSMPServiceGroupCount ());
+      assertEquals (nCount, aSGMgr.getAllSMPServiceGroups ().size ());
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI1));
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI2));
       assertNull (aSGMgr.getSMPServiceGroupOfID (aPI1));
