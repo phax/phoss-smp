@@ -109,11 +109,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
         {
           // Did not exist. Create it.
           final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantIdentifier);
-          aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID,
-                                                sExtension,
-                                                new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup),
-                                                null);
+          final DBOwnership aOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
+          aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID, sExtension, aOwnership, null);
           aEM.persist (aDBServiceGroup);
+          aEM.persist (aOwnership);
         }
         catch (final RuntimeException ex)
         {
@@ -201,13 +200,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
           return EChange.UNCHANGED;
         }
 
-        // Check the ownership afterwards, so that only existing serviceGroups
-        // are checked
-        aEM.createQuery ("DELETE from DBOwnership p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value")
-           .setParameter ("scheme", aServiceGroupID.getScheme ())
-           .setParameter ("value", aServiceGroupID.getValue ())
-           .executeUpdate ();
-
         aEM.remove (aDBServiceGroup);
         return EChange.CHANGED;
       }
@@ -266,19 +258,18 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       @ReturnsMutableCopy
       public Collection <ISMPServiceGroup> call () throws Exception
       {
-        final List <DBOwnership> aDBOwnerships = getEntityManager ().createQuery ("SELECT p FROM DBOwnership p WHERE p.user.userName = :user",
-                                                                                  DBOwnership.class)
-                                                                    .setParameter ("user", sOwnerID)
-                                                                    .getResultList ();
+        final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p WHERE p.ownership.user.userName = :user",
+                                                                                        DBServiceGroup.class)
+                                                                          .setParameter ("user", sOwnerID)
+                                                                          .getResultList ();
 
         final Collection <ISMPServiceGroup> aList = new ArrayList <> ();
-        for (final DBOwnership aDBOwnership : aDBOwnerships)
+        for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
         {
           final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,
-                                                                     aDBOwnership.getServiceGroup ()
-                                                                                 .getId ()
-                                                                                 .getAsBusinessIdentifier (),
-                                                                     aDBOwnership.getServiceGroup ().getExtension ());
+                                                                     aDBServiceGroup.getId ()
+                                                                                    .getAsBusinessIdentifier (),
+                                                                     aDBServiceGroup.getExtension ());
           aList.add (aServiceGroup);
         }
         return aList;

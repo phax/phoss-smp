@@ -118,7 +118,7 @@ public class DBServiceGroup implements Serializable
     setExtension (SMPExtensionConverter.convertToString (aExtension));
   }
 
-  @OneToOne (fetch = FetchType.EAGER, mappedBy = "serviceGroup", cascade = { CascadeType.ALL })
+  @OneToOne (fetch = FetchType.LAZY, mappedBy = "serviceGroup", cascade = { CascadeType.ALL })
   public DBOwnership getOwnership ()
   {
     return m_aOwnership;

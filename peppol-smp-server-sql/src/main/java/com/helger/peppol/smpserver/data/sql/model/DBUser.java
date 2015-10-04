@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -108,7 +109,7 @@ public class DBUser implements ISMPUserEditable
     m_sPassword = sPassword;
   }
 
-  @OneToMany (fetch = FetchType.LAZY, mappedBy = "user")
+  @OneToMany (fetch = FetchType.LAZY, mappedBy = "user", cascade = { CascadeType.ALL })
   public Set <DBOwnership> getOwnerships ()
   {
     return m_aOwnerships;

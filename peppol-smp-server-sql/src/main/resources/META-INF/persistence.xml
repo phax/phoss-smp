@@ -52,8 +52,8 @@
     <class>com.helger.peppol.smpserver.data.sql.model.DBProcess</class>
     <class>com.helger.peppol.smpserver.data.sql.model.DBServiceGroup</class>
     <class>com.helger.peppol.smpserver.data.sql.model.DBServiceMetadata</class>
-    <class>com.helger.peppol.smpserver.data.sql.model.DBUser</class>
     <class>com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection</class>
+    <class>com.helger.peppol.smpserver.data.sql.model.DBUser</class>
     <!-- Note: all properties are passed in the code -->
   </persistence-unit>
 </persistence>

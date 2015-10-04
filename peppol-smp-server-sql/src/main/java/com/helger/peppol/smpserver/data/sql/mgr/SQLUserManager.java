@@ -46,6 +46,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.persistence.EntityManager;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.callback.IThrowingCallable;
@@ -114,7 +115,10 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
       {
         public void run ()
         {
-          getEntityManager ().remove (getEntityManager ().find (DBUser.class, sUserName));
+          final EntityManager aEM = getEntityManager ();
+          final DBUser aDBUser = aEM.find (DBUser.class, sUserName);
+          if (aDBUser != null)
+            aEM.remove (aDBUser);
         }
       });
   }

@@ -48,6 +48,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
@@ -101,7 +102,7 @@ public class DBOwnership implements Serializable
     m_aUser = aUser;
   }
 
-  @ManyToOne (fetch = FetchType.LAZY)
+  @OneToOne (fetch = FetchType.LAZY)
   @JoinColumns ({ @JoinColumn (name = "businessIdentifierScheme",
                                referencedColumnName = "businessIdentifierScheme",
                                nullable = false,
