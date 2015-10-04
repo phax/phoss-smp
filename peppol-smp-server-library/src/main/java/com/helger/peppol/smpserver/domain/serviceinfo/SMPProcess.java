@@ -56,6 +56,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.identifier.IProcessIdentifier;
@@ -146,6 +147,14 @@ public class SMPProcess implements ISMPProcess
     if (!m_aEndpoints.containsKey (sTransportProfile))
       throw new IllegalStateException ("No such key present: '" + sTransportProfile + "'");
     m_aEndpoints.put (sTransportProfile, aEndpoint);
+  }
+
+  @Nonnull
+  public EChange deleteEndpoint (@Nullable final String sTransportProfile)
+  {
+    if (StringHelper.hasNoText (sTransportProfile))
+      return EChange.UNCHANGED;
+    return EChange.valueOf (m_aEndpoints.remove (sTransportProfile) != null);
   }
 
   public boolean hasExtension ()

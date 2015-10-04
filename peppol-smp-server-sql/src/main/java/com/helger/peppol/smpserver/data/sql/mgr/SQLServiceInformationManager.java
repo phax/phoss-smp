@@ -42,6 +42,7 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -92,39 +93,101 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   public SQLServiceInformationManager ()
   {}
 
-  private static void _update (@Nonnull final DBServiceMetadata aDBMetadata,
+  private static void _update (@Nonnull final EntityManager aEM,
+                               @Nonnull final DBServiceMetadata aDBMetadata,
                                @Nonnull final ISMPServiceInformation aServiceInfo)
   {
-    final ISMPProcess aProcess = aServiceInfo.getAllProcesses ().get (0);
-    final ISMPEndpoint aEndpoint = aProcess.getAllEndpoints ().get (0);
-
+    // Mutable object
     final Set <DBProcess> aDBProcesses = aDBMetadata.getProcesses ();
 
-    DBProcess aUpdateDBProcess = null;
-    DBEndpoint aUpdateDBEndpoint = null;
-    for (final DBProcess aDBProcess : aDBProcesses)
-      if (IdentifierHelper.areProcessIdentifiersEqual (aDBProcess.getId ().getAsProcessIdentifier (),
-                                                       aProcess.getProcessIdentifier ()))
-      {
-        final Set <DBEndpoint> aDBEndpoints = aDBProcess.getEndpoints ();
-        for (final DBEndpoint aDBEndpoint : aDBEndpoints)
-          if (aDBEndpoint.getId ().getTransportProfile ().equals (aEndpoint.getTransportProfile ()))
-          {
-            aDBEndpoint.setEndpointReference (aEndpoint.getEndpointReference ());
-            aDBEndpoint.setRequireBusinessLevelSignature (aEndpoint.isRequireBusinessLevelSignature ());
-            aDBEndpoint.setMinimumAuthenticationLevel (aEndpoint.getMinimumAuthenticationLevel ());
-            aDBEndpoint.setServiceActivationDate (aEndpoint.getServiceActivationDateTime ());
-            aDBEndpoint.setServiceExpirationDate (aEndpoint.getServiceExpirationDateTime ());
-            aDBEndpoint.setCertificate (aEndpoint.getCertificate ());
-            aDBEndpoint.setServiceDescription (aEndpoint.getServiceDescription ());
-            aDBEndpoint.setTechnicalContactUrl (aEndpoint.getTechnicalContactUrl ());
-            aDBEndpoint.setTechnicalInformationUrl (aEndpoint.getTechnicalInformationUrl ());
-            aUpdateDBEndpoint = aDBEndpoint;
-            break;
-          }
-        if (aUpdateDBEndpoint == null)
+    // For all existing processes
+    for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
+    {
+      DBProcess aUpdateDBProcess = null;
+      for (final DBProcess aDBProcess : aDBProcesses)
+        if (IdentifierHelper.areProcessIdentifiersEqual (aDBProcess.getId ().getAsProcessIdentifier (),
+                                                         aProcess.getProcessIdentifier ()))
         {
-          // Create a new endpoint
+          // Found a matching DB process for updating
+          aUpdateDBProcess = aDBProcess;
+
+          // Search for process to be edited or deleted
+          // Create a copy to avoid concurrent modification
+          for (final DBEndpoint aDBEndpoint : CollectionHelper.newList (aDBProcess.getEndpoints ()))
+          {
+            boolean bFound = false;
+            for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+              if (aDBEndpoint.getId ().getTransportProfile ().equals (aEndpoint.getTransportProfile ()))
+              {
+                // And endpoint for updating was found
+                bFound = true;
+                aDBEndpoint.setEndpointReference (aEndpoint.getEndpointReference ());
+                aDBEndpoint.setRequireBusinessLevelSignature (aEndpoint.isRequireBusinessLevelSignature ());
+                aDBEndpoint.setMinimumAuthenticationLevel (aEndpoint.getMinimumAuthenticationLevel ());
+                aDBEndpoint.setServiceActivationDate (aEndpoint.getServiceActivationDateTime ());
+                aDBEndpoint.setServiceExpirationDate (aEndpoint.getServiceExpirationDateTime ());
+                aDBEndpoint.setCertificate (aEndpoint.getCertificate ());
+                aDBEndpoint.setServiceDescription (aEndpoint.getServiceDescription ());
+                aDBEndpoint.setTechnicalContactUrl (aEndpoint.getTechnicalContactUrl ());
+                aDBEndpoint.setTechnicalInformationUrl (aEndpoint.getTechnicalInformationUrl ());
+                aDBEndpoint.setExtension (aEndpoint.getExtension ());
+                break;
+              }
+
+            if (!bFound)
+            {
+              // Not contained in new set
+              aDBProcess.getEndpoints ().remove (aDBEndpoint);
+              aEM.remove (aDBEndpoint);
+            }
+          }
+
+          // Search for new endpoints
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+          {
+            boolean bFound = false;
+            for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
+              if (aDBEndpoint.getId ().getTransportProfile ().equals (aEndpoint.getTransportProfile ()))
+              {
+                bFound = true;
+                break;
+              }
+
+            if (!bFound)
+            {
+              // Create a new endpoint
+              final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (),
+                                                                               aEndpoint.getTransportProfile ()),
+                                                             aDBProcess,
+                                                             aEndpoint.getEndpointReference (),
+                                                             aEndpoint.isRequireBusinessLevelSignature (),
+                                                             aEndpoint.getMinimumAuthenticationLevel (),
+                                                             aEndpoint.getServiceActivationDateTime (),
+                                                             aEndpoint.getServiceExpirationDateTime (),
+                                                             aEndpoint.getCertificate (),
+                                                             aEndpoint.getServiceDescription (),
+                                                             aEndpoint.getTechnicalContactUrl (),
+                                                             aEndpoint.getTechnicalInformationUrl (),
+                                                             aEndpoint.getExtension ());
+              aDBProcess.getEndpoints ().add (aDBEndpoint);
+            }
+          }
+
+          aDBProcess.setServiceMetadata (aDBMetadata);
+          aDBProcess.setExtension (aProcess.getExtension ());
+          break;
+        }
+
+      if (aUpdateDBProcess == null)
+      {
+        // Create a new process with new endpoints
+        final DBProcess aDBProcess = new DBProcess (new DBProcessID (aDBMetadata.getId (),
+                                                                     aProcess.getProcessIdentifier ()),
+                                                    aDBMetadata,
+                                                    aProcess.getExtension ());
+        final Set <DBEndpoint> aDBEndpoints = new HashSet <> ();
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+        {
           final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (),
                                                                            aEndpoint.getTransportProfile ()),
                                                          aDBProcess,
@@ -140,49 +203,17 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                          aEndpoint.getExtension ());
           aDBEndpoints.add (aDBEndpoint);
         }
-
-        aDBProcess.setServiceMetadata (aDBMetadata);
         aDBProcess.setEndpoints (aDBEndpoints);
-        aDBProcess.setExtension (aProcess.getExtension ());
-        aUpdateDBProcess = aDBProcess;
-        break;
+        aDBProcesses.add (aDBProcess);
       }
-
-    if (aUpdateDBProcess == null)
-    {
-      // Create a new process with a new endpoint
-      final DBProcess aDBProcess = new DBProcess (new DBProcessID (aDBMetadata.getId (),
-                                                                   aProcess.getProcessIdentifier ()),
-                                                  aDBMetadata,
-                                                  aProcess.getExtension ());
-      final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (),
-                                                                       aEndpoint.getTransportProfile ()),
-                                                     aDBProcess,
-                                                     aEndpoint.getEndpointReference (),
-                                                     aEndpoint.isRequireBusinessLevelSignature (),
-                                                     aEndpoint.getMinimumAuthenticationLevel (),
-                                                     aEndpoint.getServiceActivationDateTime (),
-                                                     aEndpoint.getServiceExpirationDateTime (),
-                                                     aEndpoint.getCertificate (),
-                                                     aEndpoint.getServiceDescription (),
-                                                     aEndpoint.getTechnicalContactUrl (),
-                                                     aEndpoint.getTechnicalInformationUrl (),
-                                                     aEndpoint.getExtension ());
-      aDBProcess.setEndpoints (CollectionHelper.newSet (aDBEndpoint));
-      aDBProcesses.add (aDBProcess);
     }
 
-    aDBMetadata.setProcesses (aDBProcesses);
     aDBMetadata.setExtension (aServiceInfo.getExtension ());
   }
 
-  public void createOrUpdateSMPServiceInformation (@Nonnull final SMPServiceInformation aServiceInformation)
+  public void createOrUpdateSMPServiceInformation (@Nonnull final ISMPServiceInformation aServiceInformation)
   {
     ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
-    ValueEnforcer.isTrue (aServiceInformation.getProcessCount () == 1, "ServiceGroup must contain a single process");
-    final SMPProcess aNewProcess = aServiceInformation.getAllProcesses ().get (0);
-    ValueEnforcer.isTrue (aNewProcess.getEndpointCount () == 1,
-                          "ServiceGroup must contain a single endpoint in the process");
 
     JPAExecutionResult <DBServiceMetadata> ret;
     ret = doInTransaction (new Callable <DBServiceMetadata> ()
@@ -198,7 +229,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
         if (aDBMetadata != null)
         {
           // Edit an existing one
-          _update (aDBMetadata, aServiceInformation);
+          _update (aEM, aDBMetadata, aServiceInformation);
           aEM.merge (aDBMetadata);
         }
         else
@@ -211,7 +242,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
             throw new IllegalStateException ("Failed to resolve service group for " + aServiceInformation);
 
           aDBMetadata = new DBServiceMetadata (aDBMetadataID, aDBServiceGroup, aServiceInformation.getExtension ());
-          _update (aDBMetadata, aServiceInformation);
+          _update (aEM, aDBMetadata, aServiceInformation);
           aEM.persist (aDBMetadata);
         }
         return aDBMetadata;

@@ -324,12 +324,11 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nonnull final ISMPRedirect aSelectedObject)
   {
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     if (aRedirectMgr.deleteSMPRedirect (aSelectedObject).isChanged ())
-      aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The selected redirect was successfully deleted!"));
+      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected redirect was successfully deleted!"));
     else
-      aNodeList.addChild (new BootstrapErrorBox ().addChild ("Failed to delete the selected redirect!"));
+      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected redirect!"));
   }
 
   @Override
@@ -350,7 +349,8 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
     for (final ISMPRedirect aCurObject : aRedirectMgr.getAllSMPRedirects ())
     {
       final SMap aParams = new SMap ().add (FIELD_SERVICE_GROUP_ID, aCurObject.getServiceGroupID ())
-                                      .add (FIELD_DOCTYPE_ID, aCurObject.getDocumentTypeIdentifier ().getURIEncoded ());
+                                      .add (FIELD_DOCTYPE_ID,
+                                            aCurObject.getDocumentTypeIdentifier ().getURIPercentEncoded ());
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject, aParams);
       final String sDisplayName = aCurObject.getServiceGroupID ();
 

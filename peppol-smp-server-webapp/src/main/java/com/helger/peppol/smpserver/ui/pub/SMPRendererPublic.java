@@ -72,6 +72,7 @@ import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.app.layout.ILayoutAreaContentProvider;
+import com.helger.photon.core.app.redirect.ForcedRedirectManager;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.core.url.LinkHelper;
@@ -221,6 +222,12 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
                                                                   (StringHelper.hasText (sHttpRequestURI) ? " for request URI " +
                                                                                                             sHttpRequestURI
                                                                                                           : "")));
+    }
+    else
+    {
+      // Add the forced redirect content here
+      if (aWPEC.containsAttribute (ForcedRedirectManager.REQUEST_PARAMETER_PRG_ACTIVE))
+        aPageContainer.addChild (ForcedRedirectManager.getLastForcedRedirectContent (aDisplayPage.getID ()));
     }
 
     final String sHeaderText = aDisplayPage.getHeaderText (aWPEC);

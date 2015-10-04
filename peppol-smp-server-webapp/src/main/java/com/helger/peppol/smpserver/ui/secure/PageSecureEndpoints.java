@@ -46,6 +46,7 @@ import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
+import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
@@ -76,6 +77,7 @@ import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.utils.CertificateHelper;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.button.BootstrapButton;
@@ -165,6 +167,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                      @Nullable final ISMPServiceInformation aSelectedObject)
   {
     if (eFormAction == EWebPageFormAction.VIEW ||
+        eFormAction == EWebPageFormAction.COPY ||
         eFormAction == EWebPageFormAction.EDIT ||
         eFormAction == EWebPageFormAction.DELETE)
     {
@@ -568,12 +571,42 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
                                   @Nonnull final BootstrapForm aForm,
                                   @Nonnull final ISMPServiceInformation aSelectedObject)
-  {}
+  {
+    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
+    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+
+    aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
+                                       aSelectedObject.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ()));
+    aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID,
+                                       aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
+    aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID, aSelectedProcess.getProcessIdentifier ().getURIEncoded ()));
+    aForm.addChild (new HCHiddenField (FIELD_TRANSPORT_PROFILE, aSelectedEndpoint.getTransportProfile ()));
+
+    aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the endpoint for service group '" +
+                                                          aSelectedObject.getServiceGroupID () +
+                                                          "' and document type '" +
+                                                          aSelectedObject.getDocumentTypeIdentifier ()
+                                                                         .getURIEncoded () +
+                                                          "'?"));
+  }
 
   @Override
   protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nonnull final ISMPServiceInformation aSelectedObject)
-  {}
+  {
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+
+    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
+    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+
+    if (aSelectedProcess.deleteEndpoint (aSelectedEndpoint.getTransportProfile ()).isChanged ())
+    {
+      aServiceInfoMgr.createOrUpdateSMPServiceInformation (aSelectedObject);
+      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected endpoint was successfully deleted!"));
+    }
+    else
+      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error deleting the selected endpoint!"));
+  }
 
   @Override
   protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
@@ -588,10 +621,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     aNodeList.addChild (aToolbar);
 
     final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING)
-                                                                   .setDataSort (0, 1),
-                                        new DTCol ("Document type ID").setDataSort (1, 0),
-                                        new DTCol ("Process ID"),
-                                        new DTCol ("Transport"),
+                                                                   .setDataSort (0, 1, 2, 3),
+                                        new DTCol ("Document type ID").setDataSort (1, 0, 2, 3),
+                                        new DTCol ("Process ID").setDataSort (2, 0, 1, 3),
+                                        new DTCol ("Transport").setDataSort (3, 0, 1, 2),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformations ())
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
@@ -615,8 +648,16 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           aRow.addCell (aEndpoint.getTransportProfile ());
 
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
+          final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);
+          final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
           aRow.addCell (new HCA (aEditURL.getAsStringWithEncodedParameters ()).setTitle ("Edit endpoint")
                                                                               .addChild (EDefaultIcon.EDIT.getAsNode ()),
+                        new HCTextNode (" "),
+                        new HCA (aCopyURL.getAsStringWithEncodedParameters ()).setTitle ("Copy endpoint")
+                                                                              .addChild (EDefaultIcon.COPY.getAsNode ()),
+                        new HCTextNode (" "),
+                        new HCA (aDeleteURL.getAsStringWithEncodedParameters ()).setTitle ("Delete endpoint")
+                                                                                .addChild (EDefaultIcon.DELETE.getAsNode ()),
                         new HCTextNode (" "),
                         new HCA (LinkHelper.getURIWithServerAndContext (aServiceInfo.getServiceGroup ()
                                                                                     .getParticpantIdentifier ()

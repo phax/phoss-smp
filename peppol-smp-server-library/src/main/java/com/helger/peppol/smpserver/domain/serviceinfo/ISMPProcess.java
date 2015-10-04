@@ -48,6 +48,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.ProcessType;
@@ -70,6 +71,13 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
   IPeppolProcessIdentifier getProcessIdentifier ();
 
   /**
+   * @return A copy of the list of all endpoints associated with this process.
+   */
+  @Nonnull
+  @ReturnsMutableCopy
+  List <? extends ISMPEndpoint> getAllEndpoints ();
+
+  /**
    * @return The number of contained endpoint information. Always &ge; 0.
    */
   @Nonnegative
@@ -81,12 +89,8 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
   @Nullable
   ISMPEndpoint getEndpointOfTransportProfile (@Nullable String sTransportProfile);
 
-  /**
-   * @return A copy of the list of all endpoints associated with this process.
-   */
   @Nonnull
-  @ReturnsMutableCopy
-  List <? extends ISMPEndpoint> getAllEndpoints ();
+  EChange deleteEndpoint (@Nullable final String sTransportProfile);
 
   @Nonnull
   ProcessType getAsJAXBObject ();
