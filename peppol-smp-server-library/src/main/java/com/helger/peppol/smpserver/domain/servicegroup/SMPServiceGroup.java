@@ -53,11 +53,11 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smpserver.domain.SMPHelper;
 
 /**
  * This class represents a single service group.
@@ -81,7 +81,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
                           @Nullable final String sExtension)
   {
     ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
-    m_sID = SMPHelper.createSMPServiceGroupID (aParticipantIdentifier);
+    m_sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
     setOwnerID (sOwnerID);
     setExtension (sExtension);
     // Make a copy to avoid unwanted changes
@@ -177,5 +177,12 @@ public class SMPServiceGroup implements ISMPServiceGroup
                                        .appendIfNotEmpty ("Extension", m_sExtension)
                                        .append ("ParticipantIdentifier", m_aParticipantIdentifier)
                                        .toString ();
+  }
+
+  @Nonnull
+  @Nonempty
+  public static String createSMPServiceGroupID (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  {
+    return IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier);
   }
 }

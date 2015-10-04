@@ -43,6 +43,11 @@ package com.helger.peppol.smpserver.domain.serviceinfo;
 import com.helger.commons.compare.AbstractComparator;
 import com.helger.peppol.identifier.IdentifierHelper;
 
+/**
+ * Compare {@link ISMPProcess} by the identifier.
+ * 
+ * @author Philip Helger
+ */
 public class ComparatorSMPProcess extends AbstractComparator <ISMPProcess>
 {
   @Override

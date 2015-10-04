@@ -54,15 +54,30 @@ import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
+/**
+ * Manager for {@link ISMPServiceInformation} objects. Service information
+ * objects require a service group to be present first.
+ *
+ * @author Philip Helger
+ */
 public interface ISMPServiceInformationManager
 {
+  /**
+   * Create or update an SMP service information object. An existing service
+   * information object is searched by service group, document type ID, process
+   * ID and transport profile.
+   *
+   * @param aServiceInformation
+   *        The service information object to handle. May not be
+   *        <code>null</code>.
+   */
   void createOrUpdateSMPServiceInformation (@Nonnull SMPServiceInformation aServiceInformation);
 
   @Nullable
   ISMPServiceInformation findServiceInformation (@Nullable ISMPServiceGroup aServiceGroup,
                                                  @Nullable IPeppolDocumentTypeIdentifier aDocTypeID,
                                                  @Nullable IPeppolProcessIdentifier aProcessID,
-                                                 @Nullable ISMPTransportProfile eTransportProfile);
+                                                 @Nullable ISMPTransportProfile aTransportProfile);
 
   @Nonnull
   EChange deleteSMPServiceInformation (@Nullable ISMPServiceInformation aSMPServiceInformation);
@@ -70,10 +85,17 @@ public interface ISMPServiceInformationManager
   @Nonnull
   EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
+  /**
+   * @return All service information objects. Never <code>null</code> but maybe
+   *         empty.
+   */
   @Nonnull
   @ReturnsMutableCopy
   Collection <? extends ISMPServiceInformation> getAllSMPServiceInformations ();
 
+  /**
+   * @return The count of all service information objects. Always &ge; 0.
+   */
   @Nonnegative
   int getSMPServiceInformationCount ();
 

@@ -72,7 +72,7 @@ import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
 import com.helger.peppol.smp.ServiceMetadataReferenceType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -125,8 +125,8 @@ public final class SMPServerAPI
                                       m_aAPIProvider.getCurrentURI ());
     }
 
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
@@ -181,9 +181,9 @@ public final class SMPServerAPI
                                           "'");
     }
 
-    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-    final Collection <? extends ISMPServiceGroup> aServiceGroups = MetaManager.getServiceGroupMgr ()
+    final Collection <? extends ISMPServiceGroup> aServiceGroups = SMPMetaManager.getServiceGroupMgr ()
                                                                               .getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
 
     final ServiceGroupReferenceListType aRefList = new ServiceGroupReferenceListType ();
@@ -218,8 +218,8 @@ public final class SMPServerAPI
                                       m_aAPIProvider.getCurrentURI ());
     }
 
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
     // Retrieve the service group
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
@@ -273,10 +273,10 @@ public final class SMPServerAPI
       throw new SMPNotFoundException ("ServiceGroup inconsistency", m_aAPIProvider.getCurrentURI ());
     }
 
-    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
 
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final String sExtension = SMPExtensionConverter.convertToString (aServiceGroup.getExtension ());
     if (aServiceGroupMgr.containsSMPServiceGroupWithID (aServiceGroupID))
       aServiceGroupMgr.updateSMPServiceGroup (sServiceGroupID, aSMPUser.getID (), sExtension);
@@ -303,11 +303,11 @@ public final class SMPServerAPI
       return ESuccess.FAILURE;
     }
 
-    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
     aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
 
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
 
     s_aLogger.info ("Finished deleteServiceGroup(" + sServiceGroupID + ")");
@@ -331,7 +331,7 @@ public final class SMPServerAPI
                                       m_aAPIProvider.getCurrentURI ());
     }
 
-    final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
       throw new SMPNotFoundException ("No such serviceGroup '" +
@@ -350,7 +350,7 @@ public final class SMPServerAPI
     }
 
     // First check for redirection, then for actual service
-    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
 
     final SignedServiceMetadataType aSignedServiceMetadata = new SignedServiceMetadataType ();
@@ -361,7 +361,7 @@ public final class SMPServerAPI
     else
     {
       // Get as regular service information
-      final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                          aDocTypeID);
       if (aServiceInfo != null)
@@ -445,11 +445,11 @@ public final class SMPServerAPI
     }
 
     // Main save
-    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPUser aDataUser = aUserMgr.validateUserCredentials (aCredentials);
     aUserMgr.verifyOwnership (aServiceGroupID, aDataUser);
 
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
@@ -460,7 +460,7 @@ public final class SMPServerAPI
 
     if (aServiceMetadata.getRedirect () != null)
     {
-      final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
       aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
                                               aDocTypeID,
                                               aServiceMetadata.getRedirect ().getHref (),
@@ -496,7 +496,7 @@ public final class SMPServerAPI
         aProcesses.add (aProcess);
       }
 
-      final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       aServiceInfoMgr.createOrUpdateSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
                                                                                       aDocTypeID,
                                                                                       aProcesses,
@@ -539,11 +539,11 @@ public final class SMPServerAPI
       return ESuccess.FAILURE;
     }
 
-    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
     aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
 
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
@@ -551,7 +551,7 @@ public final class SMPServerAPI
       return ESuccess.FAILURE;
     }
 
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                        aDocTypeID);
     if (aServiceInfo == null)

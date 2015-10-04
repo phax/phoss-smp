@@ -51,6 +51,11 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 
+/**
+ * BAse interface for a manager for {@link ISMPServiceGroup} objects.
+ * 
+ * @author Philip Helger
+ */
 public interface ISMPServiceGroupManager
 {
   @Nonnull

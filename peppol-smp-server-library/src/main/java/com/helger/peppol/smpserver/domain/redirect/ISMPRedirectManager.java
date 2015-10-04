@@ -52,7 +52,8 @@ import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
- * Manage all SMP redirects
+ * Manager for {@link ISMPRedirect} objects. Redirect objects require a service
+ * group to be present first.
  *
  * @author Philip Helger
  */
@@ -81,20 +82,49 @@ public interface ISMPRedirectManager
                                           @Nonnull String sSubjectUniqueIdentifier,
                                           @Nullable String sExtension);
 
+  /**
+   * Delete the passed SMP redirect.
+   *
+   * @param aSMPRedirect
+   *        The SMP redirect to be deleted. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if the deletion was successful
+   */
   @Nonnull
   EChange deleteSMPRedirect (@Nullable ISMPRedirect aSMPRedirect);
 
+  /**
+   * Delete all redirects owned by the passed service groups.-
+   *
+   * @param aServiceGroup
+   *        The service group which is about to be deleted.
+   * @return {@link EChange#CHANGED} is something was deleted
+   */
   @Nonnull
   EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
+  /**
+   * @return All contained SMP redirects. Never <code>null</code> but maybe
+   *         empty.
+   */
   @Nonnull
   @ReturnsMutableCopy
   Collection <? extends ISMPRedirect> getAllSMPRedirects ();
 
+  /**
+   * Get all redirects of the passed service group.
+   *
+   * @param aServiceGroup
+   *        The service group to use. May be <code>null</code>.
+   * @return All contained SMP redirects for the passed service group. Never
+   *         <code>null</code> but maybe empty.
+   */
   @Nonnull
   @ReturnsMutableCopy
   Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
+  /**
+   * @return The count of all contained redirects. Always &ge; 0.
+   */
   @Nonnegative
   int getSMPRedirectCount ();
 

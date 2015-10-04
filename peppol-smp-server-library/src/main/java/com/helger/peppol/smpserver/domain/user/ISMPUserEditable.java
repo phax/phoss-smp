@@ -43,7 +43,8 @@ package com.helger.peppol.smpserver.domain.user;
 import javax.annotation.Nonnull;
 
 /**
- * Abstract interface representing a user.
+ * Extended user interface for an SMP user that can be edited on the user
+ * interface.
  *
  * @author Philip Helger
  */

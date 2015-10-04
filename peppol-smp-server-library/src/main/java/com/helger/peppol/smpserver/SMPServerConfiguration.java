@@ -47,6 +47,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
@@ -70,24 +73,34 @@ import com.helger.peppol.utils.ConfigFile;
 @Immutable
 public final class SMPServerConfiguration
 {
+  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServerConfiguration.class);
   private static final ConfigFile s_aConfigFile;
 
   static
   {
     final List <String> aFilePaths = new ArrayList <> ();
-    // Check if the
+    // Check if the system property is present
     final String sPropertyPath = SystemProperties.getPropertyValue ("smp.server.properties.path");
     if (StringHelper.hasText (sPropertyPath))
       aFilePaths.add (sPropertyPath);
+
+    // Use the default paths
     aFilePaths.add ("private-smp-server.properties");
     aFilePaths.add ("smp-server.properties");
 
     s_aConfigFile = new ConfigFile (ArrayHelper.newArray (aFilePaths, String.class));
+    if (s_aConfigFile.isRead ())
+      s_aLogger.info ("Read smp-server.properties from " + s_aConfigFile.getReadResource ().getPath ());
+    else
+      s_aLogger.warn ("Failed to read smp-server.properties from any of the paths: " + aFilePaths);
   }
 
   private SMPServerConfiguration ()
   {}
 
+  /**
+   * @return The configuration file. Never <code>null</code>.
+   */
   @Nonnull
   public static ConfigFile getConfigFile ()
   {
@@ -104,24 +117,38 @@ public final class SMPServerConfiguration
     return s_aConfigFile.getString ("smp.backend");
   }
 
+  /**
+   * @return The path to the keystore. May be a classpath or an absolute file
+   *         path.
+   */
   @Nullable
   public static String getKeystorePath ()
   {
     return s_aConfigFile.getString ("smp.keystore.path");
   }
 
+  /**
+   * @return The password required to open the keystore.
+   */
   @Nullable
   public static String getKeystorePassword ()
   {
     return s_aConfigFile.getString ("smp.keystore.password");
   }
 
+  /**
+   * @return The alias of the SMP key in the keystore.
+   */
   @Nullable
   public static String getKeystoreKeyAlias ()
   {
     return s_aConfigFile.getString ("smp.keystore.key.alias");
   }
 
+  /**
+   * @return The password used to access the private key. MAy be different than
+   *         the password to the overall keystore.
+   */
   @Nullable
   public static char [] getKeystoreKeyPassword ()
   {

@@ -60,7 +60,9 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 public interface ISMPUserManager
 {
   /**
-   * @return <code>true</code> for SQL, <code>false</code> for XML
+   * @return <code>true</code> for SQL, <code>false</code> for XML. If this
+   *         method returns <code>true</code> all user objects must implement
+   *         {@link ISMPUserEditable}!
    */
   boolean isSpecialUserManagementNeeded ();
 
@@ -70,6 +72,9 @@ public interface ISMPUserManager
 
   void deleteUser (@Nullable String sUserName);
 
+  /**
+   * @return The number of contained user. Always &ge; 0.
+   */
   @Nonnegative
   int getUserCount ();
 

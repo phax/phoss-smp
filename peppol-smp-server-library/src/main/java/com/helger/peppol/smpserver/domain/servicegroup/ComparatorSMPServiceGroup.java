@@ -45,12 +45,17 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.compare.AbstractPartComparatorComparable;
 
+/**
+ * Comparator for {@link ISMPServiceGroup}s by participant ID.
+ *
+ * @author Philip Helger
+ */
 public class ComparatorSMPServiceGroup extends AbstractPartComparatorComparable <ISMPServiceGroup, String>
 {
   @Override
   @Nullable
   protected String getPart (@Nonnull final ISMPServiceGroup aObject)
   {
-    return aObject.getParticpantIdentifier ().getURIEncoded ();
+    return aObject.getID ();
   }
 }

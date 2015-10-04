@@ -45,6 +45,12 @@ import javax.annotation.Nonnull;
 import com.helger.commons.compare.AbstractComparator;
 import com.helger.peppol.identifier.IdentifierHelper;
 
+/**
+ * Comparator for {@link ISMPRedirect} objects. First by the service group ID
+ * and than second by the document type ID.
+ * 
+ * @author Philip Helger
+ */
 public class ComparatorSMPRedirect extends AbstractComparator <ISMPRedirect>
 {
   @Override

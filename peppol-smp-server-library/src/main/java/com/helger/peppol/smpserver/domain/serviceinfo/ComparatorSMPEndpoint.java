@@ -42,6 +42,12 @@ package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import com.helger.commons.compare.AbstractComparator;
 
+/**
+ * Compare {@link ISMPEndpoint} first be transport profile and second by
+ * endpoint reference.
+ * 
+ * @author Philip Helger
+ */
 public class ComparatorSMPEndpoint extends AbstractComparator <ISMPEndpoint>
 {
   @Override

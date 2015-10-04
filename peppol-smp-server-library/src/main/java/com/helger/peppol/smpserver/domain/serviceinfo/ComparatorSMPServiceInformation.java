@@ -43,6 +43,12 @@ package com.helger.peppol.smpserver.domain.serviceinfo;
 import com.helger.commons.compare.AbstractComparator;
 import com.helger.peppol.identifier.IdentifierHelper;
 
+/**
+ * Compare {@link ISMPServiceInformation} objects first by the service group ID
+ * and second by the document type identifier.
+ * 
+ * @author Philip Helger
+ */
 public class ComparatorSMPServiceInformation extends AbstractComparator <ISMPServiceInformation>
 {
   @Override

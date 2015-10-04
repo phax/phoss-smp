@@ -48,16 +48,24 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
 
 /**
- * Abstract interface representing a user.
+ * Interface representing an SMP user. For the SQL backend this is a separate
+ * domain object whereas for the XML backend this is a wrapper for the photon
+ * user.
  *
  * @author Philip Helger
  */
 public interface ISMPUser extends IHasID <String>, Serializable
 {
+  /**
+   * @return The user ID.
+   */
   @Nonnull
   @Nonempty
   String getID ();
 
+  /**
+   * @return The user display name.
+   */
   @Nonnull
   @Nonempty
   String getUserName ();
