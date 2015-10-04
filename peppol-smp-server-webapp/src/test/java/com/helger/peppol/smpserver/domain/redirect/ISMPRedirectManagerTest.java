@@ -28,7 +28,7 @@ import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerTestRule;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
@@ -47,7 +47,7 @@ public final class ISMPRedirectManagerTest
   @Test
   public void testRedirect ()
   {
-    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     aUserMgr.createUser (CSecurity.USER_ADMINISTRATOR_ID, "dummy");
     try
     {
@@ -55,12 +55,12 @@ public final class ISMPRedirectManagerTest
       final SimpleParticipantIdentifier aPI2 = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy2");
       final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
 
-      final ISMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
       // Ensure it is not present
       aSGMgr.deleteSMPServiceGroup (aPI);
       final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
-      final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
       // Create new one
       ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,

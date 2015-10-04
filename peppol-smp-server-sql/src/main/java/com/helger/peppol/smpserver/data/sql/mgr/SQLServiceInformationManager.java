@@ -71,7 +71,7 @@ import com.helger.peppol.smpserver.data.sql.model.DBServiceGroupID;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadata;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataID;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
@@ -301,7 +301,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   @Nonnull
   private static SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
   {
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final List <SMPProcess> aProcesses = new ArrayList <> ();
     for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
     {

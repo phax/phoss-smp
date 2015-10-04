@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import com.helger.peppol.smpserver.app.CApp;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.basic.app.menu.IMenuItemPage;
 import com.helger.photon.basic.app.menu.IMenuTree;
 import com.helger.photon.basic.app.menu.filter.MenuObjectFilterUserAssignedToUserGroup;
@@ -41,7 +41,7 @@ public final class MenuSecure
     // statically!
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID);
 
-    if (MetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
+    if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
       aMenuTree.createRootItem (new PageSecureUsers (CMenuSecure.MENU_USERS));
     aMenuTree.createRootItem (new PageSecureServiceGroups (CMenuSecure.MENU_SERVICE_GROUPS));
     aMenuTree.createRootItem (new PageSecureEndpoints (CMenuSecure.MENU_ENDPOINTS));

@@ -41,7 +41,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
@@ -93,7 +93,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPUserManager aUserManager = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
     if (aUserManager.getUserCount () == 0)
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild ("No user is present! At least one user must be present to create a service group."));
@@ -110,7 +110,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   protected ISMPServiceGroup getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                                 @Nullable final String sID)
   {
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     if (sID == null)
       return null;
     return aServiceGroupMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sID));
@@ -149,7 +149,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final String sParticipantID = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID);
     SimpleParticipantIdentifier aParticipantID = null;
     final String sOwningUserID = aWPEC.getAttributeAsString (FIELD_OWNING_USER_ID);
-    final ISMPUser aOwningUser = MetaManager.getUserMgr ().getUserOfID (sOwningUserID);
+    final ISMPUser aOwningUser = SMPMetaManager.getUserMgr ().getUserOfID (sOwningUserID);
     final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
 
     // validations
@@ -177,7 +177,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
     if (aFormErrors.isEmpty ())
     {
-      final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       if (bEdit)
       {
         // Edit only the internal data objects because no change to the SML is
@@ -267,7 +267,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     try
     {
       // Delete the service group both locally and on the SML (if active)!
-      final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier ());
     }
     catch (final Throwable t)
@@ -296,8 +296,8 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);

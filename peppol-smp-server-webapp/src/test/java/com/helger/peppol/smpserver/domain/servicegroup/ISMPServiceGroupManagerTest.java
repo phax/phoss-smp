@@ -28,8 +28,7 @@ import org.junit.rules.TestRule;
 
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerTestRule;
-import com.helger.peppol.smpserver.domain.MetaManager;
-import com.helger.peppol.smpserver.domain.SMPHelper;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 
 /**
@@ -47,18 +46,18 @@ public final class ISMPServiceGroupManagerTest
   {
     final SimpleParticipantIdentifier aPI1 = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:a");
     final SimpleParticipantIdentifier aPI2 = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:b");
-    final String sSG1 = SMPHelper.createSMPServiceGroupID (aPI1);
-    final String sSG2 = SMPHelper.createSMPServiceGroupID (aPI2);
+    final String sSG1 = SMPServiceGroup.createSMPServiceGroupID (aPI1);
+    final String sSG2 = SMPServiceGroup.createSMPServiceGroupID (aPI2);
     final String sOwner1ID = "o1";
     final String sOwner2ID = "o2";
     final String sExtension = "<ext val='a' />";
 
-    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     aUserMgr.createUser (sOwner1ID, "any");
     aUserMgr.createUser (sOwner2ID, "any");
     try
     {
-      final ISMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
       assertNotNull (aSGMgr);
 
       // Check empty state

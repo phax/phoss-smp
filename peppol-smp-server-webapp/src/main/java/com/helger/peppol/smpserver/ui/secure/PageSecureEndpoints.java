@@ -61,7 +61,7 @@ import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -130,7 +130,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
     if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to create an endpoint for it."));
@@ -149,12 +149,12 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   {
     final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
 
     final String sDocTypeID = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID);
     final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
 
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
   }
 
@@ -293,9 +293,9 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
-    final ISMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
-    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
@@ -577,7 +577,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);

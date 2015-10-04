@@ -30,7 +30,7 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smpserver.data.xml.mgr.XMLServiceInformationManager;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
@@ -55,8 +55,8 @@ public final class XMLServiceInformationManagerTest
   @Test
   public void testServiceRegistration ()
   {
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInformationMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = SMPMetaManager.getServiceInformationMgr ();
     assertEquals (0, aServiceInformationMgr.getSMPServiceInformationCount ());
 
     final IUser aTestUser = AccessManager.getInstance ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);

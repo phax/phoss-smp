@@ -30,7 +30,7 @@ import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.microdom.util.MicroHelper;
 import com.helger.peppol.identifier.IMutableDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
@@ -72,7 +72,7 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   @Nonnull
   public ISMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement)
   {
-    final ISMPServiceGroupManager aSGMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);
     final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPart (sServiceGroupID));
     if (aServiceGroup == null)

@@ -31,7 +31,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
@@ -130,7 +130,7 @@ public final class XMLUserManager implements ISMPUserManager
                                                                                  SMPUnauthorizedException
   {
     // Resolve user group
-    final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
       throw new SMPNotFoundException ("Service group " +

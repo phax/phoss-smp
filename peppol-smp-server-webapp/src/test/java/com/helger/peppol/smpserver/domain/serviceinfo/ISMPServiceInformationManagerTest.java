@@ -27,7 +27,7 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smpserver.SMPServerTestRule;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
@@ -46,9 +46,9 @@ public final class ISMPServiceInformationManagerTest
   @Test
   public void testAll ()
   {
-    final ISMPUserManager aUserMgr = MetaManager.getUserMgr ();
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
+    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
 
     aUserMgr.createUser (CSecurity.USER_ADMINISTRATOR_ID, "bla");

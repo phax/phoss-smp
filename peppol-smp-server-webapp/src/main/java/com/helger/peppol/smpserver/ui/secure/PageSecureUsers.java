@@ -35,7 +35,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.smpserver.app.CApp;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserEditable;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
@@ -80,7 +80,7 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPUserManager aUserManager = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
     if (!aUserManager.isSpecialUserManagementNeeded ())
     {
       final BootstrapWarnBox aWarnBox = new BootstrapWarnBox ().addChild (new HCDiv ().addChild ("No special user management is needed. The integrated user management must be used."));
@@ -102,7 +102,7 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
   protected ISMPUserEditable getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                                 @Nullable final String sID)
   {
-    final ISMPUserManager aUserManager = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
     final ISMPUser aUser = aUserManager.getUserOfID (sID);
     return (ISMPUserEditable) aUser;
   }
@@ -113,7 +113,7 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
                                      @Nullable final ISMPUserEditable aSelectedObject)
   {
     if (eFormAction.isDelete ())
-      return MetaManager.getServiceGroupMgr ().getSMPServiceGroupCountOfOwner (aSelectedObject.getID ()) == 0;
+      return SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupCountOfOwner (aSelectedObject.getID ()) == 0;
     return true;
   }
 
@@ -156,7 +156,7 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
                                                  @Nonnull final FormErrors aFormErrors,
                                                  @Nonnull final EWebPageFormAction eFormAction)
   {
-    final ISMPUserManager aUserManager = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
     final boolean bEdit = eFormAction.isEdit ();
     final String sUserName = bEdit ? aSelectedObject.getUserName () : aWPEC.getAttributeAsString (FIELD_USERNAME);
     final String sPassword = aWPEC.getAttributeAsString (FIELD_PASSWORD);
@@ -203,7 +203,7 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
   protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nonnull final ISMPUserEditable aSelectedObject)
   {
-    final ISMPUserManager aUserManager = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
     aUserManager.deleteUser (aSelectedObject.getID ());
     aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The user '" +
                                                                 aSelectedObject.getUserName () +
@@ -215,7 +215,7 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPUserManager aUserManager = MetaManager.getUserMgr ();
+    final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
 
     // Toolbar on top
     final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));

@@ -37,8 +37,7 @@ import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.smpserver.domain.MetaManager;
-import com.helger.peppol.smpserver.domain.SMPHelper;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
@@ -198,8 +197,8 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
 
       // Delete all redirects and all service information of this service group
       // as well
-      MetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
-      MetaManager.getServiceInformationMgr ().deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
+      SMPMetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
+      SMPMetaManager.getServiceInformationMgr ().deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
 
       markAsChanged (aRealServiceGroup, EDAOActionType.DELETE);
     }
@@ -274,7 +273,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     if (aParticipantIdentifier == null)
       return null;
 
-    final String sID = SMPHelper.createSMPServiceGroupID (aParticipantIdentifier);
+    final String sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
     m_aRWLock.readLock ().lock ();
     try
     {
@@ -291,10 +290,11 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     if (aParticipantIdentifier == null)
       return false;
 
+    final String sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
     m_aRWLock.readLock ().lock ();
     try
     {
-      return m_aMap.containsKey (SMPHelper.createSMPServiceGroupID (aParticipantIdentifier));
+      return m_aMap.containsKey (sID);
     }
     finally
     {

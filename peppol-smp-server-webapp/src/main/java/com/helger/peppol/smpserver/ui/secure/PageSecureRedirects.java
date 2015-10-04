@@ -43,7 +43,7 @@ import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -97,7 +97,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
     if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to create a redirect for it."));
@@ -120,7 +120,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
     {
       final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
       final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-      final ISMPServiceGroup aServiceGroup = MetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+      final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
       if (aServiceGroup != null)
       {
         final String sDocTypeID = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID);
@@ -144,7 +144,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
     final ISMPServiceGroup aServiceGroup = aWPEC.getRequestScope ().getCastedAttribute (ATTR_SERVICE_GROUP);
     final IDocumentTypeIdentifier aDocTypeID = aWPEC.getRequestScope ().getCastedAttribute (ATTR_DOCTYPE_ID);
 
-    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     return aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
   }
 
@@ -184,9 +184,9 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   {
     final boolean bEdit = eFormAction.isEdit ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceGroupManager aServiceGroupManager = MetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = MetaManager.getServiceInformationMgr ();
-    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
@@ -324,7 +324,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                 @Nonnull final ISMPRedirect aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     if (aRedirectMgr.deleteSMPRedirect (aSelectedObject).isChanged ())
       aNodeList.addChild (new BootstrapSuccessBox ().addChild ("The selected redirect was successfully deleted!"));
     else
@@ -336,7 +336,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPRedirectManager aRedirectMgr = MetaManager.getRedirectMgr ();
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Redirect", createCreateURL (aWPEC), EDefaultIcon.NEW);

@@ -24,7 +24,7 @@ import com.helger.commons.compare.ESortOrder;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
@@ -53,7 +53,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING)).setID (getID ());
     aTable.addHeaderRow ().addCell ();
-    for (final ISMPServiceGroup aServiceGroup : MetaManager.getServiceGroupMgr ().getAllSMPServiceGroups ())
+    for (final ISMPServiceGroup aServiceGroup : SMPMetaManager.getServiceGroupMgr ().getAllSMPServiceGroups ())
       aTable.addBodyRow ()
             .addCell (IdentifierHelper.getIdentifierURIEncoded (aServiceGroup.getParticpantIdentifier ()));
 

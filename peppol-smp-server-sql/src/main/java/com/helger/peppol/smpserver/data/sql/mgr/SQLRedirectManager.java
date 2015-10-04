@@ -59,7 +59,7 @@ import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirectionID;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
@@ -195,7 +195,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
   @Nonnull
   private static SMPRedirect _convert (@Nonnull final DBServiceMetadataRedirection aDBRedirect)
   {
-    final ISMPServiceGroupManager aServiceGroupMgr = MetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     return new SMPRedirect (aServiceGroupMgr.getSMPServiceGroupOfID (aDBRedirect.getId ().getAsBusinessIdentifier ()),
                             aDBRedirect.getId ().getAsDocumentTypeIdentifier (),
                             aDBRedirect.getRedirectionUrl (),

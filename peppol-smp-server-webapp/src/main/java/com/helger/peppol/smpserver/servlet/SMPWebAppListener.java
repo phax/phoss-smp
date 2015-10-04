@@ -30,7 +30,7 @@ import com.helger.peppol.smpserver.app.AppSecurity;
 import com.helger.peppol.smpserver.app.AppSettings;
 import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
 import com.helger.peppol.smpserver.data.xml.mgr.XMLManagerProvider;
-import com.helger.peppol.smpserver.domain.MetaManager;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.pub.InitializerPublic;
 import com.helger.peppol.smpserver.ui.secure.InitializerSecure;
@@ -87,17 +87,17 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     // Determine backend
     final String sBackend = SMPServerConfiguration.getBackend ();
     if ("sql".equalsIgnoreCase (sBackend))
-      MetaManager.setManagerFactory (new SQLManagerProvider ());
+      SMPMetaManager.setManagerFactory (new SQLManagerProvider ());
     else
       if ("xml".equalsIgnoreCase (sBackend))
-        MetaManager.setManagerFactory (new XMLManagerProvider ());
+        SMPMetaManager.setManagerFactory (new XMLManagerProvider ());
       else
         throw new InitializationException ("Invalid backend '" +
                                            sBackend +
                                            "' provided. Only 'sql' and 'xml' are supported!");
 
     // Now we can call getInstance
-    MetaManager.getInstance ();
+    SMPMetaManager.getInstance ();
   }
 
   @Override
