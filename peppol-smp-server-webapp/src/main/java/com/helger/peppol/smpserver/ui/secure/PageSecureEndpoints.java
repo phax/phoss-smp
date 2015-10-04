@@ -449,6 +449,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
 
+    aForm.addChild (createActionHeader (bEdit ? "Edit endpoint" : "Create new endpoint"));
+
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service group")
                                                  .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
                                                                                                        aSelectedObject != null ? aSelectedObject.getServiceGroupID ()

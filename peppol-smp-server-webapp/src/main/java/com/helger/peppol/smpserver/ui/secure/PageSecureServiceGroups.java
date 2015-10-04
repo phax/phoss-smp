@@ -122,7 +122,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
-    aNodeList.addChild (createActionHeader ("Show details of service group"));
+    aNodeList.addChild (createActionHeader ("Show details of service group '" + aSelectedObject.getID () + "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
@@ -219,7 +219,8 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bEdit = eFormAction.isEdit ();
 
-    aForm.addChild (createActionHeader (bEdit ? "Edit service group" : "Create new service group"));
+    aForm.addChild (createActionHeader (bEdit ? "Edit service group '" + aSelectedObject.getID () + "'"
+                                              : "Create new service group"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID,
