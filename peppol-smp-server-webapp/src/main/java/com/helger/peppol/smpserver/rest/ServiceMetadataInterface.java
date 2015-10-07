@@ -29,15 +29,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
+import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.xml.serialize.write.EXMLIncorrectCharacterHandling;
 import com.helger.commons.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.commons.xml.serialize.write.IXMLWriterSettings;
 import com.helger.commons.xml.serialize.write.XMLWriter;
 import com.helger.commons.xml.serialize.write.XMLWriterSettings;
+import com.helger.commons.xml.transform.XMLTransformerFactory;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
@@ -88,14 +93,34 @@ public final class ServiceMetadataInterface
         throw new RuntimeException ("Error in signing xml", ex);
       }
 
-      // IMPORTANT: no indent and no align!
-      final IXMLWriterSettings aSettings = new XMLWriterSettings ().setIncorrectCharacterHandling (EXMLIncorrectCharacterHandling.THROW_EXCEPTION)
-                                                                   .setIndent (EXMLSerializeIndent.NONE);
-
-      // Write the result to a byte array
       final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ();
-      if (XMLWriter.writeToStream (aDoc, aBAOS, aSettings).isFailure ())
-        throw new RuntimeException ("Failed to serialize signed node!");
+      if (false)
+      {
+        // IMPORTANT: no indent and no align!
+        final IXMLWriterSettings aSettings = new XMLWriterSettings ().setIncorrectCharacterHandling (EXMLIncorrectCharacterHandling.THROW_EXCEPTION)
+                                                                     .setIndent (EXMLSerializeIndent.NONE);
+
+        // Write the result to a byte array
+        if (XMLWriter.writeToStream (aDoc, aBAOS, aSettings).isFailure ())
+          throw new RuntimeException ("Failed to serialize signed node!");
+      }
+      else
+      {
+        // Use this because it correctly serializes &#13; which is important for
+        // validating the signature!
+        try
+        {
+          XMLTransformerFactory.newTransformer ().transform (new DOMSource (aDoc), new StreamResult (aBAOS));
+        }
+        catch (final TransformerException ex)
+        {
+          throw new IllegalStateException ("Failed to save to XML", ex);
+        }
+        finally
+        {
+          StreamHelper.close (aBAOS);
+        }
+      }
 
       return aBAOS.toByteArray ();
     }
