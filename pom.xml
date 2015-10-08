@@ -25,7 +25,7 @@
     <version>1.4.1</version>
   </parent>
   <artifactId>peppol-smp-server-parent-pom</artifactId>
-  <version>4.0.1-SNAPSHOT</version>
+  <version>4.0.1</version>
   <packaging>pom</packaging>
   <name>peppol-smp-server-parent-pom</name>
   <description>Base POM to build the peppol-smp-server projects</description>
@@ -54,7 +54,7 @@
     <connection>scm:git:git@github.com:phax/peppol-smp-server.git</connection>
     <developerConnection>scm:git:git@github.com:phax/peppol-smp-server.git</developerConnection>
     <url>http://github.com/phax/peppol-smp-server</url>
-    <tag>HEAD</tag>
+    <tag>peppol-smp-server-parent-pom-4.0.1</tag>
   </scm>
 
   <organization>
