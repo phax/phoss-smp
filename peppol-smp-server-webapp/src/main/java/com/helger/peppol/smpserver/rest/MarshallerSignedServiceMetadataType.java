@@ -17,6 +17,7 @@
 package com.helger.peppol.smpserver.rest;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.xml.bind.JAXBElement;
 
 import com.helger.commons.io.resource.IReadableResource;
@@ -29,6 +30,7 @@ import com.helger.peppol.smp.SignedServiceMetadataType;
  *
  * @author Philip Helger
  */
+@NotThreadSafe
 final class MarshallerSignedServiceMetadataType extends AbstractJAXBMarshaller <SignedServiceMetadataType>
 {
   public MarshallerSignedServiceMetadataType ()
