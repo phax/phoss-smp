@@ -45,6 +45,7 @@ import com.helger.commons.xml.serialize.write.XMLWriterSettings;
 import com.helger.commons.xml.transform.XMLTransformerFactory;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.photon.core.app.CApplication;
@@ -135,6 +136,10 @@ public final class ServiceMetadataInterface
                                            @PathParam ("DocumentTypeId") final String sDocumentTypeID,
                                            final ServiceMetadataType aServiceMetadata) throws Throwable
   {
+    // Is the writable API disabled?
+    if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+      return Response.status (Response.Status.NOT_FOUND).build ();
+
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
@@ -156,6 +161,10 @@ public final class ServiceMetadataInterface
   public Response deleteServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                              @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
   {
+    // Is the writable API disabled?
+    if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+      return Response.status (Response.Status.NOT_FOUND).build ();
+
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {

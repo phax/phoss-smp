@@ -33,6 +33,7 @@ import javax.xml.bind.JAXBElement;
 
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.photon.core.app.CApplication;
 import com.helger.web.mock.MockHttpServletResponse;
@@ -81,6 +82,10 @@ public final class ServiceGroupInterface
   public Response saveServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                     final ServiceGroupType aServiceGroup) throws Throwable
   {
+    // Is the writable API disabled?
+    if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+      return Response.status (Response.Status.NOT_FOUND).build ();
+
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
@@ -100,6 +105,10 @@ public final class ServiceGroupInterface
   @DELETE
   public Response deleteServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
+    // Is the writable API disabled?
+    if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+      return Response.status (Response.Status.NOT_FOUND).build ();
+
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {

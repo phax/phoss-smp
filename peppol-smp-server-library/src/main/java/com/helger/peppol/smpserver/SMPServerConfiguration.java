@@ -165,6 +165,19 @@ public final class SMPServerConfiguration
   }
 
   /**
+   * Check if the writable parts of the REST API are disabled. If this is the
+   * case, only the read-only part of the API can be used. The writable REST API
+   * will return an HTTP 404 error.
+   * 
+   * @return <code>true</code> if it is disabled, <code>false</code> if it is
+   *         enabled. By the default the writable API is enabled.
+   */
+  public static boolean isRESTWritableAPIDisabled ()
+  {
+    return s_aConfigFile.getBoolean ("smp.rest.writableapi.disabled", false);
+  }
+
+  /**
    * @return <code>true</code> if the SML connection is active,
    *         <code>false</code> if not.
    */
