@@ -27,9 +27,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.helger.commons.exception.InitializationException;
+import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 
 /**
- * REST Web Service for redirection
+ * REST Web Service for redirection. It is called if the server root ("/") is
+ * invoked - e.g. from a browser. It redirects the application to the UI start
+ * page.
  *
  * @author Jerry Dimitriou
  */
@@ -42,7 +45,7 @@ public final class RedirectInterface
   {
     try
     {
-      INDEX_HTML = new URI ("/public/");
+      INDEX_HTML = new URI (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH + "/");
     }
     catch (final URISyntaxException e)
     {
