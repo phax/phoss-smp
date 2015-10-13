@@ -5,6 +5,8 @@ Please read the **[Wiki](https://github.com/phax/peppol-smp-server/wiki)** for a
 
 Latest version: **4.0.1**
 
+For querying an SMP server you may want to have a look at the OSS [peppol-smp-client](https://github.com/phax/peppol-smp-client/).
+
 ---
 
 On Twitter: <a href="https://twitter.com/philiphelger">Follow @philiphelger</a>
