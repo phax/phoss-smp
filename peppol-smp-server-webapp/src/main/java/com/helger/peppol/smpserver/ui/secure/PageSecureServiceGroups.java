@@ -60,6 +60,7 @@ import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
@@ -79,7 +80,8 @@ import com.helger.validation.error.FormErrors;
 @WorkInProgress
 public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPServiceGroup>
 {
-  private final static String FIELD_PARTICIPANT_ID = "participantid";
+  private final static String FIELD_PARTICIPANT_ID_SCHEME = "participantidscheme";
+  private final static String FIELD_PARTICIPANT_ID_VALUE = "participantidvalue";
   private final static String FIELD_OWNING_USER_ID = "owninguser";
   private final static String FIELD_EXTENSION = "extension";
 
@@ -110,9 +112,10 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   protected ISMPServiceGroup getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                                 @Nullable final String sID)
   {
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     if (sID == null)
       return null;
+
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     return aServiceGroupMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sID));
   }
 
@@ -146,25 +149,31 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final boolean bEdit = eFormAction.isEdit ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
-    final String sParticipantID = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID);
+    final String sParticipantIDScheme = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID_SCHEME);
+    final String sParticipantIDValue = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID_VALUE);
     SimpleParticipantIdentifier aParticipantID = null;
     final String sOwningUserID = aWPEC.getAttributeAsString (FIELD_OWNING_USER_ID);
     final ISMPUser aOwningUser = SMPMetaManager.getUserMgr ().getUserOfID (sOwningUserID);
     final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
 
     // validations
-    if (StringHelper.hasNoText (sParticipantID))
-      aFormErrors.addFieldError (FIELD_PARTICIPANT_ID, "Participant ID must not be empty!");
+    if (StringHelper.hasNoText (sParticipantIDScheme))
+      aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_SCHEME, "Participant ID scheme must not be empty!");
     else
-    {
-      aParticipantID = SimpleParticipantIdentifier.createFromURIPartOrNull (sParticipantID);
-      if (aParticipantID == null)
-        aFormErrors.addFieldError (FIELD_PARTICIPANT_ID, "The provided participant ID has an invalid syntax!");
+      if (StringHelper.hasNoText (sParticipantIDValue))
+        aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "Participant ID value must not be empty!");
       else
-        if (!bEdit && aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID) != null)
-          aFormErrors.addFieldError (FIELD_PARTICIPANT_ID,
-                                     "Another service group for the same participant ID is already present!");
-    }
+      {
+        aParticipantID = SimpleParticipantIdentifier.createFromURIPartOrNull (sParticipantIDScheme +
+                                                                              CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
+                                                                              sParticipantIDValue);
+        if (aParticipantID == null)
+          aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "The provided participant ID has an invalid syntax!");
+        else
+          if (!bEdit && aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID) != null)
+            aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE,
+                                       "Another service group for the same participant ID is already present!");
+      }
 
     if (StringHelper.isEmpty (sOwningUserID))
       aFormErrors.addFieldError (FIELD_OWNING_USER_ID, "Owning User must not be empty!");
@@ -187,7 +196,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         // necessary. Only the owner and the extension can be edited!
         aServiceGroupMgr.updateSMPServiceGroup (aSelectedObject.getID (), aOwningUser.getID (), sExtension);
         aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
-                                                                    sParticipantID +
+                                                                    aParticipantID.getURIEncoded () +
                                                                     "' was successfully edited."));
       }
       else
@@ -200,13 +209,13 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         catch (final Throwable t)
         {
           aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error creating the new SMP ServiceGroup for participant '" +
-                                                                    sParticipantID +
+                                                                    aParticipantID.getURIEncoded () +
                                                                     "'. Technical details: " +
                                                                     t.getMessage ()));
         }
 
         aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
-                                                                    sParticipantID +
+                                                                    aParticipantID.getURIEncoded () +
                                                                     "' was successfully created."));
       }
     }
@@ -222,17 +231,32 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bEdit = eFormAction.isEdit ();
 
+    aForm.setLeft (2);
     aForm.addChild (createActionHeader (bEdit ? "Edit service group '" + aSelectedObject.getID () + "'"
                                               : "Create new service group"));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
-                                                 .setCtrl (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID,
-                                                                                         aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
-                                                                                                                                  .getURIEncoded ()
-                                                                                                                 : CIdentifier.DEFAULT_PARTICIPANT_IDENTIFIER_SCHEME +
-                                                                                                                   CIdentifier.URL_SCHEME_VALUE_SEPARATOR)).setReadOnly (bEdit))
-                                                 .setHelpText ("The participant identifier for which the service group should be created. It must contain the full identifier scheme and value. Example: iso6523-actorid-upis::9915:test")
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_PARTICIPANT_ID)));
+    {
+      final BootstrapRow aRow = new BootstrapRow ();
+      aRow.createColumn (6, 6, 4, 3)
+          .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_SCHEME,
+                                                   aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
+                                                                                            .getScheme ()
+                                                                           : CIdentifier.DEFAULT_PARTICIPANT_IDENTIFIER_SCHEME)).setPlaceholder ("Identifier scheme")
+                                                                                                                                .setReadOnly (bEdit));
+      aRow.createColumn (6, 6, 8, 9)
+          .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
+                                                   aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
+                                                                                            .getValue ()
+                                                                           : null)).setPlaceholder ("Identifier value")
+                                                                                   .setReadOnly (bEdit));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
+                                                   .setCtrl (aRow)
+                                                   .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme (default: " +
+                                                                 CIdentifier.DEFAULT_PARTICIPANT_IDENTIFIER_SCHEME +
+                                                                 "), the right part is the identifier value (e.g. 9915:test)")
+                                                   .setErrorList (aFormErrors.getListOfFields (FIELD_PARTICIPANT_ID_SCHEME,
+                                                                                               FIELD_PARTICIPANT_ID_VALUE)));
+    }
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owning User")
                                                  .setCtrl (new HCUserSelect (new RequestField (FIELD_OWNING_USER_ID,
