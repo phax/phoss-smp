@@ -196,7 +196,49 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       return false;
     }
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
+  }
 
+  private static SMap _createParamMap (@Nonnull final ISMPServiceInformation aServiceInfo,
+                                       @Nonnull final ISMPProcess aProcess,
+                                       @Nonnull final ISMPEndpoint aEndpoint)
+  {
+    return new SMap ().add (FIELD_SERVICE_GROUP_ID,
+                            aServiceInfo.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ())
+                      .add (FIELD_DOCTYPE_ID_SCHEME, aServiceInfo.getDocumentTypeIdentifier ().getScheme ())
+                      .add (FIELD_DOCTYPE_ID_VALUE, aServiceInfo.getDocumentTypeIdentifier ().getValue ())
+                      .add (FIELD_PROCESS_ID_SCHEME, aProcess.getProcessIdentifier ().getScheme ())
+                      .add (FIELD_PROCESS_ID_VALUE, aProcess.getProcessIdentifier ().getValue ())
+                      .add (FIELD_TRANSPORT_PROFILE, aEndpoint.getTransportProfile ());
+  }
+
+  @Override
+  @Nonnull
+  protected BootstrapButtonToolbar createViewToolbar (@Nonnull final WebPageExecutionContext aWPEC,
+                                                      final boolean bCanGoBack,
+                                                      @Nonnull final ISMPServiceInformation aSelectedObject)
+  {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
+    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+
+    final BootstrapButtonToolbar aToolbar = createNewViewToolbar (aWPEC);
+    if (bCanGoBack)
+    {
+      // Back to list
+      aToolbar.addButtonBack (aDisplayLocale);
+    }
+    if (isActionAllowed (aWPEC, EWebPageFormAction.EDIT, aSelectedObject))
+    {
+      // Edit object
+      aToolbar.addButtonEdit (aDisplayLocale,
+                              createEditURL (aWPEC, aSelectedObject).addAll (_createParamMap (aSelectedObject,
+                                                                                              aSelectedProcess,
+                                                                                              aSelectedEndpoint)));
+    }
+
+    // Callback
+    modifyViewToolbar (aWPEC, aSelectedObject, aToolbar);
+    return aToolbar;
   }
 
   @Override
@@ -703,17 +745,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
-          final SMap aParams = new SMap ().add (FIELD_SERVICE_GROUP_ID,
-                                                aServiceInfo.getServiceGroup ()
-                                                            .getParticpantIdentifier ()
-                                                            .getURIEncoded ())
-                                          .add (FIELD_DOCTYPE_ID_SCHEME,
-                                                aServiceInfo.getDocumentTypeIdentifier ().getScheme ())
-                                          .add (FIELD_DOCTYPE_ID_VALUE,
-                                                aServiceInfo.getDocumentTypeIdentifier ().getValue ())
-                                          .add (FIELD_PROCESS_ID_SCHEME, aProcess.getProcessIdentifier ().getScheme ())
-                                          .add (FIELD_PROCESS_ID_VALUE, aProcess.getProcessIdentifier ().getValue ())
-                                          .add (FIELD_TRANSPORT_PROFILE, aEndpoint.getTransportProfile ());
+          final SMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
 
           final HCRow aRow = aTable.addBodyRow ();
           aRow.addCell (new HCA (createViewURL (aWPEC,
