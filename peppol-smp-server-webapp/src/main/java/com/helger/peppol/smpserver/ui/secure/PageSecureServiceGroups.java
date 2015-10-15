@@ -237,13 +237,13 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
     {
       final BootstrapRow aRow = new BootstrapRow ();
-      aRow.createColumn (6, 6, 4, 3)
+      aRow.createColumn (GS_IDENTIFIER_SCHEME)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_SCHEME,
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
                                                                                             .getScheme ()
                                                                            : CIdentifier.DEFAULT_PARTICIPANT_IDENTIFIER_SCHEME)).setPlaceholder ("Identifier scheme")
                                                                                                                                 .setReadOnly (bEdit));
-      aRow.createColumn (6, 6, 8, 9)
+      aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
                                                                                             .getValue ()

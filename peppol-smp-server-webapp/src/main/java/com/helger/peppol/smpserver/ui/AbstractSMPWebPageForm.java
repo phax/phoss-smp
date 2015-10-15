@@ -20,11 +20,17 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
+import com.helger.photon.bootstrap3.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageForm;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
 public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> extends AbstractBootstrapWebPageForm <DATATYPE, WebPageExecutionContext>
 {
+  /** Grid spec for identifier schemes */
+  protected static final BootstrapGridSpec GS_IDENTIFIER_SCHEME = BootstrapGridSpec.create (6, 6, 4, 3);
+  /** Grid spec for identifier values */
+  protected static final BootstrapGridSpec GS_IDENTIFIER_VALUE = BootstrapGridSpec.create (6, 6, 8, 9);
+
   public AbstractSMPWebPageForm (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
   {
     super (sID, sName);
