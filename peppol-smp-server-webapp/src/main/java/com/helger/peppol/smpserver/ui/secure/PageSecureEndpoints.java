@@ -84,6 +84,7 @@ import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap3.uictrls.datetimepicker.BootstrapDateTimePicker;
@@ -104,8 +105,10 @@ import com.helger.validation.error.FormErrors;
 public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServiceInformation>
 {
   private final static String FIELD_SERVICE_GROUP_ID = "sgid";
-  private final static String FIELD_DOCTYPE_ID = "doctypeid";
-  private final static String FIELD_PROCESS_ID = "processid";
+  private final static String FIELD_DOCTYPE_ID_SCHEME = "doctypeidscheme";
+  private final static String FIELD_DOCTYPE_ID_VALUE = "doctypeidvalue";
+  private final static String FIELD_PROCESS_ID_SCHEME = "processidscheme";
+  private final static String FIELD_PROCESS_ID_VALUE = "processidvalue";
   private final static String FIELD_TRANSPORT_PROFILE = "transportprofile";
   private final static String FIELD_ENDPOINT_REFERENCE = "endpointreference";
   private final static String FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE = "requiresbusinesslevelsignature";
@@ -148,15 +151,18 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   protected ISMPServiceInformation getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                                       @Nullable final String sID)
   {
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+
     final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
-    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
-                                                         .getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
 
-    final String sDocTypeID = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID);
-    final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
-
-    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final String sDocTypeIDScheme = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_SCHEME);
+    final String sDocTypeIDValue = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_VALUE);
+    final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeIDScheme +
+                                                                                                          CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
+                                                                                                          sDocTypeIDValue);
     return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
   }
 
@@ -170,13 +176,15 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         eFormAction == EWebPageFormAction.EDIT ||
         eFormAction == EWebPageFormAction.DELETE)
     {
-      final String sProcessID = aWPEC.getAttributeAsString (FIELD_PROCESS_ID);
-      final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createFromURIPartOrNull (sProcessID);
-      final String sTransportProfile = aWPEC.getAttributeAsString (FIELD_TRANSPORT_PROFILE);
-
+      final String sProcessIDScheme = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_SCHEME);
+      final String sProcessIDValue = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
+      final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createFromURIPartOrNull (sProcessIDScheme +
+                                                                                                  CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
+                                                                                                  sProcessIDValue);
       final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
+        final String sTransportProfile = aWPEC.getAttributeAsString (FIELD_TRANSPORT_PROFILE);
         final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfile);
         if (aEndpoint != null)
         {
@@ -304,11 +312,15 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
 
-    final String sDocTypeID = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()
-                                    : aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID);
+    final String sDocTypeIDScheme = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getScheme ()
+                                          : aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_SCHEME);
+    final String sDocTypeIDValue = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getValue ()
+                                         : aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_VALUE);
     IPeppolDocumentTypeIdentifier aDocTypeID = null;
-    final String sProcessID = bEdit ? aSelectedProcess.getProcessIdentifier ().getURIEncoded ()
-                                    : aWPEC.getAttributeAsString (FIELD_PROCESS_ID);
+    final String sProcessIDScheme = bEdit ? aSelectedProcess.getProcessIdentifier ().getScheme ()
+                                          : aWPEC.getAttributeAsString (FIELD_PROCESS_ID_SCHEME);
+    final String sProcessIDValue = bEdit ? aSelectedProcess.getProcessIdentifier ().getValue ()
+                                         : aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
     IPeppolProcessIdentifier aProcessID = null;
 
     final String sTransportProfile = bEdit ? aSelectedEndpoint.getTransportProfile ()
@@ -337,30 +349,40 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided service group does not exist!");
     }
 
-    if (StringHelper.isEmpty (sDocTypeID))
-      aFormErrors.addFieldError (FIELD_DOCTYPE_ID, "Document type ID must not be empty!");
+    if (StringHelper.isEmpty (sDocTypeIDScheme))
+      aFormErrors.addFieldError (FIELD_DOCTYPE_ID_SCHEME, "Document type ID scheme must not be empty!");
     else
-    {
-      aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
-      if (aDocTypeID == null)
-        aFormErrors.addFieldError (FIELD_DOCTYPE_ID, "The provided document type ID has an invalid syntax!");
+      if (StringHelper.isEmpty (sDocTypeIDValue))
+        aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "Document type ID value must not be empty!");
       else
       {
-        if (aServiceGroup != null)
-          if (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID) != null)
-            aFormErrors.addFieldError (FIELD_DOCTYPE_ID,
-                                       "At least one redirect is registered for this document type. Delete the redirect before you can create an endpoint.");
+        aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeIDScheme +
+                                                                           CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
+                                                                           sDocTypeIDValue);
+        if (aDocTypeID == null)
+          aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "The provided document type ID has an invalid syntax!");
+        else
+        {
+          if (aServiceGroup != null)
+            if (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID) != null)
+              aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE,
+                                         "At least one redirect is registered for this document type. Delete the redirect before you can create an endpoint.");
+        }
       }
-    }
 
-    if (StringHelper.isEmpty (sProcessID))
-      aFormErrors.addFieldError (FIELD_PROCESS_ID, "Process ID must not be empty!");
+    if (StringHelper.isEmpty (sProcessIDScheme))
+      aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID scheme must not be empty!");
     else
-    {
-      aProcessID = SimpleProcessIdentifier.createFromURIPartOrNull (sProcessID);
-      if (aProcessID == null)
-        aFormErrors.addFieldError (FIELD_PROCESS_ID, "The provided process ID has an invalid syntax!");
-    }
+      if (StringHelper.isEmpty (sProcessIDValue))
+        aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID value must not be empty!");
+      else
+      {
+        aProcessID = SimpleProcessIdentifier.createFromURIPartOrNull (sProcessIDScheme +
+                                                                      CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
+                                                                      sProcessIDValue);
+        if (aProcessID == null)
+          aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, "The provided process ID has an invalid syntax!");
+      }
 
     if (StringHelper.isEmpty (sTransportProfile))
       aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, "Transport Profile must not be empty!");
@@ -485,21 +507,45 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                                                      aDisplayLocale).setReadOnly (bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Document type ID")
-                                                 .setCtrl (new HCEdit (new RequestField (FIELD_DOCTYPE_ID,
-                                                                                         aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
-                                                                                                                                  .getURIEncoded ()
-                                                                                                                 : CIdentifier.DEFAULT_DOCUMENT_TYPE_IDENTIFIER_SCHEME +
-                                                                                                                   CIdentifier.URL_SCHEME_VALUE_SEPARATOR)).setReadOnly (bEdit))
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_DOCTYPE_ID)));
+    {
+      final BootstrapRow aRow = new BootstrapRow ();
+      aRow.createColumn (GS_IDENTIFIER_SCHEME)
+          .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_SCHEME,
+                                                   aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
+                                                                                            .getScheme ()
+                                                                           : CIdentifier.DEFAULT_DOCUMENT_TYPE_IDENTIFIER_SCHEME)).setPlaceholder ("Identifier scheme")
+                                                                                                                                  .setReadOnly (bEdit));
+      aRow.createColumn (GS_IDENTIFIER_VALUE)
+          .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_VALUE,
+                                                   aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
+                                                                                            .getValue ()
+                                                                           : null)).setPlaceholder ("Identifier value")
+                                                                                   .setReadOnly (bEdit));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Document type ID")
+                                                   .setCtrl (aRow)
+                                                   .setErrorList (aFormErrors.getListOfFields (FIELD_DOCTYPE_ID_SCHEME,
+                                                                                               FIELD_DOCTYPE_ID_VALUE)));
+    }
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Process ID")
-                                                 .setCtrl (new HCEdit (new RequestField (FIELD_PROCESS_ID,
-                                                                                         aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()
-                                                                                                                                    .getURIEncoded ()
-                                                                                                                  : CIdentifier.DEFAULT_PROCESS_IDENTIFIER_SCHEME +
-                                                                                                                    CIdentifier.URL_SCHEME_VALUE_SEPARATOR)).setReadOnly (bEdit))
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_PROCESS_ID)));
+    {
+      final BootstrapRow aRow = new BootstrapRow ();
+      aRow.createColumn (GS_IDENTIFIER_SCHEME)
+          .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_SCHEME,
+                                                   aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()
+                                                                                              .getScheme ()
+                                                                            : CIdentifier.DEFAULT_PROCESS_IDENTIFIER_SCHEME)).setPlaceholder ("Identifier scheme")
+                                                                                                                             .setReadOnly (bEdit));
+      aRow.createColumn (GS_IDENTIFIER_VALUE)
+          .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_VALUE,
+                                                   aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()
+                                                                                              .getValue ()
+                                                                            : null)).setPlaceholder ("Identifier value")
+                                                                                    .setReadOnly (bEdit));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Process ID")
+                                                   .setCtrl (aRow)
+                                                   .setErrorList (aFormErrors.getListOfFields (FIELD_PROCESS_ID_SCHEME,
+                                                                                               FIELD_PROCESS_ID_VALUE)));
+    }
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Transport Profile")
                                                  .setCtrl (new SMPTransportProfileSelect (new RequestField (FIELD_TRANSPORT_PROFILE,
@@ -601,9 +647,12 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
     aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
                                        aSelectedObject.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ()));
-    aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID,
-                                       aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
-    aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID, aSelectedProcess.getProcessIdentifier ().getURIEncoded ()));
+    aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_SCHEME,
+                                       aSelectedObject.getDocumentTypeIdentifier ().getScheme ()));
+    aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_VALUE,
+                                       aSelectedObject.getDocumentTypeIdentifier ().getValue ()));
+    aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID_SCHEME, aSelectedProcess.getProcessIdentifier ().getScheme ()));
+    aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID_VALUE, aSelectedProcess.getProcessIdentifier ().getValue ()));
     aForm.addChild (new HCHiddenField (FIELD_TRANSPORT_PROFILE, aSelectedEndpoint.getTransportProfile ()));
 
     aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the endpoint for service group '" +
@@ -658,9 +707,12 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                 aServiceInfo.getServiceGroup ()
                                                             .getParticpantIdentifier ()
                                                             .getURIEncoded ())
-                                          .add (FIELD_DOCTYPE_ID,
-                                                aServiceInfo.getDocumentTypeIdentifier ().getURIEncoded ())
-                                          .add (FIELD_PROCESS_ID, aProcess.getProcessIdentifier ().getURIEncoded ())
+                                          .add (FIELD_DOCTYPE_ID_SCHEME,
+                                                aServiceInfo.getDocumentTypeIdentifier ().getScheme ())
+                                          .add (FIELD_DOCTYPE_ID_VALUE,
+                                                aServiceInfo.getDocumentTypeIdentifier ().getValue ())
+                                          .add (FIELD_PROCESS_ID_SCHEME, aProcess.getProcessIdentifier ().getScheme ())
+                                          .add (FIELD_PROCESS_ID_VALUE, aProcess.getProcessIdentifier ().getValue ())
                                           .add (FIELD_TRANSPORT_PROFILE, aEndpoint.getTransportProfile ());
 
           final HCRow aRow = aTable.addBodyRow ();
