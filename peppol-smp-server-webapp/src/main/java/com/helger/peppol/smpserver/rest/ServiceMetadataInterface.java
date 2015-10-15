@@ -33,6 +33,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
@@ -61,6 +63,8 @@ import com.helger.web.scope.mgr.WebScopeManager;
 @Path ("/{ServiceGroupId}/services/{DocumentTypeId}")
 public final class ServiceMetadataInterface
 {
+  private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceMetadataInterface.class);
+
   @Context
   private HttpServletRequest m_aHttpRequest;
 
@@ -138,7 +142,10 @@ public final class ServiceMetadataInterface
   {
     // Is the writable API disabled?
     if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+    {
+      s_aLogger.warn ("The writable REST API is disabled. saveServiceRegistration will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
+    }
 
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
@@ -163,7 +170,10 @@ public final class ServiceMetadataInterface
   {
     // Is the writable API disabled?
     if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+    {
+      s_aLogger.warn ("The writable REST API is disabled. deleteServiceRegistration will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
+    }
 
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try

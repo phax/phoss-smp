@@ -31,6 +31,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
@@ -48,6 +51,8 @@ import com.helger.web.scope.mgr.WebScopeManager;
 @Path ("/{ServiceGroupId}")
 public final class ServiceGroupInterface
 {
+  private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceGroupInterface.class);
+
   @Context
   private HttpServletRequest m_aHttpRequest;
 
@@ -84,7 +89,10 @@ public final class ServiceGroupInterface
   {
     // Is the writable API disabled?
     if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+    {
+      s_aLogger.warn ("The writable REST API is disabled. saveServiceGroup will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
+    }
 
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
@@ -107,7 +115,10 @@ public final class ServiceGroupInterface
   {
     // Is the writable API disabled?
     if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+    {
+      s_aLogger.warn ("The writable REST API is disabled. deleteServiceGroup will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
+    }
 
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
