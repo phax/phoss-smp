@@ -40,6 +40,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -164,9 +165,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "Participant ID value must not be empty!");
       else
       {
-        aParticipantID = SimpleParticipantIdentifier.createFromURIPartOrNull (sParticipantIDScheme +
-                                                                              CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
-                                                                              sParticipantIDValue);
+        aParticipantID = IdentifierHelper.createParticipantIdentifierOrNull (sParticipantIDScheme, sParticipantIDValue);
         if (aParticipantID == null)
           aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "The provided participant ID has an invalid syntax!");
         else

@@ -54,6 +54,7 @@ import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
@@ -160,9 +161,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
     final String sDocTypeIDScheme = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_SCHEME);
     final String sDocTypeIDValue = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_VALUE);
-    final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeIDScheme +
-                                                                                                          CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
-                                                                                                          sDocTypeIDValue);
+    final SimpleDocumentTypeIdentifier aDocTypeID = IdentifierHelper.createDocumentTypeIdentifierOrNull (sDocTypeIDScheme,
+                                                                                                         sDocTypeIDValue);
     return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
   }
 
@@ -178,9 +178,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     {
       final String sProcessIDScheme = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_SCHEME);
       final String sProcessIDValue = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
-      final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createFromURIPartOrNull (sProcessIDScheme +
-                                                                                                  CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
-                                                                                                  sProcessIDValue);
+      final SimpleProcessIdentifier aProcessID = IdentifierHelper.createProcessIdentifierOrNull (sProcessIDScheme,
+                                                                                                 sProcessIDValue);
       final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
