@@ -40,6 +40,11 @@
  */
 package com.helger.peppol.smpserver.smlhook;
 
+import javax.annotation.Nullable;
+
+import com.helger.commons.string.StringHelper;
+import com.helger.peppol.smlclient.SMLExceptionHelper;
+
 /**
  * This exception is thrown when communicating with the SML failed.
  *
@@ -47,8 +52,15 @@ package com.helger.peppol.smpserver.smlhook;
  */
 public final class RegistrationHookException extends RuntimeException
 {
-  public RegistrationHookException (final String sMsg, final Throwable aCause)
+  private static String _getRealMessage (@Nullable final String sMsg, @Nullable final Throwable aCause)
   {
-    super (sMsg, aCause);
+    final String ret = StringHelper.getNotNull (sMsg);
+    final String sFaultMessage = SMLExceptionHelper.getFaultMessage (aCause);
+    return StringHelper.getConcatenatedOnDemand (ret, " - ", sFaultMessage);
+  }
+
+  public RegistrationHookException (@Nullable final String sMsg, @Nullable final Throwable aCause)
+  {
+    super (_getRealMessage (sMsg, aCause), aCause);
   }
 }
