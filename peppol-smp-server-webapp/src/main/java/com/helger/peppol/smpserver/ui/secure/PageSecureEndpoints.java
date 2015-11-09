@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.ui.secure;
 
+import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
@@ -41,6 +42,7 @@ import com.helger.datetime.CPDT;
 import com.helger.datetime.PDTFactory;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
+import com.helger.html.hc.config.HCSettings;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCCheckBox;
@@ -629,6 +631,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final Charset aCharset = HCSettings.getConversionSettings ().getXMLWriterSettings ().getCharsetObj ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
@@ -647,7 +650,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           final SMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
 
           final HCRow aRow = aTable.addBodyRow ();
-          aRow.addCell (new HCA (createViewURL (aWPEC, aServiceInfo, aParams).getAsStringWithEncodedParameters ()).addChild (aServiceInfo.getServiceGroupID ()));
+          aRow.addCell (new HCA (createViewURL (aWPEC, aServiceInfo, aParams).getAsStringWithEncodedParameters (aCharset)).addChild (aServiceInfo.getServiceGroupID ()));
           aRow.addCell (AppCommonUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()));
           aRow.addCell (AppCommonUI.getProcessID (aProcess.getProcessIdentifier ()));
           aRow.addCell (aEndpoint.getTransportProfile ());
@@ -655,11 +658,11 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
-          aRow.addCell (new HCA (aEditURL.getAsStringWithEncodedParameters ()).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
+          aRow.addCell (new HCA (aEditURL.getAsStringWithEncodedParameters (aCharset)).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
                         new HCTextNode (" "),
-                        new HCA (aCopyURL.getAsStringWithEncodedParameters ()).setTitle ("Copy endpoint").addChild (EDefaultIcon.COPY.getAsNode ()),
+                        new HCA (aCopyURL.getAsStringWithEncodedParameters (aCharset)).setTitle ("Copy endpoint").addChild (EDefaultIcon.COPY.getAsNode ()),
                         new HCTextNode (" "),
-                        new HCA (aDeleteURL.getAsStringWithEncodedParameters ()).setTitle ("Delete endpoint").addChild (EDefaultIcon.DELETE.getAsNode ()),
+                        new HCA (aDeleteURL.getAsStringWithEncodedParameters (aCharset)).setTitle ("Delete endpoint").addChild (EDefaultIcon.DELETE.getAsNode ()),
                         new HCTextNode (" "),
                         new HCA (LinkHelper.getURIWithServerAndContext (aServiceInfo.getServiceGroup ().getParticpantIdentifier ().getURIPercentEncoded () +
                                                                         "/services/" +
