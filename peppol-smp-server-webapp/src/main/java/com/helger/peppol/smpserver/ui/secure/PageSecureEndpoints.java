@@ -75,6 +75,8 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
+import com.helger.peppol.smpserver.ui.secure.hc.HCSMPTransportProfileSelect;
 import com.helger.peppol.utils.CertificateHelper;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
@@ -589,7 +591,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     }
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Transport Profile")
-                                                 .setCtrl (new SMPTransportProfileSelect (new RequestField (FIELD_TRANSPORT_PROFILE,
+                                                 .setCtrl (new HCSMPTransportProfileSelect (new RequestField (FIELD_TRANSPORT_PROFILE,
                                                                                                             aSelectedEndpoint != null ? aSelectedEndpoint.getTransportProfile ()
                                                                                                                                       : ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ())).setReadOnly (bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_TRANSPORT_PROFILE)));

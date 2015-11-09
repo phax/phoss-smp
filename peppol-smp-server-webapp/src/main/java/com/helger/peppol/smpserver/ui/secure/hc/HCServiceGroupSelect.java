@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.ui.secure;
+package com.helger.peppol.smpserver.ui.secure.hc;
 
 import java.util.Locale;
 
@@ -22,25 +22,31 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.user.ComparatorSMPUser;
-import com.helger.peppol.smpserver.domain.user.ISMPUser;
+import com.helger.peppol.smpserver.domain.servicegroup.ComparatorSMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 
 /**
- * Select box for active users.
+ * Select box for existing service groups.
  *
  * @author Philip Helger
  */
-public class HCUserSelect extends HCExtSelect
+public class HCServiceGroupSelect extends HCExtSelect
 {
-  public HCUserSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
+  public HCServiceGroupSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
   {
     super (aRF);
 
-    for (final ISMPUser aUser : CollectionHelper.getSorted (SMPMetaManager.getUserMgr ().getAllUsers (),
-                                                            new ComparatorSMPUser (aDisplayLocale)))
-      addOption (aUser.getID (), aUser.getUserName ());
+    for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (SMPMetaManager.getServiceGroupMgr ()
+                                                                                          .getAllSMPServiceGroups (),
+                                                                            new ComparatorSMPServiceGroup ()))
+    {
+      final String sOwnerName = AppCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
+      addOption (aServiceGroup.getID (),
+                 aServiceGroup.getParticpantIdentifier ().getURIEncoded () + " [" + sOwnerName + "]");
+    }
 
     if (!hasSelectedOption ())
       addOptionPleaseSelect (aDisplayLocale);
