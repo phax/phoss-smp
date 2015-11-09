@@ -128,6 +128,9 @@
         <directory>${basedir}/src/main/resources</directory>
         <targetPath>${project.build.directory}/classes</targetPath>
         <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
       </resource>
       <resource>
         <directory>${basedir}/src/test/resources</directory>
