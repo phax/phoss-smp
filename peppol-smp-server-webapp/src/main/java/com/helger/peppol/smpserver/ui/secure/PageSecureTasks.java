@@ -83,7 +83,8 @@ public class PageSecureTasks extends AbstractSMPWebPage
     // Check SML configuration
     {
       if (!RegistrationHookFactory.isSMLConnectionActive ())
-        aOL.addItem (_createWarning ("The connection to the SML is not active. All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+        aOL.addItem (_createWarning ("The connection to the SML is not active."),
+                     new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
     }
 
     // check service groups and redirects
