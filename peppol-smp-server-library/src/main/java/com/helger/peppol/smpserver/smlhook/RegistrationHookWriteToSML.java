@@ -119,9 +119,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
       // Assign key manager and empty trust manager to SSL/TLS context
       final SSLContext aSSLCtx = SSLContext.getInstance ("TLS");
-      aSSLCtx.init (aKeyManagerFactory.getKeyManagers (),
-                    new TrustManager [] { new DoNothingTrustManager () },
-                    VerySecureRandom.getInstance ());
+      aSSLCtx.init (aKeyManagerFactory.getKeyManagers (), new TrustManager [] { new DoNothingTrustManager () }, VerySecureRandom.getInstance ());
 
       s_aDefaultSocketFactory = aSSLCtx.getSocketFactory ();
       if (s_aSMLEndpointURL.toExternalForm ().contains ("localhost"))
@@ -149,16 +147,13 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
   public void createServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
-    s_aLogger.info ("Trying to create business " +
-                    IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                    " in Business Identifier Manager Service");
+    final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+    s_aLogger.info ("Trying to CREATE business " + sParticipantID + " for " + s_sSMPID + " in SML");
 
     try
     {
       _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      s_aLogger.info ("Succeeded in creating business " +
-                      IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                      " using Business Identifier Manager Service");
+      s_aLogger.info ("Succeeded in CREATE business " + sParticipantID + " in SML");
     }
     catch (final UnauthorizedFault ex)
     {
@@ -168,9 +163,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     }
     catch (final Throwable t)
     {
-      final String sMsg = "Could not create business " +
-                          IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                          " in SML";
+      final String sMsg = "Could not create business " + sParticipantID + " in SML";
       s_aLogger.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
@@ -178,18 +171,18 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
   public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
+    final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+    s_aLogger.warn ("CREATE failed in SMP backend, so deleting again business " + sParticipantID + " for " + s_sSMPID + " from SML.");
+
     try
     {
       // Undo create
-      s_aLogger.warn ("CREATE failed in backend, so deleting " +
-                      IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                      " from SML.");
       _createSMLCaller ().delete (new SimpleParticipantIdentifier (aBusinessIdentifier));
+      s_aLogger.warn ("Succeeded in deleting again business " + sParticipantID + " from SML.");
     }
     catch (final Throwable t)
     {
-      final String sMsg = "Unable to rollback create business " +
-                          IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+      final String sMsg = "Unable to rollback create business " + sParticipantID + " in SML";
       s_aLogger.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
@@ -197,27 +190,24 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
   public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
-    s_aLogger.info ("Trying to delete business " +
-                    IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                    " in Business Identifier Manager Service");
+    final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+    s_aLogger.info ("Trying to DELETE business " + sParticipantID + " for " + s_sSMPID + " from SML");
 
     try
     {
       // Use the version with the SMP ID to be on the safe side
       _createSMLCaller ().delete (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      s_aLogger.info ("Succeded in deleting business " +
-                      IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                      " using Business Identifier Manager Service");
+      s_aLogger.info ("Succeded in deleting business " + sParticipantID + " from SML");
     }
-    catch (final NotFoundFault e)
+    catch (final NotFoundFault ex)
     {
-      s_aLogger.warn ("The business " + aBusinessIdentifier + " was not present in the SML. Just ignore.");
+      final String sMsg = "The business " + sParticipantID + " was not present in the SML and hence could not be deleted.";
+      s_aLogger.error (sMsg, ex);
+      throw new RegistrationHookException (sMsg, ex);
     }
     catch (final Throwable t)
     {
-      final String sMsg = "Could not delete business " +
-                          IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                          " in SML";
+      final String sMsg = "Could not delete business " + sParticipantID + " from SML.";
       s_aLogger.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
@@ -225,18 +215,18 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
   public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
+    final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+    s_aLogger.warn ("DELETE failed in SMP backend, so creating again business " + sParticipantID + " for " + s_sSMPID + " in SML.");
+
     try
     {
       // Undo delete
-      s_aLogger.warn ("DELETE failed in backend, so creating " +
-                      IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier) +
-                      " in SML.");
       _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
+      s_aLogger.warn ("Succeeded in creating again business " + sParticipantID + " in SML.");
     }
     catch (final Throwable t)
     {
-      final String sMsg = "Unable to rollback delete business " +
-                          IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+      final String sMsg = "Unable to rollback delete business " + sParticipantID + " in SML";
       s_aLogger.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
