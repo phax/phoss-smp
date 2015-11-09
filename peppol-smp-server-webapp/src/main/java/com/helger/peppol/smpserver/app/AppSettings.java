@@ -109,4 +109,10 @@ public final class AppSettings extends AbstractGlobalSingleton
   {
     return s_aSettings.getBooleanValue ("webapp.testversion", GlobalDebug.isDebugMode ());
   }
+
+  @Nullable
+  public static String getVersionNumber ()
+  {
+    return s_aSettings.getStringValue ("webapp.version");
+  }
 }

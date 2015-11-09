@@ -127,7 +127,7 @@
       <resource>
         <directory>${basedir}/src/main/resources</directory>
         <targetPath>${project.build.directory}/classes</targetPath>
-        <filtering>false</filtering>
+        <filtering>true</filtering>
       </resource>
       <resource>
         <directory>${basedir}/src/test/resources</directory>

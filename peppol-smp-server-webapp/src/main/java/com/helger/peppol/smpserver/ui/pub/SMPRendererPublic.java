@@ -40,6 +40,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.peppol.smpserver.app.AppSettings;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.basic.app.menu.ApplicationMenuTree;
@@ -104,8 +105,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
     });
   }
 
-  private static void _addNavbarLoginLogout (@Nonnull final LayoutExecutionContext aLEC,
-                                             @Nonnull final BootstrapNavbar aNavbar)
+  private static void _addNavbarLoginLogout (@Nonnull final LayoutExecutionContext aLEC, @Nonnull final BootstrapNavbar aNavbar)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
@@ -114,16 +114,10 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
       final Locale aDisplayLocale = aLEC.getDisplayLocale ();
       final BootstrapNav aNav = new BootstrapNav ();
       aNavbar.addButton (EBootstrapNavbarPosition.COLLAPSIBLE_DEFAULT,
-                         new BootstrapButton ().addChild ("Goto manager")
-                                               .setOnClick (LinkHelper.getURLWithContext (AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH +
-                                                                                          "/")));
-      aNav.addItem (new HCSpan ().addClass (CBootstrapCSS.NAVBAR_TEXT)
-                                 .addChild ("Logged in as ")
-                                 .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser,
-                                                                                                         aDisplayLocale))));
+                         new BootstrapButton ().addChild ("Goto manager").setOnClick (LinkHelper.getURLWithContext (AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH + "/")));
+      aNav.addItem (new HCSpan ().addClass (CBootstrapCSS.NAVBAR_TEXT).addChild ("Logged in as ").addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser, aDisplayLocale))));
 
-      aNav.addItem (new HCA (LinkHelper.getURLWithContext (aRequestScope,
-                                                           LogoutServlet.SERVLET_DEFAULT_PATH)).addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
+      aNav.addItem (new HCA (LinkHelper.getURLWithContext (aRequestScope, LogoutServlet.SERVLET_DEFAULT_PATH)).addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
       aNavbar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_RIGHT, aNav);
     }
     else
@@ -132,8 +126,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
       final BootstrapDropdownMenu aDropDown = aNav.addDropdownMenu ("Login");
       {
         // 300px would lead to a messy layout - so 250px is fine
-        final HCDiv aDiv = new HCDiv ().addStyle (CCSSProperties.PADDING.newValue ("10px"))
-                                       .addStyle (CCSSProperties.WIDTH.newValue ("250px"));
+        final HCDiv aDiv = new HCDiv ().addStyle (CCSSProperties.PADDING.newValue ("10px")).addStyle (CCSSProperties.WIDTH.newValue ("250px"));
         aDiv.addChild (AppCommonUI.createViewLoginForm (aLEC, null, false).addClass (CBootstrapCSS.NAVBAR_FORM));
         aDropDown.addItem (aDiv);
       }
@@ -160,8 +153,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   {
     // Main menu
     final IMenuTree aMenuTree = aLEC.getMenuTree ();
-    final MenuItemDeterminatorCallback aCallback = new MenuItemDeterminatorCallback (aMenuTree,
-                                                                                     aLEC.getSelectedMenuItemID ())
+    final MenuItemDeterminatorCallback aCallback = new MenuItemDeterminatorCallback (aMenuTree, aLEC.getSelectedMenuItemID ())
     {
       @Override
       protected boolean isMenuItemValidToBeDisplayed (@Nonnull final IMenuObject aMenuObj)
@@ -219,9 +211,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
                                                                   " (" +
                                                                   sHttpStatusMessage +
                                                                   ")" +
-                                                                  (StringHelper.hasText (sHttpRequestURI) ? " for request URI " +
-                                                                                                            sHttpRequestURI
-                                                                                                          : "")));
+                                                                  (StringHelper.hasText (sHttpRequestURI) ? " for request URI " + sHttpRequestURI : "")));
     }
     else
     {
@@ -244,15 +234,13 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   public static BootstrapContainer createDefaultFooter ()
   {
     final BootstrapContainer aDiv = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
-    aDiv.addChild (new HCP ().addChild ("PEPPOL SMP server"));
+    aDiv.addChild (new HCP ().addChild ("PEPPOL SMP server " + AppSettings.getVersionNumber ()));
     aDiv.addChild (new HCP ().addChild ("Created by ")
                              .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"))
                              .addChild (" - Twitter: ")
-                             .addChild (new HCA ("https://twitter.com/philiphelger").setTargetBlank ()
-                                                                                    .addChild ("@philiphelger"))
+                             .addChild (new HCA ("https://twitter.com/philiphelger").setTargetBlank ().addChild ("@philiphelger"))
                              .addChild (" - ")
-                             .addChild (new HCA ("https://github.com/phax/peppol-smp-server").setTargetBlank ()
-                                                                                             .addChild ("Source on GitHub")));
+                             .addChild (new HCA ("https://github.com/phax/peppol-smp-server").setTargetBlank ().addChild ("Source on GitHub")));
     return aDiv;
   }
 
