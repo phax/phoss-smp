@@ -109,11 +109,14 @@ public class KeyLoadingResult implements ISuccessIndicator
     }
     catch (final IOException | IllegalArgumentException ex)
     {
-      return KeyLoadingResult.createError ("Failed to load keystore from path '" + sKeyStorePath + "'. Seems like the keystore file does not exist.");
+      return KeyLoadingResult.createError ("Failed to load keystore from path '" + sKeyStorePath + "'. Seems like the keystore file does not exist. Technical details: " + ex.getMessage ());
     }
     catch (final GeneralSecurityException ex)
     {
-      return KeyLoadingResult.createError ("Failed to load keystore from path '" + sKeyStorePath + "'. Seems like the password is invalid or the keystore has an invalid format.");
+      return KeyLoadingResult.createError ("Failed to load keystore from path '" +
+                                           sKeyStorePath +
+                                           "'. Seems like the password is invalid or the keystore has an invalid format. Technical details: " +
+                                           ex.getMessage ());
     }
 
     final String sKeyStoreKeyAlias = SMPServerConfiguration.getKeystoreKeyAlias ();
@@ -149,7 +152,12 @@ public class KeyLoadingResult implements ISuccessIndicator
     }
     catch (final UnrecoverableKeyException ex)
     {
-      return KeyLoadingResult.createError ("Failed to load key with alias '" + sKeyStoreKeyAlias + "' from keystore at '" + sKeyStorePath + "'. Seems like the password for the key is invalid.");
+      return KeyLoadingResult.createError ("Failed to load key with alias '" +
+                                           sKeyStoreKeyAlias +
+                                           "' from keystore at '" +
+                                           sKeyStorePath +
+                                           "'. Seems like the password for the key is invalid. Technical details: " +
+                                           ex.getMessage ());
     }
     catch (final GeneralSecurityException ex)
     {
