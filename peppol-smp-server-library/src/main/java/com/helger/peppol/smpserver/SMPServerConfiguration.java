@@ -109,7 +109,8 @@ public final class SMPServerConfiguration
 
   /**
    * @return The backend to be used. Depends on the different possible
-   *         implementations. Should not be <code>null</code>.
+   *         implementations. Should not be <code>null</code>. Property
+   *         <code>smp.backend</code>.
    */
   @Nullable
   public static String getBackend ()
@@ -119,7 +120,7 @@ public final class SMPServerConfiguration
 
   /**
    * @return The path to the keystore. May be a classpath or an absolute file
-   *         path.
+   *         path. Property <code>smp.keystore.path</code>.
    */
   @Nullable
   public static String getKeystorePath ()
@@ -128,7 +129,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The password required to open the keystore.
+   * @return The password required to open the keystore. Property
+   *         <code>smp.keystore.password</code>.
    */
   @Nullable
   public static String getKeystorePassword ()
@@ -137,7 +139,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The alias of the SMP key in the keystore.
+   * @return The alias of the SMP key in the keystore. Property
+   *         <code>smp.keystore.key.alias</code>.
    */
   @Nullable
   public static String getKeystoreKeyAlias ()
@@ -146,8 +149,9 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The password used to access the private key. MAy be different than
-   *         the password to the overall keystore.
+   * @return The password used to access the private key. May be different than
+   *         the password to the overall keystore. Property
+   *         <code>smp.keystore.key.password</code>.
    */
   @Nullable
   public static char [] getKeystoreKeyPassword ()
@@ -158,6 +162,7 @@ public final class SMPServerConfiguration
   /**
    * @return <code>true</code> if all paths should be forced to the ROOT ("/")
    *         context, <code>false</code> if the context should remain as it is.
+   *         Property <code>smp.forceroot</code>.
    */
   public static boolean isForceRoot ()
   {
@@ -168,9 +173,10 @@ public final class SMPServerConfiguration
    * Check if the writable parts of the REST API are disabled. If this is the
    * case, only the read-only part of the API can be used. The writable REST API
    * will return an HTTP 404 error.
-   * 
+   *
    * @return <code>true</code> if it is disabled, <code>false</code> if it is
-   *         enabled. By the default the writable API is enabled.
+   *         enabled. By the default the writable API is enabled. Property
+   *         <code>smp.rest.writableapi.disabled</code>.
    */
   public static boolean isRESTWritableAPIDisabled ()
   {
@@ -179,7 +185,7 @@ public final class SMPServerConfiguration
 
   /**
    * @return <code>true</code> if the SML connection is active,
-   *         <code>false</code> if not.
+   *         <code>false</code> if not. Property <code>sml.active</code>.
    */
   public static boolean isWriteToSML ()
   {
@@ -188,7 +194,7 @@ public final class SMPServerConfiguration
 
   /**
    * @return The SML URL to use. Only relevant when {@link #isWriteToSML()} is
-   *         <code>true</code>.
+   *         <code>true</code>. Property <code>sml.url</code>.
    */
   @Nullable
   public static String getSMLURL ()
@@ -198,7 +204,8 @@ public final class SMPServerConfiguration
 
   /**
    * @return The SMP-ID to be used in the SML. Only relevant when
-   *         {@link #isWriteToSML()} is <code>true</code>.
+   *         {@link #isWriteToSML()} is <code>true</code>. Property
+   *         <code>sml.smpid</code>.
    */
   @Nullable
   public static String getSMLSMPID ()
