@@ -124,6 +124,7 @@
 
   <build>
     <resources>
+      <!-- HAck to filter only properties files -->
       <resource>
         <directory>${basedir}/src/main/resources</directory>
         <targetPath>${project.build.directory}/classes</targetPath>
@@ -132,6 +133,15 @@
           <include>**/*.properties</include>
         </includes>
       </resource>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <targetPath>${project.build.directory}/classes</targetPath>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+        </excludes>
+      </resource>
+      <!-- All the rest -->
       <resource>
         <directory>${basedir}/src/test/resources</directory>
         <targetPath>${project.build.directory}/test-classes</targetPath>
