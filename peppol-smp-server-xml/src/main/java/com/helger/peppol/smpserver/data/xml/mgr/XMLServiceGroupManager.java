@@ -26,6 +26,9 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
@@ -35,6 +38,7 @@ import com.helger.commons.microdom.IMicroElement;
 import com.helger.commons.microdom.MicroDocument;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
+import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -50,6 +54,8 @@ import com.helger.photon.basic.security.audit.AuditHelper;
 
 public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGroup> implements ISMPServiceGroupManager
 {
+  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceGroupManager.class);
+
   private static final String ELEMENT_ROOT = "servicegroups";
   private static final String ELEMENT_ITEM = "servicegroup";
 
@@ -112,10 +118,16 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   }
 
   @Nonnull
-  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
-                                                @Nullable @Nonnull final IParticipantIdentifier aParticipantIdentifier,
-                                                @Nullable final String sExtension)
+  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID, @Nullable @Nonnull final IParticipantIdentifier aParticipantIdentifier, @Nullable final String sExtension)
   {
+    s_aLogger.info ("createSMPServiceGroup (" +
+                    sOwnerID +
+                    ", " +
+                    IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier) +
+                    ", " +
+                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ")");
+
     final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
 
     // It's a new service group - throws exception in case of an error
@@ -137,19 +149,17 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
-                                      aSMPServiceGroup.getID (),
-                                      sOwnerID,
-                                      IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier),
-                                      sExtension);
+
+    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID (), sOwnerID, IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier), sExtension);
+    s_aLogger.info ("createSMPServiceGroup succeeded");
     return aSMPServiceGroup;
   }
 
   @Nonnull
-  public EChange updateSMPServiceGroup (@Nullable final String sSMPServiceGroupID,
-                                        @Nonnull @Nonempty final String sOwnerID,
-                                        @Nullable final String sExtension)
+  public EChange updateSMPServiceGroup (@Nullable final String sSMPServiceGroupID, @Nonnull @Nonempty final String sNewOwnerID, @Nullable final String sExtension)
   {
+    s_aLogger.info ("updateSMPServiceGroup (" + sSMPServiceGroupID + ", " + sNewOwnerID + ", " + (StringHelper.hasText (sExtension) ? "with extension" : "without extension") + ")");
+
     m_aRWLock.writeLock ().lock ();
     try
     {
@@ -161,7 +171,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
       }
 
       EChange eChange = EChange.UNCHANGED;
-      eChange = eChange.or (aSMPServiceGroup.setOwnerID (sOwnerID));
+      eChange = eChange.or (aSMPServiceGroup.setOwnerID (sNewOwnerID));
       eChange = eChange.or (aSMPServiceGroup.setExtension (sExtension));
       if (eChange.isUnchanged ())
         return EChange.UNCHANGED;
@@ -171,16 +181,23 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sSMPServiceGroupID, sOwnerID, sExtension);
+
+    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sSMPServiceGroupID, sNewOwnerID, sExtension);
+    s_aLogger.info ("updateSMPServiceGroup succeeded");
     return EChange.CHANGED;
   }
 
   @Nonnull
-  public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantIdentifier)
+  public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    final ISMPServiceGroup aSMPServiceGroup = getSMPServiceGroupOfID (aParticipantIdentifier);
+    s_aLogger.info ("deleteSMPServiceGroup (" + IdentifierHelper.getIdentifierURIEncoded (aParticipantID) + ")");
+
+    final ISMPServiceGroup aSMPServiceGroup = getSMPServiceGroupOfID (aParticipantID);
     if (aSMPServiceGroup == null)
+    {
+      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
       return EChange.UNCHANGED;
+    }
 
     // Delete in SML - throws exception in case of error
     m_aHook.deleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
@@ -212,7 +229,9 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     {
       m_aRWLock.writeLock ().unlock ();
     }
+
     AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID ());
+    s_aLogger.info ("deleteSMPServiceGroup succeeded");
     return EChange.CHANGED;
   }
 

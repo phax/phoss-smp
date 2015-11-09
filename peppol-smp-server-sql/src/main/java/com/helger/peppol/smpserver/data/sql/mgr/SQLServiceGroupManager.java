@@ -54,6 +54,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.state.EChange;
+import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
@@ -81,6 +82,14 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @Nonnull
   public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID, @Nonnull final IParticipantIdentifier aParticipantIdentifier, @Nullable final String sExtension)
   {
+    s_aLogger.info ("createSMPServiceGroup (" +
+                    sOwnerID +
+                    ", " +
+                    IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier) +
+                    ", " +
+                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ")");
+
     JPAExecutionResult <?> ret;
     ret = doInTransaction (new Runnable ()
     {
@@ -121,12 +130,16 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
+
+    s_aLogger.info ("createSMPServiceGroup succeeded");
     return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
   }
 
   @Nonnull
   public EChange updateSMPServiceGroup (@Nullable final String sSMPServiceGroupID, @Nonnull @Nonempty final String sNewOwnerID, @Nullable final String sExtension)
   {
+    s_aLogger.info ("updateSMPServiceGroup (" + sSMPServiceGroupID + ", " + sNewOwnerID + ", " + (StringHelper.hasText (sExtension) ? "with extension" : "without extension") + ")");
+
     final IParticipantIdentifier aParticipantIdentifier = IdentifierHelper.createParticipantIdentifierFromURIPartOrNull (sSMPServiceGroupID);
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction (new Callable <EChange> ()
@@ -171,12 +184,16 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
+
+    s_aLogger.info ("updateSMPServiceGroup succeeded");
     return ret.get ();
   }
 
   @Nonnull
-  public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aServiceGroupID)
+  public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
+    s_aLogger.info ("deleteSMPServiceGroup (" + IdentifierHelper.getIdentifierURIEncoded (aParticipantID) + ")");
+
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction (new Callable <EChange> ()
     {
@@ -185,16 +202,16 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       {
         // Check if the service group is existing
         final EntityManager aEM = getEntityManager ();
-        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aServiceGroupID);
+        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantID);
         final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
         if (aDBServiceGroup == null)
         {
-          s_aLogger.warn ("No such service group to delete: " + IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
+          s_aLogger.warn ("No such service group to delete: " + IdentifierHelper.getIdentifierURIEncoded (aParticipantID));
           return EChange.UNCHANGED;
         }
 
         // Delete in SML - throws exception in case of error
-        m_aHook.deleteServiceGroup (aServiceGroupID);
+        m_aHook.deleteServiceGroup (aParticipantID);
 
         try
         {
@@ -203,7 +220,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
         catch (final RuntimeException ex)
         {
           // An error occurred - remove from SML again
-          m_aHook.undoDeleteServiceGroup (aServiceGroupID);
+          m_aHook.undoDeleteServiceGroup (aParticipantID);
           throw ex;
         }
 
@@ -212,6 +229,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
+
+    s_aLogger.info ("deleteSMPServiceGroup succeeded");
     return ret.get ();
   }
 
