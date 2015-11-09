@@ -197,7 +197,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
     // Show results
     if (aOL.hasChildren ())
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("The following list contains all the tasks and problems that were identified"));
+      aNodeList.addChild (new BootstrapWarnBox ().addChild ("The following list of tasks and problems were identified:"));
       aNodeList.addChild (aOL);
     }
     else
