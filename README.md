@@ -3,7 +3,7 @@ A complete PEPPOL SMP server. Compared to the CIPA implementation this SMP comes
 
 Please read the **[Wiki](https://github.com/phax/peppol-smp-server/wiki)** for a detailed description. It contains an introduction with screenshots, configuration, building and running instructions as well as [News and noteworthy](https://github.com/phax/peppol-smp-server/wiki/News-and-noteworthy).
 
-Latest version: **4.0.2** (2015-11-05)
+Latest version: **4.0.3** (2015-11-09)
 
 For querying an SMP server you may want to have a look at the OSS [peppol-smp-client](https://github.com/phax/peppol-commons/).
 
