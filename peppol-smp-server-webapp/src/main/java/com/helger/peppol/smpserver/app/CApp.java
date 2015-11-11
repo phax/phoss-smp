@@ -23,8 +23,10 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.locale.LocaleCache;
+import com.helger.commons.string.StringHelper;
 import com.helger.photon.security.CSecurity;
 
 /**
@@ -37,7 +39,7 @@ public final class CApp
 {
   public static final Locale DEFAULT_LOCALE = LocaleCache.getInstance ().getLocale ("en", "US");
 
-  private static final String APPLICATION_TITLE = "PEPPOL SMP server";
+  private static final String APPLICATION_TITLE = "ph-peppol-smp-server";
 
   // Security roles
   public static final String ROLE_CONFIG_ID = "config";
@@ -81,8 +83,16 @@ public final class CApp
   {}
 
   @Nonnull
+  @Nonempty
   public static String getApplicationTitle ()
   {
     return APPLICATION_TITLE + (AppSettings.isTestVersion () ? " [TEST]" : "");
+  }
+
+  @Nonnull
+  @Nonempty
+  public static String getApplicationTitleAndVersion ()
+  {
+    return StringHelper.getConcatenatedOnDemand (getApplicationTitle (), " ", AppSettings.getVersionNumber ());
   }
 }

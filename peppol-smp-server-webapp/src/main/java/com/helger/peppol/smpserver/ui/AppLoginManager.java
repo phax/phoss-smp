@@ -25,7 +25,6 @@ import com.helger.css.ECSSUnit;
 import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.textlevel.HCSmall;
-import com.helger.peppol.smpserver.app.AppSettings;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
@@ -48,7 +47,8 @@ public final class AppLoginManager extends LoginManager
                                        @Nonnull final BootstrapRow aRow,
                                        @Nonnull final HCDiv aContentCol)
       {
-        aContentCol.addChild (new HCDiv ().addStyle (CCSSProperties.MARGIN_TOP.newValue (ECSSUnit.em (1))).addChild (new HCSmall ().addChild ("PEPPOL SMP server " + AppSettings.getVersionNumber ())));
+        aContentCol.addChild (new HCDiv ().addStyle (CCSSProperties.MARGIN_TOP.newValue (ECSSUnit.em (1)))
+                                          .addChild (new HCSmall ().addChild (CApp.getApplicationTitleAndVersion ())));
       }
     };
   }

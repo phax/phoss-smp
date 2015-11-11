@@ -41,7 +41,6 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.peppol.smpserver.app.AppSettings;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.basic.app.menu.ApplicationMenuTree;
@@ -241,7 +240,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   public static BootstrapContainer createDefaultFooter ()
   {
     final BootstrapContainer aDiv = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
-    aDiv.addChild (new HCP ().addChild ("PEPPOL SMP server " + AppSettings.getVersionNumber ()));
+    aDiv.addChild (new HCP ().addChild (CApp.getApplicationTitleAndVersion ()));
     aDiv.addChild (new HCP ().addChild ("Created by ")
                              .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"))
                              .addChild (" - Twitter: ")
