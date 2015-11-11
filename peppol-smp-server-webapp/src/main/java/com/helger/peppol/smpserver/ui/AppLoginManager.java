@@ -27,13 +27,13 @@ import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.textlevel.HCSmall;
 import com.helger.peppol.smpserver.app.AppSettings;
 import com.helger.peppol.smpserver.app.CApp;
-import com.helger.photon.basic.security.login.ELoginResult;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginHTMLProvider;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 import com.helger.photon.core.app.html.IHTMLProvider;
 import com.helger.photon.core.login.LoginManager;
+import com.helger.photon.security.login.ELoginResult;
 
 public final class AppLoginManager extends LoginManager
 {

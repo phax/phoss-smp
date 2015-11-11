@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.compare.ESortOrder;
+import com.helger.commons.errorlist.FormErrors;
 import com.helger.commons.microdom.IMicroDocument;
 import com.helger.commons.microdom.serialize.MicroReader;
 import com.helger.commons.state.EValidity;
@@ -52,7 +53,6 @@ import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCUserSelect;
-import com.helger.photon.basic.security.login.LoggedInUserManager;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
@@ -68,6 +68,7 @@ import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.url.LinkHelper;
+import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
@@ -77,7 +78,6 @@ import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.photon.uictrls.prism.EPrismLanguage;
 import com.helger.photon.uictrls.prism.HCPrismJS;
-import com.helger.validation.error.FormErrors;
 
 @WorkInProgress
 public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPServiceGroup>
@@ -111,8 +111,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
   @Override
   @Nullable
-  protected ISMPServiceGroup getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                                @Nullable final String sID)
+  protected ISMPServiceGroup getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
   {
     if (sID == null)
       return null;
@@ -122,19 +121,15 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMPServiceGroup aSelectedObject)
+  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPServiceGroup aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
     aNodeList.addChild (createActionHeader ("Show details of service group '" + aSelectedObject.getID () + "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
-                                                 .setCtrl (aSelectedObject.getParticpantIdentifier ()
-                                                                          .getURIEncoded ()));
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
-                                                 .setCtrl (AppCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID").setCtrl (aSelectedObject.getParticpantIdentifier ().getURIEncoded ()));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user").setCtrl (AppCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
     if (aSelectedObject.hasExtension ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (new HCPrismJS (EPrismLanguage.MARKUP).addChild (aSelectedObject.getExtension ())));
@@ -171,8 +166,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
           aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "The provided participant ID has an invalid syntax!");
         else
           if (!bEdit && aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID) != null)
-            aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE,
-                                       "Another service group for the same participant ID is already present!");
+            aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "Another service group for the same participant ID is already present!");
       }
 
     if (StringHelper.isEmpty (sOwningUserID))
@@ -232,23 +226,19 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final boolean bEdit = eFormAction.isEdit ();
 
     aForm.setLeft (2);
-    aForm.addChild (createActionHeader (bEdit ? "Edit service group '" + aSelectedObject.getID () + "'"
-                                              : "Create new service group"));
+    aForm.addChild (createActionHeader (bEdit ? "Edit service group '" + aSelectedObject.getID () + "'" : "Create new service group"));
 
     {
       final BootstrapRow aRow = new BootstrapRow ();
       aRow.createColumn (GS_IDENTIFIER_SCHEME)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_SCHEME,
-                                                   aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
-                                                                                            .getScheme ()
+                                                   aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ().getScheme ()
                                                                            : CIdentifier.DEFAULT_PARTICIPANT_IDENTIFIER_SCHEME)).setPlaceholder ("Identifier scheme")
                                                                                                                                 .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
-                                                   aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
-                                                                                            .getValue ()
-                                                                           : null)).setPlaceholder ("Identifier value")
-                                                                                   .setReadOnly (bEdit));
+                                                   aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ().getValue ()
+                                                                           : null)).setPlaceholder ("Identifier value").setReadOnly (bEdit));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
                                                    .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme (default: " +
@@ -281,16 +271,14 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                   @Nonnull final ISMPServiceGroup aSelectedObject)
   {
     aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the complete service group '" +
-                                                                                 aSelectedObject.getParticpantIdentifier ()
-                                                                                                .getURIEncoded () +
+                                                                                 aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
                                                                                  "'?"))
                                                .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."))
                                                .addChild (new HCDiv ().addChild ("If the connection to the SML is active this service group will also be deleted from the SML!")));
   }
 
   @Override
-  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final ISMPServiceGroup aSelectedObject)
+  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPServiceGroup aSelectedObject)
   {
     try
     {
@@ -301,20 +289,17 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     catch (final Throwable t)
     {
       aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error deleting the SMP ServiceGroup for participant '" +
-                                                                aSelectedObject.getParticpantIdentifier ()
-                                                                               .getURIEncoded () +
+                                                                aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
                                                                 "'. Technical details: " +
                                                                 t.getMessage ()));
     }
     aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
-                                                                aSelectedObject.getParticpantIdentifier ()
-                                                                               .getURIEncoded () +
+                                                                aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
                                                                 "' was successfully deleted!"));
   }
 
   @Override
-  protected boolean handleCustomActions (@Nonnull final WebPageExecutionContext aWPEC,
-                                         @Nullable final ISMPServiceGroup aSelectedObject)
+  protected boolean handleCustomActions (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPServiceGroup aSelectedObject)
   {
     return super.handleCustomActions (aWPEC, aSelectedObject);
   }
@@ -367,13 +352,13 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                     new HCTextNode (" "),
                     createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
                     new HCTextNode (" "),
-                    new HCA (LinkHelper.getURIWithServerAndContext (aCurObject.getParticpantIdentifier ()
+                    new HCA (LinkHelper.getURLWithServerAndContext (aCurObject.getParticpantIdentifier ()
                                                                               .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
                                                                                                                    sDisplayName)
                                                                                                         .setTargetBlank ()
                                                                                                         .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()),
                     new HCTextNode (" "),
-                    new HCA (LinkHelper.getURIWithServerAndContext ("complete/" +
+                    new HCA (LinkHelper.getURLWithServerAndContext ("complete/" +
                                                                     aCurObject.getParticpantIdentifier ()
                                                                               .getURIPercentEncoded ())).setTitle ("Perform complete SMP query on " +
                                                                                                                    sDisplayName)

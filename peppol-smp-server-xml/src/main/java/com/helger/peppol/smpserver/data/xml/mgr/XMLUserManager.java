@@ -39,8 +39,9 @@ import com.helger.peppol.smpserver.domain.user.XMLDataUser;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
-import com.helger.photon.basic.security.AccessManager;
-import com.helger.photon.basic.security.user.IUser;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.user.IUser;
+import com.helger.photon.security.user.UserManager;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
@@ -78,7 +79,7 @@ public final class XMLUserManager implements ISMPUserManager
   @Nonnegative
   public int getUserCount ()
   {
-    return AccessManager.getInstance ().getAllActiveUsers ().size ();
+    return PhotonSecurityManager.getUserMgr ().getActiveUserCount ();
   }
 
   @Nonnull
@@ -86,7 +87,7 @@ public final class XMLUserManager implements ISMPUserManager
   public Collection <XMLDataUser> getAllUsers ()
   {
     final List <XMLDataUser> ret = new ArrayList <> ();
-    for (final IUser aUser : AccessManager.getInstance ().getAllActiveUsers ())
+    for (final IUser aUser : PhotonSecurityManager.getUserMgr ().getAllActiveUsers ())
       ret.add (new XMLDataUser (aUser));
     return ret;
   }
@@ -95,7 +96,7 @@ public final class XMLUserManager implements ISMPUserManager
   @ReturnsMutableCopy
   public XMLDataUser getUserOfID (@Nullable final String sUserID)
   {
-    final IUser aUser = AccessManager.getInstance ().getUserOfID (sUserID);
+    final IUser aUser = PhotonSecurityManager.getUserMgr ().getUserOfID (sUserID);
     return aUser == null ? null : new XMLDataUser (aUser);
   }
 
@@ -103,14 +104,14 @@ public final class XMLUserManager implements ISMPUserManager
   public XMLDataUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException,
                                                                                                       SMPUnknownUserException
   {
-    final AccessManager aAccessMgr = AccessManager.getInstance ();
-    final IUser aUser = aAccessMgr.getUserOfLoginName (aCredentials.getUserName ());
+    final UserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
+    final IUser aUser = aUserMgr.getUserOfLoginName (aCredentials.getUserName ());
     if (aUser == null)
     {
       s_aLogger.info ("Invalid login name provided: '" + aCredentials.getUserName () + "'");
       throw new SMPUnknownUserException (aCredentials.getUserName ());
     }
-    if (!aAccessMgr.areUserIDAndPasswordValid (aUser.getID (), aCredentials.getPassword ()))
+    if (!aUserMgr.areUserIDAndPasswordValid (aUser.getID (), aCredentials.getPassword ()))
     {
       s_aLogger.info ("Invalid password provided for '" + aCredentials.getUserName () + "'");
       throw new SMPUnauthorizedException ("Username and/or password are invalid!");
@@ -121,22 +122,18 @@ public final class XMLUserManager implements ISMPUserManager
   @Nonnull
   public XMLDataUser createPreAuthenticatedUser (@Nonnull @Nonempty final String sUserName)
   {
-    return new XMLDataUser (AccessManager.getInstance ().getUserOfLoginName (sUserName));
+    return new XMLDataUser (PhotonSecurityManager.getUserMgr ().getUserOfLoginName (sUserName));
   }
 
   @Nonnull
   public ISMPServiceGroup verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                           @Nonnull final ISMPUser aCurrentUser) throws SMPNotFoundException,
-                                                                                 SMPUnauthorizedException
+                                           @Nonnull final ISMPUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
   {
     // Resolve user group
-    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
-                                                         .getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
-      throw new SMPNotFoundException ("Service group " +
-                                      IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
-                                      " does not exist");
+      throw new SMPNotFoundException ("Service group " + IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) + " does not exist");
     }
 
     // Resolve user
@@ -150,11 +147,7 @@ public final class XMLUserManager implements ISMPUserManager
     }
 
     if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Verified service group " +
-                       aServiceGroup.getID () +
-                       " is owned by user '" +
-                       aCurrentUser.getUserName () +
-                       "'");
+      s_aLogger.debug ("Verified service group " + aServiceGroup.getID () + " is owned by user '" + aCurrentUser.getUserName () + "'");
 
     return aServiceGroup;
   }

@@ -51,7 +51,7 @@ import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
-import com.helger.photon.basic.security.CSecurity;
+import com.helger.photon.security.CSecurity;
 
 /**
  * Test class for class {@link SMPRedirect}.

@@ -28,8 +28,8 @@ import com.helger.commons.microdom.util.MicroHelper;
 import com.helger.peppol.identifier.IMutableParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
-import com.helger.photon.basic.security.AccessManager;
-import com.helger.photon.basic.security.user.IUser;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.user.IUser;
 
 /**
  * This class is internally used to convert {@link SMPServiceGroup} from and to
@@ -51,9 +51,7 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
     final SMPServiceGroup aValue = (SMPServiceGroup) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_OWNER_ID, aValue.getOwnerID ());
-    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticpantIdentifier (),
-                                                                    sNamespaceURI,
-                                                                    ELEMENT_PARTICIPANT_ID));
+    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticpantIdentifier (), sNamespaceURI, ELEMENT_PARTICIPANT_ID));
     if (aValue.hasExtension ())
       aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtension ());
     return aElement;
@@ -63,7 +61,7 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   public ISMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement)
   {
     final String sOwnerID = aElement.getAttributeValue (ATTR_OWNER_ID);
-    final IUser aOwner = AccessManager.getInstance ().getUserOfID (sOwnerID);
+    final IUser aOwner = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwnerID);
     if (aOwner == null)
       throw new IllegalStateException ("Failed to resolve user ID '" + sOwnerID + "'");
 

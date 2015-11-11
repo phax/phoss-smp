@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import org.joda.time.LocalDateTime;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.CollectionHelper;
 import com.helger.datetime.PDTFactory;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
@@ -22,6 +23,7 @@ import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ComparatorSMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
@@ -98,7 +100,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
       else
       {
         // For all service groups
-        for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
+        for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (aServiceGroups, new ComparatorSMPServiceGroup ()))
         {
           final HCUL aULPerSG = new HCUL ();
           final Collection <? extends ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (aServiceGroup);
@@ -122,7 +124,9 @@ public class PageSecureTasks extends AbstractSMPWebPage
 
                   final ESMPTransportProfile eTransportProfile = ESMPTransportProfile.getFromIDOrNull (aEndpoint.getTransportProfile ());
                   if (eTransportProfile == null)
-                    aULPerEndpoint.addItem (_createWarning ("The endpoint uses the non-standard transport profile '" + aEndpoint.getTransportProfile () + "'."));
+                    aULPerEndpoint.addItem (_createWarning ("The endpoint uses the non-standard transport profile '" +
+                                                            aEndpoint.getTransportProfile () +
+                                                            "'."));
 
                   if (aEndpoint.getServiceActivationDateTime () != null)
                   {
@@ -160,37 +164,49 @@ public class PageSecureTasks extends AbstractSMPWebPage
                   {
                     final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
                     if (aNotBefore.isAfter (aNowDT))
-                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is not yet active. It will be active from " + PDTToString.getAsString (aNotBefore, aDisplayLocale) + "."));
+                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is not yet active. It will be active from " +
+                                                            PDTToString.getAsString (aNotBefore, aDisplayLocale) +
+                                                            "."));
 
                     final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
                     if (aNotAfter.isBefore (aNowDT))
-                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is already expired. It was valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale) + "."));
+                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is already expired. It was valid until " +
+                                                            PDTToString.getAsString (aNotAfter, aDisplayLocale) +
+                                                            "."));
                     else
                       if (aNotAfter.isBefore (aNowPlusDT))
-                        aULPerEndpoint.addItem (_createWarning ("The endpoint certificate will expire soon. It is only valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale) + "."));
+                        aULPerEndpoint.addItem (_createWarning ("The endpoint certificate will expire soon. It is only valid until " +
+                                                                PDTToString.getAsString (aNotAfter, aDisplayLocale) +
+                                                                "."));
                   }
 
                   // Show per endpoint errors
                   if (aULPerEndpoint.hasChildren ())
-                    aULPerProcess.addItem (new HCDiv ().addChild ("Transport profile ").addChild (new HCCode ().addChild (aEndpoint.getTransportProfile ())), aULPerEndpoint);
+                    aULPerProcess.addItem (new HCDiv ().addChild ("Transport profile ")
+                                                       .addChild (new HCCode ().addChild (aEndpoint.getTransportProfile ())),
+                                           aULPerEndpoint);
                 }
                 // Show per process errors
                 if (aULPerProcess.hasChildren ())
                   aULPerDocType.addItem (new HCDiv ().addChild ("Process ")
-                                                     .addChild (new HCCode ().addClass (CUICoreCSS.CSS_CLASS_NOWRAP).addChild (aProcess.getProcessIdentifier ().getURIEncoded ())),
+                                                     .addChild (new HCCode ().addClass (CUICoreCSS.CSS_CLASS_NOWRAP)
+                                                                             .addChild (aProcess.getProcessIdentifier ().getURIEncoded ())),
                                          aULPerProcess);
               }
               // Show per document type errors
               if (aULPerDocType.hasChildren ())
                 aULPerSG.addItem (new HCDiv ().addChild ("Document type ")
-                                              .addChild (new HCCode ().addClass (CUICoreCSS.CSS_CLASS_NOWRAP).addChild (aServiceInfo.getDocumentTypeIdentifier ().getURIEncoded ())),
+                                              .addChild (new HCCode ().addClass (CUICoreCSS.CSS_CLASS_NOWRAP)
+                                                                      .addChild (aServiceInfo.getDocumentTypeIdentifier ().getURIEncoded ())),
                                   aULPerDocType);
             }
           }
 
           // Show per service group errors
           if (aULPerSG.hasChildren ())
-            aOL.addItem (new HCDiv ().addChild ("Service group ").addChild (new HCCode ().addChild (aServiceGroup.getParticpantIdentifier ().getURIEncoded ())), aULPerSG);
+            aOL.addItem (new HCDiv ().addChild ("Service group ")
+                                     .addChild (new HCCode ().addChild (aServiceGroup.getParticpantIdentifier ().getURIEncoded ())),
+                         aULPerSG);
         }
       }
     }

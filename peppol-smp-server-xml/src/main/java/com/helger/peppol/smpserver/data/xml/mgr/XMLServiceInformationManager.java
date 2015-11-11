@@ -51,7 +51,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.photon.basic.app.dao.impl.EDAOActionType;
-import com.helger.photon.basic.security.audit.AuditHelper;
+import com.helger.photon.basic.audit.AuditHelper;
 
 /**
  * Manager for all {@link SMPServiceInformation} objects.

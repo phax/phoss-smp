@@ -25,7 +25,7 @@ import javax.annotation.concurrent.Immutable;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.locale.LocaleCache;
-import com.helger.photon.basic.security.CSecurity;
+import com.helger.photon.security.CSecurity;
 
 /**
  * Contains application wide constants.

@@ -59,7 +59,7 @@ public final class RunInJettySMPSERVER
     final Server aServer = new Server ();
     // Create connector on Port
     final ServerConnector aConnector = new ServerConnector (aServer);
-    aConnector.setPort (80);
+    aConnector.setPort (90);
     aConnector.setIdleTimeout (30000);
     // aConnector.setStatsOn (true);
     aServer.setConnectors (new Connector [] { aConnector });

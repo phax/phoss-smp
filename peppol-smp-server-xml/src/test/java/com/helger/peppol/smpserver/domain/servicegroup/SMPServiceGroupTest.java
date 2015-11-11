@@ -23,7 +23,7 @@ import org.junit.rules.TestRule;
 import com.helger.commons.mock.CommonsTestHelper;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
-import com.helger.photon.basic.security.CSecurity;
+import com.helger.photon.security.CSecurity;
 
 /**
  * Test class for class {@link SMPServiceGroup}.

@@ -33,9 +33,6 @@ import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
-import com.helger.photon.basic.security.login.LoggedInUserManager;
-import com.helger.photon.basic.security.user.IUser;
-import com.helger.photon.basic.security.util.SecurityHelper;
 import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
@@ -55,6 +52,9 @@ import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.app.layout.ILayoutAreaContentProvider;
 import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.core.url.LinkHelper;
+import com.helger.photon.security.login.LoggedInUserManager;
+import com.helger.photon.security.user.IUser;
+import com.helger.photon.security.util.SecurityHelper;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**

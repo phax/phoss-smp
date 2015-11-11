@@ -18,10 +18,10 @@ package com.helger.peppol.smpserver.app;
 
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.photon.basic.security.AccessManager;
-import com.helger.photon.basic.security.role.RoleManager;
-import com.helger.photon.basic.security.user.UserManager;
-import com.helger.photon.basic.security.usergroup.UserGroupManager;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.role.RoleManager;
+import com.helger.photon.security.user.UserManager;
+import com.helger.photon.security.usergroup.UserGroupManager;
 
 @Immutable
 public final class AppSecurity
@@ -31,68 +31,59 @@ public final class AppSecurity
 
   public static void init ()
   {
-    // Call before accessing AccessManager!
-    RoleManager.setCreateDefaults (false);
-    UserManager.setCreateDefaults (false);
-    UserGroupManager.setCreateDefaults (false);
-
-    final AccessManager aAM = AccessManager.getInstance ();
+    final UserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
+    final UserGroupManager aUserGroupMgr = PhotonSecurityManager.getUserGroupMgr ();
+    final RoleManager aRoleMgr = PhotonSecurityManager.getRoleMgr ();
 
     // Standard users
-    if (!aAM.containsUserWithID (CApp.USER_ADMINISTRATOR_ID))
+    if (!aUserMgr.containsUserWithID (CApp.USER_ADMINISTRATOR_ID))
     {
       final boolean bDisabled = false;
-      aAM.createPredefinedUser (CApp.USER_ADMINISTRATOR_ID,
-                                CApp.USER_ADMINISTRATOR_LOGINNAME,
-                                CApp.USER_ADMINISTRATOR_EMAIL,
-                                CApp.USER_ADMINISTRATOR_PASSWORD,
-                                CApp.USER_ADMINISTRATOR_FIRSTNAME,
-                                CApp.USER_ADMINISTRATOR_LASTNAME,
-                                CApp.USER_ADMINISTRATOR_DESCRIPTION,
-                                CApp.USER_ADMINISTRATOR_LOCALE,
-                                CApp.USER_ADMINISTRATOR_CUSTOMATTRS,
-                                bDisabled);
+      aUserMgr.createPredefinedUser (CApp.USER_ADMINISTRATOR_ID,
+                                     CApp.USER_ADMINISTRATOR_LOGINNAME,
+                                     CApp.USER_ADMINISTRATOR_EMAIL,
+                                     CApp.USER_ADMINISTRATOR_PASSWORD,
+                                     CApp.USER_ADMINISTRATOR_FIRSTNAME,
+                                     CApp.USER_ADMINISTRATOR_LASTNAME,
+                                     CApp.USER_ADMINISTRATOR_DESCRIPTION,
+                                     CApp.USER_ADMINISTRATOR_LOCALE,
+                                     CApp.USER_ADMINISTRATOR_CUSTOMATTRS,
+                                     bDisabled);
     }
 
     // Create all roles
-    if (!aAM.containsRoleWithID (CApp.ROLE_CONFIG_ID))
-      aAM.createPredefinedRole (CApp.ROLE_CONFIG_ID,
-                                CApp.ROLE_CONFIG_NAME,
-                                CApp.ROLE_CONFIG_DESCRIPTION,
-                                CApp.ROLE_CONFIG_CUSTOMATTRS);
-    if (!aAM.containsRoleWithID (CApp.ROLE_VIEW_ID))
-      aAM.createPredefinedRole (CApp.ROLE_VIEW_ID,
-                                CApp.ROLE_VIEW_NAME,
-                                CApp.ROLE_VIEW_DESCRIPTION,
-                                CApp.ROLE_VIEW_CUSTOMATTRS);
+    if (!aRoleMgr.containsRoleWithID (CApp.ROLE_CONFIG_ID))
+      aRoleMgr.createPredefinedRole (CApp.ROLE_CONFIG_ID, CApp.ROLE_CONFIG_NAME, CApp.ROLE_CONFIG_DESCRIPTION, CApp.ROLE_CONFIG_CUSTOMATTRS);
+    if (!aRoleMgr.containsRoleWithID (CApp.ROLE_VIEW_ID))
+      aRoleMgr.createPredefinedRole (CApp.ROLE_VIEW_ID, CApp.ROLE_VIEW_NAME, CApp.ROLE_VIEW_DESCRIPTION, CApp.ROLE_VIEW_CUSTOMATTRS);
 
     // User group Administrators
-    if (!aAM.containsUserGroupWithID (CApp.USERGROUP_ADMINISTRATORS_ID))
+    if (!aUserGroupMgr.containsUserGroupWithID (CApp.USERGROUP_ADMINISTRATORS_ID))
     {
-      aAM.createPredefinedUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID,
-                                     CApp.USERGROUP_ADMINISTRATORS_NAME,
-                                     CApp.USERGROUP_ADMINISTRATORS_DESCRIPTION,
-                                     CApp.USERGROUP_ADMINISTRATORS_CUSTOMATTRS);
+      aUserGroupMgr.createPredefinedUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID,
+                                               CApp.USERGROUP_ADMINISTRATORS_NAME,
+                                               CApp.USERGROUP_ADMINISTRATORS_DESCRIPTION,
+                                               CApp.USERGROUP_ADMINISTRATORS_CUSTOMATTRS);
       // Assign administrator user to administrators user group
-      aAM.assignUserToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID, CApp.USER_ADMINISTRATOR_ID);
+      aUserGroupMgr.assignUserToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID, CApp.USER_ADMINISTRATOR_ID);
     }
-    aAM.assignRoleToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID, CApp.ROLE_CONFIG_ID);
-    aAM.assignRoleToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID, CApp.ROLE_VIEW_ID);
+    aUserGroupMgr.assignRoleToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID, CApp.ROLE_CONFIG_ID);
+    aUserGroupMgr.assignRoleToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID, CApp.ROLE_VIEW_ID);
 
     // User group for Config users
-    if (!aAM.containsUserGroupWithID (CApp.USERGROUP_CONFIG_ID))
-      aAM.createPredefinedUserGroup (CApp.USERGROUP_CONFIG_ID,
-                                     CApp.USERGROUP_CONFIG_NAME,
-                                     CApp.USERGROUP_CONFIG_DESCRIPTION,
-                                     CApp.USERGROUP_CONFIG_CUSTOMATTRS);
-    aAM.assignRoleToUserGroup (CApp.USERGROUP_CONFIG_ID, CApp.ROLE_CONFIG_ID);
+    if (!aUserGroupMgr.containsUserGroupWithID (CApp.USERGROUP_CONFIG_ID))
+      aUserGroupMgr.createPredefinedUserGroup (CApp.USERGROUP_CONFIG_ID,
+                                               CApp.USERGROUP_CONFIG_NAME,
+                                               CApp.USERGROUP_CONFIG_DESCRIPTION,
+                                               CApp.USERGROUP_CONFIG_CUSTOMATTRS);
+    aUserGroupMgr.assignRoleToUserGroup (CApp.USERGROUP_CONFIG_ID, CApp.ROLE_CONFIG_ID);
 
     // User group for View users
-    if (!aAM.containsUserGroupWithID (CApp.USERGROUP_VIEW_ID))
-      aAM.createPredefinedUserGroup (CApp.USERGROUP_VIEW_ID,
-                                     CApp.USERGROUP_VIEW_NAME,
-                                     CApp.USERGROUP_VIEW_DESCRIPTION,
-                                     CApp.USERGROUP_VIEW_CUSTOMATTRS);
-    aAM.assignRoleToUserGroup (CApp.USERGROUP_VIEW_ID, CApp.ROLE_VIEW_ID);
+    if (!aUserGroupMgr.containsUserGroupWithID (CApp.USERGROUP_VIEW_ID))
+      aUserGroupMgr.createPredefinedUserGroup (CApp.USERGROUP_VIEW_ID,
+                                               CApp.USERGROUP_VIEW_NAME,
+                                               CApp.USERGROUP_VIEW_DESCRIPTION,
+                                               CApp.USERGROUP_VIEW_CUSTOMATTRS);
+    aUserGroupMgr.assignRoleToUserGroup (CApp.USERGROUP_VIEW_ID, CApp.ROLE_VIEW_ID);
   }
 }

@@ -25,6 +25,7 @@ import javax.annotation.Nonnull;
 import com.helger.commons.callback.INonThrowingRunnableWithParameter;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
+import com.helger.commons.url.SimpleURL;
 import com.helger.css.property.CCSSProperties;
 import com.helger.html.css.DefaultCSSClassProvider;
 import com.helger.html.css.ICSSClassProvider;
@@ -50,9 +51,6 @@ import com.helger.photon.basic.app.menu.IMenuObject;
 import com.helger.photon.basic.app.menu.IMenuSeparator;
 import com.helger.photon.basic.app.menu.IMenuTree;
 import com.helger.photon.basic.app.menu.MenuItemDeterminatorCallback;
-import com.helger.photon.basic.security.login.LoggedInUserManager;
-import com.helger.photon.basic.security.user.IUser;
-import com.helger.photon.basic.security.util.SecurityHelper;
 import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
@@ -77,6 +75,9 @@ import com.helger.photon.core.app.redirect.ForcedRedirectManager;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.core.url.LinkHelper;
+import com.helger.photon.security.login.LoggedInUserManager;
+import com.helger.photon.security.user.IUser;
+import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.page.IWebPage;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -114,10 +115,15 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
       final Locale aDisplayLocale = aLEC.getDisplayLocale ();
       final BootstrapNav aNav = new BootstrapNav ();
       aNavbar.addButton (EBootstrapNavbarPosition.COLLAPSIBLE_DEFAULT,
-                         new BootstrapButton ().addChild ("Goto manager").setOnClick (LinkHelper.getURLWithContext (AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH + "/")));
-      aNav.addItem (new HCSpan ().addClass (CBootstrapCSS.NAVBAR_TEXT).addChild ("Logged in as ").addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser, aDisplayLocale))));
+                         new BootstrapButton ().addChild ("Goto manager")
+                                               .setOnClick (LinkHelper.getURLWithContext (AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH +
+                                                                                          "/")));
+      aNav.addItem (new HCSpan ().addClass (CBootstrapCSS.NAVBAR_TEXT)
+                                 .addChild ("Logged in as ")
+                                 .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser, aDisplayLocale))));
 
-      aNav.addItem (new HCA (LinkHelper.getURLWithContext (aRequestScope, LogoutServlet.SERVLET_DEFAULT_PATH)).addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
+      aNav.addItem (new HCA (LinkHelper.getURLWithContext (aRequestScope,
+                                                           LogoutServlet.SERVLET_DEFAULT_PATH)).addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
       aNavbar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_RIGHT, aNav);
     }
     else
@@ -211,7 +217,8 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
                                                                   " (" +
                                                                   sHttpStatusMessage +
                                                                   ")" +
-                                                                  (StringHelper.hasText (sHttpRequestURI) ? " for request URI " + sHttpRequestURI : "")));
+                                                                  (StringHelper.hasText (sHttpRequestURI) ? " for request URI " + sHttpRequestURI
+                                                                                                          : "")));
     }
     else
     {
@@ -238,9 +245,10 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
     aDiv.addChild (new HCP ().addChild ("Created by ")
                              .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"))
                              .addChild (" - Twitter: ")
-                             .addChild (new HCA ("https://twitter.com/philiphelger").setTargetBlank ().addChild ("@philiphelger"))
+                             .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ().addChild ("@philiphelger"))
                              .addChild (" - ")
-                             .addChild (new HCA ("https://github.com/phax/peppol-smp-server").setTargetBlank ().addChild ("Source on GitHub")));
+                             .addChild (new HCA (new SimpleURL ("https://github.com/phax/peppol-smp-server")).setTargetBlank ()
+                                                                                                             .addChild ("Source on GitHub")));
     return aDiv;
   }
 

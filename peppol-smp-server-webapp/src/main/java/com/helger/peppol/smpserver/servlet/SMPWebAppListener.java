@@ -39,6 +39,9 @@ import com.helger.photon.core.app.CApplication;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
+import com.helger.photon.security.role.RoleManager;
+import com.helger.photon.security.user.UserManager;
+import com.helger.photon.security.usergroup.UserGroupManager;
 import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
@@ -92,9 +95,7 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
       if ("xml".equalsIgnoreCase (sBackend))
         SMPMetaManager.setManagerFactory (new XMLManagerProvider ());
       else
-        throw new InitializationException ("Invalid backend '" +
-                                           sBackend +
-                                           "' provided. Only 'sql' and 'xml' are supported!");
+        throw new InitializationException ("Invalid backend '" + sBackend + "' provided. Only 'sql' and 'xml' are supported!");
 
     // Now we can call getInstance
     SMPMetaManager.getInstance ();
@@ -110,6 +111,11 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     SLF4JBridgeHandler.install ();
 
     super.initGlobals ();
+
+    // Call before accessing PhotonSecurityManager!
+    RoleManager.setCreateDefaults (false);
+    UserManager.setCreateDefaults (false);
+    UserGroupManager.setCreateDefaults (false);
 
     if (SMPServerConfiguration.isForceRoot ())
     {
