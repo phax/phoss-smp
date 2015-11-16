@@ -51,6 +51,7 @@ public final class AppSettings extends AbstractGlobalSingleton
 
   private static final IReadableResource s_aRes;
   private static final ISettings s_aSettings;
+  private static String s_sVersionNumber;
 
   static
   {
@@ -63,6 +64,10 @@ public final class AppSettings extends AbstractGlobalSingleton
     s_aLogger.info ("Reading webapp.properties from " + s_aRes.getPath ());
     final SettingsPersistenceProperties aSPP = new SettingsPersistenceProperties ();
     s_aSettings = aSPP.readSettings (s_aRes);
+
+    // Read version number
+    final ISettings aVersionProps = aSPP.readSettings (new ClassPathResource ("version.properties"));
+    s_sVersionNumber = aVersionProps.getStringValue ("webapp.version");
   }
 
   @Deprecated
@@ -113,6 +118,6 @@ public final class AppSettings extends AbstractGlobalSingleton
   @Nullable
   public static String getVersionNumber ()
   {
-    return s_aSettings.getStringValue ("webapp.version");
+    return s_sVersionNumber;
   }
 }
