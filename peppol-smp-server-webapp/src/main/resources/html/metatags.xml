@@ -18,5 +18,5 @@
 
 -->
 <mapping>
-  <map key="description" value="PEPPOL lightweight SMP server" />
+  <map key="description" value="ph-peppol-smp-server" />
 </mapping>
