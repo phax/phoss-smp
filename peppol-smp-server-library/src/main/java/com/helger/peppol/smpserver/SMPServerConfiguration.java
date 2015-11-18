@@ -73,6 +73,12 @@ import com.helger.peppol.utils.ConfigFile;
 @Immutable
 public final class SMPServerConfiguration
 {
+  /**
+   * The name of the system property which points to the smp-server.properties
+   * files
+   */
+  public static final String SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH = "smp.server.properties.path";
+
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServerConfiguration.class);
   private static final ConfigFile s_aConfigFile;
 
@@ -80,7 +86,7 @@ public final class SMPServerConfiguration
   {
     final List <String> aFilePaths = new ArrayList <> ();
     // Check if the system property is present
-    final String sPropertyPath = SystemProperties.getPropertyValue ("smp.server.properties.path");
+    final String sPropertyPath = SystemProperties.getPropertyValue (SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH);
     if (StringHelper.hasText (sPropertyPath))
       aFilePaths.add (sPropertyPath);
 
