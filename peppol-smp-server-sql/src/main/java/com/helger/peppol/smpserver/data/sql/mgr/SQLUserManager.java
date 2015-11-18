@@ -57,9 +57,12 @@ import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnershipID;
+import com.helger.peppol.smpserver.data.sql.model.DBServiceGroup;
+import com.helger.peppol.smpserver.data.sql.model.DBServiceGroupID;
 import com.helger.peppol.smpserver.data.sql.model.DBUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
@@ -215,6 +218,14 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   public DBOwnership verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
                                       @Nonnull final ISMPUser aCredentials) throws SMPUnauthorizedException
   {
+    // Resolve service group
+    // to throw a 404 if a service group does not exist
+    final DBServiceGroup aServiceGroup = getEntityManager ().find (DBServiceGroup.class, new DBServiceGroupID (aServiceGroupID));
+    if (aServiceGroup == null)
+    {
+      throw new SMPNotFoundException ("Service group " + IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) + " does not exist");
+    }
+
     final DBOwnershipID aOwnershipID = new DBOwnershipID (aCredentials.getID (), aServiceGroupID);
     final DBOwnership aOwnership = getEntityManager ().find (DBOwnership.class, aOwnershipID);
     if (aOwnership == null)

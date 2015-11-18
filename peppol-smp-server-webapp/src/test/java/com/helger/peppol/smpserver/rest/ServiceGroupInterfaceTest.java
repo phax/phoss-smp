@@ -16,34 +16,34 @@
  */
 package com.helger.peppol.smpserver.rest;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
+
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
+import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smpserver.SMPServerTestRule;
 import com.helger.peppol.smpserver.data.xml.mgr.XMLServiceGroupManager;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.security.CSecurity;
@@ -55,32 +55,26 @@ import com.helger.web.http.basicauth.BasicAuthClientCredentials;
  *
  * @author Philip Helger
  */
+@RunWith (Parameterized.class)
 public final class ServiceGroupInterfaceTest
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceGroupInterfaceTest.class);
 
+  @Parameters (name = "{index}.: {0}")
+  public static Collection <String> data ()
+  {
+    return CollectionHelper.newList ("test-smp-server-xml.properties", "test-smp-server-sql.properties");
+  }
+
   @Rule
-  public final TestRule m_aRule = new SMPServerTestRule (new ClassPathResource ("test-smp-server-xml.properties").getAsFile ().getAbsolutePath ());
+  public final SMPServerRESTTestRule m_aRule;
 
-  private HttpServer m_aServer;
-  private WebTarget m_aTarget;
+  public ServiceGroupInterfaceTest (@Nonnull final String sClassPath)
+  {
+    m_aRule = new SMPServerRESTTestRule (new ClassPathResource (sClassPath).getAsFile ().getAbsolutePath ());
+  }
+
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
-
-  @Before
-  public void setUp ()
-  {
-    // http only
-    m_aServer = MockServer.startRegularServer ();
-
-    final Client aClient = ClientBuilder.newClient ();
-    m_aTarget = aClient.target (MockServer.BASE_URI_HTTP);
-  }
-
-  @After
-  public void tearDown ()
-  {
-    m_aServer.shutdownNow ();
-  }
 
   @Nonnull
   private static Builder _addCredentials (@Nonnull final Builder aBuilder)
@@ -94,17 +88,20 @@ public final class ServiceGroupInterfaceTest
     }
 
     // Use default credentials for SQL backend
-    return aBuilder.header (CHTTPHeader.AUTHORIZATION, new BasicAuthClientCredentials ("peppol", "Test1234").getRequestValue ());
+    return aBuilder.header (CHTTPHeader.AUTHORIZATION, new BasicAuthClientCredentials ("peppol_user", "Test1234").getRequestValue ());
   }
 
-  private static void _testResponse (final Response aResponseMsg, final int nStatusCode)
+  private static void _testResponse (final Response aResponseMsg, final int... aStatusCodes)
   {
+    ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
+    ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
+
     assertNotNull (aResponseMsg);
     // Read response
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
       s_aLogger.info ("HTTP Response: " + sResponse);
-    assertEquals (nStatusCode, aResponseMsg.getStatus ());
+    assertTrue (ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));
   }
 
   @Test
@@ -115,24 +112,25 @@ public final class ServiceGroupInterfaceTest
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (aPI);
 
+    final WebTarget aTarget = m_aRule.getWebTarget ();
     Response aResponseMsg;
 
     try
     {
       // PUT 1
-      aResponseMsg = _addCredentials (m_aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
       assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
 
       // PUT 2
-      aResponseMsg = _addCredentials (m_aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
       assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
 
       // DELETE 1
-      aResponseMsg = _addCredentials (m_aTarget.path (sPI).request ()).delete ();
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
       _testResponse (aResponseMsg, 200);
 
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
@@ -140,8 +138,8 @@ public final class ServiceGroupInterfaceTest
     finally
     {
       // DELETE 2
-      aResponseMsg = _addCredentials (m_aTarget.path (sPI).request ()).delete ();
-      _testResponse (aResponseMsg, 404);
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
+      _testResponse (aResponseMsg, 200, 404);
 
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
     }

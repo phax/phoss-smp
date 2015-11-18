@@ -103,7 +103,7 @@ public final class SMPServerAPI
                                                                                                                                    "$call");
   private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
                                                                                                                                 "$success");
-  private static final String LOG_PREFIX = "[SMP REST  API] ";
+  private static final String LOG_PREFIX = "[SMP REST API] ";
 
   private final ISMPServerAPIDataProvider m_aAPIProvider;
 
@@ -115,7 +115,7 @@ public final class SMPServerAPI
   @Nonnull
   public CompleteServiceGroupType getCompleteServiceGroup (final String sServiceGroupID) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "getCompleteServiceGroup - GET /complete/" + sServiceGroupID);
+    s_aLogger.info (LOG_PREFIX + "GET /complete/" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("getCompleteServiceGroup");
 
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
@@ -166,7 +166,7 @@ public final class SMPServerAPI
   public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sUserID,
                                                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "getServiceGroupReferenceList - GET /list/" + sUserID);
+    s_aLogger.info (LOG_PREFIX + "GET /list/" + sUserID);
     s_aStatsCounterInvocation.increment ("getServiceGroupReferenceList");
 
     if (!aCredentials.getUserName ().equals (sUserID))
@@ -202,7 +202,7 @@ public final class SMPServerAPI
   @Nonnull
   public ServiceGroupType getServiceGroup (final String sServiceGroupID) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "getServiceGroup - GET /" + sServiceGroupID);
+    s_aLogger.info (LOG_PREFIX + "GET /" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("getServiceGroup");
 
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
@@ -245,7 +245,7 @@ public final class SMPServerAPI
                                     @Nonnull final ServiceGroupType aServiceGroup,
                                     @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "saveServiceGroup - PUT /" + sServiceGroupID + " ==> " + aServiceGroup);
+    s_aLogger.info (LOG_PREFIX + "PUT /" + sServiceGroupID + " ==> " + aServiceGroup);
     s_aStatsCounterInvocation.increment ("saveServiceGroup");
 
     final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
@@ -279,7 +279,7 @@ public final class SMPServerAPI
   @Nonnull
   public ESuccess deleteServiceGroup (@Nonnull final String sServiceGroupID, @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "deleteServiceGroup - DELETE /" + sServiceGroupID);
+    s_aLogger.info (LOG_PREFIX + "DELETE /" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("deleteServiceGroup");
 
     final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
@@ -291,10 +291,11 @@ public final class SMPServerAPI
     }
 
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+
     final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
     aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
 
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
 
     s_aLogger.info (LOG_PREFIX + "Finished deleteServiceGroup(" + sServiceGroupID + ")");
@@ -306,7 +307,7 @@ public final class SMPServerAPI
   public SignedServiceMetadataType getServiceRegistration (@Nonnull final String sServiceGroupID,
                                                            @Nonnull final String sDocumentTypeID) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "getServiceRegistration - GET /" + sServiceGroupID + "/services/" + sDocumentTypeID);
+    s_aLogger.info (LOG_PREFIX + "GET /" + sServiceGroupID + "/services/" + sDocumentTypeID);
     s_aStatsCounterInvocation.increment ("getServiceRegistration");
 
     final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
@@ -365,7 +366,7 @@ public final class SMPServerAPI
                                            @Nonnull final ServiceMetadataType aServiceMetadata,
                                            @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "saveServiceRegistration - PUT /" + sServiceGroupID + "/services/" + sDocumentTypeID + " ==> " + aServiceMetadata);
+    s_aLogger.info (LOG_PREFIX + "PUT /" + sServiceGroupID + "/services/" + sDocumentTypeID + " ==> " + aServiceMetadata);
     s_aStatsCounterInvocation.increment ("saveServiceRegistration");
 
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
@@ -481,7 +482,7 @@ public final class SMPServerAPI
                                              @Nonnull final String sDocumentTypeID,
                                              @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "deleteServiceRegistration - DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID);
+    s_aLogger.info (LOG_PREFIX + "DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID);
     s_aStatsCounterInvocation.increment ("deleteServiceRegistration");
 
     final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);

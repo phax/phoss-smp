@@ -16,8 +16,6 @@
  */
 package com.helger.peppol.smpserver;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.annotation.Nullable;
 
 import com.helger.commons.string.StringHelper;
@@ -33,8 +31,6 @@ import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
  */
 public class SMPServerTestRule extends PhotonBasicWebTestRule
 {
-  private static final AtomicBoolean s_aInitBackend = new AtomicBoolean (false);
-
   public SMPServerTestRule ()
   {
     this (null);
@@ -43,25 +39,24 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
   public SMPServerTestRule (@Nullable final String sSMPServerPropertiesPath)
   {
     if (StringHelper.hasText (sSMPServerPropertiesPath))
+    {
       SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH, sSMPServerPropertiesPath);
+      SMPServerConfiguration.reloadConfiguration ();
+    }
   }
 
   @Override
   public void before ()
   {
     super.before ();
-
-    // Set it only once
-    if (s_aInitBackend.compareAndSet (false, true))
-      SMPWebAppListener.initBackendFromConfiguration ();
-
-    // Pre-init whatever is possible
-    SMPMetaManager.getInstance ();
+    SMPWebAppListener.initBackendFromConfiguration ();
   }
 
   @Override
   public void after ()
   {
+    // Reset for next run
+    SMPMetaManager.setManagerFactory (null);
     super.after ();
   }
 }

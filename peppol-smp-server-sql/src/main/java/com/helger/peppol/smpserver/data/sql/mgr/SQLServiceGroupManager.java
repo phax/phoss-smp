@@ -80,7 +80,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   }
 
   @Nonnull
-  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID, @Nonnull final IParticipantIdentifier aParticipantIdentifier, @Nullable final String sExtension)
+  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
+                                                @Nonnull final IParticipantIdentifier aParticipantIdentifier,
+                                                @Nullable final String sExtension)
   {
     s_aLogger.info ("createSMPServiceGroup (" +
                     sOwnerID +
@@ -101,7 +103,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
         final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantIdentifier);
         DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
         if (aDBServiceGroup != null)
-          throw new IllegalStateException ("The service group with ID " + IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier) + " already exists!");
+          throw new IllegalStateException ("The service group with ID " +
+                                           IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier) +
+                                           " already exists!");
 
         final DBUser aDBUser = aEM.find (DBUser.class, sOwnerID);
         if (aDBUser == null)
@@ -136,9 +140,17 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   }
 
   @Nonnull
-  public EChange updateSMPServiceGroup (@Nullable final String sSMPServiceGroupID, @Nonnull @Nonempty final String sNewOwnerID, @Nullable final String sExtension)
+  public EChange updateSMPServiceGroup (@Nullable final String sSMPServiceGroupID,
+                                        @Nonnull @Nonempty final String sNewOwnerID,
+                                        @Nullable final String sExtension)
   {
-    s_aLogger.info ("updateSMPServiceGroup (" + sSMPServiceGroupID + ", " + sNewOwnerID + ", " + (StringHelper.hasText (sExtension) ? "with extension" : "without extension") + ")");
+    s_aLogger.info ("updateSMPServiceGroup (" +
+                    sSMPServiceGroupID +
+                    ", " +
+                    sNewOwnerID +
+                    ", " +
+                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ")");
 
     final IParticipantIdentifier aParticipantIdentifier = IdentifierHelper.createParticipantIdentifierFromURIPartOrNull (sSMPServiceGroupID);
     JPAExecutionResult <EChange> ret;
@@ -230,7 +242,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    s_aLogger.info ("deleteSMPServiceGroup succeeded");
+    s_aLogger.info ("deleteSMPServiceGroup succeeded. Change=" + ret.get ().isChanged ());
     return ret.get ();
   }
 
@@ -245,16 +257,21 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       @ReturnsMutableCopy
       public Collection <ISMPServiceGroup> call () throws Exception
       {
-        final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p", DBServiceGroup.class).getResultList ();
+        final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p", DBServiceGroup.class)
+                                                                          .getResultList ();
 
         final Collection <ISMPServiceGroup> aList = new ArrayList <> ();
         for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
         {
           final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
           if (aDBOwnership == null)
-            throw new IllegalStateException ("Service group " + aDBServiceGroup.getId ().getAsBusinessIdentifier ().getURIEncoded () + " has no owner");
+            throw new IllegalStateException ("Service group " +
+                                             aDBServiceGroup.getId ().getAsBusinessIdentifier ().getURIEncoded () +
+                                             " has no owner");
 
-          final SMPServiceGroup aServiceGroup = new SMPServiceGroup (aDBOwnership.getId ().getUsername (), aDBServiceGroup.getId ().getAsBusinessIdentifier (), aDBServiceGroup.getExtension ());
+          final SMPServiceGroup aServiceGroup = new SMPServiceGroup (aDBOwnership.getId ().getUsername (),
+                                                                     aDBServiceGroup.getId ().getAsBusinessIdentifier (),
+                                                                     aDBServiceGroup.getExtension ());
           aList.add (aServiceGroup);
         }
         return aList;
@@ -276,14 +293,17 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       @ReturnsMutableCopy
       public Collection <ISMPServiceGroup> call () throws Exception
       {
-        final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p WHERE p.ownership.user.userName = :user", DBServiceGroup.class)
+        final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p WHERE p.ownership.user.userName = :user",
+                                                                                        DBServiceGroup.class)
                                                                           .setParameter ("user", sOwnerID)
                                                                           .getResultList ();
 
         final Collection <ISMPServiceGroup> aList = new ArrayList <> ();
         for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
         {
-          final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aDBServiceGroup.getId ().getAsBusinessIdentifier (), aDBServiceGroup.getExtension ());
+          final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,
+                                                                     aDBServiceGroup.getId ().getAsBusinessIdentifier (),
+                                                                     aDBServiceGroup.getExtension ());
           aList.add (aServiceGroup);
         }
         return aList;
@@ -304,8 +324,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       @ReturnsMutableCopy
       public Long call () throws Exception
       {
-        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p) FROM DBOwnership p WHERE p.user.userName = :user", DBOwnership.class).setParameter ("user",
-                                                                                                                                                                                        sOwnerID));
+        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p) FROM DBOwnership p WHERE p.user.userName = :user",
+                                                                                   DBOwnership.class)
+                                                                     .setParameter ("user", sOwnerID));
         return Long.valueOf (nCount);
       }
     });

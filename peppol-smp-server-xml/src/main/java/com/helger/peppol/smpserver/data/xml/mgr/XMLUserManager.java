@@ -129,7 +129,7 @@ public final class XMLUserManager implements ISMPUserManager
   public ISMPServiceGroup verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
                                            @Nonnull final ISMPUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
   {
-    // Resolve user group
+    // Resolve service group
     final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
