@@ -42,15 +42,19 @@ package com.helger.peppol.smpserver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.peppol.utils.ConfigFile;
@@ -70,7 +74,7 @@ import com.helger.peppol.utils.ConfigFile;
  *
  * @author Philip Helger
  */
-@Immutable
+@ThreadSafe
 public final class SMPServerConfiguration
 {
   /**
@@ -78,11 +82,29 @@ public final class SMPServerConfiguration
    * files
    */
   public static final String SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH = "smp.server.properties.path";
+  public static final String PATH_PRIVATE_SMP_SERVER_PROPERTIES = "private-smp-server.properties";
+  public static final String PATH_SMP_SERVER_PROPERTIES = "smp-server.properties";
 
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServerConfiguration.class);
-  private static final ConfigFile s_aConfigFile;
+  private static final ReadWriteLock s_aRWLock = new ReentrantReadWriteLock ();
+  @GuardedBy ("s_aRWLock")
+  private static ConfigFile s_aConfigFile;
 
   static
+  {
+    reloadConfiguration ();
+  }
+
+  /**
+   * Reload the configuration file. It checks if the system property
+   * {@link #SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH} is present and if so,
+   * tries it first, than {@link #PATH_PRIVATE_SMP_SERVER_PROPERTIES} is checked
+   * and finally the {@link #PATH_SMP_SERVER_PROPERTIES} path is checked.
+   *
+   * @return {@link ESuccess}
+   */
+  @Nonnull
+  public static ESuccess reloadConfiguration ()
   {
     final List <String> aFilePaths = new ArrayList <> ();
     // Check if the system property is present
@@ -91,14 +113,26 @@ public final class SMPServerConfiguration
       aFilePaths.add (sPropertyPath);
 
     // Use the default paths
-    aFilePaths.add ("private-smp-server.properties");
-    aFilePaths.add ("smp-server.properties");
+    aFilePaths.add (PATH_PRIVATE_SMP_SERVER_PROPERTIES);
+    aFilePaths.add (PATH_SMP_SERVER_PROPERTIES);
 
-    s_aConfigFile = new ConfigFile (ArrayHelper.newArray (aFilePaths, String.class));
-    if (s_aConfigFile.isRead ())
+    s_aRWLock.writeLock ().lock ();
+    try
+    {
+      s_aConfigFile = new ConfigFile (ArrayHelper.newArray (aFilePaths, String.class));
+      if (!s_aConfigFile.isRead ())
+      {
+        s_aLogger.warn ("Failed to read smp-server.properties from any of the paths: " + aFilePaths);
+        return ESuccess.FAILURE;
+      }
+
       s_aLogger.info ("Read smp-server.properties from " + s_aConfigFile.getReadResource ().getPath ());
-    else
-      s_aLogger.warn ("Failed to read smp-server.properties from any of the paths: " + aFilePaths);
+      return ESuccess.SUCCESS;
+    }
+    finally
+    {
+      s_aRWLock.writeLock ().unlock ();
+    }
   }
 
   private SMPServerConfiguration ()
@@ -110,7 +144,15 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ConfigFile getConfigFile ()
   {
-    return s_aConfigFile;
+    s_aRWLock.readLock ().lock ();
+    try
+    {
+      return s_aConfigFile;
+    }
+    finally
+    {
+      s_aRWLock.readLock ().unlock ();
+    }
   }
 
   /**
@@ -121,7 +163,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getBackend ()
   {
-    return s_aConfigFile.getString ("smp.backend");
+    return getConfigFile ().getString ("smp.backend");
   }
 
   /**
@@ -131,7 +173,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeystorePath ()
   {
-    return s_aConfigFile.getString ("smp.keystore.path");
+    return getConfigFile ().getString ("smp.keystore.path");
   }
 
   /**
@@ -141,7 +183,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeystorePassword ()
   {
-    return s_aConfigFile.getString ("smp.keystore.password");
+    return getConfigFile ().getString ("smp.keystore.password");
   }
 
   /**
@@ -151,7 +193,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeystoreKeyAlias ()
   {
-    return s_aConfigFile.getString ("smp.keystore.key.alias");
+    return getConfigFile ().getString ("smp.keystore.key.alias");
   }
 
   /**
@@ -162,7 +204,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static char [] getKeystoreKeyPassword ()
   {
-    return s_aConfigFile.getCharArray ("smp.keystore.key.password");
+    return getConfigFile ().getCharArray ("smp.keystore.key.password");
   }
 
   /**
@@ -172,7 +214,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isForceRoot ()
   {
-    return s_aConfigFile.getBoolean ("smp.forceroot", false);
+    return getConfigFile ().getBoolean ("smp.forceroot", false);
   }
 
   /**
@@ -186,7 +228,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isRESTWritableAPIDisabled ()
   {
-    return s_aConfigFile.getBoolean ("smp.rest.writableapi.disabled", false);
+    return getConfigFile ().getBoolean ("smp.rest.writableapi.disabled", false);
   }
 
   /**
@@ -195,7 +237,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isWriteToSML ()
   {
-    return s_aConfigFile.getBoolean ("sml.active", false);
+    return getConfigFile ().getBoolean ("sml.active", false);
   }
 
   /**
@@ -205,7 +247,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLURL ()
   {
-    return s_aConfigFile.getString ("sml.url");
+    return getConfigFile ().getString ("sml.url");
   }
 
   /**
@@ -216,6 +258,6 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLSMPID ()
   {
-    return s_aConfigFile.getString ("sml.smpid");
+    return getConfigFile ().getString ("sml.smpid");
   }
 }
