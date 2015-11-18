@@ -85,7 +85,7 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
     ret.put (PersistenceUnitProperties.CACHE_SHARED_DEFAULT, "false");
 
     // Enable this line for SQL debug logging
-    if (true)
+    if (false)
       ret.put (PersistenceUnitProperties.LOGGING_LEVEL, "finer");
 
     return ret;
