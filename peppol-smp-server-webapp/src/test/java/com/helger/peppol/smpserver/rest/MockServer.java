@@ -55,19 +55,19 @@ final class MockServer
     path = String.format ("/%s", UriComponent.decodePath (u.getPath (), true).get (1).toString ());
 
     final WebappContext aContext = new WebappContext ("GrizzlyContext", path);
-    ServletRegistration registration;
+    ServletRegistration aRegistration;
     if (aServletClass != null)
-      registration = aContext.addServlet (aServletClass.getName (), aServletClass);
+      aRegistration = aContext.addServlet (aServletClass.getName (), aServletClass);
     else
-      registration = aContext.addServlet (aServlet.getClass ().getName (), aServlet);
-    registration.addMapping ("/*");
+      aRegistration = aContext.addServlet (aServlet.getClass ().getName (), aServlet);
+    aRegistration.addMapping ("/*");
 
     if (aContextInitParams != null)
       for (final Map.Entry <String, String> e : aContextInitParams.entrySet ())
         aContext.setInitParameter (e.getKey (), e.getValue ());
 
     if (aInitParams != null)
-      registration.setInitParameters (aInitParams);
+      aRegistration.setInitParameters (aInitParams);
 
     return aContext;
   }
@@ -77,7 +77,10 @@ final class MockServer
   {
     final Map <String, String> aInitParams = new HashMap <String, String> ();
     aInitParams.put ("jersey.config.server.provider.packages",
-                     com.helger.peppol.smpserver.rest.ServiceGroupInterface.class.getPackage ().getName ());
+                     com.helger.peppol.smpserver.rest.ServiceGroupInterface.class.getPackage ().getName () +
+                                                               "," +
+                                                               com.helger.peppol.smpserver.exceptionmapper.RuntimeExceptionMapper.class.getPackage ()
+                                                                                                                                       .getName ());
     return _createContext (URI.create (sURI), ServletContainer.class, null, aInitParams, null);
   }
 
