@@ -49,7 +49,7 @@ import com.helger.db.jpa.AbstractPerRequestEntityManager;
 /**
  * The per-request singleton, that creates {@link EntityManager} objects from
  * {@link SMPEntityManagerFactory}.
- * 
+ *
  * @author philip
  */
 public final class SMPEntityManagerWrapper extends AbstractPerRequestEntityManager

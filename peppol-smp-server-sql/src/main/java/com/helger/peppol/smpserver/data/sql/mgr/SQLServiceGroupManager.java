@@ -42,7 +42,9 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
@@ -50,9 +52,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 
+import org.eclipse.persistence.config.CacheUsage;
+
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.equals.EqualsHelper;
+import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
@@ -77,6 +82,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   public SQLServiceGroupManager ()
   {
     m_aHook = RegistrationHookFactory.getOrCreateInstance ();
+    setUseTransactionsForSelect (true);
   }
 
   @Nonnull
@@ -240,7 +246,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       }
     });
     if (ret.hasThrowable ())
+    {
+      s_aLogger.info ("deleteSMPServiceGroup failed. Throwable: " + ClassHelper.getClassLocalName (ret.getThrowable ()));
       throw new RuntimeException (ret.getThrowable ());
+    }
 
     s_aLogger.info ("deleteSMPServiceGroup succeeded. Change=" + ret.get ().isChanged ());
     return ret.get ();
@@ -250,6 +259,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
   {
+    s_aLogger.info ("getAllSMPServiceGroups()");
+
     JPAExecutionResult <Collection <ISMPServiceGroup>> ret;
     ret = doSelect (new Callable <Collection <ISMPServiceGroup>> ()
     {
@@ -286,6 +297,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
+    s_aLogger.info ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
+
     JPAExecutionResult <Collection <ISMPServiceGroup>> ret;
     ret = doSelect (new Callable <Collection <ISMPServiceGroup>> ()
     {
@@ -317,6 +330,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @Nonnegative
   public int getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
   {
+    s_aLogger.info ("getSMPServiceGroupCountOfOwner(" + sOwnerID + ")");
+
     JPAExecutionResult <Long> ret;
     ret = doSelect (new Callable <Long> ()
     {
@@ -338,6 +353,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @Nullable
   public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
+    s_aLogger.info ("getSMPServiceGroupOfID(" +
+                    (aParticipantIdentifier == null ? "null" : IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier)) +
+                    ")");
+
     if (aParticipantIdentifier == null)
       return null;
 
@@ -365,6 +384,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
+    s_aLogger.info ("containsSMPServiceGroupWithID(" +
+                    (aParticipantIdentifier == null ? "null" : IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier)) +
+                    ")");
+
     if (aParticipantIdentifier == null)
       return false;
 
@@ -375,7 +398,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       @ReturnsMutableCopy
       public Boolean call () throws Exception
       {
-        final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class, new DBServiceGroupID (aParticipantIdentifier));
+        // Disable caching here
+        final Map <String, Object> aProps = new HashMap <> ();
+        aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
+        final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class, new DBServiceGroupID (aParticipantIdentifier), aProps);
         return Boolean.valueOf (aDBServiceGroup != null);
       }
     });
@@ -387,6 +413,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @Nonnegative
   public int getSMPServiceGroupCount ()
   {
+    s_aLogger.info ("getSMPServiceGroupCount()");
+
     JPAExecutionResult <Long> ret;
     ret = doSelect (new Callable <Long> ()
     {
