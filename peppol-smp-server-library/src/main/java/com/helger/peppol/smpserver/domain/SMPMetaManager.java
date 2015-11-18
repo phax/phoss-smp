@@ -41,11 +41,11 @@
 package com.helger.peppol.smpserver.domain;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
@@ -59,7 +59,7 @@ import com.helger.peppol.smpserver.security.SMPKeyManager;
 
 /**
  * The central SMP meta manager containing all the singleton manager instances.
- * 
+ *
  * @author Philip Helger
  */
 public final class SMPMetaManager extends AbstractGlobalSingleton
@@ -78,17 +78,20 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
    * {@link #getInstance()} is called.
    *
    * @param aManagerFactory
-   *        The manager factory to be used. May not be <code>null</code>.
+   *        The manager factory to be used. May be <code>null</code> for testing
+   *        purposes.
    * @throws IllegalStateException
    *         If another manager factory is already present.
    */
-  public static void setManagerFactory (@Nonnull final ISMPManagerProvider aManagerFactory)
+  public static void setManagerFactory (@Nullable final ISMPManagerProvider aManagerFactory)
   {
-    ValueEnforcer.notNull (aManagerFactory, "ManagerFactory");
-    if (s_aManagerProvider != null)
+    if (s_aManagerProvider != null && aManagerFactory != null)
       throw new IllegalStateException ("A manager factory is already set. You cannot set this twice!");
     s_aManagerProvider = aManagerFactory;
-    s_aLogger.info ("Using " + aManagerFactory + " as the backend");
+    if (aManagerFactory == null)
+      s_aLogger.info ("Using no backend manager factory");
+    else
+      s_aLogger.info ("Using " + aManagerFactory + " as the backend");
   }
 
   @Deprecated
