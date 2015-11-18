@@ -132,7 +132,6 @@ public final class ServiceMetadataInterfaceTest
     final String sDT = aDT.getURIEncoded ();
 
     final SimpleProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V20.getAsProcessIdentifier ();
-    final String sProcID = aProcID.getURIEncoded ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (aPI);
@@ -165,9 +164,13 @@ public final class ServiceMetadataInterfaceTest
 
     try
     {
+      _testResponse (aTarget.path (sPI).request ().get (), 404);
+
       // PUT ServiceGroup
       aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
+
+      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
       final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI);
       assertNotNull (aServiceGroup);
 
@@ -201,6 +204,8 @@ public final class ServiceMetadataInterfaceTest
         _testResponse (aResponseMsg, 200, 400);
         assertNull (SMPMetaManager.getServiceInformationMgr ().getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
       }
+
+      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
     }
     finally
     {
@@ -208,6 +213,7 @@ public final class ServiceMetadataInterfaceTest
       aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
       _testResponse (aResponseMsg, 200, 404);
 
+      _testResponse (aTarget.path (sPI).request ().get (), 404);
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
     }
   }

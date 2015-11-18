@@ -117,22 +117,28 @@ public final class ServiceGroupInterfaceTest
 
     try
     {
+      // GET
+      _testResponse (aTarget.path (sPI).request ().get (), 404);
+
       // PUT 1
       aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
+      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
       assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
 
       // PUT 2
       aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
+      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
       assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
 
       // DELETE 1
       aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
       _testResponse (aResponseMsg, 200);
 
+      _testResponse (aTarget.path (sPI).request ().get (), 404);
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
     }
     finally
@@ -141,6 +147,7 @@ public final class ServiceGroupInterfaceTest
       aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
       _testResponse (aResponseMsg, 200, 404);
 
+      _testResponse (aTarget.path (sPI).request ().get (), 404);
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
     }
   }
