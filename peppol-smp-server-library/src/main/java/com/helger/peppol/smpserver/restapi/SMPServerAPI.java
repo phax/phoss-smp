@@ -566,7 +566,15 @@ public final class SMPServerAPI
                                                                                                                                       .getExtension ())));
       }
 
-      s_aLogger.info (LOG_PREFIX + "Finished saveServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + "," + aServiceMetadata + ")");
+      s_aLogger.info (LOG_PREFIX +
+                      "Finished saveServiceRegistration(" +
+                      sServiceGroupID +
+                      "," +
+                      sDocumentTypeID +
+                      "," +
+                      aServiceMetadata +
+                      ") - " +
+                      (aServiceMetadata.getRedirect () != null ? "Redirect" : "ServiceInformation"));
       s_aStatsCounterSuccess.increment ("saveServiceRegistration");
       return ESuccess.SUCCESS;
     }
@@ -633,7 +641,7 @@ public final class SMPServerAPI
         final EChange eChange = aServiceInfoMgr.deleteSMPServiceInformation (aServiceInfo);
         if (eChange.isChanged ())
         {
-          s_aLogger.info (LOG_PREFIX + "Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
+          s_aLogger.info (LOG_PREFIX + "Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ") - ServiceInformation");
           s_aStatsCounterSuccess.increment ("deleteServiceRegistration");
           return ESuccess.SUCCESS;
         }
@@ -648,7 +656,7 @@ public final class SMPServerAPI
           final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
           if (eChange.isChanged ())
           {
-            s_aLogger.info (LOG_PREFIX + "Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
+            s_aLogger.info (LOG_PREFIX + "Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ") - Redirect");
             s_aStatsCounterSuccess.increment ("deleteServiceRegistration");
             return ESuccess.SUCCESS;
           }
