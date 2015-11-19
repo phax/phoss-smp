@@ -42,13 +42,17 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
+
+import org.eclipse.persistence.config.CacheUsage;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
@@ -115,10 +119,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
         if (aDBRedirect == null)
         {
           // Create a new one
-          aDBRedirect = new DBServiceMetadataRedirection (aDBRedirectID,
-                                                          sTargetHref,
-                                                          sSubjectUniqueIdentifier,
-                                                          sExtension);
+          aDBRedirect = new DBServiceMetadataRedirection (aDBRedirectID, sTargetHref, sSubjectUniqueIdentifier, sExtension);
           aEM.persist (aDBRedirect);
         }
         else
@@ -179,10 +180,8 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       {
         final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
                                                           DBServiceMetadataRedirection.class)
-                                            .setParameter ("scheme",
-                                                           aServiceGroup.getParticpantIdentifier ().getScheme ())
-                                            .setParameter ("value",
-                                                           aServiceGroup.getParticpantIdentifier ().getValue ())
+                                            .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                            .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
                                             .executeUpdate ();
         return EChange.valueOf (nCnt > 0);
       }
@@ -213,9 +212,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       @Nonnull
       public List <DBServiceMetadataRedirection> call ()
       {
-        return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p",
-                                                DBServiceMetadataRedirection.class)
-                                  .getResultList ();
+        return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p", DBServiceMetadataRedirection.class).getResultList ();
       }
     });
     if (ret.hasThrowable ())
@@ -289,9 +286,12 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       @Nonnull
       public DBServiceMetadataRedirection call ()
       {
+        // Disable caching here
+        final Map <String, Object> aProps = new HashMap <> ();
+        aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
         final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
                                                                                                  aDocTypeID);
-        return getEntityManager ().find (DBServiceMetadataRedirection.class, aDBRedirectID);
+        return getEntityManager ().find (DBServiceMetadataRedirection.class, aDBRedirectID, aProps);
       }
     });
     if (ret.hasThrowable ())

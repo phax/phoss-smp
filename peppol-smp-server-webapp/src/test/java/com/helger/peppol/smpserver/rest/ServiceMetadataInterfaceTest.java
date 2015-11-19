@@ -53,6 +53,7 @@ import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ProcessListType;
 import com.helger.peppol.smp.ProcessType;
+import com.helger.peppol.smp.RedirectType;
 import com.helger.peppol.smp.ServiceEndpointList;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
@@ -203,6 +204,83 @@ public final class ServiceMetadataInterfaceTest
         aResponseMsg = _addCredentials (aTarget.path (sPI).path ("services").path (sDT).request ()).delete ();
         _testResponse (aResponseMsg, 200, 400);
         assertNull (SMPMetaManager.getServiceInformationMgr ().getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+      }
+
+      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
+    }
+    finally
+    {
+      // DELETE ServiceGroup
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
+      _testResponse (aResponseMsg, 200, 404);
+
+      _testResponse (aTarget.path (sPI).request ().get (), 404);
+      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
+    }
+  }
+
+  @Test
+  public void testCreateAndDeleteRedirect ()
+  {
+    final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final String sPI = aPI.getURIEncoded ();
+
+    final SimpleDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
+    final String sDT = aDT.getURIEncoded ();
+
+    final ServiceGroupType aSG = new ServiceGroupType ();
+    aSG.setParticipantIdentifier (aPI);
+
+    final ServiceMetadataType aSM = new ServiceMetadataType ();
+    final RedirectType aRedir = new RedirectType ();
+    aRedir.setHref ("http://other-smp.domain.xyz");
+    aRedir.setCertificateUID ("APP_0000000000000");
+    aSM.setRedirect (aRedir);
+
+    final WebTarget aTarget = m_aRule.getWebTarget ();
+    Response aResponseMsg;
+
+    try
+    {
+      _testResponse (aTarget.path (sPI).request ().get (), 404);
+
+      // PUT ServiceGroup
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      _testResponse (aResponseMsg, 200);
+
+      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
+      final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI);
+      assertNotNull (aServiceGroup);
+
+      try
+      {
+        // PUT 1 ServiceInformation
+        aResponseMsg = _addCredentials (aTarget.path (sPI)
+                                               .path ("services")
+                                               .path (sDT)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
+        _testResponse (aResponseMsg, 200);
+        assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+
+        // PUT 2 ServiceInformation
+        aResponseMsg = _addCredentials (aTarget.path (sPI)
+                                               .path ("services")
+                                               .path (sDT)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
+        _testResponse (aResponseMsg, 200);
+        assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+
+        // DELETE 1 Redirect
+        aResponseMsg = _addCredentials (aTarget.path (sPI).path ("services").path (sDT).request ()).delete ();
+        _testResponse (aResponseMsg, 200);
+        assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+      }
+      finally
+      {
+        // DELETE 2 Redirect
+        aResponseMsg = _addCredentials (aTarget.path (sPI).path ("services").path (sDT).request ()).delete ();
+        _testResponse (aResponseMsg, 200, 400);
+        assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
       }
 
       assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));

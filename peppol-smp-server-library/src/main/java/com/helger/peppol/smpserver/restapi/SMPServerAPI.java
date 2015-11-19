@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.lang.ClassHelper;
+import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
@@ -520,6 +521,7 @@ public final class SMPServerAPI
 
       if (aServiceMetadata.getRedirect () != null)
       {
+        // Handle redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
                                                 aDocTypeID,
@@ -529,6 +531,7 @@ public final class SMPServerAPI
       }
       else
       {
+        // Handle service information
         final ProcessListType aJAXBProcesses = aServiceMetadata.getServiceInformation ().getProcessList ();
         final List <SMPProcess> aProcesses = new ArrayList <> ();
         for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
@@ -624,16 +627,36 @@ public final class SMPServerAPI
 
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
-      if (aServiceInfo == null)
+      if (aServiceInfo != null)
       {
-        s_aLogger.info (LOG_PREFIX + "Service group '" + sServiceGroupID + "' has no document type '" + sDocumentTypeID + "' on this SMP!");
-        return ESuccess.FAILURE;
+        // Handle service information
+        final EChange eChange = aServiceInfoMgr.deleteSMPServiceInformation (aServiceInfo);
+        if (eChange.isChanged ())
+        {
+          s_aLogger.info (LOG_PREFIX + "Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
+          s_aStatsCounterSuccess.increment ("deleteServiceRegistration");
+          return ESuccess.SUCCESS;
+        }
       }
-      aServiceInfoMgr.deleteSMPServiceInformation (aServiceInfo);
+      else
+      {
+        final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+        final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
+        if (aRedirect != null)
+        {
+          // Handle redirect
+          final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
+          if (eChange.isChanged ())
+          {
+            s_aLogger.info (LOG_PREFIX + "Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
+            s_aStatsCounterSuccess.increment ("deleteServiceRegistration");
+            return ESuccess.SUCCESS;
+          }
+        }
+      }
 
-      s_aLogger.info (LOG_PREFIX + "Finished deleteServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
-      s_aStatsCounterSuccess.increment ("deleteServiceRegistration");
-      return ESuccess.SUCCESS;
+      s_aLogger.info (LOG_PREFIX + "Service group '" + sServiceGroupID + "' has no document type '" + sDocumentTypeID + "' on this SMP!");
+      return ESuccess.FAILURE;
     }
     catch (final Throwable t)
     {
