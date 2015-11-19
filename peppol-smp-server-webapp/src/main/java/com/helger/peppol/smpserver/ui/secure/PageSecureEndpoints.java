@@ -51,6 +51,7 @@ import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
@@ -273,7 +274,9 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Transport profile").setCtrl (aSelectedEndpoint.getTransportProfile ()));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
-                                                 .setCtrl (HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (), HC_Target.BLANK)));
+                                                 .setCtrl (StringHelper.hasText (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),
+                                                                                                                                                       HC_Target.BLANK)
+                                                                                                                            : new HCEM ().addChild ("none")));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires business level signature")
                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedEndpoint.isRequireBusinessLevelSignature (),
@@ -426,7 +429,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                  "Another endpoint for the provided service group, document type, process and transport profile is already present.");
 
     if (StringHelper.isEmpty (sEndpointReference))
-      aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "Endpoint Reference must not be empty!");
+    {
+      if (false)
+        aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "Endpoint Reference must not be empty!");
+    }
     else
       if (URLHelper.getAsURL (sEndpointReference) == null)
         aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "The Endpoint Reference is not a valid URL!");
@@ -565,7 +571,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                                                                                                         : ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ())).setReadOnly (bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_TRANSPORT_PROFILE)));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Endpoint Reference")
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint Reference")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_ENDPOINT_REFERENCE,
                                                                                          aSelectedEndpoint != null ? aSelectedEndpoint.getEndpointReference ()
                                                                                                                    : null)))

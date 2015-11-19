@@ -79,7 +79,7 @@ public class SMPEndpoint implements ISMPEndpoint
   private String m_sExtension;
 
   public SMPEndpoint (@Nonnull @Nonempty final String sTransportProfile,
-                      @Nonnull @Nonempty final String sEndpointReference,
+                      @Nullable final String sEndpointReference,
                       final boolean bRequireBusinessLevelSignature,
                       @Nullable final String sMinimumAuthenticationLevel,
                       @Nullable final LocalDateTime aServiceActivationDT,
@@ -116,16 +116,14 @@ public class SMPEndpoint implements ISMPEndpoint
     m_sTransportProfile = sTransportProfile;
   }
 
-  @Nonnull
-  @Nonempty
+  @Nullable
   public String getEndpointReference ()
   {
     return m_sEndpointReference;
   }
 
-  public void setEndpointReference (@Nonnull @Nonempty final String sEndpointReference)
+  public void setEndpointReference (@Nullable final String sEndpointReference)
   {
-    ValueEnforcer.notEmpty (sEndpointReference, "EndpointReference");
     m_sEndpointReference = sEndpointReference;
   }
 

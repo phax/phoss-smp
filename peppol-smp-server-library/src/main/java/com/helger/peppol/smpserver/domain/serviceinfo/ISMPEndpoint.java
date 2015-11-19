@@ -75,8 +75,7 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    * @return The address of an endpoint, as an WS-Addressing Endpoint Reference
    *         (EPR). This is just a URL.
    */
-  @Nonnull
-  @Nonempty
+  @Nullable
   String getEndpointReference ();
 
   /**
