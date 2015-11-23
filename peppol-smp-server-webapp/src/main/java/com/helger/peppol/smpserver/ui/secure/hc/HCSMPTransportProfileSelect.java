@@ -22,6 +22,11 @@ import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.photon.core.form.RequestField;
 
+/**
+ * Select for the default transport profiles
+ * 
+ * @author Philip Helger
+ */
 public class HCSMPTransportProfileSelect extends HCSelect
 {
   public HCSMPTransportProfileSelect (@Nonnull final RequestField aRF)

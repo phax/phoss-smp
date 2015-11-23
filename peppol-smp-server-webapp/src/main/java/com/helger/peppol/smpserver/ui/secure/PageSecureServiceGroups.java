@@ -58,7 +58,7 @@ import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
-import com.helger.peppol.smpserver.ui.secure.hc.HCUserSelect;
+import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
 import com.helger.peppol.utils.BusdoxURLHelper;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
@@ -184,7 +184,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     }
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owning User")
-                                                 .setCtrl (new HCUserSelect (new RequestField (FIELD_OWNING_USER_ID,
+                                                 .setCtrl (new HCSMPUserSelect (new RequestField (FIELD_OWNING_USER_ID,
                                                                                                aSelectedObject != null ? aSelectedObject.getOwnerID ()
                                                                                                                        : LoggedInUserManager.getInstance ()
                                                                                                                                             .getCurrentUserID ()),

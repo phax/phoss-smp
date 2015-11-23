@@ -28,18 +28,17 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 
 /**
- * Select box for active users.
+ * Select box for active SMP users (depending on the backend).
  *
  * @author Philip Helger
  */
-public class HCUserSelect extends HCExtSelect
+public class HCSMPUserSelect extends HCExtSelect
 {
-  public HCUserSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
+  public HCSMPUserSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
   {
     super (aRF);
 
-    for (final ISMPUser aUser : CollectionHelper.getSorted (SMPMetaManager.getUserMgr ().getAllUsers (),
-                                                            new ComparatorSMPUser (aDisplayLocale)))
+    for (final ISMPUser aUser : CollectionHelper.getSorted (SMPMetaManager.getUserMgr ().getAllUsers (), new ComparatorSMPUser (aDisplayLocale)))
       addOption (aUser.getID (), aUser.getUserName ());
 
     if (!hasSelectedOption ())
