@@ -76,6 +76,12 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
   }
 
   @Override
+  protected String getInitParameterServerURL (@Nonnull final ServletContext aSC, final boolean bProductionMode)
+  {
+    return SMPServerConfiguration.getPublicServerURL ();
+  }
+
+  @Override
   @Nonnull
   protected Map <String, IApplicationInitializer <LayoutExecutionContext>> getAllInitializers ()
   {

@@ -218,6 +218,17 @@ public final class SMPServerConfiguration
   }
 
   /**
+   * @return The server URL that should be used to create absolute URLs inside
+   *         the application. This may be helpful when running on a proxied
+   *         Tomcat behind a web server. Property <code>smp.publicurl</code>.
+   */
+  @Nullable
+  public static String getPublicServerURL ()
+  {
+    return getConfigFile ().getString ("smp.publicurl");
+  }
+
+  /**
    * Check if the writable parts of the REST API are disabled. If this is the
    * case, only the read-only part of the API can be used. The writable REST API
    * will return an HTTP 404 error.
