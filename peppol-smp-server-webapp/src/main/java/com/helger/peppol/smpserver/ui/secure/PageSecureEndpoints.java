@@ -64,6 +64,7 @@ import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -75,6 +76,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
+import com.helger.peppol.smpserver.domain.transportprofile.SMPTransportProfileManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPTransportProfileSelect;
@@ -342,6 +344,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+    final SMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID () : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
@@ -356,8 +359,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final String sProcessIDValue = bEdit ? aSelectedProcess.getProcessIdentifier ().getValue () : aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
     IPeppolProcessIdentifier aProcessID = null;
 
-    final String sTransportProfile = bEdit ? aSelectedEndpoint.getTransportProfile () : aWPEC.getAttributeAsString (FIELD_TRANSPORT_PROFILE);
-    final ESMPTransportProfile eTransportProfile = ESMPTransportProfile.getFromIDOrNull (sTransportProfile);
+    final String sTransportProfileID = bEdit ? aSelectedEndpoint.getTransportProfile () : aWPEC.getAttributeAsString (FIELD_TRANSPORT_PROFILE);
+    final ISMPTransportProfile aTransportProfile = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfileID);
     final String sEndpointReference = aWPEC.getAttributeAsString (FIELD_ENDPOINT_REFERENCE);
     final boolean bRequireBusinessLevelSignature = aWPEC.getAttributeAsBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aWPEC.getAttributeAsString (FIELD_MINIMUM_AUTHENTICATION_LEVEL);
@@ -414,17 +417,17 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, "The provided process ID has an invalid syntax!");
       }
 
-    if (StringHelper.isEmpty (sTransportProfile))
+    if (StringHelper.isEmpty (sTransportProfileID))
       aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, "Transport Profile must not be empty!");
     else
-      if (eTransportProfile == null)
-        aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, "Transport Profile of type '" + sTransportProfile + "' does not exist!");
+      if (aTransportProfile == null)
+        aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, "Transport Profile of type '" + sTransportProfileID + "' does not exist!");
     if (!bEdit &&
         aServiceGroup != null &&
         aDocTypeID != null &&
         aProcessID != null &&
-        eTransportProfile != null &&
-        aServiceInfoMgr.findServiceInformation (aServiceGroup, aDocTypeID, aProcessID, eTransportProfile) != null)
+        aTransportProfile != null &&
+        aServiceInfoMgr.findServiceInformation (aServiceGroup, aDocTypeID, aProcessID, aTransportProfile) != null)
       aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE,
                                  "Another endpoint for the provided service group, document type, process and transport profile is already present.");
 
@@ -484,7 +487,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aServiceInfo.addProcess ((SMPProcess) aProcess);
       }
 
-      aProcess.setEndpoint (new SMPEndpoint (sTransportProfile,
+      aProcess.setEndpoint (new SMPEndpoint (sTransportProfileID,
                                              sEndpointReference,
                                              bRequireBusinessLevelSignature,
                                              sMinimumAuthenticationLevel,
@@ -711,7 +714,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                         new DTCol ("Process ID").setDataSort (2, 0, 1, 3),
                                         new DTCol ("Transport").setDataSort (3, 0, 1, 2),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformations ())
+    for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformation ())
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {

@@ -54,6 +54,7 @@ import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.transportprofile.SMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 
@@ -66,8 +67,11 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPMetaManager.class);
 
+  public static final String FILENAME_TRANSPORT_PROFILES = "transportprofiles.xml";
+
   private static ISMPManagerProvider s_aManagerProvider = null;
 
+  private SMPTransportProfileManager m_aTransportProfileManager;
   private ISMPUserManager m_aUserMgr;
   private ISMPServiceGroupManager m_aServiceGroupMgr;
   private ISMPRedirectManager m_aRedirectMgr;
@@ -107,6 +111,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
     try
     {
+      m_aTransportProfileManager = new SMPTransportProfileManager (FILENAME_TRANSPORT_PROFILES);
+
       m_aUserMgr = s_aManagerProvider.createUserMgr ();
       if (m_aUserMgr == null)
         throw new IllegalStateException ("Failed to create User manager!");
@@ -134,7 +140,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
       s_aLogger.info (ClassHelper.getClassLocalName (this) + " was initialized");
     }
-    catch (final RuntimeException ex)
+    catch (final Exception ex)
     {
       throw new InitializationException ("Failed to init " + ClassHelper.getClassLocalName (this), ex);
     }
@@ -144,6 +150,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static SMPMetaManager getInstance ()
   {
     return getGlobalSingleton (SMPMetaManager.class);
+  }
+
+  @Nonnull
+  public static SMPTransportProfileManager getTransportProfileMgr ()
+  {
+    return getInstance ().m_aTransportProfileManager;
   }
 
   @Nonnull

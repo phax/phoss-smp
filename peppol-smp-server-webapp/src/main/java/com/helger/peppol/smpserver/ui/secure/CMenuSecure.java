@@ -26,6 +26,7 @@ public final class CMenuSecure
   public static final String MENU_SERVICE_GROUPS = "service_groups";
   public static final String MENU_ENDPOINTS = "endpoints";
   public static final String MENU_REDIRECTS = "redirects";
+  public static final String MENU_TRANSPORT_PROFILES = "transport_profiles";
   public static final String MENU_CERTIFICATE_INFORMATION = "certificate_information";
   public static final String MENU_TASKS = "tasks";
   public static final String MENU_CHANGE_PASSWORD = "change_pw";

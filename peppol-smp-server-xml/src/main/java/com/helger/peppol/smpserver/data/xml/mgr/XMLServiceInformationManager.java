@@ -260,7 +260,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformations ()
+  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     m_aRWLock.readLock ().lock ();
     try

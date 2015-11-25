@@ -177,7 +177,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     try
     {
       // Undo create
-      _createSMLCaller ().delete (new SimpleParticipantIdentifier (aBusinessIdentifier));
+      _createSMLCaller ().delete (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       s_aLogger.warn ("Succeeded in deleting again business " + sParticipantID + " from SML.");
     }
     catch (final Throwable t)

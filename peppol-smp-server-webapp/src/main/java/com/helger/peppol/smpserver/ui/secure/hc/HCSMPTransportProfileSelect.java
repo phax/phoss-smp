@@ -18,13 +18,16 @@ package com.helger.peppol.smpserver.ui.secure.hc;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.id.ComparatorHasIDString;
 import com.helger.html.hc.html.forms.HCSelect;
-import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.core.form.RequestField;
 
 /**
  * Select for the default transport profiles
- * 
+ *
  * @author Philip Helger
  */
 public class HCSMPTransportProfileSelect extends HCSelect
@@ -33,7 +36,8 @@ public class HCSMPTransportProfileSelect extends HCSelect
   {
     super (aRF);
 
-    for (final ESMPTransportProfile eTP : ESMPTransportProfile.values ())
-      addOption (eTP.getID (), eTP.getID () + " [" + eTP.getName () + "]");
+    for (final ISMPTransportProfile aTP : CollectionHelper.getSorted (SMPMetaManager.getTransportProfileMgr ().getAllSMPTransportProfiles (),
+                                                                      new ComparatorHasIDString <ISMPTransportProfile> ()))
+      addOption (aTP.getID (), aTP.getID () + " [" + aTP.getName () + "]");
   }
 }

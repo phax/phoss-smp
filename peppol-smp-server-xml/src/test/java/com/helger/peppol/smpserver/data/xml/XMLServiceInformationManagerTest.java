@@ -79,9 +79,9 @@ public final class XMLServiceInformationManagerTest
         aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG, aDocTypeID, CollectionHelper.newList (aProcess), "extsi"));
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ()).getProcessCount ());
+        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
         assertEquals (1,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ())
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
                                       .get (0)
                                       .getEndpointCount ());
@@ -107,14 +107,14 @@ public final class XMLServiceInformationManagerTest
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ()).getProcessCount ());
+        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
         assertEquals (1,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ())
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
                                       .get (0)
                                       .getEndpointCount ());
         assertEquals ("http://localhost/as2-ver2",
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ())
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
                                       .get (0)
                                       .getAllEndpoints ()
@@ -143,9 +143,9 @@ public final class XMLServiceInformationManagerTest
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ()).getProcessCount ());
+        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
         assertEquals (2,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ())
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
                                       .get (0)
                                       .getEndpointCount ());
@@ -161,14 +161,14 @@ public final class XMLServiceInformationManagerTest
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (2, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ()).getProcessCount ());
+        assertEquals (2, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
         assertEquals (2,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ())
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
                                       .get (0)
                                       .getEndpointCount ());
         assertEquals (1,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformations ())
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
                                       .get (1)
                                       .getEndpointCount ());

@@ -372,7 +372,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformations ()
+  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     JPAExecutionResult <List <DBServiceMetadata>> ret;
     ret = doInTransaction (new Callable <List <DBServiceMetadata>> ()

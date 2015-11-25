@@ -91,7 +91,7 @@ public interface ISMPServiceInformationManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends ISMPServiceInformation> getAllSMPServiceInformations ();
+  Collection <? extends ISMPServiceInformation> getAllSMPServiceInformation ();
 
   /**
    * @return The count of all service information objects. Always &ge; 0.
