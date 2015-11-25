@@ -273,7 +273,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Process ID")
                                                  .setCtrl (AppCommonUI.getProcessID (aSelectedProcess.getProcessIdentifier ())));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Transport profile").setCtrl (aSelectedEndpoint.getTransportProfile ()));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Transport profile")
+                                                 .setCtrl (new HCA (createViewURL (aWPEC,
+                                                                                   CMenuSecure.MENU_TRANSPORT_PROFILES,
+                                                                                   aSelectedEndpoint.getTransportProfile ())).addChild (aSelectedEndpoint.getTransportProfile ())));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
                                                  .setCtrl (StringHelper.hasText (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),
@@ -712,7 +715,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING).setDataSort (0, 1, 2, 3),
                                         new DTCol ("Document type ID").setDataSort (1, 0, 2, 3),
                                         new DTCol ("Process ID").setDataSort (2, 0, 1, 3),
-                                        new DTCol ("Transport").setDataSort (3, 0, 1, 2),
+                                        new DTCol ("Transport profile").setDataSort (3, 0, 1, 2),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformation ())
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
@@ -724,7 +727,9 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           aRow.addCell (new HCA (createViewURL (aWPEC, aServiceInfo, aParams)).addChild (aServiceInfo.getServiceGroupID ()));
           aRow.addCell (AppCommonUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()));
           aRow.addCell (AppCommonUI.getProcessID (aProcess.getProcessIdentifier ()));
-          aRow.addCell (aEndpoint.getTransportProfile ());
+          aRow.addCell (new HCA (createViewURL (aWPEC,
+                                                CMenuSecure.MENU_TRANSPORT_PROFILES,
+                                                aEndpoint.getTransportProfile ())).addChild (aEndpoint.getTransportProfile ()));
 
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);

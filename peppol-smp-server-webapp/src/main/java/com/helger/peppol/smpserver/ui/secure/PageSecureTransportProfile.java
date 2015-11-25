@@ -26,6 +26,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.transportprofile.SMPTransportProfileManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
+import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
@@ -104,7 +105,6 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   {
     final boolean bEdit = eFormAction.isEdit ();
 
-    aForm.setLeft (2);
     aForm.addChild (createActionHeader (bEdit ? "Edit transport profile '" + aSelectedObject.getID () + "'" : "Create new transport profile"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("ID")
@@ -114,7 +114,7 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
                                                  .setHelpText ("The ID of the transport profile to be used in SMP endpoints.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_ID)));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name")
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Name")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_NAME,
                                                                                          aSelectedObject != null ? aSelectedObject.getName ()
                                                                                                                  : null)))
@@ -190,6 +190,8 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final SMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+
+    aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page lets you create custom transport profiles that can be used in service information endpoints."));
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new transport profile", createCreateURL (aWPEC), EDefaultIcon.NEW);

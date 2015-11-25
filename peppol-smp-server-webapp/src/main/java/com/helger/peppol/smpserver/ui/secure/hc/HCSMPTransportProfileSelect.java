@@ -18,6 +18,7 @@ package com.helger.peppol.smpserver.ui.secure.hc;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.id.ComparatorHasIDString;
 import com.helger.html.hc.html.forms.HCSelect;
@@ -32,12 +33,19 @@ import com.helger.photon.core.form.RequestField;
  */
 public class HCSMPTransportProfileSelect extends HCSelect
 {
+  @Nonnull
+  @Nonempty
+  public static String getDisplayName (@Nonnull final ISMPTransportProfile aTP)
+  {
+    return aTP.getID () + " [" + aTP.getName () + "]";
+  }
+
   public HCSMPTransportProfileSelect (@Nonnull final RequestField aRF)
   {
     super (aRF);
 
     for (final ISMPTransportProfile aTP : CollectionHelper.getSorted (SMPMetaManager.getTransportProfileMgr ().getAllSMPTransportProfiles (),
                                                                       new ComparatorHasIDString <ISMPTransportProfile> ()))
-      addOption (aTP.getID (), aTP.getID () + " [" + aTP.getName () + "]");
+      addOption (aTP.getID (), getDisplayName (aTP));
   }
 }
