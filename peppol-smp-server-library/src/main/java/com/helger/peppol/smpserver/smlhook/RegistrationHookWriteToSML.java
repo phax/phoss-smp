@@ -197,7 +197,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     {
       // Use the version with the SMP ID to be on the safe side
       _createSMLCaller ().delete (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      s_aLogger.info ("Succeded in deleting business " + sParticipantID + " from SML");
+      s_aLogger.info ("Succeeded in deleting business " + sParticipantID + " from SML");
     }
     catch (final NotFoundFault ex)
     {

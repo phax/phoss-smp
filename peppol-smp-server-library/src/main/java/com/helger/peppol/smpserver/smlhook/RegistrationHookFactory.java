@@ -40,12 +40,16 @@
  */
 package com.helger.peppol.smpserver.smlhook;
 
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 
 /**
@@ -56,7 +60,7 @@ public final class RegistrationHookFactory
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationHookFactory.class);
 
-  // The cached instance
+  private static final ReadWriteLock s_aRWLock = new ReentrantReadWriteLock ();
   private static IRegistrationHook s_aInstance;
 
   private RegistrationHookFactory ()
@@ -65,15 +69,17 @@ public final class RegistrationHookFactory
   /**
    * Create a new instance every time this method is invoked.
    *
+   * @param bWriteToSML
+   *        <code>true</code> if writing to SML should be enabled,
+   *        <code>false</code> otherwise.
    * @return A new instance of {@link IRegistrationHook} according to the
    *         configuration file.
    * @throws IllegalStateException
    *         If the class could not be instantiated
    */
   @Nonnull
-  public static IRegistrationHook createInstance ()
+  public static IRegistrationHook createInstance (final boolean bWriteToSML)
   {
-    final boolean bWriteToSML = SMPServerConfiguration.isWriteToSML ();
     s_aLogger.info ("Access to the SML is " + (bWriteToSML ? "enabled" : "disabled") + " in this SMP server!");
     return bWriteToSML ? new RegistrationHookWriteToSML () : new RegistrationHookDoNothing ();
   }
@@ -89,9 +95,55 @@ public final class RegistrationHookFactory
   @Nonnull
   public static IRegistrationHook getOrCreateInstance ()
   {
-    if (s_aInstance == null)
-      s_aInstance = createInstance ();
-    return s_aInstance;
+    IRegistrationHook ret;
+    s_aRWLock.readLock ().lock ();
+    try
+    {
+      ret = s_aInstance;
+    }
+    finally
+    {
+      s_aRWLock.readLock ().unlock ();
+    }
+
+    if (ret == null)
+    {
+      s_aRWLock.writeLock ().lock ();
+      try
+      {
+        // Try again in write lock
+        ret = s_aInstance;
+        if (ret == null)
+        {
+          final boolean bWriteToSML = SMPServerConfiguration.isWriteToSML ();
+          s_aInstance = ret = createInstance (bWriteToSML);
+        }
+      }
+      finally
+      {
+        s_aRWLock.writeLock ().unlock ();
+      }
+    }
+    return ret;
+  }
+
+  public static void setInstance (@Nonnull final IRegistrationHook aInstance)
+  {
+    ValueEnforcer.notNull (aInstance, "Instance");
+    s_aRWLock.writeLock ().lock ();
+    try
+    {
+      s_aInstance = aInstance;
+    }
+    finally
+    {
+      s_aRWLock.writeLock ().unlock ();
+    }
+  }
+
+  public static void setInstance (final boolean bWriteToSML)
+  {
+    setInstance (createInstance (bWriteToSML));
   }
 
   public static boolean isSMLConnectionActive ()
