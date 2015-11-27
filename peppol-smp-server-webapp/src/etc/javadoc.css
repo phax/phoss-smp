@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * phloc javadoc CSS
- *
+
+/*
+ * based on phloc javadoc CSS.
  * (c) 2011-2014 phloc systems.
  * Derived from the original javadoc CSS from Sun JDK
  */
@@ -340,7 +340,6 @@ ul.blockList li.blockList h2 {
 .serializedFormContainer dl.nameValue dd {
 	display: inline;
 	font-size: 1.1em;
-	margin: 0 0 0 1px;
 }
 
 ul.horizontal li {
