@@ -130,7 +130,7 @@
 
   <build>
     <resources>
-      <!-- HAck to filter only properties files -->
+      <!-- Hack to filter only properties files -->
       <resource>
         <directory>${basedir}/src/main/resources</directory>
         <targetPath>${project.build.directory}/classes</targetPath>
