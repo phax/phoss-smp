@@ -98,11 +98,14 @@ public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
       // Ensure that no context is emitted by using "replacePath" first!
       aBuilder = aBuilder.replacePath ("");
     }
-    return aBuilder.path (ServiceGroupInterface.class).buildFromEncoded (IdentifierHelper.getIdentifierURIPercentEncoded (aServiceGroupID)).toString ();
+    return aBuilder.path (ServiceGroupInterface.class)
+                   .buildFromEncoded (IdentifierHelper.getIdentifierURIPercentEncoded (aServiceGroupID))
+                   .toString ();
   }
 
   @Nonnull
-  public String getServiceMetadataReferenceHref (@Nonnull final IParticipantIdentifier aServiceGroupID, @Nonnull final IDocumentTypeIdentifier aDocTypeID)
+  public String getServiceMetadataReferenceHref (@Nonnull final IParticipantIdentifier aServiceGroupID,
+                                                 @Nonnull final IDocumentTypeIdentifier aDocTypeID)
   {
     UriBuilder aBuilder = getBaseUriBuilder ();
     if (SMPServerConfiguration.isForceRoot ())
@@ -111,7 +114,8 @@ public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
       aBuilder = aBuilder.replacePath ("");
     }
     return aBuilder.path (ServiceMetadataInterface.class)
-                   .buildFromEncoded (IdentifierHelper.getIdentifierURIPercentEncoded (aServiceGroupID), IdentifierHelper.getIdentifierURIPercentEncoded (aDocTypeID))
+                   .buildFromEncoded (IdentifierHelper.getIdentifierURIPercentEncoded (aServiceGroupID),
+                                      IdentifierHelper.getIdentifierURIPercentEncoded (aDocTypeID))
                    .toString ();
   }
 }

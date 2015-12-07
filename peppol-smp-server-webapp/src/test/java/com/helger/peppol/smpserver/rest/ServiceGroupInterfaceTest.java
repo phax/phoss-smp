@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import javax.annotation.Nonnull;
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.io.resource.ClassPathResource;
@@ -88,10 +90,11 @@ public final class ServiceGroupInterfaceTest
     }
 
     // Use default credentials for SQL backend
-    return aBuilder.header (CHTTPHeader.AUTHORIZATION, new BasicAuthClientCredentials ("peppol_user", "Test1234").getRequestValue ());
+    return aBuilder.header (CHTTPHeader.AUTHORIZATION,
+                            new BasicAuthClientCredentials ("peppol_user", "Test1234").getRequestValue ());
   }
 
-  private static void _testResponse (final Response aResponseMsg, final int... aStatusCodes)
+  private static void _testResponse (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
@@ -101,7 +104,10 @@ public final class ServiceGroupInterfaceTest
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
       s_aLogger.info ("HTTP Response: " + sResponse);
-    assertTrue (ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));
+    assertTrue (aResponseMsg.getStatus () +
+                " is not in " +
+                Arrays.toString (aStatusCodes),
+                ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));
   }
 
   @Test
@@ -121,14 +127,16 @@ public final class ServiceGroupInterfaceTest
       _testResponse (aTarget.path (sPI).request ().get (), 404);
 
       // PUT 1
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI)
+                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
       assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
       assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
 
       // PUT 2
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI)
+                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
       assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));

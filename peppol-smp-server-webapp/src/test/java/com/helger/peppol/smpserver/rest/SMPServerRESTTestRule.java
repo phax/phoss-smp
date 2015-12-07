@@ -25,6 +25,7 @@ import javax.ws.rs.client.WebTarget;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import com.helger.peppol.smpserver.SMPServerTestRule;
+import com.helger.web.servlet.server.StaticServerInfo;
 
 public class SMPServerRESTTestRule extends SMPServerTestRule
 {
@@ -40,6 +41,10 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
   public void before ()
   {
     super.before ();
+
+    // Init once
+    if (!StaticServerInfo.isSet ())
+      StaticServerInfo.init ("http", "localhost", 80, "");
 
     // http only
     m_aServer = MockServer.startRegularServer ();
