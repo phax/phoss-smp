@@ -271,4 +271,17 @@ public final class SMPServerConfiguration
   {
     return getConfigFile ().getString ("sml.smpid");
   }
+
+  /**
+   * This is an internal property that is undocumented and only present for
+   * testing purposes.
+   * 
+   * @return <code>true</code> if the PEM header of the public certificate in an
+   *         SMP endpoint should NOT contain the "---BEGIN CERTIFICATE---" and
+   *         "---END CERTIFICATE---" stuff.
+   */
+  public static boolean isAvoidPEMCertificateAffix ()
+  {
+    return getConfigFile ().getBoolean ("smp-internal.avoidpemaffix", false);
+  }
 }

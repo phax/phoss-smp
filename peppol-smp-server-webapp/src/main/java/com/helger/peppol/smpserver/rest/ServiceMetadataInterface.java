@@ -39,17 +39,21 @@ import org.w3c.dom.Document;
 
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.io.stream.StreamHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.xml.serialize.write.EXMLIncorrectCharacterHandling;
 import com.helger.commons.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.commons.xml.serialize.write.IXMLWriterSettings;
 import com.helger.commons.xml.serialize.write.XMLWriter;
 import com.helger.commons.xml.serialize.write.XMLWriterSettings;
 import com.helger.commons.xml.transform.XMLTransformerFactory;
+import com.helger.peppol.smp.EndpointType;
+import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
+import com.helger.peppol.utils.CertificateHelper;
 import com.helger.photon.core.app.CApplication;
 import com.helger.web.mock.MockHttpServletResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
@@ -84,6 +88,26 @@ public final class ServiceMetadataInterface
     {
       final SignedServiceMetadataType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceRegistration (sServiceGroupID,
                                                                                                                                  sDocumentTypeID);
+
+      if (SMPServerConfiguration.isAvoidPEMCertificateAffix ())
+        if (ret.getServiceMetadata ().getServiceInformation () != null)
+          for (final ProcessType aProcess : ret.getServiceMetadata ()
+                                               .getServiceInformation ()
+                                               .getProcessList ()
+                                               .getProcess ())
+            for (final EndpointType aEndpoint : aProcess.getServiceEndpointList ().getEndpoint ())
+            {
+              String sCert = aEndpoint.getCertificate ();
+              if (StringHelper.hasText (sCert))
+              {
+                // Trim special prefix and suffix
+                sCert = StringHelper.trimStart (sCert, CertificateHelper.BEGIN_CERTIFICATE);
+                sCert = StringHelper.trimEnd (sCert, CertificateHelper.END_CERTIFICATE);
+                // Remove any optionally present spaces (from the PEM affixes)
+                aEndpoint.setCertificate (sCert.trim ());
+              }
+            }
+
       // Convert to DOM document
       final MarshallerSignedServiceMetadataType aMarshaller = new MarshallerSignedServiceMetadataType ();
       final Document aDoc = aMarshaller.write (ret);
