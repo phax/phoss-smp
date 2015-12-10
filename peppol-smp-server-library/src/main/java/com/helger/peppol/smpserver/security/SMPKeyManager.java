@@ -77,6 +77,7 @@ import org.w3c.dom.Element;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
+import com.helger.commons.string.StringHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.KeyStoreHelper;
 
@@ -105,6 +106,9 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
       final String sKeyStorePassword = SMPServerConfiguration.getKeystorePassword ();
       final String sKeyStoreKeyAlias = SMPServerConfiguration.getKeystoreKeyAlias ();
       final char [] aKeyStoreKeyPassword = SMPServerConfiguration.getKeystoreKeyPassword ();
+
+      if (StringHelper.hasNoText (sKeyStoreClassPath))
+        throw new InitializationException ("No SMP keystore path provided!");
 
       final KeyStore aKeyStore = KeyStoreHelper.loadKeyStore (sKeyStoreClassPath, sKeyStorePassword);
       final KeyStore.Entry aEntry = aKeyStore.getEntry (sKeyStoreKeyAlias,
