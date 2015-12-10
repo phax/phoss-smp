@@ -59,6 +59,7 @@ import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.factory.IFactory;
 import com.helger.commons.lang.ServiceLoaderHelper;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 
 /**
@@ -195,5 +196,11 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     {
       m_aRWLock.writeLock ().unlock ();
     }
+  }
+
+  @Override
+  public String toString ()
+  {
+    return new ToStringGenerator (this).append ("map", m_aMap).toString ();
   }
 }
