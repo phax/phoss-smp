@@ -78,24 +78,28 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPServiceInformationManager m_aServiceInformationMgr;
 
   /**
-   * Set the manager factory to be used. This must be called exactly once before
-   * {@link #getInstance()} is called.
+   * Set the manager provider to be used. This must be called exactly once
+   * before {@link #getInstance()} is called.
    *
-   * @param aManagerFactory
+   * @param aManagerProvider
    *        The manager factory to be used. May be <code>null</code> for testing
    *        purposes.
    * @throws IllegalStateException
-   *         If another manager factory is already present.
+   *         If another manager provider is already present.
    */
-  public static void setManagerFactory (@Nullable final ISMPManagerProvider aManagerFactory)
+  public static void setManagerProvider (@Nullable final ISMPManagerProvider aManagerProvider)
   {
-    if (s_aManagerProvider != null && aManagerFactory != null)
-      throw new IllegalStateException ("A manager factory is already set. You cannot set this twice!");
-    s_aManagerProvider = aManagerFactory;
-    if (aManagerFactory == null)
-      s_aLogger.info ("Using no backend manager factory");
+    if (s_aManagerProvider != null && aManagerProvider != null)
+      throw new IllegalStateException ("A manager provider is already set. You cannot set this twice!");
+
+    if (isGlobalSingletonInstantiated (SMPMetaManager.class))
+      s_aLogger.warn ("Setting the manager provider after singleton instantiation may not have the desired effect.");
+
+    s_aManagerProvider = aManagerProvider;
+    if (aManagerProvider == null)
+      s_aLogger.info ("Using no backend manager provider");
     else
-      s_aLogger.info ("Using " + aManagerFactory + " as the backend");
+      s_aLogger.info ("Using " + aManagerProvider + " as the backend");
   }
 
   @Deprecated
@@ -135,7 +139,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       }
       catch (final Exception ex)
       {
-        // fall through. Certificate stays invalid
+        // fall through. Certificate stays invalid, no SML access possible.
       }
 
       s_aLogger.info (ClassHelper.getClassLocalName (this) + " was initialized");

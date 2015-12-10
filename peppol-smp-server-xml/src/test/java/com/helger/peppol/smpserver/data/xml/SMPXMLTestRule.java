@@ -38,7 +38,7 @@ public class SMPXMLTestRule extends PhotonBasicWebTestRule
 
     // Set it only once
     if (s_aInitBackend.compareAndSet (false, true))
-      SMPMetaManager.setManagerFactory (new XMLManagerProvider ());
+      SMPMetaManager.setManagerProvider (new XMLManagerProvider ());
   }
 
   @Override

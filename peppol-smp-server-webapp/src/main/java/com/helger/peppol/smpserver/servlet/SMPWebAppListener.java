@@ -28,8 +28,8 @@ import com.helger.commons.exception.InitializationException;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppSecurity;
 import com.helger.peppol.smpserver.app.AppSettings;
-import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
-import com.helger.peppol.smpserver.data.xml.mgr.XMLManagerProvider;
+import com.helger.peppol.smpserver.backend.SMPBackendRegistry;
+import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.pub.InitializerPublic;
@@ -94,14 +94,15 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
   public static void initBackendFromConfiguration ()
   {
     // Determine backend
-    final String sBackend = SMPServerConfiguration.getBackend ();
-    if ("sql".equalsIgnoreCase (sBackend))
-      SMPMetaManager.setManagerFactory (new SQLManagerProvider ());
+    final String sBackendID = SMPServerConfiguration.getBackend ();
+    final ISMPManagerProvider aManagerProvider = SMPBackendRegistry.getInstance ().getManagerProvider (sBackendID);
+    if (aManagerProvider != null)
+      SMPMetaManager.setManagerProvider (aManagerProvider);
     else
-      if ("xml".equalsIgnoreCase (sBackend))
-        SMPMetaManager.setManagerFactory (new XMLManagerProvider ());
-      else
-        throw new InitializationException ("Invalid backend '" + sBackend + "' provided. Only 'sql' and 'xml' are supported!");
+      throw new InitializationException ("Invalid backend '" +
+                                         sBackendID +
+                                         "' provided. Supported ones are: " +
+                                         SMPBackendRegistry.getInstance ().getAllBackendIDs ());
 
     // Now we can call getInstance
     SMPMetaManager.getInstance ();

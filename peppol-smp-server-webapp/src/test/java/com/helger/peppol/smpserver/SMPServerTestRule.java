@@ -56,7 +56,7 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
   public void after ()
   {
     // Reset for next run
-    SMPMetaManager.setManagerFactory (null);
+    SMPMetaManager.setManagerProvider (null);
     super.after ();
   }
 }
