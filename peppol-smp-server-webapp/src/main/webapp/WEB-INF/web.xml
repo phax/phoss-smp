@@ -20,7 +20,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
   xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
   id="SMP_WebApp" version="2.5">
-  <display-name>PEPPOL lightweight SMP server</display-name>
+  <display-name>ph-peppol-smp-server</display-name>
 
   <listener>
     <listener-class>com.helger.peppol.smpserver.servlet.SMPWebAppListener</listener-class>
