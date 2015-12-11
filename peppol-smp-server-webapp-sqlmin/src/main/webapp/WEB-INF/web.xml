@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2014-2015 Philip Helger (www.helger.com)
+    philip[at]helger[dot]com
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+  id="SMP_WebApp-SQLMin" version="2.5">
+  <display-name>ph-peppol-smp-server [sql minimum]</display-name>
+
+  <listener>
+    <listener-class>com.helger.peppol.smpserver.servlet.SMPWebAppListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>com.helger.peppol.smpserver.servlet.TimeZoneCorrectorListener</listener-class>
+  </listener>
+
+  <filter>
+    <filter-name>RestFilter</filter-name>
+    <filter-class>org.glassfish.jersey.servlet.ServletContainer</filter-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <!-- add package separated by ";" -->
+      <param-value>com.helger.peppol.smpserver.rest;com.helger.peppol.smpserver.exceptionmapper</param-value>
+    </init-param>
+    <init-param>
+      <param-name>jersey.config.servlet.filter.staticContentRegex</param-name>
+      <param-value>/(web)/.*|/favicon.ico</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>RestFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <servlet>
+    <servlet-name>SMPWebServlet</servlet-name>
+    <servlet-class>com.helger.peppol.smpserver.servlet.SMPWebServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SMPWebServlet</servlet-name>
+    <url-pattern>/web/*</url-pattern>
+  </servlet-mapping>
+</web-app>

@@ -169,6 +169,7 @@
     <module>peppol-smp-server-sql</module>
     <module>peppol-smp-server-xml</module>
     <module>peppol-smp-server-webapp</module>
+    <module>peppol-smp-server-webapp-sqlmin</module>
   </modules>
   
   <build>
