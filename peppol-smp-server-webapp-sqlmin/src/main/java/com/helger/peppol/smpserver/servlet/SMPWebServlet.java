@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.helger.commons.url.SimpleURL;
+import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.grouping.HCP;
 import com.helger.html.hc.html.metadata.HCHead;
@@ -20,6 +21,8 @@ import com.helger.html.hc.render.HCRenderer;
 import com.helger.peppol.smpserver.CSMPServer;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.security.SMPKeyManager;
+import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 
 /**
  * This servlet is responsible for rendering the static web site content.
@@ -44,7 +47,16 @@ public final class SMPWebServlet extends HttpServlet
 
     aBody.addChild (new HCP ().addChild ("Version: " + CSMPServer.getVersionNumber ()));
 
-    aBody.addChild (new HCP ().addChild ("Created by ")
+    if (!SMPKeyManager.isCertificateValid ())
+      aBody.addChild (new HCP ().addChild ("Certificate configuration is invalid. REST queries will not work!"));
+
+    aBody.addChild (new HCP ().addChild ("SML connection: " +
+                                         (RegistrationHookFactory.isSMLConnectionActive () ? "active!"
+                                                                                           : "NOT active!")));
+
+    aBody.addChild (new HCP ().addStyle (CCSSProperties.BORDER_TOP.newValue ("solid 1px black"))
+                              .addStyle (CCSSProperties.PADDING_TOP.newValue ("1em"))
+                              .addChild ("Created by ")
                               .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"))
                               .addChild (" - Twitter: ")
                               .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ()
