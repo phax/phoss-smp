@@ -67,7 +67,7 @@ public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
   @Nonnull
   public URI getCurrentURI ()
   {
-    if (m_bUseStaticServerInfo)
+    if (m_bUseStaticServerInfo && StaticServerInfo.isSet ())
       return URLHelper.getAsURI (StaticServerInfo.getInstance ().getFullServerPath () + "/" + m_aUriInfo.getPath ());
     if (false)
     {
@@ -84,7 +84,7 @@ public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
   @Nonnull
   protected UriBuilder getBaseUriBuilder ()
   {
-    if (m_bUseStaticServerInfo)
+    if (m_bUseStaticServerInfo && StaticServerInfo.isSet ())
       return UriBuilder.fromUri (StaticServerInfo.getInstance ().getFullServerPath () + "/" + m_aUriInfo.getPath ());
     return m_aUriInfo.getBaseUriBuilder ();
   }
