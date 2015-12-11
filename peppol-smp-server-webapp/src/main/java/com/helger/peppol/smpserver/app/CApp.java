@@ -27,6 +27,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.locale.LocaleCache;
 import com.helger.commons.string.StringHelper;
+import com.helger.peppol.smpserver.CSMPServer;
 import com.helger.photon.security.CSecurity;
 
 /**
@@ -93,6 +94,6 @@ public final class CApp
   @Nonempty
   public static String getApplicationTitleAndVersion ()
   {
-    return StringHelper.getConcatenatedOnDemand (getApplicationTitle (), " ", AppSettings.getVersionNumber ());
+    return StringHelper.getConcatenatedOnDemand (getApplicationTitle (), " ", CSMPServer.getVersionNumber ());
   }
 }
