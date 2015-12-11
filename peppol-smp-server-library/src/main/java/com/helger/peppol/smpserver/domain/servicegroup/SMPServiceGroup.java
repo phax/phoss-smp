@@ -52,12 +52,13 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
+import com.helger.peppol.bdxr.BDXRExtensionConverter;
+import com.helger.peppol.bdxr.BDXRHelper;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
-import com.helger.peppol.smp.ServiceGroupType;
 
 /**
  * This class represents a single service group.
@@ -139,9 +140,9 @@ public class SMPServiceGroup implements ISMPServiceGroup
   }
 
   @Nonnull
-  public ServiceGroupType getAsJAXBObject ()
+  public com.helger.peppol.smp.ServiceGroupType getAsJAXBObjectPeppol ()
   {
-    final ServiceGroupType ret = new ServiceGroupType ();
+    final com.helger.peppol.smp.ServiceGroupType ret = new com.helger.peppol.smp.ServiceGroupType ();
     ret.setParticipantIdentifier (m_aParticipantIdentifier.getClone ());
     if (false)
     {
@@ -149,6 +150,20 @@ public class SMPServiceGroup implements ISMPServiceGroup
       ret.setServiceMetadataReferenceCollection (null);
     }
     ret.setExtension (SMPExtensionConverter.convertOrNull (m_sExtension));
+    return ret;
+  }
+
+  @Nonnull
+  public com.helger.peppol.bdxr.ServiceGroupType getAsJAXBObjectBDXR ()
+  {
+    final com.helger.peppol.bdxr.ServiceGroupType ret = new com.helger.peppol.bdxr.ServiceGroupType ();
+    ret.setParticipantIdentifier (BDXRHelper.getAsBDXRParticipantIdentifier (m_aParticipantIdentifier));
+    if (false)
+    {
+      // This is set by the REST server
+      ret.setServiceMetadataReferenceCollection (null);
+    }
+    ret.setExtension (BDXRExtensionConverter.convertOrNull (m_sExtension));
     return ret;
   }
 

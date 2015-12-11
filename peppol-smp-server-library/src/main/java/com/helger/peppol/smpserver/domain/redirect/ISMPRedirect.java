@@ -47,7 +47,6 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
@@ -96,5 +95,8 @@ public interface ISMPRedirect extends IHasID <String>, Serializable, ISMPHasExte
   String getSubjectUniqueIdentifier ();
 
   @Nonnull
-  ServiceMetadataType getAsJAXBObject ();
+  com.helger.peppol.smp.ServiceMetadataType getAsJAXBObjectPeppol ();
+
+  @Nonnull
+  com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ();
 }

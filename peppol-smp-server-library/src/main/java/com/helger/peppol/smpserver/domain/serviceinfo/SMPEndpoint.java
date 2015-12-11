@@ -53,6 +53,7 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.utils.CertificateHelper;
@@ -249,9 +250,9 @@ public class SMPEndpoint implements ISMPEndpoint
   }
 
   @Nonnull
-  public EndpointType getAsJAXBObject ()
+  public com.helger.peppol.smp.EndpointType getAsJAXBObjectPeppol ()
   {
-    final EndpointType ret = new EndpointType ();
+    final com.helger.peppol.smp.EndpointType ret = new com.helger.peppol.smp.EndpointType ();
     ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (m_sEndpointReference));
     ret.setRequireBusinessLevelSignature (m_bRequireBusinessLevelSignature);
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
@@ -262,6 +263,24 @@ public class SMPEndpoint implements ISMPEndpoint
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
     ret.setExtension (SMPExtensionConverter.convertOrNull (m_sExtension));
+    ret.setTransportProfile (m_sTransportProfile);
+    return ret;
+  }
+
+  @Nonnull
+  public com.helger.peppol.bdxr.EndpointType getAsJAXBObjectBDXR ()
+  {
+    final com.helger.peppol.bdxr.EndpointType ret = new com.helger.peppol.bdxr.EndpointType ();
+    ret.setEndpointURI (m_sEndpointReference);
+    ret.setRequireBusinessLevelSignature (m_bRequireBusinessLevelSignature);
+    ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
+    ret.setServiceActivationDate (m_aServiceActivationDT);
+    ret.setServiceExpirationDate (m_aServiceExpirationDT);
+    ret.setCertificate (CertificateHelper.convertCertificateStringToByteArray (m_sCertificate));
+    ret.setServiceDescription (m_sServiceDescription);
+    ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
+    ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
+    ret.setExtension (BDXRExtensionConverter.convertOrNull (m_sExtension));
     ret.setTransportProfile (m_sTransportProfile);
     return ret;
   }

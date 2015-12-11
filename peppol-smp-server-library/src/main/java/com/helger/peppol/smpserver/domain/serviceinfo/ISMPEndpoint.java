@@ -49,7 +49,6 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
 
 /**
@@ -161,5 +160,8 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
   String getTechnicalInformationUrl ();
 
   @Nonnull
-  EndpointType getAsJAXBObject ();
+  com.helger.peppol.smp.EndpointType getAsJAXBObjectPeppol ();
+
+  @Nonnull
+  com.helger.peppol.bdxr.EndpointType getAsJAXBObjectBDXR ();
 }

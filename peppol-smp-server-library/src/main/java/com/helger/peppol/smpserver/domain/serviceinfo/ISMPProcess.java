@@ -51,7 +51,6 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
-import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
 
 /**
@@ -112,5 +111,8 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
   EChange deleteEndpoint (@Nullable String sTransportProfile);
 
   @Nonnull
-  ProcessType getAsJAXBObject ();
+  com.helger.peppol.smp.ProcessType getAsJAXBObjectPeppol ();
+
+  @Nonnull
+  com.helger.peppol.bdxr.ProcessType getAsJAXBObjectBDXR ();
 }

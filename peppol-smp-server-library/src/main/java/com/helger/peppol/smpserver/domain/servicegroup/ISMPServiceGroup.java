@@ -47,12 +47,11 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
 import com.helger.peppol.identifier.participant.IPeppolParticipantIdentifier;
-import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
 
 /**
  * Base interface for a single SMP service group.
- * 
+ *
  * @author Philip Helger
  */
 public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHasExtension
@@ -79,5 +78,8 @@ public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHas
   IPeppolParticipantIdentifier getParticpantIdentifier ();
 
   @Nonnull
-  ServiceGroupType getAsJAXBObject ();
+  com.helger.peppol.smp.ServiceGroupType getAsJAXBObjectPeppol ();
+
+  @Nonnull
+  com.helger.peppol.bdxr.ServiceGroupType getAsJAXBObjectBDXR ();
 }

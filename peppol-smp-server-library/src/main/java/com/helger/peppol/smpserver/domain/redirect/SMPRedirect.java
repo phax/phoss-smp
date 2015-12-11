@@ -49,13 +49,12 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
+import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.smp.RedirectType;
 import com.helger.peppol.smp.SMPExtensionConverter;
-import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -164,14 +163,27 @@ public class SMPRedirect implements ISMPRedirect
   }
 
   @Nonnull
-  public ServiceMetadataType getAsJAXBObject ()
+  public com.helger.peppol.smp.ServiceMetadataType getAsJAXBObjectPeppol ()
   {
-    final RedirectType aRedirect = new RedirectType ();
+    final com.helger.peppol.smp.RedirectType aRedirect = new com.helger.peppol.smp.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
     aRedirect.setExtension (SMPExtensionConverter.convertOrNull (m_sExtension));
 
-    final ServiceMetadataType ret = new ServiceMetadataType ();
+    final com.helger.peppol.smp.ServiceMetadataType ret = new com.helger.peppol.smp.ServiceMetadataType ();
+    ret.setRedirect (aRedirect);
+    return ret;
+  }
+
+  @Nonnull
+  public com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ()
+  {
+    final com.helger.peppol.bdxr.RedirectType aRedirect = new com.helger.peppol.bdxr.RedirectType ();
+    aRedirect.setHref (m_sTargetHref);
+    aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
+    aRedirect.setExtension (BDXRExtensionConverter.convertOrNull (m_sExtension));
+
+    final com.helger.peppol.bdxr.ServiceMetadataType ret = new com.helger.peppol.bdxr.ServiceMetadataType ();
     ret.setRedirect (aRedirect);
     return ret;
   }

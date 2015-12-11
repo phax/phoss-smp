@@ -58,6 +58,8 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.peppol.bdxr.BDXRExtensionConverter;
+import com.helger.peppol.bdxr.BDXRHelper;
 import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
@@ -65,7 +67,6 @@ import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
-import com.helger.peppol.smp.ServiceEndpointList;
 
 /**
  * Default implementation of the {@link ISMPProcess} interface.
@@ -173,15 +174,28 @@ public class SMPProcess implements ISMPProcess
   }
 
   @Nonnull
-  public ProcessType getAsJAXBObject ()
+  public com.helger.peppol.smp.ProcessType getAsJAXBObjectPeppol ()
   {
-    final ProcessType ret = new ProcessType ();
+    final com.helger.peppol.smp.ProcessType ret = new com.helger.peppol.smp.ProcessType ();
     ret.setProcessIdentifier (new SimpleProcessIdentifier (m_aProcessIdentifier));
-    final ServiceEndpointList aEndpointList = new ServiceEndpointList ();
+    final com.helger.peppol.smp.ServiceEndpointList aEndpointList = new com.helger.peppol.smp.ServiceEndpointList ();
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
-      aEndpointList.addEndpoint (aEndpoint.getAsJAXBObject ());
+      aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectPeppol ());
     ret.setServiceEndpointList (aEndpointList);
     ret.setExtension (SMPExtensionConverter.convertOrNull (m_sExtension));
+    return ret;
+  }
+
+  @Nonnull
+  public com.helger.peppol.bdxr.ProcessType getAsJAXBObjectBDXR ()
+  {
+    final com.helger.peppol.bdxr.ProcessType ret = new com.helger.peppol.bdxr.ProcessType ();
+    ret.setProcessIdentifier (BDXRHelper.getAsBDXRProcessIdentifier (m_aProcessIdentifier));
+    final com.helger.peppol.bdxr.ServiceEndpointList aEndpointList = new com.helger.peppol.bdxr.ServiceEndpointList ();
+    for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
+      aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectBDXR ());
+    ret.setServiceEndpointList (aEndpointList);
+    ret.setExtension (BDXRExtensionConverter.convertOrNull (m_sExtension));
     return ret;
   }
 

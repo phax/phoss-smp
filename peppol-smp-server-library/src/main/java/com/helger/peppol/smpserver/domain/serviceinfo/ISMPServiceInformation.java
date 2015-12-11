@@ -52,7 +52,6 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.id.IHasID;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
-import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
@@ -121,7 +120,7 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
 
   /**
    * Add the passed process.
-   * 
+   *
    * @param aProcess
    *        The process to be added. May not be <code>null</code>.
    * @throws IllegalArgumentException
@@ -130,5 +129,8 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
   void addProcess (@Nonnull SMPProcess aProcess);
 
   @Nonnull
-  ServiceMetadataType getAsJAXBObject ();
+  com.helger.peppol.smp.ServiceMetadataType getAsJAXBObjectPeppol ();
+
+  @Nonnull
+  com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ();
 }

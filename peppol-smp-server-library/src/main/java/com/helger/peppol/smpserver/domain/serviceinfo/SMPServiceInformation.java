@@ -57,17 +57,17 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
+import com.helger.peppol.bdxr.BDXRExtensionConverter;
+import com.helger.peppol.bdxr.BDXRHelper;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
-import com.helger.peppol.smp.ProcessListType;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smp.ServiceInformationType;
-import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -207,18 +207,35 @@ public class SMPServiceInformation implements ISMPServiceInformation
   }
 
   @Nonnull
-  public ServiceMetadataType getAsJAXBObject ()
+  public com.helger.peppol.smp.ServiceMetadataType getAsJAXBObjectPeppol ()
   {
-    final ServiceInformationType aSI = new ServiceInformationType ();
+    final com.helger.peppol.smp.ServiceInformationType aSI = new com.helger.peppol.smp.ServiceInformationType ();
     aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
     aSI.setDocumentIdentifier (new SimpleDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
-    final ProcessListType aProcesses = new ProcessListType ();
+    final com.helger.peppol.smp.ProcessListType aProcesses = new com.helger.peppol.smp.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
-      aProcesses.addProcess (aProcess.getAsJAXBObject ());
+      aProcesses.addProcess (aProcess.getAsJAXBObjectPeppol ());
     aSI.setProcessList (aProcesses);
     aSI.setExtension (SMPExtensionConverter.convertOrNull (m_sExtension));
 
-    final ServiceMetadataType ret = new ServiceMetadataType ();
+    final com.helger.peppol.smp.ServiceMetadataType ret = new com.helger.peppol.smp.ServiceMetadataType ();
+    ret.setServiceInformation (aSI);
+    return ret;
+  }
+
+  @Nonnull
+  public com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ()
+  {
+    final com.helger.peppol.bdxr.ServiceInformationType aSI = new com.helger.peppol.bdxr.ServiceInformationType ();
+    aSI.setParticipantIdentifier (BDXRHelper.getAsBDXRParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
+    aSI.setDocumentIdentifier (BDXRHelper.getAsBDXRDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
+    final com.helger.peppol.bdxr.ProcessListType aProcesses = new com.helger.peppol.bdxr.ProcessListType ();
+    for (final ISMPProcess aProcess : m_aProcesses.values ())
+      aProcesses.addProcess (aProcess.getAsJAXBObjectBDXR ());
+    aSI.setProcessList (aProcesses);
+    aSI.setExtension (BDXRExtensionConverter.convertOrNull (m_sExtension));
+
+    final com.helger.peppol.bdxr.ServiceMetadataType ret = new com.helger.peppol.bdxr.ServiceMetadataType ();
     ret.setServiceInformation (aSI);
     return ret;
   }
