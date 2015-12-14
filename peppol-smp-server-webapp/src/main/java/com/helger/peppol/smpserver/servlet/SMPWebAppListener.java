@@ -39,6 +39,7 @@ import com.helger.photon.core.app.CApplication;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
+import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.role.RoleManager;
 import com.helger.photon.security.user.UserManager;
 import com.helger.photon.security.usergroup.UserGroupManager;
@@ -136,6 +137,9 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
 
     // Set all security related stuff
     AppSecurity.init ();
+
+    // New login logs out old user
+    LoggedInUserManager.getInstance ().setLogoutAlreadyLoggedInUser (true);
 
     // Determine backend
     initBackendFromConfiguration ();
