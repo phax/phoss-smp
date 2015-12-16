@@ -249,6 +249,41 @@ public class SMPEndpoint implements ISMPEndpoint
     m_sExtension = sExtension;
   }
 
+  // XXX replace with CertificateHelper version in peppol-commons >= 4.3.4
+  @Nullable
+  public static String getRFC1421CompliantString (@Nullable final String sCertificate, final boolean bIncludePEMHeader)
+  {
+    // Remove special begin and end stuff
+    String sPlainString = CertificateHelper.getWithoutPEMHeader (sCertificate);
+    if (StringHelper.hasNoText (sPlainString))
+      return null;
+
+    // Start building the result
+    final int nMaxLineLength = 64;
+    final String sCRLF = "\r\n";
+    // Start with the prefix
+    final StringBuilder aSB = new StringBuilder ();
+    if (bIncludePEMHeader)
+      aSB.append (CertificateHelper.BEGIN_CERTIFICATE).append ('\n');
+    while (sPlainString.length () > nMaxLineLength)
+    {
+      // Append line + CRLF
+      aSB.append (sPlainString, 0, nMaxLineLength).append (sCRLF);
+
+      // Remove the start of the string
+      sPlainString = sPlainString.substring (nMaxLineLength);
+    }
+
+    // Append the rest
+    aSB.append (sPlainString);
+
+    // Add trailer
+    if (bIncludePEMHeader)
+      aSB.append ('\n').append (CertificateHelper.END_CERTIFICATE);
+
+    return aSB.toString ();
+  }
+
   @Nonnull
   public com.helger.peppol.smp.EndpointType getAsJAXBObjectPeppol ()
   {
@@ -258,7 +293,8 @@ public class SMPEndpoint implements ISMPEndpoint
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
     ret.setServiceActivationDate (m_aServiceActivationDT);
     ret.setServiceExpirationDate (m_aServiceExpirationDT);
-    ret.setCertificate (CertificateHelper.getRFC1421CompliantString (m_sCertificate));
+    // For compatibility, don't add BEGIN_CERTIFCATE and END_CERTIFICATE
+    ret.setCertificate (getRFC1421CompliantString (m_sCertificate, false));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
