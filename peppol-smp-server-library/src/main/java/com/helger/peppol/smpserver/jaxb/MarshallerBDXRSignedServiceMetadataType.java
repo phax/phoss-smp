@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.rest;
+package com.helger.peppol.smpserver.jaxb;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -22,18 +22,18 @@ import javax.xml.bind.JAXBElement;
 
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.jaxb.AbstractJAXBMarshaller;
-import com.helger.peppol.smp.ObjectFactory;
-import com.helger.peppol.smp.SignedServiceMetadataType;
+import com.helger.peppol.bdxr.ObjectFactory;
+import com.helger.peppol.bdxr.SignedServiceMetadataType;
 
 /**
- * A simple JAXB marshaller for the {@link SignedServiceMetadataType} type.
+ * A simple JAXB marshaller for the BDXR {@link SignedServiceMetadataType} type.
  *
  * @author Philip Helger
  */
 @NotThreadSafe
-final class MarshallerSignedServiceMetadataType extends AbstractJAXBMarshaller <SignedServiceMetadataType>
+public final class MarshallerBDXRSignedServiceMetadataType extends AbstractJAXBMarshaller <SignedServiceMetadataType>
 {
-  public MarshallerSignedServiceMetadataType ()
+  public MarshallerBDXRSignedServiceMetadataType ()
   {
     super (SignedServiceMetadataType.class, (IReadableResource []) null);
   }
