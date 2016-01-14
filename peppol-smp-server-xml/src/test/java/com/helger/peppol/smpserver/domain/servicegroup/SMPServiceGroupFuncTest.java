@@ -30,7 +30,7 @@ import com.helger.photon.security.CSecurity;
  *
  * @author Philip Helger
  */
-public final class SMPServiceGroupTest
+public final class SMPServiceGroupFuncTest
 {
   @Rule
   public final TestRule m_aTestRule = new PhotonBasicWebTestRule ();
