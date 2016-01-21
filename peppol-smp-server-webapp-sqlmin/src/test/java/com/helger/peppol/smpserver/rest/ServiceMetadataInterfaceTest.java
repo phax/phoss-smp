@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014-2015 Philip Helger (www.helger.com)
+ * Copyright (C) 2014-2016 Philip Helger (www.helger.com)
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.rest;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -65,7 +66,8 @@ import com.helger.web.http.CHTTPHeader;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * Test class for class {@link ServiceMetadataInterface}
+ * Test class for class {@link ServiceMetadataInterface}. This test class is
+ * automatically run for XML and SQL backend!
  *
  * @author Philip Helger
  */
@@ -117,8 +119,12 @@ public final class ServiceMetadataInterfaceTest
   @Test
   public void testCreateAndDeleteServiceInformation ()
   {
-    final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
-    final String sPI = aPI.getURIEncoded ();
+    // Lower case
+    final SimpleParticipantIdentifier aPI_LC = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final String sPI_LC = aPI_LC.getURIEncoded ();
+    // Upper case
+    final SimpleParticipantIdentifier aPI_UC = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
+    final String sPI_UC = aPI_UC.getURIEncoded ();
 
     final SimpleDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
     final String sDT = aDT.getURIEncoded ();
@@ -126,11 +132,11 @@ public final class ServiceMetadataInterfaceTest
     final SimpleProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V20.getAsProcessIdentifier ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
-    aSG.setParticipantIdentifier (aPI);
+    aSG.setParticipantIdentifier (aPI_LC);
 
     final ServiceMetadataType aSM = new ServiceMetadataType ();
     final ServiceInformationType aSI = new ServiceInformationType ();
-    aSI.setParticipantIdentifier (aPI);
+    aSI.setParticipantIdentifier (aPI_LC);
     aSI.setDocumentIdentifier (aDT);
     {
       final ProcessListType aPL = new ProcessListType ();
@@ -156,21 +162,27 @@ public final class ServiceMetadataInterfaceTest
 
     try
     {
-      _testResponse (aTarget.path (sPI).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
 
       // PUT ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                              .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
-      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
-      final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI);
+      // Read both
+      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+      assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
+
+      final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI_LC);
       assertNotNull (aServiceGroup);
+      final ISMPServiceGroup aServiceGroup_UC = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI_UC);
+      assertEquals (aServiceGroup, aServiceGroup_UC);
 
       try
       {
         // PUT 1 ServiceInformation
-        aResponseMsg = _addCredentials (aTarget.path (sPI)
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                                .path ("services")
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
@@ -179,7 +191,7 @@ public final class ServiceMetadataInterfaceTest
                                      .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
         // PUT 2 ServiceInformation
-        aResponseMsg = _addCredentials (aTarget.path (sPI)
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                                .path ("services")
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
@@ -188,7 +200,7 @@ public final class ServiceMetadataInterfaceTest
                                      .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
         // DELETE 1 ServiceInformation
-        aResponseMsg = _addCredentials (aTarget.path (sPI).path ("services").path (sDT).request ()).delete ();
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
         _testResponse (aResponseMsg, 200);
         assertNull (SMPMetaManager.getServiceInformationMgr ()
                                   .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
@@ -196,36 +208,42 @@ public final class ServiceMetadataInterfaceTest
       finally
       {
         // DELETE 2 ServiceInformation
-        aResponseMsg = _addCredentials (aTarget.path (sPI).path ("services").path (sDT).request ()).delete ();
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
         _testResponse (aResponseMsg, 200, 400);
         assertNull (SMPMetaManager.getServiceInformationMgr ()
                                   .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
       }
 
-      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
+      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
     }
     finally
     {
       // DELETE ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
       _testResponse (aResponseMsg, 200, 404);
 
-      _testResponse (aTarget.path (sPI).request ().get (), 404);
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
+      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
     }
   }
 
   @Test
   public void testCreateAndDeleteRedirect ()
   {
-    final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
-    final String sPI = aPI.getURIEncoded ();
+    // Lower case
+    final SimpleParticipantIdentifier aPI_LC = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final String sPI_LC = aPI_LC.getURIEncoded ();
+    // Upper case
+    final SimpleParticipantIdentifier aPI_UC = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
+    final String sPI_UC = aPI_UC.getURIEncoded ();
 
     final SimpleDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
     final String sDT = aDT.getURIEncoded ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
-    aSG.setParticipantIdentifier (aPI);
+    aSG.setParticipantIdentifier (aPI_LC);
 
     final ServiceMetadataType aSM = new ServiceMetadataType ();
     final RedirectType aRedir = new RedirectType ();
@@ -238,21 +256,26 @@ public final class ServiceMetadataInterfaceTest
 
     try
     {
-      _testResponse (aTarget.path (sPI).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
 
       // PUT ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                              .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
-      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
-      final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI);
+      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+      assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
+
+      final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI_LC);
       assertNotNull (aServiceGroup);
+      final ISMPServiceGroup aServiceGroup_UC = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI_UC);
+      assertEquals (aServiceGroup, aServiceGroup_UC);
 
       try
       {
         // PUT 1 ServiceInformation
-        aResponseMsg = _addCredentials (aTarget.path (sPI)
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                                .path ("services")
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
@@ -261,7 +284,7 @@ public final class ServiceMetadataInterfaceTest
                                                                                                      aDT));
 
         // PUT 2 ServiceInformation
-        aResponseMsg = _addCredentials (aTarget.path (sPI)
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                                .path ("services")
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
@@ -270,28 +293,30 @@ public final class ServiceMetadataInterfaceTest
                                                                                                      aDT));
 
         // DELETE 1 Redirect
-        aResponseMsg = _addCredentials (aTarget.path (sPI).path ("services").path (sDT).request ()).delete ();
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
         _testResponse (aResponseMsg, 200);
         assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
       }
       finally
       {
         // DELETE 2 Redirect
-        aResponseMsg = _addCredentials (aTarget.path (sPI).path ("services").path (sDT).request ()).delete ();
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
         _testResponse (aResponseMsg, 200, 400);
         assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
       }
 
-      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
+      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
     }
     finally
     {
       // DELETE ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
       _testResponse (aResponseMsg, 200, 404);
 
-      _testResponse (aTarget.path (sPI).request ().get (), 404);
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
+      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
     }
   }
 }
