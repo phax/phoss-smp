@@ -37,7 +37,7 @@ import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
  *
  * @author Philip Helger
  */
-public final class ISMPServiceInformationManagerTest
+public final class ISMPServiceInformationManagerFuncTest
 {
   @Rule
   public final TestRule m_aTestRule = new SMPServerTestRule ();

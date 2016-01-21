@@ -38,7 +38,7 @@ import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
  *
  * @author Philip Helger
  */
-public final class ISMPRedirectManagerTest
+public final class ISMPRedirectManagerFuncTest
 {
   @Rule
   public final TestRule m_aTestRule = new SMPServerTestRule ();
