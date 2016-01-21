@@ -197,7 +197,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
-    final List <Object> aX509Content = new ArrayList <Object> ();
+    final List <Object> aX509Content = new ArrayList <> ();
     aX509Content.add (_getCertificate ().getSubjectX500Principal ().getName ());
     aX509Content.add (_getCertificate ());
     final X509Data aX509Data = aKeyInfoFactory.newX509Data (aX509Content);
@@ -216,7 +216,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
   /**
    * This method is only to be called on startup to indicate that the
-   * certificate configuration from the config file is valid or not.
+   * certificate configuration from the config file is valid.
    */
   public static void internalMarkCertificateValid ()
   {
@@ -225,7 +225,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
   /**
    * @return A shortcut method to determine if the certification configuration
-   *         is valid or not.
+   *         is valid or not. This method can be used, even if
+   *         {@link #getInstance()} throws an exception.
    */
   public static boolean isCertificateValid ()
   {
