@@ -40,6 +40,8 @@
  */
 package com.helger.peppol.smpserver.domain.servicegroup;
 
+import java.util.Locale;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -77,16 +79,49 @@ public class SMPServiceGroup implements ISMPServiceGroup
   // Status member
   private final SimpleParticipantIdentifier m_aParticipantIdentifier;
 
+  /**
+   * Create a unified participant identifier with a lower cased value, because
+   * according to the PEPPOL policy for identifiers, the values must be treated
+   * case-sensitive.
+   *
+   * @param sValue
+   *        The original participant identifier value. May not be
+   *        <code>null</code>.
+   * @return The new participant identifier value with a lower cased value.
+   */
+  @Nonnull
+  public static String createUnifiedParticipantIdentifierValue (@Nonnull final String sValue)
+  {
+    ValueEnforcer.notNull (sValue, "Value");
+    return sValue.toLowerCase (Locale.US);
+  }
+
+  /**
+   * Create a unified participant identifier with a lower cased value, because
+   * according to the PEPPOL policy for identifiers, the values must be treated
+   * case-sensitive.
+   *
+   * @param aParticipantIdentifier
+   *        The original participant identifier. May not be <code>null</code>.
+   * @return The new participant identifier with a lower cased value.
+   */
+  @Nonnull
+  public static SimpleParticipantIdentifier createUnifiedParticipantIdentifier (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  {
+    ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
+    return new SimpleParticipantIdentifier (aParticipantIdentifier.getScheme (),
+                                            createUnifiedParticipantIdentifierValue (aParticipantIdentifier.getValue ()));
+  }
+
   public SMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
                           @Nonnull final IParticipantIdentifier aParticipantIdentifier,
                           @Nullable final String sExtension)
   {
-    ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
     m_sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
     setOwnerID (sOwnerID);
     setExtension (sExtension);
     // Make a copy to avoid unwanted changes
-    m_aParticipantIdentifier = new SimpleParticipantIdentifier (aParticipantIdentifier);
+    m_aParticipantIdentifier = createUnifiedParticipantIdentifier (aParticipantIdentifier);
   }
 
   @Nonnull
@@ -198,6 +233,6 @@ public class SMPServiceGroup implements ISMPServiceGroup
   @Nonempty
   public static String createSMPServiceGroupID (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
   {
-    return IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier);
+    return IdentifierHelper.getIdentifierURIEncoded (createUnifiedParticipantIdentifier (aParticipantIdentifier));
   }
 }

@@ -54,6 +54,7 @@ import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 
 /**
  * ServiceGroupId == participant ID
@@ -74,7 +75,8 @@ public class DBServiceGroupID implements Serializable
   public DBServiceGroupID (@Nonnull final IParticipantIdentifier aBusinessID)
   {
     setBusinessIdentifierScheme (aBusinessID.getScheme ());
-    setBusinessIdentifier (aBusinessID.getValue ());
+    // Ensure lower case participat value
+    setBusinessIdentifier (SMPServiceGroup.createUnifiedParticipantIdentifierValue (aBusinessID.getValue ()));
   }
 
   @Column (name = "businessIdentifierScheme", nullable = false, length = CIdentifier.MAX_IDENTIFIER_SCHEME_LENGTH)

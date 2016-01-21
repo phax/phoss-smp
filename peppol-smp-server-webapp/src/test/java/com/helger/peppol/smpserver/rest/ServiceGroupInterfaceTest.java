@@ -53,7 +53,8 @@ import com.helger.web.http.CHTTPHeader;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * Test class for class {@link ServiceGroupInterface}
+ * Test class for class {@link ServiceGroupInterface}. This test class is
+ * automatically run for XML and SQL backend!
  *
  * @author Philip Helger
  */
@@ -113,10 +114,14 @@ public final class ServiceGroupInterfaceTest
   @Test
   public void testCreateAndDeleteServiceGroup ()
   {
-    final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
-    final String sPI = aPI.getURIEncoded ();
+    // Lower case version
+    final SimpleParticipantIdentifier aPI_LC = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final String sPI_LC = aPI_LC.getURIEncoded ();
+    // Upper case version
+    final SimpleParticipantIdentifier aPI_UC = SimpleParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
+    final String sPI_UC = aPI_UC.getURIEncoded ();
     final ServiceGroupType aSG = new ServiceGroupType ();
-    aSG.setParticipantIdentifier (aPI);
+    aSG.setParticipantIdentifier (aPI_LC);
 
     final WebTarget aTarget = m_aRule.getWebTarget ();
     Response aResponseMsg;
@@ -124,39 +129,55 @@ public final class ServiceGroupInterfaceTest
     try
     {
       // GET
-      _testResponse (aTarget.path (sPI).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
 
-      // PUT 1
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
+      // PUT 1 - create
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                              .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
-      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
+      // Both regular and upper case must work
+      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+      assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
+      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
 
-      // PUT 2
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
+      // PUT 2 - overwrite
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      _testResponse (aResponseMsg, 200);
+      aResponseMsg = _addCredentials (aTarget.path (sPI_UC)
                                              .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponse (aResponseMsg, 200);
 
-      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
+      // Both regular and upper case must work
+      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+      assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
+      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
 
       // DELETE 1
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
       _testResponse (aResponseMsg, 200);
 
-      _testResponse (aTarget.path (sPI).request ().get (), 404);
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
+      // Both must be deleted
+      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
     }
     finally
     {
       // DELETE 2
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
       _testResponse (aResponseMsg, 200, 404);
 
-      _testResponse (aTarget.path (sPI).request ().get (), 404);
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
+      // Both must be deleted
+      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
     }
   }
 }

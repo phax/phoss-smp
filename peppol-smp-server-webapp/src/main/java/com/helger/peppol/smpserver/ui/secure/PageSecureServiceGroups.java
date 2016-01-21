@@ -240,7 +240,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         else
           if (!bEdit && aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID) != null)
             aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE,
-                                       "Another service group for the same participant ID is already present!");
+                                       "Another service group for the same participant ID is already present (case insensitive)!");
       }
 
     if (StringHelper.isEmpty (sOwningUserID))
