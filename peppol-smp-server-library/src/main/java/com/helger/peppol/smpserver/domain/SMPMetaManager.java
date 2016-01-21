@@ -92,7 +92,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static void setManagerProvider (@Nullable final ISMPManagerProvider aManagerProvider)
   {
     if (s_aManagerProvider != null && aManagerProvider != null)
-      throw new IllegalStateException ("A manager provider is already set. You cannot set this twice!");
+      throw new IllegalStateException ("A manager provider is already set. You cannot set this twice! Call it with null before setting a new one");
 
     if (isGlobalSingletonInstantiated (SMPMetaManager.class))
       s_aLogger.warn ("Setting the manager provider after singleton instantiation may not have the desired effect.");
@@ -101,7 +101,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     if (aManagerProvider == null)
       s_aLogger.info ("Using no backend manager provider");
     else
-      s_aLogger.info ("Using " + aManagerProvider + " as the backend");
+      s_aLogger.info ("Using " + aManagerProvider + " as the backend manager provider");
   }
 
   @Deprecated
@@ -199,6 +199,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
    * @see SMPServerConfiguration#getBackend()
    * @see SMPBackendRegistry
    * @see ISMPManagerProvider
+   * @see #setManagerProvider(ISMPManagerProvider)
    */
   public static void initBackendFromConfiguration () throws InitializationException
   {
@@ -206,13 +207,14 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     final String sBackendID = SMPServerConfiguration.getBackend ();
     final SMPBackendRegistry aBackendRegistry = SMPBackendRegistry.getInstance ();
     final ISMPManagerProvider aManagerProvider = aBackendRegistry.getManagerProvider (sBackendID);
-    if (aManagerProvider != null)
-      SMPMetaManager.setManagerProvider (aManagerProvider);
-    else
+    if (aManagerProvider == null)
       throw new InitializationException ("Invalid backend '" +
                                          sBackendID +
                                          "' provided. Supported ones are: " +
                                          aBackendRegistry.getAllBackendIDs ());
+
+    // Remember the manager provider
+    setManagerProvider (aManagerProvider);
 
     // Now we can call getInstance to ensure everything is initialized correctly
     getInstance ();
