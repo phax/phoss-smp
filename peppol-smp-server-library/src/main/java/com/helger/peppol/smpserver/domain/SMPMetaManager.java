@@ -104,6 +104,16 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       s_aLogger.info ("Using " + aManagerProvider + " as the backend manager provider");
   }
 
+  /**
+   * @return The currently set manager provider. May be <code>null</code>.
+   * @see #setManagerProvider(ISMPManagerProvider)
+   */
+  @Nullable
+  public static ISMPManagerProvider getManagerProvider ()
+  {
+    return s_aManagerProvider;
+  }
+
   @Deprecated
   @UsedViaReflection
   public SMPMetaManager ()
@@ -137,7 +147,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       try
       {
         SMPKeyManager.getInstance ();
-        SMPKeyManager.markCertificateValid ();
+        SMPKeyManager.internalMarkCertificateValid ();
       }
       catch (final Exception ex)
       {

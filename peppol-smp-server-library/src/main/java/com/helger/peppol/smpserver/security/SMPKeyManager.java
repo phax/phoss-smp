@@ -214,11 +214,19 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     aSignature.sign (aSignContext);
   }
 
-  public static void markCertificateValid ()
+  /**
+   * This method is only to be called on startup to indicate that the
+   * certificate configuration from the config file is valid or not.
+   */
+  public static void internalMarkCertificateValid ()
   {
     s_aCertificateValid.set (true);
   }
 
+  /**
+   * @return A shortcut method to determine if the certification configuration
+   *         is valid or not.
+   */
   public static boolean isCertificateValid ()
   {
     return s_aCertificateValid.get ();
