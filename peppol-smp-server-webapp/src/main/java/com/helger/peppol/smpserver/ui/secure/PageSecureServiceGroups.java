@@ -56,6 +56,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
@@ -293,12 +294,15 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                   @Nonnull final BootstrapForm aForm,
                                   @Nonnull final ISMPServiceGroup aSelectedObject)
   {
-    aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the complete service group '" +
-                                                                                 aSelectedObject.getParticpantIdentifier ()
-                                                                                                .getURIEncoded () +
-                                                                                 "'?"))
-                                               .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."))
-                                               .addChild (new HCDiv ().addChild ("If the connection to the SML is active this service group will also be deleted from the SML!")));
+    final BootstrapQuestionBox aQB = new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the complete service group '" +
+                                                                                                  aSelectedObject.getParticpantIdentifier ()
+                                                                                                                 .getURIEncoded () +
+                                                                                                  "'?"))
+                                                                .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."));
+    if (RegistrationHookFactory.isSMLConnectionActive ())
+      aQB.addChild (new HCDiv ().addChild ("Since the connection to the SML is active this service group will also be deleted from the SML!"));
+
+    aForm.addChild (aQB);
   }
 
   @Override
