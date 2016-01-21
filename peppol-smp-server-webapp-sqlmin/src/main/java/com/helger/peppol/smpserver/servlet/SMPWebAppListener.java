@@ -21,13 +21,10 @@ import javax.servlet.ServletContext;
 
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.helger.commons.exception.InitializationException;
 import com.helger.html.EHTMLVersion;
 import com.helger.html.hc.config.HCSettings;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppSettings;
-import com.helger.peppol.smpserver.backend.SMPBackendRegistry;
-import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.basic.app.request.ApplicationRequestManager;
 import com.helger.photon.core.servlet.WebAppListener;
@@ -70,23 +67,6 @@ public class SMPWebAppListener extends WebAppListener
     return SMPServerConfiguration.getPublicServerURL ();
   }
 
-  public static void initBackendFromConfiguration ()
-  {
-    // Determine backend
-    final String sBackendID = SMPServerConfiguration.getBackend ();
-    final ISMPManagerProvider aManagerProvider = SMPBackendRegistry.getInstance ().getManagerProvider (sBackendID);
-    if (aManagerProvider != null)
-      SMPMetaManager.setManagerProvider (aManagerProvider);
-    else
-      throw new InitializationException ("Invalid backend '" +
-                                         sBackendID +
-                                         "' provided. Supported ones are: " +
-                                         SMPBackendRegistry.getInstance ().getAllBackendIDs ());
-
-    // Now we can call getInstance
-    SMPMetaManager.getInstance ();
-  }
-
   @Override
   protected void afterContextInitialized (@Nonnull final ServletContext aSC)
   {
@@ -105,6 +85,6 @@ public class SMPWebAppListener extends WebAppListener
     ApplicationRequestManager.getRequestMgr ().setUsePaths (true);
 
     // Determine backend
-    initBackendFromConfiguration ();
+    SMPMetaManager.initBackendFromConfiguration ();
   }
 }

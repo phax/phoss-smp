@@ -21,7 +21,6 @@ import javax.annotation.Nullable;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.servlet.SMPWebAppListener;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 
 /**
@@ -40,7 +39,8 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
   {
     if (StringHelper.hasText (sSMPServerPropertiesPath))
     {
-      SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH, sSMPServerPropertiesPath);
+      SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH,
+                                         sSMPServerPropertiesPath);
       SMPServerConfiguration.reloadConfiguration ();
     }
   }
@@ -49,7 +49,7 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
   public void before ()
   {
     super.before ();
-    SMPWebAppListener.initBackendFromConfiguration ();
+    SMPMetaManager.initBackendFromConfiguration ();
   }
 
   @Override

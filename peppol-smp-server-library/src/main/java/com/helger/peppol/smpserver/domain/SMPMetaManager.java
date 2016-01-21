@@ -51,6 +51,8 @@ import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.scope.IScope;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.backend.SMPBackendRegistry;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
@@ -184,5 +186,35 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static ISMPServiceInformationManager getServiceInformationMgr ()
   {
     return getInstance ().m_aServiceInformationMgr;
+  }
+
+  /**
+   * This is the initialization routine that must be called upon application
+   * startup. It performs the SPI initialization of all registered manager
+   * provider ({@link ISMPManagerProvider}) and selects the one specified in the
+   * SMP server configuration file.
+   *
+   * @throws InitializationException
+   *         If an unsupported backend is provided in the configuration.
+   * @see SMPServerConfiguration#getBackend()
+   * @see SMPBackendRegistry
+   * @see ISMPManagerProvider
+   */
+  public static void initBackendFromConfiguration () throws InitializationException
+  {
+    // Determine backend
+    final String sBackendID = SMPServerConfiguration.getBackend ();
+    final SMPBackendRegistry aBackendRegistry = SMPBackendRegistry.getInstance ();
+    final ISMPManagerProvider aManagerProvider = aBackendRegistry.getManagerProvider (sBackendID);
+    if (aManagerProvider != null)
+      SMPMetaManager.setManagerProvider (aManagerProvider);
+    else
+      throw new InitializationException ("Invalid backend '" +
+                                         sBackendID +
+                                         "' provided. Supported ones are: " +
+                                         aBackendRegistry.getAllBackendIDs ());
+
+    // Now we can call getInstance to ensure everything is initialized correctly
+    getInstance ();
   }
 }

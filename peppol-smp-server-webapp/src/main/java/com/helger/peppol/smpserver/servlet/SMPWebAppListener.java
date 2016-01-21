@@ -24,12 +24,9 @@ import javax.servlet.ServletContext;
 
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.helger.commons.exception.InitializationException;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppSecurity;
 import com.helger.peppol.smpserver.app.AppSettings;
-import com.helger.peppol.smpserver.backend.SMPBackendRegistry;
-import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.pub.InitializerPublic;
@@ -83,33 +80,6 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
   }
 
   @Override
-  @Nonnull
-  protected Map <String, IApplicationInitializer <LayoutExecutionContext>> getAllInitializers ()
-  {
-    final Map <String, IApplicationInitializer <LayoutExecutionContext>> ret = new HashMap <String, IApplicationInitializer <LayoutExecutionContext>> ();
-    ret.put (CApplication.APP_ID_PUBLIC, new InitializerPublic ());
-    ret.put (CApplication.APP_ID_SECURE, new InitializerSecure ());
-    return ret;
-  }
-
-  public static void initBackendFromConfiguration ()
-  {
-    // Determine backend
-    final String sBackendID = SMPServerConfiguration.getBackend ();
-    final ISMPManagerProvider aManagerProvider = SMPBackendRegistry.getInstance ().getManagerProvider (sBackendID);
-    if (aManagerProvider != null)
-      SMPMetaManager.setManagerProvider (aManagerProvider);
-    else
-      throw new InitializationException ("Invalid backend '" +
-                                         sBackendID +
-                                         "' provided. Supported ones are: " +
-                                         SMPBackendRegistry.getInstance ().getAllBackendIDs ());
-
-    // Now we can call getInstance
-    SMPMetaManager.getInstance ();
-  }
-
-  @Override
   protected void initGlobals ()
   {
     // Internal stuff:
@@ -142,6 +112,16 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     LoggedInUserManager.getInstance ().setLogoutAlreadyLoggedInUser (true);
 
     // Determine backend
-    initBackendFromConfiguration ();
+    SMPMetaManager.initBackendFromConfiguration ();
+  }
+
+  @Override
+  @Nonnull
+  protected Map <String, IApplicationInitializer <LayoutExecutionContext>> getAllInitializers ()
+  {
+    final Map <String, IApplicationInitializer <LayoutExecutionContext>> ret = new HashMap <String, IApplicationInitializer <LayoutExecutionContext>> ();
+    ret.put (CApplication.APP_ID_PUBLIC, new InitializerPublic ());
+    ret.put (CApplication.APP_ID_SECURE, new InitializerSecure ());
+    return ret;
   }
 }
