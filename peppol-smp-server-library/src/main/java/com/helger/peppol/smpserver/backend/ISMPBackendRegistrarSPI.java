@@ -54,10 +54,11 @@ import com.helger.commons.annotation.IsSPIInterface;
 public interface ISMPBackendRegistrarSPI
 {
   /**
-   * Register your backend at the provided {@link ISMPBackendRegistry}.
+   * Register your backend(s) at the provided {@link ISMPBackendRegistry}.
    *
    * @param aRegistry
-   *        The registry to register your backends at. Never <code>null</code>.
+   *        The registry to register your backend(s) at. Never <code>null</code>
+   *        .
    */
   void registerSMPBackend (@Nonnull ISMPBackendRegistry aRegistry);
 }

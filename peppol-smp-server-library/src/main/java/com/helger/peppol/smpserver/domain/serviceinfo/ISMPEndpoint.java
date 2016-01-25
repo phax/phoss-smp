@@ -159,9 +159,17 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
   @Nullable
   String getTechnicalInformationUrl ();
 
+  /**
+   * @return This service information object as a PEPPOL SMP JAXB object for the
+   *         REST interface. Never <code>null</code>.
+   */
   @Nonnull
   com.helger.peppol.smp.EndpointType getAsJAXBObjectPeppol ();
 
+  /**
+   * @return This service information object as a BDXR SMP JAXB object for the
+   *         REST interface. Never <code>null</code>.
+   */
   @Nonnull
   com.helger.peppol.bdxr.EndpointType getAsJAXBObjectBDXR ();
 }

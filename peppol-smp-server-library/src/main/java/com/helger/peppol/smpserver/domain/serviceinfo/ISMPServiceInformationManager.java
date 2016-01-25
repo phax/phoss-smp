@@ -73,21 +73,63 @@ public interface ISMPServiceInformationManager
    */
   void mergeSMPServiceInformation (@Nonnull ISMPServiceInformation aServiceInformation);
 
+  /**
+   * Find the service information matching the passed quadruple of parameters.
+   * If one of the parameters is <code>null</code> no match should be found and
+   * <code>null</code> should be returned. This is a sanity method to find the
+   * service information for a certain endpoint and is a specialization of
+   * {@link #getSMPServiceInformationOfServiceGroupAndDocumentType(ISMPServiceGroup, IDocumentTypeIdentifier)}
+   * .
+   *
+   * @param aServiceGroup
+   *        The service group to be searched. May be <code>null</code>.
+   * @param aDocTypeID
+   *        The document type ID to search. May be <code>null</code>.
+   * @param aProcessID
+   *        The process ID to search. May be <code>null</code>.
+   * @param aTransportProfile
+   *        The transport profile to search. May be <code>null</code>.
+   * @return <code>null</code> if any of the parameters is <code>null</code> or
+   *         if no such service information exists.
+   * @see #getSMPServiceInformationOfServiceGroupAndDocumentType(ISMPServiceGroup,
+   *      IDocumentTypeIdentifier)
+   */
   @Nullable
   ISMPServiceInformation findServiceInformation (@Nullable ISMPServiceGroup aServiceGroup,
                                                  @Nullable IPeppolDocumentTypeIdentifier aDocTypeID,
                                                  @Nullable IPeppolProcessIdentifier aProcessID,
                                                  @Nullable ISMPTransportProfile aTransportProfile);
 
+  /**
+   * Delete the provided service information object.
+   *
+   * @param aSMPServiceInformation
+   *        The service information objects to be deleted. May be
+   *        <code>null</code>.
+   * @return {@link EChange#CHANGED} if the parameter is not <code>null</code>
+   *         and was successfully deleted from the internal data structures.
+   *         {@link EChange#UNCHANGED} must be returned otherwise.
+   */
   @Nonnull
   EChange deleteSMPServiceInformation (@Nullable ISMPServiceInformation aSMPServiceInformation);
 
+  /**
+   * Delete all contained service information objects that belong to the passed
+   * service group.
+   *
+   * @param aServiceGroup
+   *        The service group for which all service information objects should
+   *        be deleted. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} only if the passed service group is not
+   *         <code>null</code> and if at least one service information object
+   *         was deleted. {@link EChange#UNCHANGED} must be returned otherwise.
+   */
   @Nonnull
   EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   /**
-   * @return All service information objects. Never <code>null</code> but maybe
-   *         empty.
+   * @return All service information objects in arbitrary order. Never
+   *         <code>null</code> but maybe empty.
    */
   @Nonnull
   @ReturnsMutableCopy
@@ -99,14 +141,52 @@ public interface ISMPServiceInformationManager
   @Nonnegative
   int getSMPServiceInformationCount ();
 
+  /**
+   * Get all service information objects that belong to the provided service
+   * group.
+   *
+   * @param aServiceGroup
+   *        The service group of interest. May be <code>null</code>.
+   * @return Never <code>null</code> but maybe empty list of all matching
+   *         service information objects in arbitrary order. An empty result
+   *         means that either a non-existing service group was passed <b>or</b>
+   *         that no service information objects exist for the provided service
+   *         group.
+   */
   @Nonnull
   @ReturnsMutableCopy
   Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
+  /**
+   * Get all SMP document types that are registered for the provided service
+   * group. This is a sanity method to handle the REST service group request
+   * (e.g. <code>/iso6523-actorid-upis::0088/example</code>) in an efficient
+   * way.
+   *
+   * @param aServiceGroup
+   *        The service group of interest. May be <code>null</code>.
+   * @return Never <code>null</code> but may empty collection of document type
+   *         identifiers in arbitrary order. An empty result means that either a
+   *         non-existing service group was passed <b>or</b> that no service
+   *         information objects exist for the provided service group.
+   * @see #getAllSMPDocumentTypesOfServiceGroup(ISMPServiceGroup)
+   */
   @Nonnull
   @ReturnsMutableCopy
   Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
+  /**
+   * Get the service information for the passed tuple of service group and
+   * document type identifier.
+   *
+   * @param aServiceGroup
+   *        The service group of interest. May be <code>null</code>.
+   * @param aDocumentTypeIdentifier
+   *        The document type identifier to search. May be <code>null</code>.
+   * @return <code>null</code> if any parameter is <code>null</code> or if the
+   *         service group is not found or if the document type is not found in
+   *         the service group.
+   */
   @Nullable
   ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable ISMPServiceGroup aServiceGroup,
                                                                                 @Nullable IDocumentTypeIdentifier aDocumentTypeIdentifier);

@@ -71,6 +71,7 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
 
   /**
    * @return A copy of the list of all endpoints associated with this process.
+   *         Never <code>null</code> but maybe empty.
    */
   @Nonnull
   @ReturnsMutableCopy
@@ -82,11 +83,27 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
   @Nonnegative
   int getEndpointCount ();
 
+  /**
+   * Find the endpoint with the passed transport profile.
+   *
+   * @param aTransportProfile
+   *        The transport profile to search. May be <code>null</code>.
+   * @return <code>null</code> if the passed transport profile is
+   *         <code>null</code> or if no such endpoint exists.
+   */
   @Nullable
   ISMPEndpoint getEndpointOfTransportProfile (@Nullable ISMPTransportProfile aTransportProfile);
 
+  /**
+   * Find the endpoint with the passed transport profile ID.
+   *
+   * @param sTransportProfileID
+   *        The transport profile ID to search. May be <code>null</code>.
+   * @return <code>null</code> if the passed transport profile is
+   *         <code>null</code> or empty or if no such endpoint exists.
+   */
   @Nullable
-  ISMPEndpoint getEndpointOfTransportProfile (@Nullable String sTransportProfile);
+  ISMPEndpoint getEndpointOfTransportProfile (@Nullable String sTransportProfileID);
 
   /**
    * Add a new endpoint.
@@ -110,9 +127,17 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
   @Nonnull
   EChange deleteEndpoint (@Nullable String sTransportProfile);
 
+  /**
+   * @return This service information object as a PEPPOL SMP JAXB object for the
+   *         REST interface. Never <code>null</code>.
+   */
   @Nonnull
   com.helger.peppol.smp.ProcessType getAsJAXBObjectPeppol ();
 
+  /**
+   * @return This service information object as a BDXR SMP JAXB object for the
+   *         REST interface. Never <code>null</code>.
+   */
   @Nonnull
   com.helger.peppol.bdxr.ProcessType getAsJAXBObjectBDXR ();
 }

@@ -128,9 +128,17 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    */
   void addProcess (@Nonnull SMPProcess aProcess);
 
+  /**
+   * @return This service information object as a PEPPOL SMP JAXB object for the
+   *         REST interface. Never <code>null</code>.
+   */
   @Nonnull
   com.helger.peppol.smp.ServiceMetadataType getAsJAXBObjectPeppol ();
 
+  /**
+   * @return This service information object as a BDXR SMP JAXB object for the
+   *         REST interface. Never <code>null</code>.
+   */
   @Nonnull
   com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ();
 }

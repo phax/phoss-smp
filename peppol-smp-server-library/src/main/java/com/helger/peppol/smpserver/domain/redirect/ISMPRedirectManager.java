@@ -46,6 +46,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
@@ -63,23 +64,25 @@ public interface ISMPRedirectManager
    * Create or update a redirect for a service group.
    *
    * @param aServiceGroup
-   *        Service group
+   *        Service group the redirect belongs to. May not be <code>null</code>.
    * @param aDocumentTypeIdentifier
-   *        Document type identifier affected.
+   *        Document type identifier effected. May not be <code>null</code>.
    * @param sTargetHref
-   *        Target URL of the new SMP
+   *        Target URL of the new SMP. May neither be <code>null</code> nor
+   *        empty.
    * @param sSubjectUniqueIdentifier
    *        The subject unique identifier of the target SMPs certificate used to
-   *        sign its resources.
+   *        sign its resources. May neither be <code>null</code> nor empty.
    * @param sExtension
-   *        Optional extension element
+   *        Optional extension element. May be <code>null</code>. If present it
+   *        must be well-formed XML content.
    * @return The new or updated {@link ISMPRedirect}. Never <code>null</code>.
    */
   @Nonnull
   ISMPRedirect createOrUpdateSMPRedirect (@Nonnull ISMPServiceGroup aServiceGroup,
                                           @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                          @Nonnull String sTargetHref,
-                                          @Nonnull String sSubjectUniqueIdentifier,
+                                          @Nonnull @Nonempty String sTargetHref,
+                                          @Nonnull @Nonempty String sSubjectUniqueIdentifier,
                                           @Nullable String sExtension);
 
   /**
@@ -128,6 +131,19 @@ public interface ISMPRedirectManager
   @Nonnegative
   int getSMPRedirectCount ();
 
+  /**
+   * Find the redirect that matches the passed tuple of service group and
+   * document type.
+   * 
+   * @param aServiceGroup
+   *        The service group to query. May be <code>null</code>.
+   * @param aDocTypeID
+   *        The document type to query. May be <code>null</code>.
+   * @return <code>null</code> if the passed service group is <code>null</code>
+   *         or not contained, or if the passed document type is
+   *         <code>null</code> or if it is not contained as a redirect in the
+   *         passed service group.
+   */
   @Nullable
   ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable ISMPServiceGroup aServiceGroup,
                                                             @Nullable IDocumentTypeIdentifier aDocTypeID);

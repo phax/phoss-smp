@@ -45,7 +45,7 @@ import javax.annotation.Nullable;
 /**
  * Base interface for objects having an extension (service group, redirect,
  * endpoint, process and service metadata)
- * 
+ *
  * @author Philip Helger
  */
 public interface ISMPHasExtension
@@ -58,7 +58,8 @@ public interface ISMPHasExtension
 
   /**
    * @return The string representation of the extension element. May be
-   *         <code>null</code>.
+   *         <code>null</code>. If an extension is present it must be
+   *         well-formed XML content.
    * @see #hasExtension()
    */
   @Nullable

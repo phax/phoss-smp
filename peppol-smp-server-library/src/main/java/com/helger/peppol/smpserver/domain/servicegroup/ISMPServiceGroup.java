@@ -77,9 +77,17 @@ public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHas
   @Nonnull
   IPeppolParticipantIdentifier getParticpantIdentifier ();
 
+  /**
+   * @return This service information object as a PEPPOL SMP JAXB object for the
+   *         REST interface. Never <code>null</code>.
+   */
   @Nonnull
   com.helger.peppol.smp.ServiceGroupType getAsJAXBObjectPeppol ();
 
+  /**
+   * @return This service information object as a BDXR SMP JAXB object for the
+   *         REST interface. Never <code>null</code>.
+   */
   @Nonnull
   com.helger.peppol.bdxr.ServiceGroupType getAsJAXBObjectBDXR ();
 }
