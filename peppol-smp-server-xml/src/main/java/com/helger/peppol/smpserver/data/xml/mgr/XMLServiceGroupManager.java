@@ -118,7 +118,9 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   }
 
   @Nonnull
-  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID, @Nullable @Nonnull final IParticipantIdentifier aParticipantIdentifier, @Nullable final String sExtension)
+  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
+                                                @Nullable @Nonnull final IParticipantIdentifier aParticipantIdentifier,
+                                                @Nullable final String sExtension)
   {
     s_aLogger.info ("createSMPServiceGroup (" +
                     sOwnerID +
@@ -150,26 +152,38 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
       m_aRWLock.writeLock ().unlock ();
     }
 
-    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID (), sOwnerID, IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier), sExtension);
+    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
+                                      aSMPServiceGroup.getID (),
+                                      sOwnerID,
+                                      IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier),
+                                      sExtension);
     s_aLogger.info ("createSMPServiceGroup succeeded");
     return aSMPServiceGroup;
   }
 
   @Nonnull
-  public EChange updateSMPServiceGroup (@Nullable final String sSMPServiceGroupID, @Nonnull @Nonempty final String sNewOwnerID, @Nullable final String sExtension)
+  public EChange updateSMPServiceGroup (@Nullable final String sSMPServiceGroupID,
+                                        @Nonnull @Nonempty final String sNewOwnerID,
+                                        @Nullable final String sExtension)
   {
-    s_aLogger.info ("updateSMPServiceGroup (" + sSMPServiceGroupID + ", " + sNewOwnerID + ", " + (StringHelper.hasText (sExtension) ? "with extension" : "without extension") + ")");
+    s_aLogger.info ("updateSMPServiceGroup (" +
+                    sSMPServiceGroupID +
+                    ", " +
+                    sNewOwnerID +
+                    ", " +
+                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ")");
+
+    final SMPServiceGroup aSMPServiceGroup = _getSMPServiceGroupOfID (sSMPServiceGroupID);
+    if (aSMPServiceGroup == null)
+    {
+      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, sSMPServiceGroupID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
 
     m_aRWLock.writeLock ().lock ();
     try
     {
-      final SMPServiceGroup aSMPServiceGroup = m_aMap.get (sSMPServiceGroupID);
-      if (aSMPServiceGroup == null)
-      {
-        AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, sSMPServiceGroupID, "no-such-id");
-        return EChange.UNCHANGED;
-      }
-
       EChange eChange = EChange.UNCHANGED;
       eChange = eChange.or (aSMPServiceGroup.setOwnerID (sNewOwnerID));
       eChange = eChange.or (aSMPServiceGroup.setExtension (sExtension));
@@ -287,12 +301,12 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     return ret;
   }
 
-  public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
+  @Nullable
+  private SMPServiceGroup _getSMPServiceGroupOfID (@Nullable final String sID)
   {
-    if (aParticipantIdentifier == null)
+    if (StringHelper.hasNoText (sID))
       return null;
 
-    final String sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
     m_aRWLock.readLock ().lock ();
     try
     {
@@ -302,6 +316,15 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     {
       m_aRWLock.readLock ().unlock ();
     }
+  }
+
+  public SMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
+  {
+    if (aParticipantIdentifier == null)
+      return null;
+
+    final String sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
+    return _getSMPServiceGroupOfID (sID);
   }
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
