@@ -9,4 +9,8 @@ For querying an SMP server you may want to have a look at the OSS [peppol-smp-cl
 
 ---
 
+**Note: Version 4.1.1 will be the last version supporting JDK 7. Version 5+ will target only JDK 8!** 
+
+---
+
 On Twitter: <a href="https://twitter.com/philiphelger">Follow @philiphelger</a>
