@@ -128,15 +128,15 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
                                                         @Nullable final IPeppolProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
-    if (aOldInformation != null)
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
+    if (aServiceInfo != null)
     {
-      final ISMPProcess aProcess = aOldInformation.getProcessOfID (aProcessID);
+      final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
         final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (aTransportProfile);
         if (aEndpoint != null)
-          return aOldInformation;
+          return aServiceInfo;
       }
     }
     return null;
