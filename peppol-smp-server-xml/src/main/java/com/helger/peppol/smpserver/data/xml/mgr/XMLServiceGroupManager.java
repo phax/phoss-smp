@@ -42,9 +42,13 @@ import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
+import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
@@ -206,7 +210,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   {
     s_aLogger.info ("deleteSMPServiceGroup (" + IdentifierHelper.getIdentifierURIEncoded (aParticipantID) + ")");
 
-    final ISMPServiceGroup aSMPServiceGroup = getSMPServiceGroupOfID (aParticipantID);
+    final SMPServiceGroup aSMPServiceGroup = getSMPServiceGroupOfID (aParticipantID);
     if (aSMPServiceGroup == null)
     {
       AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
@@ -216,26 +220,53 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     // Delete in SML - throws exception in case of error
     m_aHook.deleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
 
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    Collection <? extends ISMPRedirect> aOldRedirects = null;
+    Collection <? extends ISMPServiceInformation> aOldServiceInformation = null;
+
     m_aRWLock.writeLock ().lock ();
     try
     {
-      final SMPServiceGroup aRealServiceGroup = m_aMap.remove (aSMPServiceGroup.getID ());
-      if (aRealServiceGroup == null)
+      if (m_aMap.remove (aSMPServiceGroup.getID ()) == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aSMPServiceGroup.getID ());
         return EChange.UNCHANGED;
       }
 
-      // Delete all redirects and all service information of this service group
-      // as well
-      SMPMetaManager.getRedirectMgr ().deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
-      SMPMetaManager.getServiceInformationMgr ().deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
+      // Save all redirects (in case of an error) and delete them
+      aOldRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
+      aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
 
-      markAsChanged (aRealServiceGroup, EDAOActionType.DELETE);
+      // Save all service information (in case of an error) and delete them
+      aOldServiceInformation = aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (aSMPServiceGroup);
+      aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
+
+      markAsChanged (aSMPServiceGroup, EDAOActionType.DELETE);
     }
     catch (final RuntimeException ex)
     {
-      // An error occurred - remove from SML again
+      // Deletion failed - shit
+
+      // Try to rollback the actions
+      if (!m_aMap.containsKey (aSMPServiceGroup.getID ()))
+        _addSMPServiceGroup (aSMPServiceGroup);
+
+      // Restore redirects (if any)
+      if (CollectionHelper.isNotEmpty (aOldRedirects))
+        for (final ISMPRedirect aOldRedirect : aOldRedirects)
+          aRedirectMgr.createOrUpdateSMPRedirect (aSMPServiceGroup,
+                                                  aOldRedirect.getDocumentTypeIdentifier (),
+                                                  aOldRedirect.getTargetHref (),
+                                                  aOldRedirect.getSubjectUniqueIdentifier (),
+                                                  aOldRedirect.getExtension ());
+
+      // Restore service information (if any)
+      if (CollectionHelper.isNotEmpty (aOldServiceInformation))
+        for (final ISMPServiceInformation aOldServiceInfo : aOldServiceInformation)
+          aServiceInfoMgr.mergeSMPServiceInformation (aOldServiceInfo);
+
+      // An error occurred - restore in SML again
       m_aHook.undoDeleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
       throw ex;
     }
