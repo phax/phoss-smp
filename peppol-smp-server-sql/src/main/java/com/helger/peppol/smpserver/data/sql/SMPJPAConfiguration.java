@@ -46,7 +46,6 @@ import javax.annotation.concurrent.Immutable;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 import com.helger.commons.annotation.PresentForCodeCoverage;
-import com.helger.commons.debug.GlobalDebug;
 
 /**
  * Default JPA configuration file properties
@@ -75,7 +74,6 @@ public final class SMPJPAConfiguration
   @Nonnull
   public static String getDefaultDDLGenerationMode ()
   {
-    return GlobalDebug.isDebugMode () ? PersistenceUnitProperties.DDL_SQL_SCRIPT_GENERATION
-                                      : PersistenceUnitProperties.NONE;
+    return PersistenceUnitProperties.NONE;
   }
 }
