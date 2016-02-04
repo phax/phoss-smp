@@ -27,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.helger.commons.exception.InitializationException;
+import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
  * REST Web Service for redirection. It is called if the server root ("/") is
@@ -44,7 +45,7 @@ public final class RedirectInterface
   {
     try
     {
-      INDEX_HTML = new URI ("/web/");
+      INDEX_HTML = new URI (WebScopeManager.getGlobalScope ().getContextPath () + "/web/");
     }
     catch (final URISyntaxException e)
     {

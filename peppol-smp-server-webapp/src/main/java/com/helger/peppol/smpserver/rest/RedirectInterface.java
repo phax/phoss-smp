@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 
 import com.helger.commons.exception.InitializationException;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
+import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
  * REST Web Service for redirection. It is called if the server root ("/") is
@@ -45,7 +46,9 @@ public final class RedirectInterface
   {
     try
     {
-      INDEX_HTML = new URI (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH + "/");
+      INDEX_HTML = new URI (WebScopeManager.getGlobalScope ().getContextPath () +
+                            AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH +
+                            "/");
     }
     catch (final URISyntaxException e)
     {
