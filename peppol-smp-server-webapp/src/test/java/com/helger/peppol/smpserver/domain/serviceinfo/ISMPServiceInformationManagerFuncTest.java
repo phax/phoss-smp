@@ -16,10 +16,14 @@
  */
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
+import static org.junit.Assert.assertTrue;
+
+import javax.persistence.PersistenceException;
+
+import org.eclipse.persistence.exceptions.DatabaseException;
 import org.joda.time.LocalDateTime;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.datetime.PDTFactory;
@@ -40,7 +44,7 @@ import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 public final class ISMPServiceInformationManagerFuncTest
 {
   @Rule
-  public final TestRule m_aTestRule = new SMPServerTestRule ();
+  public final SMPServerTestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
   public void testAll ()
@@ -53,7 +57,17 @@ public final class ISMPServiceInformationManagerFuncTest
     final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createWithDefaultScheme ("junit-proc");
 
     final String sUserID = "junitserviceinfo";
-    aUserMgr.createUser (sUserID, "bla");
+    try
+    {
+      aUserMgr.createUser (sUserID, "bla");
+    }
+    catch (final PersistenceException ex)
+    {
+      assertTrue (ex.getCause () instanceof DatabaseException);
+      // MySQL is not configured correctly!
+      return;
+    }
+
     try
     {
       aServiceGroupMgr.deleteSMPServiceGroup (aPI1);
