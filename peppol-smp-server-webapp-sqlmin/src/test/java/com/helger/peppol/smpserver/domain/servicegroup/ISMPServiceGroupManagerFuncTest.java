@@ -33,7 +33,6 @@ import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerTestRule;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
-import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 
 /**
  * Test class for class {@link ISMPServiceGroupManager}.
@@ -64,8 +63,7 @@ public final class ISMPServiceGroupManagerFuncTest
     catch (final PersistenceException ex)
     {
       assertTrue (ex.getCause () instanceof DatabaseException);
-      assertTrue (ex.getCause ().getCause () instanceof CommunicationsException);
-      // MySQL is not running!
+      // MySQL is not configured correctly!
       return;
     }
 
