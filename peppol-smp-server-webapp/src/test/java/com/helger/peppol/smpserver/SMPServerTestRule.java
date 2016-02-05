@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
+import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 
@@ -50,6 +51,11 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
   {
     super.before ();
     SMPMetaManager.initBackendFromConfiguration ();
+  }
+
+  public boolean isSQLMode ()
+  {
+    return SMPMetaManager.getManagerProvider () instanceof SQLManagerProvider;
   }
 
   @Override
