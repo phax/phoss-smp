@@ -16,6 +16,11 @@
  */
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
+import static org.junit.Assert.assertTrue;
+
+import javax.persistence.PersistenceException;
+
+import org.eclipse.persistence.exceptions.DatabaseException;
 import org.joda.time.LocalDateTime;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +36,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 
 /**
  * Test class for class {@link ISMPServiceInformationManager}.
@@ -53,7 +59,18 @@ public final class ISMPServiceInformationManagerFuncTest
     final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createWithDefaultScheme ("junit-proc");
 
     final String sUserID = "junitserviceinfo";
-    aUserMgr.createUser (sUserID, "bla");
+    try
+    {
+      aUserMgr.createUser (sUserID, "bla");
+    }
+    catch (final PersistenceException ex)
+    {
+      assertTrue (ex.getCause () instanceof DatabaseException);
+      assertTrue (ex.getCause ().getCause () instanceof CommunicationsException);
+      // MySQL is not running!
+      return;
+    }
+
     try
     {
       aServiceGroupMgr.deleteSMPServiceGroup (aPI1);

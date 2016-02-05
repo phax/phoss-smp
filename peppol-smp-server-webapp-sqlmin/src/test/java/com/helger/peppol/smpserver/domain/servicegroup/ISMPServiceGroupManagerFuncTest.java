@@ -22,6 +22,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import javax.persistence.PersistenceException;
+
+import org.eclipse.persistence.exceptions.DatabaseException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -30,6 +33,7 @@ import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerTestRule;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 
 /**
  * Test class for class {@link ISMPServiceGroupManager}.
@@ -53,7 +57,18 @@ public final class ISMPServiceGroupManagerFuncTest
     final String sExtension = "<ext val='a' />";
 
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-    aUserMgr.createUser (sOwner1ID, "any");
+    try
+    {
+      aUserMgr.createUser (sOwner1ID, "any");
+    }
+    catch (final PersistenceException ex)
+    {
+      assertTrue (ex.getCause () instanceof DatabaseException);
+      assertTrue (ex.getCause ().getCause () instanceof CommunicationsException);
+      // MySQL is not running!
+      return;
+    }
+
     aUserMgr.createUser (sOwner2ID, "any");
     try
     {

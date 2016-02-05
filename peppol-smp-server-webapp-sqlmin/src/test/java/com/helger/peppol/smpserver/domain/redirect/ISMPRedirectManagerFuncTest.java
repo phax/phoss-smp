@@ -20,6 +20,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import javax.persistence.PersistenceException;
+
+import org.eclipse.persistence.exceptions.DatabaseException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -32,6 +35,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 
 /**
  * Test class for class {@link ISMPRedirectManager}.
@@ -48,7 +52,18 @@ public final class ISMPRedirectManagerFuncTest
   {
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final String sUserID = "junitredir";
-    aUserMgr.createUser (sUserID, "dummy");
+    try
+    {
+      aUserMgr.createUser (sUserID, "dummy");
+    }
+    catch (final PersistenceException ex)
+    {
+      assertTrue (ex.getCause () instanceof DatabaseException);
+      assertTrue (ex.getCause ().getCause () instanceof CommunicationsException);
+      // MySQL is not running!
+      return;
+    }
+
     try
     {
       final SimpleParticipantIdentifier aPI1 = SimpleParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
