@@ -69,19 +69,19 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
   }
 
   @Override
-  protected void onRecoveryCreate (final SMPRedirect aElement)
+  protected void onRecoveryCreate (@Nonnull final SMPRedirect aElement)
   {
-    _addSMPRedirect (aElement);
+    _addSMPRedirect (aElement, false);
   }
 
   @Override
-  protected void onRecoveryUpdate (final SMPRedirect aElement)
+  protected void onRecoveryUpdate (@Nonnull final SMPRedirect aElement)
   {
-    _addSMPRedirect (aElement);
+    _addSMPRedirect (aElement, true);
   }
 
   @Override
-  protected void onRecoveryDelete (final SMPRedirect aElement)
+  protected void onRecoveryDelete (@Nonnull final SMPRedirect aElement)
   {
     m_aMap.remove (aElement.getID ());
   }
@@ -91,7 +91,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
   protected EChange onRead (@Nonnull final IMicroDocument aDoc)
   {
     for (final IMicroElement eSMPRedirect : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
-      _addSMPRedirect (MicroTypeConverter.convertToNative (eSMPRedirect, SMPRedirect.class));
+      _addSMPRedirect (MicroTypeConverter.convertToNative (eSMPRedirect, SMPRedirect.class), false);
     return EChange.UNCHANGED;
   }
 
@@ -107,12 +107,12 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
   }
 
   @MustBeLocked (ELockType.WRITE)
-  private void _addSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
+  private void _addSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect, final boolean bUpdate)
   {
     ValueEnforcer.notNull (aSMPRedirect, "SMPRedirect");
 
     final String sSMPRedirectID = aSMPRedirect.getID ();
-    if (m_aMap.containsKey (sSMPRedirectID))
+    if (!bUpdate && m_aMap.containsKey (sSMPRedirectID))
       throw new IllegalArgumentException ("SMPRedirect ID '" + sSMPRedirectID + "' is already in use!");
     m_aMap.put (aSMPRedirect.getID (), aSMPRedirect);
   }
@@ -124,7 +124,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
     m_aRWLock.writeLock ().lock ();
     try
     {
-      _addSMPRedirect (aSMPRedirect);
+      _addSMPRedirect (aSMPRedirect, false);
       markAsChanged (aSMPRedirect, EDAOActionType.CREATE);
     }
     finally

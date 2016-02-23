@@ -82,13 +82,13 @@ public final class SMPTransportProfileManager extends AbstractWALDAO <SMPTranspo
   @Override
   protected void onRecoveryCreate (@Nonnull final SMPTransportProfile aSMPTransportProfile)
   {
-    _addItem (aSMPTransportProfile);
+    _addItem (aSMPTransportProfile, false);
   }
 
   @Override
   protected void onRecoveryUpdate (@Nonnull final SMPTransportProfile aSMPTransportProfile)
   {
-    _addItem (aSMPTransportProfile);
+    _addItem (aSMPTransportProfile, true);
   }
 
   @Override
@@ -103,7 +103,7 @@ public final class SMPTransportProfileManager extends AbstractWALDAO <SMPTranspo
   {
     // Add the default transport profiles
     for (final ESMPTransportProfile eTransportProfile : ESMPTransportProfile.values ())
-      _addItem (new SMPTransportProfile (eTransportProfile));
+      _addItem (new SMPTransportProfile (eTransportProfile), false);
     return EChange.CHANGED;
   }
 
@@ -112,7 +112,7 @@ public final class SMPTransportProfileManager extends AbstractWALDAO <SMPTranspo
   protected EChange onRead (@Nonnull final IMicroDocument aDoc)
   {
     for (final IMicroElement eSMPTransportProfile : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
-      _addItem (MicroTypeConverter.convertToNative (eSMPTransportProfile, SMPTransportProfile.class));
+      _addItem (MicroTypeConverter.convertToNative (eSMPTransportProfile, SMPTransportProfile.class), false);
     return EChange.UNCHANGED;
   }
 
@@ -127,18 +127,19 @@ public final class SMPTransportProfileManager extends AbstractWALDAO <SMPTranspo
     return aDoc;
   }
 
-  private void _addItem (@Nonnull final SMPTransportProfile aSMPTransportProfile)
+  private void _addItem (@Nonnull final SMPTransportProfile aSMPTransportProfile, final boolean bUpdate)
   {
     ValueEnforcer.notNull (aSMPTransportProfile, "SMPTransportProfile");
 
     final String sSMPTransportProfileID = aSMPTransportProfile.getID ();
-    if (m_aMap.containsKey (sSMPTransportProfileID))
+    if (!bUpdate && m_aMap.containsKey (sSMPTransportProfileID))
       throw new IllegalArgumentException ("SMPTransportProfile ID '" + sSMPTransportProfileID + "' is already in use!");
     m_aMap.put (sSMPTransportProfileID, aSMPTransportProfile);
   }
 
   @Nullable
-  public ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty final String sID, @Nonnull @Nonempty final String sName)
+  public ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty final String sID,
+                                                         @Nonnull @Nonempty final String sName)
   {
     final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID, sName);
 
@@ -149,7 +150,7 @@ public final class SMPTransportProfileManager extends AbstractWALDAO <SMPTranspo
       if (containsSMPTransportProfileWithID (sID))
         return null;
 
-      _addItem (aSMPTransportProfile);
+      _addItem (aSMPTransportProfile, false);
       markAsChanged (aSMPTransportProfile, EDAOActionType.CREATE);
     }
     finally
@@ -161,7 +162,8 @@ public final class SMPTransportProfileManager extends AbstractWALDAO <SMPTranspo
   }
 
   @Nonnull
-  public EChange updateSMPTransportProfile (@Nullable final String sSMPTransportProfileID, @Nonnull @Nonempty final String sName)
+  public EChange updateSMPTransportProfile (@Nullable final String sSMPTransportProfileID,
+                                            @Nonnull @Nonempty final String sName)
   {
     m_aRWLock.writeLock ().lock ();
     try

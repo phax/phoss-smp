@@ -74,19 +74,19 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   }
 
   @Override
-  protected void onRecoveryCreate (final SMPServiceGroup aElement)
+  protected void onRecoveryCreate (@Nonnull final SMPServiceGroup aElement)
   {
-    _addSMPServiceGroup (aElement);
+    _addSMPServiceGroup (aElement, false);
   }
 
   @Override
-  protected void onRecoveryUpdate (final SMPServiceGroup aElement)
+  protected void onRecoveryUpdate (@Nonnull final SMPServiceGroup aElement)
   {
-    _addSMPServiceGroup (aElement);
+    _addSMPServiceGroup (aElement, true);
   }
 
   @Override
-  protected void onRecoveryDelete (final SMPServiceGroup aElement)
+  protected void onRecoveryDelete (@Nonnull final SMPServiceGroup aElement)
   {
     m_aMap.remove (aElement.getID ());
   }
@@ -96,7 +96,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   protected EChange onRead (@Nonnull final IMicroDocument aDoc)
   {
     for (final IMicroElement eSMPServiceGroup : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
-      _addSMPServiceGroup (MicroTypeConverter.convertToNative (eSMPServiceGroup, SMPServiceGroup.class));
+      _addSMPServiceGroup (MicroTypeConverter.convertToNative (eSMPServiceGroup, SMPServiceGroup.class), false);
     return EChange.UNCHANGED;
   }
 
@@ -111,12 +111,12 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     return aDoc;
   }
 
-  private void _addSMPServiceGroup (@Nonnull final SMPServiceGroup aSMPServiceGroup)
+  private void _addSMPServiceGroup (@Nonnull final SMPServiceGroup aSMPServiceGroup, final boolean bUpdate)
   {
     ValueEnforcer.notNull (aSMPServiceGroup, "SMPServiceGroup");
 
     final String sSMPServiceGroupID = aSMPServiceGroup.getID ();
-    if (m_aMap.containsKey (sSMPServiceGroupID))
+    if (!bUpdate && m_aMap.containsKey (sSMPServiceGroupID))
       throw new IllegalArgumentException ("SMPServiceGroup ID '" + sSMPServiceGroupID + "' is already in use!");
     m_aMap.put (aSMPServiceGroup.getID (), aSMPServiceGroup);
   }
@@ -142,7 +142,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     m_aRWLock.writeLock ().lock ();
     try
     {
-      _addSMPServiceGroup (aSMPServiceGroup);
+      _addSMPServiceGroup (aSMPServiceGroup, false);
       markAsChanged (aSMPServiceGroup, EDAOActionType.CREATE);
     }
     catch (final RuntimeException ex)
@@ -250,7 +250,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
 
       // Try to rollback the actions
       if (!m_aMap.containsKey (aSMPServiceGroup.getID ()))
-        _addSMPServiceGroup (aSMPServiceGroup);
+        _addSMPServiceGroup (aSMPServiceGroup, false);
 
       // Restore redirects (if any)
       if (CollectionHelper.isNotEmpty (aOldRedirects))

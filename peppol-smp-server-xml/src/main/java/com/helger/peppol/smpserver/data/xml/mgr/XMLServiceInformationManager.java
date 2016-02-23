@@ -58,7 +58,8 @@ import com.helger.photon.basic.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServiceInformation> implements ISMPServiceInformationManager
+public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServiceInformation>
+                                                implements ISMPServiceInformationManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceInformationManager.class);
   private static final String ELEMENT_ROOT = "serviceinformationlist";
@@ -73,19 +74,19 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   }
 
   @Override
-  protected void onRecoveryCreate (final SMPServiceInformation aElement)
+  protected void onRecoveryCreate (@Nonnull final SMPServiceInformation aElement)
   {
-    _addSMPServiceInformation (aElement);
+    _addSMPServiceInformation (aElement, false);
   }
 
   @Override
-  protected void onRecoveryUpdate (final SMPServiceInformation aElement)
+  protected void onRecoveryUpdate (@Nonnull final SMPServiceInformation aElement)
   {
-    _addSMPServiceInformation (aElement);
+    _addSMPServiceInformation (aElement, true);
   }
 
   @Override
-  protected void onRecoveryDelete (final SMPServiceInformation aElement)
+  protected void onRecoveryDelete (@Nonnull final SMPServiceInformation aElement)
   {
     m_aMap.remove (aElement.getID ());
   }
@@ -96,7 +97,9 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   {
     for (final IMicroElement eSMPServiceInformation : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
     {
-      _addSMPServiceInformation (MicroTypeConverter.convertToNative (eSMPServiceInformation, SMPServiceInformation.class));
+      _addSMPServiceInformation (MicroTypeConverter.convertToNative (eSMPServiceInformation,
+                                                                     SMPServiceInformation.class),
+                                 false);
     }
     return EChange.UNCHANGED;
   }
@@ -112,13 +115,16 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     return aDoc;
   }
 
-  private void _addSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation)
+  private void _addSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation,
+                                          final boolean bUpdate)
   {
     ValueEnforcer.notNull (aSMPServiceInformation, "SMPServiceInformation");
 
     final String sSMPServiceInformationID = aSMPServiceInformation.getID ();
-    if (m_aMap.containsKey (sSMPServiceInformationID))
-      throw new IllegalArgumentException ("SMPServiceInformation ID '" + sSMPServiceInformationID + "' is already in use!");
+    if (!bUpdate && m_aMap.containsKey (sSMPServiceInformationID))
+      throw new IllegalArgumentException ("SMPServiceInformation ID '" +
+                                          sSMPServiceInformationID +
+                                          "' is already in use!");
     m_aMap.put (aSMPServiceInformation.getID (), aSMPServiceInformation);
   }
 
@@ -128,7 +134,8 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
                                                         @Nullable final IPeppolProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                       aDocTypeID);
     if (aServiceInfo != null)
     {
       final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
@@ -191,7 +198,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
         if (bRemovedOld)
           markAsChanged (aOldInformation, EDAOActionType.DELETE);
 
-        _addSMPServiceInformation (aSMPServiceInformation);
+        _addSMPServiceInformation (aSMPServiceInformation, false);
         markAsChanged (aSMPServiceInformation, EDAOActionType.CREATE);
       }
       finally
