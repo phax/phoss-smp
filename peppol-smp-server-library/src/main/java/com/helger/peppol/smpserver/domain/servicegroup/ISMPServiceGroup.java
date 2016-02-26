@@ -64,7 +64,8 @@ public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHas
   String getID ();
 
   /**
-   * @return The ID of the owner of this service group. Never <code>null</code>.
+   * @return The ID of the owning user of this service group. Never
+   *         <code>null</code>.
    */
   @Nonnull
   @Nonempty
