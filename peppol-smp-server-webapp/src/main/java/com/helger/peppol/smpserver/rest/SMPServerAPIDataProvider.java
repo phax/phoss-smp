@@ -68,7 +68,12 @@ public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
   public URI getCurrentURI ()
   {
     if (m_bUseStaticServerInfo && StaticServerInfo.isSet ())
-      return URLHelper.getAsURI (StaticServerInfo.getInstance ().getFullServerPath () + "/" + m_aUriInfo.getPath ());
+    {
+      // Do not decode params - '#' lets URI parser fail!
+      return URLHelper.getAsURI (StaticServerInfo.getInstance ().getFullServerPath () +
+                                 "/" +
+                                 m_aUriInfo.getPath (false));
+    }
     if (false)
     {
       // http://172.31.14.98:90/
@@ -85,7 +90,12 @@ public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
   protected UriBuilder getBaseUriBuilder ()
   {
     if (m_bUseStaticServerInfo && StaticServerInfo.isSet ())
-      return UriBuilder.fromUri (StaticServerInfo.getInstance ().getFullServerPath () + "/" + m_aUriInfo.getPath ());
+    {
+      // Do not decode params - '#' lets URI parser fail!
+      return UriBuilder.fromUri (StaticServerInfo.getInstance ().getFullServerPath () +
+                                 "/" +
+                                 m_aUriInfo.getPath (false));
+    }
     return m_aUriInfo.getBaseUriBuilder ();
   }
 
