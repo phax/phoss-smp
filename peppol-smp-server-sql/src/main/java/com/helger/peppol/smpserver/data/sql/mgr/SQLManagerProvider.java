@@ -41,9 +41,11 @@
 package com.helger.peppol.smpserver.data.sql.mgr;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
@@ -81,6 +83,12 @@ public final class SQLManagerProvider implements ISMPManagerProvider
   public ISMPServiceInformationManager createServiceInformationMgr ()
   {
     return new SQLServiceInformationManager ();
+  }
+
+  @Nullable
+  public ISMPBusinessCardManager createBusinessCardMgr ()
+  {
+    return null;
   }
 
   @Override

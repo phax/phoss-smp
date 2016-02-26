@@ -42,8 +42,6 @@ package com.helger.peppol.smpserver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
@@ -78,15 +77,23 @@ import com.helger.peppol.utils.ConfigFile;
 public final class SMPServerConfiguration
 {
   /**
-   * The name of the system property which points to the smp-server.properties
-   * files
+   * The name of the primary system property which points to the
+   * smp-server.properties files
+   */
+  public static final String SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH = "peppol.smp.server.properties.path";
+  /**
+   * The name of the secondary system property which points to the
+   * smp-server.properties files
    */
   public static final String SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH = "smp.server.properties.path";
+
+  /** The default primary properties file to load */
   public static final String PATH_PRIVATE_SMP_SERVER_PROPERTIES = "private-smp-server.properties";
+  /** The default secondary properties file to load */
   public static final String PATH_SMP_SERVER_PROPERTIES = "smp-server.properties";
 
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServerConfiguration.class);
-  private static final ReadWriteLock s_aRWLock = new ReentrantReadWriteLock ();
+  private static final SimpleReadWriteLock s_aRWLock = new SimpleReadWriteLock ();
   @GuardedBy ("s_aRWLock")
   private static ConfigFile s_aConfigFile;
 
@@ -97,6 +104,7 @@ public final class SMPServerConfiguration
 
   /**
    * Reload the configuration file. It checks if the system property
+   * {@link #SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH} or
    * {@link #SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH} is present and if so,
    * tries it first, than {@link #PATH_PRIVATE_SMP_SERVER_PROPERTIES} is checked
    * and finally the {@link #PATH_SMP_SERVER_PROPERTIES} path is checked.
@@ -108,7 +116,10 @@ public final class SMPServerConfiguration
   {
     final List <String> aFilePaths = new ArrayList <> ();
     // Check if the system property is present
-    final String sPropertyPath = SystemProperties.getPropertyValue (SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH);
+    String sPropertyPath = SystemProperties.getPropertyValue (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH);
+    if (StringHelper.hasText (sPropertyPath))
+      aFilePaths.add (sPropertyPath);
+    sPropertyPath = SystemProperties.getPropertyValue (SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH);
     if (StringHelper.hasText (sPropertyPath))
       aFilePaths.add (sPropertyPath);
 
@@ -240,6 +251,18 @@ public final class SMPServerConfiguration
   public static boolean isRESTWritableAPIDisabled ()
   {
     return getConfigFile ().getBoolean ("smp.rest.writableapi.disabled", false);
+  }
+
+  /**
+   * Check if the PEPPOL Directory integration (offering the /businesscard API)
+   * is enabled.
+   * 
+   * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
+   *         By default it is disabled.
+   */
+  public static boolean isPEPPOLDirectoryIntegrationEnabled ()
+  {
+    return getConfigFile ().getBoolean ("smp.peppol.directory.integration.enabled", false);
   }
 
   /**

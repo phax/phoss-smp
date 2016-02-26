@@ -106,6 +106,10 @@
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>peppol-directory-businesscard</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>

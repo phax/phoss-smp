@@ -53,6 +53,7 @@ import com.helger.commons.scope.IScope;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.backend.SMPBackendRegistry;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
@@ -78,6 +79,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPServiceGroupManager m_aServiceGroupMgr;
   private ISMPRedirectManager m_aRedirectMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
+  private ISMPBusinessCardManager m_aBusinessCardMgr;
 
   /**
    * Set the manager provider to be used. This must be called exactly once
@@ -143,6 +145,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr ();
       if (m_aServiceInformationMgr == null)
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
+      m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr ();
 
       try
       {
@@ -196,6 +199,17 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static ISMPServiceInformationManager getServiceInformationMgr ()
   {
     return getInstance ().m_aServiceInformationMgr;
+  }
+
+  @Nullable
+  public static ISMPBusinessCardManager getBusinessCardMgr ()
+  {
+    return getInstance ().m_aBusinessCardMgr;
+  }
+
+  public static boolean hasBusinessCardMgr ()
+  {
+    return getBusinessCardMgr () != null;
   }
 
   /**

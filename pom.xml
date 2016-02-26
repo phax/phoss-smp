@@ -100,7 +100,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>4.3.4</version>
+        <version>4.3.5-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -108,6 +108,13 @@
         <groupId>com.helger</groupId>
         <artifactId>ph-db-parent-pom</artifactId>
         <version>4.1.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>peppol-directory-parent-pom</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

@@ -38,53 +38,73 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.domain;
+package com.helger.peppol.smpserver.domain.businesscard;
 
+import java.util.Collection;
+import java.util.List;
+
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
-import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.state.EChange;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
- * An abstract manager provider interface. This must be implemented for each
- * supported backend. The correct implementation must be set in the MetaManager
- * before instantiating it.
+ * Manager for {@link ISMPBusinessCard} objects. Business card objects require a
+ * service group to be present first.
  *
  * @author Philip Helger
  */
-public interface ISMPManagerProvider
+public interface ISMPBusinessCardManager
 {
   /**
-   * @return A new user manager. May not be <code>null</code>.
+   * Create or update a business card for a service group.
+   *
+   * @param aServiceGroup
+   *        Service group the redirect belongs to. May not be <code>null</code>.
+   * @param aEntities
+   *        The entities for this business card. May not be <code>null</code>.
+   * @return The new or updated {@link ISMPBusinessCard}. Never
+   *         <code>null</code>.
    */
   @Nonnull
-  ISMPUserManager createUserMgr ();
+  ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull ISMPServiceGroup aServiceGroup,
+                                                  @Nonnull List <SMPBusinessCardEntity> aEntities);
 
   /**
-   * @return A new service group manager. May not be <code>null</code>.
+   * Delete the passed SMP business card.
+   *
+   * @param aSMPBusinessCard
+   *        The SMP redirect to be deleted. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if the deletion was successful
    */
   @Nonnull
-  ISMPServiceGroupManager createServiceGroupMgr ();
+  EChange deleteSMPBusinessCard (@Nullable ISMPBusinessCard aSMPBusinessCard);
 
   /**
-   * @return A new redirect manager. May not be <code>null</code>.
+   * @return All contained SMP business cards. Never <code>null</code> but maybe
+   *         empty.
    */
   @Nonnull
-  ISMPRedirectManager createRedirectMgr ();
+  @ReturnsMutableCopy
+  Collection <? extends ISMPBusinessCard> getAllSMPBusinessCards ();
 
   /**
-   * @return A new service information manager. May not be <code>null</code>.
-   */
-  @Nonnull
-  ISMPServiceInformationManager createServiceInformationMgr ();
-
-  /**
-   * @return A new business card manager. May be <code>null</code>!
+   * Get the business card of the passed service group.
+   *
+   * @param aServiceGroup
+   *        The service group to use. May be <code>null</code>.
+   * @return The contained business card or <code>null</code> if none is
+   *         assigned.
    */
   @Nullable
-  ISMPBusinessCardManager createBusinessCardMgr ();
+  ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+
+  /**
+   * @return The count of all contained business cards. Always &ge; 0.
+   */
+  @Nonnegative
+  int getSMPBusinessCardCount ();
 }

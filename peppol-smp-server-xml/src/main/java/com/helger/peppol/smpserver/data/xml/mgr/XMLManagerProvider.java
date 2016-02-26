@@ -17,9 +17,11 @@
 package com.helger.peppol.smpserver.data.xml.mgr;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
@@ -83,6 +85,12 @@ public final class XMLManagerProvider implements ISMPManagerProvider
     {
       throw new RuntimeException (ex.getMessage (), ex);
     }
+  }
+
+  @Nullable
+  public ISMPBusinessCardManager createBusinessCardMgr ()
+  {
+    return null;
   }
 
   @Override
