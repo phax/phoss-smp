@@ -81,35 +81,6 @@
     </developer>
   </developers>
   
-  <profiles>
-    <profile>
-      <!-- Use the profile to compile for WildFly: -->
-      <id>wildfly</id>
-      <activation>
-        <property>
-          <name>wildfly</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-          <version>1.1.1</version>
-        </dependency>
-        <dependency>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-impl</artifactId>
-          <version>2.2.11</version>
-        </dependency>
-        <dependency>
-          <groupId>com.sun.xml.ws</groupId>
-          <artifactId>jaxws-rt</artifactId>
-          <version>2.2.10</version>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
-
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
@@ -140,6 +111,12 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-jaxws</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <type>pom</type>
     </dependency>
 
     <dependency>
