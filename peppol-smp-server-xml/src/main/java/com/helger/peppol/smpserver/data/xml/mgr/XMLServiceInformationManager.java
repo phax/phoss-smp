@@ -298,7 +298,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final Collection <ISMPServiceInformation> ret = new ArrayList <ISMPServiceInformation> ();
+    final Collection <ISMPServiceInformation> ret = new ArrayList <> ();
     if (aServiceGroup != null)
     {
       m_aRWLock.readLock ().lock ();
@@ -347,7 +347,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     if (aDocumentTypeIdentifier == null)
       return null;
 
-    final List <ISMPServiceInformation> ret = new ArrayList <ISMPServiceInformation> ();
+    final List <ISMPServiceInformation> ret = new ArrayList <> ();
 
     m_aRWLock.readLock ().lock ();
     try

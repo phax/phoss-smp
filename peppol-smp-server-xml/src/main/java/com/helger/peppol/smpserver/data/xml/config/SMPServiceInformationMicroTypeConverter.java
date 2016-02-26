@@ -80,7 +80,7 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
 
     final IMutableDocumentTypeIdentifier aDocTypeIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_DOCUMENT_TYPE_IDENTIFIER),
                                                                                                   IMutableDocumentTypeIdentifier.class);
-    final List <SMPProcess> aProcesses = new ArrayList <SMPProcess> ();
+    final List <SMPProcess> aProcesses = new ArrayList <> ();
     for (final IMicroElement aProcess : aElement.getAllChildElements (ELEMENT_PROCESS))
       aProcesses.add (MicroTypeConverter.convertToNative (aProcess, SMPProcess.class));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);

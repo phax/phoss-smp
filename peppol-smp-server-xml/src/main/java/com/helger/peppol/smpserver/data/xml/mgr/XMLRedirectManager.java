@@ -283,7 +283,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
   @ReturnsMutableCopy
   public Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {
-    final List <ISMPRedirect> ret = new ArrayList <ISMPRedirect> ();
+    final List <ISMPRedirect> ret = new ArrayList <> ();
     if (StringHelper.hasText (sServiceGroupID))
     {
       m_aRWLock.readLock ().lock ();

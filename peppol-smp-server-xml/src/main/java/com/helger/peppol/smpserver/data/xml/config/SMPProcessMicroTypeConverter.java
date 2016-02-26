@@ -67,7 +67,7 @@ public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter
   {
     final IMutableProcessIdentifier aProcessIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PROCESS_IDENTIFIER),
                                                                                              IMutableProcessIdentifier.class);
-    final List <SMPEndpoint> aEndpoints = new ArrayList <SMPEndpoint> ();
+    final List <SMPEndpoint> aEndpoints = new ArrayList <> ();
     for (final IMicroElement aEndpoint : aElement.getAllChildElements (ELEMENT_ENDPOINT))
       aEndpoints.add (MicroTypeConverter.convertToNative (aEndpoint, SMPEndpoint.class));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
