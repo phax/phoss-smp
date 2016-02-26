@@ -100,7 +100,7 @@ public final class BDXRServerAPI
                                                                                                                                    "$call");
   private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (BDXRServerAPI.class.getName () +
                                                                                                                                 "$success");
-  private static final String LOG_PREFIX = "[SMP REST API] ";
+  private static final String LOG_PREFIX = "[BDXR REST API] ";
 
   private final ISMPServerAPIDataProvider m_aAPIProvider;
 
