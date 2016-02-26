@@ -119,7 +119,6 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxws</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
       <type>pom</type>
     </dependency>
 

@@ -72,7 +72,6 @@
   </developers>
 
   <properties>
-    <jaxws-plugin.version>2.3.1-b20150201.1248</jaxws-plugin.version>
     <!-- Must correspond to jaxws-tools.version in jaxws-maven-plugin POM -->
     <jaxws.version>2.2.9-b14002</jaxws.version>
     <log4j.version>2.5</log4j.version>
@@ -127,6 +126,12 @@
         <version>0.1.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-jaxws</artifactId>
+        <version>1.0.0</version>
+        <type>pom</type>
       </dependency>
       
       <dependency>
