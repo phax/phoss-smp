@@ -43,6 +43,7 @@ package com.helger.peppol.smpserver.exception;
 import java.net.URI;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class SMPNotFoundException extends SMPServerException
 {
@@ -65,8 +66,8 @@ public class SMPNotFoundException extends SMPServerException
    * @param aNotFoundURI
    *        The URI that was not found.
    */
-  public SMPNotFoundException (@Nonnull final String sMessage, @Nonnull final URI aNotFoundURI)
+  public SMPNotFoundException (@Nonnull final String sMessage, @Nullable final URI aNotFoundURI)
   {
-    super ("Not found: " + sMessage + " at " + aNotFoundURI.toString ());
+    super ("Not found: " + sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
   }
 }
