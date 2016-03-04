@@ -48,10 +48,12 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final SMPServiceGroup aValue = (SMPServiceGroup) aObject;
+    final ISMPServiceGroup aValue = (ISMPServiceGroup) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_OWNER_ID, aValue.getOwnerID ());
-    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticpantIdentifier (), sNamespaceURI, ELEMENT_PARTICIPANT_ID));
+    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticpantIdentifier (),
+                                                                    sNamespaceURI,
+                                                                    ELEMENT_PARTICIPANT_ID));
     if (aValue.hasExtension ())
       aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtension ());
     return aElement;

@@ -56,7 +56,7 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final SMPServiceInformation aValue = (SMPServiceInformation) aObject;
+    final ISMPServiceInformation aValue = (ISMPServiceInformation) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_SERVICE_GROUP_ID, aValue.getServiceGroupID ());
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),

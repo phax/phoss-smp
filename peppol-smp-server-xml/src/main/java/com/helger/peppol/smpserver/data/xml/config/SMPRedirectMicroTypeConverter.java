@@ -51,7 +51,7 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final SMPRedirect aValue = (SMPRedirect) aObject;
+    final ISMPRedirect aValue = (ISMPRedirect) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_SERVICE_GROUPD_ID, aValue.getServiceGroupID ());
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),

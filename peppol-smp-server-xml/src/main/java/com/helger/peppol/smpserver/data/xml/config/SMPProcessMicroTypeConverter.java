@@ -50,7 +50,7 @@ public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final SMPProcess aValue = (SMPProcess) aObject;
+    final ISMPProcess aValue = (ISMPProcess) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getProcessIdentifier (),
                                                                     sNamespaceURI,

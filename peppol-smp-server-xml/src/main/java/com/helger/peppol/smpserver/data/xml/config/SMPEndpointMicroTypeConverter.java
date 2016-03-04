@@ -54,7 +54,7 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final SMPEndpoint aValue = (SMPEndpoint) aObject;
+    final ISMPEndpoint aValue = (ISMPEndpoint) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_TRANSPORT_PROFILE, aValue.getTransportProfile ());
     aElement.setAttribute (ATTR_ENDPOINT_REFERENCE, aValue.getEndpointReference ());
