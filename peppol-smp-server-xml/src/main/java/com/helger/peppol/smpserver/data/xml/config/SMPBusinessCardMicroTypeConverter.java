@@ -86,6 +86,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       for (final SMPBusinessCardIdentifier aIdentifier : aEntity.getIdentifiers ())
       {
         eEntity.appendElement (sNamespaceURI, ELEMENT_IDENTIFIER)
+               .setAttribute (ATTR_ID, aIdentifier.getID ())
                .setAttribute (ATTR_SCHEME, aIdentifier.getScheme ())
                .setAttribute (ATTR_VALUE, aIdentifier.getValue ());
       }
@@ -96,6 +97,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       for (final SMPBusinessCardContact aContact : aEntity.getContacts ())
       {
         eEntity.appendElement (sNamespaceURI, ELEMENT_CONTACT)
+               .setAttribute (ATTR_ID, aContact.getID ())
                .setAttribute (ATTR_TYPE, aContact.getType ())
                .setAttribute (ATTR_NAME, aContact.getName ())
                .setAttribute (ATTR_PHONE, aContact.getPhoneNumber ())
@@ -130,8 +132,10 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
                                                                                   ELEMENT_GEOGRAPHICAL_INFORMATION));
       for (final IMicroElement eIdentifier : eEntity.getAllChildElements (ELEMENT_IDENTIFIER))
       {
-        aEntity.getIdentifiers ().add (new SMPBusinessCardIdentifier (eIdentifier.getAttributeValue (ATTR_SCHEME),
-                                                                      eIdentifier.getAttributeValue (ATTR_VALUE)));
+        aEntity.getIdentifiers ()
+               .add (new SMPBusinessCardIdentifier (eIdentifier.getAttributeValue (ATTR_ID),
+                                                    eIdentifier.getAttributeValue (ATTR_SCHEME),
+                                                    eIdentifier.getAttributeValue (ATTR_VALUE)));
       }
       for (final IMicroElement eWebsite : eEntity.getAllChildElements (ELEMENT_WEBSITE_URI))
       {
@@ -140,7 +144,8 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       for (final IMicroElement eContact : eEntity.getAllChildElements (ELEMENT_CONTACT))
       {
         aEntity.getContacts ()
-               .add (new SMPBusinessCardContact (eContact.getAttributeValue (ATTR_TYPE),
+               .add (new SMPBusinessCardContact (eContact.getAttributeValue (ATTR_ID),
+                                                 eContact.getAttributeValue (ATTR_TYPE),
                                                  eContact.getAttributeValue (ATTR_NAME),
                                                  eContact.getAttributeValue (ATTR_PHONE),
                                                  eContact.getAttributeValue (ATTR_EMAIL)));
