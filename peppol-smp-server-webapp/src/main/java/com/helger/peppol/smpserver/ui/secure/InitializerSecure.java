@@ -23,6 +23,7 @@ import com.helger.commons.io.resource.IReadableResource;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppSettings;
 import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.ui.ajax.CAjaxSecure;
 import com.helger.photon.basic.app.locale.ILocaleManager;
 import com.helger.photon.basic.app.menu.IMenuTree;
 import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFile;
@@ -62,7 +63,9 @@ public final class InitializerSecure extends DefaultApplicationInitializer <Layo
 
   @Override
   public void initAjax (@Nonnull final IAjaxInvoker aAjaxInvoker)
-  {}
+  {
+    CAjaxSecure.init (aAjaxInvoker);
+  }
 
   @Override
   public void initRest ()

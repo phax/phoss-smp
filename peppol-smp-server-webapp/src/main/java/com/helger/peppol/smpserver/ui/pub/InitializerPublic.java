@@ -58,9 +58,7 @@ public final class InitializerPublic extends DefaultApplicationInitializer <Layo
   @Override
   public void initAjax (@Nonnull final IAjaxInvoker aAjaxInvoker)
   {
-    aAjaxInvoker.registerFunction (CAjaxPublic.DATATABLES);
-    aAjaxInvoker.registerFunction (CAjaxPublic.DATATABLES_I18N);
-    aAjaxInvoker.registerFunction (CAjaxPublic.LOGIN);
+    CAjaxPublic.init (aAjaxInvoker);
   }
 
   @Override

@@ -30,20 +30,18 @@ import com.helger.json.JsonObject;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.core.EPhotonCoreText;
-import com.helger.photon.core.ajax.executor.AbstractAjaxExecutor;
 import com.helger.photon.core.ajax.response.AjaxJsonResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.login.CLogin;
 import com.helger.photon.security.login.ELoginResult;
 import com.helger.photon.security.login.LoggedInUserManager;
-import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
  * Ajax executor to login a user from view application.
  *
  * @author Philip Helger
  */
-public final class AjaxExecutorPublicLogin extends AbstractAjaxExecutor
+public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutorJson
 {
   public static final String JSON_LOGGEDIN = "loggedin";
   public static final String JSON_HTML = "html";
@@ -52,11 +50,10 @@ public final class AjaxExecutorPublicLogin extends AbstractAjaxExecutor
 
   @Override
   @Nonnull
-  protected AjaxJsonResponse mainHandleRequest (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope) throws Exception
+  protected AjaxJsonResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
   {
-    final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
-    final String sLoginName = aRequestScope.getAttributeAsString (CLogin.REQUEST_ATTR_USERID);
-    final String sPassword = aRequestScope.getAttributeAsString (CLogin.REQUEST_ATTR_PASSWORD);
+    final String sLoginName = aLEC.getAttributeAsString (CLogin.REQUEST_ATTR_USERID);
+    final String sPassword = aLEC.getAttributeAsString (CLogin.REQUEST_ATTR_PASSWORD);
 
     // Main login
     final ELoginResult eLoginResult = LoggedInUserManager.getInstance ().loginUser (sLoginName,

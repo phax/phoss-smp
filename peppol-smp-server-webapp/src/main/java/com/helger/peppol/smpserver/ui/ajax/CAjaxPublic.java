@@ -16,10 +16,12 @@
  */
 package com.helger.peppol.smpserver.ui.ajax;
 
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.photon.core.ajax.IAjaxFunctionDeclaration;
+import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.photon.core.ajax.decl.PublicApplicationAjaxFunctionDeclaration;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
@@ -41,4 +43,11 @@ public final class CAjaxPublic
 
   private CAjaxPublic ()
   {}
+
+  public static void init (@Nonnull final IAjaxInvoker aAjaxInvoker)
+  {
+    aAjaxInvoker.registerFunction (CAjaxPublic.DATATABLES);
+    aAjaxInvoker.registerFunction (CAjaxPublic.DATATABLES_I18N);
+    aAjaxInvoker.registerFunction (CAjaxPublic.LOGIN);
+  }
 }
