@@ -35,11 +35,20 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   private String m_sAdditionalInformation;
   private LocalDate m_aRegistrationDate;
 
+  /**
+   * Create a new instance with a unique ID.
+   */
   public SMPBusinessCardEntity ()
   {
     this (GlobalIDFactory.getNewPersistentStringID ());
   }
 
+  /**
+   * Create an instance with an existing ID. Only when editing!
+   * 
+   * @param sID
+   *        The ID of the object. May neither be <code>null</code> nor empty.
+   */
   public SMPBusinessCardEntity (@Nonnull @Nonempty final String sID)
   {
     m_sID = ValueEnforcer.notEmpty (sID, "ID");
@@ -181,6 +190,13 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   public boolean hasWebsiteURIs ()
   {
     return !m_aWebsiteURIs.isEmpty ();
+  }
+
+  public void setWebsiteURIs (@Nonnull final List <String> aWebsiteURIs)
+  {
+    ValueEnforcer.notNull (aWebsiteURIs, "WebsiteURIs");
+    m_aWebsiteURIs.clear ();
+    m_aWebsiteURIs.addAll (aWebsiteURIs);
   }
 
   /**
