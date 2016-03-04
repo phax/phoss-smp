@@ -43,6 +43,7 @@ import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
@@ -439,10 +440,17 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
-                                        new DTCol ("Extension?"),
-                                        new DTCol ("DocTypes").setDisplayType (EBaseType.INT, aDisplayLocale),
-                                        new DTCol ("Processes").setDisplayType (EBaseType.INT, aDisplayLocale),
-                                        new DTCol ("Endpoints").setDisplayType (EBaseType.INT, aDisplayLocale),
+                                        new DTCol (new HCSpan ().addChild ("Ext?")
+                                                                .setTitle ("Is an Extension present?")),
+                                        new DTCol (new HCSpan ().addChild ("Docs")
+                                                                .setTitle ("Number of assigned document types")).setDisplayType (EBaseType.INT,
+                                                                                                                                 aDisplayLocale),
+                                        new DTCol (new HCSpan ().addChild ("Procs")
+                                                                .setTitle ("Number of assigned processes")).setDisplayType (EBaseType.INT,
+                                                                                                                            aDisplayLocale),
+                                        new DTCol (new HCSpan ().addChild ("EPs")
+                                                                .setTitle ("Number of assigned endpoints")).setDisplayType (EBaseType.INT,
+                                                                                                                            aDisplayLocale),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceGroup aCurObject : aServiceGroupMgr.getAllSMPServiceGroups ())
     {
