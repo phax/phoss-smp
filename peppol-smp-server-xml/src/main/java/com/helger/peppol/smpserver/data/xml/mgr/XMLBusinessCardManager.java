@@ -37,6 +37,7 @@ import com.helger.commons.microdom.IMicroElement;
 import com.helger.commons.microdom.MicroDocument;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
+import com.helger.commons.string.StringHelper;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
@@ -247,10 +248,19 @@ public final class XMLBusinessCardManager extends AbstractWALDAO <SMPBusinessCar
     if (aServiceGroup == null)
       return null;
 
+    return getSMPBusinessCardOfID (aServiceGroup.getID ());
+  }
+
+  @Nullable
+  public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final String sID)
+  {
+    if (StringHelper.hasNoText (sID))
+      return null;
+
     m_aRWLock.readLock ().lock ();
     try
     {
-      return m_aMap.get (aServiceGroup.getID ());
+      return m_aMap.get (sID);
     }
     finally
     {

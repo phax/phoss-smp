@@ -19,10 +19,14 @@ package com.helger.peppol.smpserver.ui.secure;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.basic.app.menu.IMenuItemPage;
+import com.helger.photon.basic.app.menu.IMenuObject;
+import com.helger.photon.basic.app.menu.IMenuObjectFilter;
 import com.helger.photon.basic.app.menu.IMenuTree;
+import com.helger.photon.basic.app.menu.filter.AbstractMenuObjectFilter;
 import com.helger.photon.bootstrap3.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap3.pages.security.BasePageSecurityChangePassword;
 import com.helger.photon.security.menu.MenuObjectFilterUserAssignedToUserGroup;
@@ -40,12 +44,21 @@ public final class MenuSecure
     // We need this additional indirection layer, as the pages are initialized
     // statically!
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID);
+    final IMenuObjectFilter aFilterPEPPOLDirectory = new AbstractMenuObjectFilter ()
+    {
+      public boolean matchesFilter (@Nonnull final IMenuObject aValue)
+      {
+        return SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ();
+      }
+    };
 
     if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
       aMenuTree.createRootItem (new PageSecureUsers (CMenuSecure.MENU_USERS));
     aMenuTree.createRootItem (new PageSecureServiceGroups (CMenuSecure.MENU_SERVICE_GROUPS));
     aMenuTree.createRootItem (new PageSecureEndpoints (CMenuSecure.MENU_ENDPOINTS));
     aMenuTree.createRootItem (new PageSecureRedirects (CMenuSecure.MENU_REDIRECTS));
+    aMenuTree.createRootItem (new PageSecureBusinessCards (CMenuSecure.MENU_BUSINESS_CARDS))
+             .setDisplayFilter (aFilterPEPPOLDirectory);
     aMenuTree.createRootItem (new PageSecureTransportProfile (CMenuSecure.MENU_TRANSPORT_PROFILES));
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
     aMenuTree.createRootItem (new PageSecureTasks (CMenuSecure.MENU_TASKS));
@@ -56,7 +69,8 @@ public final class MenuSecure
       final IMenuItemPage aAdmin = aMenuTree.createRootItem (new BasePageShowChildren <WebPageExecutionContext> (CMenuSecure.MENU_ADMIN,
                                                                                                                  "Administration",
                                                                                                                  aMenuTree));
-      aMenuTree.createItem (aAdmin, new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
+      aMenuTree.createItem (aAdmin,
+                            new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CApp.DEFAULT_LOCALE);
     }
 

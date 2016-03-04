@@ -14,6 +14,7 @@ import org.joda.time.LocalDate;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.pd.businesscard.PDBusinessEntityType;
 
@@ -78,6 +79,14 @@ public class SMPBusinessCardEntity implements Serializable
   public String getGeographicalInformation ()
   {
     return m_sGeographicalInformation;
+  }
+
+  /**
+   * @return The geographic information. May be <code>null</code>.
+   */
+  public boolean hasGeographicalInformation ()
+  {
+    return StringHelper.hasText (m_sGeographicalInformation);
   }
 
   /**
@@ -177,6 +186,11 @@ public class SMPBusinessCardEntity implements Serializable
   public String getAdditionalInformation ()
   {
     return m_sAdditionalInformation;
+  }
+
+  public boolean hasAdditionalInformation ()
+  {
+    return StringHelper.hasText (m_sAdditionalInformation);
   }
 
   /**

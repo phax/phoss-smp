@@ -103,6 +103,17 @@ public interface ISMPBusinessCardManager
   ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   /**
+   * Get the business card of the passed ID (= Service group ID).
+   *
+   * @param sID
+   *        The ID to use. May be <code>null</code>.
+   * @return The contained business card or <code>null</code> if none is
+   *         assigned.
+   */
+  @Nullable
+  ISMPBusinessCard getSMPBusinessCardOfID (@Nullable String sID);
+
+  /**
    * @return The count of all contained business cards. Always &ge; 0.
    */
   @Nonnegative
