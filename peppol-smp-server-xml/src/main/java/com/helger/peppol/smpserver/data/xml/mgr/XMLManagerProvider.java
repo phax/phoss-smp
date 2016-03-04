@@ -38,6 +38,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   public static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";
   public static final String SMP_REDIRECT_XML = "smp-redirect.xml";
   public static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
+  public static final String SMP_BUSINESS_CARD_XML = "smp-business-card.xml";
 
   public XMLManagerProvider ()
   {}
@@ -90,7 +91,14 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   @Nullable
   public ISMPBusinessCardManager createBusinessCardMgr ()
   {
-    return null;
+    try
+    {
+      return new XMLBusinessCardManager (SMP_BUSINESS_CARD_XML);
+    }
+    catch (final DAOException ex)
+    {
+      throw new RuntimeException (ex.getMessage (), ex);
+    }
   }
 
   @Override

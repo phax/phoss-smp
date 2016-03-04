@@ -1,7 +1,6 @@
 
 package com.helger.peppol.smpserver.domain.businesscard;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -9,9 +8,12 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.commons.type.ObjectType;
 import com.helger.pd.businesscard.PDBusinessCardType;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
@@ -23,14 +25,21 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 @NotThreadSafe
 public class SMPBusinessCard implements ISMPBusinessCard
 {
+  public static final ObjectType OT = new ObjectType ("smpbusinesscard");
+
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
-  private final List <SMPBusinessCardEntity> m_aEntities = new ArrayList <> ();
+  private final List <SMPBusinessCardEntity> m_aEntities;
 
-  public SMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup)
+  public SMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
+                          @Nonnull final List <SMPBusinessCardEntity> aEntities)
   {
-    m_aServiceGroup = ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aEntities, "Entities");
+
+    m_aServiceGroup = aServiceGroup;
     m_sID = m_aServiceGroup.getID ();
+    m_aEntities = CollectionHelper.newList (aEntities);
   }
 
   @Nonnull
@@ -62,6 +71,22 @@ public class SMPBusinessCard implements ISMPBusinessCard
   public List <SMPBusinessCardEntity> getEntities ()
   {
     return m_aEntities;
+  }
+
+  /**
+   * @return A mutable list with all {@link SMPBusinessCardEntity} objects.
+   *         Never <code>null</code>.
+   */
+  @Nonnull
+  @ReturnsMutableCopy
+  public List <SMPBusinessCardEntity> getAllEntities ()
+  {
+    return CollectionHelper.newList (m_aEntities);
+  }
+
+  public int getEntityCount ()
+  {
+    return m_aEntities.size ();
   }
 
   @Nonnull
