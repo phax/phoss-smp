@@ -31,17 +31,22 @@ import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
+import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
+import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.grouping.HCDiv;
+import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -57,6 +62,7 @@ import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap3.table.BootstrapTable;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.RequestField;
@@ -117,6 +123,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                      @Nonnull final ISMPBusinessCard aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
     aNodeList.addChild (createActionHeader ("Show details of Business Card"));
 
@@ -125,7 +132,61 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                  .setCtrl (new HCA (createViewURL (aWPEC,
                                                                                    CMenuSecure.MENU_SERVICE_GROUPS,
                                                                                    aSelectedObject.getServiceGroup ())).addChild (aSelectedObject.getServiceGroupID ())));
-    // TODO
+
+    int nIndex = 0;
+    for (final SMPBusinessCardEntity aEntity : aSelectedObject.getAllEntities ())
+    {
+      ++nIndex;
+      aForm.addChild (createDataGroupHeader ("Entity " + nIndex));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aEntity.getName ()));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code").setCtrl (aEntity.getCountryCode ()));
+      if (aEntity.hasGeographicalInformation ())
+      {
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Geographical information")
+                                                     .setCtrl (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ())));
+      }
+      if (aEntity.hasIdentifiers ())
+      {
+        final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star ());
+        aTable.addHeaderRow ().addCells ("Scheme", "Value");
+        for (final SMPBusinessCardIdentifier aIdentifier : aEntity.getIdentifiers ())
+          aTable.addBodyRow ().addCell (aIdentifier.getScheme (), aIdentifier.getValue ());
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aTable));
+      }
+      if (aEntity.hasWebsiteURIs ())
+      {
+        final HCNodeList aNL = new HCNodeList ();
+        for (final String sWebsiteURI : aEntity.getWebsiteURIs ())
+          aNL.addChild (new HCDiv ().addChild (HCA.createLinkedWebsite (sWebsiteURI)));
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs").setCtrl (aNL));
+      }
+      if (aEntity.hasContacts ())
+      {
+        final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star (), HCCol.star (), HCCol.star ());
+        aTable.addHeaderRow ().addCells ("Type", "Name", "Phone number", "Email address");
+        for (final SMPBusinessCardContact aContact : aEntity.getContacts ())
+          aTable.addBodyRow ().addCell (aContact.getType (),
+                                        aContact.getName (),
+                                        aContact.getPhoneNumber (),
+                                        aContact.getEmail ());
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Contacts").setCtrl (aTable));
+      }
+      if (aEntity.hasAdditionalInformation ())
+      {
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Additional information")
+                                                     .setCtrl (HCExtHelper.nl2divList (aEntity.getAdditionalInformation ())));
+      }
+      if (aEntity.hasRegistrationDate ())
+      {
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Registration date")
+                                                     .setCtrl (PDTToString.getAsString (aEntity.getRegistrationDate (),
+                                                                                        aDisplayLocale)));
+      }
+    }
+
+    if (nIndex == 0)
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Entity")
+                                                   .setCtrl (new HCEM ().addChild ("none defined")));
 
     aNodeList.addChild (aForm);
   }

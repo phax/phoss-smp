@@ -126,6 +126,11 @@ public class SMPBusinessCardEntity implements Serializable
     return m_aIdentifiers;
   }
 
+  public boolean hasIdentifiers ()
+  {
+    return !m_aIdentifiers.isEmpty ();
+  }
+
   /**
    * Gets the value of the websiteURI property.
    * <p>
@@ -149,6 +154,11 @@ public class SMPBusinessCardEntity implements Serializable
   public List <String> getWebsiteURIs ()
   {
     return m_aWebsiteURIs;
+  }
+
+  public boolean hasWebsiteURIs ()
+  {
+    return !m_aWebsiteURIs.isEmpty ();
   }
 
   /**
@@ -175,6 +185,11 @@ public class SMPBusinessCardEntity implements Serializable
   public List <SMPBusinessCardContact> getContacts ()
   {
     return m_aContacts;
+  }
+
+  public boolean hasContacts ()
+  {
+    return !m_aContacts.isEmpty ();
   }
 
   /**
@@ -213,6 +228,11 @@ public class SMPBusinessCardEntity implements Serializable
   public LocalDate getRegistrationDate ()
   {
     return m_aRegistrationDate;
+  }
+
+  public boolean hasRegistrationDate ()
+  {
+    return m_aRegistrationDate != null;
   }
 
   /**
