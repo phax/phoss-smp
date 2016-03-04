@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.errorlist.FormErrors;
 import com.helger.html.hc.IHCNode;
+import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCards;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
@@ -31,7 +32,10 @@ public final class AjaxExecutorSecureCreateBusinessEntityInput extends AbstractS
   @Nonnull
   protected AjaxHtmlResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
   {
-    IHCNode aNode = PageSecureBusinessCards.createEntityInputForm (aLEC, null, new FormErrors ());
+    IHCNode aNode = PageSecureBusinessCards.createEntityInputForm (aLEC,
+                                                                   (SMPBusinessCardEntity) null,
+                                                                   (String) null,
+                                                                   new FormErrors ());
     if (aNode == null)
       aNode = new BootstrapErrorBox ().addChild ("Es ist ein interner Fehler aufgetreten. Bitte laden Sie die Seite neu.");
 

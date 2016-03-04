@@ -49,7 +49,6 @@ import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCEM;
-import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.html.jquery.JQuery;
@@ -174,11 +173,12 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aForm.addChild (createDataGroupHeader ("Entity " + nIndex));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aEntity.getName ()));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code")
-                                                   .setCtrl (aEntity.getCountryCode () +
-                                                             " - " +
-                                                             CountryCache.getInstance ()
+                                                   .setCtrl (CountryCache.getInstance ()
                                                                          .getCountry (aEntity.getCountryCode ())
-                                                                         .getDisplayCountry (aDisplayLocale)));
+                                                                         .getDisplayCountry (aDisplayLocale) +
+                                                             " [" +
+                                                             aEntity.getCountryCode () +
+                                                             "]"));
       if (aEntity.hasGeographicalInformation ())
       {
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Geographical information")
@@ -254,6 +254,14 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID));
       if (aServiceGroup == null)
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided Service Group does not exist!");
+      else
+        if (!bEdit)
+        {
+          final ISMPBusinessCard aExistingBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (sServiceGroupID);
+          if (aExistingBusinessCard != null)
+            aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID,
+                                       "The selected Service Group already has a Business Card assigned!");
+        }
     }
 
     final IRequestParamMap aEntities = aWPEC.getRequestParamMap ().getMap (PREFIX_ENTITY);
@@ -318,11 +326,14 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   @Nonnull
   public static IHCNode createEntityInputForm (@Nonnull final LayoutExecutionContext aLEC,
                                                @Nullable final SMPBusinessCardEntity aExistingEntity,
+                                               @Nullable final String sExistingID,
                                                @Nonnull final FormErrors aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sEntityID = aExistingEntity != null ? aExistingEntity.getID ()
-                                                     : "tmp" + Integer.toString (GlobalIDFactory.getNewIntID ());
+                                                     : StringHelper.hasText (sExistingID) ? sExistingID
+                                                                                          : "tmp" +
+                                                                                            Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final BootstrapPanel aPanel = new BootstrapPanel ().setID (sEntityID);
     aPanel.getOrCreateHeader ().addChild ("Business Card Entity");
@@ -395,11 +406,21 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
 
     final HCDiv aEntityContainer = aForm.addAndReturnChild (new HCDiv ().setID ("entitycontainer"));
 
-    if (aSelectedObject != null)
+    final IRequestParamMap aEntities = aWPEC.getRequestParamMap ().getMap (PREFIX_ENTITY);
+    if (aEntities != null)
     {
-      // add all existing stored entities
-      for (final SMPBusinessCardEntity aEntity : aSelectedObject.getAllEntities ())
-        aEntityContainer.addChild (createEntityInputForm (aWPEC, aEntity, aFormErrors));
+      // Re-show of form
+      for (final String sEntityRowID : aEntities.keySet ())
+        aEntityContainer.addChild (createEntityInputForm (aWPEC, null, sEntityRowID, aFormErrors));
+    }
+    else
+    {
+      if (aSelectedObject != null)
+      {
+        // add all existing stored entities
+        for (final SMPBusinessCardEntity aEntity : aSelectedObject.getAllEntities ())
+          aEntityContainer.addChild (createEntityInputForm (aWPEC, aEntity, (String) null, aFormErrors));
+      }
     }
 
     {
@@ -503,11 +524,10 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
           final HCRow aRow = aTable.addBodyRow ();
           aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
           aRow.addCell (aEntity.getName ());
-          aRow.addCell (new HCSpan ().addChild (aEntity.getCountryCode ())
-                                     .setTitle (CountryCache.getInstance ()
-                                                            .getCountry (aEntity.getCountryCode ())
-                                                            .getDisplayCountry (aDisplayLocale)));
-          aRow.addCell (aEntity.getGeographicalInformation ());
+          aRow.addCell (CountryCache.getInstance ()
+                                    .getCountry (aEntity.getCountryCode ())
+                                    .getDisplayCountry (aDisplayLocale));
+          aRow.addCell (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ()));
           {
             final HCNodeList aIdentifiers = new HCNodeList ();
             for (final SMPBusinessCardIdentifier aIdentifier : aEntity.getIdentifiers ())

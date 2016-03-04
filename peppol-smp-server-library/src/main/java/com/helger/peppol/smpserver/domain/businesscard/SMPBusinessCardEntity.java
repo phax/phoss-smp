@@ -274,14 +274,16 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
     final PDBusinessEntityType ret = new PDBusinessEntityType ();
     ret.setName (m_sName);
     ret.setCountryCode (m_sCountryCode);
-    ret.setGeographicalInformation (m_sGeographicalInformation);
+    if (hasGeographicalInformation ())
+      ret.setGeographicalInformation (m_sGeographicalInformation);
     for (final SMPBusinessCardIdentifier aItem : m_aIdentifiers)
       ret.addIdentifier (aItem.getAsJAXBObject ());
     for (final String sItem : m_aWebsiteURIs)
       ret.addWebsiteURI (sItem);
     for (final SMPBusinessCardContact aItem : m_aContacts)
       ret.addContact (aItem.getAsJAXBObject ());
-    ret.setAdditionalInformation (m_sAdditionalInformation);
+    if (hasAdditionalInformation ())
+      ret.setAdditionalInformation (m_sAdditionalInformation);
     ret.setRegistrationDate (m_aRegistrationDate);
     return ret;
   }
