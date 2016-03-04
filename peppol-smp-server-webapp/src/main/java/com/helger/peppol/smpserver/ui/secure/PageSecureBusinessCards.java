@@ -174,19 +174,23 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     for (final SMPBusinessCardEntity aEntity : aSelectedObject.getAllEntities ())
     {
       ++nIndex;
-      aForm.addChild (createDataGroupHeader ("Entity " + nIndex));
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aEntity.getName ()));
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code")
-                                                   .setCtrl (CountryCache.getInstance ()
-                                                                         .getCountry (aEntity.getCountryCode ())
-                                                                         .getDisplayCountry (aDisplayLocale) +
-                                                             " [" +
-                                                             aEntity.getCountryCode () +
-                                                             "]"));
+      final BootstrapPanel aPanel = aForm.addAndReturnChild (new BootstrapPanel ());
+      aPanel.getOrCreateHeader ().addChild ("Business Entity " + nIndex);
+
+      final BootstrapViewForm aForm2 = aPanel.getBody ().addAndReturnChild (new BootstrapViewForm ());
+
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aEntity.getName ()));
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code")
+                                                    .setCtrl (CountryCache.getInstance ()
+                                                                          .getCountry (aEntity.getCountryCode ())
+                                                                          .getDisplayCountry (aDisplayLocale) +
+                                                              " [" +
+                                                              aEntity.getCountryCode () +
+                                                              "]"));
       if (aEntity.hasGeographicalInformation ())
       {
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Geographical information")
-                                                     .setCtrl (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ())));
+        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Geographical information")
+                                                      .setCtrl (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ())));
       }
       if (aEntity.hasIdentifiers ())
       {
@@ -194,14 +198,14 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         aTable.addHeaderRow ().addCells ("Scheme", "Value");
         for (final SMPBusinessCardIdentifier aIdentifier : aEntity.getIdentifiers ())
           aTable.addBodyRow ().addCell (aIdentifier.getScheme (), aIdentifier.getValue ());
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aTable));
+        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aTable));
       }
       if (aEntity.hasWebsiteURIs ())
       {
         final HCNodeList aNL = new HCNodeList ();
         for (final String sWebsiteURI : aEntity.getWebsiteURIs ())
           aNL.addChild (new HCDiv ().addChild (HCA.createLinkedWebsite (sWebsiteURI)));
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs").setCtrl (aNL));
+        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs").setCtrl (aNL));
       }
       if (aEntity.hasContacts ())
       {
@@ -212,18 +216,18 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                         aContact.getName (),
                                         aContact.getPhoneNumber (),
                                         aContact.getEmail ());
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Contacts").setCtrl (aTable));
+        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Contacts").setCtrl (aTable));
       }
       if (aEntity.hasAdditionalInformation ())
       {
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Additional information")
-                                                     .setCtrl (HCExtHelper.nl2divList (aEntity.getAdditionalInformation ())));
+        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Additional information")
+                                                      .setCtrl (HCExtHelper.nl2divList (aEntity.getAdditionalInformation ())));
       }
       if (aEntity.hasRegistrationDate ())
       {
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Registration date")
-                                                     .setCtrl (PDTToString.getAsString (aEntity.getRegistrationDate (),
-                                                                                        aDisplayLocale)));
+        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Registration date")
+                                                      .setCtrl (PDTToString.getAsString (aEntity.getRegistrationDate (),
+                                                                                         aDisplayLocale)));
       }
     }
 
