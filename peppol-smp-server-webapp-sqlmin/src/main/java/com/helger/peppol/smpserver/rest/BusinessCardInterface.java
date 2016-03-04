@@ -21,13 +21,18 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.pd.businesscard.ObjectFactory;
 import com.helger.pd.businesscard.PDBusinessCardType;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.photon.core.app.CApplication;
 import com.helger.web.mock.MockHttpServletResponse;
@@ -40,6 +45,8 @@ import com.helger.web.scope.mgr.WebScopeManager;
 @Path ("/businesscard/{ServiceGroupId}")
 public final class BusinessCardInterface
 {
+  private static final Logger s_aLogger = LoggerFactory.getLogger (BusinessCardInterface.class);
+
   @Context
   private HttpServletRequest m_aHttpRequest;
 
@@ -55,6 +62,13 @@ public final class BusinessCardInterface
   @Produces (MediaType.TEXT_XML)
   public JAXBElement <PDBusinessCardType> getBusinessCard (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
+    // Is the PEPPOL Directory integration enabled?
+    if (!SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ())
+    {
+      s_aLogger.warn ("The PEPPOL Directory integration is disabled. getBusinessCard will not be executed.");
+      throw new WebApplicationException (404);
+    }
+
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
