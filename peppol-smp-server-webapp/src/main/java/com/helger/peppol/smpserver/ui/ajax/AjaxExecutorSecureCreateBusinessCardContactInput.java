@@ -20,26 +20,30 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.errorlist.FormErrors;
 import com.helger.html.hc.IHCNode;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
+import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
 import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCards;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 
 /**
- * Create a new business entity input row
+ * Create a new business entity contact input row
  *
  * @author Philip Helger
  */
-public final class AjaxExecutorSecureCreateBusinessCardEntityInput extends AbstractSMPAjaxExecutorHtml
+public final class AjaxExecutorSecureCreateBusinessCardContactInput extends AbstractSMPAjaxExecutorHtml
 {
+  public static final String PARAM_ENTITY_ID = "entityid";
+
   @Override
   @Nonnull
   protected AjaxHtmlResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
   {
-    final IHCNode aNode = PageSecureBusinessCards.createEntityInputForm (aLEC,
-                                                                         (SMPBusinessCardEntity) null,
-                                                                         (String) null,
-                                                                         new FormErrors ());
+    final String sEntityID = aLEC.getAttributeAsString (PARAM_ENTITY_ID);
+
+    final IHCNode aNode = PageSecureBusinessCards.createContactInputForm (sEntityID,
+                                                                          (SMPBusinessCardContact) null,
+                                                                          (String) null,
+                                                                          new FormErrors ());
 
     // Build the HTML response
     return AjaxHtmlResponse.createSuccess (aLEC.getRequestScope (), aNode);

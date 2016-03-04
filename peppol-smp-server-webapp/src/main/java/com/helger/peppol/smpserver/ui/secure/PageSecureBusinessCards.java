@@ -30,6 +30,7 @@ import org.joda.time.LocalDate;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
+import com.helger.commons.compare.CompareHelper;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.errorlist.FormErrors;
 import com.helger.commons.errorlist.IError;
@@ -46,6 +47,7 @@ import com.helger.commons.url.URLValidator;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
+import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -72,6 +74,7 @@ import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
+import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorSecureCreateBusinessCardContactInput;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorSecureCreateBusinessCardIdentifierInput;
 import com.helger.peppol.smpserver.ui.ajax.CAjaxSecure;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
@@ -106,6 +109,7 @@ import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.smtp.util.EmailAddressValidator;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.web.servlet.request.IRequestParamMap;
 import com.helger.web.servlet.request.RequestParamMap;
@@ -125,7 +129,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   private static final String PREFIX_CONTACT = "contact";
   private static final String SUFFIX_TYPE = "type";
   private static final String SUFFIX_PHONE = "phone";
-  private static final String SUFFIX_EMAIL = "phone";
+  private static final String SUFFIX_EMAIL = "email";
   private static final String SUFFIX_ADDITIONAL_INFO = "additional";
   private static final String SUFFIX_REG_DATE = "regdate";
   private static final String TMP_ID_PREFIX = "tmp";
@@ -226,10 +230,11 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star (), HCCol.star (), HCCol.star ());
         aTable.addHeaderRow ().addCells ("Type", "Name", "Phone number", "Email address");
         for (final SMPBusinessCardContact aContact : aEntity.getContacts ())
-          aTable.addBodyRow ().addCell (aContact.getType (),
-                                        aContact.getName (),
-                                        aContact.getPhoneNumber (),
-                                        aContact.getEmail ());
+        {
+          final HCRow aBodyRow = aTable.addBodyRow ();
+          aBodyRow.addCells (aContact.getType (), aContact.getName (), aContact.getPhoneNumber ());
+          aBodyRow.addCell (HCA_MailTo.createLinkedEmail (aContact.getEmail ()));
+        }
         aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Contacts").setCtrl (aTable));
       }
       if (aEntity.hasAdditionalInformation ())
@@ -295,8 +300,8 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
 
         // Entity name
         final String sFieldName = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityRowID, SUFFIX_NAME);
-        final String sName = aEntityRow.get (SUFFIX_NAME);
-        if (StringHelper.hasNoText (sName))
+        final String sEntityName = aEntityRow.get (SUFFIX_NAME);
+        if (StringHelper.hasNoText (sEntityName))
           aFormErrors.addFieldError (sFieldName, "The Name of the Entity must be provided!");
 
         // Entity country code
@@ -376,6 +381,65 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
               aFormErrors.addFieldError (sFieldWebsiteURIs, "The website URI '" + sRealWebsiteURI + "' is invalid!");
         }
 
+        // Entity Contacts
+        final List <SMPBusinessCardContact> aSMPContacts = new ArrayList <> ();
+        final IRequestParamMap aContacts = aEntities.getMap (sEntityRowID, PREFIX_CONTACT);
+        if (aContacts != null)
+          for (final String sContactRowID : aContacts.keySet ())
+          {
+            final Map <String, String> aContactRow = aContacts.getValueMap (sContactRowID);
+            final int nErrors2 = aFormErrors.getFieldItemCount ();
+
+            final String sType = aContactRow.get (SUFFIX_TYPE);
+            final String sName = aContactRow.get (SUFFIX_NAME);
+            final String sPhoneNumber = aContactRow.get (SUFFIX_PHONE);
+
+            final String sFieldEmail = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                                     sEntityRowID,
+                                                                     PREFIX_CONTACT,
+                                                                     sContactRowID,
+                                                                     SUFFIX_EMAIL);
+            final String sEmail = aContactRow.get (SUFFIX_EMAIL);
+            if (StringHelper.hasText (sEmail))
+              if (!EmailAddressValidator.isValid (sEmail))
+                aFormErrors.addFieldError (sFieldEmail, "The provided email address is invalid!");
+
+            final boolean bIsAnySet = StringHelper.hasText (sType) ||
+                                      StringHelper.hasText (sName) ||
+                                      StringHelper.hasText (sPhoneNumber) ||
+                                      StringHelper.hasText (sEmail);
+
+            if (aFormErrors.getFieldItemCount () == nErrors2 && bIsAnySet)
+            {
+              final boolean bIsNewContact = sContactRowID.startsWith (TMP_ID_PREFIX);
+              aSMPContacts.add (bIsNewContact ? new SMPBusinessCardContact (sType, sName, sPhoneNumber, sEmail)
+                                              : new SMPBusinessCardContact (sContactRowID,
+                                                                            sType,
+                                                                            sName,
+                                                                            sPhoneNumber,
+                                                                            sEmail));
+            }
+          }
+
+        Collections.sort (aSMPContacts, new Comparator <SMPBusinessCardContact> ()
+        {
+          public int compare (final SMPBusinessCardContact o1, final SMPBusinessCardContact o2)
+          {
+            int ret = CompareHelper.compareIgnoreCase (o1.getType (), o2.getType ());
+            if (ret == 0)
+            {
+              ret = CompareHelper.compareIgnoreCase (o1.getName (), o2.getName ());
+              if (ret == 0)
+              {
+                ret = CompareHelper.compareIgnoreCase (o1.getPhoneNumber (), o2.getPhoneNumber ());
+                if (ret == 0)
+                  ret = CompareHelper.compareIgnoreCase (o1.getEmail (), o2.getEmail ());
+              }
+            }
+            return ret;
+          }
+        });
+
         // Entity Additional Information
         final String sAdditionalInfo = aEntityRow.get (SUFFIX_ADDITIONAL_INFO);
 
@@ -392,11 +456,12 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
           final boolean bIsNewEntity = sEntityRowID.startsWith (TMP_ID_PREFIX);
           final SMPBusinessCardEntity aEntity = bIsNewEntity ? new SMPBusinessCardEntity ()
                                                              : new SMPBusinessCardEntity (sEntityRowID);
-          aEntity.setName (sName);
+          aEntity.setName (sEntityName);
           aEntity.setCountryCode (sCountryCode);
           aEntity.setGeographicalInformation (sGeoInfo);
           aEntity.setIdentifiers (aSMPIdentifiers);
           aEntity.setWebsiteURIs (aWebsiteURIs);
+          aEntity.setContacts (aSMPContacts);
           aEntity.setAdditionalInformation (sAdditionalInfo);
           aEntity.setRegistrationDate (aRegDate);
           aSMPEntities.add (aEntity);
@@ -466,6 +531,77 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                 aExistingIdentifier == null ? null : aExistingIdentifier.getValue ()))
                                                                                                                       .setPlaceholder ("Identifier value"),
                   createStandaloneError (aFormErrors.getListOfField (sFieldValue)));
+
+    aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
+                                                                 .setOnClick (JQuery.idRef (aRow).remove ()));
+
+    return aRow;
+  }
+
+  @Nonnull
+  public static HCRow createContactInputForm (@Nonnull final String sEntityID,
+                                              @Nullable final SMPBusinessCardContact aExistingContact,
+                                              @Nullable final String sExistingID,
+                                              @Nonnull final FormErrors aFormErrors)
+  {
+    final String sContactID = aExistingContact != null ? aExistingContact.getID ()
+                                                       : StringHelper.hasText (sExistingID) ? sExistingID
+                                                                                            : TMP_ID_PREFIX +
+                                                                                              Integer.toString (GlobalIDFactory.getNewIntID ());
+
+    final HCRow aRow = new HCRow ();
+
+    // Type
+    {
+      final String sFieldType = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                              sEntityID,
+                                                              PREFIX_CONTACT,
+                                                              sContactID,
+                                                              SUFFIX_TYPE);
+      aRow.addCell (new HCEdit (new RequestField (sFieldType,
+                                                  aExistingContact == null ? null : aExistingContact.getType ()))
+                                                                                                                 .setPlaceholder ("Contact type"),
+                    createStandaloneError (aFormErrors.getListOfField (sFieldType)));
+    }
+
+    // Name
+    {
+      final String sFieldName = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                              sEntityID,
+                                                              PREFIX_CONTACT,
+                                                              sContactID,
+                                                              SUFFIX_NAME);
+      aRow.addCell (new HCEdit (new RequestField (sFieldName,
+                                                  aExistingContact == null ? null : aExistingContact.getName ()))
+                                                                                                                 .setPlaceholder ("Contact name"),
+                    createStandaloneError (aFormErrors.getListOfField (sFieldName)));
+    }
+
+    // Phone number
+    {
+      final String sFieldPhone = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                               sEntityID,
+                                                               PREFIX_CONTACT,
+                                                               sContactID,
+                                                               SUFFIX_PHONE);
+      aRow.addCell (new HCEdit (new RequestField (sFieldPhone,
+                                                  aExistingContact == null ? null : aExistingContact.getPhoneNumber ()))
+                                                                                                                        .setPlaceholder ("Contact phone number"),
+                    createStandaloneError (aFormErrors.getListOfField (sFieldPhone)));
+    }
+
+    // Email address
+    {
+      final String sFieldEmail = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                               sEntityID,
+                                                               PREFIX_CONTACT,
+                                                               sContactID,
+                                                               SUFFIX_EMAIL);
+      aRow.addCell (new HCEdit (new RequestField (sFieldEmail,
+                                                  aExistingContact == null ? null : aExistingContact.getEmail ()))
+                                                                                                                  .setPlaceholder ("Contact email address"),
+                    createStandaloneError (aFormErrors.getListOfField (sFieldEmail)));
+    }
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
                                                                  .setOnClick (JQuery.idRef (aRow).remove ()));
@@ -564,6 +700,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aNL));
     }
 
+    // Website URIs
     final String sFieldWebsiteURIs = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_WEBSITE_URIS);
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs")
                                                  .setCtrl (new HCTextAreaAutosize (new RequestField (sFieldWebsiteURIs,
@@ -572,6 +709,54 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                                                                                                                          aExistingEntity.getWebsiteURIs ()))))
                                                  .setHelpText ("Put each Website URI in a separate line")
                                                  .setErrorList (aFormErrors.getListOfField (sFieldWebsiteURIs)));
+
+    // Contacts
+    {
+      final String sBodyID = sEntityID + PREFIX_CONTACT;
+      final HCNodeList aNL = new HCNodeList ();
+      final BootstrapTable aTable = aNL.addAndReturnChild (new BootstrapTable (HCCol.star (),
+                                                                               HCCol.star (),
+                                                                               HCCol.star (),
+                                                                               HCCol.star (),
+                                                                               HCCol.star ()));
+      aTable.addHeaderRow ().addCells ("Type", "Name", "Phone number", "Email address", "");
+      aTable.setBodyID (sBodyID);
+
+      final IRequestParamMap aContacts = aLEC.getRequestParamMap ().getMap (PREFIX_ENTITY, sEntityID, PREFIX_CONTACT);
+      if (aContacts != null)
+      {
+        // Re-show of form
+        for (final String sIdentifierRowID : aContacts.keySet ())
+          aTable.addBodyRow (createContactInputForm (sEntityID, null, sIdentifierRowID, aFormErrors));
+      }
+      else
+      {
+        if (aExistingEntity != null)
+        {
+          // add all existing stored entities
+          for (final SMPBusinessCardContact aContact : aExistingEntity.getContacts ())
+            aTable.addBodyRow (createContactInputForm (sEntityID, aContact, (String) null, aFormErrors));
+        }
+      }
+
+      {
+        final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
+        final JSVar aJSAppendData = aJSAppend.param ("data");
+        aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (AjaxHtmlResponse.PROPERTY_HTML)));
+
+        final JSPackage aOnAdd = new JSPackage ();
+        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT.getInvocationURL (aRequestScope,
+                                                                                                                            new SMap ().add (AjaxExecutorSecureCreateBusinessCardContactInput.PARAM_ENTITY_ID,
+                                                                                                                                             sEntityID)))
+                                            .data (new JSAssocArray ())
+                                            .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
+                                            .build ());
+
+        aNL.addChild (new BootstrapButton ().setIcon (EDefaultIcon.PLUS).addChild ("Add Contact").setOnClick (aOnAdd));
+      }
+
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aNL));
+    }
 
     final String sFieldAdditionalInfo = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_ADDITIONAL_INFO);
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Additional Information")

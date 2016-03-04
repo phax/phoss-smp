@@ -1,13 +1,18 @@
 /**
- * Copyright (C) 2012-2016 winenet GmbH - www.winenet.at
- * All Rights Reserved
+ * Copyright (C) 2014-2016 Philip Helger (www.helger.com)
+ * philip[at]helger[dot]com
  *
- * This file is part of the winenet-Kellerbuch software.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Proprietary and confidential.
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unauthorized copying of this file, via any medium is
- * strictly prohibited.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.helger.peppol.smpserver.ui.ajax;
 
@@ -17,12 +22,11 @@ import com.helger.commons.errorlist.FormErrors;
 import com.helger.html.hc.IHCNode;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCards;
-import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 
 /**
- * Create a new business entity input row
+ * Create a new business entity identifier input row
  *
  * @author Philip Helger
  */
@@ -36,12 +40,10 @@ public final class AjaxExecutorSecureCreateBusinessCardIdentifierInput extends A
   {
     final String sEntityID = aLEC.getAttributeAsString (PARAM_ENTITY_ID);
 
-    IHCNode aNode = PageSecureBusinessCards.createIdentifierInputForm (sEntityID,
-                                                                       (SMPBusinessCardIdentifier) null,
-                                                                       (String) null,
-                                                                       new FormErrors ());
-    if (aNode == null)
-      aNode = new BootstrapErrorBox ().addChild ("Es ist ein interner Fehler aufgetreten. Bitte laden Sie die Seite neu.");
+    final IHCNode aNode = PageSecureBusinessCards.createIdentifierInputForm (sEntityID,
+                                                                             (SMPBusinessCardIdentifier) null,
+                                                                             (String) null,
+                                                                             new FormErrors ());
 
     // Build the HTML response
     return AjaxHtmlResponse.createSuccess (aLEC.getRequestScope (), aNode);
