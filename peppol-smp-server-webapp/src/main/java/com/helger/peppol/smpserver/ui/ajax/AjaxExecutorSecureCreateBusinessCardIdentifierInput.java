@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.errorlist.FormErrors;
 import com.helger.html.hc.IHCNode;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
+import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCards;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
@@ -26,16 +26,20 @@ import com.helger.photon.core.app.context.LayoutExecutionContext;
  *
  * @author Philip Helger
  */
-public final class AjaxExecutorSecureCreateBusinessEntityInput extends AbstractSMPAjaxExecutorHtml
+public final class AjaxExecutorSecureCreateBusinessCardIdentifierInput extends AbstractSMPAjaxExecutorHtml
 {
+  public static final String PARAM_ENTITY_ID = "entityid";
+
   @Override
   @Nonnull
   protected AjaxHtmlResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
   {
-    IHCNode aNode = PageSecureBusinessCards.createEntityInputForm (aLEC,
-                                                                   (SMPBusinessCardEntity) null,
-                                                                   (String) null,
-                                                                   new FormErrors ());
+    final String sEntityID = aLEC.getAttributeAsString (PARAM_ENTITY_ID);
+
+    IHCNode aNode = PageSecureBusinessCards.createIdentifierInputForm (sEntityID,
+                                                                       (SMPBusinessCardIdentifier) null,
+                                                                       (String) null,
+                                                                       new FormErrors ());
     if (aNode == null)
       aNode = new BootstrapErrorBox ().addChild ("Es ist ein interner Fehler aufgetreten. Bitte laden Sie die Seite neu.");
 

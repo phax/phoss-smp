@@ -45,7 +45,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
 
   /**
    * Create an instance with an existing ID. Only when editing!
-   * 
+   *
    * @param sID
    *        The ID of the object. May neither be <code>null</code> nor empty.
    */
@@ -160,6 +160,13 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   public boolean hasIdentifiers ()
   {
     return !m_aIdentifiers.isEmpty ();
+  }
+
+  public void setIdentifiers (@Nonnull final List <SMPBusinessCardIdentifier> aIdentifiers)
+  {
+    ValueEnforcer.notNull (aIdentifiers, "Identifiers");
+    m_aIdentifiers.clear ();
+    m_aIdentifiers.addAll (aIdentifiers);
   }
 
   /**

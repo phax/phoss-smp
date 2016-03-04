@@ -32,6 +32,8 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.errorlist.FormErrors;
+import com.helger.commons.errorlist.IError;
+import com.helger.commons.errorlist.IErrorList;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.locale.country.CountryCache;
 import com.helger.commons.regex.RegExHelper;
@@ -39,6 +41,7 @@ import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
+import com.helger.commons.url.SMap;
 import com.helger.commons.url.URLValidator;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
@@ -69,16 +72,20 @@ import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
+import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorSecureCreateBusinessCardIdentifierInput;
 import com.helger.peppol.smpserver.ui.ajax.CAjaxSecure;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
+import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.button.BootstrapButton;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap3.button.EBootstrapButtonSize;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap3.form.BootstrapHelpBlock;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
 import com.helger.photon.bootstrap3.panel.BootstrapPanel;
 import com.helger.photon.bootstrap3.table.BootstrapTable;
@@ -111,7 +118,14 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   private static final String SUFFIX_NAME = "name";
   private static final String SUFFIX_COUNTRY_CODE = "country";
   private static final String SUFFIX_GEO_INFO = "geoinfo";
+  private static final String PREFIX_IDENTIFIER = "identifier";
+  private static final String SUFFIX_SCHEME = "scheme";
+  private static final String SUFFIX_VALUE = "value";
   private static final String SUFFIX_WEBSITE_URIS = "website";
+  private static final String PREFIX_CONTACT = "contact";
+  private static final String SUFFIX_TYPE = "type";
+  private static final String SUFFIX_PHONE = "phone";
+  private static final String SUFFIX_EMAIL = "phone";
   private static final String SUFFIX_ADDITIONAL_INFO = "additional";
   private static final String SUFFIX_REG_DATE = "regdate";
   private static final String TMP_ID_PREFIX = "tmp";
@@ -197,7 +211,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star ());
         aTable.addHeaderRow ().addCells ("Scheme", "Value");
         for (final SMPBusinessCardIdentifier aIdentifier : aEntity.getIdentifiers ())
-          aTable.addBodyRow ().addCell (aIdentifier.getScheme (), aIdentifier.getValue ());
+          aTable.addBodyRow ().addCells (aIdentifier.getScheme (), aIdentifier.getValue ());
         aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aTable));
       }
       if (aEntity.hasWebsiteURIs ())
@@ -296,6 +310,56 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         // Entity Geographical Information
         final String sGeoInfo = aEntityRow.get (SUFFIX_GEO_INFO);
 
+        // Entity Identifiers
+        final List <SMPBusinessCardIdentifier> aSMPIdentifiers = new ArrayList <> ();
+        final IRequestParamMap aIdentifiers = aEntities.getMap (sEntityRowID, PREFIX_IDENTIFIER);
+        if (aIdentifiers != null)
+          for (final String sIdentifierRowID : aIdentifiers.keySet ())
+          {
+            final Map <String, String> aIdentifierRow = aIdentifiers.getValueMap (sIdentifierRowID);
+            final int nErrors2 = aFormErrors.getFieldItemCount ();
+
+            // Scheme
+            final String sFieldScheme = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                                      sEntityRowID,
+                                                                      PREFIX_IDENTIFIER,
+                                                                      sIdentifierRowID,
+                                                                      SUFFIX_SCHEME);
+            final String sScheme = aIdentifierRow.get (SUFFIX_SCHEME);
+            if (StringHelper.hasNoText (sScheme))
+              aFormErrors.addFieldError (sFieldScheme, "The Scheme of the Identifier must be provided!");
+
+            // Value
+            final String sFieldValue = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                                     sEntityRowID,
+                                                                     PREFIX_IDENTIFIER,
+                                                                     sIdentifierRowID,
+                                                                     SUFFIX_VALUE);
+            final String sValue = aIdentifierRow.get (SUFFIX_VALUE);
+            if (StringHelper.hasNoText (sValue))
+              aFormErrors.addFieldError (sFieldValue, "The Value of the Identifier must be provided!");
+
+            if (aFormErrors.getFieldItemCount () == nErrors2)
+            {
+              final boolean bIsNewIdentifier = sIdentifierRowID.startsWith (TMP_ID_PREFIX);
+              aSMPIdentifiers.add (bIsNewIdentifier ? new SMPBusinessCardIdentifier (sScheme, sValue)
+                                                    : new SMPBusinessCardIdentifier (sIdentifierRowID,
+                                                                                     sScheme,
+                                                                                     sValue));
+            }
+          }
+
+        Collections.sort (aSMPIdentifiers, new Comparator <SMPBusinessCardIdentifier> ()
+        {
+          public int compare (final SMPBusinessCardIdentifier o1, final SMPBusinessCardIdentifier o2)
+          {
+            int ret = o1.getScheme ().compareToIgnoreCase (o2.getScheme ());
+            if (ret == 0)
+              ret = o1.getValue ().compareToIgnoreCase (o2.getValue ());
+            return ret;
+          }
+        });
+
         // Entity Website URIs
         final String sFieldWebsiteURIs = RequestParamMap.getFieldName (PREFIX_ENTITY,
                                                                        sEntityRowID,
@@ -331,6 +395,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
           aEntity.setName (sName);
           aEntity.setCountryCode (sCountryCode);
           aEntity.setGeographicalInformation (sGeoInfo);
+          aEntity.setIdentifiers (aSMPIdentifiers);
           aEntity.setWebsiteURIs (aWebsiteURIs);
           aEntity.setAdditionalInformation (sAdditionalInfo);
           aEntity.setRegistrationDate (aRegDate);
@@ -355,6 +420,59 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     }
   }
 
+  @Nullable
+  public static IHCNode createStandaloneError (@Nullable final IErrorList aFormErrors)
+  {
+    if (aFormErrors == null || aFormErrors.isEmpty ())
+      return null;
+
+    final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.HAS_ERROR);
+    for (final IError aError : aFormErrors)
+      aDiv.addChild (new BootstrapHelpBlock ().addChild (aError.getErrorText ()));
+    return aDiv;
+  }
+
+  @Nonnull
+  public static HCRow createIdentifierInputForm (@Nonnull final String sEntityID,
+                                                 @Nullable final SMPBusinessCardIdentifier aExistingIdentifier,
+                                                 @Nullable final String sExistingID,
+                                                 @Nonnull final FormErrors aFormErrors)
+  {
+    final String sIdentifierID = aExistingIdentifier != null ? aExistingIdentifier.getID ()
+                                                             : StringHelper.hasText (sExistingID) ? sExistingID
+                                                                                                  : TMP_ID_PREFIX +
+                                                                                                    Integer.toString (GlobalIDFactory.getNewIntID ());
+
+    final HCRow aRow = new HCRow ();
+
+    // Identifier scheme
+    final String sFieldScheme = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                              sEntityID,
+                                                              PREFIX_IDENTIFIER,
+                                                              sIdentifierID,
+                                                              SUFFIX_SCHEME);
+    aRow.addCell (new HCEdit (new RequestField (sFieldScheme,
+                                                aExistingIdentifier == null ? null : aExistingIdentifier.getScheme ()))
+                                                                                                                       .setPlaceholder ("Identifier scheme"),
+                  createStandaloneError (aFormErrors.getListOfField (sFieldScheme)));
+
+    // Identifier Value
+    final String sFieldValue = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                             sEntityID,
+                                                             PREFIX_IDENTIFIER,
+                                                             sIdentifierID,
+                                                             SUFFIX_VALUE);
+    aRow.addCell (new HCEdit (new RequestField (sFieldValue,
+                                                aExistingIdentifier == null ? null : aExistingIdentifier.getValue ()))
+                                                                                                                      .setPlaceholder ("Identifier value"),
+                  createStandaloneError (aFormErrors.getListOfField (sFieldValue)));
+
+    aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
+                                                                 .setOnClick (JQuery.idRef (aRow).remove ()));
+
+    return aRow;
+  }
+
   @Nonnull
   public static IHCNode createEntityInputForm (@Nonnull final LayoutExecutionContext aLEC,
                                                @Nullable final SMPBusinessCardEntity aExistingEntity,
@@ -362,13 +480,14 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                @Nonnull final FormErrors aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
+    final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final String sEntityID = aExistingEntity != null ? aExistingEntity.getID ()
                                                      : StringHelper.hasText (sExistingID) ? sExistingID
                                                                                           : TMP_ID_PREFIX +
                                                                                             Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final BootstrapPanel aPanel = new BootstrapPanel ().setID (sEntityID);
-    aPanel.getOrCreateHeader ().addChild ("Business Card Entity");
+    aPanel.getOrCreateHeader ().addChild ("Business Entity");
     final HCDiv aBody = aPanel.getBody ();
 
     final BootstrapViewForm aForm = aBody.addAndReturnChild (new BootstrapViewForm ());
@@ -394,6 +513,56 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                                                                      aExistingEntity == null ? null
                                                                                                                              : aExistingEntity.getGeographicalInformation ())))
                                                  .setErrorList (aFormErrors.getListOfField (sFieldGeoInfo)));
+
+    // Identifiers
+    {
+      final String sBodyID = sEntityID + PREFIX_IDENTIFIER;
+      final HCNodeList aNL = new HCNodeList ();
+      final BootstrapTable aTable = aNL.addAndReturnChild (new BootstrapTable (HCCol.star (),
+                                                                               HCCol.star (),
+                                                                               HCCol.star ()));
+      aTable.addHeaderRow ().addCells ("Scheme", "Value", "");
+      aTable.setBodyID (sBodyID);
+
+      final IRequestParamMap aIdentifiers = aLEC.getRequestParamMap ().getMap (PREFIX_ENTITY,
+                                                                               sEntityID,
+                                                                               PREFIX_IDENTIFIER);
+      if (aIdentifiers != null)
+      {
+        // Re-show of form
+        for (final String sIdentifierRowID : aIdentifiers.keySet ())
+          aTable.addBodyRow (createIdentifierInputForm (sEntityID, null, sIdentifierRowID, aFormErrors));
+      }
+      else
+      {
+        if (aExistingEntity != null)
+        {
+          // add all existing stored entities
+          for (final SMPBusinessCardIdentifier aIdentifier : aExistingEntity.getIdentifiers ())
+            aTable.addBodyRow (createIdentifierInputForm (sEntityID, aIdentifier, (String) null, aFormErrors));
+        }
+      }
+
+      {
+        final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
+        final JSVar aJSAppendData = aJSAppend.param ("data");
+        aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (AjaxHtmlResponse.PROPERTY_HTML)));
+
+        final JSPackage aOnAdd = new JSPackage ();
+        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT.getInvocationURL (aRequestScope,
+                                                                                                                               new SMap ().add (AjaxExecutorSecureCreateBusinessCardIdentifierInput.PARAM_ENTITY_ID,
+                                                                                                                                                sEntityID)))
+                                            .data (new JSAssocArray ())
+                                            .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
+                                            .build ());
+
+        aNL.addChild (new BootstrapButton ().setIcon (EDefaultIcon.PLUS)
+                                            .addChild ("Add Identifier")
+                                            .setOnClick (aOnAdd));
+      }
+
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aNL));
+    }
 
     final String sFieldWebsiteURIs = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_WEBSITE_URIS);
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs")
@@ -471,7 +640,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                .add (JQuery.idRef (aEntityContainer).append (aJSAppendData.ref (AjaxHtmlResponse.PROPERTY_HTML)));
 
       final JSPackage aOnAdd = new JSPackage ();
-      aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_ENTITY_INPUT.getInvocationURL (aRequestScope))
+      aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT.getInvocationURL (aRequestScope))
                                           .data (new JSAssocArray ())
                                           .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                           .build ());

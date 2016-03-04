@@ -26,14 +26,17 @@ import com.helger.photon.core.ajax.decl.SecureApplicationAjaxFunctionDeclaration
 @Immutable
 public final class CAjaxSecure
 {
-  public static final IAjaxFunctionDeclaration FUNCTION_CREATE_BUSINESS_ENTITY_INPUT = new SecureApplicationAjaxFunctionDeclaration ("createBusinessEntityInput",
-                                                                                                                            AjaxExecutorSecureCreateBusinessEntityInput.class);
+  public static final IAjaxFunctionDeclaration FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT = new SecureApplicationAjaxFunctionDeclaration ("createBusinessCardEntityInput",
+                                                                                                                                          AjaxExecutorSecureCreateBusinessCardEntityInput.class);
+  public static final IAjaxFunctionDeclaration FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT = new SecureApplicationAjaxFunctionDeclaration ("createBusinessCardIdentifierInput",
+                                                                                                                                              AjaxExecutorSecureCreateBusinessCardIdentifierInput.class);
 
   private CAjaxSecure ()
   {}
 
   public static void init (@Nonnull final IAjaxInvoker aAjaxInvoker)
   {
-    aAjaxInvoker.registerFunction (FUNCTION_CREATE_BUSINESS_ENTITY_INPUT);
+    aAjaxInvoker.registerFunction (FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT);
+    aAjaxInvoker.registerFunction (FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT);
   }
 }
