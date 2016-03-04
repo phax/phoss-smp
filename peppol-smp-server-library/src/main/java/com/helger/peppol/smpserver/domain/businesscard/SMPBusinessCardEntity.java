@@ -11,16 +11,21 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import org.joda.time.LocalDate;
 
+import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.commons.id.IHasID;
+import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.pd.businesscard.PDBusinessEntityType;
 
 @NotThreadSafe
-public class SMPBusinessCardEntity implements Serializable
+public class SMPBusinessCardEntity implements IHasID <String>, Serializable
 {
+  private final String m_sID;
   private String m_sName;
   private String m_sCountryCode;
   private String m_sGeographicalInformation;
@@ -29,6 +34,23 @@ public class SMPBusinessCardEntity implements Serializable
   private final List <SMPBusinessCardContact> m_aContacts = new ArrayList <> ();
   private String m_sAdditionalInformation;
   private LocalDate m_aRegistrationDate;
+
+  public SMPBusinessCardEntity ()
+  {
+    this (GlobalIDFactory.getNewPersistentStringID ());
+  }
+
+  public SMPBusinessCardEntity (@Nonnull @Nonempty final String sID)
+  {
+    m_sID = ValueEnforcer.notEmpty (sID, "ID");
+  }
+
+  @Nonnull
+  @Nonempty
+  public String getID ()
+  {
+    return m_sID;
+  }
 
   /**
    * @return The entity name. May be <code>null</code>.
@@ -264,15 +286,10 @@ public class SMPBusinessCardEntity implements Serializable
     return ret;
   }
 
-  @Override
-  public boolean equals (final Object o)
+  public boolean isEqualContent (@Nullable final SMPBusinessCardEntity rhs)
   {
-    if (o == this)
-      return true;
-    if (o == null || !getClass ().equals (o.getClass ()))
+    if (rhs == null)
       return false;
-
-    final SMPBusinessCardEntity rhs = (SMPBusinessCardEntity) o;
     return EqualsHelper.equals (m_sName, rhs.m_sName) &&
            EqualsHelper.equals (m_sCountryCode, rhs.m_sCountryCode) &&
            EqualsHelper.equals (m_sGeographicalInformation, rhs.m_sGeographicalInformation) &&
@@ -284,23 +301,27 @@ public class SMPBusinessCardEntity implements Serializable
   }
 
   @Override
+  public boolean equals (final Object o)
+  {
+    if (o == this)
+      return true;
+    if (o == null || !getClass ().equals (o.getClass ()))
+      return false;
+    final SMPBusinessCardEntity rhs = (SMPBusinessCardEntity) o;
+    return m_sID.equals (rhs.m_sID);
+  }
+
+  @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_sName)
-                                       .append (m_sCountryCode)
-                                       .append (m_sGeographicalInformation)
-                                       .append (m_aIdentifiers)
-                                       .append (m_aWebsiteURIs)
-                                       .append (m_aContacts)
-                                       .append (m_sAdditionalInformation)
-                                       .append (m_aRegistrationDate)
-                                       .getHashCode ();
+    return new HashCodeGenerator (this).append (m_sID).getHashCode ();
   }
 
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("name", m_sName)
+    return new ToStringGenerator (this).append ("ID", m_sID)
+                                       .append ("name", m_sName)
                                        .append ("countryCode", m_sCountryCode)
                                        .append ("geographicalInformation", m_sGeographicalInformation)
                                        .append ("identifier", m_aIdentifiers)

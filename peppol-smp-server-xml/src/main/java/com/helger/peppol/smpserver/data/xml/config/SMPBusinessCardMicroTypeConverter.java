@@ -49,6 +49,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
 {
   private static final String ATTR_SERVICE_GROUPD_ID = "servicegroupid";
   private static final String ELEMENT_ENTITY = "entity";
+  private static final String ATTR_ID = "id";
   private static final String ATTR_NAME = "name";
   private static final String ATTR_COUNTRY_CODE = "country";
   private static final String ELEMENT_GEOGRAPHICAL_INFORMATION = "geoinfo";
@@ -74,6 +75,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
     for (final SMPBusinessCardEntity aEntity : aValue.getAllEntities ())
     {
       final IMicroElement eEntity = aElement.appendElement (sNamespaceURI, ELEMENT_ENTITY);
+      eEntity.setAttribute (ATTR_ID, aEntity.getID ());
       eEntity.setAttribute (ATTR_NAME, aEntity.getName ());
       eEntity.setAttribute (ATTR_COUNTRY_CODE, aEntity.getCountryCode ());
       if (aEntity.hasGeographicalInformation ())
@@ -121,7 +123,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
     final List <SMPBusinessCardEntity> aEntities = new ArrayList <> ();
     for (final IMicroElement eEntity : aElement.getAllChildElements (ELEMENT_ENTITY))
     {
-      final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity ();
+      final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (eEntity.getAttributeValue (ATTR_ID));
       aEntity.setName (eEntity.getAttributeValue (ATTR_NAME));
       aEntity.setCountryCode (eEntity.getAttributeValue (ATTR_COUNTRY_CODE));
       aEntity.setGeographicalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
