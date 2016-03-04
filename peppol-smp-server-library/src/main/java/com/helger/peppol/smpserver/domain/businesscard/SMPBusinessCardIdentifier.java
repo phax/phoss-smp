@@ -4,11 +4,14 @@ package com.helger.peppol.smpserver.domain.businesscard;
 import java.io.Serializable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.commons.id.IHasID;
+import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.pd.businesscard.PDIdentifierType;
 
@@ -18,15 +21,31 @@ import com.helger.pd.businesscard.PDIdentifierType;
  * @author Philip Helger
  */
 @Immutable
-public class SMPBusinessCardIdentifier implements Serializable
+public class SMPBusinessCardIdentifier implements IHasID <String>, Serializable
 {
+  private final String m_sID;
   private final String m_sScheme;
   private final String m_sValue;
 
   public SMPBusinessCardIdentifier (@Nonnull @Nonempty final String sScheme, @Nonnull @Nonempty final String sValue)
   {
+    this (GlobalIDFactory.getNewPersistentStringID (), sScheme, sValue);
+  }
+
+  public SMPBusinessCardIdentifier (@Nonnull @Nonempty final String sID,
+                                    @Nonnull @Nonempty final String sScheme,
+                                    @Nonnull @Nonempty final String sValue)
+  {
+    m_sID = ValueEnforcer.notEmpty (sID, "ID");
     m_sScheme = ValueEnforcer.notEmpty (sScheme, "Scheme");
     m_sValue = ValueEnforcer.notEmpty (sValue, "Value");
+  }
+
+  @Nonnull
+  @Nonempty
+  public String getID ()
+  {
+    return m_sID;
   }
 
   /**
@@ -69,6 +88,13 @@ public class SMPBusinessCardIdentifier implements Serializable
     return ret;
   }
 
+  public boolean isEqualContent (@Nullable final SMPBusinessCardIdentifier rhs)
+  {
+    if (rhs == null)
+      return false;
+    return m_sScheme.equals (rhs.m_sScheme) && m_sValue.equals (rhs.m_sValue);
+  }
+
   @Override
   public boolean equals (final Object o)
   {
@@ -77,18 +103,21 @@ public class SMPBusinessCardIdentifier implements Serializable
     if (o == null || !getClass ().equals (o.getClass ()))
       return false;
     final SMPBusinessCardIdentifier rhs = (SMPBusinessCardIdentifier) o;
-    return m_sScheme.equals (rhs.m_sScheme) && m_sValue.equals (rhs.m_sValue);
+    return m_sID.equals (rhs.m_sID);
   }
 
   @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_sValue).append (m_sScheme).getHashCode ();
+    return new HashCodeGenerator (this).append (m_sID).getHashCode ();
   }
 
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("value", m_sValue).append ("scheme", m_sScheme).toString ();
+    return new ToStringGenerator (this).append ("ID", m_sID)
+                                       .append ("value", m_sValue)
+                                       .append ("scheme", m_sScheme)
+                                       .toString ();
   }
 }

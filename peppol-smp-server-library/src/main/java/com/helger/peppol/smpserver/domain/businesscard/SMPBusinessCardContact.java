@@ -7,8 +7,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
+import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.commons.id.IHasID;
+import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.pd.businesscard.PDContactType;
@@ -19,8 +23,9 @@ import com.helger.pd.businesscard.PDContactType;
  * @author Philip Helger
  */
 @Immutable
-public class SMPBusinessCardContact implements Serializable
+public class SMPBusinessCardContact implements IHasID <String>, Serializable
 {
+  private final String m_sID;
   private final String m_sType;
   private final String m_sName;
   private final String m_sPhoneNumber;
@@ -31,10 +36,27 @@ public class SMPBusinessCardContact implements Serializable
                                  @Nullable final String sPhoneNumber,
                                  @Nullable final String sEmail)
   {
+    this (GlobalIDFactory.getNewPersistentStringID (), sType, sName, sPhoneNumber, sEmail);
+  }
+
+  public SMPBusinessCardContact (@Nonnull @Nonempty final String sID,
+                                 @Nullable final String sType,
+                                 @Nullable final String sName,
+                                 @Nullable final String sPhoneNumber,
+                                 @Nullable final String sEmail)
+  {
+    m_sID = ValueEnforcer.notEmpty (sID, "ID");
     m_sType = sType;
     m_sName = sName;
     m_sPhoneNumber = sPhoneNumber;
     m_sEmail = sEmail;
+  }
+
+  @Nonnull
+  @Nonempty
+  public String getID ()
+  {
+    return m_sID;
   }
 
   /**
@@ -109,6 +131,16 @@ public class SMPBusinessCardContact implements Serializable
     return ret;
   }
 
+  public boolean isEqualContent (@Nullable final SMPBusinessCardContact rhs)
+  {
+    if (rhs == null)
+      return false;
+    return EqualsHelper.equals (m_sType, rhs.m_sType) &&
+           EqualsHelper.equals (m_sName, rhs.m_sName) &&
+           EqualsHelper.equals (m_sPhoneNumber, rhs.m_sPhoneNumber) &&
+           EqualsHelper.equals (m_sEmail, rhs.m_sEmail);
+  }
+
   @Override
   public boolean equals (final Object o)
   {
@@ -117,26 +149,20 @@ public class SMPBusinessCardContact implements Serializable
     if (o == null || !getClass ().equals (o.getClass ()))
       return false;
     final SMPBusinessCardContact rhs = (SMPBusinessCardContact) o;
-    return EqualsHelper.equals (m_sType, rhs.m_sType) &&
-           EqualsHelper.equals (m_sName, rhs.m_sName) &&
-           EqualsHelper.equals (m_sPhoneNumber, rhs.m_sPhoneNumber) &&
-           EqualsHelper.equals (m_sEmail, rhs.m_sEmail);
+    return m_sID.equals (rhs.m_sID);
   }
 
   @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_sType)
-                                       .append (m_sName)
-                                       .append (m_sPhoneNumber)
-                                       .append (m_sEmail)
-                                       .getHashCode ();
+    return new HashCodeGenerator (this).append (m_sID).getHashCode ();
   }
 
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("type", m_sType)
+    return new ToStringGenerator (this).append ("ID", m_sID)
+                                       .append ("type", m_sType)
                                        .append ("name", m_sName)
                                        .append ("phoneNumber", m_sPhoneNumber)
                                        .append ("email", m_sEmail)
