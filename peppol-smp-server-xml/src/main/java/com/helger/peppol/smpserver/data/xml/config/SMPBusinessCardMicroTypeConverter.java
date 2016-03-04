@@ -146,6 +146,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       aEntity.setAdditionalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
                                                                                 ELEMENT_ADDITIONAL_INFORMATION));
       aEntity.setRegistrationDate (eEntity.getAttributeValueWithConversion (ATTR_REGISTRATION_DATE, LocalDate.class));
+      aEntities.add (aEntity);
     }
 
     return new SMPBusinessCard (aServiceGroup, aEntities);
