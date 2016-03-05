@@ -38,11 +38,13 @@ import com.helger.commons.errorlist.IErrorList;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.locale.country.CountryCache;
 import com.helger.commons.regex.RegExHelper;
+import com.helger.commons.state.ESuccess;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SMap;
+import com.helger.commons.url.URLHelper;
 import com.helger.commons.url.URLValidator;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
@@ -64,7 +66,10 @@ import com.helger.html.jscode.JSAnonymousFunction;
 import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
+import com.helger.pd.client.PDClient;
+import com.helger.peppol.identifier.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
@@ -100,6 +105,7 @@ import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldDate;
 import com.helger.photon.core.url.LinkHelper;
+import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.html.select.HCCountrySelect;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.js.JSJQueryHelper;
@@ -133,6 +139,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   private static final String SUFFIX_ADDITIONAL_INFO = "additional";
   private static final String SUFFIX_REG_DATE = "regdate";
   private static final String TMP_ID_PREFIX = "tmp";
+  private static final String ACTION_PUBLIC_TO_INDEXER = "publishtoindexer";
 
   public PageSecureBusinessCards (@Nonnull @Nonempty final String sID)
   {
@@ -271,7 +278,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
-    final List <SMPBusinessCardEntity> aSMPEntities = new ArrayList <> ();
+    final List <SMPBusinessCardEntity> aSMPEntities = new ArrayList<> ();
 
     // validations
     if (StringHelper.isEmpty (sServiceGroupID))
@@ -316,7 +323,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         final String sGeoInfo = aEntityRow.get (SUFFIX_GEO_INFO);
 
         // Entity Identifiers
-        final List <SMPBusinessCardIdentifier> aSMPIdentifiers = new ArrayList <> ();
+        final List <SMPBusinessCardIdentifier> aSMPIdentifiers = new ArrayList<> ();
         final IRequestParamMap aIdentifiers = aEntities.getMap (sEntityRowID, PREFIX_IDENTIFIER);
         if (aIdentifiers != null)
           for (final String sIdentifierRowID : aIdentifiers.keySet ())
@@ -370,7 +377,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                                        sEntityRowID,
                                                                        SUFFIX_WEBSITE_URIS);
         final String sWebsiteURIs = aEntityRow.get (SUFFIX_WEBSITE_URIS);
-        final List <String> aWebsiteURIs = new ArrayList <> ();
+        final List <String> aWebsiteURIs = new ArrayList<> ();
         for (final String sWebsiteURI : RegExHelper.getSplitToArray (sWebsiteURIs, "\\n"))
         {
           final String sRealWebsiteURI = sWebsiteURI.trim ();
@@ -382,7 +389,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         }
 
         // Entity Contacts
-        final List <SMPBusinessCardContact> aSMPContacts = new ArrayList <> ();
+        final List <SMPBusinessCardContact> aSMPContacts = new ArrayList<> ();
         final IRequestParamMap aContacts = aEntities.getMap (sEntityRowID, PREFIX_CONTACT);
         if (aContacts != null)
           for (final String sContactRowID : aContacts.keySet ())
@@ -855,6 +862,30 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
   }
 
+  private void _publishToIndexer (@Nonnull final WebPageExecutionContext aWPEC,
+                                  @Nonnull final ISMPBusinessCard aSelectedObject)
+  {
+    final IPeppolParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ().getParticpantIdentifier ();
+    final ESuccess eSuccess = new PDClient (URLHelper.getAsURI (SMPServerConfiguration.getPEPPOLDirectoryHostName ())).addServiceGroupToIndex (aParticipantID);
+    if (eSuccess.isSuccess ())
+      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
+                                                                  aParticipantID.getURIEncoded () +
+                                                                  "'"));
+    else
+      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
+                                                                aParticipantID.getURIEncoded () +
+                                                                "'"));
+  }
+
+  @Override
+  protected boolean handleCustomActions (@Nonnull final WebPageExecutionContext aWPEC,
+                                         @Nullable final ISMPBusinessCard aSelectedObject)
+  {
+    if (aWPEC.hasAction (ACTION_PUBLIC_TO_INDEXER) && aSelectedObject != null)
+      _publishToIndexer (aWPEC, aSelectedObject);
+    return true;
+  }
+
   @Nonnull
   private IHCNode _createActionCell (@Nonnull final WebPageExecutionContext aWPEC,
                                      @Nonnull final ISMPBusinessCard aCurObject)
@@ -878,7 +909,13 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                                                                     .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
                                                                                                                                          sDisplayName)
                                                                                                                               .setTargetBlank ()
-                                                                                                                              .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                                                                                                                              .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()),
+                                          new HCTextNode (" "),
+                                          new HCA (aWPEC.getSelfHref ()
+                                                        .add (CPageParam.PARAM_ACTION, ACTION_PUBLIC_TO_INDEXER)
+                                                        .add (CPageParam.PARAM_OBJECT,
+                                                              aCurObject.getID ())).setTitle ("Update Business Card in PEPPOL Directory")
+                                                                                   .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
   }
 
   @Override

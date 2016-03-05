@@ -114,7 +114,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESuccess reloadConfiguration ()
   {
-    final List <String> aFilePaths = new ArrayList <> ();
+    final List <String> aFilePaths = new ArrayList<> ();
     // Check if the system property is present
     String sPropertyPath = SystemProperties.getPropertyValue (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH);
     if (StringHelper.hasText (sPropertyPath))
@@ -256,13 +256,23 @@ public final class SMPServerConfiguration
   /**
    * Check if the PEPPOL Directory integration (offering the /businesscard API)
    * is enabled.
-   * 
+   *
    * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
    *         By default it is disabled.
    */
   public static boolean isPEPPOLDirectoryIntegrationEnabled ()
   {
     return getConfigFile ().getBoolean ("smp.peppol.directory.integration.enabled", false);
+  }
+
+  /**
+   * @return The host name of the PEPPOL Directory server. Never
+   *         <code>null</code>.
+   */
+  @Nonnull
+  public static String getPEPPOLDirectoryHostName ()
+  {
+    return getConfigFile ().getString ("smp.peppol.directory.hostname", "http://pyp.helger.com");
   }
 
   /**
