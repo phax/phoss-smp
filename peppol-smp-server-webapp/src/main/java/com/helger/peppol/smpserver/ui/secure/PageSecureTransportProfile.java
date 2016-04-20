@@ -40,7 +40,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.peppol.smpserver.domain.transportprofile.SMPTransportProfileManager;
+import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
@@ -69,9 +69,10 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   }
 
   @Override
-  protected ISMPTransportProfile getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
+  protected ISMPTransportProfile getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+                                                    @Nullable final String sID)
   {
-    final SMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+    final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     return aTransportProfileMgr.getSMPTransportProfileOfID (sID);
   }
 
@@ -99,7 +100,8 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPTransportProfile aSelectedObject)
+  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+                                     @Nonnull final ISMPTransportProfile aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
@@ -121,7 +123,8 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   {
     final boolean bEdit = eFormAction.isEdit ();
 
-    aForm.addChild (createActionHeader (bEdit ? "Edit transport profile '" + aSelectedObject.getID () + "'" : "Create new transport profile"));
+    aForm.addChild (createActionHeader (bEdit ? "Edit transport profile '" + aSelectedObject.getID () + "'"
+                                              : "Create new transport profile"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("ID")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_ID,
@@ -145,7 +148,7 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
                                                  @Nonnull final EWebPageFormAction eFormAction)
   {
     final boolean bEdit = eFormAction.isEdit ();
-    final SMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+    final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
 
     // Never edit ID
     final String sID = bEdit ? aSelectedObject.getID () : aWPEC.getAttributeAsString (FIELD_ID);
@@ -170,12 +173,16 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
       if (bEdit)
       {
         aTransportProfileMgr.updateSMPTransportProfile (sID, sName);
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The transport profile '" + sID + "' was successfully edited."));
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The transport profile '" +
+                                                                    sID +
+                                                                    "' was successfully edited."));
       }
       else
       {
         aTransportProfileMgr.createSMPTransportProfile (sID, sName);
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The new transport profile '" + sID + "' was successfully created."));
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The new transport profile '" +
+                                                                    sID +
+                                                                    "' was successfully created."));
       }
     }
   }
@@ -191,9 +198,10 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   }
 
   @Override
-  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPTransportProfile aSelectedObject)
+  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+                                @Nonnull final ISMPTransportProfile aSelectedObject)
   {
-    final SMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+    final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     aTransportProfileMgr.removeSMPTransportProfile (aSelectedObject.getID ());
     aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The transport profile '" +
                                                                 aSelectedObject.getID () +
@@ -205,7 +213,7 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final SMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+    final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
 
     aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page lets you create custom transport profiles that can be used in service information endpoints."));
 
@@ -228,11 +236,10 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
                     new HCTextNode (" "),
                     createCopyLink (aWPEC, aCurObject, "Copy " + aCurObject.getID ()),
                     new HCTextNode (" "),
-                    isActionAllowed (aWPEC, EWebPageFormAction.DELETE, aCurObject)
-                                                                                   ? createDeleteLink (aWPEC,
-                                                                                                       aCurObject,
-                                                                                                       "Delete " + aCurObject.getID ())
-                                                                                   : createEmptyAction ());
+                    isActionAllowed (aWPEC,
+                                     EWebPageFormAction.DELETE,
+                                     aCurObject) ? createDeleteLink (aWPEC, aCurObject, "Delete " + aCurObject.getID ())
+                                                 : createEmptyAction ());
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);

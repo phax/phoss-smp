@@ -67,11 +67,12 @@ import com.helger.photon.basic.app.dao.impl.EDAOActionType;
 import com.helger.photon.basic.audit.AuditHelper;
 
 public final class SMPTransportProfileManager extends AbstractWALDAO <SMPTransportProfile>
+                                              implements ISMPTransportProfileManager
 {
   private static final String ELEMENT_ROOT = "transportprofiles";
   private static final String ELEMENT_ITEM = "transportprofile";
 
-  private final Map <String, SMPTransportProfile> m_aMap = new HashMap <String, SMPTransportProfile> ();
+  private final Map <String, SMPTransportProfile> m_aMap = new HashMap <> ();
 
   public SMPTransportProfileManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
