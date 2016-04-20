@@ -278,7 +278,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
-    final List <SMPBusinessCardEntity> aSMPEntities = new ArrayList<> ();
+    final List <SMPBusinessCardEntity> aSMPEntities = new ArrayList <> ();
 
     // validations
     if (StringHelper.isEmpty (sServiceGroupID))
@@ -323,7 +323,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         final String sGeoInfo = aEntityRow.get (SUFFIX_GEO_INFO);
 
         // Entity Identifiers
-        final List <SMPBusinessCardIdentifier> aSMPIdentifiers = new ArrayList<> ();
+        final List <SMPBusinessCardIdentifier> aSMPIdentifiers = new ArrayList <> ();
         final IRequestParamMap aIdentifiers = aEntities.getMap (sEntityRowID, PREFIX_IDENTIFIER);
         if (aIdentifiers != null)
           for (final String sIdentifierRowID : aIdentifiers.keySet ())
@@ -377,7 +377,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                                        sEntityRowID,
                                                                        SUFFIX_WEBSITE_URIS);
         final String sWebsiteURIs = aEntityRow.get (SUFFIX_WEBSITE_URIS);
-        final List <String> aWebsiteURIs = new ArrayList<> ();
+        final List <String> aWebsiteURIs = new ArrayList <> ();
         for (final String sWebsiteURI : RegExHelper.getSplitToArray (sWebsiteURIs, "\\n"))
         {
           final String sRealWebsiteURI = sWebsiteURI.trim ();
@@ -389,7 +389,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         }
 
         // Entity Contacts
-        final List <SMPBusinessCardContact> aSMPContacts = new ArrayList<> ();
+        final List <SMPBusinessCardContact> aSMPContacts = new ArrayList <> ();
         final IRequestParamMap aContacts = aEntities.getMap (sEntityRowID, PREFIX_CONTACT);
         if (aContacts != null)
           for (final String sContactRowID : aContacts.keySet ())
@@ -777,7 +777,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                  .setCtrl (new BootstrapDateTimePicker (new RequestFieldDate (sFieldRegDate,
                                                                                                               aExistingEntity == null ? null
                                                                                                                                       : aExistingEntity.getRegistrationDate (),
-                                                                                                              aDisplayLocale)))
+                                                                                                              aDisplayLocale)).setEndDate (null))
                                                  .setErrorList (aFormErrors.getListOfField (sFieldRegDate)));
 
     final BootstrapButtonToolbar aToolbar = aBody.addAndReturnChild (new BootstrapButtonToolbar (aLEC));
