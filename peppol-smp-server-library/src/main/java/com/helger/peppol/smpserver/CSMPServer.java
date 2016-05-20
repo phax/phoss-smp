@@ -65,7 +65,7 @@ public final class CSMPServer extends AbstractGlobalSingleton
     // Read version number
     final SettingsPersistenceProperties aSPP = new SettingsPersistenceProperties ();
     final ISettings aVersionProps = aSPP.readSettings (new ClassPathResource (SMP_SERVER_VERSION_FILENAME));
-    s_sVersionNumber = aVersionProps.getStringValue ("smp.version");
+    s_sVersionNumber = aVersionProps.getAsString ("smp.version");
     if (s_sVersionNumber == null)
       throw new InitializationException ("Error determining SMP version number!");
   }

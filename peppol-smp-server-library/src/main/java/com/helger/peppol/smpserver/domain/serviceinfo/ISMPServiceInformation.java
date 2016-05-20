@@ -49,7 +49,9 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
@@ -141,4 +143,16 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    */
   @Nonnull
   com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ();
+
+  @Nonnull
+  static IComparator <ISMPServiceInformation> comparator ()
+  {
+    return (aElement1, aElement2) -> {
+      int ret = aElement1.getServiceGroupID ().compareTo (aElement2.getServiceGroupID ());
+      if (ret == 0)
+        ret = IdentifierHelper.compareDocumentTypeIdentifiers (aElement1.getDocumentTypeIdentifier (),
+                                                               aElement2.getDocumentTypeIdentifier ());
+      return ret;
+    };
+  }
 }

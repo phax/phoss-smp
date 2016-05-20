@@ -41,14 +41,14 @@
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.compare.IComparator;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
 
 /**
@@ -172,4 +172,15 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    */
   @Nonnull
   com.helger.peppol.bdxr.EndpointType getAsJAXBObjectBDXR ();
+
+  @Nonnull
+  static IComparator <ISMPEndpoint> comparator ()
+  {
+    return (aElement1, aElement2) -> {
+      int ret = aElement1.getTransportProfile ().compareTo (aElement2.getTransportProfile ());
+      if (ret == 0)
+        ret = aElement1.getEndpointReference ().compareTo (aElement2.getEndpointReference ());
+      return ret;
+    };
+  }
 }

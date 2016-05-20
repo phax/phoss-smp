@@ -45,7 +45,9 @@ import java.io.Serializable;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -107,4 +109,16 @@ public interface ISMPRedirect extends IHasID <String>, Serializable, ISMPHasExte
    */
   @Nonnull
   com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ();
+
+  @Nonnull
+  static IComparator <ISMPRedirect> comparator ()
+  {
+    return (aElement1, aElement2) -> {
+      int ret = aElement1.getServiceGroupID ().compareTo (aElement2.getServiceGroupID ());
+      if (ret == 0)
+        ret = IdentifierHelper.compareDocumentTypeIdentifiers (aElement1.getDocumentTypeIdentifier (),
+                                                               aElement2.getDocumentTypeIdentifier ());
+      return ret;
+    };
+  }
 }

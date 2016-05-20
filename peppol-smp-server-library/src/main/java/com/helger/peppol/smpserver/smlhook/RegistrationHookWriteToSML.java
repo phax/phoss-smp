@@ -57,6 +57,8 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.random.VerySecureRandom;
+import com.helger.commons.ws.HostnameVerifierVerifyAll;
+import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
@@ -65,8 +67,6 @@ import com.helger.peppol.smlclient.participant.NotFoundFault;
 import com.helger.peppol.smlclient.participant.UnauthorizedFault;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.KeyStoreHelper;
-import com.helger.web.https.DoNothingTrustManager;
-import com.helger.web.https.HostnameVerifierAlwaysTrue;
 
 /**
  * An implementation of the RegistrationHook that informs the SML of updates to
@@ -119,11 +119,13 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
       // Assign key manager and empty trust manager to SSL/TLS context
       final SSLContext aSSLCtx = SSLContext.getInstance ("TLS");
-      aSSLCtx.init (aKeyManagerFactory.getKeyManagers (), new TrustManager [] { new DoNothingTrustManager () }, VerySecureRandom.getInstance ());
+      aSSLCtx.init (aKeyManagerFactory.getKeyManagers (),
+                    new TrustManager [] { new TrustManagerTrustAll () },
+                    VerySecureRandom.getInstance ());
 
       s_aDefaultSocketFactory = aSSLCtx.getSocketFactory ();
       if (s_aSMLEndpointURL.toExternalForm ().contains ("localhost"))
-        s_aDefaultHostnameVerifier = new HostnameVerifierAlwaysTrue ();
+        s_aDefaultHostnameVerifier = new HostnameVerifierVerifyAll ();
       else
         s_aDefaultHostnameVerifier = null;
     }
@@ -172,7 +174,11 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
   public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
-    s_aLogger.warn ("CREATE failed in SMP backend, so deleting again business " + sParticipantID + " for " + s_sSMPID + " from SML.");
+    s_aLogger.warn ("CREATE failed in SMP backend, so deleting again business " +
+                    sParticipantID +
+                    " for " +
+                    s_sSMPID +
+                    " from SML.");
 
     try
     {
@@ -201,7 +207,9 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     }
     catch (final NotFoundFault ex)
     {
-      final String sMsg = "The business " + sParticipantID + " was not present in the SML and hence could not be deleted.";
+      final String sMsg = "The business " +
+                          sParticipantID +
+                          " was not present in the SML and hence could not be deleted.";
       s_aLogger.error (sMsg, ex);
       throw new RegistrationHookException (sMsg, ex);
     }
@@ -216,7 +224,11 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
   public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
-    s_aLogger.warn ("DELETE failed in SMP backend, so creating again business " + sParticipantID + " for " + s_sSMPID + " in SML.");
+    s_aLogger.warn ("DELETE failed in SMP backend, so creating again business " +
+                    sParticipantID +
+                    " for " +
+                    s_sSMPID +
+                    " in SML.");
 
     try
     {

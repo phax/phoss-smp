@@ -143,7 +143,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     try
     {
       final IFactory <? extends ISMPManagerProvider> aFactory = m_aMap.get (sBackendID);
-      return aFactory == null ? null : aFactory.create ();
+      return aFactory == null ? null : aFactory.get ();
     }
     finally
     {

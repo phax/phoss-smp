@@ -40,11 +40,8 @@
  */
 package com.helger.peppol.smpserver.jaxb;
 
-import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.xml.bind.JAXBElement;
 
-import com.helger.commons.io.resource.IReadableResource;
 import com.helger.jaxb.AbstractJAXBMarshaller;
 import com.helger.peppol.bdxr.ObjectFactory;
 import com.helger.peppol.bdxr.SignedServiceMetadataType;
@@ -59,13 +56,6 @@ public final class MarshallerBDXRSignedServiceMetadataType extends AbstractJAXBM
 {
   public MarshallerBDXRSignedServiceMetadataType ()
   {
-    super (SignedServiceMetadataType.class, (IReadableResource []) null);
-  }
-
-  @Override
-  @Nonnull
-  protected JAXBElement <SignedServiceMetadataType> wrapObject (@Nonnull final SignedServiceMetadataType aObject)
-  {
-    return new ObjectFactory ().createSignedServiceMetadata (aObject);
+    super (SignedServiceMetadataType.class, o -> new ObjectFactory ().createSignedServiceMetadata (o));
   }
 }

@@ -41,10 +41,13 @@
 package com.helger.peppol.smpserver.domain.user;
 
 import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
 
 /**
@@ -69,4 +72,10 @@ public interface ISMPUser extends IHasID <String>, Serializable
   @Nonnull
   @Nonempty
   String getUserName ();
+
+  @Nonnull
+  static Comparator <ISMPUser> comparator (@Nonnull final Locale aSortLocale)
+  {
+    return IComparator.getComparatorCollating (ISMPUser::getUserName, aSortLocale);
+  }
 }

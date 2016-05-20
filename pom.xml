@@ -22,10 +22,10 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>1.4.2</version>
+    <version>1.8.2</version>
   </parent>
   <artifactId>peppol-smp-server-parent-pom</artifactId>
-  <version>4.1.3-SNAPSHOT</version>
+  <version>5.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>peppol-smp-server-parent-pom</name>
   <description>Base POM to build the peppol-smp-server projects</description>
@@ -75,8 +75,7 @@
     <!-- Must correspond to jaxws-tools.version in jaxws-maven-plugin POM -->
     <jaxws.version>2.2.9-b14002</jaxws.version>
     <log4j.version>2.5</log4j.version>
-    <photon.version>6.2.0</photon.version>
-    <jersey.version>2.22.2</jersey.version>
+    <jersey.version>2.23</jersey.version>
     <eclipselink.version>2.6.3</eclipselink.version>
   </properties>
   
@@ -85,45 +84,45 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>6.2.4</version>
+        <version>8.0.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>${photon.version}</version>
+        <version>7.0.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>4.3.5</version>
+        <version>5.0.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-db-parent-pom</artifactId>
-        <version>4.1.1</version>
+        <version>5.0.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-json</artifactId>
-        <version>2.0.2</version>
+        <version>3.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css</artifactId>
-        <version>4.1.1</version>
+        <version>5.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>peppol-directory-parent-pom</artifactId>
-        <version>0.2.0</version>
+        <version>0.3.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -220,16 +219,6 @@
   </modules>
   
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>

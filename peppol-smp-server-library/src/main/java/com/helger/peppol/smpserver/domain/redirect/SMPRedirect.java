@@ -45,6 +45,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
@@ -181,7 +182,7 @@ public class SMPRedirect implements ISMPRedirect
     final com.helger.peppol.bdxr.RedirectType aRedirect = new com.helger.peppol.bdxr.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
-    aRedirect.setExtension (BDXRExtensionConverter.convertOrNull (m_sExtension));
+    aRedirect.setExtension (new CommonsArrayList <> (BDXRExtensionConverter.convertOrNull (m_sExtension)));
 
     final com.helger.peppol.bdxr.ServiceMetadataType ret = new com.helger.peppol.bdxr.ServiceMetadataType ();
     ret.setRedirect (aRedirect);
@@ -214,7 +215,7 @@ public class SMPRedirect implements ISMPRedirect
                                        .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
                                        .append ("TargetHref", m_sTargetHref)
                                        .append ("SubjectUniqueIdentifier", m_sSubjectUniqueIdentifier)
-                                       .appendIfNotEmpty ("Extension", m_sExtension)
+                                       .appendIf ("Extension", m_sExtension, StringHelper::hasText)
                                        .toString ();
   }
 }

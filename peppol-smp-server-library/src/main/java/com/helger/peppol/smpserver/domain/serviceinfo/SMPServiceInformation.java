@@ -41,7 +41,6 @@
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +52,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsLinkedHashMap;
+import com.helger.commons.collection.ext.ICommonsOrderedMap;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
@@ -83,7 +84,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
   private SimpleDocumentTypeIdentifier m_aDocumentTypeIdentifier;
-  private final Map <IPeppolProcessIdentifier, SMPProcess> m_aProcesses = new LinkedHashMap <> ();
+  private final ICommonsOrderedMap <IPeppolProcessIdentifier, SMPProcess> m_aProcesses = new CommonsLinkedHashMap <> ();
   private String m_sExtension;
 
   /**
@@ -265,7 +266,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
                                        .append ("ServiceGroup", m_aServiceGroup)
                                        .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
                                        .append ("Processes", m_aProcesses)
-                                       .appendIfNotEmpty ("Extension", m_sExtension)
+                                       .appendIf ("Extension", m_sExtension, StringHelper::hasText)
                                        .toString ();
   }
 

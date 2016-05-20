@@ -41,9 +41,7 @@
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -53,6 +51,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsLinkedHashMap;
+import com.helger.commons.collection.ext.ICommonsOrderedMap;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
@@ -77,7 +77,7 @@ import com.helger.peppol.smp.SMPExtensionConverter;
 public class SMPProcess implements ISMPProcess
 {
   private SimpleProcessIdentifier m_aProcessIdentifier;
-  private final Map <String, SMPEndpoint> m_aEndpoints = new LinkedHashMap <> ();
+  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap <> ();
   private String m_sExtension;
 
   public SMPProcess (@Nonnull final IProcessIdentifier aProcessIdentifier,

@@ -40,12 +40,12 @@
  */
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
@@ -308,7 +308,7 @@ public class SMPEndpoint implements ISMPEndpoint
   {
     final com.helger.peppol.bdxr.EndpointType ret = new com.helger.peppol.bdxr.EndpointType ();
     ret.setEndpointURI (m_sEndpointReference);
-    ret.setRequireBusinessLevelSignature (m_bRequireBusinessLevelSignature);
+    ret.setRequireBusinessLevelSignature (Boolean.valueOf (m_bRequireBusinessLevelSignature));
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
     ret.setServiceActivationDate (m_aServiceActivationDT);
     ret.setServiceExpirationDate (m_aServiceExpirationDT);

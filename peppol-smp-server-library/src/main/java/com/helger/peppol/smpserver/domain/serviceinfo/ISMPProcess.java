@@ -48,7 +48,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.compare.IComparator;
 import com.helger.commons.state.EChange;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.ISMPHasExtension;
@@ -140,4 +142,11 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
    */
   @Nonnull
   com.helger.peppol.bdxr.ProcessType getAsJAXBObjectBDXR ();
+
+  @Nonnull
+  static IComparator <ISMPProcess> comparator ()
+  {
+    return (aElement1, aElement2) -> IdentifierHelper.compareProcessIdentifiers (aElement1.getProcessIdentifier (),
+                                                                                 aElement2.getProcessIdentifier ());
+  }
 }

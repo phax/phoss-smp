@@ -41,6 +41,7 @@
 package com.helger.peppol.smpserver.domain.servicegroup;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
@@ -91,4 +92,10 @@ public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHas
    */
   @Nonnull
   com.helger.peppol.bdxr.ServiceGroupType getAsJAXBObjectBDXR ();
+
+  @Nonnull
+  static Comparator <ISMPServiceGroup> comparator ()
+  {
+    return Comparator.comparing (ISMPServiceGroup::getID);
+  }
 }
