@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.id.ComparatorHasIDString;
+import com.helger.commons.id.IHasID;
 import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -44,8 +44,9 @@ public class HCSMPTransportProfileSelect extends HCSelect
   {
     super (aRF);
 
-    for (final ISMPTransportProfile aTP : CollectionHelper.getSorted (SMPMetaManager.getTransportProfileMgr ().getAllSMPTransportProfiles (),
-                                                                      new ComparatorHasIDString <ISMPTransportProfile> ()))
+    for (final ISMPTransportProfile aTP : CollectionHelper.getSorted (SMPMetaManager.getTransportProfileMgr ()
+                                                                                    .getAllSMPTransportProfiles (),
+                                                                      IHasID.getComparatorID ()))
       addOption (aTP.getID (), getDisplayName (aTP));
   }
 }

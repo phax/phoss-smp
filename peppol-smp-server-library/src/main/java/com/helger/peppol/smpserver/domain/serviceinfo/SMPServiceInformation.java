@@ -51,8 +51,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsLinkedHashMap;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsOrderedMap;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.StringHelper;
@@ -161,9 +161,9 @@ public class SMPServiceInformation implements ISMPServiceInformation
   }
 
   @Nonnull
-  public List <SMPProcess> getAllProcesses ()
+  public ICommonsList <SMPProcess> getAllProcesses ()
   {
-    return CollectionHelper.newList (m_aProcesses.values ());
+    return m_aProcesses.copyOfValues ();
   }
 
   public void addProcess (@Nonnull final SMPProcess aProcess)
@@ -180,11 +180,6 @@ public class SMPServiceInformation implements ISMPServiceInformation
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
     m_aProcesses.clear ();
     m_aProcesses.putAll (aProcesses);
-  }
-
-  public boolean hasExtension ()
-  {
-    return StringHelper.hasText (m_sExtension);
   }
 
   @Nullable

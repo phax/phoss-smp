@@ -24,7 +24,7 @@ import com.helger.photon.basic.app.locale.ILocaleManager;
 import com.helger.photon.basic.app.menu.IMenuTree;
 import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
-import com.helger.photon.core.app.init.DefaultApplicationInitializer;
+import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.app.layout.ILayoutManager;
 
@@ -33,35 +33,30 @@ import com.helger.photon.core.app.layout.ILayoutManager;
  *
  * @author Philip Helger
  */
-public final class InitializerPublic extends DefaultApplicationInitializer <LayoutExecutionContext>
+public final class InitializerPublic implements IApplicationInitializer <LayoutExecutionContext>
 {
-  @Override
   public void initLocales (@Nonnull final ILocaleManager aLocaleMgr)
   {
     aLocaleMgr.registerLocale (CApp.DEFAULT_LOCALE);
     aLocaleMgr.setDefaultLocale (CApp.DEFAULT_LOCALE);
   }
 
-  @Override
   public void initLayout (@Nonnull final ILayoutManager <LayoutExecutionContext> aLayoutMgr)
   {
     // Register all layout area handler (order is important for SEO!)
     aLayoutMgr.registerAreaContentProvider (CLayout.LAYOUT_AREAID_VIEWPORT, new SMPRendererPublic ());
   }
 
-  @Override
   public void initMenu (@Nonnull final IMenuTree aMenuTree)
   {
     MenuPublic.init (aMenuTree);
   }
 
-  @Override
   public void initAjax (@Nonnull final IAjaxInvoker aAjaxInvoker)
   {
     CAjaxPublic.init (aAjaxInvoker);
   }
 
-  @Override
   public void initRest ()
   {}
 }

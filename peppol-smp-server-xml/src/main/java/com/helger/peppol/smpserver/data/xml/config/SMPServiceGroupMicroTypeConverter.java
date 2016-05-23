@@ -25,7 +25,7 @@ import com.helger.commons.microdom.MicroElement;
 import com.helger.commons.microdom.convert.IMicroTypeConverter;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.microdom.util.MicroHelper;
-import com.helger.peppol.identifier.IMutableParticipantIdentifier;
+import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -67,8 +67,8 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
     if (aOwner == null)
       throw new IllegalStateException ("Failed to resolve user ID '" + sOwnerID + "'");
 
-    final IMutableParticipantIdentifier aParticipantIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PARTICIPANT_ID),
-                                                                                                     IMutableParticipantIdentifier.class);
+    final SimpleParticipantIdentifier aParticipantIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PARTICIPANT_ID),
+                                                                                                   SimpleParticipantIdentifier.class);
 
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 

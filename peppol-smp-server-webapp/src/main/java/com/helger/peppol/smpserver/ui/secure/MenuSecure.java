@@ -46,7 +46,7 @@ public final class MenuSecure
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID);
     final IMenuObjectFilter aFilterPEPPOLDirectory = new AbstractMenuObjectFilter ()
     {
-      public boolean matchesFilter (@Nonnull final IMenuObject aValue)
+      public boolean test (@Nonnull final IMenuObject aValue)
       {
         return SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ();
       }

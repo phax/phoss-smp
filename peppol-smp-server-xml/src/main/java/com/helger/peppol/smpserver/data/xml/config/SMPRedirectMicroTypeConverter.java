@@ -25,7 +25,7 @@ import com.helger.commons.microdom.MicroElement;
 import com.helger.commons.microdom.convert.IMicroTypeConverter;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.microdom.util.MicroHelper;
-import com.helger.peppol.identifier.IMutableDocumentTypeIdentifier;
+import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
@@ -73,8 +73,8 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
     if (aServiceGroup == null)
       throw new IllegalStateException ("Failed to resolve service group with ID '" + sServiceGroupID + "'");
 
-    final IMutableDocumentTypeIdentifier aDocTypeIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_DOCUMENT_TYPE_IDENTIFIER),
-                                                                                                  IMutableDocumentTypeIdentifier.class);
+    final SimpleDocumentTypeIdentifier aDocTypeIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_DOCUMENT_TYPE_IDENTIFIER),
+                                                                                                SimpleDocumentTypeIdentifier.class);
     final String sTargetHref = aElement.getAttributeValue (ATTR_TARGET_HREF);
     final String sSubjectUniqueIdentifier = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE_SUID);
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);

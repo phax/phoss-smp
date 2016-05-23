@@ -16,14 +16,13 @@
  */
 package com.helger.peppol.smpserver.servlet;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nonnull;
 import javax.servlet.ServletContext;
 
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import com.helger.commons.collection.ext.CommonsHashMap;
+import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppSecurity;
 import com.helger.peppol.smpserver.app.AppSettings;
@@ -37,9 +36,6 @@ import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
 import com.helger.photon.security.login.LoggedInUserManager;
-import com.helger.photon.security.role.RoleManager;
-import com.helger.photon.security.user.UserManager;
-import com.helger.photon.security.usergroup.UserGroupManager;
 import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
@@ -90,11 +86,6 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
 
     super.initGlobals ();
 
-    // Call before accessing PhotonSecurityManager!
-    RoleManager.setCreateDefaults (false);
-    UserManager.setCreateDefaults (false);
-    UserGroupManager.setCreateDefaults (false);
-
     if (SMPServerConfiguration.isForceRoot ())
     {
       // Enforce an empty context path according to the specs!
@@ -117,9 +108,9 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
 
   @Override
   @Nonnull
-  protected Map <String, IApplicationInitializer <LayoutExecutionContext>> getAllInitializers ()
+  protected ICommonsMap <String, IApplicationInitializer <LayoutExecutionContext>> getAllInitializers ()
   {
-    final Map <String, IApplicationInitializer <LayoutExecutionContext>> ret = new HashMap <String, IApplicationInitializer <LayoutExecutionContext>> ();
+    final ICommonsMap <String, IApplicationInitializer <LayoutExecutionContext>> ret = new CommonsHashMap <> ();
     ret.put (CApplication.APP_ID_PUBLIC, new InitializerPublic ());
     ret.put (CApplication.APP_ID_SECURE, new InitializerSecure ());
     return ret;

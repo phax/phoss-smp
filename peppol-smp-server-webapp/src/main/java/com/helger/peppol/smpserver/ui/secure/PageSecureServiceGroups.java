@@ -35,7 +35,6 @@ import com.helger.commons.microdom.serialize.MicroReader;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
-import com.helger.commons.type.EBaseType;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.html.forms.HCEdit;
@@ -87,6 +86,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
+import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.photon.uictrls.prism.EPrismLanguage;
 import com.helger.photon.uictrls.prism.HCPrismJS;
@@ -443,13 +443,13 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                         new DTCol (new HCSpan ().addChild ("Ext?")
                                                                 .setTitle ("Is an Extension present?")),
                                         new DTCol (new HCSpan ().addChild ("Docs")
-                                                                .setTitle ("Number of assigned document types")).setDisplayType (EBaseType.INT,
+                                                                .setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
                                                                                                                                  aDisplayLocale),
                                         new DTCol (new HCSpan ().addChild ("Procs")
-                                                                .setTitle ("Number of assigned processes")).setDisplayType (EBaseType.INT,
+                                                                .setTitle ("Number of assigned processes")).setDisplayType (EDTColType.INT,
                                                                                                                             aDisplayLocale),
                                         new DTCol (new HCSpan ().addChild ("EPs")
-                                                                .setTitle ("Number of assigned endpoints")).setDisplayType (EBaseType.INT,
+                                                                .setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
                                                                                                                             aDisplayLocale),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceGroup aCurObject : aServiceGroupMgr.getAllSMPServiceGroups ())

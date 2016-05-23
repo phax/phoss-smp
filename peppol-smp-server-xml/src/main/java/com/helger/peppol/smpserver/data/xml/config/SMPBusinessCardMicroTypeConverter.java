@@ -16,13 +16,12 @@
  */
 package com.helger.peppol.smpserver.data.xml.config;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import org.joda.time.LocalDate;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.microdom.IMicroElement;

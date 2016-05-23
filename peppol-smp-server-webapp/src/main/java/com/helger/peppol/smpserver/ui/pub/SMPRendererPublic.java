@@ -22,7 +22,6 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
-import com.helger.commons.callback.INonThrowingRunnableWithParameter;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
@@ -57,13 +56,13 @@ import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbs;
 import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbsProvider;
 import com.helger.photon.bootstrap3.button.BootstrapButton;
 import com.helger.photon.bootstrap3.dropdown.BootstrapDropdownMenu;
+import com.helger.photon.bootstrap3.ext.BootstrapSystemMessage;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.nav.BootstrapNav;
 import com.helger.photon.bootstrap3.navbar.BootstrapNavbar;
 import com.helger.photon.bootstrap3.navbar.EBootstrapNavbarPosition;
 import com.helger.photon.bootstrap3.navbar.EBootstrapNavbarType;
 import com.helger.photon.bootstrap3.pageheader.BootstrapPageHeader;
-import com.helger.photon.bootstrap3.pages.settings.SystemMessageUIHelper;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapMenuItemRenderer;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapMenuItemRendererHorz;
 import com.helger.photon.core.EPhotonCoreText;
@@ -95,17 +94,14 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   public SMPRendererPublic ()
   {
     m_aFooterObjects = new ArrayList <IMenuObject> ();
-    ApplicationMenuTree.getTree ().iterateAllMenuObjects (new INonThrowingRunnableWithParameter <IMenuObject> ()
-    {
-      public void run (@Nonnull final IMenuObject aCurrentObject)
-      {
-        if (aCurrentObject.containsAttribute (CMenuPublic.FLAG_FOOTER))
-          m_aFooterObjects.add (aCurrentObject);
-      }
+    ApplicationMenuTree.getTree ().iterateAllMenuObjects (aCurrentObject -> {
+      if (aCurrentObject.containsAttribute (CMenuPublic.FLAG_FOOTER))
+        m_aFooterObjects.add (aCurrentObject);
     });
   }
 
-  private static void _addNavbarLoginLogout (@Nonnull final LayoutExecutionContext aLEC, @Nonnull final BootstrapNavbar aNavbar)
+  private static void _addNavbarLoginLogout (@Nonnull final LayoutExecutionContext aLEC,
+                                             @Nonnull final BootstrapNavbar aNavbar)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
@@ -119,7 +115,8 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
                                                                                           "/")));
       aNav.addItem (new HCSpan ().addClass (CBootstrapCSS.NAVBAR_TEXT)
                                  .addChild ("Logged in as ")
-                                 .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser, aDisplayLocale))));
+                                 .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser,
+                                                                                                         aDisplayLocale))));
 
       aNav.addItem (new HCA (LinkHelper.getURLWithContext (aRequestScope,
                                                            LogoutServlet.SERVLET_DEFAULT_PATH)).addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
@@ -131,7 +128,8 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
       final BootstrapDropdownMenu aDropDown = aNav.addDropdownMenu ("Login");
       {
         // 300px would lead to a messy layout - so 250px is fine
-        final HCDiv aDiv = new HCDiv ().addStyle (CCSSProperties.PADDING.newValue ("10px")).addStyle (CCSSProperties.WIDTH.newValue ("250px"));
+        final HCDiv aDiv = new HCDiv ().addStyle (CCSSProperties.PADDING.newValue ("10px"))
+                                       .addStyle (CCSSProperties.WIDTH.newValue ("250px"));
         aDiv.addChild (AppCommonUI.createViewLoginForm (aLEC, null, false).addClass (CBootstrapCSS.NAVBAR_FORM));
         aDropDown.addItem (aDiv);
       }
@@ -158,7 +156,8 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   {
     // Main menu
     final IMenuTree aMenuTree = aLEC.getMenuTree ();
-    final MenuItemDeterminatorCallback aCallback = new MenuItemDeterminatorCallback (aMenuTree, aLEC.getSelectedMenuItemID ())
+    final MenuItemDeterminatorCallback aCallback = new MenuItemDeterminatorCallback (aMenuTree,
+                                                                                     aLEC.getSelectedMenuItemID ())
     {
       @Override
       protected boolean isMenuItemValidToBeDisplayed (@Nonnull final IMenuObject aMenuObj)
@@ -203,7 +202,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
     final HCNodeList aPageContainer = new HCNodeList ();
 
     // First add the system message
-    aPageContainer.addChild (SystemMessageUIHelper.createDefaultBox ());
+    aPageContainer.addChild (BootstrapSystemMessage.createDefault ());
 
     // Handle 404 case here (see error404.jsp)
     if ("true".equals (aRequestScope.getAttributeAsString ("httpError")))
@@ -216,7 +215,8 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
                                                                   " (" +
                                                                   sHttpStatusMessage +
                                                                   ")" +
-                                                                  (StringHelper.hasText (sHttpRequestURI) ? " for request URI " + sHttpRequestURI
+                                                                  (StringHelper.hasText (sHttpRequestURI) ? " for request URI " +
+                                                                                                            sHttpRequestURI
                                                                                                           : "")));
     }
     else
@@ -244,7 +244,8 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
     aDiv.addChild (new HCP ().addChild ("Created by ")
                              .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"))
                              .addChild (" - Twitter: ")
-                             .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ().addChild ("@philiphelger"))
+                             .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ()
+                                                                                                    .addChild ("@philiphelger"))
                              .addChild (" - ")
                              .addChild (new HCA (new SimpleURL ("https://github.com/phax/peppol-smp-server")).setTargetBlank ()
                                                                                                              .addChild ("Source on GitHub")));

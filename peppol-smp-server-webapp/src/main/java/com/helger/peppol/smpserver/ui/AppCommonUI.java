@@ -19,6 +19,10 @@ package com.helger.peppol.smpserver.ui;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,22 +30,18 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
-import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
-
+import com.helger.commons.CGlobal;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.css.property.CCSSProperties;
 import com.helger.datetime.PDTFactory;
 import com.helger.datetime.format.PDTToString;
-import com.helger.datetime.format.PeriodFormatMultilingual;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCEditPassword;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCCol;
-import com.helger.html.hc.html.tabular.IHCTable;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.html.textlevel.HCWBR;
 import com.helger.html.hc.impl.HCNodeList;
@@ -68,9 +68,7 @@ import com.helger.photon.bootstrap3.label.BootstrapLabel;
 import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
 import com.helger.photon.bootstrap3.table.BootstrapTable;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
-import com.helger.photon.bootstrap3.uictrls.datatables.IBootstrapDataTablesConfigurator;
 import com.helger.photon.core.EPhotonCoreText;
-import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.login.CLogin;
@@ -86,29 +84,54 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 @Immutable
 public final class AppCommonUI
 {
-  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25).addItem (50).addItem (100).addItemAll ();
+  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25)
+                                                                                     .addItem (50)
+                                                                                     .addItem (100)
+                                                                                     .addItemAll ();
 
   private AppCommonUI ()
   {}
 
   public static void init ()
   {
-    BootstrapDataTables.setConfigurator (new IBootstrapDataTablesConfigurator ()
-    {
-      public void configure (@Nonnull final ILayoutExecutionContext aLEC,
-                             @Nonnull final IHCTable <?> aTable,
-                             @Nonnull final BootstrapDataTables aDataTables)
-      {
-        final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
-        aDataTables.setAutoWidth (false)
-                   .setLengthMenu (LENGTH_MENU)
-                   .setAjaxBuilder (new JQueryAjaxBuilder ().url (CAjaxPublic.DATATABLES.getInvocationURL (aRequestScope))
-                                                            .data (new JSAssocArray ().add (AjaxExecutorDataTables.OBJECT_ID, aTable.getID ())))
-                   .setServerFilterType (EDataTablesFilterType.ALL_TERMS_PER_ROW)
-                   .setTextLoadingURL (CAjaxPublic.DATATABLES_I18N.getInvocationURL (aRequestScope), AjaxExecutorDataTablesI18N.LANGUAGE_ID)
-                   .addPlugin (new DataTablesPluginSearchHighlight ());
-      }
+    BootstrapDataTables.setConfigurator ( (aLEC, aTable, aDataTables) -> {
+      final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
+      aDataTables.setAutoWidth (false)
+                 .setLengthMenu (LENGTH_MENU)
+                 .setAjaxBuilder (new JQueryAjaxBuilder ().url (CAjaxPublic.DATATABLES.getInvocationURL (aRequestScope))
+                                                          .data (new JSAssocArray ().add (AjaxExecutorDataTables.OBJECT_ID,
+                                                                                          aTable.getID ())))
+                 .setServerFilterType (EDataTablesFilterType.ALL_TERMS_PER_ROW)
+                 .setTextLoadingURL (CAjaxPublic.DATATABLES_I18N.getInvocationURL (aRequestScope),
+                                     AjaxExecutorDataTablesI18N.LANGUAGE_ID)
+                 .addPlugin (new DataTablesPluginSearchHighlight ());
     });
+  }
+
+  private static String _getPeriod (@Nonnull final LocalDateTime aNowLDT, @Nonnull final LocalDateTime aNotAfter)
+  {
+    final Period aPeriod = Period.between (aNowLDT.toLocalDate (), aNotAfter.toLocalDate ());
+    final Duration aDuration = Duration.between (aNowLDT.toLocalTime (),
+                                                 aNotAfter.plus (1, ChronoUnit.DAYS).toLocalTime ());
+    long nSecs = aDuration.getSeconds ();
+    final long nHours = nSecs / CGlobal.SECONDS_PER_HOUR;
+    nSecs -= nHours * CGlobal.SECONDS_PER_HOUR;
+    final long nMinutes = nSecs / CGlobal.SECONDS_PER_MINUTE;
+    nSecs -= nMinutes * CGlobal.SECONDS_PER_MINUTE;
+    String ret = "";
+    if (aPeriod.getYears () > 0)
+      ret += aPeriod.getYears () + " years, ";
+    return ret +
+           aPeriod.getMonths () +
+           " months, " +
+           aPeriod.getDays () +
+           " days, " +
+           nHours +
+           " hours, " +
+           nMinutes +
+           " minutes and " +
+           nSecs +
+           " seconds";
   }
 
   @Nonnull
@@ -125,7 +148,9 @@ public final class AppCommonUI
     final String sIDPassword = GlobalIDFactory.getNewStringID ();
     final String sIDErrorField = GlobalIDFactory.getNewStringID ();
 
-    final BootstrapForm aForm = new BootstrapForm (aLEC.getSelfHref (), bFullUI ? EBootstrapFormType.HORIZONTAL : EBootstrapFormType.DEFAULT);
+    final BootstrapForm aForm = new BootstrapForm (aLEC.getSelfHref (),
+                                                   bFullUI ? EBootstrapFormType.HORIZONTAL
+                                                           : EBootstrapFormType.DEFAULT);
     aForm.setLeft (3);
 
     // User name field
@@ -146,12 +171,15 @@ public final class AppCommonUI
       final JSPackage aOnClick = new JSPackage ();
       final JSAnonymousFunction aJSSuccess = new JSAnonymousFunction ();
       final JSVar aJSData = aJSSuccess.param ("data");
-      aJSSuccess.body ()._if (aJSData.ref (AjaxExecutorPublicLogin.JSON_LOGGEDIN),
-                              JSHtml.windowLocationReload (),
-                              JQuery.idRef (sIDErrorField).empty ().append (aJSData.ref (AjaxExecutorPublicLogin.JSON_HTML)));
+      aJSSuccess.body ()
+                ._if (aJSData.ref (AjaxExecutorPublicLogin.JSON_LOGGEDIN),
+                      JSHtml.windowLocationReload (),
+                      JQuery.idRef (sIDErrorField).empty ().append (aJSData.ref (AjaxExecutorPublicLogin.JSON_HTML)));
       aOnClick.add (new JQueryAjaxBuilder ().url (CAjaxPublic.LOGIN.getInvocationURI (aRequestScope))
-                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID, JQuery.idRef (sIDUserName).val ())
-                                                                      .add (CLogin.REQUEST_ATTR_PASSWORD, JQuery.idRef (sIDPassword).val ()))
+                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID,
+                                                                            JQuery.idRef (sIDUserName).val ())
+                                                                      .add (CLogin.REQUEST_ATTR_PASSWORD,
+                                                                            JQuery.idRef (sIDPassword).val ()))
                                             .success (aJSSuccess)
                                             .build ());
       aOnClick._return (false);
@@ -177,28 +205,33 @@ public final class AppCommonUI
     aCertDetails.addBodyRow ()
                 .addCell ("Valid from:")
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotBefore, aDisplayLocale) + " "),
-                          aNowLDT.isBefore (aNotBefore) ? new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("!!!NOT YET VALID!!!") : null);
+                          aNowLDT.isBefore (aNotBefore) ? new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("!!!NOT YET VALID!!!")
+                                                        : null);
     aCertDetails.addBodyRow ()
                 .addCell ("Valid to:")
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotAfter, aDisplayLocale) + " "),
                           aNowLDT.isAfter (aNotAfter) ? new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("!!!NO LONGER VALID!!!")
                                                       : new HCDiv ().addChild ("Valid for: " +
-                                                                               PeriodFormatMultilingual.getFormatterLong (aDisplayLocale)
-                                                                                                       .print (new Period (aNowLDT, aNotAfter))));
+                                                                               _getPeriod (aNowLDT, aNotAfter)));
 
     if (aPublicKey instanceof RSAPublicKey)
     {
       // Special handling for RSA
       aCertDetails.addBodyRow ()
                   .addCell ("Public key:")
-                  .addCell (aX509Cert.getPublicKey ().getAlgorithm () + " (" + ((RSAPublicKey) aPublicKey).getModulus ().bitLength () + " bits)");
+                  .addCell (aX509Cert.getPublicKey ().getAlgorithm () +
+                            " (" +
+                            ((RSAPublicKey) aPublicKey).getModulus ().bitLength () +
+                            " bits)");
     }
     else
     {
       // Usually EC or DSA key
       aCertDetails.addBodyRow ().addCell ("Public key:").addCell (aX509Cert.getPublicKey ().getAlgorithm ());
     }
-    aCertDetails.addBodyRow ().addCell ("Signature algorithm:").addCell (aX509Cert.getSigAlgName () + " (" + aX509Cert.getSigAlgOID () + ")");
+    aCertDetails.addBodyRow ()
+                .addCell ("Signature algorithm:")
+                .addCell (aX509Cert.getSigAlgName () + " (" + aX509Cert.getSigAlgOID () + ")");
     return aCertDetails;
   }
 
@@ -268,7 +301,9 @@ public final class AppCommonUI
       aExtensions.addChild (new HCCode ().addChild (sExtension));
     }
     aUL.addItem ().addChild ("Extension IDs (" + aExtensionIDs.size () + "): ").addChild (aExtensions);
-    aUL.addItem ().addChild ("Customization ID (transaction + extensions): ").addChild (new HCCode ().addChild (aParts.getAsUBLCustomizationID ()));
+    aUL.addItem ()
+       .addChild ("Customization ID (transaction + extensions): ")
+       .addChild (new HCCode ().addChild (aParts.getAsUBLCustomizationID ()));
     aUL.addItem ().addChild ("Version: ").addChild (new HCCode ().addChild (aParts.getVersion ()));
     return aUL;
   }

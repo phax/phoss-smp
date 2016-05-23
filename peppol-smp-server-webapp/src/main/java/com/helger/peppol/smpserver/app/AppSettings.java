@@ -85,28 +85,28 @@ public final class AppSettings extends AbstractGlobalSingleton
   @Nullable
   public static String getGlobalDebug ()
   {
-    return s_aSettings.getStringValue ("global.debug");
+    return s_aSettings.getAsString ("global.debug");
   }
 
   @Nullable
   public static String getGlobalProduction ()
   {
-    return s_aSettings.getStringValue ("global.production");
+    return s_aSettings.getAsString ("global.production");
   }
 
   @Nullable
   public static String getDataPath ()
   {
-    return s_aSettings.getStringValue ("webapp.datapath");
+    return s_aSettings.getAsString ("webapp.datapath");
   }
 
   public static boolean isCheckFileAccess ()
   {
-    return s_aSettings.getBooleanValue ("webapp.checkfileaccess", true);
+    return s_aSettings.getAsBoolean ("webapp.checkfileaccess", true);
   }
 
   public static boolean isTestVersion ()
   {
-    return s_aSettings.getBooleanValue ("webapp.testversion", GlobalDebug.isDebugMode ());
+    return s_aSettings.getAsBoolean ("webapp.testversion", GlobalDebug.isDebugMode ());
   }
 }

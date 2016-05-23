@@ -157,11 +157,6 @@ public class SMPProcess implements ISMPProcess
     return EChange.valueOf (m_aEndpoints.remove (sTransportProfile) != null);
   }
 
-  public boolean hasExtension ()
-  {
-    return StringHelper.hasText (m_sExtension);
-  }
-
   @Nullable
   public String getExtension ()
   {

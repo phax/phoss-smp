@@ -26,20 +26,23 @@ import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.textlevel.HCSmall;
 import com.helger.peppol.smpserver.app.CApp;
+import com.helger.photon.basic.auth.credentials.ICredentialValidationResult;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginHTMLProvider;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 import com.helger.photon.core.app.html.IHTMLProvider;
 import com.helger.photon.core.login.LoginManager;
-import com.helger.photon.security.login.ELoginResult;
 
 public final class AppLoginManager extends LoginManager
 {
   @Override
-  protected IHTMLProvider createLoginScreen (final boolean bLoginError, @Nonnull final ELoginResult eLoginResult)
+  protected IHTMLProvider createLoginScreen (final boolean bLoginError,
+                                             @Nonnull final ICredentialValidationResult aLoginResult)
   {
-    return new BootstrapLoginHTMLProvider (bLoginError, eLoginResult, CApp.getApplicationTitle () + " Administration - Login")
+    return new BootstrapLoginHTMLProvider (bLoginError,
+                                           aLoginResult,
+                                           CApp.getApplicationTitle () + " Administration - Login")
     {
       @Override
       protected void onAfterContainer (@Nonnull final ISimpleWebExecutionContext aSWEC,

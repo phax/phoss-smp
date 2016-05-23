@@ -18,13 +18,12 @@ package com.helger.peppol.smpserver.ui.secure;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
@@ -38,13 +37,11 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SMap;
 import com.helger.commons.url.URLHelper;
-import com.helger.datetime.CPDT;
 import com.helger.datetime.PDTFactory;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
-import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -88,6 +85,7 @@ import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.button.BootstrapButton;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap3.form.BootstrapCheckBox;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
@@ -97,6 +95,7 @@ import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap3.uictrls.datetimepicker.BootstrapDateTimePicker;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.RequestField;
+import com.helger.photon.core.form.RequestFieldBoolean;
 import com.helger.photon.core.form.RequestFieldDate;
 import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.uicore.icon.EDefaultIcon;
@@ -512,10 +511,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                              sEndpointReference,
                                              bRequireBusinessLevelSignature,
                                              sMinimumAuthenticationLevel,
-                                             aNotBeforeDate == null ? null
-                                                                    : aNotBeforeDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
-                                             aNotAfterDate == null ? null
-                                                                   : aNotAfterDate.toLocalDateTime (CPDT.NULL_LOCAL_TIME),
+                                             aNotBeforeDate == null ? null : aNotBeforeDate.atStartOfDay (),
+                                             aNotAfterDate == null ? null : aNotAfterDate.atStartOfDay (),
                                              sCertificate,
                                              sServiceDescription,
                                              sTechnicalContact,
@@ -615,9 +612,9 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_ENDPOINT_REFERENCE)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires Business Level Signature")
-                                                 .setCtrl (new HCCheckBox (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
-                                                                           aSelectedEndpoint != null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
-                                                                                                     : false))
+                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
+                                                                                                           aSelectedEndpoint != null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
+                                                                                                                                     : false)))
                                                  .setHelpText ("Check the box if the recipient requires business-level signatures for\r\n" +
                                                                "the message, meaning a signature applied to the business message\r\n" +
                                                                "before the message is put on the transport. This is independent of\r\n" +

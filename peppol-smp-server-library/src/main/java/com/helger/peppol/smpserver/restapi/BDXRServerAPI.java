@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.base64.Base64;
+import com.helger.commons.lang.BooleanHelper;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
@@ -457,7 +458,8 @@ public final class BDXRServerAPI
           {
             final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),
                                                            aJAXBEndpoint.getEndpointURI (),
-                                                           aJAXBEndpoint.isRequireBusinessLevelSignature (),
+                                                           BooleanHelper.getBooleanValue (aJAXBEndpoint.isRequireBusinessLevelSignature (),
+                                                                                          false),
                                                            aJAXBEndpoint.getMinimumAuthenticationLevel (),
                                                            aJAXBEndpoint.getServiceActivationDate (),
                                                            aJAXBEndpoint.getServiceExpirationDate (),

@@ -22,7 +22,6 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.user.ComparatorSMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
@@ -38,7 +37,8 @@ public class HCSMPUserSelect extends HCExtSelect
   {
     super (aRF);
 
-    for (final ISMPUser aUser : CollectionHelper.getSorted (SMPMetaManager.getUserMgr ().getAllUsers (), new ComparatorSMPUser (aDisplayLocale)))
+    for (final ISMPUser aUser : CollectionHelper.getSorted (SMPMetaManager.getUserMgr ().getAllUsers (),
+                                                            ISMPUser.comparator (aDisplayLocale)))
       addOption (aUser.getID (), aUser.getUserName ());
 
     if (!hasSelectedOption ())

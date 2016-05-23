@@ -148,12 +148,6 @@ public class SMPServiceGroup implements ISMPServiceGroup
     return EChange.CHANGED;
   }
 
-  public boolean hasExtension ()
-  {
-    return StringHelper.hasText (m_sExtension);
-  }
-
-  @Nullable
   public String getExtension ()
   {
     return m_sExtension;
@@ -224,7 +218,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
   {
     return new ToStringGenerator (this).append ("ID", m_sID)
                                        .append ("OwnerID", m_sOwnerID)
-                                       .appendIfNotEmpty ("Extension", m_sExtension)
+                                       .appendIf ("Extension", m_sExtension, StringHelper::hasText)
                                        .append ("ParticipantIdentifier", m_aParticipantIdentifier)
                                        .toString ();
   }

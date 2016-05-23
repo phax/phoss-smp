@@ -41,6 +41,7 @@
 package com.helger.peppol.smpserver.data.sql.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import javax.annotation.Nullable;
 import javax.persistence.Column;
@@ -58,10 +59,9 @@ import javax.persistence.Transient;
 
 import org.eclipse.persistence.annotations.Convert;
 import org.eclipse.persistence.annotations.Converter;
-import org.joda.time.LocalDateTime;
 
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
-import com.helger.db.jpa.eclipselink.converter.JPAJodaLocalDateTimeConverter;
+import com.helger.db.jpa.eclipselink.converter.JPALocalDateTimeConverter;
 import com.helger.peppol.smp.ExtensionType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 
@@ -72,7 +72,7 @@ import com.helger.peppol.smp.SMPExtensionConverter;
  */
 @Entity
 @Table (name = "smp_endpoint")
-@Converter (name = "localdatetime", converterClass = JPAJodaLocalDateTimeConverter.class)
+@Converter (name = "localdatetime", converterClass = JPALocalDateTimeConverter.class)
 public class DBEndpoint implements Serializable
 {
   private DBEndpointID m_aID;
@@ -132,36 +132,12 @@ public class DBEndpoint implements Serializable
   }
 
   @ManyToOne (fetch = FetchType.LAZY)
-  @JoinColumns ({ @JoinColumn (name = "processIdentifier",
-                               referencedColumnName = "processIdentifier",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false),
-                  @JoinColumn (name = "processIdentifierType",
-                               referencedColumnName = "processIdentifierType",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false),
-                  @JoinColumn (name = "businessIdentifier",
-                               referencedColumnName = "businessIdentifier",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false),
-                  @JoinColumn (name = "businessIdentifierScheme",
-                               referencedColumnName = "businessIdentifierScheme",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false),
-                  @JoinColumn (name = "documentIdentifier",
-                               referencedColumnName = "documentIdentifier",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false),
-                  @JoinColumn (name = "documentIdentifierScheme",
-                               referencedColumnName = "documentIdentifierScheme",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false) })
+  @JoinColumns ({ @JoinColumn (name = "processIdentifier", referencedColumnName = "processIdentifier", nullable = false, insertable = false, updatable = false),
+                  @JoinColumn (name = "processIdentifierType", referencedColumnName = "processIdentifierType", nullable = false, insertable = false, updatable = false),
+                  @JoinColumn (name = "businessIdentifier", referencedColumnName = "businessIdentifier", nullable = false, insertable = false, updatable = false),
+                  @JoinColumn (name = "businessIdentifierScheme", referencedColumnName = "businessIdentifierScheme", nullable = false, insertable = false, updatable = false),
+                  @JoinColumn (name = "documentIdentifier", referencedColumnName = "documentIdentifier", nullable = false, insertable = false, updatable = false),
+                  @JoinColumn (name = "documentIdentifierScheme", referencedColumnName = "documentIdentifierScheme", nullable = false, insertable = false, updatable = false) })
   public DBProcess getProcess ()
   {
     return m_aProcess;

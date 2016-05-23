@@ -30,7 +30,7 @@ import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFile;
 import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFileManager;
 import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
-import com.helger.photon.core.app.init.DefaultApplicationInitializer;
+import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.app.layout.ILayoutManager;
 import com.helger.photon.uictrls.prism.EPrismLanguage;
@@ -40,34 +40,29 @@ import com.helger.photon.uictrls.prism.EPrismLanguage;
  *
  * @author Philip Helger
  */
-public final class InitializerSecure extends DefaultApplicationInitializer <LayoutExecutionContext>
+public final class InitializerSecure implements IApplicationInitializer <LayoutExecutionContext>
 {
-  @Override
   public void initLocales (@Nonnull final ILocaleManager aLocaleMgr)
   {
     aLocaleMgr.registerLocale (CApp.DEFAULT_LOCALE);
     aLocaleMgr.setDefaultLocale (CApp.DEFAULT_LOCALE);
   }
 
-  @Override
   public void initLayout (@Nonnull final ILayoutManager <LayoutExecutionContext> aLayoutMgr)
   {
     aLayoutMgr.registerAreaContentProvider (CLayout.LAYOUT_AREAID_VIEWPORT, new SMPRendererSecure ());
   }
 
-  @Override
   public void initMenu (@Nonnull final IMenuTree aMenuTree)
   {
     MenuSecure.init (aMenuTree);
   }
 
-  @Override
   public void initAjax (@Nonnull final IAjaxInvoker aAjaxInvoker)
   {
     CAjaxSecure.init (aAjaxInvoker);
   }
 
-  @Override
   public void initRest ()
   {
     final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();

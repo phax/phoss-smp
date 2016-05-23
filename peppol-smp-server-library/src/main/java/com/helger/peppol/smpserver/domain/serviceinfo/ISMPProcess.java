@@ -53,7 +53,7 @@ import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
-import com.helger.peppol.smpserver.domain.ISMPHasExtension;
+import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 
 /**
  * This interface represents a single process information within a service

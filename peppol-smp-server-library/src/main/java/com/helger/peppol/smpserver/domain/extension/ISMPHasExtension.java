@@ -38,64 +38,35 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.domain.servicegroup;
+package com.helger.peppol.smpserver.domain.extension;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import javax.annotation.Nullable;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.id.IHasID;
-import com.helger.peppol.identifier.participant.IPeppolParticipantIdentifier;
-import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
+import com.helger.commons.string.StringHelper;
 
 /**
- * Base interface for a single SMP service group.
+ * Base interface for objects having an extension (service group, redirect,
+ * endpoint, process and service metadata)
  *
  * @author Philip Helger
  */
-public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHasExtension
+public interface ISMPHasExtension
 {
   /**
-   * @return the URI encoded participant identifier is the ID.
+   * @return The string representation of the extension element. May be
+   *         <code>null</code>. If an extension is present it must be
+   *         well-formed XML content.
+   * @see #hasExtension()
    */
-  @Nonnull
-  @Nonempty
-  String getID ();
+  @Nullable
+  String getExtension ();
 
   /**
-   * @return The ID of the owning user of this service group. Never
-   *         <code>null</code>.
+   * @return <code>true</code> if an extension is present, <code>false</code>
+   *         otherwise.
    */
-  @Nonnull
-  @Nonempty
-  String getOwnerID ();
-
-  /**
-   * @return The participant identifier of this service group. Never
-   *         <code>null</code>.
-   */
-  @Nonnull
-  IPeppolParticipantIdentifier getParticpantIdentifier ();
-
-  /**
-   * @return This service information object as a PEPPOL SMP JAXB object for the
-   *         REST interface. Never <code>null</code>.
-   */
-  @Nonnull
-  com.helger.peppol.smp.ServiceGroupType getAsJAXBObjectPeppol ();
-
-  /**
-   * @return This service information object as a BDXR SMP JAXB object for the
-   *         REST interface. Never <code>null</code>.
-   */
-  @Nonnull
-  com.helger.peppol.bdxr.ServiceGroupType getAsJAXBObjectBDXR ();
-
-  @Nonnull
-  static Comparator <ISMPServiceGroup> comparator ()
+  default boolean hasExtension ()
   {
-    return Comparator.comparing (ISMPServiceGroup::getID);
+    return StringHelper.hasText (getExtension ());
   }
 }

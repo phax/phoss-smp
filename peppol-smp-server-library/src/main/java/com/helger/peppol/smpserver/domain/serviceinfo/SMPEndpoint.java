@@ -233,11 +233,6 @@ public class SMPEndpoint implements ISMPEndpoint
     m_sTechnicalInformationUrl = sTechnicalInformationUrl;
   }
 
-  public boolean hasExtension ()
-  {
-    return StringHelper.hasText (m_sExtension);
-  }
-
   @Nullable
   public String getExtension ()
   {

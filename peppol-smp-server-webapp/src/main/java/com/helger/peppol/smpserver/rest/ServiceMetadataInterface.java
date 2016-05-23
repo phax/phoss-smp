@@ -88,7 +88,7 @@ public final class ServiceMetadataInterface
 
       // Convert to DOM document
       final MarshallerSMPSignedServiceMetadataType aMarshaller = new MarshallerSMPSignedServiceMetadataType ();
-      final Document aDoc = aMarshaller.write (ret);
+      final Document aDoc = aMarshaller.getAsDocument (ret);
 
       // Sign the document
       try

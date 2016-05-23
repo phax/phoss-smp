@@ -16,19 +16,18 @@
  */
 package com.helger.peppol.smpserver.data.xml.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.microdom.IMicroElement;
 import com.helger.commons.microdom.MicroElement;
 import com.helger.commons.microdom.convert.IMicroTypeConverter;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.microdom.util.MicroHelper;
-import com.helger.peppol.identifier.IMutableProcessIdentifier;
+import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
@@ -65,9 +64,9 @@ public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter
   @Nonnull
   public ISMPProcess convertToNative (@Nonnull final IMicroElement aElement)
   {
-    final IMutableProcessIdentifier aProcessIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PROCESS_IDENTIFIER),
-                                                                                             IMutableProcessIdentifier.class);
-    final List <SMPEndpoint> aEndpoints = new ArrayList <> ();
+    final SimpleProcessIdentifier aProcessIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PROCESS_IDENTIFIER),
+                                                                                           SimpleProcessIdentifier.class);
+    final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
     for (final IMicroElement aEndpoint : aElement.getAllChildElements (ELEMENT_ENDPOINT))
       aEndpoints.add (MicroTypeConverter.convertToNative (aEndpoint, SMPEndpoint.class));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);

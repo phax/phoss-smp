@@ -18,12 +18,11 @@ package com.helger.peppol.smpserver.ui.secure;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
-
-import org.joda.time.LocalDateTime;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
@@ -39,7 +38,6 @@ import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
-import com.helger.peppol.smpserver.domain.servicegroup.ComparatorSMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
@@ -95,7 +93,8 @@ public class PageSecureTasks extends AbstractSMPWebPage
     {
       final KeyLoadingResult aKeyLoadingResult = KeyLoadingResult.loadConfiguredKey ();
       if (aKeyLoadingResult.isFailure ())
-        aOL.addItem (_createError ("Problem with the certificate configuration"), new HCDiv ().addChild (aKeyLoadingResult.getErrorMessage ()));
+        aOL.addItem (_createError ("Problem with the certificate configuration"),
+                     new HCDiv ().addChild (aKeyLoadingResult.getErrorMessage ()));
     }
 
     // Check SML configuration
@@ -116,7 +115,8 @@ public class PageSecureTasks extends AbstractSMPWebPage
       else
       {
         // For all service groups
-        for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (aServiceGroups, new ComparatorSMPServiceGroup ()))
+        for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (aServiceGroups,
+                                                                                ISMPServiceGroup.comparator ()))
         {
           final HCUL aULPerSG = new HCUL ();
           final Collection <? extends ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (aServiceGroup);
@@ -148,7 +148,8 @@ public class PageSecureTasks extends AbstractSMPWebPage
                   {
                     if (aEndpoint.getServiceActivationDateTime ().isAfter (aNowDT))
                       aULPerEndpoint.addItem (_createWarning ("The endpoint is not yet active. It will be active from " +
-                                                              PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (), aDisplayLocale) +
+                                                              PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (),
+                                                                                       aDisplayLocale) +
                                                               "."));
                   }
 
@@ -156,12 +157,14 @@ public class PageSecureTasks extends AbstractSMPWebPage
                   {
                     if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowDT))
                       aULPerEndpoint.addItem (_createError ("The endpoint is not longer active. It was valid until " +
-                                                            PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (), aDisplayLocale) +
+                                                            PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
+                                                                                     aDisplayLocale) +
                                                             "."));
                     else
                       if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowPlusDT))
                         aULPerEndpoint.addItem (_createWarning ("The endpoint will be inactive soon. It is only valid until " +
-                                                                PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (), aDisplayLocale) +
+                                                                PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
+                                                                                         aDisplayLocale) +
                                                                 "."));
                   }
 
@@ -206,14 +209,16 @@ public class PageSecureTasks extends AbstractSMPWebPage
                 if (aULPerProcess.hasChildren ())
                   aULPerDocType.addItem (new HCDiv ().addChild ("Process ")
                                                      .addChild (new HCCode ().addClass (CUICoreCSS.CSS_CLASS_NOWRAP)
-                                                                             .addChild (aProcess.getProcessIdentifier ().getURIEncoded ())),
+                                                                             .addChild (aProcess.getProcessIdentifier ()
+                                                                                                .getURIEncoded ())),
                                          aULPerProcess);
               }
               // Show per document type errors
               if (aULPerDocType.hasChildren ())
                 aULPerSG.addItem (new HCDiv ().addChild ("Document type ")
                                               .addChild (new HCCode ().addClass (CUICoreCSS.CSS_CLASS_NOWRAP)
-                                                                      .addChild (aServiceInfo.getDocumentTypeIdentifier ().getURIEncoded ())),
+                                                                      .addChild (aServiceInfo.getDocumentTypeIdentifier ()
+                                                                                             .getURIEncoded ())),
                                   aULPerDocType);
             }
           }
@@ -221,7 +226,8 @@ public class PageSecureTasks extends AbstractSMPWebPage
           // Show per service group errors
           if (aULPerSG.hasChildren ())
             aOL.addItem (new HCDiv ().addChild ("Service group ")
-                                     .addChild (new HCCode ().addChild (aServiceGroup.getParticpantIdentifier ().getURIEncoded ())),
+                                     .addChild (new HCCode ().addChild (aServiceGroup.getParticpantIdentifier ()
+                                                                                     .getURIEncoded ())),
                          aULPerSG);
         }
       }

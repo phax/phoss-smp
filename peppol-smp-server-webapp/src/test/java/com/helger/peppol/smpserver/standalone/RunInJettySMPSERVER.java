@@ -16,29 +16,12 @@
  */
 package com.helger.peppol.smpserver.standalone;
 
-import java.io.File;
-
-import org.eclipse.jetty.annotations.AnnotationConfiguration;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.webapp.Configuration;
-import org.eclipse.jetty.webapp.FragmentConfiguration;
-import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
-import org.eclipse.jetty.webapp.MetaInfConfiguration;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.webapp.WebInfConfiguration;
-import org.eclipse.jetty.webapp.WebXmlConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.helger.commons.system.SystemProperties;
+import com.helger.photon.jetty.JettyStarter;
 
 /**
- * Run this as an application and your SML will be up and running on port 8080
- * of your local machine. Please ensure that you have adopted the Hibernate
- * configuration file.<br>
+ * Run this as an application and your SMP will be up and running on port 90 (to
+ * not interfere with anything already running on port 80) of your local
+ * machine. Please ensure that you have adopted the DB configuration file.<br>
  * To stop the running Jetty simply invoke the {@link JettyStopSMPSERVER}
  * application in this package. It performs a graceful shutdown of the App
  * Server.
@@ -47,64 +30,8 @@ import com.helger.commons.system.SystemProperties;
  */
 public final class RunInJettySMPSERVER
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (RunInJettySMPSERVER.class);
-  private static final String RESOURCE_PREFIX = "target/webapp-classes";
-
   public static void main (final String... args) throws Exception
   {
-    if (System.getSecurityManager () != null)
-      throw new IllegalStateException ("Security Manager is set but not supported - aborting!");
-
-    // Create main server
-    final Server aServer = new Server ();
-    // Create connector on Port
-    final ServerConnector aConnector = new ServerConnector (aServer);
-    aConnector.setPort (90);
-    aConnector.setIdleTimeout (30000);
-    // aConnector.setStatsOn (true);
-    aServer.setConnectors (new Connector [] { aConnector });
-
-    final WebAppContext aWebAppCtx = new WebAppContext ();
-    aWebAppCtx.setDescriptor (RESOURCE_PREFIX + "/WEB-INF/web.xml");
-    aWebAppCtx.setResourceBase (RESOURCE_PREFIX);
-    aWebAppCtx.setContextPath ("/");
-    aWebAppCtx.setTempDirectory (new File (SystemProperties.getTmpDir () + '/' + RunInJettySMPSERVER.class.getName ()));
-    aWebAppCtx.setParentLoaderPriority (true);
-    // Important to add the AnnotationConfiguration!
-    aWebAppCtx.setConfigurations (new Configuration [] { new WebInfConfiguration (),
-                                                         new WebXmlConfiguration (),
-                                                         new MetaInfConfiguration (),
-                                                         new FragmentConfiguration (),
-                                                         new JettyWebXmlConfiguration (),
-                                                         new AnnotationConfiguration () });
-    aServer.setHandler (aWebAppCtx);
-    final ServletContextHandler aCtx = aWebAppCtx;
-
-    // Setting final properties
-    // Stops the server when ctrl+c is pressed (registers to
-    // Runtime.addShutdownHook)
-    aServer.setStopAtShutdown (true);
-    // Starting shutdown listener thread
-    new JettyMonitor ().start ();
-    try
-    {
-      // Starting the engines:
-      aServer.start ();
-      if (aCtx.isFailed ())
-      {
-        s_aLogger.error ("Failed to start server - stopping server!");
-        aServer.stop ();
-        s_aLogger.error ("Failed to start server - stopped server!");
-      }
-      else
-      {
-        // Running the server!
-        aServer.join ();
-      }
-    }
-    catch (final Exception ex)
-    {
-      throw new IllegalStateException ("Failed to run server!", ex);
-    }
+    new JettyStarter (RunInJettySMPSERVER.class).setPort (90).setStopPort (8078).run ();
   }
 }

@@ -49,7 +49,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.compare.IComparator;
-import com.helger.peppol.smpserver.domain.ISMPHasExtension;
+import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 
 /**
  * Represents a single SMP endpoint that is contained in a single

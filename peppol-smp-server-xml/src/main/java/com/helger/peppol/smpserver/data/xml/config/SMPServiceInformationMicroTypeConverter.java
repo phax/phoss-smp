@@ -28,7 +28,7 @@ import com.helger.commons.microdom.MicroElement;
 import com.helger.commons.microdom.convert.IMicroTypeConverter;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.microdom.util.MicroHelper;
-import com.helger.peppol.identifier.IMutableDocumentTypeIdentifier;
+import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -78,8 +78,8 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
     if (aServiceGroup == null)
       throw new IllegalStateException ("Failed to resolve service group with ID '" + sServiceGroupID + "'");
 
-    final IMutableDocumentTypeIdentifier aDocTypeIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_DOCUMENT_TYPE_IDENTIFIER),
-                                                                                                  IMutableDocumentTypeIdentifier.class);
+    final SimpleDocumentTypeIdentifier aDocTypeIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_DOCUMENT_TYPE_IDENTIFIER),
+                                                                                                SimpleDocumentTypeIdentifier.class);
     final List <SMPProcess> aProcesses = new ArrayList <> ();
     for (final IMicroElement aProcess : aElement.getAllChildElements (ELEMENT_PROCESS))
       aProcesses.add (MicroTypeConverter.convertToNative (aProcess, SMPProcess.class));

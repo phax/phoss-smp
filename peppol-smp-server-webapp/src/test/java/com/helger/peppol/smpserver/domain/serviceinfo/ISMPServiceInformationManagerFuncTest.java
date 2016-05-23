@@ -18,10 +18,11 @@ package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.PersistenceException;
 
 import org.eclipse.persistence.exceptions.DatabaseException;
-import org.joda.time.LocalDateTime;
 import org.junit.Rule;
 import org.junit.Test;
 

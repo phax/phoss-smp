@@ -22,7 +22,6 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.servicegroup.ComparatorSMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.core.form.RequestField;
@@ -41,7 +40,7 @@ public class HCServiceGroupSelect extends HCExtSelect
 
     for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (SMPMetaManager.getServiceGroupMgr ()
                                                                                           .getAllSMPServiceGroups (),
-                                                                            new ComparatorSMPServiceGroup ()))
+                                                                            ISMPServiceGroup.comparator ()))
     {
       final String sOwnerName = AppCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
       addOption (aServiceGroup.getID (),

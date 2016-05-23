@@ -147,11 +147,6 @@ public class SMPRedirect implements ISMPRedirect
     m_sSubjectUniqueIdentifier = sSubjectUniqueIdentifier;
   }
 
-  public boolean hasExtension ()
-  {
-    return StringHelper.hasText (m_sExtension);
-  }
-
   @Nullable
   public String getExtension ()
   {
