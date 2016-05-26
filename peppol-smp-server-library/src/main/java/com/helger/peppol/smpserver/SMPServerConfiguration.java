@@ -51,7 +51,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
@@ -130,7 +129,7 @@ public final class SMPServerConfiguration
     s_aRWLock.writeLock ().lock ();
     try
     {
-      s_aConfigFile = new ConfigFile (ArrayHelper.newArray (aFilePaths, String.class));
+      s_aConfigFile = new ConfigFile (aFilePaths);
       if (!s_aConfigFile.isRead ())
       {
         s_aLogger.warn ("Failed to read smp-server.properties from any of the paths: " + aFilePaths);
