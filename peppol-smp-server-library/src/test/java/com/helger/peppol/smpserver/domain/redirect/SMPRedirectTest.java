@@ -54,7 +54,7 @@ import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentif
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
-import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
+import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 
 /**
@@ -65,7 +65,7 @@ import com.helger.photon.security.CSecurity;
 public final class SMPRedirectTest
 {
   @Rule
-  public final TestRule m_aTestRule = new PhotonBasicWebTestRule ();
+  public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
   public void testRedirect ()

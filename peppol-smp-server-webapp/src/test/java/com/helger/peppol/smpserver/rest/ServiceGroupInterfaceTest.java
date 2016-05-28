@@ -47,6 +47,7 @@ import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
+import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
 import com.helger.peppol.smpserver.data.xml.mgr.XMLServiceGroupManager;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.security.CSecurity;
@@ -129,9 +130,10 @@ public final class ServiceGroupInterfaceTest
     Response aResponseMsg;
 
     // GET
+    final boolean bIsSQL = SMPMetaManager.getManagerProvider () instanceof SQLManagerProvider;
     final int nStatus = _testResponse (aTarget.path (sPI_LC).request ().get (),
-                                       m_aRule.isSQLMode () ? new int [] { 404, 500 } : new int [] { 404 });
-    if (m_aRule.isSQLMode () && nStatus == 500)
+                                       bIsSQL ? new int [] { 404, 500 } : new int [] { 404 });
+    if (bIsSQL && nStatus == 500)
     {
       // Seems like MySQL is not running
       return;

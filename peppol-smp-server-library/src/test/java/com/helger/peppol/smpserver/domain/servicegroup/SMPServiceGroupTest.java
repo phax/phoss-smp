@@ -50,9 +50,9 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
-import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 
 /**
@@ -63,13 +63,14 @@ import com.helger.photon.security.CSecurity;
 public final class SMPServiceGroupTest
 {
   @Rule
-  public final TestRule m_aTestRule = new PhotonBasicWebTestRule ();
+  public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
   public void testBasic ()
   {
-    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (IPeppolParticipantIdentifier.DEFAULT_SCHEME,
-                                                                        "0088:dummy");
+    final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
+                                                     .createParticipantIdentifier (IPeppolParticipantIdentifier.DEFAULT_SCHEME,
+                                                                                   "0088:dummy");
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());

@@ -31,9 +31,9 @@ import org.junit.rules.TestRule;
 
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
-import com.helger.peppol.smpserver.SMPServerTestRule;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 
 /**
  * Test class for class {@link ISMPServiceGroupManager}.

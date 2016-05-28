@@ -62,6 +62,7 @@ import com.helger.peppol.smp.ServiceEndpointList;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
+import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
 import com.helger.peppol.smpserver.data.xml.mgr.XMLServiceGroupManager;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -174,9 +175,10 @@ public final class ServiceMetadataInterfaceTest
     final WebTarget aTarget = m_aRule.getWebTarget ();
     Response aResponseMsg;
 
+    final boolean bIsSQL = SMPMetaManager.getManagerProvider () instanceof SQLManagerProvider;
     final int nStatus = _testResponse (aTarget.path (sPI_LC).request ().get (),
-                                       m_aRule.isSQLMode () ? new int [] { 404, 500 } : new int [] { 404 });
-    if (m_aRule.isSQLMode () && nStatus == 500)
+                                       bIsSQL ? new int [] { 404, 500 } : new int [] { 404 });
+    if (bIsSQL && nStatus == 500)
     {
       // Seems like MySQL is not running
       return;
@@ -275,9 +277,10 @@ public final class ServiceMetadataInterfaceTest
     final WebTarget aTarget = m_aRule.getWebTarget ();
     Response aResponseMsg;
 
+    final boolean bIsSQL = SMPMetaManager.getManagerProvider () instanceof SQLManagerProvider;
     final int nStatus = _testResponse (aTarget.path (sPI_LC).request ().get (),
-                                       m_aRule.isSQLMode () ? new int [] { 404, 500 } : new int [] { 404 });
-    if (m_aRule.isSQLMode () && nStatus == 500)
+                                       bIsSQL ? new int [] { 404, 500 } : new int [] { 404 });
+    if (bIsSQL && nStatus == 500)
     {
       // Seems like MySQL is not running
       return;

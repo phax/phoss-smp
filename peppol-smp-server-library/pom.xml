@@ -121,6 +121,11 @@
       <artifactId>ph-jaxws</artifactId>
       <type>pom</type>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>

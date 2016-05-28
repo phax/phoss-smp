@@ -34,11 +34,11 @@ import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
-import com.helger.peppol.smpserver.SMPServerTestRule;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 
 /**
  * Test class for class {@link ISMPServiceInformationManager}.
