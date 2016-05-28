@@ -56,11 +56,9 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
-import com.helger.peppol.identifier.DocumentIdentifierType;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smp.CompleteServiceGroupType;
@@ -123,7 +121,7 @@ public final class SMPServerAPI
 
     try
     {
-      final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final PeppolParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -244,7 +242,7 @@ public final class SMPServerAPI
 
     try
     {
-      final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final PeppolParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -307,7 +305,7 @@ public final class SMPServerAPI
 
     try
     {
-      final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final PeppolParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -361,7 +359,7 @@ public final class SMPServerAPI
 
     try
     {
-      final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final PeppolParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -422,7 +420,7 @@ public final class SMPServerAPI
                                         m_aAPIProvider.getCurrentURI ());
       }
 
-      final DocumentIdentifierType aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         throw new SMPNotFoundException ("Failed to parse documentTypeID '" +
@@ -501,7 +499,7 @@ public final class SMPServerAPI
 
     try
     {
-      final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final PeppolParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -648,7 +646,7 @@ public final class SMPServerAPI
 
     try
     {
-      final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final PeppolParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier

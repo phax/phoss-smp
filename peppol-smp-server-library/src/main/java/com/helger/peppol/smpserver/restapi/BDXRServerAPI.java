@@ -73,7 +73,6 @@ import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -384,7 +383,7 @@ public final class BDXRServerAPI
         return ESuccess.FAILURE;
       }
 
-      final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         // Invalid identifier
@@ -532,7 +531,7 @@ public final class BDXRServerAPI
         return ESuccess.FAILURE;
       }
 
-      final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         // Invalid identifier
