@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerTestRule;
@@ -63,9 +65,9 @@ public final class ISMPRedirectManagerFuncTest
     }
     try
     {
-      final PeppolParticipantIdentifier aPI1 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
-      final PeppolParticipantIdentifier aPI2 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest2");
-      final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("junit::testdoc#ext:1.0");
+      final IParticipantIdentifier aPI1 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
+      final IParticipantIdentifier aPI2 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest2");
+      final IDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("junit::testdoc#ext:1.0");
 
       final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);

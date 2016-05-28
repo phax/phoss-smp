@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerTestRule;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -47,8 +48,8 @@ public final class ISMPServiceGroupManagerFuncTest
   @Test
   public void testBasic ()
   {
-    final PeppolParticipantIdentifier aPI1 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
-    final PeppolParticipantIdentifier aPI2 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest2");
+    final IParticipantIdentifier aPI1 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
+    final IParticipantIdentifier aPI2 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest2");
     final String sSG1 = SMPServiceGroup.createSMPServiceGroupID (aPI1);
     final String sSG2 = SMPServiceGroup.createSMPServiceGroupID (aPI2);
     final String sOwner1ID = "junitsg1";

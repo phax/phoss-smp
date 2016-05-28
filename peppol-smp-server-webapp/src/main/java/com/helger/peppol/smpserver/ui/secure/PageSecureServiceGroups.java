@@ -47,7 +47,6 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -178,7 +177,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
                                                                                             .getScheme ()
                                                                            : IPeppolParticipantIdentifier.DEFAULT_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                                                 .setReadOnly (bEdit));
+                                                                                                                          .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
@@ -235,7 +234,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "Participant ID value must not be empty!");
       else
       {
-        aParticipantID = PeppolParticipantIdentifier.createIfValid (sParticipantIDScheme, sParticipantIDValue);
+        aParticipantID = new SimpleParticipantIdentifier (sParticipantIDScheme, sParticipantIDValue);
         if (aParticipantID == null)
           aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "The provided participant ID has an invalid syntax!");
         else

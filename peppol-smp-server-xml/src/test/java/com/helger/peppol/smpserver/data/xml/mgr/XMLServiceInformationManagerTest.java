@@ -27,6 +27,7 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.datetime.PDTFactory;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
@@ -63,7 +64,7 @@ public final class XMLServiceInformationManagerTest
 
     final IUser aTestUser = PhotonSecurityManager.getUserMgr ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
     assertNotNull (aTestUser);
-    final PeppolParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     aServiceGroupMgr.deleteSMPServiceGroup (aPI);
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
     try

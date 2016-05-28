@@ -42,9 +42,10 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -115,13 +116,13 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   protected ISMPRedirect getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
   {
     final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
-    final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+    final IParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
                                                          .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup != null)
     {
       final String sDocTypeID = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID);
-      final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
+      final IDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
       if (aDocTypeID != null)
       {
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
@@ -142,13 +143,13 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
         eFormAction == EWebPageFormAction.DELETE)
     {
       final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
-      final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
                                                            .getSMPServiceGroupOfID (aServiceGroupID);
       if (aServiceGroup != null)
       {
         final String sDocTypeID = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID);
-        final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
+        final IDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
         if (aDocTypeID != null)
         {
           aWPEC.getRequestScope ().setAttribute (ATTR_SERVICE_GROUP, aServiceGroup);
@@ -224,7 +225,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
       aFormErrors.addFieldError (FIELD_DOCTYPE_ID, "Document Type ID must not be empty!");
     else
     {
-      aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
+      aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeID);
       if (aDocTypeID == null)
         aFormErrors.addFieldError (FIELD_DOCTYPE_ID, "The provided Document Type ID has an invalid syntax!");
       else

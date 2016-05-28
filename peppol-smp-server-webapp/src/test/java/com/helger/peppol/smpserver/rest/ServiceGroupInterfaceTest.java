@@ -43,6 +43,7 @@ import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
@@ -116,10 +117,10 @@ public final class ServiceGroupInterfaceTest
   public void testCreateAndDeleteServiceGroup ()
   {
     // Lower case version
-    final PeppolParticipantIdentifier aPI_LC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final ParticipantIdentifierType aPI_LC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
     final String sPI_LC = aPI_LC.getURIEncoded ();
     // Upper case version
-    final PeppolParticipantIdentifier aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
+    final ParticipantIdentifierType aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
     final String sPI_UC = aPI_UC.getURIEncoded ();
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (aPI_LC);

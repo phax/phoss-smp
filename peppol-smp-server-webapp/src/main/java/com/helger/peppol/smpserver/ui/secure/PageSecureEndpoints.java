@@ -55,13 +55,12 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
@@ -164,13 +163,12 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
     final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
-    final PeppolParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+    final IParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
 
     final String sDocTypeIDScheme = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_SCHEME);
     final String sDocTypeIDValue = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_VALUE);
-    final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createIfValid (sDocTypeIDScheme,
-                                                                                                sDocTypeIDValue);
+    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (sDocTypeIDScheme, sDocTypeIDValue);
     return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
   }
 

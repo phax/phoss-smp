@@ -47,6 +47,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
@@ -66,8 +68,8 @@ public final class SMPRedirectTest
   @Test
   public void testRedirect ()
   {
-    final PeppolParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
-    final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
+    final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final IDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
 
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 

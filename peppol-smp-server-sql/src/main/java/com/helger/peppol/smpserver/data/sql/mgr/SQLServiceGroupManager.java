@@ -63,7 +63,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnershipID;
@@ -155,7 +155,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    final IParticipantIdentifier aParticipantIdentifier = PeppolParticipantIdentifier.createFromURIPartOrNull (sSMPServiceGroupID);
+    final IParticipantIdentifier aParticipantIdentifier = SimpleParticipantIdentifier.createFromURIPartOrNull (sSMPServiceGroupID);
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction (new Callable <EChange> ()
     {

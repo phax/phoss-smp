@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import com.helger.commons.mock.CommonsTestHelper;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 import com.helger.photon.security.CSecurity;
@@ -38,7 +39,7 @@ public final class SMPServiceGroupFuncTest
   @Test
   public void testBasic ()
   {
-    final PeppolParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
     CommonsTestHelper.testMicroTypeConversion (aSG);
   }

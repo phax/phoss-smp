@@ -44,6 +44,7 @@ import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
@@ -131,10 +132,10 @@ public final class ServiceMetadataInterfaceTest
   public void testCreateAndDeleteServiceInformation ()
   {
     // Lower case
-    final PeppolParticipantIdentifier aPI_LC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final ParticipantIdentifierType aPI_LC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
     final String sPI_LC = aPI_LC.getURIEncoded ();
     // Upper case
-    final PeppolParticipantIdentifier aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
+    final ParticipantIdentifierType aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
     final String sPI_UC = aPI_UC.getURIEncoded ();
 
     final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
@@ -251,10 +252,10 @@ public final class ServiceMetadataInterfaceTest
   public void testCreateAndDeleteRedirect ()
   {
     // Lower case
-    final PeppolParticipantIdentifier aPI_LC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final ParticipantIdentifierType aPI_LC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
     final String sPI_LC = aPI_LC.getURIEncoded ();
     // Upper case
-    final PeppolParticipantIdentifier aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
+    final ParticipantIdentifierType aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
     final String sPI_UC = aPI_UC.getURIEncoded ();
 
     final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();

@@ -53,6 +53,7 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.datetime.PDTFactory;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
@@ -74,7 +75,7 @@ public final class SMPServiceInformationTest
   @Test
   public void testBasic ()
   {
-    final PeppolParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     final ISMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
@@ -122,7 +123,7 @@ public final class SMPServiceInformationTest
   @Test
   public void testMinimal ()
   {
-    final PeppolParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     final ISMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     final SMPEndpoint aEP = new SMPEndpoint ("tp",
