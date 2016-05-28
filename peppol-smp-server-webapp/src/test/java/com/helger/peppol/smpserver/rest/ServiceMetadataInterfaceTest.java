@@ -45,9 +45,11 @@ import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
@@ -138,7 +140,7 @@ public final class ServiceMetadataInterfaceTest
     final ParticipantIdentifierType aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
     final String sPI_UC = aPI_UC.getURIEncoded ();
 
-    final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
+    final IDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
     final String sDT = aDT.getURIEncoded ();
 
     final SimpleProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V20.getAsProcessIdentifier ();
@@ -149,7 +151,7 @@ public final class ServiceMetadataInterfaceTest
     final ServiceMetadataType aSM = new ServiceMetadataType ();
     final ServiceInformationType aSI = new ServiceInformationType ();
     aSI.setParticipantIdentifier (aPI_LC);
-    aSI.setDocumentIdentifier (aDT);
+    aSI.setDocumentIdentifier (new SimpleDocumentTypeIdentifier (aDT));
     {
       final ProcessListType aPL = new ProcessListType ();
       final ProcessType aProcess = new ProcessType ();
@@ -258,7 +260,7 @@ public final class ServiceMetadataInterfaceTest
     final ParticipantIdentifierType aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
     final String sPI_UC = aPI_UC.getURIEncoded ();
 
-    final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
+    final IPeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
     final String sDT = aDT.getURIEncoded ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
