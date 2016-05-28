@@ -25,6 +25,13 @@ import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
+/**
+ * This {@link ISMPManagerProvider} implementation returns non-<code>null</code>
+ * managers that all do nothing. This is only needed to access the identifier
+ * factory.
+ *
+ * @author Philip Helger
+ */
 public class MockSMPManagerProvider implements ISMPManagerProvider
 {
   public ISMPTransportProfileManager createTransportProfileMgr ()
@@ -33,27 +40,27 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
     {
       public EChange updateSMPTransportProfile (final String sSMPTransportProfileID, final String sName)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public EChange removeSMPTransportProfile (final String sSMPTransportProfileID)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public ISMPTransportProfile getSMPTransportProfileOfID (final String sID)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public Collection <? extends ISMPTransportProfile> getAllSMPTransportProfiles ()
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public ISMPTransportProfile createSMPTransportProfile (final String sID, final String sName)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public boolean containsSMPTransportProfileWithID (final String sID)
@@ -70,12 +77,12 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
       public Object verifyOwnership (final IParticipantIdentifier aServiceGroupID,
                                      final ISMPUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public ISMPUser validateUserCredentials (final BasicAuthClientCredentials aCredentials) throws Throwable
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public void updateUser (final String sUserName, final String sPassword)
@@ -88,7 +95,7 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
 
       public ISMPUser getUserOfID (final String sUserID)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public int getUserCount ()
@@ -98,7 +105,7 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
 
       public Collection <? extends ISMPUser> getAllUsers ()
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public void deleteUser (final String sUserName)
@@ -117,12 +124,12 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
                                             final String sOwnerID,
                                             final String sExtension)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public ISMPServiceGroup getSMPServiceGroupOfID (final IParticipantIdentifier aParticipantIdentifier)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public int getSMPServiceGroupCountOfOwner (final String sOwnerID)
@@ -137,24 +144,24 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
 
       public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (final String sOwnerID)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public EChange deleteSMPServiceGroup (final IParticipantIdentifier aParticipantIdentifier)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public ISMPServiceGroup createSMPServiceGroup (final String sOwnerID,
                                                      final IParticipantIdentifier aParticipantIdentifier,
                                                      final String sExtension)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public boolean containsSMPServiceGroupWithID (final IParticipantIdentifier aParticipantIdentifier)
@@ -171,7 +178,7 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
       public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (final ISMPServiceGroup aServiceGroup,
                                                                        final IDocumentTypeIdentifier aDocTypeID)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public int getSMPRedirectCount ()
@@ -181,22 +188,22 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
 
       public Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public Collection <? extends ISMPRedirect> getAllSMPRedirects ()
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public EChange deleteSMPRedirect (final ISMPRedirect aSMPRedirect)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public EChange deleteAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public ISMPRedirect createOrUpdateSMPRedirect (final ISMPServiceGroup aServiceGroup,
@@ -205,7 +212,7 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
                                                      final String sSubjectUniqueIdentifier,
                                                      final String sExtension)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
     };
   }
@@ -220,7 +227,7 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
       public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (final ISMPServiceGroup aServiceGroup,
                                                                                            final IDocumentTypeIdentifier aDocumentTypeIdentifier)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public int getSMPServiceInformationCount ()
@@ -230,17 +237,17 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
 
       public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (final ISMPServiceGroup aServiceGroup)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public ISMPServiceInformation findServiceInformation (final ISMPServiceGroup aServiceGroup,
@@ -248,17 +255,17 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
                                                             final IProcessIdentifier aProcessID,
                                                             final ISMPTransportProfile aTransportProfile)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public EChange deleteSMPServiceInformation (final ISMPServiceInformation aSMPServiceInformation)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public EChange deleteAllSMPServiceInformationOfServiceGroup (final ISMPServiceGroup aServiceGroup)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
     };
   }
@@ -269,12 +276,12 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
     {
       public ISMPBusinessCard getSMPBusinessCardOfServiceGroup (final ISMPServiceGroup aServiceGroup)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public ISMPBusinessCard getSMPBusinessCardOfID (final String sID)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public int getSMPBusinessCardCount ()
@@ -284,18 +291,18 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
 
       public Collection <? extends ISMPBusinessCard> getAllSMPBusinessCards ()
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public EChange deleteSMPBusinessCard (final ISMPBusinessCard aSMPBusinessCard)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
 
       public ISMPBusinessCard createOrUpdateSMPBusinessCard (final ISMPServiceGroup aServiceGroup,
                                                              final List <SMPBusinessCardEntity> aEntities)
       {
-        return null;
+        throw new UnsupportedOperationException ();
       }
     };
   }
