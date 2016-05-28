@@ -48,9 +48,11 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
 import com.helger.photon.security.CSecurity;
@@ -68,8 +70,10 @@ public final class SMPRedirectTest
   @Test
   public void testRedirect ()
   {
-    final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
-    final IDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
+    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (IPeppolParticipantIdentifier.DEFAULT_SCHEME,
+                                                                        "0088:dummy");
+    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (IPeppolDocumentTypeIdentifier.DEFAULT_SCHEME,
+                                                                                 "testdoctype");
 
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 

@@ -53,10 +53,16 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.datetime.PDTFactory;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
+import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
+import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
@@ -103,13 +109,15 @@ public final class SMPServiceInformationTest
     assertEquals ("ti", aEP.getTechnicalInformationUrl ());
     assertEquals ("extep", aEP.getExtension ());
 
-    final PeppolProcessIdentifier aProcessID = PeppolProcessIdentifier.createWithDefaultScheme ("testproc");
+    final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (IPeppolProcessIdentifier.DEFAULT_SCHEME,
+                                                                       "testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
     assertEquals ("extproc", aProcess.getExtension ());
 
-    final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
+    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (IPeppolDocumentTypeIdentifier.DEFAULT_SCHEME,
+                                                                                 "testdoctype");
     final SMPServiceInformation aSI = new SMPServiceInformation (aSG,
                                                                  aDocTypeID,
                                                                  CollectionHelper.newList (aProcess),
@@ -123,7 +131,8 @@ public final class SMPServiceInformationTest
   @Test
   public void testMinimal ()
   {
-    final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (IPeppolParticipantIdentifier.DEFAULT_SCHEME,
+                                                                        "0088:dummy");
     final ISMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     final SMPEndpoint aEP = new SMPEndpoint ("tp",
@@ -149,13 +158,15 @@ public final class SMPServiceInformationTest
     assertNull (aEP.getTechnicalInformationUrl ());
     assertNull (aEP.getExtension ());
 
-    final PeppolProcessIdentifier aProcessID = PeppolProcessIdentifier.createWithDefaultScheme ("testproc");
+    final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (IPeppolProcessIdentifier.DEFAULT_SCHEME,
+                                                                       "testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), (String) null);
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
     assertNull (aProcess.getExtension ());
 
-    final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
+    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (IPeppolDocumentTypeIdentifier.DEFAULT_SCHEME,
+                                                                                 "testdoctype");
     final SMPServiceInformation aSI = new SMPServiceInformation (aSG,
                                                                  aDocTypeID,
                                                                  CollectionHelper.newList (aProcess),
