@@ -54,7 +54,9 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
@@ -369,12 +371,12 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                           : aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_SCHEME);
     final String sDocTypeIDValue = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getValue ()
                                          : aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_VALUE);
-    IPeppolDocumentTypeIdentifier aDocTypeID = null;
+    IDocumentTypeIdentifier aDocTypeID = null;
     final String sProcessIDScheme = bEdit ? aSelectedProcess.getProcessIdentifier ().getScheme ()
                                           : aWPEC.getAttributeAsString (FIELD_PROCESS_ID_SCHEME);
     final String sProcessIDValue = bEdit ? aSelectedProcess.getProcessIdentifier ().getValue ()
                                          : aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
-    IPeppolProcessIdentifier aProcessID = null;
+    IProcessIdentifier aProcessID = null;
 
     final String sTransportProfileID = bEdit ? aSelectedEndpoint.getTransportProfile ()
                                              : aWPEC.getAttributeAsString (FIELD_TRANSPORT_PROFILE);
@@ -409,7 +411,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "Document type ID value must not be empty!");
       else
       {
-        aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeIDScheme +
+        aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeIDScheme +
                                                                            CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
                                                                            sDocTypeIDValue);
         if (aDocTypeID == null)

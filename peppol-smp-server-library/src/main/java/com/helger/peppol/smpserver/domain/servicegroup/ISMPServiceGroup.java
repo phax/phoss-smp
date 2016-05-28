@@ -47,7 +47,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
-import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 
 /**
@@ -77,7 +77,7 @@ public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHas
    *         <code>null</code>.
    */
   @Nonnull
-  IPeppolParticipantIdentifier getParticpantIdentifier ();
+  IParticipantIdentifier getParticpantIdentifier ();
 
   /**
    * @return This service information object as a PEPPOL SMP JAXB object for the

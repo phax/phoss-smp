@@ -48,6 +48,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
 import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -79,7 +80,7 @@ public interface ISMPRedirect extends IHasID <String>, Serializable, ISMPHasExte
    *         <code>null</code>.
    */
   @Nonnull
-  IPeppolDocumentTypeIdentifier getDocumentTypeIdentifier ();
+  IDocumentTypeIdentifier getDocumentTypeIdentifier ();
 
   /**
    * @return The destination href of the new SMP. Never <code>null</code>.

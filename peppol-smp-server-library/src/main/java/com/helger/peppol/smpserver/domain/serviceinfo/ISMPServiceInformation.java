@@ -54,14 +54,13 @@ import com.helger.commons.id.IHasID;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
  * This interface represents the main information in a service metadata, if no
  * redirect is present. It consists of a document type identifier (
- * {@link IPeppolDocumentTypeIdentifier}) and a list of processes (
+ * {@link IDocumentTypeIdentifier}) and a list of processes (
  * {@link ISMPProcess}).
  *
  * @author Philip Helger

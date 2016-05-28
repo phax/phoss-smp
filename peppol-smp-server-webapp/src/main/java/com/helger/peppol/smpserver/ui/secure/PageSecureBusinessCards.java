@@ -19,7 +19,6 @@ package com.helger.peppol.smpserver.ui.secure;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -66,8 +65,8 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.pd.client.PDClient;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
@@ -277,7 +276,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
-    final List <SMPBusinessCardEntity> aSMPEntities = new ArrayList <> ();
+    final List <SMPBusinessCardEntity> aSMPEntities = new ArrayList<> ();
 
     // validations
     if (StringHelper.isEmpty (sServiceGroupID))
@@ -322,7 +321,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         final String sGeoInfo = aEntityRow.get (SUFFIX_GEO_INFO);
 
         // Entity Identifiers
-        final List <SMPBusinessCardIdentifier> aSMPIdentifiers = new ArrayList <> ();
+        final List <SMPBusinessCardIdentifier> aSMPIdentifiers = new ArrayList<> ();
         final IRequestParamMap aIdentifiers = aEntities.getMap (sEntityRowID, PREFIX_IDENTIFIER);
         if (aIdentifiers != null)
           for (final String sIdentifierRowID : aIdentifiers.keySet ())
@@ -360,15 +359,11 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
             }
           }
 
-        Collections.sort (aSMPIdentifiers, new Comparator <SMPBusinessCardIdentifier> ()
-        {
-          public int compare (final SMPBusinessCardIdentifier o1, final SMPBusinessCardIdentifier o2)
-          {
-            int ret = o1.getScheme ().compareToIgnoreCase (o2.getScheme ());
-            if (ret == 0)
-              ret = o1.getValue ().compareToIgnoreCase (o2.getValue ());
-            return ret;
-          }
+        Collections.sort (aSMPIdentifiers, (o1, o2) -> {
+          int ret = o1.getScheme ().compareToIgnoreCase (o2.getScheme ());
+          if (ret == 0)
+            ret = o1.getValue ().compareToIgnoreCase (o2.getValue ());
+          return ret;
         });
 
         // Entity Website URIs
@@ -376,7 +371,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                                        sEntityRowID,
                                                                        SUFFIX_WEBSITE_URIS);
         final String sWebsiteURIs = aEntityRow.get (SUFFIX_WEBSITE_URIS);
-        final List <String> aWebsiteURIs = new ArrayList <> ();
+        final List <String> aWebsiteURIs = new ArrayList<> ();
         for (final String sWebsiteURI : RegExHelper.getSplitToArray (sWebsiteURIs, "\\n"))
         {
           final String sRealWebsiteURI = sWebsiteURI.trim ();
@@ -388,7 +383,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         }
 
         // Entity Contacts
-        final List <SMPBusinessCardContact> aSMPContacts = new ArrayList <> ();
+        final List <SMPBusinessCardContact> aSMPContacts = new ArrayList<> ();
         final IRequestParamMap aContacts = aEntities.getMap (sEntityRowID, PREFIX_CONTACT);
         if (aContacts != null)
           for (final String sContactRowID : aContacts.keySet ())
@@ -427,23 +422,19 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
             }
           }
 
-        Collections.sort (aSMPContacts, new Comparator <SMPBusinessCardContact> ()
-        {
-          public int compare (final SMPBusinessCardContact o1, final SMPBusinessCardContact o2)
+        Collections.sort (aSMPContacts, (o1, o2) -> {
+          int ret = CompareHelper.compareIgnoreCase (o1.getType (), o2.getType ());
+          if (ret == 0)
           {
-            int ret = CompareHelper.compareIgnoreCase (o1.getType (), o2.getType ());
+            ret = CompareHelper.compareIgnoreCase (o1.getName (), o2.getName ());
             if (ret == 0)
             {
-              ret = CompareHelper.compareIgnoreCase (o1.getName (), o2.getName ());
+              ret = CompareHelper.compareIgnoreCase (o1.getPhoneNumber (), o2.getPhoneNumber ());
               if (ret == 0)
-              {
-                ret = CompareHelper.compareIgnoreCase (o1.getPhoneNumber (), o2.getPhoneNumber ());
-                if (ret == 0)
-                  ret = CompareHelper.compareIgnoreCase (o1.getEmail (), o2.getEmail ());
-              }
+                ret = CompareHelper.compareIgnoreCase (o1.getEmail (), o2.getEmail ());
             }
-            return ret;
           }
+          return ret;
         });
 
         // Entity Additional Information
@@ -477,13 +468,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     if (aFormErrors.isEmpty ())
     {
       // Store in a consistent manner
-      Collections.sort (aSMPEntities, new Comparator <SMPBusinessCardEntity> ()
-      {
-        public int compare (final SMPBusinessCardEntity o1, final SMPBusinessCardEntity o2)
-        {
-          return o1.getName ().compareToIgnoreCase (o2.getName ());
-        }
-      });
+      Collections.sort (aSMPEntities, (o1, o2) -> o1.getName ().compareToIgnoreCase (o2.getName ()));
       aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities);
       aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
                                                                   aServiceGroup.getID () +
@@ -864,7 +849,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   private void _publishToIndexer (@Nonnull final WebPageExecutionContext aWPEC,
                                   @Nonnull final ISMPBusinessCard aSelectedObject)
   {
-    final IPeppolParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ().getParticpantIdentifier ();
+    final IParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ().getParticpantIdentifier ();
     final ESuccess eSuccess = new PDClient (URLHelper.getAsURI (SMPServerConfiguration.getPEPPOLDirectoryHostName ())).addServiceGroupToIndex (aParticipantID);
     if (eSuccess.isSuccess ())
       aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +

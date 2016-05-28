@@ -53,8 +53,7 @@ import com.helger.commons.type.ObjectType;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
@@ -69,7 +68,7 @@ public class SMPRedirect implements ISMPRedirect
 
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
-  private PeppolDocumentTypeIdentifier m_aDocumentTypeIdentifier;
+  private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
   private String m_sTargetHref;
   private String m_sSubjectUniqueIdentifier;
   private String m_sExtension;
@@ -109,7 +108,7 @@ public class SMPRedirect implements ISMPRedirect
   }
 
   @Nonnull
-  public IPeppolDocumentTypeIdentifier getDocumentTypeIdentifier ()
+  public IDocumentTypeIdentifier getDocumentTypeIdentifier ()
   {
     return m_aDocumentTypeIdentifier;
   }
@@ -118,7 +117,7 @@ public class SMPRedirect implements ISMPRedirect
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
     // Make a copy to avoid external changes
-    m_aDocumentTypeIdentifier = new PeppolDocumentTypeIdentifier (aDocumentTypeIdentifier);
+    m_aDocumentTypeIdentifier = new SimpleDocumentTypeIdentifier (aDocumentTypeIdentifier);
   }
 
   @Nonnull

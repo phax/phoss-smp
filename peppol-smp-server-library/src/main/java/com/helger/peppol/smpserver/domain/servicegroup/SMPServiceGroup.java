@@ -58,8 +58,7 @@ import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.bdxr.BDXRHelper;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
 
 /**
@@ -77,7 +76,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
   private String m_sExtension;
 
   // Status member
-  private final PeppolParticipantIdentifier m_aParticipantIdentifier;
+  private final IParticipantIdentifier m_aParticipantIdentifier;
 
   /**
    * Create a unified participant identifier with a lower cased value, because
@@ -106,10 +105,10 @@ public class SMPServiceGroup implements ISMPServiceGroup
    * @return The new participant identifier with a lower cased value.
    */
   @Nonnull
-  public static PeppolParticipantIdentifier createUnifiedParticipantIdentifier (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  public static IParticipantIdentifier createUnifiedParticipantIdentifier (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
   {
     ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
-    return new PeppolParticipantIdentifier (aParticipantIdentifier.getScheme (),
+    return new SimpleParticipantIdentifier (aParticipantIdentifier.getScheme (),
                                             createUnifiedParticipantIdentifierValue (aParticipantIdentifier.getValue ()));
   }
 
@@ -163,7 +162,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
   }
 
   @Nonnull
-  public IPeppolParticipantIdentifier getParticpantIdentifier ()
+  public IParticipantIdentifier getParticpantIdentifier ()
   {
     return m_aParticipantIdentifier;
   }
@@ -172,7 +171,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
   public com.helger.peppol.smp.ServiceGroupType getAsJAXBObjectPeppol ()
   {
     final com.helger.peppol.smp.ServiceGroupType ret = new com.helger.peppol.smp.ServiceGroupType ();
-    ret.setParticipantIdentifier (m_aParticipantIdentifier.getClone ());
+    ret.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aParticipantIdentifier));
     if (false)
     {
       // This is set by the REST server
