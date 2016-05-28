@@ -39,8 +39,7 @@ import com.helger.commons.microdom.MicroDocument;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
+import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
@@ -130,8 +129,8 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
 
   @Nullable
   public ISMPServiceInformation findServiceInformation (@Nullable final ISMPServiceGroup aServiceGroup,
-                                                        @Nullable final IPeppolDocumentTypeIdentifier aDocTypeID,
-                                                        @Nullable final IPeppolProcessIdentifier aProcessID,
+                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID,
+                                                        @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
     final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
@@ -298,7 +297,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   @ReturnsMutableCopy
   public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final Collection <ISMPServiceInformation> ret = new ArrayList <> ();
+    final Collection <ISMPServiceInformation> ret = new ArrayList<> ();
     if (aServiceGroup != null)
     {
       m_aRWLock.readLock ().lock ();
@@ -320,7 +319,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   @ReturnsMutableCopy
   public Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final Collection <IDocumentTypeIdentifier> ret = new ArrayList <> ();
+    final Collection <IDocumentTypeIdentifier> ret = new ArrayList<> ();
     if (aServiceGroup != null)
     {
       m_aRWLock.readLock ().lock ();
@@ -347,7 +346,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     if (aDocumentTypeIdentifier == null)
       return null;
 
-    final List <ISMPServiceInformation> ret = new ArrayList <> ();
+    final List <ISMPServiceInformation> ret = new ArrayList<> ();
 
     m_aRWLock.readLock ().lock ();
     try

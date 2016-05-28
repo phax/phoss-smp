@@ -52,8 +52,9 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
 import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
@@ -87,7 +88,7 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    *         <code>null</code>.
    */
   @Nonnull
-  IPeppolDocumentTypeIdentifier getDocumentTypeIdentifier ();
+  IDocumentTypeIdentifier getDocumentTypeIdentifier ();
 
   /**
    * @return The number of contained process information. Always &ge; 0.
@@ -103,7 +104,7 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    * @return <code>null</code> if no such process exists
    */
   @Nullable
-  ISMPProcess getProcessOfID (@Nullable IPeppolProcessIdentifier aProcessID);
+  ISMPProcess getProcessOfID (@Nullable IProcessIdentifier aProcessID);
 
   /**
    * @return A copy of the list of all processes associated with this service

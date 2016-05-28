@@ -55,7 +55,7 @@ import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.CPeppolIdentifier;
+import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 
@@ -84,7 +84,7 @@ public class DBServiceMetadataID implements Serializable
     setDocumentTypeIdentifier (aDocumentTypeID);
   }
 
-  @Column (name = "businessIdentifierScheme", nullable = false, length = CPeppolIdentifier.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;
@@ -113,7 +113,7 @@ public class DBServiceMetadataID implements Serializable
     setBusinessIdentifier (aPI.getValue ());
   }
 
-  @Column (name = "documentIdentifierScheme", nullable = false, length = CPeppolIdentifier.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "documentIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getDocumentTypeIdentifierScheme ()
   {
     return m_sDocumentTypeIdentifierScheme;

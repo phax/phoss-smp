@@ -18,9 +18,7 @@ package com.helger.peppol.smpserver.data.xml.mgr;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -33,6 +31,8 @@ import com.helger.commons.annotation.MustBeLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsHashMap;
+import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.microdom.IMicroDocument;
 import com.helger.commons.microdom.IMicroElement;
 import com.helger.commons.microdom.MicroDocument;
@@ -60,7 +60,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
   private static final String ELEMENT_ROOT = "redirects";
   private static final String ELEMENT_ITEM = "redirect";
 
-  private final Map <String, SMPRedirect> m_aMap = new HashMap <String, SMPRedirect> ();
+  private final ICommonsMap <String, SMPRedirect> m_aMap = new CommonsHashMap<> ();
 
   public XMLRedirectManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {

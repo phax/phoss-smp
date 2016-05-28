@@ -54,7 +54,7 @@ import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
-import com.helger.peppol.identifier.peppol.CPeppolIdentifier;
+import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
@@ -88,7 +88,7 @@ public class DBEndpointID implements Serializable
     setTransportProfile (sTransportProfile);
   }
 
-  @Column (name = "businessIdentifierScheme", nullable = false, length = CPeppolIdentifier.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;
@@ -117,7 +117,7 @@ public class DBEndpointID implements Serializable
     setBusinessIdentifier (aBusinessIdentifier.getValue ());
   }
 
-  @Column (name = "processIdentifierType", nullable = false, length = CPeppolIdentifier.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "processIdentifierType", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getProcessIdentifierScheme ()
   {
     return m_sProcessIdentifierScheme;
@@ -146,7 +146,7 @@ public class DBEndpointID implements Serializable
     setProcessIdentifier (aProcessID.getValue ());
   }
 
-  @Column (name = "documentIdentifierScheme", nullable = false, length = CPeppolIdentifier.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "documentIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getDocumentIdentifierScheme ()
   {
     return m_sDocumentTypeIdentifierScheme;

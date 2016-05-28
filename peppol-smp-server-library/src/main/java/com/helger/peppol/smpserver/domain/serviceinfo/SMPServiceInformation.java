@@ -64,8 +64,7 @@ import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
@@ -84,8 +83,8 @@ public class SMPServiceInformation implements ISMPServiceInformation
 
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
-  private PeppolDocumentTypeIdentifier m_aDocumentTypeIdentifier;
-  private final ICommonsOrderedMap <IPeppolProcessIdentifier, SMPProcess> m_aProcesses = new CommonsLinkedHashMap<> ();
+  private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
+  private final ICommonsOrderedMap <IProcessIdentifier, SMPProcess> m_aProcesses = new CommonsLinkedHashMap<> ();
   private String m_sExtension;
 
   /**
@@ -135,7 +134,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   }
 
   @Nonnull
-  public IPeppolDocumentTypeIdentifier getDocumentTypeIdentifier ()
+  public IDocumentTypeIdentifier getDocumentTypeIdentifier ()
   {
     return m_aDocumentTypeIdentifier;
   }
@@ -144,7 +143,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
     // Make a copy to avoid external changes
-    m_aDocumentTypeIdentifier = new PeppolDocumentTypeIdentifier (aDocumentTypeIdentifier);
+    m_aDocumentTypeIdentifier = new SimpleDocumentTypeIdentifier (aDocumentTypeIdentifier);
   }
 
   @Nonnegative
@@ -154,7 +153,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   }
 
   @Nullable
-  public SMPProcess getProcessOfID (@Nullable final IPeppolProcessIdentifier aProcessID)
+  public SMPProcess getProcessOfID (@Nullable final IProcessIdentifier aProcessID)
   {
     if (aProcessID == null)
       return null;

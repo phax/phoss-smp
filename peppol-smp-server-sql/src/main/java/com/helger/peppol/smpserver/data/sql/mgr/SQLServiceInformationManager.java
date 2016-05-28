@@ -61,8 +61,7 @@ import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
+import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBEndpoint;
@@ -275,8 +274,8 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nullable
   public ISMPServiceInformation findServiceInformation (@Nullable final ISMPServiceGroup aServiceGroup,
-                                                        @Nullable final IPeppolDocumentTypeIdentifier aDocTypeID,
-                                                        @Nullable final IPeppolProcessIdentifier aProcessID,
+                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID,
+                                                        @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
     final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,

@@ -53,10 +53,12 @@ import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.part.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
@@ -263,11 +265,12 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
 
     // Document type identifier
     {
+      final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
       final HCNodeList aCtrl = new HCNodeList ();
-      aCtrl.addChild (new HCDiv ().addChild (AppCommonUI.getDocumentTypeID (aSelectedObject.getDocumentTypeIdentifier ())));
+      aCtrl.addChild (new HCDiv ().addChild (AppCommonUI.getDocumentTypeID (aDocumentTypeID)));
       try
       {
-        final IPeppolDocumentTypeIdentifierParts aParts = aSelectedObject.getDocumentTypeIdentifier ().getParts ();
+        final IPeppolDocumentTypeIdentifierParts aParts = PeppolIdentifierHelper.getDocumentTypeIdentifierParts (aDocumentTypeID);
         aCtrl.addChild (AppCommonUI.getDocumentTypeIDDetails (aParts));
       }
       catch (final IllegalArgumentException ex)
