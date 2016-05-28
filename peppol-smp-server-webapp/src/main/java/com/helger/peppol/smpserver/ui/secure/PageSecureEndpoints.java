@@ -53,13 +53,13 @@ import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.CIdentifier;
-import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifierParts;
-import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
-import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.part.IPeppolDocumentTypeIdentifierParts;
+import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
+import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -160,13 +160,13 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
     final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
-    final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+    final PeppolParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
 
     final String sDocTypeIDScheme = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_SCHEME);
     final String sDocTypeIDValue = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_VALUE);
-    final SimpleDocumentTypeIdentifier aDocTypeID = IdentifierHelper.createDocumentTypeIdentifierOrNull (sDocTypeIDScheme,
-                                                                                                         sDocTypeIDValue);
+    final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createIfValid (sDocTypeIDScheme,
+                                                                                                sDocTypeIDValue);
     return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
   }
 
@@ -182,8 +182,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     {
       final String sProcessIDScheme = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_SCHEME);
       final String sProcessIDValue = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
-      final SimpleProcessIdentifier aProcessID = IdentifierHelper.createProcessIdentifierOrNull (sProcessIDScheme,
-                                                                                                 sProcessIDValue);
+      final PeppolProcessIdentifier aProcessID = PeppolProcessIdentifier.createIfValid (sProcessIDScheme,
+                                                                                        sProcessIDValue);
       final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
@@ -406,7 +406,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "Document type ID value must not be empty!");
       else
       {
-        aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeIDScheme +
+        aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeIDScheme +
                                                                            CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
                                                                            sDocTypeIDValue);
         if (aDocTypeID == null)
@@ -427,7 +427,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID value must not be empty!");
       else
       {
-        aProcessID = SimpleProcessIdentifier.createFromURIPartOrNull (sProcessIDScheme +
+        aProcessID = PeppolProcessIdentifier.createFromURIPartOrNull (sProcessIDScheme +
                                                                       CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
                                                                       sProcessIDValue);
         if (aProcessID == null)
@@ -564,8 +564,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_SCHEME,
                                                    aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
                                                                                             .getScheme ()
-                                                                           : CIdentifier.DEFAULT_DOCUMENT_TYPE_IDENTIFIER_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                                  .setReadOnly (bEdit));
+                                                                           : IPeppolDocumentTypeIdentifier.DEFAULT_SCHEME)).setPlaceholder ("Identifier scheme")
+                                                                                                                           .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_VALUE,
                                                    aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
@@ -584,8 +584,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_SCHEME,
                                                    aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()
                                                                                               .getScheme ()
-                                                                            : CIdentifier.DEFAULT_PROCESS_IDENTIFIER_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                             .setReadOnly (bEdit));
+                                                                            : IPeppolProcessIdentifier.DEFAULT_SCHEME)).setPlaceholder ("Identifier scheme")
+                                                                                                                       .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_VALUE,
                                                    aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()

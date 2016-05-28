@@ -59,7 +59,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirectionID;

@@ -42,7 +42,7 @@ package com.helger.peppol.smpserver.smlhook;
 
 import javax.annotation.Nonnull;
 
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 
 /**
  * Base interface for the callback to modify the SML.

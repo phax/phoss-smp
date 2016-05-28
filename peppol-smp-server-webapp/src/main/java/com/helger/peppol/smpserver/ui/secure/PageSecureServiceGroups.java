@@ -45,9 +45,9 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
-import com.helger.peppol.identifier.CIdentifier;
-import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -177,8 +177,8 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_SCHEME,
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
                                                                                             .getScheme ()
-                                                                           : CIdentifier.DEFAULT_PARTICIPANT_IDENTIFIER_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                                .setReadOnly (bEdit));
+                                                                           : IPeppolParticipantIdentifier.DEFAULT_SCHEME)).setPlaceholder ("Identifier scheme")
+                                                                                                                                                 .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
@@ -188,7 +188,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
                                                    .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme (default: " +
-                                                                 CIdentifier.DEFAULT_PARTICIPANT_IDENTIFIER_SCHEME +
+                                                                 IPeppolParticipantIdentifier.DEFAULT_SCHEME +
                                                                  "), the right part is the identifier value (e.g. 9915:test)")
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PARTICIPANT_ID_SCHEME,
                                                                                                FIELD_PARTICIPANT_ID_VALUE)));
@@ -235,7 +235,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "Participant ID value must not be empty!");
       else
       {
-        aParticipantID = IdentifierHelper.createParticipantIdentifierOrNull (sParticipantIDScheme, sParticipantIDValue);
+        aParticipantID = PeppolParticipantIdentifier.createIfValid (sParticipantIDScheme, sParticipantIDValue);
         if (aParticipantID == null)
           aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "The provided participant ID has an invalid syntax!");
         else

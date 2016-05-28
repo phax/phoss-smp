@@ -43,7 +43,7 @@ package com.helger.peppol.smpserver.smlhook;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 
 /**
  * An implementation of {@link IRegistrationHook} that does nothing.

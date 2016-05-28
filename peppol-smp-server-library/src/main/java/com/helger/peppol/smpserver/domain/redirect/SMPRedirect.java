@@ -51,10 +51,10 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
@@ -69,7 +69,7 @@ public class SMPRedirect implements ISMPRedirect
 
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
-  private SimpleDocumentTypeIdentifier m_aDocumentTypeIdentifier;
+  private PeppolDocumentTypeIdentifier m_aDocumentTypeIdentifier;
   private String m_sTargetHref;
   private String m_sSubjectUniqueIdentifier;
   private String m_sExtension;
@@ -118,7 +118,7 @@ public class SMPRedirect implements ISMPRedirect
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
     // Make a copy to avoid external changes
-    m_aDocumentTypeIdentifier = new SimpleDocumentTypeIdentifier (aDocumentTypeIdentifier);
+    m_aDocumentTypeIdentifier = new PeppolDocumentTypeIdentifier (aDocumentTypeIdentifier);
   }
 
   @Nonnull
@@ -177,7 +177,7 @@ public class SMPRedirect implements ISMPRedirect
     final com.helger.peppol.bdxr.RedirectType aRedirect = new com.helger.peppol.bdxr.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
-    aRedirect.setExtension (new CommonsArrayList <> (BDXRExtensionConverter.convertOrNull (m_sExtension)));
+    aRedirect.setExtension (new CommonsArrayList<> (BDXRExtensionConverter.convertOrNull (m_sExtension)));
 
     final com.helger.peppol.bdxr.ServiceMetadataType ret = new com.helger.peppol.bdxr.ServiceMetadataType ();
     ret.setRedirect (aRedirect);

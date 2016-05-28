@@ -27,9 +27,9 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.datetime.PDTFactory;
-import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smpserver.data.xml.SMPXMLTestRule;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -63,24 +63,39 @@ public final class XMLServiceInformationManagerTest
 
     final IUser aTestUser = PhotonSecurityManager.getUserMgr ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
     assertNotNull (aTestUser);
-    final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final PeppolParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     aServiceGroupMgr.deleteSMPServiceGroup (aPI);
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
     try
     {
       final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
       final LocalDateTime aEndDT = aStartDT.plusYears (1);
-      final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createWithDefaultScheme ("testproc");
-      final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
+      final PeppolProcessIdentifier aProcessID = PeppolProcessIdentifier.createWithDefaultScheme ("testproc");
+      final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
 
       {
         // Create a new service information
-        final SMPEndpoint aEP = new SMPEndpoint ("tp", "http://localhost/as2", false, "minauth", aStartDT, aEndDT, "cert", "sd", "tc", "ti", "extep");
+        final SMPEndpoint aEP = new SMPEndpoint ("tp",
+                                                 "http://localhost/as2",
+                                                 false,
+                                                 "minauth",
+                                                 aStartDT,
+                                                 aEndDT,
+                                                 "cert",
+                                                 "sd",
+                                                 "tc",
+                                                 "ti",
+                                                 "extep");
         final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
-        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG, aDocTypeID, CollectionHelper.newList (aProcess), "extsi"));
+        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
+                                                                                      aDocTypeID,
+                                                                                      CollectionHelper.newList (aProcess),
+                                                                                      "extsi"));
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
+        assertEquals (1,
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                      .getProcessCount ());
         assertEquals (1,
                       CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
@@ -90,7 +105,8 @@ public final class XMLServiceInformationManagerTest
 
       {
         // Replace endpoint URL with equal transport profile -> replace
-        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG, aDocTypeID);
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+                                                                                                                         aDocTypeID);
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
         assertNotNull (aProcess);
@@ -108,7 +124,9 @@ public final class XMLServiceInformationManagerTest
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
+        assertEquals (1,
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                      .getProcessCount ());
         assertEquals (1,
                       CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
@@ -126,7 +144,8 @@ public final class XMLServiceInformationManagerTest
       {
         // Add endpoint with different transport profile -> added to existing
         // process
-        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG, aDocTypeID);
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+                                                                                                                         aDocTypeID);
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
         assertNotNull (aProcess);
@@ -144,7 +163,9 @@ public final class XMLServiceInformationManagerTest
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
+        assertEquals (1,
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                      .getProcessCount ());
         assertEquals (2,
                       CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
@@ -155,14 +176,29 @@ public final class XMLServiceInformationManagerTest
       {
         // Add endpoint with different process - add to existing
         // serviceGroup+docType part
-        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG, aDocTypeID);
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+                                                                                                                         aDocTypeID);
         assertNotNull (aSI);
-        final SMPEndpoint aEP = new SMPEndpoint ("tp", "http://localhost/as2", false, "minauth", aStartDT, aEndDT, "cert", "sd", "tc", "ti", "extep");
-        aSI.addProcess (new SMPProcess (SimpleProcessIdentifier.createWithDefaultScheme ("testproc2"), CollectionHelper.newList (aEP), "extproc"));
+        final SMPEndpoint aEP = new SMPEndpoint ("tp",
+                                                 "http://localhost/as2",
+                                                 false,
+                                                 "minauth",
+                                                 aStartDT,
+                                                 aEndDT,
+                                                 "cert",
+                                                 "sd",
+                                                 "tc",
+                                                 "ti",
+                                                 "extep");
+        aSI.addProcess (new SMPProcess (PeppolProcessIdentifier.createWithDefaultScheme ("testproc2"),
+                                        CollectionHelper.newList (aEP),
+                                        "extproc"));
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (2, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
+        assertEquals (2,
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                      .getProcessCount ());
         assertEquals (2,
                       CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()

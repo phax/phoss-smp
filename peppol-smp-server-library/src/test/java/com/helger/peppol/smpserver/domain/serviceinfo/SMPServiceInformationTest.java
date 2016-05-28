@@ -53,9 +53,9 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.datetime.PDTFactory;
-import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
@@ -74,7 +74,7 @@ public final class SMPServiceInformationTest
   @Test
   public void testBasic ()
   {
-    final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final PeppolParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     final ISMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
@@ -102,13 +102,13 @@ public final class SMPServiceInformationTest
     assertEquals ("ti", aEP.getTechnicalInformationUrl ());
     assertEquals ("extep", aEP.getExtension ());
 
-    final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createWithDefaultScheme ("testproc");
+    final PeppolProcessIdentifier aProcessID = PeppolProcessIdentifier.createWithDefaultScheme ("testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
     assertEquals ("extproc", aProcess.getExtension ());
 
-    final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
+    final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
     final SMPServiceInformation aSI = new SMPServiceInformation (aSG,
                                                                  aDocTypeID,
                                                                  CollectionHelper.newList (aProcess),
@@ -122,7 +122,7 @@ public final class SMPServiceInformationTest
   @Test
   public void testMinimal ()
   {
-    final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    final PeppolParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     final ISMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     final SMPEndpoint aEP = new SMPEndpoint ("tp",
@@ -148,13 +148,13 @@ public final class SMPServiceInformationTest
     assertNull (aEP.getTechnicalInformationUrl ());
     assertNull (aEP.getExtension ());
 
-    final SimpleProcessIdentifier aProcessID = SimpleProcessIdentifier.createWithDefaultScheme ("testproc");
+    final PeppolProcessIdentifier aProcessID = PeppolProcessIdentifier.createWithDefaultScheme ("testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), (String) null);
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
     assertNull (aProcess.getExtension ());
 
-    final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
+    final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
     final SMPServiceInformation aSI = new SMPServiceInformation (aSG,
                                                                  aDocTypeID,
                                                                  CollectionHelper.newList (aProcess),

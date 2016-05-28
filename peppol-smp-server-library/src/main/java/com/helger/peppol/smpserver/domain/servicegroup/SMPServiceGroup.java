@@ -56,10 +56,10 @@ import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.bdxr.BDXRHelper;
-import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.identifier.participant.IPeppolParticipantIdentifier;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
 
 /**
@@ -77,7 +77,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
   private String m_sExtension;
 
   // Status member
-  private final SimpleParticipantIdentifier m_aParticipantIdentifier;
+  private final PeppolParticipantIdentifier m_aParticipantIdentifier;
 
   /**
    * Create a unified participant identifier with a lower cased value, because
@@ -106,10 +106,10 @@ public class SMPServiceGroup implements ISMPServiceGroup
    * @return The new participant identifier with a lower cased value.
    */
   @Nonnull
-  public static SimpleParticipantIdentifier createUnifiedParticipantIdentifier (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  public static PeppolParticipantIdentifier createUnifiedParticipantIdentifier (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
   {
     ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
-    return new SimpleParticipantIdentifier (aParticipantIdentifier.getScheme (),
+    return new PeppolParticipantIdentifier (aParticipantIdentifier.getScheme (),
                                             createUnifiedParticipantIdentifierValue (aParticipantIdentifier.getValue ()));
   }
 

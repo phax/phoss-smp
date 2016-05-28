@@ -51,8 +51,9 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
-import com.helger.peppol.identifier.CIdentifier;
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.CPeppolIdentifier;
+import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 
 /**
  * ID for the ownership
@@ -88,7 +89,7 @@ public class DBOwnershipID implements Serializable
     m_sUsername = sUserName;
   }
 
-  @Column (name = "businessIdentifierScheme", nullable = false, length = CIdentifier.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme", nullable = false, length = CPeppolIdentifier.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;
@@ -99,7 +100,7 @@ public class DBOwnershipID implements Serializable
     m_sParticipantIdentifierScheme = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
   }
 
-  @Column (name = "businessIdentifier", nullable = false, length = CIdentifier.MAX_PARTICIPANT_IDENTIFIER_VALUE_LENGTH)
+  @Column (name = "businessIdentifier", nullable = false, length = IPeppolParticipantIdentifier.MAX_VALUE_LENGTH)
   public String getBusinessIdentifier ()
   {
     return m_sParticipantIdentifier;

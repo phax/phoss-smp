@@ -39,8 +39,8 @@ import com.helger.commons.microdom.MicroDocument;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
@@ -283,7 +283,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
   @ReturnsMutableCopy
   public Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {
-    final List <ISMPRedirect> ret = new ArrayList <> ();
+    final List <ISMPRedirect> ret = new ArrayList<> ();
     if (StringHelper.hasText (sServiceGroupID))
     {
       m_aRWLock.readLock ().lock ();

@@ -61,8 +61,9 @@ import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
-import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnershipID;
@@ -99,42 +100,38 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                     ")");
 
     JPAExecutionResult <?> ret;
-    ret = doInTransaction (new Runnable ()
-    {
-      public void run ()
+    ret = doInTransaction ((Runnable) () -> {
+      final EntityManager aEM = getEntityManager ();
+
+      // Check if the passed service group ID is already in use
+      final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantIdentifier);
+      DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
+      if (aDBServiceGroup != null)
+        throw new IllegalStateException ("The service group with ID " +
+                                         IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier) +
+                                         " already exists!");
+
+      final DBUser aDBUser = aEM.find (DBUser.class, sOwnerID);
+      if (aDBUser == null)
+        throw new IllegalStateException ("User '" + sOwnerID + "' does not exist!");
+
+      // It's a new service group - throws exception in case of an error
+      m_aHook.createServiceGroup (aParticipantIdentifier);
+
+      try
       {
-        final EntityManager aEM = getEntityManager ();
-
-        // Check if the passed service group ID is already in use
-        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantIdentifier);
-        DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
-        if (aDBServiceGroup != null)
-          throw new IllegalStateException ("The service group with ID " +
-                                           IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier) +
-                                           " already exists!");
-
-        final DBUser aDBUser = aEM.find (DBUser.class, sOwnerID);
-        if (aDBUser == null)
-          throw new IllegalStateException ("User '" + sOwnerID + "' does not exist!");
-
-        // It's a new service group - throws exception in case of an error
-        m_aHook.createServiceGroup (aParticipantIdentifier);
-
-        try
-        {
-          // Did not exist. Create it.
-          final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantIdentifier);
-          final DBOwnership aOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
-          aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID, sExtension, aOwnership, null);
-          aEM.persist (aDBServiceGroup);
-          aEM.persist (aOwnership);
-        }
-        catch (final RuntimeException ex)
-        {
-          // An error occurred - remove from SML again
-          m_aHook.undoCreateServiceGroup (aParticipantIdentifier);
-          throw ex;
-        }
+        // Did not exist. Create it.
+        final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantIdentifier);
+        final DBOwnership aOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
+        aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID, sExtension, aOwnership, null);
+        aEM.persist (aDBServiceGroup);
+        aEM.persist (aOwnership);
+      }
+      catch (final RuntimeException ex)
+      {
+        // An error occurred - remove from SML again
+        m_aHook.undoCreateServiceGroup (aParticipantIdentifier);
+        throw ex;
       }
     });
 
@@ -158,7 +155,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    final IParticipantIdentifier aParticipantIdentifier = IdentifierHelper.createParticipantIdentifierFromURIPartOrNull (sSMPServiceGroupID);
+    final IParticipantIdentifier aParticipantIdentifier = PeppolParticipantIdentifier.createFromURIPartOrNull (sSMPServiceGroupID);
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction (new Callable <EChange> ()
     {
@@ -275,7 +272,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                                         DBServiceGroup.class)
                                                                           .getResultList ();
 
-        final Collection <ISMPServiceGroup> aList = new ArrayList <> ();
+        final Collection <ISMPServiceGroup> aList = new ArrayList<> ();
         for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
         {
           final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
@@ -316,7 +313,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                           .setParameter ("user", sOwnerID)
                                                                           .getResultList ();
 
-        final Collection <ISMPServiceGroup> aList = new ArrayList <> ();
+        final Collection <ISMPServiceGroup> aList = new ArrayList<> ();
         for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
         {
           final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,
@@ -410,7 +407,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       public Boolean call () throws Exception
       {
         // Disable caching here
-        final Map <String, Object> aProps = new HashMap <> ();
+        final Map <String, Object> aProps = new HashMap<> ();
         aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
         final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
                                                                          new DBServiceGroupID (aParticipantIdentifier),

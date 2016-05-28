@@ -68,11 +68,12 @@ import com.helger.peppol.bdxr.ServiceMetadataReferenceType;
 import com.helger.peppol.bdxr.ServiceMetadataType;
 import com.helger.peppol.bdxr.SignedServiceMetadataType;
 import com.helger.peppol.identifier.DocumentIdentifierType;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
-import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -296,7 +297,7 @@ public final class BDXRServerAPI
                                         m_aAPIProvider.getCurrentURI ());
       }
 
-      final DocumentIdentifierType aDocTypeID = IdentifierHelper.createDocumentTypeIdentifierFromURIPartOrNull (sDocumentTypeID);
+      final DocumentIdentifierType aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         throw new SMPNotFoundException ("Failed to parse documentTypeID '" +
@@ -383,7 +384,7 @@ public final class BDXRServerAPI
         return ESuccess.FAILURE;
       }
 
-      final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         // Invalid identifier
@@ -450,10 +451,10 @@ public final class BDXRServerAPI
       {
         // Handle service information
         final ProcessListType aJAXBProcesses = aServiceMetadata.getServiceInformation ().getProcessList ();
-        final List <SMPProcess> aProcesses = new ArrayList <> ();
+        final List <SMPProcess> aProcesses = new ArrayList<> ();
         for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
         {
-          final List <SMPEndpoint> aEndpoints = new ArrayList <> ();
+          final List <SMPEndpoint> aEndpoints = new ArrayList<> ();
           for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
           {
             final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),
@@ -531,7 +532,7 @@ public final class BDXRServerAPI
         return ESuccess.FAILURE;
       }
 
-      final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         // Invalid identifier

@@ -60,12 +60,13 @@ import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.bdxr.BDXRHelper;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.identifier.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smp.ServiceInformationType;
@@ -83,8 +84,8 @@ public class SMPServiceInformation implements ISMPServiceInformation
 
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
-  private SimpleDocumentTypeIdentifier m_aDocumentTypeIdentifier;
-  private final ICommonsOrderedMap <IPeppolProcessIdentifier, SMPProcess> m_aProcesses = new CommonsLinkedHashMap <> ();
+  private PeppolDocumentTypeIdentifier m_aDocumentTypeIdentifier;
+  private final ICommonsOrderedMap <IPeppolProcessIdentifier, SMPProcess> m_aProcesses = new CommonsLinkedHashMap<> ();
   private String m_sExtension;
 
   /**
@@ -143,7 +144,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
     // Make a copy to avoid external changes
-    m_aDocumentTypeIdentifier = new SimpleDocumentTypeIdentifier (aDocumentTypeIdentifier);
+    m_aDocumentTypeIdentifier = new PeppolDocumentTypeIdentifier (aDocumentTypeIdentifier);
   }
 
   @Nonnegative

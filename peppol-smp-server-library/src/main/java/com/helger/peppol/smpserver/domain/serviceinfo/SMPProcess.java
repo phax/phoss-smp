@@ -60,9 +60,10 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.bdxr.BDXRHelper;
-import com.helger.peppol.identifier.IProcessIdentifier;
-import com.helger.peppol.identifier.process.IPeppolProcessIdentifier;
-import com.helger.peppol.identifier.process.SimpleProcessIdentifier;
+import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
+import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
+import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
+import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.ProcessType;
@@ -76,8 +77,8 @@ import com.helger.peppol.smp.SMPExtensionConverter;
 @NotThreadSafe
 public class SMPProcess implements ISMPProcess
 {
-  private SimpleProcessIdentifier m_aProcessIdentifier;
-  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap <> ();
+  private PeppolProcessIdentifier m_aProcessIdentifier;
+  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap<> ();
   private String m_sExtension;
 
   public SMPProcess (@Nonnull final IProcessIdentifier aProcessIdentifier,
@@ -101,7 +102,7 @@ public class SMPProcess implements ISMPProcess
   {
     ValueEnforcer.notNull (aProcessIdentifier, "ProcessIdentifier");
     // Make a copy to avoid unavoided changes
-    m_aProcessIdentifier = new SimpleProcessIdentifier (aProcessIdentifier);
+    m_aProcessIdentifier = new PeppolProcessIdentifier (aProcessIdentifier);
   }
 
   @Nonnegative
