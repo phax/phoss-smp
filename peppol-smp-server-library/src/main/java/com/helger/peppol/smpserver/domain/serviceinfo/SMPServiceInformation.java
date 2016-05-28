@@ -59,8 +59,9 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.bdxr.BDXRHelper;
 import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.identifier.bdxr.doctype.BDXRDocumentTypeIdentifier;
+import com.helger.peppol.identifier.bdxr.participant.BDXRParticipantIdentifier;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
@@ -222,8 +223,8 @@ public class SMPServiceInformation implements ISMPServiceInformation
   public com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ()
   {
     final com.helger.peppol.bdxr.ServiceInformationType aSI = new com.helger.peppol.bdxr.ServiceInformationType ();
-    aSI.setParticipantIdentifier (BDXRHelper.getAsBDXRParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
-    aSI.setDocumentIdentifier (BDXRHelper.getAsBDXRDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
+    aSI.setParticipantIdentifier (new BDXRParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
+    aSI.setDocumentIdentifier (new BDXRDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.peppol.bdxr.ProcessListType aProcesses = new com.helger.peppol.bdxr.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
       aProcesses.addProcess (aProcess.getAsJAXBObjectBDXR ());

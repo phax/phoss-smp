@@ -55,8 +55,8 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.bdxr.BDXRHelper;
 import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.identifier.bdxr.participant.BDXRParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
@@ -185,7 +185,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
   public com.helger.peppol.bdxr.ServiceGroupType getAsJAXBObjectBDXR ()
   {
     final com.helger.peppol.bdxr.ServiceGroupType ret = new com.helger.peppol.bdxr.ServiceGroupType ();
-    ret.setParticipantIdentifier (BDXRHelper.getAsBDXRParticipantIdentifier (m_aParticipantIdentifier));
+    ret.setParticipantIdentifier (new BDXRParticipantIdentifier (m_aParticipantIdentifier));
     if (false)
     {
       // This is set by the REST server

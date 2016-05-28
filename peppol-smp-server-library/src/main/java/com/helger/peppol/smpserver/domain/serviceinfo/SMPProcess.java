@@ -59,7 +59,7 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.bdxr.BDXRHelper;
+import com.helger.peppol.identifier.bdxr.process.BDXRProcessIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.EndpointType;
@@ -184,7 +184,7 @@ public class SMPProcess implements ISMPProcess
   public com.helger.peppol.bdxr.ProcessType getAsJAXBObjectBDXR ()
   {
     final com.helger.peppol.bdxr.ProcessType ret = new com.helger.peppol.bdxr.ProcessType ();
-    ret.setProcessIdentifier (BDXRHelper.getAsBDXRProcessIdentifier (m_aProcessIdentifier));
+    ret.setProcessIdentifier (new BDXRProcessIdentifier (m_aProcessIdentifier));
     final com.helger.peppol.bdxr.ServiceEndpointList aEndpointList = new com.helger.peppol.bdxr.ServiceEndpointList ();
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
       aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectBDXR ());
