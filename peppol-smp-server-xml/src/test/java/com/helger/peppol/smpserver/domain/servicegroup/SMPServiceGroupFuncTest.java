@@ -23,7 +23,7 @@ import org.junit.rules.TestRule;
 import com.helger.commons.mock.CommonsTestHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
-import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
+import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 
 /**
@@ -34,7 +34,7 @@ import com.helger.photon.security.CSecurity;
 public final class SMPServiceGroupFuncTest
 {
   @Rule
-  public final TestRule m_aTestRule = new PhotonBasicWebTestRule ();
+  public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
   public void testBasic ()

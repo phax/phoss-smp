@@ -41,7 +41,6 @@
 package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +56,9 @@ import org.eclipse.persistence.config.CacheUsage;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.IdentifierHelper;
@@ -353,7 +355,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   private static SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
   {
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final List <SMPProcess> aProcesses = new ArrayList<> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
     for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
     {
       final List <SMPEndpoint> aEndpoints = new ArrayList<> ();
@@ -386,7 +388,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
+  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     JPAExecutionResult <List <DBServiceMetadata>> ret;
     ret = doInTransaction (new Callable <List <DBServiceMetadata>> ()
@@ -401,7 +403,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    final List <SMPServiceInformation> aServiceInformations = new ArrayList<> ();
+    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
     for (final DBServiceMetadata aDBMetadata : ret.get ())
       aServiceInformations.add (_convert (aDBMetadata));
     return aServiceInformations;
@@ -428,9 +430,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final List <SMPServiceInformation> aServiceInformations = new ArrayList<> ();
+    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       JPAExecutionResult <List <DBServiceMetadata>> ret;
@@ -454,9 +456,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsCollection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final Collection <IDocumentTypeIdentifier> ret = new ArrayList<> ();
+    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       for (final ISMPServiceInformation aServiceInformation : getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))

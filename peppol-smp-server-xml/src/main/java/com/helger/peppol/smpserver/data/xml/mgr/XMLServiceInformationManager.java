@@ -16,12 +16,6 @@
  */
 package com.helger.peppol.smpserver.data.xml.mgr;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,6 +27,11 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.CommonsHashMap;
+import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.microdom.IMicroDocument;
 import com.helger.commons.microdom.IMicroElement;
 import com.helger.commons.microdom.MicroDocument;
@@ -64,7 +63,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   private static final String ELEMENT_ROOT = "serviceinformationlist";
   private static final String ELEMENT_ITEM = "serviceinformation";
 
-  private final Map <String, SMPServiceInformation> m_aMap = new HashMap <String, SMPServiceInformation> ();
+  private final ICommonsMap <String, SMPServiceInformation> m_aMap = new CommonsHashMap<> ();
 
   public XMLServiceInformationManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
@@ -266,12 +265,12 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
+  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     m_aRWLock.readLock ().lock ();
     try
     {
-      return CollectionHelper.newList (m_aMap.values ());
+      return m_aMap.copyOfValues ();
     }
     finally
     {
@@ -295,9 +294,9 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final Collection <ISMPServiceInformation> ret = new ArrayList<> ();
+    final ICommonsCollection <ISMPServiceInformation> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       m_aRWLock.readLock ().lock ();
@@ -317,9 +316,9 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsCollection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final Collection <IDocumentTypeIdentifier> ret = new ArrayList<> ();
+    final ICommonsCollection <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       m_aRWLock.readLock ().lock ();
@@ -346,7 +345,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     if (aDocumentTypeIdentifier == null)
       return null;
 
-    final List <ISMPServiceInformation> ret = new ArrayList<> ();
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList<> ();
 
     m_aRWLock.readLock ().lock ();
     try
@@ -371,6 +370,6 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
                       "' and document type '" +
                       aDocumentTypeIdentifier.getValue () +
                       "'. This seems to be a bug! Using the first one.");
-    return ret.get (0);
+    return ret.getFirst ();
   }
 }

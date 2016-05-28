@@ -27,9 +27,13 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.datetime.PDTFactory;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
+import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
+import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smpserver.data.xml.SMPXMLTestRule;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -58,6 +62,7 @@ public final class XMLServiceInformationManagerTest
   @Test
   public void testServiceRegistration ()
   {
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInformationMgr = SMPMetaManager.getServiceInformationMgr ();
     assertEquals (0, aServiceInformationMgr.getSMPServiceInformationCount ());
@@ -71,8 +76,10 @@ public final class XMLServiceInformationManagerTest
     {
       final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
       final LocalDateTime aEndDT = aStartDT.plusYears (1);
-      final PeppolProcessIdentifier aProcessID = PeppolProcessIdentifier.createWithDefaultScheme ("testproc");
-      final PeppolDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("testdoctype");
+      final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (IPeppolProcessIdentifier.DEFAULT_SCHEME,
+                                                                                        "testproc");
+      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (IPeppolDocumentTypeIdentifier.DEFAULT_SCHEME,
+                                                                                                  "testdoctype");
 
       {
         // Create a new service information

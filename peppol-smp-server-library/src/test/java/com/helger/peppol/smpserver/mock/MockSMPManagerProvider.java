@@ -3,6 +3,7 @@ package com.helger.peppol.smpserver.mock;
 import java.util.Collection;
 import java.util.List;
 
+import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -235,17 +236,17 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
         return 0;
       }
 
-      public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+      public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
       {
         throw new UnsupportedOperationException ();
       }
 
-      public Collection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
+      public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
       {
         throw new UnsupportedOperationException ();
       }
 
-      public Collection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+      public ICommonsCollection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (final ISMPServiceGroup aServiceGroup)
       {
         throw new UnsupportedOperationException ();
       }
