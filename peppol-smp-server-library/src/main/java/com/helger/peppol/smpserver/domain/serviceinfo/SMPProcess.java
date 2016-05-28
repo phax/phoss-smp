@@ -62,8 +62,6 @@ import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.bdxr.BDXRHelper;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
-import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
-import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.ProcessType;
@@ -77,7 +75,7 @@ import com.helger.peppol.smp.SMPExtensionConverter;
 @NotThreadSafe
 public class SMPProcess implements ISMPProcess
 {
-  private PeppolProcessIdentifier m_aProcessIdentifier;
+  private IProcessIdentifier m_aProcessIdentifier;
   private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap<> ();
   private String m_sExtension;
 
@@ -93,7 +91,7 @@ public class SMPProcess implements ISMPProcess
   }
 
   @Nonnull
-  public IPeppolProcessIdentifier getProcessIdentifier ()
+  public IProcessIdentifier getProcessIdentifier ()
   {
     return m_aProcessIdentifier;
   }
@@ -102,7 +100,7 @@ public class SMPProcess implements ISMPProcess
   {
     ValueEnforcer.notNull (aProcessIdentifier, "ProcessIdentifier");
     // Make a copy to avoid unavoided changes
-    m_aProcessIdentifier = new PeppolProcessIdentifier (aProcessIdentifier);
+    m_aProcessIdentifier = new SimpleProcessIdentifier (aProcessIdentifier);
   }
 
   @Nonnegative

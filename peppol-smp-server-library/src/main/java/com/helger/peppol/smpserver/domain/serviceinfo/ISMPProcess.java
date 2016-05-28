@@ -51,15 +51,15 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
+import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 
 /**
  * This interface represents a single process information within a service
  * information. A process consists of a process identifier (
- * {@link IPeppolProcessIdentifier}) and a list of endpoints (
- * {@link ISMPEndpoint}). It is contained in an {@link ISMPServiceInformation}.
+ * {@link IProcessIdentifier}) and a list of endpoints ( {@link ISMPEndpoint}).
+ * It is contained in an {@link ISMPServiceInformation}.
  *
  * @author Philip Helger
  */
@@ -69,7 +69,7 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
    * @return The process identifier of this process. Never <code>null</code>.
    */
   @Nonnull
-  IPeppolProcessIdentifier getProcessIdentifier ();
+  IProcessIdentifier getProcessIdentifier ();
 
   /**
    * @return A copy of the list of all endpoints associated with this process.

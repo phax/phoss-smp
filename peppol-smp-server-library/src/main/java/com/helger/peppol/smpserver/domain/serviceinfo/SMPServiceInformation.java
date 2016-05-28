@@ -65,7 +65,6 @@ import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
-import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smp.ServiceInformationType;
@@ -169,13 +168,13 @@ public class SMPServiceInformation implements ISMPServiceInformation
   public void addProcess (@Nonnull final SMPProcess aProcess)
   {
     ValueEnforcer.notNull (aProcess, "Process");
-    final IPeppolProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
+    final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
     if (m_aProcesses.containsKey (aProcessID))
       throw new IllegalStateException ("A process with ID '" + aProcessID.getURIEncoded () + "' is already contained!");
     m_aProcesses.put (aProcessID, aProcess);
   }
 
-  public void setProcesses (@Nonnull @Nonempty final Map <IPeppolProcessIdentifier, SMPProcess> aProcesses)
+  public void setProcesses (@Nonnull @Nonempty final Map <? extends IProcessIdentifier, ? extends SMPProcess> aProcesses)
   {
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
     m_aProcesses.clear ();
