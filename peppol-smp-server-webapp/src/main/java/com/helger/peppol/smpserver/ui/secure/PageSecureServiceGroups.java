@@ -45,6 +45,8 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
@@ -218,10 +220,11 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   {
     final boolean bEdit = eFormAction.isEdit ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
     final String sParticipantIDScheme = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID_SCHEME);
     final String sParticipantIDValue = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID_VALUE);
-    SimpleParticipantIdentifier aParticipantID = null;
+    IParticipantIdentifier aParticipantID = null;
     final String sOwningUserID = aWPEC.getAttributeAsString (FIELD_OWNING_USER_ID);
     final ISMPUser aOwningUser = SMPMetaManager.getUserMgr ().getUserOfID (sOwningUserID);
     final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
@@ -234,7 +237,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "Participant ID value must not be empty!");
       else
       {
-        aParticipantID = new SimpleParticipantIdentifier (sParticipantIDScheme, sParticipantIDValue);
+        aParticipantID = aIdentifierFactory.createParticipantIdentifier (sParticipantIDScheme, sParticipantIDValue);
         if (aParticipantID == null)
           aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "The provided participant ID has an invalid syntax!");
         else

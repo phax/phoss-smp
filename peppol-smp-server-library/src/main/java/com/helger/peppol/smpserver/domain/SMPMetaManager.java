@@ -51,6 +51,10 @@ import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.scope.IScope;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
+import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
+import com.helger.peppol.identifier.factory.SimpleIdentifierFactory;
+import com.helger.peppol.smpserver.ESMPIdentifierType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.backend.SMPBackendRegistry;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
@@ -72,6 +76,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
   private static ISMPManagerProvider s_aManagerProvider = null;
 
+  private IIdentifierFactory m_aIdentifierFactory;
   private ISMPTransportProfileManager m_aTransportProfileManager;
   private ISMPUserManager m_aUserMgr;
   private ISMPServiceGroupManager m_aServiceGroupMgr;
@@ -127,6 +132,19 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
     try
     {
+      final ESMPIdentifierType eIdentifierType = SMPServerConfiguration.getIdentifierType ();
+      switch (eIdentifierType)
+      {
+        case SIMPLE:
+          m_aIdentifierFactory = new SimpleIdentifierFactory ();
+          break;
+        case PEPPOL:
+          m_aIdentifierFactory = new PeppolIdentifierFactory ();
+          break;
+        default:
+          throw new IllegalStateException ("Failed to determine iddentifier types!");
+      }
+
       m_aTransportProfileManager = s_aManagerProvider.createTransportProfileMgr ();
       if (m_aTransportProfileManager == null)
         throw new IllegalStateException ("Failed to create TransportProfile manager!");
@@ -172,6 +190,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static SMPMetaManager getInstance ()
   {
     return getGlobalSingleton (SMPMetaManager.class);
+  }
+
+  @Nonnull
+  public static IIdentifierFactory getIdentifierFactory ()
+  {
+    return getInstance ().m_aIdentifierFactory;
   }
 
   @Nonnull

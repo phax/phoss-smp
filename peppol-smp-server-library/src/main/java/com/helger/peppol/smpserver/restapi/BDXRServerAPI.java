@@ -67,12 +67,11 @@ import com.helger.peppol.bdxr.ServiceMetadataReferenceCollectionType;
 import com.helger.peppol.bdxr.ServiceMetadataReferenceType;
 import com.helger.peppol.bdxr.ServiceMetadataType;
 import com.helger.peppol.bdxr.SignedServiceMetadataType;
-import com.helger.peppol.identifier.DocumentIdentifierType;
 import com.helger.peppol.identifier.IdentifierHelper;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
+import com.helger.peppol.identifier.bdxr.doctype.BDXRDocumentTypeIdentifier;
+import com.helger.peppol.identifier.bdxr.participant.BDXRParticipantIdentifier;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -118,7 +117,7 @@ public final class BDXRServerAPI
 
     try
     {
-      final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IParticipantIdentifier aServiceGroupID = BDXRParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -181,7 +180,7 @@ public final class BDXRServerAPI
 
     try
     {
-      final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IParticipantIdentifier aServiceGroupID = BDXRParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -235,7 +234,7 @@ public final class BDXRServerAPI
 
     try
     {
-      final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IParticipantIdentifier aServiceGroupID = BDXRParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -277,7 +276,7 @@ public final class BDXRServerAPI
 
     try
     {
-      final ParticipantIdentifierType aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IParticipantIdentifier aServiceGroupID = BDXRParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         throw new SMPNotFoundException ("Failed to parse serviceGroup '" +
@@ -296,7 +295,7 @@ public final class BDXRServerAPI
                                         m_aAPIProvider.getCurrentURI ());
       }
 
-      final DocumentIdentifierType aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final IDocumentTypeIdentifier aDocTypeID = BDXRDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         throw new SMPNotFoundException ("Failed to parse documentTypeID '" +
@@ -375,7 +374,7 @@ public final class BDXRServerAPI
 
     try
     {
-      final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IParticipantIdentifier aServiceGroupID = BDXRParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -383,7 +382,7 @@ public final class BDXRServerAPI
         return ESuccess.FAILURE;
       }
 
-      final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final IDocumentTypeIdentifier aDocTypeID = BDXRDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         // Invalid identifier
@@ -523,7 +522,7 @@ public final class BDXRServerAPI
 
     try
     {
-      final SimpleParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IParticipantIdentifier aServiceGroupID = BDXRParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -531,7 +530,7 @@ public final class BDXRServerAPI
         return ESuccess.FAILURE;
       }
 
-      final SimpleDocumentTypeIdentifier aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final IDocumentTypeIdentifier aDocTypeID = BDXRDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         // Invalid identifier

@@ -126,9 +126,7 @@ public final class SMPServerConfiguration
     aFilePaths.add (PATH_PRIVATE_SMP_SERVER_PROPERTIES);
     aFilePaths.add (PATH_SMP_SERVER_PROPERTIES);
 
-    s_aRWLock.writeLock ().lock ();
-    try
-    {
+    return s_aRWLock.writeLocked ( () -> {
       s_aConfigFile = new ConfigFile (aFilePaths);
       if (!s_aConfigFile.isRead ())
       {
@@ -138,11 +136,7 @@ public final class SMPServerConfiguration
 
       s_aLogger.info ("Read smp-server.properties from " + s_aConfigFile.getReadResource ().getPath ());
       return ESuccess.SUCCESS;
-    }
-    finally
-    {
-      s_aRWLock.writeLock ().unlock ();
-    }
+    });
   }
 
   private SMPServerConfiguration ()
@@ -154,21 +148,14 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ConfigFile getConfigFile ()
   {
-    s_aRWLock.readLock ().lock ();
-    try
-    {
-      return s_aConfigFile;
-    }
-    finally
-    {
-      s_aRWLock.readLock ().unlock ();
-    }
+    return s_aRWLock.readLocked ( () -> s_aConfigFile);
   }
 
   /**
    * @return The backend to be used. Depends on the different possible
    *         implementations. Should not be <code>null</code>. Property
    *         <code>smp.backend</code>.
+   * @see com.helger.peppol.smpserver.backend.SMPBackendRegistry
    */
   @Nullable
   public static String getBackend ()
@@ -236,6 +223,18 @@ public final class SMPServerConfiguration
   public static String getPublicServerURL ()
   {
     return getConfigFile ().getString ("smp.publicurl");
+  }
+
+  /**
+   * @return The identifier types to be used. Never <code>null</code>. Defaults
+   *         to {@link ESMPIdentifierType#PEPPOL}. Property
+   *         <code>smp.identifiertype</code>.
+   */
+  @Nonnull
+  public static ESMPIdentifierType getIdentifierType ()
+  {
+    final String sType = getConfigFile ().getString ("smp.identifiertype");
+    return ESMPIdentifierType.getFromIDOrDefault (sType, ESMPIdentifierType.PEPPOL);
   }
 
   /**

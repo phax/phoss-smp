@@ -57,9 +57,11 @@ import com.helger.commons.type.ObjectType;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.bdxr.participant.BDXRParticipantIdentifier;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 
 /**
  * This class represents a single service group.
@@ -108,8 +110,9 @@ public class SMPServiceGroup implements ISMPServiceGroup
   public static IParticipantIdentifier createUnifiedParticipantIdentifier (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
   {
     ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
-    return new SimpleParticipantIdentifier (aParticipantIdentifier.getScheme (),
-                                            createUnifiedParticipantIdentifierValue (aParticipantIdentifier.getValue ()));
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    return aIdentifierFactory.createParticipantIdentifier (aParticipantIdentifier.getScheme (),
+                                                           createUnifiedParticipantIdentifierValue (aParticipantIdentifier.getValue ()));
   }
 
   public SMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,

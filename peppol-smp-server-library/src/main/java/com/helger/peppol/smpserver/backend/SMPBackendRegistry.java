@@ -40,10 +40,6 @@
  */
 package com.helger.peppol.smpserver.backend;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -54,7 +50,9 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsLinkedHashMap;
+import com.helger.commons.collection.ext.ICommonsMap;
+import com.helger.commons.collection.ext.ICommonsSet;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.factory.IFactory;
 import com.helger.commons.lang.ServiceLoaderHelper;
@@ -82,7 +80,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   private static boolean s_bDefaultInstantiated = false;
 
   private final SimpleReadWriteLock m_aRWLock = new SimpleReadWriteLock ();
-  private final Map <String, IFactory <? extends ISMPManagerProvider>> m_aMap = new LinkedHashMap <> ();
+  private final ICommonsMap <String, IFactory <? extends ISMPManagerProvider>> m_aMap = new CommonsLinkedHashMap<> ();
 
   private SMPBackendRegistry ()
   {
@@ -111,17 +109,11 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (aFactory, "Factory");
 
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
+    m_aRWLock.writeLocked ( () -> {
       if (m_aMap.containsKey (sID))
         throw new IllegalArgumentException ("Another SMP backend with ID '" + sID + "' is already registered!");
       m_aMap.put (sID, aFactory);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
+    });
   }
 
   /**
@@ -139,16 +131,10 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     if (StringHelper.hasNoText (sBackendID))
       return null;
 
-    m_aRWLock.readLock ().lock ();
-    try
-    {
+    return m_aRWLock.readLocked ( () -> {
       final IFactory <? extends ISMPManagerProvider> aFactory = m_aMap.get (sBackendID);
       return aFactory == null ? null : aFactory.get ();
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    });
   }
 
   /**
@@ -157,17 +143,9 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
    */
   @Nonnull
   @ReturnsMutableCopy
-  public Set <String> getAllBackendIDs ()
+  public ICommonsSet <String> getAllBackendIDs ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return CollectionHelper.newOrderedSet (m_aMap.keySet ());
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return m_aRWLock.readLocked ( () -> m_aMap.copyOfKeySet ());
   }
 
   /**
@@ -176,9 +154,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
    */
   public void reinitialize ()
   {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
+    m_aRWLock.writeLocked ( () -> {
       m_aMap.clear ();
 
       // register all SPI implementations
@@ -191,11 +167,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
 
       if (s_aLogger.isDebugEnabled ())
         s_aLogger.debug (m_aMap.size () + " SMP backends registered");
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
+    });
   }
 
   @Override
