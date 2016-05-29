@@ -52,17 +52,14 @@ import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
-import com.helger.peppol.identifier.CIdentifier;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
-import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -159,16 +156,18 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   protected ISMPServiceInformation getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                                       @Nullable final String sID)
   {
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
     final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
-    final IParticipantIdentifier aServiceGroupID = SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
 
     final String sDocTypeIDScheme = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_SCHEME);
     final String sDocTypeIDValue = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_VALUE);
-    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (sDocTypeIDScheme, sDocTypeIDValue);
+    final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (sDocTypeIDScheme,
+                                                                                                sDocTypeIDValue);
     return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
   }
 
@@ -182,9 +181,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         eFormAction == EWebPageFormAction.EDIT ||
         eFormAction == EWebPageFormAction.DELETE)
     {
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
       final String sProcessIDScheme = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_SCHEME);
       final String sProcessIDValue = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
-      final PeppolProcessIdentifier aProcessID = PeppolProcessIdentifier.createIfValid (sProcessIDScheme,
+      final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (sProcessIDScheme,
                                                                                         sProcessIDValue);
       final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);
       if (aProcess != null)
@@ -360,6 +360,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
@@ -397,7 +398,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A service group must be selected!");
     else
     {
-      aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID));
+      aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
       if (aServiceGroup == null)
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided service group does not exist!");
     }
@@ -409,9 +410,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "Document type ID value must not be empty!");
       else
       {
-        aDocTypeID = SimpleDocumentTypeIdentifier.createFromURIPartOrNull (sDocTypeIDScheme +
-                                                                           CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
-                                                                           sDocTypeIDValue);
+        aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (sDocTypeIDScheme, sDocTypeIDValue);
         if (aDocTypeID == null)
           aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "The provided document type ID has an invalid syntax!");
         else
@@ -430,9 +429,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID value must not be empty!");
       else
       {
-        aProcessID = PeppolProcessIdentifier.createFromURIPartOrNull (sProcessIDScheme +
-                                                                      CIdentifier.URL_SCHEME_VALUE_SEPARATOR +
-                                                                      sProcessIDValue);
+        aProcessID = aIdentifierFactory.createProcessIdentifier (sProcessIDScheme, sProcessIDValue);
         if (aProcessID == null)
           aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, "The provided process ID has an invalid syntax!");
       }
@@ -449,8 +446,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aProcessID != null &&
         aTransportProfile != null &&
         aServiceInfoMgr.findServiceInformation (aServiceGroup, aDocTypeID, aProcessID, aTransportProfile) != null)
+    {
       aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE,
                                  "Another endpoint for the provided service group, document type, process and transport profile is already present.");
+    }
 
     if (StringHelper.isEmpty (sEndpointReference))
     {
