@@ -44,7 +44,7 @@ import com.helger.peppol.identifier.CIdentifier;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
+import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -297,7 +297,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_DOCTYPE_ID,
                                                                                          aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
                                                                                                                                   .getURIEncoded ()
-                                                                                                                 : IPeppolDocumentTypeIdentifier.DEFAULT_SCHEME +
+                                                                                                                 : PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME +
                                                                                                                    CIdentifier.URL_SCHEME_VALUE_SEPARATOR)).setReadOnly (bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DOCTYPE_ID)));
 

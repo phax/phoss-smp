@@ -48,7 +48,7 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -178,7 +178,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_SCHEME,
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
                                                                                             .getScheme ()
-                                                                           : IPeppolParticipantIdentifier.DEFAULT_SCHEME)).setPlaceholder ("Identifier scheme")
+                                                                           : PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME)).setPlaceholder ("Identifier scheme")
                                                                                                                           .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
@@ -189,7 +189,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
                                                    .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme (default: " +
-                                                                 IPeppolParticipantIdentifier.DEFAULT_SCHEME +
+                                                                 PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME +
                                                                  "), the right part is the identifier value (e.g. 9915:test)")
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PARTICIPANT_ID_SCHEME,
                                                                                                FIELD_PARTICIPANT_ID_VALUE)));

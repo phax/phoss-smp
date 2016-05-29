@@ -50,7 +50,7 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
@@ -69,7 +69,7 @@ public final class SMPServiceGroupTest
   public void testBasic ()
   {
     final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
-                                                     .createParticipantIdentifier (IPeppolParticipantIdentifier.DEFAULT_SCHEME,
+                                                     .createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                                    "0088:dummy");
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
     assertTrue (StringHelper.hasText (aSG.getID ()));

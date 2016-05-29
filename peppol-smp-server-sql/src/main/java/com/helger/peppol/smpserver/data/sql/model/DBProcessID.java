@@ -61,9 +61,6 @@ import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentif
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 
 /**
  * The ID of a single process.
@@ -103,7 +100,7 @@ public class DBProcessID implements Serializable
     m_sParticipantIdentifierScheme = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
   }
 
-  @Column (name = "businessIdentifier", nullable = false, length = IPeppolParticipantIdentifier.MAX_VALUE_LENGTH)
+  @Column (name = "businessIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_PARTICIPANT_VALUE_LENGTH)
   public String getBusinessIdentifier ()
   {
     return m_sParticipantIdentifier;
@@ -132,7 +129,7 @@ public class DBProcessID implements Serializable
     m_sDocumentTypeIdentifierScheme = sDocumentIdentifierScheme;
   }
 
-  @Column (name = "documentIdentifier", nullable = false, length = IPeppolDocumentTypeIdentifier.MAX_VALUE_LENGTH)
+  @Column (name = "documentIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_DOCUEMNT_TYPE_VALUE_LENGTH)
   public String getDocumentIdentifier ()
   {
     return m_sDocumentTypeIdentifier;
@@ -161,7 +158,7 @@ public class DBProcessID implements Serializable
     m_sProcessIdentifierScheme = sProcessIdentifierScheme;
   }
 
-  @Column (name = "processIdentifier", nullable = false, length = IPeppolProcessIdentifier.MAX_VALUE_LENGTH)
+  @Column (name = "processIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_PROCESS_VALUE_LENGTH)
   public String getProcessIdentifier ()
   {
     return m_sProcessIdentifier;

@@ -54,7 +54,6 @@ import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 
 /**
@@ -91,7 +90,7 @@ public class DBServiceGroupID implements Serializable
     m_sParticipantIdentifierScheme = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
   }
 
-  @Column (name = "businessIdentifier", nullable = false, length = IPeppolParticipantIdentifier.MAX_VALUE_LENGTH)
+  @Column (name = "businessIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_PARTICIPANT_VALUE_LENGTH)
   public String getBusinessIdentifier ()
   {
     return m_sParticipantIdentifier;

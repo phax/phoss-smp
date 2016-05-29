@@ -53,7 +53,6 @@ import com.helger.commons.string.ToStringGenerator;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.identifier.peppol.participant.IPeppolParticipantIdentifier;
 
 /**
  * ID for the ownership
@@ -100,7 +99,7 @@ public class DBOwnershipID implements Serializable
     m_sParticipantIdentifierScheme = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
   }
 
-  @Column (name = "businessIdentifier", nullable = false, length = IPeppolParticipantIdentifier.MAX_VALUE_LENGTH)
+  @Column (name = "businessIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_PARTICIPANT_VALUE_LENGTH)
   public String getBusinessIdentifier ()
   {
     return m_sParticipantIdentifier;

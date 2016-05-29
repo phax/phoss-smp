@@ -57,9 +57,7 @@ import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
-import com.helger.peppol.identifier.peppol.process.IPeppolProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -566,7 +564,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_SCHEME,
                                                    aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
                                                                                             .getScheme ()
-                                                                           : IPeppolDocumentTypeIdentifier.DEFAULT_SCHEME)).setPlaceholder ("Identifier scheme")
+                                                                           : PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME)).setPlaceholder ("Identifier scheme")
                                                                                                                            .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_VALUE,
@@ -586,7 +584,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_SCHEME,
                                                    aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()
                                                                                               .getScheme ()
-                                                                            : IPeppolProcessIdentifier.DEFAULT_SCHEME)).setPlaceholder ("Identifier scheme")
+                                                                            : PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME)).setPlaceholder ("Identifier scheme")
                                                                                                                        .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_VALUE,
