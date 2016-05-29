@@ -47,11 +47,11 @@ import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
+import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ObjectFactory;
@@ -144,7 +144,7 @@ public final class ServiceMetadataInterfaceTest
     final IDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
     final String sDT = aDT.getURIEncoded ();
 
-    final SimpleProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V20.getAsProcessIdentifier ();
+    final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V20.getAsProcessIdentifier ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (aPI_LC);
