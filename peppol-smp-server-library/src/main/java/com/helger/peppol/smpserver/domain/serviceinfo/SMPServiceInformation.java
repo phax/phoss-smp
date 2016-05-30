@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +50,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.CommonsLinkedHashMap;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsOrderedMap;
@@ -84,7 +84,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
   private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
-  private final ICommonsOrderedMap <IProcessIdentifier, SMPProcess> m_aProcesses = new CommonsLinkedHashMap<> ();
+  private final ICommonsOrderedMap <IProcessIdentifier, SMPProcess> m_aProcesses = new CommonsLinkedHashMap <> ();
   private String m_sExtension;
 
   /**
@@ -269,7 +269,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   public static SMPServiceInformation createFromJAXB (@Nonnull final ISMPServiceGroup aServiceGroup,
                                                       @Nonnull final ServiceInformationType aServiceInformation)
   {
-    final List <SMPProcess> aProcesses = new ArrayList <SMPProcess> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     for (final ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,

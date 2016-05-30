@@ -16,12 +16,12 @@
  */
 package com.helger.peppol.smpserver.ui.pub;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
@@ -89,11 +89,11 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
 {
   private static final ICSSClassProvider CSS_CLASS_FOOTER_LINKS = DefaultCSSClassProvider.create ("footer-links");
 
-  private final List <IMenuObject> m_aFooterObjects;
+  private final ICommonsList <IMenuObject> m_aFooterObjects;
 
   public SMPRendererPublic ()
   {
-    m_aFooterObjects = new ArrayList <IMenuObject> ();
+    m_aFooterObjects = new CommonsArrayList <> ();
     ApplicationMenuTree.getTree ().iterateAllMenuObjects (aCurrentObject -> {
       if (aCurrentObject.containsAttribute (CMenuPublic.FLAG_FOOTER))
         m_aFooterObjects.add (aCurrentObject);

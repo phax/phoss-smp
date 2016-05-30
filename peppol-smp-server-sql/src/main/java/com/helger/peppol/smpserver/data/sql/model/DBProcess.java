@@ -41,7 +41,6 @@
 package com.helger.peppol.smpserver.data.sql.model;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -61,6 +60,8 @@ import javax.persistence.Transient;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.collection.ext.CommonsHashSet;
+import com.helger.commons.collection.ext.ICommonsSet;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.smp.ExtensionType;
 import com.helger.peppol.smp.SMPExtensionConverter;
@@ -77,7 +78,7 @@ public class DBProcess implements Serializable
   private DBProcessID m_aID;
   private DBServiceMetadata m_aServiceMetadata;
   private String m_sExtension;
-  private Set <DBEndpoint> m_aEndpoints = new HashSet <DBEndpoint> ();
+  private ICommonsSet <DBEndpoint> m_aEndpoints = new CommonsHashSet <> ();
 
   @Deprecated
   @UsedOnlyByJPA
@@ -104,26 +105,10 @@ public class DBProcess implements Serializable
   }
 
   @ManyToOne (fetch = FetchType.LAZY)
-  @JoinColumns ({ @JoinColumn (name = "documentIdentifier",
-                               referencedColumnName = "documentIdentifier",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false),
-                  @JoinColumn (name = "documentIdentifierScheme",
-                               referencedColumnName = "documentIdentifierScheme",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false),
-                  @JoinColumn (name = "businessIdentifier",
-                               referencedColumnName = "businessIdentifier",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false),
-                  @JoinColumn (name = "businessIdentifierScheme",
-                               referencedColumnName = "businessIdentifierScheme",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false) })
+  @JoinColumns ({ @JoinColumn (name = "documentIdentifier", referencedColumnName = "documentIdentifier", nullable = false, insertable = false, updatable = false),
+                  @JoinColumn (name = "documentIdentifierScheme", referencedColumnName = "documentIdentifierScheme", nullable = false, insertable = false, updatable = false),
+                  @JoinColumn (name = "businessIdentifier", referencedColumnName = "businessIdentifier", nullable = false, insertable = false, updatable = false),
+                  @JoinColumn (name = "businessIdentifierScheme", referencedColumnName = "businessIdentifierScheme", nullable = false, insertable = false, updatable = false) })
   public DBServiceMetadata getServiceMetadata ()
   {
     return m_aServiceMetadata;
@@ -160,7 +145,7 @@ public class DBProcess implements Serializable
     return m_aEndpoints;
   }
 
-  public void setEndpoints (@Nonnull final Set <DBEndpoint> aEndpoints)
+  public void setEndpoints (@Nonnull final ICommonsSet <DBEndpoint> aEndpoints)
   {
     ValueEnforcer.notNull (aEndpoints, "Endpoints");
     m_aEndpoints = aEndpoints;

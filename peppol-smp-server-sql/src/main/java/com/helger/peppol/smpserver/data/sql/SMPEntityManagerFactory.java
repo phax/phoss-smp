@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.data.sql;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -49,6 +48,8 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
+import com.helger.commons.collection.ext.CommonsHashMap;
+import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.db.jpa.AbstractGlobalEntityManagerFactory;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.ConfigFile;
@@ -67,16 +68,18 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
     // Standard configuration file
     final ConfigFile aConfigFile = SMPServerConfiguration.getConfigFile ();
 
-    final Map <String, Object> ret = new HashMap <String, Object> ();
+    final ICommonsMap <String, Object> ret = new CommonsHashMap <> ();
     // Read all properties from the standard configuration file
     // Connection pooling
-    ret.put (PersistenceUnitProperties.CONNECTION_POOL_MAX, aConfigFile.getString (SMPJPAConfiguration.CONFIG_JDBC_READ_CONNECTIONS_MAX));
+    ret.put (PersistenceUnitProperties.CONNECTION_POOL_MAX,
+             aConfigFile.getString (SMPJPAConfiguration.CONFIG_JDBC_READ_CONNECTIONS_MAX));
 
     // EclipseLink should create the database schema automatically
     // Values: Values: none/create-tables/drop-and-create-tables
     ret.put (PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
     ret.put (PersistenceUnitProperties.DDL_GENERATION_MODE,
-             aConfigFile.getString (SMPJPAConfiguration.CONFIG_DDL_GENERATION_MODE, SMPJPAConfiguration.getDefaultDDLGenerationMode ()));
+             aConfigFile.getString (SMPJPAConfiguration.CONFIG_DDL_GENERATION_MODE,
+                                    SMPJPAConfiguration.getDefaultDDLGenerationMode ()));
     ret.put (PersistenceUnitProperties.CREATE_JDBC_DDL_FILE, "db-create-smp.sql");
     ret.put (PersistenceUnitProperties.DROP_JDBC_DDL_FILE, "db-drop-smp.sql");
 

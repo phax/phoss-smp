@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnegative;
@@ -51,7 +50,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.CommonsLinkedHashMap;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsOrderedMap;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
@@ -76,7 +77,7 @@ import com.helger.peppol.smp.SMPExtensionConverter;
 public class SMPProcess implements ISMPProcess
 {
   private IProcessIdentifier m_aProcessIdentifier;
-  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap<> ();
+  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap <> ();
   private String m_sExtension;
 
   public SMPProcess (@Nonnull final IProcessIdentifier aProcessIdentifier,
@@ -228,7 +229,7 @@ public class SMPProcess implements ISMPProcess
   @Nonnull
   public static SMPProcess createFromJAXB (@Nonnull final ProcessType aProcess)
   {
-    final List <SMPEndpoint> aEndpoints = new ArrayList <SMPEndpoint> ();
+    final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
     for (final EndpointType aEndpoint : aProcess.getServiceEndpointList ().getEndpoint ())
       aEndpoints.add (SMPEndpoint.createFromJAXB (aEndpoint));
     return new SMPProcess (aProcess.getProcessIdentifier (),

@@ -17,7 +17,6 @@
 package com.helger.peppol.smpserver.rest;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -29,6 +28,9 @@ import org.glassfish.grizzly.servlet.WebappContext;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.uri.UriComponent;
+
+import com.helger.commons.collection.ext.CommonsHashMap;
+import com.helger.commons.collection.ext.ICommonsMap;
 
 /**
  * Main class.
@@ -75,7 +77,7 @@ final class MockServer
   @Nonnull
   private static WebappContext _createContext (final String sURI)
   {
-    final Map <String, String> aInitParams = new HashMap <String, String> ();
+    final ICommonsMap <String, String> aInitParams = new CommonsHashMap <> ();
     aInitParams.put ("jersey.config.server.provider.packages",
                      com.helger.peppol.smpserver.rest.ServiceGroupInterface.class.getPackage ().getName () +
                                                                "," +
