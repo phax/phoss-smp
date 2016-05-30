@@ -49,13 +49,12 @@ import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
  * This interface represents a single SMP redirect for a certain document type
- * identifier ({@link IPeppolDocumentTypeIdentifier}).
+ * identifier ({@link IDocumentTypeIdentifier}).
  *
  * @author Philip Helger
  */
