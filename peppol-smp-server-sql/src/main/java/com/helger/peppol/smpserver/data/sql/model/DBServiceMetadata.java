@@ -41,7 +41,6 @@
 package com.helger.peppol.smpserver.data.sql.model;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -60,6 +59,7 @@ import javax.persistence.Table;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.collection.ext.CommonsHashSet;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 
 /**
@@ -73,7 +73,7 @@ public class DBServiceMetadata implements Serializable
 {
   private DBServiceMetadataID m_aID;
   private DBServiceGroup m_aServiceGroup;
-  private Set <DBProcess> m_aProcesses = new HashSet<> ();
+  private Set <DBProcess> m_aProcesses = new CommonsHashSet<> ();
   private String m_sExtension;
 
   @Deprecated

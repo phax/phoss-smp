@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.data.sql.model;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -53,6 +52,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.helger.commons.collection.ext.CommonsHashSet;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.smpserver.domain.user.ISMPUserEditable;
 
@@ -67,7 +67,7 @@ public class DBUser implements ISMPUserEditable
 {
   private String m_sUserName;
   private String m_sPassword;
-  private Set <DBOwnership> m_aOwnerships = new HashSet<> ();
+  private Set <DBOwnership> m_aOwnerships = new CommonsHashSet<> ();
 
   @Deprecated
   @UsedOnlyByJPA
