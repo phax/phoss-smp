@@ -47,9 +47,7 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
@@ -75,6 +73,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.helger.commons.annotation.UsedViaReflection;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.commons.string.StringHelper;
@@ -197,7 +197,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
-    final List <Object> aX509Content = new ArrayList <> ();
+    final ICommonsList <Object> aX509Content = new CommonsArrayList<> ();
     aX509Content.add (_getCertificate ().getSubjectX500Principal ().getName ());
     aX509Content.add (_getCertificate ());
     final X509Data aX509Data = aKeyInfoFactory.newX509Data (aX509Content);

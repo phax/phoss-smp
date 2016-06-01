@@ -40,9 +40,6 @@
  */
 package com.helger.peppol.smpserver;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
@@ -51,6 +48,8 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
@@ -113,7 +112,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESuccess reloadConfiguration ()
   {
-    final List <String> aFilePaths = new ArrayList<> ();
+    final ICommonsList <String> aFilePaths = new CommonsArrayList<> ();
     // Check if the system property is present
     String sPropertyPath = SystemProperties.getPropertyValue (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH);
     if (StringHelper.hasText (sPropertyPath))

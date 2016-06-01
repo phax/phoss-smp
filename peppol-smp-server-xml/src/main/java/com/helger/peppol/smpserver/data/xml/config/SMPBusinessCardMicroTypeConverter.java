@@ -17,13 +17,13 @@
 package com.helger.peppol.smpserver.data.xml.config;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.microdom.IMicroElement;
 import com.helger.commons.microdom.MicroElement;
 import com.helger.commons.microdom.convert.IMicroTypeConverter;
@@ -121,7 +121,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
     if (aServiceGroup == null)
       throw new IllegalStateException ("Failed to resolve service group with ID '" + sServiceGroupID + "'");
 
-    final List <SMPBusinessCardEntity> aEntities = new ArrayList<> ();
+    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList<> ();
     for (final IMicroElement eEntity : aElement.getAllChildElements (ELEMENT_ENTITY))
     {
       final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (eEntity.getAttributeValue (ATTR_ID));

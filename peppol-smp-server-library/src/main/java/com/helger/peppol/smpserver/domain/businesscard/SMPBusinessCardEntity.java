@@ -43,7 +43,6 @@ package com.helger.peppol.smpserver.domain.businesscard;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -53,6 +52,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.id.IHasID;
@@ -68,9 +69,9 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   private String m_sName;
   private String m_sCountryCode;
   private String m_sGeographicalInformation;
-  private final List <SMPBusinessCardIdentifier> m_aIdentifiers = new ArrayList <> ();
-  private final List <String> m_aWebsiteURIs = new ArrayList <> ();
-  private final List <SMPBusinessCardContact> m_aContacts = new ArrayList <> ();
+  private final ICommonsList <SMPBusinessCardIdentifier> m_aIdentifiers = new CommonsArrayList<> ();
+  private final ICommonsList <String> m_aWebsiteURIs = new CommonsArrayList<> ();
+  private final ICommonsList <SMPBusinessCardContact> m_aContacts = new CommonsArrayList<> ();
   private String m_sAdditionalInformation;
   private LocalDate m_aRegistrationDate;
 

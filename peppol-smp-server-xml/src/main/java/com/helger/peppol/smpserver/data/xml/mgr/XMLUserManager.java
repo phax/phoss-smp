@@ -16,10 +16,6 @@
  */
 package com.helger.peppol.smpserver.data.xml.mgr;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,6 +25,9 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.data.xml.domain.XMLDataUser;
@@ -84,9 +83,9 @@ public final class XMLUserManager implements ISMPUserManager
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <XMLDataUser> getAllUsers ()
+  public ICommonsCollection <XMLDataUser> getAllUsers ()
   {
-    final List <XMLDataUser> ret = new ArrayList <> ();
+    final ICommonsList <XMLDataUser> ret = new CommonsArrayList<> ();
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ().getAllActiveUsers ())
       ret.add (new XMLDataUser (aUser));
     return ret;
@@ -127,13 +126,17 @@ public final class XMLUserManager implements ISMPUserManager
 
   @Nonnull
   public ISMPServiceGroup verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                           @Nonnull final ISMPUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
+                                           @Nonnull final ISMPUser aCurrentUser) throws SMPNotFoundException,
+                                                                                 SMPUnauthorizedException
   {
     // Resolve service group
-    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
+                                                         .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
-      throw new SMPNotFoundException ("Service group " + IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) + " does not exist");
+      throw new SMPNotFoundException ("Service group " +
+                                      IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
+                                      " does not exist");
     }
 
     // Resolve user
@@ -147,7 +150,11 @@ public final class XMLUserManager implements ISMPUserManager
     }
 
     if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Verified service group " + aServiceGroup.getID () + " is owned by user '" + aCurrentUser.getUserName () + "'");
+      s_aLogger.debug ("Verified service group " +
+                       aServiceGroup.getID () +
+                       " is owned by user '" +
+                       aCurrentUser.getUserName () +
+                       "'");
 
     return aServiceGroup;
   }

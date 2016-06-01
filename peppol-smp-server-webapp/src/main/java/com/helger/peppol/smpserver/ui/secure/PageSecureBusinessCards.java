@@ -17,9 +17,7 @@
 package com.helger.peppol.smpserver.ui.secure;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -28,6 +26,8 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.CompareHelper;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.errorlist.FormErrors;
@@ -276,7 +276,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
-    final List <SMPBusinessCardEntity> aSMPEntities = new ArrayList<> ();
+    final ICommonsList <SMPBusinessCardEntity> aSMPEntities = new CommonsArrayList<> ();
 
     // validations
     if (StringHelper.isEmpty (sServiceGroupID))
@@ -321,7 +321,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         final String sGeoInfo = aEntityRow.get (SUFFIX_GEO_INFO);
 
         // Entity Identifiers
-        final List <SMPBusinessCardIdentifier> aSMPIdentifiers = new ArrayList<> ();
+        final ICommonsList <SMPBusinessCardIdentifier> aSMPIdentifiers = new CommonsArrayList<> ();
         final IRequestParamMap aIdentifiers = aEntities.getMap (sEntityRowID, PREFIX_IDENTIFIER);
         if (aIdentifiers != null)
           for (final String sIdentifierRowID : aIdentifiers.keySet ())
@@ -371,7 +371,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                                        sEntityRowID,
                                                                        SUFFIX_WEBSITE_URIS);
         final String sWebsiteURIs = aEntityRow.get (SUFFIX_WEBSITE_URIS);
-        final List <String> aWebsiteURIs = new ArrayList<> ();
+        final ICommonsList <String> aWebsiteURIs = new CommonsArrayList<> ();
         for (final String sWebsiteURI : RegExHelper.getSplitToArray (sWebsiteURIs, "\\n"))
         {
           final String sRealWebsiteURI = sWebsiteURI.trim ();
@@ -383,7 +383,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         }
 
         // Entity Contacts
-        final List <SMPBusinessCardContact> aSMPContacts = new ArrayList<> ();
+        final ICommonsList <SMPBusinessCardContact> aSMPContacts = new CommonsArrayList<> ();
         final IRequestParamMap aContacts = aEntities.getMap (sEntityRowID, PREFIX_CONTACT);
         if (aContacts != null)
           for (final String sContactRowID : aContacts.keySet ())

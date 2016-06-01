@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.restapi;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -50,6 +49,8 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.base64.Base64;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.lang.BooleanHelper;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EChange;
@@ -449,10 +450,10 @@ public final class BDXRServerAPI
       {
         // Handle service information
         final ProcessListType aJAXBProcesses = aServiceMetadata.getServiceInformation ().getProcessList ();
-        final List <SMPProcess> aProcesses = new ArrayList<> ();
+        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
         for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
         {
-          final List <SMPEndpoint> aEndpoints = new ArrayList<> ();
+          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
           for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
           {
             final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),

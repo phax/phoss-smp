@@ -16,13 +16,12 @@
  */
 package com.helger.peppol.smpserver.data.xml.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.microdom.IMicroElement;
 import com.helger.commons.microdom.MicroElement;
 import com.helger.commons.microdom.convert.IMicroTypeConverter;
@@ -80,7 +79,7 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
 
     final SimpleDocumentTypeIdentifier aDocTypeIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_DOCUMENT_TYPE_IDENTIFIER),
                                                                                                 SimpleDocumentTypeIdentifier.class);
-    final List <SMPProcess> aProcesses = new ArrayList<> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
     for (final IMicroElement aProcess : aElement.getAllChildElements (ELEMENT_PROCESS))
       aProcesses.add (MicroTypeConverter.convertToNative (aProcess, SMPProcess.class));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
