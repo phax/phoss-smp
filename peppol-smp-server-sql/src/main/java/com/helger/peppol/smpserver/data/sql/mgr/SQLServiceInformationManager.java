@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.data.sql.mgr;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -358,7 +357,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
     for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
     {
-      final List <SMPEndpoint> aEndpoints = new ArrayList<> ();
+      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
       for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
       {
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBEndpoint.getId ().getTransportProfile (),
