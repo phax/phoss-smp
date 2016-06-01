@@ -126,6 +126,11 @@
       <artifactId>junit</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-oton-security</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
