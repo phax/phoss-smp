@@ -179,7 +179,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
                                                                                             .getScheme ()
                                                                            : PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                          .setReadOnly (bEdit));
+                                                                                                                                .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
@@ -362,6 +362,15 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
     aNodeList.addChild (createActionHeader ("Check DNS state of participants"));
+
+    try
+    {
+      InetAddress.getByName ("www.google.com");
+    }
+    catch (final UnknownHostException ex)
+    {
+      aNodeList.addChild (new BootstrapWarnBox ().addChild ("It seems like you are offline! So please handle the results on this page with care!"));
+    }
 
     final String sSMLZoneName = _getSMLHostName ();
 
