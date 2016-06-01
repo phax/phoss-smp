@@ -27,7 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.datetime.PDTFactory;
+import com.helger.commons.datetime.PDTFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;

@@ -51,8 +51,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.datetime.PDTConfig;
 import com.helger.commons.exception.InitializationException;
-import com.helger.datetime.config.PDTConfig;
 
 /**
  * This class is used for setting the timezone so that dates saved to the

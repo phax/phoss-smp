@@ -25,8 +25,8 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.lang.ClassHelper;
-import com.helger.datetime.PDTFactory;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.impl.HCNodeList;
