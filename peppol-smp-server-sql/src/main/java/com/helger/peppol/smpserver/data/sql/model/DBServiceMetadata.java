@@ -41,6 +41,8 @@
 package com.helger.peppol.smpserver.data.sql.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -58,8 +60,6 @@ import javax.persistence.Table;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.collection.ext.CommonsHashSet;
-import com.helger.commons.collection.ext.ICommonsSet;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 
 /**
@@ -73,7 +73,7 @@ public class DBServiceMetadata implements Serializable
 {
   private DBServiceMetadataID m_aID;
   private DBServiceGroup m_aServiceGroup;
-  private ICommonsSet <DBProcess> m_aProcesses = new CommonsHashSet <> ();
+  private Set <DBProcess> m_aProcesses = new HashSet<> ();
   private String m_sExtension;
 
   @Deprecated
@@ -117,12 +117,12 @@ public class DBServiceMetadata implements Serializable
   @Nonnull
   @ReturnsMutableObject ("design")
   @OneToMany (fetch = FetchType.LAZY, mappedBy = "serviceMetadata", cascade = { CascadeType.ALL })
-  public ICommonsSet <DBProcess> getProcesses ()
+  public Set <DBProcess> getProcesses ()
   {
     return m_aProcesses;
   }
 
-  public void setProcesses (@Nonnull final ICommonsSet <DBProcess> aProcesses)
+  public void setProcesses (@Nonnull final Set <DBProcess> aProcesses)
   {
     ValueEnforcer.notNull (aProcesses, "Processes");
     m_aProcesses = aProcesses;

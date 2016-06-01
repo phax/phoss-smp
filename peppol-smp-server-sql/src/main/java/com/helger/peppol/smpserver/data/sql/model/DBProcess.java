@@ -41,6 +41,7 @@
 package com.helger.peppol.smpserver.data.sql.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -60,8 +61,6 @@ import javax.persistence.Transient;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.collection.ext.CommonsHashSet;
-import com.helger.commons.collection.ext.ICommonsSet;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.smp.ExtensionType;
 import com.helger.peppol.smp.SMPExtensionConverter;
@@ -78,7 +77,7 @@ public class DBProcess implements Serializable
   private DBProcessID m_aID;
   private DBServiceMetadata m_aServiceMetadata;
   private String m_sExtension;
-  private ICommonsSet <DBEndpoint> m_aEndpoints = new CommonsHashSet <> ();
+  private Set <DBEndpoint> m_aEndpoints = new HashSet<> ();
 
   @Deprecated
   @UsedOnlyByJPA
@@ -145,7 +144,7 @@ public class DBProcess implements Serializable
     return m_aEndpoints;
   }
 
-  public void setEndpoints (@Nonnull final ICommonsSet <DBEndpoint> aEndpoints)
+  public void setEndpoints (@Nonnull final Set <DBEndpoint> aEndpoints)
   {
     ValueEnforcer.notNull (aEndpoints, "Endpoints");
     m_aEndpoints = aEndpoints;

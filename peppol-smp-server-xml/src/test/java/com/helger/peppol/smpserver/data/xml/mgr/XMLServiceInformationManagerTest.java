@@ -32,7 +32,6 @@ import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smpserver.data.xml.SMPXMLTestRule;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -61,15 +60,20 @@ public final class XMLServiceInformationManagerTest
   @Test
   public void testServiceRegistration ()
   {
+    // Ensure the user is present
+    final IUser aTestUser = PhotonSecurityManager.getUserMgr ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
+    assertNotNull (aTestUser);
+
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInformationMgr = SMPMetaManager.getServiceInformationMgr ();
     assertEquals (0, aServiceInformationMgr.getSMPServiceInformationCount ());
 
-    final IUser aTestUser = PhotonSecurityManager.getUserMgr ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
-    assertNotNull (aTestUser);
-    final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
+    // Delete existing service group
+    final IParticipantIdentifier aPI = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                       "0088:dummy");
     aServiceGroupMgr.deleteSMPServiceGroup (aPI);
+
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
     try
     {

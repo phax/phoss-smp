@@ -84,7 +84,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
   private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
-  private final ICommonsOrderedMap <IProcessIdentifier, SMPProcess> m_aProcesses = new CommonsLinkedHashMap <> ();
+  private final ICommonsOrderedMap <String, SMPProcess> m_aProcesses = new CommonsLinkedHashMap<> ();
   private String m_sExtension;
 
   /**
@@ -152,12 +152,18 @@ public class SMPServiceInformation implements ISMPServiceInformation
     return m_aProcesses.size ();
   }
 
+  @Nonnull
+  private static String _getKey (@Nonnull final IProcessIdentifier aProcessID)
+  {
+    return aProcessID.getURIEncoded ();
+  }
+
   @Nullable
   public SMPProcess getProcessOfID (@Nullable final IProcessIdentifier aProcessID)
   {
     if (aProcessID == null)
       return null;
-    return m_aProcesses.get (aProcessID);
+    return m_aProcesses.get (_getKey (aProcessID));
   }
 
   @Nonnull
@@ -169,13 +175,13 @@ public class SMPServiceInformation implements ISMPServiceInformation
   public void addProcess (@Nonnull final SMPProcess aProcess)
   {
     ValueEnforcer.notNull (aProcess, "Process");
-    final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
-    if (m_aProcesses.containsKey (aProcessID))
-      throw new IllegalStateException ("A process with ID '" + aProcessID.getURIEncoded () + "' is already contained!");
-    m_aProcesses.put (aProcessID, aProcess);
+    final String sProcessID = _getKey (aProcess.getProcessIdentifier ());
+    if (m_aProcesses.containsKey (sProcessID))
+      throw new IllegalStateException ("A process with ID '" + sProcessID + "' is already contained!");
+    m_aProcesses.put (sProcessID, aProcess);
   }
 
-  public void setProcesses (@Nonnull @Nonempty final Map <? extends IProcessIdentifier, ? extends SMPProcess> aProcesses)
+  public void setProcesses (@Nonnull @Nonempty final Map <String, ? extends SMPProcess> aProcesses)
   {
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
     m_aProcesses.clear ();
@@ -269,7 +275,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   public static SMPServiceInformation createFromJAXB (@Nonnull final ISMPServiceGroup aServiceGroup,
                                                       @Nonnull final ServiceInformationType aServiceInformation)
   {
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
     for (final ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,

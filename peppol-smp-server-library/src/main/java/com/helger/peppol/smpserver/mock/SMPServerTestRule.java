@@ -16,13 +16,18 @@
  */
 package com.helger.peppol.smpserver.mock;
 
+import java.util.Locale;
+
 import javax.annotation.Nullable;
 
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
+import com.helger.commons.url.SMap;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
+import com.helger.photon.security.CSecurity;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 
 /**
  * Special SMP server JUnit test rule.
@@ -51,6 +56,16 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
   {
     super.before ();
     SMPMetaManager.initBackendFromConfiguration ();
+    PhotonSecurityManager.getUserMgr ().createPredefinedUser (CSecurity.USER_ADMINISTRATOR_ID,
+                                                              CSecurity.USER_ADMINISTRATOR_LOGIN,
+                                                              CSecurity.USER_ADMINISTRATOR_EMAIL,
+                                                              CSecurity.USER_ADMINISTRATOR_PASSWORD,
+                                                              "SMP",
+                                                              "Admin",
+                                                              "Description",
+                                                              Locale.US,
+                                                              new SMap (),
+                                                              false);
   }
 
   @Override

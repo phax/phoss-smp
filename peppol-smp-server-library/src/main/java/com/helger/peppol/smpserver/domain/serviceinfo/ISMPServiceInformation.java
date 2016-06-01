@@ -41,7 +41,6 @@
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -49,6 +48,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
 import com.helger.peppol.identifier.IdentifierHelper;
@@ -111,7 +111,7 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    */
   @Nonnull
   @ReturnsMutableCopy
-  List <? extends ISMPProcess> getAllProcesses ();
+  ICommonsList <? extends ISMPProcess> getAllProcesses ();
 
   /**
    * @return The overall endpoint count for all processes in this object. Always

@@ -37,6 +37,7 @@ import com.helger.commons.microdom.IMicroElement;
 import com.helger.commons.microdom.MicroDocument;
 import com.helger.commons.microdom.convert.MicroTypeConverter;
 import com.helger.commons.state.EChange;
+import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -123,7 +124,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
       throw new IllegalArgumentException ("SMPServiceInformation ID '" +
                                           sSMPServiceInformationID +
                                           "' is already in use!");
-    m_aMap.put (aSMPServiceInformation.getID (), aSMPServiceInformation);
+    m_aMap.put (sSMPServiceInformationID, aSMPServiceInformation);
   }
 
   @Nullable
@@ -267,29 +268,13 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
   @ReturnsMutableCopy
   public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.copyOfValues ();
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return m_aRWLock.readLocked ( () -> m_aMap.copyOfValues ());
   }
 
   @Nonnegative
   public int getSMPServiceInformationCount ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.size ();
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return m_aRWLock.readLocked ( () -> m_aMap.size ());
   }
 
   @Nonnull
@@ -324,9 +309,10 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
       m_aRWLock.readLock ().lock ();
       try
       {
-        for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
-          if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()))
-            ret.add (aServiceInformation.getDocumentTypeIdentifier ());
+        CollectionHelper.findAllMapped (m_aMap.values (),
+                                        aSI -> aSI.getServiceGroupID ().equals (aServiceGroup.getID ()),
+                                        aSI -> aSI.getDocumentTypeIdentifier (),
+                                        ret::add);
       }
       finally
       {
@@ -350,12 +336,11 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     m_aRWLock.readLock ().lock ();
     try
     {
-      for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
-        if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
-            aServiceInformation.getDocumentTypeIdentifier ().equals (aDocumentTypeIdentifier))
-        {
-          ret.add (aServiceInformation);
-        }
+      CollectionHelper.findAll (m_aMap.values (),
+                                aSI -> aSI.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
+                                       IdentifierHelper.areDocumentTypeIdentifiersEqual (aSI.getDocumentTypeIdentifier (),
+                                                                                         aDocumentTypeIdentifier),
+                                ret::add);
     }
     finally
     {
