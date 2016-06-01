@@ -58,9 +58,9 @@ import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
+import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.peppol.smpserver.mock.SMPServerTestRule;
@@ -107,7 +107,8 @@ public final class SMPServiceInformationTest
     assertEquals ("ti", aEP.getTechnicalInformationUrl ());
     assertEquals ("extep", aEP.getExtension ());
 
-    final IProcessIdentifier aProcessID = PeppolProcessIdentifier.createWithDefaultScheme ("testproc");
+    final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
+                                                                       "testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
@@ -155,7 +156,8 @@ public final class SMPServiceInformationTest
     assertNull (aEP.getTechnicalInformationUrl ());
     assertNull (aEP.getExtension ());
 
-    final IProcessIdentifier aProcessID = PeppolProcessIdentifier.createWithDefaultScheme ("testproc");
+    final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
+                                                                       "testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), (String) null);
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
