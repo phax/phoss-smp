@@ -40,14 +40,13 @@
  */
 package com.helger.peppol.smpserver.domain.redirect;
 
-import java.util.Collection;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -111,7 +110,7 @@ public interface ISMPRedirectManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends ISMPRedirect> getAllSMPRedirects ();
+  ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirects ();
 
   /**
    * Get all redirects of the passed service group.
@@ -123,7 +122,7 @@ public interface ISMPRedirectManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   /**
    * @return The count of all contained redirects. Always &ge; 0.
@@ -134,7 +133,7 @@ public interface ISMPRedirectManager
   /**
    * Find the redirect that matches the passed tuple of service group and
    * document type.
-   * 
+   *
    * @param aServiceGroup
    *        The service group to query. May be <code>null</code>.
    * @param aDocTypeID

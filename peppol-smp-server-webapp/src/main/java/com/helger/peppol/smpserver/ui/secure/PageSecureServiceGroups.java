@@ -363,13 +363,14 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
     aNodeList.addChild (createActionHeader ("Check DNS state of participants"));
 
+    // Simple check if we're online or not
     try
     {
       InetAddress.getByName ("www.google.com");
     }
     catch (final UnknownHostException ex)
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("It seems like you are offline! So please handle the results on this page with care!"));
+      aNodeList.addChild (new BootstrapWarnBox ().addChild ("It seems like you are offline! So please interpret the results on this page with care!"));
     }
 
     final String sSMLZoneName = _getSMLHostName ();

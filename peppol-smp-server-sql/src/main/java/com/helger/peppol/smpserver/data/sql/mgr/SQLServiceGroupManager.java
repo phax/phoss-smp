@@ -40,8 +40,6 @@
  */
 package com.helger.peppol.smpserver.data.sql.mgr;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +54,8 @@ import org.eclipse.persistence.config.CacheUsage;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EChange;
@@ -257,22 +257,22 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
+  public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     s_aLogger.info ("getAllSMPServiceGroups()");
 
-    JPAExecutionResult <Collection <ISMPServiceGroup>> ret;
-    ret = doSelect (new Callable <Collection <ISMPServiceGroup>> ()
+    JPAExecutionResult <ICommonsCollection <ISMPServiceGroup>> ret;
+    ret = doSelect (new Callable <ICommonsCollection <ISMPServiceGroup>> ()
     {
       @Nonnull
       @ReturnsMutableCopy
-      public Collection <ISMPServiceGroup> call () throws Exception
+      public ICommonsCollection <ISMPServiceGroup> call () throws Exception
       {
         final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p",
                                                                                         DBServiceGroup.class)
                                                                           .getResultList ();
 
-        final Collection <ISMPServiceGroup> aList = new ArrayList<> ();
+        final ICommonsCollection <ISMPServiceGroup> aList = new CommonsArrayList<> ();
         for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
         {
           final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
@@ -297,23 +297,23 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
+  public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
     s_aLogger.info ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
 
-    JPAExecutionResult <Collection <ISMPServiceGroup>> ret;
-    ret = doSelect (new Callable <Collection <ISMPServiceGroup>> ()
+    JPAExecutionResult <ICommonsCollection <ISMPServiceGroup>> ret;
+    ret = doSelect (new Callable <ICommonsCollection <ISMPServiceGroup>> ()
     {
       @Nonnull
       @ReturnsMutableCopy
-      public Collection <ISMPServiceGroup> call () throws Exception
+      public ICommonsCollection <ISMPServiceGroup> call () throws Exception
       {
         final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p WHERE p.ownership.user.userName = :user",
                                                                                         DBServiceGroup.class)
                                                                           .setParameter ("user", sOwnerID)
                                                                           .getResultList ();
 
-        final Collection <ISMPServiceGroup> aList = new ArrayList<> ();
+        final ICommonsCollection <ISMPServiceGroup> aList = new CommonsArrayList<> ();
         for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
         {
           final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,

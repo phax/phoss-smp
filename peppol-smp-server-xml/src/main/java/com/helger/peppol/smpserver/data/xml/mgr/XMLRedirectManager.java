@@ -16,10 +16,6 @@
  */
 package com.helger.peppol.smpserver.data.xml.mgr;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,7 +27,10 @@ import com.helger.commons.annotation.MustBeLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.CommonsHashMap;
+import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.microdom.IMicroDocument;
 import com.helger.commons.microdom.IMicroElement;
@@ -259,7 +258,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPRedirect> getAllSMPRedirects ()
+  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirects ()
   {
     m_aRWLock.readLock ().lock ();
     try
@@ -274,16 +273,16 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
     return getAllSMPRedirectsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
+  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {
-    final List <ISMPRedirect> ret = new ArrayList<> ();
+    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList<> ();
     if (StringHelper.hasText (sServiceGroupID))
     {
       m_aRWLock.readLock ().lock ();

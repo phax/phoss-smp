@@ -1,6 +1,5 @@
 package com.helger.peppol.smpserver.mock;
 
-import java.util.Collection;
 import java.util.List;
 
 import com.helger.commons.collection.ext.ICommonsCollection;
@@ -54,7 +53,7 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
         throw new UnsupportedOperationException ();
       }
 
-      public Collection <? extends ISMPTransportProfile> getAllSMPTransportProfiles ()
+      public ICommonsCollection <? extends ISMPTransportProfile> getAllSMPTransportProfiles ()
       {
         throw new UnsupportedOperationException ();
       }
@@ -104,7 +103,7 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
         return 0;
       }
 
-      public Collection <? extends ISMPUser> getAllUsers ()
+      public ICommonsCollection <? extends ISMPUser> getAllUsers ()
       {
         throw new UnsupportedOperationException ();
       }
@@ -143,12 +142,12 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
         return 0;
       }
 
-      public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (final String sOwnerID)
+      public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (final String sOwnerID)
       {
         throw new UnsupportedOperationException ();
       }
 
-      public Collection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
+      public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
       {
         throw new UnsupportedOperationException ();
       }
@@ -187,12 +186,12 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
         return 0;
       }
 
-      public Collection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+      public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
       {
         throw new UnsupportedOperationException ();
       }
 
-      public Collection <? extends ISMPRedirect> getAllSMPRedirects ()
+      public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirects ()
       {
         throw new UnsupportedOperationException ();
       }
@@ -290,7 +289,7 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
         return 0;
       }
 
-      public Collection <? extends ISMPBusinessCard> getAllSMPBusinessCards ()
+      public ICommonsCollection <? extends ISMPBusinessCard> getAllSMPBusinessCards ()
       {
         throw new UnsupportedOperationException ();
       }
