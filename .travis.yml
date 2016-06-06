@@ -1,5 +1,15 @@
 language: java
 
+env:
+  global:
+    - SONATYPE_USERNAME=ph@phloc.com
+    - secure: "fTjOKaUUUKOSV32XrSLxkT7rV0pJe9IqCam8Oxfs4UB0ykfGWLiCvtvAsbZT8JUr8/EYyH4k/NGus73pn92gM7xkpg4yMuuIMMvDGN7/YpI3Q
+PcxhmO+/h9JMqSZZniFuMVtOJsf/YIISmFIKRN82/3tlk9j53PCltOVD+x3T7g3W1jYwlCxpYfsJgBS0Svlwdq2Nawosb/UaSmWe8mpIgpOyu6Z30XTWpVvT
+E82gMQvGGpB6yGoS5sACLozenVS+DJlGSvIvzXpZVcqkpf+NJGGadDPX0Cii3hIetirjha3/bDekGOZxbOS/8lCq3R9q3gcdcn3JLqBV9f8FS/5L8A8zz872
+Q1/P0w7NEHjP+EsOs/hg/dMRAC7WxoRCY/v8lEOK+ady9Zkz14blqxEAN+YmuMwhakojmoXZYzmFbBL5IMKsJkvM4MRCWP95Om45Z5J8YN264g/3fn7T6H1k
+Atyrchr3PhqWwwETaKWcMDTrywRl9KDaL3sXQNpf+u4M6HkMRWciYoMd06sLrZwXhVdT0NYXXVbRT8ieWSXHIOaEnAR94Hcs/pDofv9Ogi0HObxNic9FvFwD
+2mTVRW0bORg2EFAvb0oNQBZUV3NKGqeTEHv4PbBb1idlLU1hweNyncjnGppKPSuv36EJb9n/dGoFQTbluByXjkgJ/g/iX4="
+
 jdk:
   - oraclejdk8
   
@@ -9,4 +19,6 @@ install:
 cache:
   directories:
   - $HOME/.m2
-  
+
+after_success:
+  - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
