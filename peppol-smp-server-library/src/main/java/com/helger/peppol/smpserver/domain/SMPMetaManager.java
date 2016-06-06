@@ -64,6 +64,8 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
+import com.helger.peppol.url.BDXURLProvider;
+import com.helger.peppol.url.IPeppolURLProvider;
 
 /**
  * The central SMP meta manager containing all the singleton manager instances.
@@ -77,6 +79,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private static ISMPManagerProvider s_aManagerProvider = null;
 
   private IIdentifierFactory m_aIdentifierFactory;
+  private IPeppolURLProvider m_aPeppolURLProvider;
   private ISMPTransportProfileManager m_aTransportProfileManager;
   private ISMPUserManager m_aUserMgr;
   private ISMPServiceGroupManager m_aServiceGroupMgr;
@@ -145,6 +148,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
           throw new IllegalStateException ("Failed to determine iddentifier types!");
       }
 
+      // TODO make customizable
+      m_aPeppolURLProvider = new BDXURLProvider ();
+
       m_aTransportProfileManager = s_aManagerProvider.createTransportProfileMgr ();
       if (m_aTransportProfileManager == null)
         throw new IllegalStateException ("Failed to create TransportProfile manager!");
@@ -195,6 +201,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static IIdentifierFactory getIdentifierFactory ()
   {
     return getInstance ().m_aIdentifierFactory;
+  }
+
+  @Nonnull
+  public static IPeppolURLProvider getPeppolURLProvider ()
+  {
+    return getInstance ().m_aPeppolURLProvider;
   }
 
   @Nonnull

@@ -61,7 +61,7 @@ import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
-import com.helger.peppol.utils.BusdoxURLHelper;
+import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
@@ -374,6 +374,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     }
 
     final String sSMLZoneName = _getSMLHostName ();
+    final IPeppolURLProvider aURLProvider = SMPMetaManager.getPeppolURLProvider ();
 
     final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("DNS name"),
@@ -381,8 +382,8 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                         new DTCol ("Nice name")).setID (getID () + "checkdns");
     for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
     {
-      final String sDNSName = BusdoxURLHelper.getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
-                                                                       sSMLZoneName);
+      final String sDNSName = aURLProvider.getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
+                                                                    sSMLZoneName);
 
       InetAddress aInetAddress = null;
       try
