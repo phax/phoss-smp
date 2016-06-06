@@ -47,7 +47,6 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
@@ -108,7 +107,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
       final char [] aKeyStoreKeyPassword = SMPServerConfiguration.getKeystoreKeyPassword ();
 
       if (StringHelper.hasNoText (sKeyStoreClassPath))
-        throw new InitializationException ("No SMP keystore path provided!");
+        throw new InitializationException ("No SMP keystore path provided in the configuration file!");
 
       final KeyStore aKeyStore = KeyStoreHelper.loadKeyStore (sKeyStoreClassPath, sKeyStorePassword);
       final KeyStore.Entry aEntry = aKeyStore.getEntry (sKeyStoreKeyAlias,
@@ -138,12 +137,9 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                       "' and alias '" +
                       sKeyStoreKeyAlias +
                       "'");
+      internalMarkCertificateValid ();
     }
-    catch (final IOException ex)
-    {
-      throw new InitializationException ("Error in constructor of SMPKeyManager", ex);
-    }
-    catch (final GeneralSecurityException ex)
+    catch (final IOException | GeneralSecurityException ex)
     {
       throw new InitializationException ("Error in constructor of SMPKeyManager", ex);
     }
@@ -183,8 +179,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     final Reference aReference = aSignatureFactory.newReference ("",
                                                                  aSignatureFactory.newDigestMethod (DigestMethod.SHA1,
                                                                                                     null),
-                                                                 Collections.singletonList (aSignatureFactory.newTransform (Transform.ENVELOPED,
-                                                                                                                            (TransformParameterSpec) null)),
+                                                                 new CommonsArrayList <> (aSignatureFactory.newTransform (Transform.ENVELOPED,
+                                                                                                                          (TransformParameterSpec) null)),
                                                                  null,
                                                                  null);
 
@@ -193,15 +189,15 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                                                                  (C14NMethodParameterSpec) null),
                                                                     aSignatureFactory.newSignatureMethod (SignatureMethod.RSA_SHA1,
                                                                                                           null),
-                                                                    Collections.singletonList (aReference));
+                                                                    new CommonsArrayList <> (aReference));
 
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
-    final ICommonsList <Object> aX509Content = new CommonsArrayList<> ();
+    final ICommonsList <Object> aX509Content = new CommonsArrayList <> ();
     aX509Content.add (_getCertificate ().getSubjectX500Principal ().getName ());
     aX509Content.add (_getCertificate ());
     final X509Data aX509Data = aKeyInfoFactory.newX509Data (aX509Content);
-    final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (Collections.singletonList (aX509Data));
+    final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList <> (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and
     // location of the resulting XMLSignature's parent element.
@@ -218,7 +214,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * This method is only to be called on startup to indicate that the
    * certificate configuration from the config file is valid.
    */
-  public static void internalMarkCertificateValid ()
+  static void internalMarkCertificateValid ()
   {
     s_aCertificateValid.set (true);
   }

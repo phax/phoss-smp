@@ -33,7 +33,6 @@ import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
-import com.helger.peppol.smpserver.data.xml.SMPXMLTestRule;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -43,6 +42,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
+import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -55,7 +55,7 @@ import com.helger.photon.security.user.IUser;
 public final class XMLServiceInformationManagerTest
 {
   @Rule
-  public final TestRule m_aTestRule = new SMPXMLTestRule ();
+  public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
   public void testServiceRegistration ()

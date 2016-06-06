@@ -171,7 +171,6 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       try
       {
         SMPKeyManager.getInstance ();
-        SMPKeyManager.internalMarkCertificateValid ();
       }
       catch (final Exception ex)
       {
