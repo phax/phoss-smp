@@ -64,6 +64,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
+import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.url.BDXURLProvider;
 import com.helger.peppol.url.IPeppolURLProvider;
 
@@ -176,6 +177,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
       try
       {
+        // If trust manager fails, key manager is not usable!
+        SMPTrustManager.getInstance ();
         SMPKeyManager.getInstance ();
       }
       catch (final Exception ex)

@@ -23,7 +23,6 @@ import java.security.KeyStore;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.commons.ValueEnforcer;
 import com.helger.commons.state.ISuccessIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
@@ -71,20 +70,6 @@ final class SMPKeyStoreLoadingResult implements ISuccessIndicator
     return m_sErrorMessage;
   }
 
-  @Nonnull
-  public static SMPKeyStoreLoadingResult createSuccess (@Nonnull final KeyStore aKeyStore)
-  {
-    ValueEnforcer.notNull (aKeyStore, "KeyStore");
-    return new SMPKeyStoreLoadingResult (aKeyStore, null);
-  }
-
-  @Nonnull
-  public static SMPKeyStoreLoadingResult createError (@Nonnull final String sErrorMessage)
-  {
-    ValueEnforcer.notNull (sErrorMessage, "ErrorMessage");
-    return new SMPKeyStoreLoadingResult (null, sErrorMessage);
-  }
-
   /**
    * Load the keystore from the SMP server configuration that is used to sign
    * certain SMP responses.
@@ -95,36 +80,82 @@ final class SMPKeyStoreLoadingResult implements ISuccessIndicator
   public static SMPKeyStoreLoadingResult loadConfiguredKeyStore ()
   {
     // Get the parameters for the key store
-    final String sKeyStorePath = SMPServerConfiguration.getKeystorePath ();
+    final String sKeyStorePath = SMPServerConfiguration.getKeyStorePath ();
     if (StringHelper.hasNoText (sKeyStorePath))
-      return SMPKeyStoreLoadingResult.createError ("No keystore path is defined in the configuration file.");
+      return new SMPKeyStoreLoadingResult (null, "No keystore path is defined in the configuration file.");
 
-    final char [] aKeyStorePassword = SMPServerConfiguration.getKeystoreKeyPassword ();
-    if (aKeyStorePassword == null)
-      return SMPKeyStoreLoadingResult.createError ("No keystore password is defined in the configuration file.");
+    final String sKeyStorePassword = SMPServerConfiguration.getKeyStorePassword ();
+    if (sKeyStorePassword == null)
+      return new SMPKeyStoreLoadingResult (null, "No keystore password is defined in the configuration file.");
 
     KeyStore aKeyStore = null;
     // Try to load key store
     try
     {
-      aKeyStore = KeyStoreHelper.loadKeyStore (sKeyStorePath, aKeyStorePassword);
+      aKeyStore = KeyStoreHelper.loadKeyStore (sKeyStorePath, sKeyStorePassword);
     }
     catch (final IOException | IllegalArgumentException ex)
     {
-      return SMPKeyStoreLoadingResult.createError ("Failed to load keystore from path '" +
-                                                   sKeyStorePath +
-                                                   "'. Seems like the keystore file does not exist. Technical details: " +
-                                                   ex.getMessage ());
+      return new SMPKeyStoreLoadingResult (null,
+                                           "Failed to load keystore from path '" +
+                                                 sKeyStorePath +
+                                                 "'. Seems like the keystore file does not exist. Technical details: " +
+                                                 ex.getMessage ());
     }
     catch (final GeneralSecurityException ex)
     {
-      return SMPKeyStoreLoadingResult.createError ("Failed to load keystore from path '" +
-                                                   sKeyStorePath +
-                                                   "'. Seems like the password is invalid or the keystore has an invalid format. Technical details: " +
-                                                   ex.getMessage ());
+      return new SMPKeyStoreLoadingResult (null,
+                                           "Failed to load keystore from path '" +
+                                                 sKeyStorePath +
+                                                 "'. Seems like the password is invalid or the keystore has an invalid format. Technical details: " +
+                                                 ex.getMessage ());
     }
 
     // Finally success
-    return SMPKeyStoreLoadingResult.createSuccess (aKeyStore);
+    return new SMPKeyStoreLoadingResult (aKeyStore, null);
+  }
+
+  /**
+   * Load the trust store from the SMP server configuration.
+   *
+   * @return The trust store loading result. Never <code>null</code>.
+   */
+  @Nonnull
+  public static SMPKeyStoreLoadingResult loadConfiguredTrustStore ()
+  {
+    // Get the parameters for the trust store
+    final String sTrustStorePath = SMPServerConfiguration.getTrustStorePath ();
+    if (StringHelper.hasNoText (sTrustStorePath))
+      return new SMPKeyStoreLoadingResult (null, "No truststore path is defined in the configuration file.");
+
+    final String sTrustStorePassword = SMPServerConfiguration.getTrustStorePassword ();
+    if (sTrustStorePassword == null)
+      return new SMPKeyStoreLoadingResult (null, "No truststore password is defined in the configuration file.");
+
+    KeyStore aTrustStore = null;
+    // Try to load trust store
+    try
+    {
+      aTrustStore = KeyStoreHelper.loadKeyStore (sTrustStorePath, sTrustStorePassword);
+    }
+    catch (final IOException | IllegalArgumentException ex)
+    {
+      return new SMPKeyStoreLoadingResult (null,
+                                           "Failed to load truststore from path '" +
+                                                 sTrustStorePath +
+                                                 "'. Seems like the truststore file does not exist. Technical details: " +
+                                                 ex.getMessage ());
+    }
+    catch (final GeneralSecurityException ex)
+    {
+      return new SMPKeyStoreLoadingResult (null,
+                                           "Failed to load truststore from path '" +
+                                                 sTrustStorePath +
+                                                 "'. Seems like the password is invalid or the truststore has an invalid format. Technical details: " +
+                                                 ex.getMessage ());
+    }
+
+    // Finally success
+    return new SMPKeyStoreLoadingResult (aTrustStore, null);
   }
 }

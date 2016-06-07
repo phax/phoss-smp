@@ -24,7 +24,6 @@ import java.security.UnrecoverableKeyException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.commons.ValueEnforcer;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.ISuccessIndicator;
 import com.helger.commons.string.StringHelper;
@@ -72,20 +71,6 @@ final class SMPKeyLoadingResult implements ISuccessIndicator
     return m_sErrorMessage;
   }
 
-  @Nonnull
-  public static SMPKeyLoadingResult createSuccess (@Nonnull final PrivateKeyEntry aKeyEntry)
-  {
-    ValueEnforcer.notNull (aKeyEntry, "KeyEntry");
-    return new SMPKeyLoadingResult (aKeyEntry, null);
-  }
-
-  @Nonnull
-  public static SMPKeyLoadingResult createError (@Nonnull final String sErrorMessage)
-  {
-    ValueEnforcer.notNull (sErrorMessage, "ErrorMessage");
-    return new SMPKeyLoadingResult (null, sErrorMessage);
-  }
-
   /**
    * Load the private key entry from the SMP server configuration that is used
    * to sign certain SMP responses.
@@ -97,15 +82,15 @@ final class SMPKeyLoadingResult implements ISuccessIndicator
   @Nonnull
   public static SMPKeyLoadingResult loadConfiguredKey (@Nonnull final KeyStore aKeyStore)
   {
-    final String sKeyStorePath = SMPServerConfiguration.getKeystorePath ();
+    final String sKeyStorePath = SMPServerConfiguration.getKeyStorePath ();
 
-    final String sKeyStoreKeyAlias = SMPServerConfiguration.getKeystoreKeyAlias ();
+    final String sKeyStoreKeyAlias = SMPServerConfiguration.getKeyStoreKeyAlias ();
     if (StringHelper.hasNoText (sKeyStoreKeyAlias))
-      return SMPKeyLoadingResult.createError ("No keystore key alias is defined in the configuration file.");
+      return new SMPKeyLoadingResult (null, "No keystore key alias is defined in the configuration file.");
 
-    final char [] aKeyStoreKeyPassword = SMPServerConfiguration.getKeystoreKeyPassword ();
+    final char [] aKeyStoreKeyPassword = SMPServerConfiguration.getKeyStoreKeyPassword ();
     if (aKeyStoreKeyPassword == null)
-      return SMPKeyLoadingResult.createError ("No keystore key password is defined in the configuration file.");
+      return new SMPKeyLoadingResult (null, "No keystore key password is defined in the configuration file.");
 
     // Try to load the key.
     KeyStore.PrivateKeyEntry aKeyEntry = null;
@@ -116,45 +101,49 @@ final class SMPKeyLoadingResult implements ISuccessIndicator
       if (aEntry == null)
       {
         // No such entry
-        return SMPKeyLoadingResult.createError ("The keystore key alias '" +
-                                                sKeyStoreKeyAlias +
-                                                "' was not found in keystore '" +
-                                                sKeyStorePath +
-                                                "'.");
+        return new SMPKeyLoadingResult (null,
+                                        "The keystore key alias '" +
+                                              sKeyStoreKeyAlias +
+                                              "' was not found in keystore '" +
+                                              sKeyStorePath +
+                                              "'.");
       }
       if (!(aEntry instanceof KeyStore.PrivateKeyEntry))
       {
         // Not a private key
-        return SMPKeyLoadingResult.createError ("The keystore key alias '" +
-                                                sKeyStoreKeyAlias +
-                                                "' was found in keystore '" +
-                                                sKeyStorePath +
-                                                "' but it is not a private key! The internal type is " +
-                                                ClassHelper.getClassName (aEntry));
+        return new SMPKeyLoadingResult (null,
+                                        "The keystore key alias '" +
+                                              sKeyStoreKeyAlias +
+                                              "' was found in keystore '" +
+                                              sKeyStorePath +
+                                              "' but it is not a private key! The internal type is " +
+                                              ClassHelper.getClassName (aEntry));
       }
 
       aKeyEntry = (KeyStore.PrivateKeyEntry) aEntry;
     }
     catch (final UnrecoverableKeyException ex)
     {
-      return SMPKeyLoadingResult.createError ("Failed to load key with alias '" +
-                                              sKeyStoreKeyAlias +
-                                              "' from keystore at '" +
-                                              sKeyStorePath +
-                                              "'. Seems like the password for the key is invalid. Technical details: " +
-                                              ex.getMessage ());
+      return new SMPKeyLoadingResult (null,
+                                      "Failed to load key with alias '" +
+                                            sKeyStoreKeyAlias +
+                                            "' from keystore at '" +
+                                            sKeyStorePath +
+                                            "'. Seems like the password for the key is invalid. Technical details: " +
+                                            ex.getMessage ());
     }
     catch (final GeneralSecurityException ex)
     {
-      return SMPKeyLoadingResult.createError ("Failed to load key with alias '" +
-                                              sKeyStoreKeyAlias +
-                                              "' from keystore at '" +
-                                              sKeyStorePath +
-                                              "'. Technical details: " +
-                                              ex.getMessage ());
+      return new SMPKeyLoadingResult (null,
+                                      "Failed to load key with alias '" +
+                                            sKeyStoreKeyAlias +
+                                            "' from keystore at '" +
+                                            sKeyStorePath +
+                                            "'. Technical details: " +
+                                            ex.getMessage ());
     }
 
     // Finally success
-    return SMPKeyLoadingResult.createSuccess (aKeyEntry);
+    return new SMPKeyLoadingResult (aKeyEntry, null);
   }
 }

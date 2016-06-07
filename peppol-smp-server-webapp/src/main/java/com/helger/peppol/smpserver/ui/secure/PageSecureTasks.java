@@ -45,6 +45,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
+import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.utils.CertificateHelper;
@@ -83,7 +84,6 @@ public class PageSecureTasks extends AbstractSMPWebPage
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-    final SMPKeyManager aKeyMgr = SMPKeyManager.getInstance ();
     final LocalDateTime aNowDT = PDTFactory.getCurrentLocalDateTime ();
     final LocalDateTime aNowPlusDT = aNowDT.plusMonths (3);
 
@@ -91,11 +91,18 @@ public class PageSecureTasks extends AbstractSMPWebPage
 
     final HCOL aOL = new HCOL ();
 
-    // check certificate configuration
+    // check keystore configuration
     {
-      if (aKeyMgr.hasInitializationError ())
+      if (!SMPKeyManager.isCertificateValid ())
         aOL.addItem (_createError ("Problem with the certificate configuration"),
-                     new HCDiv ().addChild (aKeyMgr.getInitializationError ()));
+                     new HCDiv ().addChild (SMPKeyManager.getInitializationError ()));
+    }
+
+    // check truststore configuration
+    {
+      if (!SMPTrustManager.isCertificateValid ())
+        aOL.addItem (_createError ("Problem with the truststore configuration"),
+                     new HCDiv ().addChild (SMPTrustManager.getInitializationError ()));
     }
 
     // Check SML configuration

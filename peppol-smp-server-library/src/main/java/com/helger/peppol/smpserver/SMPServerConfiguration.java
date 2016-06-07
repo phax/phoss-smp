@@ -55,6 +55,7 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.peppol.utils.ConfigFile;
+import com.helger.peppol.utils.KeyStoreHelper;
 
 /**
  * The central configuration for the SMP server. This class manages the content
@@ -112,7 +113,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESuccess reloadConfiguration ()
   {
-    final ICommonsList <String> aFilePaths = new CommonsArrayList<> ();
+    final ICommonsList <String> aFilePaths = new CommonsArrayList <> ();
     // Check if the system property is present
     String sPropertyPath = SystemProperties.getPropertyValue (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH);
     if (StringHelper.hasText (sPropertyPath))
@@ -167,7 +168,7 @@ public final class SMPServerConfiguration
    *         path. Property <code>smp.keystore.path</code>.
    */
   @Nullable
-  public static String getKeystorePath ()
+  public static String getKeyStorePath ()
   {
     return getConfigFile ().getString ("smp.keystore.path");
   }
@@ -177,7 +178,7 @@ public final class SMPServerConfiguration
    *         <code>smp.keystore.password</code>.
    */
   @Nullable
-  public static String getKeystorePassword ()
+  public static String getKeyStorePassword ()
   {
     return getConfigFile ().getString ("smp.keystore.password");
   }
@@ -187,7 +188,7 @@ public final class SMPServerConfiguration
    *         <code>smp.keystore.key.alias</code>.
    */
   @Nullable
-  public static String getKeystoreKeyAlias ()
+  public static String getKeyStoreKeyAlias ()
   {
     return getConfigFile ().getString ("smp.keystore.key.alias");
   }
@@ -198,9 +199,31 @@ public final class SMPServerConfiguration
    *         <code>smp.keystore.key.password</code>.
    */
   @Nullable
-  public static char [] getKeystoreKeyPassword ()
+  public static char [] getKeyStoreKeyPassword ()
   {
     return getConfigFile ().getCharArray ("smp.keystore.key.password");
+  }
+
+  /**
+   * @return The path to the truststore. May be a classpath or an absolute file
+   *         path. Property <code>smp.truststore.path</code>. Defaults to
+   *         {@link KeyStoreHelper#TRUSTSTORE_COMPLETE_CLASSPATH}.
+   */
+  @Nonnull
+  public static String getTrustStorePath ()
+  {
+    return getConfigFile ().getString ("smp.truststore.path", KeyStoreHelper.TRUSTSTORE_COMPLETE_CLASSPATH);
+  }
+
+  /**
+   * @return The password required to open the truststore. Property
+   *         <code>smp.truststore.password</code>. Defaults to
+   *         {@link KeyStoreHelper#TRUSTSTORE_PASSWORD}
+   */
+  @Nonnull
+  public static String getTrustStorePassword ()
+  {
+    return getConfigFile ().getString ("smp.truststore.password", KeyStoreHelper.TRUSTSTORE_PASSWORD);
   }
 
   /**

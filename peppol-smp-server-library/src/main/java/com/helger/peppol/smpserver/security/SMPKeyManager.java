@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.security;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
@@ -81,108 +80,67 @@ import com.helger.commons.exception.InitializationException;
 import com.helger.commons.random.RandomHelper;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.utils.KeyStoreHelper;
 
 /**
  * This class holds the private key for signing and the certificate for
  * checking.
  *
- * @author PEPPOL.AT, BRZ, Philip Helger
+ * @author Philip Helger
  */
 public final class SMPKeyManager extends AbstractGlobalSingleton
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPKeyManager.class);
 
   private static final AtomicBoolean s_aCertificateValid = new AtomicBoolean (false);
+  private static String s_sInitError;
 
-  private KeyStore m_aTrustStore;
-  private String m_sInitError;
   private KeyStore m_aKeyStore;
   private KeyStore.PrivateKeyEntry m_aKeyEntry;
 
-  private final void _reload () throws InitializationException
+  private void _loadCertificates () throws InitializationException
   {
     // Reset every time
-    m_sInitError = null;
+    s_aCertificateValid.set (false);
+    s_sInitError = null;
     m_aKeyStore = null;
     m_aKeyEntry = null;
 
-    // Load the KeyStore and get the signing key and certificate.
+    // Load the key store and get the signing key
     final SMPKeyStoreLoadingResult aKeyStoreLoading = SMPKeyStoreLoadingResult.loadConfiguredKeyStore ();
     if (aKeyStoreLoading.isFailure ())
     {
-      m_sInitError = aKeyStoreLoading.getErrorMessage ();
-      throw new InitializationException (m_sInitError);
+      s_sInitError = aKeyStoreLoading.getErrorMessage ();
+      throw new InitializationException (s_sInitError);
     }
     m_aKeyStore = aKeyStoreLoading.getKeyStore ();
 
     final SMPKeyLoadingResult aKeyLoading = SMPKeyLoadingResult.loadConfiguredKey (m_aKeyStore);
     if (aKeyLoading.isFailure ())
     {
-      m_sInitError = aKeyLoading.getErrorMessage ();
-      throw new InitializationException (m_sInitError);
+      s_sInitError = aKeyLoading.getErrorMessage ();
+      throw new InitializationException (s_sInitError);
     }
 
     m_aKeyEntry = aKeyLoading.getKeyEntry ();
     s_aLogger.info ("SMPKeyManager successfully initialized with keystore '" +
-                    SMPServerConfiguration.getKeystorePath () +
+                    SMPServerConfiguration.getKeyStorePath () +
                     "' and alias '" +
-                    SMPServerConfiguration.getKeystoreKeyAlias () +
+                    SMPServerConfiguration.getKeyStoreKeyAlias () +
                     "'");
-  }
-
-  private final void _ensureLoaded () throws InitializationException
-  {
-    if (!isCertificateValid ())
-    {
-      _reload ();
-      internalMarkCertificateValid ();
-    }
+    s_aCertificateValid.set (true);
   }
 
   @Deprecated
   @UsedViaReflection
-  public SMPKeyManager ()
+  public SMPKeyManager () throws InitializationException
   {
-    // Load trust store
-    try
-    {
-      m_aTrustStore = KeyStoreHelper.loadKeyStore (KeyStoreHelper.TRUSTSTORE_COMPLETE_CLASSPATH,
-                                                   KeyStoreHelper.TRUSTSTORE_PASSWORD);
-    }
-    catch (GeneralSecurityException | IOException ex)
-    {
-      throw new InitializationException ("Failed to load PEPPOL truststore", ex);
-    }
-    _ensureLoaded ();
+    _loadCertificates ();
   }
 
   @Nonnull
   public static SMPKeyManager getInstance ()
   {
     return getGlobalSingleton (SMPKeyManager.class);
-  }
-
-  public boolean hasInitializationError ()
-  {
-    return getInitializationError () != null;
-  }
-
-  @Nullable
-  public String getInitializationError ()
-  {
-    _ensureLoaded ();
-    return m_sInitError;
-  }
-
-  /**
-   * @return The global trust store to be used. This trust store is never
-   *         reloaded and must be present.
-   */
-  @Nonnull
-  public KeyStore getTrustStore ()
-  {
-    return m_aTrustStore;
   }
 
   /**
@@ -193,7 +151,6 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   @Nullable
   public KeyStore getKeyStore ()
   {
-    _ensureLoaded ();
     return m_aKeyStore;
   }
 
@@ -205,20 +162,26 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   @Nullable
   public KeyStore.PrivateKeyEntry getPrivateKeyEntry ()
   {
-    _ensureLoaded ();
     return m_aKeyEntry;
   }
 
+  /**
+   * Create an SSLContext based on the configured key store and trust store.
+   *
+   * @return A new {@link SSLContext} and never <code>null</code>.
+   * @throws GeneralSecurityException
+   *         In case something goes wrong :)
+   */
   @Nonnull
   public SSLContext createSSLContext () throws GeneralSecurityException
   {
     // Key manager
     final KeyManagerFactory aKeyManagerFactory = KeyManagerFactory.getInstance (KeyManagerFactory.getDefaultAlgorithm ());
-    aKeyManagerFactory.init (getKeyStore (), SMPServerConfiguration.getKeystoreKeyPassword ());
+    aKeyManagerFactory.init (getKeyStore (), SMPServerConfiguration.getKeyStoreKeyPassword ());
 
     // Trust manager
     final TrustManagerFactory aTrustManagerFactory = TrustManagerFactory.getInstance (TrustManagerFactory.getDefaultAlgorithm ());
-    aTrustManagerFactory.init (getTrustStore ());
+    aTrustManagerFactory.init (SMPTrustManager.getInstance ().getTrustStore ());
 
     // Assign key manager and empty trust manager to SSL/TLS context
     final SSLContext aSSLCtx = SSLContext.getInstance ("TLS");
@@ -277,15 +240,6 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   }
 
   /**
-   * This method is only to be called on startup to indicate that the
-   * certificate configuration from the config file is valid.
-   */
-  static void internalMarkCertificateValid ()
-  {
-    s_aCertificateValid.set (true);
-  }
-
-  /**
    * @return A shortcut method to determine if the certification configuration
    *         is valid or not. This method can be used, even if
    *         {@link #getInstance()} throws an exception.
@@ -293,5 +247,17 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   public static boolean isCertificateValid ()
   {
     return s_aCertificateValid.get ();
+  }
+
+  /**
+   * If the certificate is not valid according to {@link #isCertificateValid()}
+   * this method can be used to determine the error details.
+   *
+   * @return <code>null</code> if initialization was successful.
+   */
+  @Nullable
+  public static String getInitializationError ()
+  {
+    return s_sInitError;
   }
 }

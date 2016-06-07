@@ -91,6 +91,17 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
     return " Technical details: " + ClassHelper.getClassLocalName (t) + " " + StringHelper.getNotNull (t.getMessage ());
   }
 
+  private static boolean _canShowPage (@Nonnull final WebPageExecutionContext aWPEC)
+  {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    if (!SMPKeyManager.isCertificateValid ())
+    {
+      aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid keystore/certificate is provided, so no connection with the SML can be established!"));
+      return false;
+    }
+    return true;
+  }
+
   private void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrors aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
@@ -372,17 +383,6 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                                            ex.getMessage ());
       }
     }
-  }
-
-  private static boolean _canShowPage (@Nonnull final WebPageExecutionContext aWPEC)
-  {
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
-    if (!SMPKeyManager.isCertificateValid ())
-    {
-      aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid keystore/certificate is provided, so no connection with the SML can be established!"));
-      return false;
-    }
-    return true;
   }
 
   @Override

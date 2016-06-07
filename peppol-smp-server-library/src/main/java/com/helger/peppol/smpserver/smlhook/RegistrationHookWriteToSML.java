@@ -98,24 +98,25 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     s_sSMPID = SMPServerConfiguration.getSMLSMPID ();
     s_aLogger.info ("This SMP has the ID: " + s_sSMPID);
 
-    final SMPKeyManager aKeyMgr = SMPKeyManager.getInstance ();
-    if (aKeyMgr.hasInitializationError ())
-      throw new InitializationException ("Cannot init registration hook to SML, because private key setup has errors: " +
-                                         aKeyMgr.getInitializationError ());
+    // SSL socker factory
+    if (!SMPKeyManager.isCertificateValid ())
+      throw new InitializationException ("Cannot init registration hook to SML, because private key/ceertificate setup has errors: " +
+                                         SMPKeyManager.getInitializationError ());
 
     try
     {
-      s_aDefaultSocketFactory = aKeyMgr.createSSLContext ().getSocketFactory ();
-
-      if (s_aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US).contains ("localhost"))
-        s_aDefaultHostnameVerifier = new HostnameVerifierVerifyAll ();
-      else
-        s_aDefaultHostnameVerifier = null;
+      s_aDefaultSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
     }
     catch (final Exception ex)
     {
       throw new InitializationException ("Failed to init SSLContext for SML access", ex);
     }
+
+    // Hostname verifier
+    if (s_aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US).contains ("localhost"))
+      s_aDefaultHostnameVerifier = new HostnameVerifierVerifyAll ();
+    else
+      s_aDefaultHostnameVerifier = null;
   }
 
   public RegistrationHookWriteToSML ()
