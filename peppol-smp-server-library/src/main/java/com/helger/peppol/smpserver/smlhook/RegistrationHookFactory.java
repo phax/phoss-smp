@@ -40,9 +40,6 @@
  */
 package com.helger.peppol.smpserver.smlhook;
 
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
@@ -50,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 
 /**
@@ -60,7 +58,7 @@ public final class RegistrationHookFactory
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationHookFactory.class);
 
-  private static final ReadWriteLock s_aRWLock = new ReentrantReadWriteLock ();
+  private static final SimpleReadWriteLock s_aRWLock = new SimpleReadWriteLock ();
   private static IRegistrationHook s_aInstance;
 
   private RegistrationHookFactory ()
@@ -95,16 +93,7 @@ public final class RegistrationHookFactory
   @Nonnull
   public static IRegistrationHook getOrCreateInstance ()
   {
-    IRegistrationHook ret;
-    s_aRWLock.readLock ().lock ();
-    try
-    {
-      ret = s_aInstance;
-    }
-    finally
-    {
-      s_aRWLock.readLock ().unlock ();
-    }
+    IRegistrationHook ret = s_aRWLock.readLocked ( () -> s_aInstance);
 
     if (ret == null)
     {
@@ -130,15 +119,7 @@ public final class RegistrationHookFactory
   public static void setInstance (@Nonnull final IRegistrationHook aInstance)
   {
     ValueEnforcer.notNull (aInstance, "Instance");
-    s_aRWLock.writeLock ().lock ();
-    try
-    {
-      s_aInstance = aInstance;
-    }
-    finally
-    {
-      s_aRWLock.writeLock ().unlock ();
-    }
+    s_aRWLock.writeLocked ( () -> s_aInstance = aInstance);
   }
 
   public static void setInstance (final boolean bWriteToSML)

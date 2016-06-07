@@ -44,6 +44,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.utils.CertificateHelper;
@@ -82,6 +83,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+    final SMPKeyManager aKeyMgr = SMPKeyManager.getInstance ();
     final LocalDateTime aNowDT = PDTFactory.getCurrentLocalDateTime ();
     final LocalDateTime aNowPlusDT = aNowDT.plusMonths (3);
 
@@ -91,10 +93,9 @@ public class PageSecureTasks extends AbstractSMPWebPage
 
     // check certificate configuration
     {
-      final KeyLoadingResult aKeyLoadingResult = KeyLoadingResult.loadConfiguredKey ();
-      if (aKeyLoadingResult.isFailure ())
+      if (aKeyMgr.hasInitializationError ())
         aOL.addItem (_createError ("Problem with the certificate configuration"),
-                     new HCDiv ().addChild (aKeyLoadingResult.getErrorMessage ()));
+                     new HCDiv ().addChild (aKeyMgr.getInitializationError ()));
     }
 
     // Check SML configuration

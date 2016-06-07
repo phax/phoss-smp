@@ -42,24 +42,18 @@ package com.helger.peppol.smpserver.smlhook;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyStore;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.exception.InitializationException;
-import com.helger.commons.random.VerySecureRandom;
 import com.helger.commons.ws.HostnameVerifierVerifyAll;
-import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
@@ -67,7 +61,7 @@ import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.NotFoundFault;
 import com.helger.peppol.smlclient.participant.UnauthorizedFault;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.utils.KeyStoreHelper;
+import com.helger.peppol.smpserver.security.SMPKeyManager;
 
 /**
  * An implementation of the RegistrationHook that informs the SML of updates to
@@ -104,27 +98,15 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     s_sSMPID = SMPServerConfiguration.getSMLSMPID ();
     s_aLogger.info ("This SMP has the ID: " + s_sSMPID);
 
+    final SMPKeyManager aKeyMgr = SMPKeyManager.getInstance ();
+    if (aKeyMgr.hasInitializationError ())
+      throw new InitializationException ("Cannot init registration hook to SML, because private key setup has errors: " +
+                                         aKeyMgr.getInitializationError ());
+
     try
     {
-      final String sKeystorePath = SMPServerConfiguration.getKeystorePath ();
-      final String sKeystorePassword = SMPServerConfiguration.getKeystorePassword ();
+      s_aDefaultSocketFactory = aKeyMgr.createSSLContext ().getSocketFactory ();
 
-      // Main key storage
-      final KeyStore aKeyStore = KeyStoreHelper.loadKeyStore (sKeystorePath, sKeystorePassword);
-
-      // Key manager
-      final KeyManagerFactory aKeyManagerFactory = KeyManagerFactory.getInstance ("SunX509");
-      aKeyManagerFactory.init (aKeyStore, sKeystorePassword.toCharArray ());
-
-      // Trust manager
-
-      // Assign key manager and empty trust manager to SSL/TLS context
-      final SSLContext aSSLCtx = SSLContext.getInstance ("TLS");
-      aSSLCtx.init (aKeyManagerFactory.getKeyManagers (),
-                    new TrustManager [] { new TrustManagerTrustAll () },
-                    VerySecureRandom.getInstance ());
-
-      s_aDefaultSocketFactory = aSSLCtx.getSocketFactory ();
       if (s_aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US).contains ("localhost"))
         s_aDefaultHostnameVerifier = new HostnameVerifierVerifyAll ();
       else
@@ -132,7 +114,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     }
     catch (final Exception ex)
     {
-      throw new InitializationException ("Failed to init keyStore for SML access", ex);
+      throw new InitializationException ("Failed to init SSLContext for SML access", ex);
     }
   }
 

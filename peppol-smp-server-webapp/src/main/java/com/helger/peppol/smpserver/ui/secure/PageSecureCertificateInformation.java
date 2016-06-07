@@ -31,6 +31,7 @@ import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
@@ -58,19 +59,22 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
-    final KeyLoadingResult aKeyLoadingResult = KeyLoadingResult.loadConfiguredKey ();
-    if (aKeyLoadingResult.isFailure ())
+    final SMPKeyManager aKeyMgr = SMPKeyManager.getInstance ();
+
+    if (aKeyMgr.hasInitializationError ())
     {
-      aNodeList.addChild (new BootstrapErrorBox ().addChild (aKeyLoadingResult.getErrorMessage ()));
+      aNodeList.addChild (new BootstrapErrorBox ().addChild (aKeyMgr.getInitializationError ()));
     }
     else
     {
       // Successfully loaded private key
-      final PrivateKeyEntry aKeyEntry = aKeyLoadingResult.getKeyEntry ();
+      final PrivateKeyEntry aKeyEntry = aKeyMgr.getPrivateKeyEntry ();
       final Certificate [] aChain = aKeyEntry.getCertificateChain ();
 
       // Key store path and password are fine
-      aNodeList.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" + SMPServerConfiguration.getKeystorePath () + "' and was successfully loaded."))
+      aNodeList.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" +
+                                                                                      SMPServerConfiguration.getKeystorePath () +
+                                                                                      "' and was successfully loaded."))
                                                     .addChild (new HCDiv ().addChild ("The private key with the alias '" +
                                                                                       SMPServerConfiguration.getKeystoreKeyAlias () +
                                                                                       "' was successfully loaded.")));
@@ -87,11 +91,14 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         if (aCert instanceof X509Certificate)
         {
           final X509Certificate aX509Cert = (X509Certificate) aCert;
-          final BootstrapTable aCertDetails = AppCommonUI.createCertificateDetailsTable (aX509Cert, aNowLDT, aDisplayLocale);
+          final BootstrapTable aCertDetails = AppCommonUI.createCertificateDetailsTable (aX509Cert,
+                                                                                         aNowLDT,
+                                                                                         aDisplayLocale);
           aUL.addItem (aCertDetails.getAsResponsiveTable ());
         }
         else
-          aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " + ClassHelper.getClassName (aCert));
+          aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
+                       ClassHelper.getClassName (aCert));
       }
       aNodeList.addChild (aUL);
     }

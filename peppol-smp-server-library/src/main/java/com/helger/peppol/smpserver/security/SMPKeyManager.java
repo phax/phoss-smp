@@ -45,11 +45,14 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
@@ -75,8 +78,8 @@ import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.exception.InitializationException;
+import com.helger.commons.random.RandomHelper;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
-import com.helger.commons.string.StringHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.KeyStoreHelper;
 
@@ -92,57 +95,66 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
   private static final AtomicBoolean s_aCertificateValid = new AtomicBoolean (false);
 
-  private final KeyStore.PrivateKeyEntry m_aKeyEntry;
+  private KeyStore m_aTrustStore;
+  private String m_sInitError;
+  private KeyStore m_aKeyStore;
+  private KeyStore.PrivateKeyEntry m_aKeyEntry;
+
+  private final void _reload () throws InitializationException
+  {
+    // Reset every time
+    m_sInitError = null;
+    m_aKeyStore = null;
+    m_aKeyEntry = null;
+
+    // Load the KeyStore and get the signing key and certificate.
+    final SMPKeyStoreLoadingResult aKeyStoreLoading = SMPKeyStoreLoadingResult.loadConfiguredKeyStore ();
+    if (aKeyStoreLoading.isFailure ())
+    {
+      m_sInitError = aKeyStoreLoading.getErrorMessage ();
+      throw new InitializationException (m_sInitError);
+    }
+    m_aKeyStore = aKeyStoreLoading.getKeyStore ();
+
+    final SMPKeyLoadingResult aKeyLoading = SMPKeyLoadingResult.loadConfiguredKey (m_aKeyStore);
+    if (aKeyLoading.isFailure ())
+    {
+      m_sInitError = aKeyLoading.getErrorMessage ();
+      throw new InitializationException (m_sInitError);
+    }
+
+    m_aKeyEntry = aKeyLoading.getKeyEntry ();
+    s_aLogger.info ("SMPKeyManager successfully initialized with keystore '" +
+                    SMPServerConfiguration.getKeystorePath () +
+                    "' and alias '" +
+                    SMPServerConfiguration.getKeystoreKeyAlias () +
+                    "'");
+  }
+
+  private final void _ensureLoaded () throws InitializationException
+  {
+    if (!isCertificateValid ())
+    {
+      _reload ();
+      internalMarkCertificateValid ();
+    }
+  }
 
   @Deprecated
   @UsedViaReflection
   public SMPKeyManager ()
   {
-    // Load the KeyStore and get the signing key and certificate.
+    // Load trust store
     try
     {
-      final String sKeyStoreClassPath = SMPServerConfiguration.getKeystorePath ();
-      final String sKeyStorePassword = SMPServerConfiguration.getKeystorePassword ();
-      final String sKeyStoreKeyAlias = SMPServerConfiguration.getKeystoreKeyAlias ();
-      final char [] aKeyStoreKeyPassword = SMPServerConfiguration.getKeystoreKeyPassword ();
-
-      if (StringHelper.hasNoText (sKeyStoreClassPath))
-        throw new InitializationException ("No SMP keystore path provided in the configuration file!");
-
-      final KeyStore aKeyStore = KeyStoreHelper.loadKeyStore (sKeyStoreClassPath, sKeyStorePassword);
-      final KeyStore.Entry aEntry = aKeyStore.getEntry (sKeyStoreKeyAlias,
-                                                        new KeyStore.PasswordProtection (aKeyStoreKeyPassword));
-      if (aEntry == null)
-      {
-        // Alias not found
-        throw new InitializationException ("Failed to find key store alias '" +
-                                           sKeyStoreKeyAlias +
-                                           "' in keystore '" +
-                                           sKeyStoreClassPath +
-                                           "'. Does the alias exist? Is the key password correct?");
-      }
-      if (!(aEntry instanceof KeyStore.PrivateKeyEntry))
-      {
-        // Not a private key
-        throw new InitializationException ("The keystore alias '" +
-                                           sKeyStoreKeyAlias +
-                                           "' was found in keystore '" +
-                                           sKeyStoreClassPath +
-                                           "' but it is not a private key! The internal type is " +
-                                           aEntry.getClass ().getName ());
-      }
-      m_aKeyEntry = (KeyStore.PrivateKeyEntry) aEntry;
-      s_aLogger.info ("SMPKeyManager initialized with keystore '" +
-                      sKeyStoreClassPath +
-                      "' and alias '" +
-                      sKeyStoreKeyAlias +
-                      "'");
-      internalMarkCertificateValid ();
+      m_aTrustStore = KeyStoreHelper.loadKeyStore (KeyStoreHelper.TRUSTSTORE_COMPLETE_CLASSPATH,
+                                                   KeyStoreHelper.TRUSTSTORE_PASSWORD);
     }
-    catch (final IOException | GeneralSecurityException ex)
+    catch (GeneralSecurityException | IOException ex)
     {
-      throw new InitializationException ("Error in constructor of SMPKeyManager", ex);
+      throw new InitializationException ("Failed to load PEPPOL truststore", ex);
     }
+    _ensureLoaded ();
   }
 
   @Nonnull
@@ -151,16 +163,69 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     return getGlobalSingleton (SMPKeyManager.class);
   }
 
-  @Nonnull
-  private PrivateKey _getPrivateKey ()
+  public boolean hasInitializationError ()
   {
-    return m_aKeyEntry.getPrivateKey ();
+    return getInitializationError () != null;
+  }
+
+  @Nullable
+  public String getInitializationError ()
+  {
+    _ensureLoaded ();
+    return m_sInitError;
+  }
+
+  /**
+   * @return The global trust store to be used. This trust store is never
+   *         reloaded and must be present.
+   */
+  @Nonnull
+  public KeyStore getTrustStore ()
+  {
+    return m_aTrustStore;
+  }
+
+  /**
+   * @return The configured keystore. May be <code>null</code> if loading
+   *         failed. In that case check the result of
+   *         {@link #getInitializationError()}.
+   */
+  @Nullable
+  public KeyStore getKeyStore ()
+  {
+    _ensureLoaded ();
+    return m_aKeyStore;
+  }
+
+  /**
+   * @return The configured private key. May be <code>null</code> if loading
+   *         failed. In that case check the result of
+   *         {@link #getInitializationError()}.
+   */
+  @Nullable
+  public KeyStore.PrivateKeyEntry getPrivateKeyEntry ()
+  {
+    _ensureLoaded ();
+    return m_aKeyEntry;
   }
 
   @Nonnull
-  private X509Certificate _getCertificate ()
+  public SSLContext createSSLContext () throws GeneralSecurityException
   {
-    return (X509Certificate) m_aKeyEntry.getCertificate ();
+    // Key manager
+    final KeyManagerFactory aKeyManagerFactory = KeyManagerFactory.getInstance (KeyManagerFactory.getDefaultAlgorithm ());
+    aKeyManagerFactory.init (getKeyStore (), SMPServerConfiguration.getKeystoreKeyPassword ());
+
+    // Trust manager
+    final TrustManagerFactory aTrustManagerFactory = TrustManagerFactory.getInstance (TrustManagerFactory.getDefaultAlgorithm ());
+    aTrustManagerFactory.init (getTrustStore ());
+
+    // Assign key manager and empty trust manager to SSL/TLS context
+    final SSLContext aSSLCtx = SSLContext.getInstance ("TLS");
+    aSSLCtx.init (aKeyManagerFactory.getKeyManagers (),
+                  aTrustManagerFactory.getTrustManagers (),
+                  RandomHelper.getSecureRandom ());
+    return aSSLCtx;
   }
 
   public void signXML (@Nonnull final Element aElementToSign) throws NoSuchAlgorithmException,
@@ -194,14 +259,15 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
     final ICommonsList <Object> aX509Content = new CommonsArrayList <> ();
-    aX509Content.add (_getCertificate ().getSubjectX500Principal ().getName ());
-    aX509Content.add (_getCertificate ());
+    final X509Certificate aCert = (X509Certificate) m_aKeyEntry.getCertificate ();
+    aX509Content.add (aCert.getSubjectX500Principal ().getName ());
+    aX509Content.add (aCert);
     final X509Data aX509Data = aKeyInfoFactory.newX509Data (aX509Content);
     final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList <> (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and
     // location of the resulting XMLSignature's parent element.
-    final DOMSignContext aSignContext = new DOMSignContext (_getPrivateKey (), aElementToSign);
+    final DOMSignContext aSignContext = new DOMSignContext (m_aKeyEntry.getPrivateKey (), aElementToSign);
 
     // Create the XMLSignature, but don't sign it yet.
     final XMLSignature aSignature = aSignatureFactory.newXMLSignature (aSingedInfo, aKeyInfo);
