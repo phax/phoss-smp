@@ -43,6 +43,7 @@ package com.helger.peppol.smpserver.smlhook;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -124,7 +125,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
                     VerySecureRandom.getInstance ());
 
       s_aDefaultSocketFactory = aSSLCtx.getSocketFactory ();
-      if (s_aSMLEndpointURL.toExternalForm ().contains ("localhost"))
+      if (s_aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US).contains ("localhost"))
         s_aDefaultHostnameVerifier = new HostnameVerifierVerifyAll ();
       else
         s_aDefaultHostnameVerifier = null;
