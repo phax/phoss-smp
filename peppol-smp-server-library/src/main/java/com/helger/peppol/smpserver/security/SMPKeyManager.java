@@ -260,4 +260,18 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   {
     return s_sInitError;
   }
+
+  public static void reloadFromConfiguration ()
+  {
+    try
+    {
+      final SMPKeyManager aInstance = getGlobalSingletonIfInstantiated (SMPKeyManager.class);
+      if (aInstance != null)
+        aInstance._loadCertificates ();
+      else
+        getInstance ();
+    }
+    catch (final Exception ex)
+    {}
+  }
 }

@@ -197,7 +197,7 @@ public final class AppCommonUI
     final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
     final PublicKey aPublicKey = aX509Cert.getPublicKey ();
 
-    final BootstrapTable aCertDetails = new BootstrapTable (HCCol.star (), HCCol.star ());
+    final BootstrapTable aCertDetails = new BootstrapTable (HCCol.perc (20), HCCol.star ());
     aCertDetails.addBodyRow ().addCell ("Version:").addCell (Integer.toString (aX509Cert.getVersion ()));
     aCertDetails.addBodyRow ().addCell ("Subject:").addCell (aX509Cert.getSubjectX500Principal ().getName ());
     aCertDetails.addBodyRow ().addCell ("Issuer:").addCell (aX509Cert.getIssuerX500Principal ().getName ());

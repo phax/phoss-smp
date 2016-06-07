@@ -46,6 +46,7 @@ import com.helger.peppol.smlclient.smp.NotFoundFault;
 import com.helger.peppol.smlclient.smp.UnauthorizedFault;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
+import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.basic.audit.AuditHelper;
@@ -94,6 +95,11 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
   private static boolean _canShowPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    if (!SMPTrustManager.isCertificateValid ())
+    {
+      aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid truststore is provided, so no connection with the SML can be established!"));
+      return false;
+    }
     if (!SMPKeyManager.isCertificateValid ())
     {
       aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid keystore/certificate is provided, so no connection with the SML can be established!"));

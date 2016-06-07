@@ -134,4 +134,18 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
   {
     return s_sInitError;
   }
+
+  public static void reloadFromConfiguration ()
+  {
+    try
+    {
+      final SMPTrustManager aInstance = getGlobalSingletonIfInstantiated (SMPTrustManager.class);
+      if (aInstance != null)
+        aInstance._loadCertificates ();
+      else
+        getInstance ();
+    }
+    catch (final Exception ex)
+    {}
+  }
 }

@@ -22,6 +22,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -39,10 +40,15 @@ import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap3.button.BootstrapButton;
+import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.nav.BootstrapTabBox;
 import com.helger.photon.bootstrap3.table.BootstrapTable;
+import com.helger.photon.uicore.css.CPageParam;
+import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
 /**
@@ -53,6 +59,9 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
  */
 public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 {
+  private static final String ACTION_RELOAD_KEYSTORE = "reloadkeystore";
+  private static final String ACTION_RELOAD_TRUSTSTORE = "reloadtruststore";
+
   public PageSecureCertificateInformation (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Certificate information");
@@ -64,6 +73,35 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final LocalDateTime aNowLDT = PDTFactory.getCurrentLocalDateTime ();
+
+    if (aWPEC.hasAction (ACTION_RELOAD_KEYSTORE))
+    {
+      SMPKeyManager.reloadFromConfiguration ();
+      aWPEC.postRedirectGet (new BootstrapInfoBox ().addChild ("The keystore was updated from the configuration at " +
+                                                               DateTimeFormatter.ISO_LOCAL_TIME.format (aNowLDT) +
+                                                               ". The changes are reflected below."));
+    }
+    else
+      if (aWPEC.hasAction (ACTION_RELOAD_TRUSTSTORE))
+      {
+        SMPTrustManager.reloadFromConfiguration ();
+        aWPEC.postRedirectGet (new BootstrapInfoBox ().addChild ("The truststore was updated from the configuration at " +
+                                                                 DateTimeFormatter.ISO_LOCAL_TIME.format (aNowLDT) +
+                                                                 ". The changes are reflected below."));
+      }
+
+    {
+      final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+      aToolbar.addChild (new BootstrapButton ().addChild ("Reload keystore")
+                                               .setIcon (EDefaultIcon.REFRESH)
+                                               .setOnClick (aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION,
+                                                                                      ACTION_RELOAD_KEYSTORE)));
+      aToolbar.addChild (new BootstrapButton ().addChild ("Reload truststore")
+                                               .setIcon (EDefaultIcon.REFRESH)
+                                               .setOnClick (aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION,
+                                                                                      ACTION_RELOAD_TRUSTSTORE)));
+      aNodeList.addChild (aToolbar);
+    }
 
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
 
