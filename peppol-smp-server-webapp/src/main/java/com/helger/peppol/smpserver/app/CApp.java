@@ -80,6 +80,9 @@ public final class CApp
   public static final Locale USER_ADMINISTRATOR_LOCALE = CApp.DEFAULT_LOCALE;
   public static final ICommonsMap <String, String> USER_ADMINISTRATOR_CUSTOMATTRS = null;
 
+  /** A regular expression pattern to validate the SMP ID. */
+  public static final String PATTERN_SMP_ID = "[a-zA-Z0-9\\-\\.]+";
+
   private CApp ()
   {}
 

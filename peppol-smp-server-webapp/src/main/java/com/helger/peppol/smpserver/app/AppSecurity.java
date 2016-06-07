@@ -18,6 +18,7 @@ package com.helger.peppol.smpserver.app;
 
 import javax.annotation.concurrent.Immutable;
 
+import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.RoleManager;
 import com.helger.photon.security.user.UserManager;
@@ -53,9 +54,15 @@ public final class AppSecurity
 
     // Create all roles
     if (!aRoleMgr.containsRoleWithID (CApp.ROLE_CONFIG_ID))
-      aRoleMgr.createPredefinedRole (CApp.ROLE_CONFIG_ID, CApp.ROLE_CONFIG_NAME, CApp.ROLE_CONFIG_DESCRIPTION, CApp.ROLE_CONFIG_CUSTOMATTRS);
+      aRoleMgr.createPredefinedRole (CApp.ROLE_CONFIG_ID,
+                                     CApp.ROLE_CONFIG_NAME,
+                                     CApp.ROLE_CONFIG_DESCRIPTION,
+                                     CApp.ROLE_CONFIG_CUSTOMATTRS);
     if (!aRoleMgr.containsRoleWithID (CApp.ROLE_VIEW_ID))
-      aRoleMgr.createPredefinedRole (CApp.ROLE_VIEW_ID, CApp.ROLE_VIEW_NAME, CApp.ROLE_VIEW_DESCRIPTION, CApp.ROLE_VIEW_CUSTOMATTRS);
+      aRoleMgr.createPredefinedRole (CApp.ROLE_VIEW_ID,
+                                     CApp.ROLE_VIEW_NAME,
+                                     CApp.ROLE_VIEW_DESCRIPTION,
+                                     CApp.ROLE_VIEW_CUSTOMATTRS);
 
     // User group Administrators
     if (!aUserGroupMgr.containsUserGroupWithID (CApp.USERGROUP_ADMINISTRATORS_ID))
@@ -85,5 +92,8 @@ public final class AppSecurity
                                                CApp.USERGROUP_VIEW_DESCRIPTION,
                                                CApp.USERGROUP_VIEW_CUSTOMATTRS);
     aUserGroupMgr.assignRoleToUserGroup (CApp.USERGROUP_VIEW_ID, CApp.ROLE_VIEW_ID);
+
+    // New login logs out old user
+    LoggedInUserManager.getInstance ().setLogoutAlreadyLoggedInUser (true);
   }
 }

@@ -23,9 +23,11 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsMap;
+import com.helger.commons.regex.RegExHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppSecurity;
 import com.helger.peppol.smpserver.app.AppSettings;
+import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.pub.InitializerPublic;
@@ -35,7 +37,6 @@ import com.helger.photon.core.app.CApplication;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
-import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
@@ -99,11 +100,17 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     // Set all security related stuff
     AppSecurity.init ();
 
-    // New login logs out old user
-    LoggedInUserManager.getInstance ().setLogoutAlreadyLoggedInUser (true);
-
     // Determine backend
     SMPMetaManager.initBackendFromConfiguration ();
+
+    // Check SMP ID
+    final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
+    if (!RegExHelper.stringMatchesPattern (CApp.PATTERN_SMP_ID, sSMPID))
+      throw new IllegalArgumentException ("The provided SMP ID '" +
+                                          sSMPID +
+                                          "' is not valid when used as a DNS name. It must match the regular expression '" +
+                                          CApp.PATTERN_SMP_ID +
+                                          "'!");
   }
 
   @Override

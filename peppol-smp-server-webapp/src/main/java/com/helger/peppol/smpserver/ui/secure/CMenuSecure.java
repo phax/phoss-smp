@@ -30,8 +30,9 @@ public final class CMenuSecure
   public static final String MENU_TRANSPORT_PROFILES = "transport_profiles";
   public static final String MENU_CERTIFICATE_INFORMATION = "certificate_information";
   public static final String MENU_TASKS = "tasks";
-  public static final String MENU_CHANGE_PASSWORD = "change_pw";
+  public static final String MENU_SML_SETUP = "sml_setup";
   public static final String MENU_ADMIN = "admin";
+  public static final String MENU_CHANGE_PASSWORD = "change_pw";
 
   private CMenuSecure ()
   {}
