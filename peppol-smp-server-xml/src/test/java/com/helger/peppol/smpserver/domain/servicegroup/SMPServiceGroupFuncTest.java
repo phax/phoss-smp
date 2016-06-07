@@ -22,13 +22,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import com.helger.commons.mock.CommonsTestHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
+import com.helger.xml.mock.XMLTestHelper;
 
 /**
  * Test class for class {@link SMPServiceGroup}.
@@ -48,6 +48,6 @@ public final class SMPServiceGroupFuncTest
 
     final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:dummy");
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
-    CommonsTestHelper.testMicroTypeConversion (aSG);
+    XMLTestHelper.testMicroTypeConversion (aSG);
   }
 }

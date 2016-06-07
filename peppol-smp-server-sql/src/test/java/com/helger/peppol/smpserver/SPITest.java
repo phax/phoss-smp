@@ -42,7 +42,7 @@ package com.helger.peppol.smpserver;
 
 import org.junit.Test;
 
-import com.helger.commons.mock.CommonsTestHelper;
+import com.helger.commons.mock.SPITestHelper;
 
 /**
  * Test SPI definitions
@@ -54,6 +54,6 @@ public final class SPITest
   @Test
   public void testBasic () throws Exception
   {
-    CommonsTestHelper.testIfAllSPIImplementationsAreValid ();
+    SPITestHelper.testIfAllSPIImplementationsAreValid ();
   }
 }
