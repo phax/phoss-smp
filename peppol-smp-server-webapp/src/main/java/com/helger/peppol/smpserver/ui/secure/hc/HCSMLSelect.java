@@ -17,40 +17,20 @@
 package com.helger.peppol.smpserver.ui.secure.hc;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import com.helger.commons.collection.ArrayHelper;
-import com.helger.commons.string.StringHelper;
 import com.helger.peppol.sml.ESML;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 
 public class HCSMLSelect extends HCExtSelect
 {
-  @Nullable
-  public static String getSMLName (@Nonnull final ESML eSML)
-  {
-    if (eSML == ESML.DIGIT_PRODUCTION)
-      return "SML";
-    if (eSML == ESML.DIGIT_TEST)
-      return "SMK";
-    return "other";
-  }
-
-  @Nonnull
-  private static String _getPrefix (@Nonnull final ESML eSML)
-  {
-    final String sName = getSMLName (eSML);
-    if (StringHelper.hasText (sName))
-      return "[" + sName + "] ";
-    return "";
-  }
-
   public HCSMLSelect (@Nonnull final RequestField aRF)
   {
     super (aRF);
     ArrayHelper.forEach (ESML.values (),
-                         ESML::requiresClientCertificate,
-                         eSML -> addOption (eSML.getID (), _getPrefix (eSML) + eSML.getManagementServiceURL ()));
+                         ISMLInfo::requiresClientCertificate,
+                         x -> addOption (x.getID (), "[" + x.getDisplayName () + "] " + x.getManagementServiceURL ()));
   }
 }

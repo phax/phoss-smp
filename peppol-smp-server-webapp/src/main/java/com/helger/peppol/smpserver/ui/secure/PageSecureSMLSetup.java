@@ -39,6 +39,7 @@ import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ESML;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
 import com.helger.peppol.smlclient.smp.BadRequestFault;
 import com.helger.peppol.smlclient.smp.InternalErrorFault;
@@ -112,7 +113,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSML = aWPEC.getAttributeAsString (FIELD_SML);
-    final ESML eSML = ESML.getFromIDOrNull (sSML);
+    final ISMLInfo eSML = ESML.getFromIDOrNull (sSML);
     final String sPhysicalAddress = aWPEC.getAttributeAsString (FIELD_PHYSICAL_ADDRESS);
     final String sLogicalAddress = aWPEC.getAttributeAsString (FIELD_LOGICAL_ADDRESS);
 
@@ -201,8 +202,11 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                                            sLogicalAddress,
                                            eSML.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
-          | ClientTransportException ex)
+      catch (final GeneralSecurityException
+             | BadRequestFault
+             | InternalErrorFault
+             | UnauthorizedFault
+             | ClientTransportException ex)
       {
         final String sMsg = "Error registering SMP '" +
                             sSMPID +
@@ -230,11 +234,11 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSML = aWPEC.getAttributeAsString (FIELD_SML);
-    final ESML eSML = ESML.getFromIDOrNull (sSML);
+    final ISMLInfo aSML = ESML.getFromIDOrNull (sSML);
     final String sPhysicalAddress = aWPEC.getAttributeAsString (FIELD_PHYSICAL_ADDRESS);
     final String sLogicalAddress = aWPEC.getAttributeAsString (FIELD_LOGICAL_ADDRESS);
 
-    if (eSML == null)
+    if (aSML == null)
       aFormErrors.addFieldError (FIELD_SML, "A valid SML must be selected!");
 
     if (StringHelper.hasNoText (sPhysicalAddress))
@@ -298,7 +302,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
       try
       {
         final SSLSocketFactory aSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
-        final ManageServiceMetadataServiceCaller aCaller = new ManageServiceMetadataServiceCaller (eSML);
+        final ManageServiceMetadataServiceCaller aCaller = new ManageServiceMetadataServiceCaller (aSML);
         aCaller.setSSLSocketFactory (aSocketFactory);
         aCaller.update (sSMPID, sPhysicalAddress, sLogicalAddress);
 
@@ -309,7 +313,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                             "' and logical address '" +
                             sLogicalAddress +
                             "' at the SML '" +
-                            eSML.getManagementServiceURL () +
+                            aSML.getManagementServiceURL () +
                             "'.";
         s_aLogger.info (sMsg);
         aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
@@ -317,10 +321,13 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                                            sSMPID,
                                            sPhysicalAddress,
                                            sLogicalAddress,
-                                           eSML.getManagementServiceURL ());
+                                           aSML.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
-          | NotFoundFault ex)
+      catch (final GeneralSecurityException
+             | BadRequestFault
+             | InternalErrorFault
+             | UnauthorizedFault
+             | NotFoundFault ex)
       {
         final String sMsg = "Error updating SMP '" +
                             sSMPID +
@@ -329,7 +336,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                             "' and logical address '" +
                             sLogicalAddress +
                             "' to the SML '" +
-                            eSML.getManagementServiceURL () +
+                            aSML.getManagementServiceURL () +
                             "'.";
         s_aLogger.error (sMsg, ex);
         aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg + _getTechnicalDetails (ex)));
@@ -337,7 +344,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                                            sSMPID,
                                            sPhysicalAddress,
                                            sLogicalAddress,
-                                           eSML.getManagementServiceURL (),
+                                           aSML.getManagementServiceURL (),
                                            ex.getClass (),
                                            ex.getMessage ());
       }
@@ -348,9 +355,9 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSML = aWPEC.getAttributeAsString (FIELD_SML);
-    final ESML eSML = ESML.getFromIDOrNull (sSML);
+    final ISMLInfo aSML = ESML.getFromIDOrNull (sSML);
 
-    if (eSML == null)
+    if (aSML == null)
       aFormErrors.addFieldError (FIELD_SML, "A valid SML must be selected!");
 
     if (aFormErrors.isEmpty ())
@@ -359,32 +366,35 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
       try
       {
         final SSLSocketFactory aSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
-        final ManageServiceMetadataServiceCaller aCaller = new ManageServiceMetadataServiceCaller (eSML);
+        final ManageServiceMetadataServiceCaller aCaller = new ManageServiceMetadataServiceCaller (aSML);
         aCaller.setSSLSocketFactory (aSocketFactory);
         aCaller.delete (sSMPID);
 
         final String sMsg = "Successfully deleted SMP '" +
                             sSMPID +
                             "' from the SML '" +
-                            eSML.getManagementServiceURL () +
+                            aSML.getManagementServiceURL () +
                             "'.";
         s_aLogger.info (sMsg);
         aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
-        AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, eSML.getManagementServiceURL ());
+        AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, aSML.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
-          | NotFoundFault ex)
+      catch (final GeneralSecurityException
+             | BadRequestFault
+             | InternalErrorFault
+             | UnauthorizedFault
+             | NotFoundFault ex)
       {
         final String sMsg = "Error deleting SMP '" +
                             sSMPID +
                             "' from the SML '" +
-                            eSML.getManagementServiceURL () +
+                            aSML.getManagementServiceURL () +
                             "'.";
         s_aLogger.error (sMsg, ex);
         aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg + _getTechnicalDetails (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-delete",
                                            sSMPID,
-                                           eSML.getManagementServiceURL (),
+                                           aSML.getManagementServiceURL (),
                                            ex.getClass (),
                                            ex.getMessage ());
       }
@@ -400,10 +410,10 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final FormErrors aFormErrors = new FormErrors ();
     final boolean bShowInput = true;
-    final ESML eDefaultSML = EnumHelper.findFirst (ESML.class,
-                                                   e -> e.getManageParticipantIdentifierEndpointAddress ()
-                                                         .equals (SMPServerConfiguration.getSMLURL ()),
-                                                   ESML.DIGIT_PRODUCTION);
+    final ISMLInfo aDefaultSML = EnumHelper.findFirst (ESML.class,
+                                                       e -> e.getManageParticipantIdentifierEndpointAddress ()
+                                                             .equals (SMPServerConfiguration.getSMLURL ()),
+                                                       ESML.DIGIT_PRODUCTION);
 
     if (aWPEC.hasAction (CPageParam.ACTION_PERFORM))
     {
@@ -442,7 +452,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
         aForm.addChild (new BootstrapInfoBox ().addChild ("Register this SMP to the SML. This must only be done once per SMP!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML,
-                                                                                                  eDefaultSML)))
+                                                                                                  aDefaultSML)))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
                                                      .setCtrl (new HCEM ().addChild (sSMPID))
@@ -473,7 +483,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
         aForm.addChild (new BootstrapInfoBox ().addChild ("Update this SMP at the SML. This must only be done when either the IP address or the host name of the SMP changed!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML,
-                                                                                                  eDefaultSML)))
+                                                                                                  aDefaultSML)))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
                                                      .setCtrl (new HCEM ().addChild (sSMPID))
@@ -504,7 +514,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
         aForm.addChild (new BootstrapInfoBox ().addChild ("Delete this SMP from the SML."));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML,
-                                                                                                  eDefaultSML)))
+                                                                                                  aDefaultSML)))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
                                                      .setCtrl (new HCEM ().addChild (sSMPID))
