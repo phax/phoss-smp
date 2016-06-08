@@ -55,7 +55,6 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.peppol.utils.ConfigFile;
-import com.helger.peppol.utils.KeyStoreHelper;
 
 /**
  * The central configuration for the SMP server. This class manages the content
@@ -206,24 +205,22 @@ public final class SMPServerConfiguration
 
   /**
    * @return The path to the truststore. May be a classpath or an absolute file
-   *         path. Property <code>smp.truststore.path</code>. Defaults to
-   *         {@link KeyStoreHelper#TRUSTSTORE_COMPLETE_CLASSPATH}.
+   *         path. Property <code>smp.truststore.path</code>.
    */
-  @Nonnull
+  @Nullable
   public static String getTrustStorePath ()
   {
-    return getConfigFile ().getString ("smp.truststore.path", KeyStoreHelper.TRUSTSTORE_COMPLETE_CLASSPATH);
+    return getConfigFile ().getString ("smp.truststore.path");
   }
 
   /**
    * @return The password required to open the truststore. Property
-   *         <code>smp.truststore.password</code>. Defaults to
-   *         {@link KeyStoreHelper#TRUSTSTORE_PASSWORD}
+   *         <code>smp.truststore.password</code>.
    */
-  @Nonnull
+  @Nullable
   public static String getTrustStorePassword ()
   {
-    return getConfigFile ().getString ("smp.truststore.password", KeyStoreHelper.TRUSTSTORE_PASSWORD);
+    return getConfigFile ().getString ("smp.truststore.password");
   }
 
   /**

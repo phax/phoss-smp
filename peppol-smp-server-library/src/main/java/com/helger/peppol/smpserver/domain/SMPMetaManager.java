@@ -177,8 +177,14 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
       try
       {
-        // If trust manager fails, key manager is not usable!
         SMPTrustManager.getInstance ();
+      }
+      catch (final Exception ex)
+      {
+        // fall through. No special trust store - no problem :)
+      }
+      try
+      {
         SMPKeyManager.getInstance ();
       }
       catch (final Exception ex)

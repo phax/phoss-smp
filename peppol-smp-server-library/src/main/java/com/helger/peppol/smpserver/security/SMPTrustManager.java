@@ -55,7 +55,7 @@ import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 
 /**
- * This class holds the gglobal trust store.
+ * This class holds the global trust store.
  *
  * @author Philip Helger
  */
@@ -84,7 +84,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
     }
     m_aTrustStore = aTrustStoreLoading.getKeyStore ();
 
-    s_aLogger.info ("SMPKeyManager successfully initialized with truststore '" +
+    s_aLogger.info ("SMPTrustManager successfully initialized with truststore '" +
                     SMPServerConfiguration.getTrustStorePath () +
                     "'");
     s_aCertificateValid.set (true);
@@ -107,7 +107,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
    * @return The global trust store to be used. This trust store is never
    *         reloaded and must be present.
    */
-  @Nonnull
+  @Nullable
   public KeyStore getTrustStore ()
   {
     return m_aTrustStore;

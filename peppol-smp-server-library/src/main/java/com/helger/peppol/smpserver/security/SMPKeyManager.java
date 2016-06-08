@@ -51,6 +51,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -79,6 +80,7 @@ import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.random.RandomHelper;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
+import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 
 /**
@@ -180,14 +182,22 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     aKeyManagerFactory.init (getKeyStore (), SMPServerConfiguration.getKeyStoreKeyPassword ());
 
     // Trust manager
-    final TrustManagerFactory aTrustManagerFactory = TrustManagerFactory.getInstance (TrustManagerFactory.getDefaultAlgorithm ());
-    aTrustManagerFactory.init (SMPTrustManager.getInstance ().getTrustStore ());
+    TrustManager [] aTrustManagers;
+    if (SMPTrustManager.isCertificateValid ())
+    {
+      final TrustManagerFactory aTrustManagerFactory = TrustManagerFactory.getInstance (TrustManagerFactory.getDefaultAlgorithm ());
+      aTrustManagerFactory.init (SMPTrustManager.getInstance ().getTrustStore ());
+      aTrustManagers = aTrustManagerFactory.getTrustManagers ();
+    }
+    else
+    {
+      // No trust store defined
+      aTrustManagers = new TrustManager [] { new TrustManagerTrustAll () };
+    }
 
     // Assign key manager and empty trust manager to SSL/TLS context
     final SSLContext aSSLCtx = SSLContext.getInstance ("TLS");
-    aSSLCtx.init (aKeyManagerFactory.getKeyManagers (),
-                  aTrustManagerFactory.getTrustManagers (),
-                  RandomHelper.getSecureRandom ());
+    aSSLCtx.init (aKeyManagerFactory.getKeyManagers (), aTrustManagers, RandomHelper.getSecureRandom ());
     return aSSLCtx;
   }
 
