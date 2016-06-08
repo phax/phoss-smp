@@ -58,10 +58,9 @@ import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smp.CompleteServiceGroupType;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ProcessListType;
@@ -122,7 +121,8 @@ public final class SMPServerAPI
 
     try
     {
-      final IParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -243,7 +243,8 @@ public final class SMPServerAPI
 
     try
     {
-      final IParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -306,7 +307,8 @@ public final class SMPServerAPI
 
     try
     {
-      final IParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -360,7 +362,8 @@ public final class SMPServerAPI
 
     try
     {
-      final IParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -402,7 +405,8 @@ public final class SMPServerAPI
 
     try
     {
-      final IParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         throw new SMPNotFoundException ("Failed to parse serviceGroup '" +
@@ -421,7 +425,7 @@ public final class SMPServerAPI
                                         m_aAPIProvider.getCurrentURI ());
       }
 
-      final IDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         throw new SMPNotFoundException ("Failed to parse documentTypeID '" +
@@ -500,7 +504,8 @@ public final class SMPServerAPI
 
     try
     {
-      final IParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -508,7 +513,7 @@ public final class SMPServerAPI
         return ESuccess.FAILURE;
       }
 
-      final IDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         // Invalid identifier
@@ -575,10 +580,10 @@ public final class SMPServerAPI
       {
         // Handle service information
         final ProcessListType aJAXBProcesses = aServiceMetadata.getServiceInformation ().getProcessList ();
-        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
+        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
         for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
         {
-          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
+          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
           for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
           {
             final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),
@@ -647,7 +652,8 @@ public final class SMPServerAPI
 
     try
     {
-      final IParticipantIdentifier aServiceGroupID = PeppolParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID);
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
@@ -655,7 +661,7 @@ public final class SMPServerAPI
         return ESuccess.FAILURE;
       }
 
-      final IDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createFromURIPartOrNull (sDocumentTypeID);
+      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocumentTypeID);
       if (aDocTypeID == null)
       {
         // Invalid identifier
