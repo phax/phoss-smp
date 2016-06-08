@@ -132,6 +132,18 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                            aChain.length +
                                                            " certificates. Please ensure that the respective root certificates are contained!"));
 
+        if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
+        {
+          final X509Certificate aHead = (X509Certificate) aChain[0];
+          final String sIssuer = aHead.getIssuerX500Principal ().getName ();
+          if ("CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK".equals (sIssuer))
+            aTab.addChild (new BootstrapWarnBox ().addChild ("You are currently using a PEPPOL pilot certificate!"));
+          else
+            if ("CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK".equals (sIssuer))
+              aTab.addChild (new BootstrapSuccessBox ().addChild ("You are currently using a PEPPOL production certificate!"));
+          // else: we don't care
+        }
+
         final HCOL aUL = new HCOL ();
         for (final Certificate aCert : aChain)
         {
