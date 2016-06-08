@@ -156,11 +156,6 @@
           <exclude>**/*.properties</exclude>
         </excludes>
       </resource>
-      <!-- All the rest -->
-      <resource>
-        <directory>${basedir}/src/test/resources</directory>
-        <filtering>false</filtering>
-      </resource>
     </resources>
 
     <plugins>
