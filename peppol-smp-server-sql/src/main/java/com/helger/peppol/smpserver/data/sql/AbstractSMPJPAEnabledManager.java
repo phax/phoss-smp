@@ -40,14 +40,9 @@
  */
 package com.helger.peppol.smpserver.data.sql;
 
-import javax.annotation.Nonnull;
-import javax.persistence.EntityManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.callback.exception.LoggingExceptionCallback;
-import com.helger.db.jpa.IHasEntityManager;
 import com.helger.db.jpa.JPAEnabledManager;
 
 public abstract class AbstractSMPJPAEnabledManager extends JPAEnabledManager
@@ -56,19 +51,7 @@ public abstract class AbstractSMPJPAEnabledManager extends JPAEnabledManager
 
   public AbstractSMPJPAEnabledManager ()
   {
-    super (new IHasEntityManager ()
-    {
-      // This additional indirection level is required!!!
-      // So that for every request the correct getInstance is invoked!
-      @Nonnull
-      public EntityManager getEntityManager ()
-      {
-        return SMPEntityManagerWrapper.getInstance ().getEntityManager ();
-      }
-    });
-
-    // Exceptions are handled by logging them
-    setCustomExceptionCallback (new LoggingExceptionCallback ());
+    super ( () -> SMPEntityManagerWrapper.getInstance ().getEntityManager ());
 
     // To avoid some EclipseLink logging issues
     setUseTransactionsForSelect (true);
