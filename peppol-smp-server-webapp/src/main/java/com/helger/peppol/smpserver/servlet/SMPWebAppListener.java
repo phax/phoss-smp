@@ -37,7 +37,7 @@ import com.helger.photon.core.app.CApplication;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
-import com.helger.web.scope.mgr.WebScopeManager;
+import com.helger.web.servlet.ServletContextPathHolder;
 
 /**
  * Special SMP web app listener
@@ -90,7 +90,7 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     if (SMPServerConfiguration.isForceRoot ())
     {
       // Enforce an empty context path according to the specs!
-      WebScopeManager.getGlobalScope ().setCustomContextPath ("");
+      ServletContextPathHolder.setCustomContextPath ("");
     }
     ApplicationRequestManager.getRequestMgr ().setUsePaths (true);
 
