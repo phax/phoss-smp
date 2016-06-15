@@ -34,11 +34,14 @@ import com.helger.commons.lang.ClassHelper;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.utils.LoadedKey;
+import com.helger.peppol.utils.LoadedKeyStore;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
@@ -59,6 +62,8 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
  */
 public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 {
+  private static final String SMP_ISSUER_PILOT = "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK";
+  private static final String SMP_ISSUER_PRODUCTION = "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK";
   private static final String ACTION_RELOAD_KEYSTORE = "reloadkeystore";
   private static final String ACTION_RELOAD_TRUSTSTORE = "reloadtruststore";
 
@@ -136,10 +141,10 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         {
           final X509Certificate aHead = (X509Certificate) aChain[0];
           final String sIssuer = aHead.getIssuerX500Principal ().getName ();
-          if ("CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK".equals (sIssuer))
+          if (SMP_ISSUER_PILOT.equals (sIssuer))
             aTab.addChild (new BootstrapWarnBox ().addChild ("You are currently using a PEPPOL pilot certificate!"));
           else
-            if ("CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK".equals (sIssuer))
+            if (SMP_ISSUER_PRODUCTION.equals (sIssuer))
               aTab.addChild (new BootstrapSuccessBox ().addChild ("You are currently using a PEPPOL production certificate!"));
           // else: we don't care
         }
@@ -209,6 +214,86 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         aTab.addChild (aUL);
       }
       aTabBox.addTab ("truststore", "Truststore", aTab);
+    }
+
+    // PEPPOL Directory client certificate
+    if (SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ())
+    {
+      final HCNodeList aTab = new HCNodeList ();
+
+      final String sKeyStorePath = PDClientConfiguration.getKeyStorePath ();
+
+      final LoadedKeyStore aKeyStoreLR = LoadedKeyStore.loadKeyStore (sKeyStorePath,
+                                                                      PDClientConfiguration.getKeyStorePassword ());
+      if (aKeyStoreLR.isFailure ())
+      {
+        aTab.addChild (new BootstrapErrorBox ().addChild (aKeyStoreLR.getErrorMessage ()));
+      }
+      else
+      {
+        final KeyStore aKeyStore = aKeyStoreLR.getKeyStore ();
+        final String sKeyStoreAlias = PDClientConfiguration.getKeyStoreKeyAlias ();
+        final LoadedKey aKeyLoading = LoadedKey.loadKey (aKeyStore,
+                                                         sKeyStorePath,
+                                                         sKeyStoreAlias,
+                                                         PDClientConfiguration.getKeyStoreKeyPassword ());
+        if (aKeyLoading.isFailure ())
+        {
+          aTab.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" +
+                                                                                     sKeyStorePath +
+                                                                                     "' and was successfully loaded.")));
+          aTab.addChild (new BootstrapErrorBox ().addChild (aKeyLoading.getErrorMessage ()));
+        }
+        else
+        {
+          // Successfully loaded private key
+          final PrivateKeyEntry aKeyEntry = aKeyLoading.getKeyEntry ();
+          final Certificate [] aChain = aKeyEntry.getCertificateChain ();
+
+          // Key store path and password are fine
+          aTab.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" +
+                                                                                     sKeyStorePath +
+                                                                                     "' and was successfully loaded."))
+                                                   .addChild (new HCDiv ().addChild ("The private key with the alias '" +
+                                                                                     sKeyStoreAlias +
+                                                                                     "' was successfully loaded.")));
+
+          if (aChain.length != 3)
+            aTab.addChild (new BootstrapWarnBox ().addChild ("The private key should be a chain of 3 certificates but it has " +
+                                                             aChain.length +
+                                                             " certificates. Please ensure that the respective root certificates are contained!"));
+
+          if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
+          {
+            final X509Certificate aHead = (X509Certificate) aChain[0];
+            final String sIssuer = aHead.getIssuerX500Principal ().getName ();
+            if (SMP_ISSUER_PILOT.equals (sIssuer))
+              aTab.addChild (new BootstrapWarnBox ().addChild ("You are currently using a PEPPOL pilot certificate!"));
+            else
+              if (SMP_ISSUER_PRODUCTION.equals (sIssuer))
+                aTab.addChild (new BootstrapSuccessBox ().addChild ("You are currently using a PEPPOL production certificate!"));
+            // else: we don't care
+          }
+
+          final HCOL aUL = new HCOL ();
+          for (final Certificate aCert : aChain)
+          {
+            if (aCert instanceof X509Certificate)
+            {
+              final X509Certificate aX509Cert = (X509Certificate) aCert;
+              final BootstrapTable aCertDetails = AppCommonUI.createCertificateDetailsTable (aX509Cert,
+                                                                                             aNowLDT,
+                                                                                             aDisplayLocale);
+              aUL.addItem (aCertDetails.getAsResponsiveTable ());
+            }
+            else
+              aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
+                           ClassHelper.getClassName (aCert));
+          }
+          aTab.addChild (aUL);
+        }
+      }
+      aTabBox.addTab ("pdkeystore", "PEPPOL Directory Keystore", aTab);
     }
   }
 }

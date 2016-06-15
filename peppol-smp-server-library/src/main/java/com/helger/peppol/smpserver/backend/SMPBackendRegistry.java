@@ -80,7 +80,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   private static boolean s_bDefaultInstantiated = false;
 
   private final SimpleReadWriteLock m_aRWLock = new SimpleReadWriteLock ();
-  private final ICommonsMap <String, IFactory <? extends ISMPManagerProvider>> m_aMap = new CommonsLinkedHashMap<> ();
+  private final ICommonsMap <String, IFactory <? extends ISMPManagerProvider>> m_aMap = new CommonsLinkedHashMap <> ();
 
   private SMPBackendRegistry ()
   {

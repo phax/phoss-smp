@@ -82,6 +82,8 @@ import com.helger.commons.random.RandomHelper;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.utils.LoadedKey;
+import com.helger.peppol.utils.LoadedKeyStore;
 
 /**
  * This class holds the private key for signing and the certificate for
@@ -108,22 +110,26 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     m_aKeyEntry = null;
 
     // Load the key store and get the signing key
-    final SMPKeyStoreLoadingResult aKeyStoreLoading = SMPKeyStoreLoadingResult.loadConfiguredKeyStore ();
-    if (aKeyStoreLoading.isFailure ())
+    final LoadedKeyStore aLoadedKeyStore = LoadedKeyStore.loadKeyStore (SMPServerConfiguration.getKeyStorePath (),
+                                                                        SMPServerConfiguration.getKeyStorePassword ());
+    if (aLoadedKeyStore.isFailure ())
     {
-      s_sInitError = aKeyStoreLoading.getErrorMessage ();
+      s_sInitError = aLoadedKeyStore.getErrorMessage ();
       throw new InitializationException (s_sInitError);
     }
-    m_aKeyStore = aKeyStoreLoading.getKeyStore ();
+    m_aKeyStore = aLoadedKeyStore.getKeyStore ();
 
-    final SMPKeyLoadingResult aKeyLoading = SMPKeyLoadingResult.loadConfiguredKey (m_aKeyStore);
-    if (aKeyLoading.isFailure ())
+    final LoadedKey aLoadedKey = LoadedKey.loadKey (m_aKeyStore,
+                                                    SMPServerConfiguration.getKeyStorePath (),
+                                                    SMPServerConfiguration.getKeyStoreKeyAlias (),
+                                                    SMPServerConfiguration.getKeyStoreKeyPassword ());
+    if (aLoadedKey.isFailure ())
     {
-      s_sInitError = aKeyLoading.getErrorMessage ();
+      s_sInitError = aLoadedKey.getErrorMessage ();
       throw new InitializationException (s_sInitError);
     }
 
-    m_aKeyEntry = aKeyLoading.getKeyEntry ();
+    m_aKeyEntry = aLoadedKey.getKeyEntry ();
     s_aLogger.info ("SMPKeyManager successfully initialized with keystore '" +
                     SMPServerConfiguration.getKeyStorePath () +
                     "' and alias '" +

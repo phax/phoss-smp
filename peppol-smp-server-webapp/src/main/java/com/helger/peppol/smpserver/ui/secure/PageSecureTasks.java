@@ -52,7 +52,7 @@ import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.utils.CertificateHelper;
-import com.helger.peppol.utils.KeyStoreHelper;
+import com.helger.peppol.utils.LoadedKeyStore;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
@@ -122,16 +122,11 @@ public class PageSecureTasks extends AbstractSMPWebPage
         aOL.addItem (_createError ("An invalid PEPPOL Directory hostname is provided"),
                      new HCDiv ().addChild ("A connection to the PEPPOL Directory server cannot be establised!"));
 
-      try
-      {
-        KeyStoreHelper.loadKeyStore (PDClientConfiguration.getKeyStorePath (),
-                                     PDClientConfiguration.getKeyStorePassword ());
-      }
-      catch (final Exception ex)
-      {
+      final LoadedKeyStore aLoadedKeyStore = LoadedKeyStore.loadKeyStore (PDClientConfiguration.getKeyStorePath (),
+                                                                          PDClientConfiguration.getKeyStorePassword ());
+      if (aLoadedKeyStore.isFailure ())
         aOL.addItem (_createError ("The PEPPOL Directory client certificate configuration is invalid."),
-                     new HCDiv ().addChild ("A connection to the PEPPOL Directory server cannot be establised!"));
-      }
+                     new HCDiv ().addChild (aLoadedKeyStore.getErrorMessage ()));
     }
 
     // check service groups and redirects

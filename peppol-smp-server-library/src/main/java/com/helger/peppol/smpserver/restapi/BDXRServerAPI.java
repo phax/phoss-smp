@@ -450,10 +450,10 @@ public final class BDXRServerAPI
       {
         // Handle service information
         final ProcessListType aJAXBProcesses = aServiceMetadata.getServiceInformation ().getProcessList ();
-        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
+        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
         for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
         {
-          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
+          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
           for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
           {
             final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),

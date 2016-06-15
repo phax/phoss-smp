@@ -176,7 +176,7 @@ public class SMPRedirect implements ISMPRedirect
     final com.helger.peppol.bdxr.RedirectType aRedirect = new com.helger.peppol.bdxr.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
-    aRedirect.setExtension (new CommonsArrayList<> (BDXRExtensionConverter.convertOrNull (m_sExtension)));
+    aRedirect.setExtension (new CommonsArrayList <> (BDXRExtensionConverter.convertOrNull (m_sExtension)));
 
     final com.helger.peppol.bdxr.ServiceMetadataType ret = new com.helger.peppol.bdxr.ServiceMetadataType ();
     ret.setRedirect (aRedirect);

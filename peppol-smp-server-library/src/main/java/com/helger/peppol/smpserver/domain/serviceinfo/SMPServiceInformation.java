@@ -84,7 +84,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
   private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
-  private final ICommonsOrderedMap <String, SMPProcess> m_aProcesses = new CommonsLinkedHashMap<> ();
+  private final ICommonsOrderedMap <String, SMPProcess> m_aProcesses = new CommonsLinkedHashMap <> ();
   private String m_sExtension;
 
   /**
@@ -275,7 +275,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
   public static SMPServiceInformation createFromJAXB (@Nonnull final ISMPServiceGroup aServiceGroup,
                                                       @Nonnull final ServiceInformationType aServiceInformation)
   {
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     for (final ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,

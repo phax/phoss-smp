@@ -565,7 +565,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                    aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
                                                                                             .getScheme ()
                                                                            : PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                           .setReadOnly (bEdit));
+                                                                                                                                  .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_VALUE,
                                                    aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
@@ -585,7 +585,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                    aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()
                                                                                               .getScheme ()
                                                                             : PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                       .setReadOnly (bEdit));
+                                                                                                                             .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_VALUE,
                                                    aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()

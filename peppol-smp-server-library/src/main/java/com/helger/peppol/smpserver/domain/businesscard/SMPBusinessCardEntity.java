@@ -69,9 +69,9 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   private String m_sName;
   private String m_sCountryCode;
   private String m_sGeographicalInformation;
-  private final ICommonsList <SMPBusinessCardIdentifier> m_aIdentifiers = new CommonsArrayList<> ();
-  private final ICommonsList <String> m_aWebsiteURIs = new CommonsArrayList<> ();
-  private final ICommonsList <SMPBusinessCardContact> m_aContacts = new CommonsArrayList<> ();
+  private final ICommonsList <SMPBusinessCardIdentifier> m_aIdentifiers = new CommonsArrayList <> ();
+  private final ICommonsList <String> m_aWebsiteURIs = new CommonsArrayList <> ();
+  private final ICommonsList <SMPBusinessCardContact> m_aContacts = new CommonsArrayList <> ();
   private String m_sAdditionalInformation;
   private LocalDate m_aRegistrationDate;
 
