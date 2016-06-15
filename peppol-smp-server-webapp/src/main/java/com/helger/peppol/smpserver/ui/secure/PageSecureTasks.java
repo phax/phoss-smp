@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.commons.string.StringHelper;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -34,7 +35,9 @@ import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -49,6 +52,7 @@ import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.utils.CertificateHelper;
+import com.helger.peppol.utils.KeyStoreHelper;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
@@ -110,6 +114,24 @@ public class PageSecureTasks extends AbstractSMPWebPage
       if (!RegistrationHookFactory.isSMLConnectionActive ())
         aOL.addItem (_createWarning ("The connection to the SML is not active."),
                      new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+    }
+
+    if (SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ())
+    {
+      if (StringHelper.hasNoText (SMPServerConfiguration.getPEPPOLDirectoryHostName ()))
+        aOL.addItem (_createError ("An invalid PEPPOL Directory hostname is provided"),
+                     new HCDiv ().addChild ("A connection to the PEPPOL Directory server cannot be establised!"));
+
+      try
+      {
+        KeyStoreHelper.loadKeyStore (PDClientConfiguration.getKeyStorePath (),
+                                     PDClientConfiguration.getKeyStorePassword ());
+      }
+      catch (final Exception ex)
+      {
+        aOL.addItem (_createError ("The PEPPOL Directory client certificate configuration is invalid."),
+                     new HCDiv ().addChild ("A connection to the PEPPOL Directory server cannot be establised!"));
+      }
     }
 
     // check service groups and redirects
