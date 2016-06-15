@@ -149,6 +149,25 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
           throw new IllegalStateException ("Failed to determine iddentifier types!");
       }
 
+      // Initialize first because the service group manager initializes the
+      // RegistrationHookFactory
+      try
+      {
+        SMPTrustManager.getInstance ();
+      }
+      catch (final Exception ex)
+      {
+        // fall through. No special trust store - no problem :)
+      }
+      try
+      {
+        SMPKeyManager.getInstance ();
+      }
+      catch (final Exception ex)
+      {
+        // fall through. Certificate stays invalid, no SML access possible.
+      }
+
       // TODO make customizable
       m_aPeppolURLProvider = new BDXURLProvider ();
 
@@ -174,23 +193,6 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr ();
-
-      try
-      {
-        SMPTrustManager.getInstance ();
-      }
-      catch (final Exception ex)
-      {
-        // fall through. No special trust store - no problem :)
-      }
-      try
-      {
-        SMPKeyManager.getInstance ();
-      }
-      catch (final Exception ex)
-      {
-        // fall through. Certificate stays invalid, no SML access possible.
-      }
 
       s_aLogger.info (ClassHelper.getClassLocalName (this) + " was initialized");
     }
