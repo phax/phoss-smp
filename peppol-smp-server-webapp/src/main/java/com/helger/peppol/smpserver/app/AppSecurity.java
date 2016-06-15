@@ -95,5 +95,8 @@ public final class AppSecurity
 
     // New login logs out old user
     LoggedInUserManager.getInstance ().setLogoutAlreadyLoggedInUser (true);
+
+    // Setup internal error handler (if configured)
+    SMPInternalErrorHandler.doSetup ();
   }
 }
