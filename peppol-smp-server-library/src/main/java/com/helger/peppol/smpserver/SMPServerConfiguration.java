@@ -126,7 +126,7 @@ public final class SMPServerConfiguration
     aFilePaths.add (PATH_SMP_SERVER_PROPERTIES);
 
     return s_aRWLock.writeLocked ( () -> {
-      s_aConfigFile = new ConfigFile (aFilePaths);
+      s_aConfigFile = ConfigFile.create (aFilePaths);
       if (!s_aConfigFile.isRead ())
       {
         s_aLogger.warn ("Failed to read smp-server.properties from any of the paths: " + aFilePaths);
@@ -159,7 +159,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getBackend ()
   {
-    return getConfigFile ().getString ("smp.backend");
+    return getConfigFile ().getAsString ("smp.backend");
   }
 
   /**
@@ -169,7 +169,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeyStorePath ()
   {
-    return getConfigFile ().getString ("smp.keystore.path");
+    return getConfigFile ().getAsString ("smp.keystore.path");
   }
 
   /**
@@ -179,7 +179,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeyStorePassword ()
   {
-    return getConfigFile ().getString ("smp.keystore.password");
+    return getConfigFile ().getAsString ("smp.keystore.password");
   }
 
   /**
@@ -189,7 +189,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeyStoreKeyAlias ()
   {
-    return getConfigFile ().getString ("smp.keystore.key.alias");
+    return getConfigFile ().getAsString ("smp.keystore.key.alias");
   }
 
   /**
@@ -200,7 +200,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static char [] getKeyStoreKeyPassword ()
   {
-    return getConfigFile ().getCharArray ("smp.keystore.key.password");
+    return getConfigFile ().getAsCharArray ("smp.keystore.key.password");
   }
 
   /**
@@ -210,7 +210,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getTrustStorePath ()
   {
-    return getConfigFile ().getString ("smp.truststore.path");
+    return getConfigFile ().getAsString ("smp.truststore.path");
   }
 
   /**
@@ -220,7 +220,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getTrustStorePassword ()
   {
-    return getConfigFile ().getString ("smp.truststore.password");
+    return getConfigFile ().getAsString ("smp.truststore.password");
   }
 
   /**
@@ -230,7 +230,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isForceRoot ()
   {
-    return getConfigFile ().getBoolean ("smp.forceroot", false);
+    return getConfigFile ().getAsBoolean ("smp.forceroot", false);
   }
 
   /**
@@ -241,7 +241,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getPublicServerURL ()
   {
-    return getConfigFile ().getString ("smp.publicurl");
+    return getConfigFile ().getAsString ("smp.publicurl");
   }
 
   /**
@@ -252,7 +252,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESMPIdentifierType getIdentifierType ()
   {
-    final String sType = getConfigFile ().getString ("smp.identifiertype");
+    final String sType = getConfigFile ().getAsString ("smp.identifiertype");
     return ESMPIdentifierType.getFromIDOrDefault (sType, ESMPIdentifierType.PEPPOL);
   }
 
@@ -267,7 +267,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isRESTWritableAPIDisabled ()
   {
-    return getConfigFile ().getBoolean ("smp.rest.writableapi.disabled", false);
+    return getConfigFile ().getAsBoolean ("smp.rest.writableapi.disabled", false);
   }
 
   /**
@@ -279,7 +279,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isPEPPOLDirectoryIntegrationEnabled ()
   {
-    return getConfigFile ().getBoolean ("smp.peppol.directory.integration.enabled", false);
+    return getConfigFile ().getAsBoolean ("smp.peppol.directory.integration.enabled", false);
   }
 
   /**
@@ -289,7 +289,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static String getPEPPOLDirectoryHostName ()
   {
-    return getConfigFile ().getString ("smp.peppol.directory.hostname", "http://pyp.helger.com");
+    return getConfigFile ().getAsString ("smp.peppol.directory.hostname", "http://pyp.helger.com");
   }
 
   /**
@@ -298,7 +298,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isWriteToSML ()
   {
-    return getConfigFile ().getBoolean ("sml.active", false);
+    return getConfigFile ().getAsBoolean ("sml.active", false);
   }
 
   /**
@@ -308,7 +308,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLURL ()
   {
-    return getConfigFile ().getString ("sml.url");
+    return getConfigFile ().getAsString ("sml.url");
   }
 
   /**
@@ -319,6 +319,6 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLSMPID ()
   {
-    return getConfigFile ().getString ("sml.smpid");
+    return getConfigFile ().getAsString ("sml.smpid");
   }
 }

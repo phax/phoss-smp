@@ -73,19 +73,19 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback impleme
   public static void doSetup ()
   {
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
-    final String sSenderAddress = aCF.getString ("smp.errorhandler.sender.email");
-    final String sSenderName = aCF.getString ("smp.errorhandler.sender.name", "SMP Internal Error Sender");
-    final String sReceiverAddress = aCF.getString ("smp.errorhandler.receiver.email");
-    final String sReceiverName = aCF.getString ("smp.errorhandler.receiver.name");
-    final String sSMTPHostName = aCF.getString ("smp.smtp.hostname");
-    final int nSMTPPort = aCF.getInt ("smp.smtp.port", -1);
-    final String sSMTPUserName = aCF.getString ("smp.smtp.username");
-    final String sSMTPPassword = aCF.getString ("smp.smtp.password");
-    final boolean bSMTPSSLEnabled = aCF.getBoolean ("smp.smtp.ssl", false);
-    final boolean bSMTPSTARTTLSEnabled = aCF.getBoolean ("smp.smtp.starttls", false);
-    final long nSMTPConnectionTimeoutMS = aCF.getLong ("smp.smtp.connectiontimeoutms", 10_000);
-    final long nSMTPSocketTimeoutMS = aCF.getLong ("smp.smtp.sockettimeoutms", 10_000);
-    final boolean bSMTPDebug = aCF.getBoolean ("smp.smtp.debug", false);
+    final String sSenderAddress = aCF.getAsString ("smp.errorhandler.sender.email");
+    final String sSenderName = aCF.getAsString ("smp.errorhandler.sender.name", "SMP Internal Error Sender");
+    final String sReceiverAddress = aCF.getAsString ("smp.errorhandler.receiver.email");
+    final String sReceiverName = aCF.getAsString ("smp.errorhandler.receiver.name");
+    final String sSMTPHostName = aCF.getAsString ("smp.smtp.hostname");
+    final int nSMTPPort = aCF.getAsInt ("smp.smtp.port", -1);
+    final String sSMTPUserName = aCF.getAsString ("smp.smtp.username");
+    final String sSMTPPassword = aCF.getAsString ("smp.smtp.password");
+    final boolean bSMTPSSLEnabled = aCF.getAsBoolean ("smp.smtp.ssl", false);
+    final boolean bSMTPSTARTTLSEnabled = aCF.getAsBoolean ("smp.smtp.starttls", false);
+    final long nSMTPConnectionTimeoutMS = aCF.getAsLong ("smp.smtp.connectiontimeoutms", 10_000);
+    final long nSMTPSocketTimeoutMS = aCF.getAsLong ("smp.smtp.sockettimeoutms", 10_000);
+    final boolean bSMTPDebug = aCF.getAsBoolean ("smp.smtp.debug", false);
     final SMTPSettings aSMTPSettings = StringHelper.hasText (sSMTPHostName) ? new SMTPSettings (sSMTPHostName,
                                                                                                 nSMTPPort,
                                                                                                 sSMTPUserName,
