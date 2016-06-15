@@ -96,11 +96,14 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
   private static boolean _canShowPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    if (!SMPTrustManager.isCertificateValid ())
-    {
-      aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid truststore is provided, so no connection with the SML can be established!"));
-      return false;
-    }
+
+    // No truststore is okay - that can be handled
+    if (false)
+      if (!SMPTrustManager.isCertificateValid ())
+      {
+        aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid truststore is provided, so no connection with the SML can be established!"));
+        return false;
+      }
     if (!SMPKeyManager.isCertificateValid ())
     {
       aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid keystore/certificate is provided, so no connection with the SML can be established!"));
@@ -202,10 +205,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                                            sLogicalAddress,
                                            eSML.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException
-             | BadRequestFault
-             | InternalErrorFault
-             | UnauthorizedFault
+      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
              | ClientTransportException ex)
       {
         final String sMsg = "Error registering SMP '" +
@@ -323,10 +323,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                                            sLogicalAddress,
                                            aSML.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException
-             | BadRequestFault
-             | InternalErrorFault
-             | UnauthorizedFault
+      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
              | NotFoundFault ex)
       {
         final String sMsg = "Error updating SMP '" +
@@ -379,10 +376,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
         aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, aSML.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException
-             | BadRequestFault
-             | InternalErrorFault
-             | UnauthorizedFault
+      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
              | NotFoundFault ex)
       {
         final String sMsg = "Error deleting SMP '" +

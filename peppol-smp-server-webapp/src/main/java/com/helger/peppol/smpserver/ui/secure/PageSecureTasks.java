@@ -101,7 +101,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
     // check truststore configuration
     {
       if (!SMPTrustManager.isCertificateValid ())
-        aOL.addItem (_createError ("Problem with the truststore configuration"),
+        aOL.addItem (_createWarning ("Problem with the truststore configuration"),
                      new HCDiv ().addChild (SMPTrustManager.getInitializationError ()));
     }
 

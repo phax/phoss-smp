@@ -169,7 +169,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       final HCNodeList aTab = new HCNodeList ();
       if (!SMPTrustManager.isCertificateValid ())
       {
-        aTab.addChild (new BootstrapErrorBox ().addChild (SMPTrustManager.getInitializationError ()));
+        aTab.addChild (new BootstrapWarnBox ().addChild (SMPTrustManager.getInitializationError ()));
       }
       else
       {
