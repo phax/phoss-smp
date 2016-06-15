@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.IReadableResource;
+import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppSettings;
 import com.helger.peppol.smpserver.app.CApp;
@@ -70,10 +71,16 @@ public final class InitializerSecure implements IApplicationInitializer <LayoutE
                                                                                                 .setSyntaxHighlightLanguage (EPrismLanguage.MARKUP));
     aCFM.registerConfigurationFile (new ConfigurationFile (AppSettings.getSettingsResource ()).setDescription ("SMP web application configuration")
                                                                                               .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
-
     final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
     if (aConfigRes != null)
       aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
                                                                         .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+    if (SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ())
+    {
+      final IReadableResource aPDClientConfig = PDClientConfiguration.getConfigFile ().getReadResource ();
+      if (aPDClientConfig != null)
+        aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription ("PEPPOL Directory client configuration")
+                                                                               .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+    }
   }
 }
