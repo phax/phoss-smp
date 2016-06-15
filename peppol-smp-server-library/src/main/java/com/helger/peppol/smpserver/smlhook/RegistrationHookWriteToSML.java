@@ -98,9 +98,9 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     s_sSMPID = SMPServerConfiguration.getSMLSMPID ();
     s_aLogger.info ("This SMP has the ID: " + s_sSMPID);
 
-    // SSL socker factory
+    // SSL socket factory
     if (!SMPKeyManager.isCertificateValid ())
-      throw new InitializationException ("Cannot init registration hook to SML, because private key/ceertificate setup has errors: " +
+      throw new InitializationException ("Cannot init registration hook to SML, because private key/certificate setup has errors: " +
                                          SMPKeyManager.getInitializationError ());
 
     try
