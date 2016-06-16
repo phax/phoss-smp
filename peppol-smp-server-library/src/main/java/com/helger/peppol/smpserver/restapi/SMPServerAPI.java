@@ -468,7 +468,13 @@ public final class SMPServerAPI
 
       // Signature must be added by the rest service
 
-      s_aLogger.info (LOG_PREFIX + "Finished getServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
+      s_aLogger.info (LOG_PREFIX +
+                      "Finished getServiceRegistration(" +
+                      sServiceGroupID +
+                      "," +
+                      sDocumentTypeID +
+                      ") " +
+                      (aRedirect != null ? "with redirect" : "with service information"));
       s_aStatsCounterSuccess.increment ("getServiceRegistration");
       return aSignedServiceMetadata;
     }
