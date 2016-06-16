@@ -164,6 +164,37 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   }
 
   @Override
+  @Nonnull
+  protected BootstrapButtonToolbar createViewToolbar (@Nonnull final WebPageExecutionContext aWPEC,
+                                                      final boolean bCanGoBack,
+                                                      @Nonnull final ISMPRedirect aSelectedObject)
+  {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+
+    final BootstrapButtonToolbar aToolbar = createNewViewToolbar (aWPEC);
+    if (bCanGoBack)
+    {
+      // Back to list
+      aToolbar.addButtonBack (aDisplayLocale);
+    }
+    if (isActionAllowed (aWPEC, EWebPageFormAction.EDIT, aSelectedObject))
+    {
+      // Edit object
+      aToolbar.addButtonEdit (aDisplayLocale,
+                              createEditURL (aWPEC,
+                                             aSelectedObject).addAll (new SMap ().add (FIELD_SERVICE_GROUP_ID,
+                                                                                       aSelectedObject.getServiceGroupID ())
+                                                                                 .add (FIELD_DOCTYPE_ID,
+                                                                                       aSelectedObject.getDocumentTypeIdentifier ()
+                                                                                                      .getURIEncoded ())));
+    }
+
+    // Callback
+    modifyViewToolbar (aWPEC, aSelectedObject, aToolbar);
+    return aToolbar;
+  }
+
+  @Override
   protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                      @Nonnull final ISMPRedirect aSelectedObject)
   {
