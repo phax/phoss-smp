@@ -41,7 +41,6 @@
 package com.helger.peppol.smpserver.data.sql.mgr;
 
 import java.util.Collection;
-import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -49,10 +48,8 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.callback.IThrowingCallable;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
@@ -63,7 +60,6 @@ import com.helger.peppol.smpserver.data.sql.model.DBUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
-import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.web.http.basicauth.BasicAuthClientCredentials;
@@ -85,28 +81,20 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
   public void createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
-    doInTransaction (new Runnable ()
-    {
-      public void run ()
-      {
-        final DBUser aDBUser = new DBUser (sUserName, sPassword);
-        getEntityManager ().persist (aDBUser);
-      }
+    doInTransaction ((Runnable) () -> {
+      final DBUser aDBUser = new DBUser (sUserName, sPassword);
+      getEntityManager ().persist (aDBUser);
     });
   }
 
   public void updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
-    doInTransaction (new Runnable ()
-    {
-      public void run ()
+    doInTransaction ((Runnable) () -> {
+      final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUserName);
+      if (aDBUser != null)
       {
-        final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUserName);
-        if (aDBUser != null)
-        {
-          aDBUser.setPassword (sPassword);
-          getEntityManager ().merge (aDBUser);
-        }
+        aDBUser.setPassword (sPassword);
+        getEntityManager ().merge (aDBUser);
       }
     });
   }
@@ -114,15 +102,11 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   public void deleteUser (@Nullable final String sUserName)
   {
     if (StringHelper.hasText (sUserName))
-      doInTransaction (new Runnable ()
-      {
-        public void run ()
-        {
-          final EntityManager aEM = getEntityManager ();
-          final DBUser aDBUser = aEM.find (DBUser.class, sUserName);
-          if (aDBUser != null)
-            aEM.remove (aDBUser);
-        }
+      doInTransaction ((Runnable) () -> {
+        final EntityManager aEM = getEntityManager ();
+        final DBUser aDBUser = aEM.find (DBUser.class, sUserName);
+        if (aDBUser != null)
+          aEM.remove (aDBUser);
       });
   }
 
@@ -130,15 +114,9 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   public int getUserCount ()
   {
     JPAExecutionResult <Long> ret;
-    ret = doSelect (new Callable <Long> ()
-    {
-      @Nonnull
-      @ReturnsMutableCopy
-      public Long call () throws Exception
-      {
-        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p) FROM DBUser p"));
-        return Long.valueOf (nCount);
-      }
+    ret = doSelect ( () -> {
+      final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p) FROM DBUser p"));
+      return Long.valueOf (nCount);
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
@@ -150,15 +128,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   public Collection <DBUser> getAllUsers ()
   {
     JPAExecutionResult <Collection <DBUser>> ret;
-    ret = doSelect (new Callable <Collection <DBUser>> ()
-    {
-      @Nonnull
-      @ReturnsMutableCopy
-      public Collection <DBUser> call () throws Exception
-      {
-        return getEntityManager ().createQuery ("SELECT p FROM DBUser p", DBUser.class).getResultList ();
-      }
-    });
+    ret = doSelect ( () -> getEntityManager ().createQuery ("SELECT p FROM DBUser p", DBUser.class).getResultList ());
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
     return ret.get ();
@@ -171,15 +141,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
       return null;
 
     JPAExecutionResult <DBUser> ret;
-    ret = doSelect (new Callable <DBUser> ()
-    {
-      @Nonnull
-      @ReturnsMutableCopy
-      public DBUser call () throws Exception
-      {
-        return getEntityManager ().find (DBUser.class, sID);
-      }
-    });
+    ret = doSelect ( () -> getEntityManager ().find (DBUser.class, sID));
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
     return ret.get ();
@@ -189,27 +151,21 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   public DBUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
     JPAExecutionResult <DBUser> ret;
-    ret = doSelect (new IThrowingCallable <DBUser, SMPServerException> ()
-    {
-      @Nonnull
-      @ReturnsMutableCopy
-      public DBUser call () throws SMPServerException
-      {
-        final String sUserName = aCredentials.getUserName ();
-        final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUserName);
+    ret = doSelect ( () -> {
+      final String sUserName = aCredentials.getUserName ();
+      final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUserName);
 
-        // Check that the user exists
-        if (aDBUser == null)
-          throw new SMPUnknownUserException (sUserName);
+      // Check that the user exists
+      if (aDBUser == null)
+        throw new SMPUnknownUserException (sUserName);
 
-        // Check that the password is correct
-        if (!aDBUser.getPassword ().equals (aCredentials.getPassword ()))
-          throw new SMPUnauthorizedException ("Illegal password for user '" + sUserName + "'");
+      // Check that the password is correct
+      if (!aDBUser.getPassword ().equals (aCredentials.getPassword ()))
+        throw new SMPUnauthorizedException ("Illegal password for user '" + sUserName + "'");
 
-        if (s_aLogger.isDebugEnabled ())
-          s_aLogger.debug ("Verified credentials of user '" + sUserName + "' successfully");
-        return aDBUser;
-      }
+      if (s_aLogger.isDebugEnabled ())
+        s_aLogger.debug ("Verified credentials of user '" + sUserName + "' successfully");
+      return aDBUser;
     });
     return ret.getOrThrow ();
   }
@@ -220,10 +176,11 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   {
     // Resolve service group
     // to throw a 404 if a service group does not exist
-    final DBServiceGroup aServiceGroup = getEntityManager ().find (DBServiceGroup.class, new DBServiceGroupID (aServiceGroupID));
+    final DBServiceGroup aServiceGroup = getEntityManager ().find (DBServiceGroup.class,
+                                                                   new DBServiceGroupID (aServiceGroupID));
     if (aServiceGroup == null)
     {
-      throw new SMPNotFoundException ("Service group " + IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) + " does not exist");
+      throw new SMPNotFoundException ("Service group " + aServiceGroupID.getURIEncoded () + " does not exist");
     }
 
     final DBOwnershipID aOwnershipID = new DBOwnershipID (aCredentials.getID (), aServiceGroupID);
@@ -233,12 +190,12 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
       throw new SMPUnauthorizedException ("User '" +
                                           aCredentials.getUserName () +
                                           "' does not own " +
-                                          IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
+                                          aServiceGroupID.getURIEncoded ());
     }
 
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("Verified service group ID " +
-                       IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
+                       aServiceGroupID.getURIEncoded () +
                        " is owned by user '" +
                        aCredentials.getUserName () +
                        "'");

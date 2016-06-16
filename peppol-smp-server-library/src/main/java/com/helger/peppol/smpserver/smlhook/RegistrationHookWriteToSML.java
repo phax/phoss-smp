@@ -54,7 +54,6 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.ws.HostnameVerifierVerifyAll;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
@@ -133,7 +132,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
   public void createServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
-    final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+    final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     s_aLogger.info ("Trying to CREATE business " + sParticipantID + " for " + s_sSMPID + " in SML");
 
     try
@@ -157,7 +156,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
   public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
-    final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+    final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     s_aLogger.warn ("CREATE failed in SMP backend, so deleting again business " +
                     sParticipantID +
                     " for " +
@@ -180,7 +179,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
   public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
-    final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+    final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     s_aLogger.info ("Trying to DELETE business " + sParticipantID + " for " + s_sSMPID + " from SML");
 
     try
@@ -207,7 +206,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
   public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
-    final String sParticipantID = IdentifierHelper.getIdentifierURIEncoded (aBusinessIdentifier);
+    final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     s_aLogger.warn ("DELETE failed in SMP backend, so creating again business " +
                     sParticipantID +
                     " for " +

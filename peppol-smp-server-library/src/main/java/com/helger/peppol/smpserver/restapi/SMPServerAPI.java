@@ -532,7 +532,7 @@ public final class SMPServerAPI
         {
           s_aLogger.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +
-                          IdentifierHelper.getIdentifierURIEncoded (aServiceInformation.getParticipantIdentifier ()) +
+                          aServiceInformation.getParticipantIdentifier ().getURIEncoded () +
                           " param:" +
                           aServiceGroupID);
           return ESuccess.FAILURE;
@@ -543,7 +543,7 @@ public final class SMPServerAPI
         {
           s_aLogger.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +
-                          IdentifierHelper.getIdentifierURIEncoded (aServiceInformation.getDocumentIdentifier ()) +
+                          aServiceInformation.getDocumentIdentifier ().getURIEncoded () +
                           " param:" +
                           aDocTypeID);
           // Document type must equal path

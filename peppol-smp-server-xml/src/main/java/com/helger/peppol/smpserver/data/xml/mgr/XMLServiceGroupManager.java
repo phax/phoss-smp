@@ -34,7 +34,6 @@ import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
@@ -62,7 +61,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   private static final String ELEMENT_ROOT = "servicegroups";
   private static final String ELEMENT_ITEM = "servicegroup";
 
-  private final ICommonsMap <String, SMPServiceGroup> m_aMap = new CommonsHashMap<> ();
+  private final ICommonsMap <String, SMPServiceGroup> m_aMap = new CommonsHashMap <> ();
   private final IRegistrationHook m_aHook;
 
   public XMLServiceGroupManager (@Nonnull @Nonempty final String sFilename) throws DAOException
@@ -128,7 +127,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     s_aLogger.info ("createSMPServiceGroup (" +
                     sOwnerID +
                     ", " +
-                    IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier) +
+                    aParticipantIdentifier.getURIEncoded () +
                     ", " +
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
@@ -158,7 +157,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
                                       aSMPServiceGroup.getID (),
                                       sOwnerID,
-                                      IdentifierHelper.getIdentifierURIEncoded (aParticipantIdentifier),
+                                      aParticipantIdentifier.getURIEncoded (),
                                       sExtension);
     s_aLogger.info ("createSMPServiceGroup succeeded");
     return aSMPServiceGroup;
@@ -207,7 +206,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   @Nonnull
   public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    s_aLogger.info ("deleteSMPServiceGroup (" + IdentifierHelper.getIdentifierURIEncoded (aParticipantID) + ")");
+    s_aLogger.info ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
     final SMPServiceGroup aSMPServiceGroup = getSMPServiceGroupOfID (aParticipantID);
     if (aSMPServiceGroup == null)
@@ -290,7 +289,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   @ReturnsMutableCopy
   public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
-    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList<> ();
+    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     m_aRWLock.readLocked ( () -> CollectionHelper.findAll (m_aMap.values (),
                                                            aSG -> aSG.getOwnerID ().equals (sOwnerID),
                                                            ret::add));

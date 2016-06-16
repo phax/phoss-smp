@@ -55,7 +55,6 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.bdxr.participant.BDXRParticipantIdentifier;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -229,6 +228,6 @@ public class SMPServiceGroup implements ISMPServiceGroup
   @Nonempty
   public static String createSMPServiceGroupID (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
   {
-    return IdentifierHelper.getIdentifierURIEncoded (createUnifiedParticipantIdentifier (aParticipantIdentifier));
+    return createUnifiedParticipantIdentifier (aParticipantIdentifier).getURIEncoded ();
   }
 }

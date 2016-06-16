@@ -24,7 +24,6 @@ import javax.ws.rs.core.UriInfo;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.url.URLHelper;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
@@ -109,7 +108,7 @@ public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
       aBuilder = aBuilder.replacePath ("");
     }
     return aBuilder.path (ServiceGroupInterface.class)
-                   .buildFromEncoded (IdentifierHelper.getIdentifierURIPercentEncoded (aServiceGroupID))
+                   .buildFromEncoded (aServiceGroupID.getURIPercentEncoded ())
                    .toString ();
   }
 
@@ -124,8 +123,7 @@ public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
       aBuilder = aBuilder.replacePath ("");
     }
     return aBuilder.path (ServiceMetadataInterface.class)
-                   .buildFromEncoded (IdentifierHelper.getIdentifierURIPercentEncoded (aServiceGroupID),
-                                      IdentifierHelper.getIdentifierURIPercentEncoded (aDocTypeID))
+                   .buildFromEncoded (aServiceGroupID.getURIPercentEncoded (), aDocTypeID.getURIPercentEncoded ())
                    .toString ();
   }
 }

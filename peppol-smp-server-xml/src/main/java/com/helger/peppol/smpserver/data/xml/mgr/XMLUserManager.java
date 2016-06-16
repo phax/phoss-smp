@@ -28,7 +28,6 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.data.xml.domain.XMLDataUser;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -85,7 +84,7 @@ public final class XMLUserManager implements ISMPUserManager
   @ReturnsMutableCopy
   public ICommonsCollection <XMLDataUser> getAllUsers ()
   {
-    final ICommonsList <XMLDataUser> ret = new CommonsArrayList<> ();
+    final ICommonsList <XMLDataUser> ret = new CommonsArrayList <> ();
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ().getAllActiveUsers ())
       ret.add (new XMLDataUser (aUser));
     return ret;
@@ -134,9 +133,7 @@ public final class XMLUserManager implements ISMPUserManager
                                                          .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
-      throw new SMPNotFoundException ("Service group " +
-                                      IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID) +
-                                      " does not exist");
+      throw new SMPNotFoundException ("Service group " + aServiceGroupID.getURIEncoded () + " does not exist");
     }
 
     // Resolve user
@@ -146,7 +143,7 @@ public final class XMLUserManager implements ISMPUserManager
       throw new SMPUnauthorizedException ("User '" +
                                           aCurrentUser.getUserName () +
                                           "' does not own " +
-                                          IdentifierHelper.getIdentifierURIEncoded (aServiceGroupID));
+                                          aServiceGroupID.getURIEncoded ());
     }
 
     if (s_aLogger.isDebugEnabled ())

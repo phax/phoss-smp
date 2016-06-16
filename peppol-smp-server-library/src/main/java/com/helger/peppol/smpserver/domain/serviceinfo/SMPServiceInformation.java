@@ -59,7 +59,6 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.bdxr.doctype.BDXRDocumentTypeIdentifier;
 import com.helger.peppol.identifier.bdxr.participant.BDXRParticipantIdentifier;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
@@ -110,7 +109,7 @@ public class SMPServiceInformation implements ISMPServiceInformation
       for (final SMPProcess aProcess : aProcesses)
         addProcess (aProcess);
     setExtension (sExtension);
-    m_sID = aServiceGroup.getID () + "-" + IdentifierHelper.getIdentifierURIEncoded (aDocumentTypeIdentifier);
+    m_sID = aServiceGroup.getID () + "-" + aDocumentTypeIdentifier.getURIEncoded ();
   }
 
   @Nonnull

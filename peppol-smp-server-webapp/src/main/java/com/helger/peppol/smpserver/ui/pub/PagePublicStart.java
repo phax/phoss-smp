@@ -25,7 +25,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
@@ -60,7 +59,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
     for (final ISMPServiceGroup aServiceGroup : SMPMetaManager.getServiceGroupMgr ().getAllSMPServiceGroups ())
     {
       aTable.addBodyRow ()
-            .addCell (IdentifierHelper.getIdentifierURIEncoded (aServiceGroup.getParticpantIdentifier ()))
+            .addCell (aServiceGroup.getParticpantIdentifier ().getURIEncoded ())
             .addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
     }
 
