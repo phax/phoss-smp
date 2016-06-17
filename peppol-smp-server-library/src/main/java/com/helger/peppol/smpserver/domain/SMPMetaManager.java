@@ -65,8 +65,8 @@ import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileM
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
-import com.helger.peppol.url.PeppolURLProvider;
 import com.helger.peppol.url.IPeppolURLProvider;
+import com.helger.peppol.url.PeppolURLProvider;
 
 /**
  * The central SMP meta manager containing all the singleton manager instances.
@@ -169,7 +169,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       }
 
       // TODO make customizable
-      m_aPeppolURLProvider = new PeppolURLProvider ();
+      m_aPeppolURLProvider = PeppolURLProvider.INSTANCE;
 
       m_aTransportProfileManager = s_aManagerProvider.createTransportProfileMgr ();
       if (m_aTransportProfileManager == null)

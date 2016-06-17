@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.compare.ESortOrder;
+import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -58,9 +59,9 @@ public final class PagePublicStart extends AbstractSMPWebPage
                                         new DTCol ("Extension?").setDataSort (1, 0)).setID (getID ());
     for (final ISMPServiceGroup aServiceGroup : SMPMetaManager.getServiceGroupMgr ().getAllSMPServiceGroups ())
     {
-      aTable.addBodyRow ()
-            .addCell (aServiceGroup.getParticpantIdentifier ().getURIEncoded ())
-            .addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
+      final HCRow aRow = aTable.addBodyRow ();
+      aRow.addCell (aServiceGroup.getParticpantIdentifier ().getURIEncoded ());
+      aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
