@@ -71,6 +71,7 @@ public final class MenuSecure
     aMenuTree.createRootItem (new PageSecureTransportProfile (CMenuSecure.MENU_TRANSPORT_PROFILES));
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
     aMenuTree.createRootItem (new PageSecureTasks (CMenuSecure.MENU_TASKS));
+    aMenuTree.createRootItem (new PageSecureSMLInfo (CMenuSecure.MENU_SML_INFO));
     aMenuTree.createRootItem (new PageSecureSMLSetup (CMenuSecure.MENU_SML_SETUP))
              .setDisplayFilter (aFilterSMLConnectionActive);
     aMenuTree.createRootSeparator ();

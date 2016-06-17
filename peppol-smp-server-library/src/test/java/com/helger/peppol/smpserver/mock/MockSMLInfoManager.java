@@ -1,7 +1,6 @@
 package com.helger.peppol.smpserver.mock;
 
-import java.util.Collection;
-
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
@@ -32,7 +31,7 @@ final class MockSMLInfoManager implements ISMLInfoManager
     return null;
   }
 
-  public Collection <? extends ISMLInfo> getAllSMLInfos ()
+  public ICommonsList <? extends ISMLInfo> getAllSMLInfos ()
   {
     throw new UnsupportedOperationException ();
   }

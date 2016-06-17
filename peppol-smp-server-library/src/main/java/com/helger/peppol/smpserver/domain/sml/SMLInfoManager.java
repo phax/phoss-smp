@@ -69,7 +69,7 @@ public final class SMLInfoManager extends AbstractMapBasedWALDAO <ISMLInfo, SMLI
   {
     // Add the default transport profiles
     for (final ESML e : ESML.values ())
-      internalCreateItem (new SMLInfo (e));
+      internalCreateItem (SMLInfo.create (e));
     return EChange.CHANGED;
   }
 
