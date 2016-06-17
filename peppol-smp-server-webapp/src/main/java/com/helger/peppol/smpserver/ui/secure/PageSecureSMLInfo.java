@@ -92,6 +92,7 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
   protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                      @Nonnull final ISMLInfo aSelectedObject)
   {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
     aNodeList.addChild (createActionHeader ("Show details of SML information '" +
@@ -100,6 +101,20 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aSelectedObject.getDisplayName ()));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("DNS Zone").setCtrl (aSelectedObject.getDNSZone ()));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Publisher DNS Zone")
+                                                 .setCtrl (aSelectedObject.getPublisherDNSZone ()));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Management Service URL")
+                                                 .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getManagementServiceURL ())));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Manage Service Metadata Endpoint")
+                                                 .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getManageServiceMetaDataEndpointAddress ()
+                                                                                                   .toExternalForm ())));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Manage Participant Identifier Endpoint")
+                                                 .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getManageParticipantIdentifierEndpointAddress ()
+                                                                                                   .toExternalForm ())));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Client certificate required?")
+                                                 .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedObject.isClientCertificateRequired (),
+                                                                                       aDisplayLocale)));
 
     aNodeList.addChild (aForm);
   }
@@ -188,11 +203,14 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
 
     if (aFormErrors.isEmpty ())
     {
+      // Lowercase with the US locale - not display locale specific
+      final String sDNSZoneLC = sDNSZone.toLowerCase (Locale.US);
+
       if (bEdit)
       {
         aSMLInfoMgr.updateSMLInfo (aSelectedObject.getID (),
                                    sDisplayName,
-                                   sDNSZone,
+                                   sDNSZoneLC,
                                    sManagementAddressURL,
                                    bClientCertificateRequired);
         aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SML information '" +
@@ -201,7 +219,7 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
       }
       else
       {
-        aSMLInfoMgr.createSMLInfo (sDisplayName, sDNSZone, sManagementAddressURL, bClientCertificateRequired);
+        aSMLInfoMgr.createSMLInfo (sDisplayName, sDNSZoneLC, sManagementAddressURL, bClientCertificateRequired);
         aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The new SML information '" +
                                                                     sDisplayName +
                                                                     "' was successfully created."));
