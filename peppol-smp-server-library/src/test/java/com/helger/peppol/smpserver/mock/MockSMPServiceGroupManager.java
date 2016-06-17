@@ -40,7 +40,7 @@
  */
 package com.helger.peppol.smpserver.mock;
 
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -48,7 +48,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 
 /**
  * Mock implementation of {@link ISMPServiceGroupManager}.
- * 
+ *
  * @author Philip Helger
  */
 final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
@@ -73,12 +73,12 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
     return 0;
   }
 
-  public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (final String sOwnerID)
+  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (final String sOwnerID)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
+  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     throw new UnsupportedOperationException ();
   }

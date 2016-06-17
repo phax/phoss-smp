@@ -16,10 +16,7 @@
  */
 package com.helger.peppol.smpserver.data.xml.mgr;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -28,100 +25,30 @@ import javax.annotation.Nullable;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ELockType;
 import com.helger.commons.annotation.IsLocked;
-import com.helger.commons.annotation.MustBeLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.commons.string.StringHelper;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
+import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
-import com.helger.photon.basic.app.dao.impl.EDAOActionType;
 import com.helger.photon.basic.audit.AuditHelper;
-import com.helger.xml.microdom.IMicroDocument;
-import com.helger.xml.microdom.IMicroElement;
-import com.helger.xml.microdom.MicroDocument;
-import com.helger.xml.microdom.convert.MicroTypeConverter;
 
 /**
  * Manager for all {@link SMPBusinessCard} objects.
  *
  * @author Philip Helger
  */
-public final class XMLBusinessCardManager extends AbstractWALDAO <SMPBusinessCard> implements ISMPBusinessCardManager
+public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard>
+                                          implements ISMPBusinessCardManager
 {
-  private static final String ELEMENT_ROOT = "root";
-  private static final String ELEMENT_ITEM = "businesscard";
-
-  private final Map <String, SMPBusinessCard> m_aMap = new HashMap <> ();
-
   public XMLBusinessCardManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPBusinessCard.class, sFilename);
-    initialRead ();
-  }
-
-  @Override
-  protected void onRecoveryCreate (@Nonnull final SMPBusinessCard aElement)
-  {
-    _addSMPBusinessCard (aElement, EDAOActionType.CREATE);
-  }
-
-  @Override
-  protected void onRecoveryUpdate (@Nonnull final SMPBusinessCard aElement)
-  {
-    _addSMPBusinessCard (aElement, EDAOActionType.UPDATE);
-  }
-
-  @Override
-  protected void onRecoveryDelete (@Nonnull final SMPBusinessCard aElement)
-  {
-    m_aMap.remove (aElement.getID ());
-  }
-
-  @Override
-  @Nonnull
-  protected EChange onRead (@Nonnull final IMicroDocument aDoc)
-  {
-    for (final IMicroElement eSMPBusinessCard : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
-      _addSMPBusinessCard (MicroTypeConverter.convertToNative (eSMPBusinessCard, SMPBusinessCard.class),
-                           EDAOActionType.CREATE);
-    return EChange.UNCHANGED;
-  }
-
-  @Override
-  @Nonnull
-  protected IMicroDocument createWriteData ()
-  {
-    final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.appendElement (ELEMENT_ROOT);
-    for (final ISMPBusinessCard aSMPBusinessCard : CollectionHelper.getSortedByKey (m_aMap).values ())
-      eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aSMPBusinessCard, ELEMENT_ITEM));
-    return aDoc;
-  }
-
-  @MustBeLocked (ELockType.WRITE)
-  private void _addSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard, final EDAOActionType eActionType)
-  {
-    ValueEnforcer.notNull (aSMPBusinessCard, "SMPBusinessCard");
-
-    final String sSMPBusinessCardID = aSMPBusinessCard.getID ();
-    if (eActionType == EDAOActionType.CREATE)
-    {
-      if (m_aMap.containsKey (sSMPBusinessCardID))
-        throw new IllegalArgumentException ("SMPBusinessCard ID '" + sSMPBusinessCardID + "' is already in use!");
-    }
-    else
-    {
-      if (!m_aMap.containsKey (sSMPBusinessCardID))
-        throw new IllegalArgumentException ("SMPBusinessCard ID '" + sSMPBusinessCardID + "' cannot be updated!");
-    }
-    m_aMap.put (aSMPBusinessCard.getID (), aSMPBusinessCard);
   }
 
   @Nonnull
@@ -131,8 +58,7 @@ public final class XMLBusinessCardManager extends AbstractWALDAO <SMPBusinessCar
     m_aRWLock.writeLock ().lock ();
     try
     {
-      _addSMPBusinessCard (aSMPBusinessCard, EDAOActionType.CREATE);
-      markAsChanged (aSMPBusinessCard, EDAOActionType.CREATE);
+      internalCreateItem (aSMPBusinessCard);
     }
     finally
     {
@@ -152,8 +78,7 @@ public final class XMLBusinessCardManager extends AbstractWALDAO <SMPBusinessCar
     m_aRWLock.writeLock ().lock ();
     try
     {
-      m_aMap.put (aSMPBusinessCard.getID (), aSMPBusinessCard);
-      markAsChanged (aSMPBusinessCard, EDAOActionType.UPDATE);
+      internalUpdateItem (aSMPBusinessCard);
     }
     finally
     {
@@ -207,14 +132,12 @@ public final class XMLBusinessCardManager extends AbstractWALDAO <SMPBusinessCar
     m_aRWLock.writeLock ().lock ();
     try
     {
-      final SMPBusinessCard aRealServiceMetadata = m_aMap.remove (aSMPBusinessCard.getID ());
-      if (aRealServiceMetadata == null)
+      final SMPBusinessCard aRealBusinessCard = internalDeleteItem (aSMPBusinessCard.getID ());
+      if (aRealBusinessCard == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, "no-such-id", aSMPBusinessCard.getID ());
         return EChange.UNCHANGED;
       }
-
-      markAsChanged (aRealServiceMetadata, EDAOActionType.DELETE);
     }
     finally
     {
@@ -229,56 +152,30 @@ public final class XMLBusinessCardManager extends AbstractWALDAO <SMPBusinessCar
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <? extends ISMPBusinessCard> getAllSMPBusinessCards ()
+  public ICommonsList <? extends ISMPBusinessCard> getAllSMPBusinessCards ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return CollectionHelper.newList (m_aMap.values ());
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return getAll ();
   }
 
   @Nullable
   public ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
+
     if (aServiceGroup == null)
       return null;
 
-    return getSMPBusinessCardOfID (aServiceGroup.getID ());
+    return getOfID (aServiceGroup.getID ());
   }
 
   @Nullable
   public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final String sID)
   {
-    if (StringHelper.hasNoText (sID))
-      return null;
-
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.get (sID);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return getOfID (sID);
   }
 
   @Nonnegative
   public int getSMPBusinessCardCount ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.size ();
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return getCount ();
   }
 }

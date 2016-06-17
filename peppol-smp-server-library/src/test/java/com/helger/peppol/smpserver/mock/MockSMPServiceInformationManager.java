@@ -40,7 +40,7 @@
  */
 package com.helger.peppol.smpserver.mock;
 
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
@@ -51,7 +51,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 
 /**
  * Mock implementation of {@link ISMPServiceInformationManager}.
- * 
+ *
  * @author Philip Helger
  */
 final class MockSMPServiceInformationManager implements ISMPServiceInformationManager
@@ -70,17 +70,17 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     return 0;
   }
 
-  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
+  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ICommonsCollection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (final ISMPServiceGroup aServiceGroup)
   {
     throw new UnsupportedOperationException ();
   }

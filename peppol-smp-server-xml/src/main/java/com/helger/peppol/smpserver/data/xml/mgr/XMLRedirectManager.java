@@ -23,15 +23,10 @@ import javax.annotation.Nullable;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ELockType;
 import com.helger.commons.annotation.IsLocked;
-import com.helger.commons.annotation.MustBeLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.CommonsHashMap;
-import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
-import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IdentifierHelper;
@@ -40,80 +35,21 @@ import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
+import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
-import com.helger.photon.basic.app.dao.impl.EDAOActionType;
 import com.helger.photon.basic.audit.AuditHelper;
-import com.helger.xml.microdom.IMicroDocument;
-import com.helger.xml.microdom.IMicroElement;
-import com.helger.xml.microdom.MicroDocument;
-import com.helger.xml.microdom.convert.MicroTypeConverter;
 
 /**
  * Manager for all {@link SMPRedirect} objects.
  *
  * @author Philip Helger
  */
-public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> implements ISMPRedirectManager
+public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedirect, SMPRedirect>
+                                      implements ISMPRedirectManager
 {
-  private static final String ELEMENT_ROOT = "redirects";
-  private static final String ELEMENT_ITEM = "redirect";
-
-  private final ICommonsMap <String, SMPRedirect> m_aMap = new CommonsHashMap<> ();
-
   public XMLRedirectManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPRedirect.class, sFilename);
-    initialRead ();
-  }
-
-  @Override
-  protected void onRecoveryCreate (@Nonnull final SMPRedirect aElement)
-  {
-    _addSMPRedirect (aElement, false);
-  }
-
-  @Override
-  protected void onRecoveryUpdate (@Nonnull final SMPRedirect aElement)
-  {
-    _addSMPRedirect (aElement, true);
-  }
-
-  @Override
-  protected void onRecoveryDelete (@Nonnull final SMPRedirect aElement)
-  {
-    m_aMap.remove (aElement.getID ());
-  }
-
-  @Override
-  @Nonnull
-  protected EChange onRead (@Nonnull final IMicroDocument aDoc)
-  {
-    for (final IMicroElement eSMPRedirect : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
-      _addSMPRedirect (MicroTypeConverter.convertToNative (eSMPRedirect, SMPRedirect.class), false);
-    return EChange.UNCHANGED;
-  }
-
-  @Override
-  @Nonnull
-  protected IMicroDocument createWriteData ()
-  {
-    final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.appendElement (ELEMENT_ROOT);
-    for (final ISMPRedirect aSMPRedirect : CollectionHelper.getSortedByKey (m_aMap).values ())
-      eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aSMPRedirect, ELEMENT_ITEM));
-    return aDoc;
-  }
-
-  @MustBeLocked (ELockType.WRITE)
-  private void _addSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect, final boolean bUpdate)
-  {
-    ValueEnforcer.notNull (aSMPRedirect, "SMPRedirect");
-
-    final String sSMPRedirectID = aSMPRedirect.getID ();
-    if (!bUpdate && m_aMap.containsKey (sSMPRedirectID))
-      throw new IllegalArgumentException ("SMPRedirect ID '" + sSMPRedirectID + "' is already in use!");
-    m_aMap.put (aSMPRedirect.getID (), aSMPRedirect);
   }
 
   @Nonnull
@@ -123,8 +59,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
     m_aRWLock.writeLock ().lock ();
     try
     {
-      _addSMPRedirect (aSMPRedirect, false);
-      markAsChanged (aSMPRedirect, EDAOActionType.CREATE);
+      internalCreateItem (aSMPRedirect);
     }
     finally
     {
@@ -147,8 +82,7 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
     m_aRWLock.writeLock ().lock ();
     try
     {
-      m_aMap.put (aSMPRedirect.getID (), aSMPRedirect);
-      markAsChanged (aSMPRedirect, EDAOActionType.UPDATE);
+      internalUpdateItem (aSMPRedirect);
     }
     finally
     {
@@ -224,14 +158,12 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
     m_aRWLock.writeLock ().lock ();
     try
     {
-      final SMPRedirect aRealServiceMetadata = m_aMap.remove (aSMPRedirect.getID ());
-      if (aRealServiceMetadata == null)
+      final SMPRedirect aRealRedirect = internalDeleteItem (aSMPRedirect.getID ());
+      if (aRealRedirect == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
         return EChange.UNCHANGED;
       }
-
-      markAsChanged (aRealServiceMetadata, EDAOActionType.DELETE);
     }
     finally
     {
@@ -258,62 +190,35 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirects ()
+  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirects ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return CollectionHelper.newList (m_aMap.values ());
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return getAll ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
     return getAllSMPRedirectsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
+  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {
-    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList<> ();
+    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (StringHelper.hasText (sServiceGroupID))
-    {
-      m_aRWLock.readLock ().lock ();
-      try
-      {
-        for (final ISMPRedirect aRedirect : m_aMap.values ())
-          if (aRedirect.getServiceGroupID ().equals (sServiceGroupID))
-            ret.add (aRedirect);
-      }
-      finally
-      {
-        m_aRWLock.readLock ().unlock ();
-      }
-    }
+      findAll (x -> x.getServiceGroupID ().equals (sServiceGroupID), ret::add);
     return ret;
   }
 
   @Nonnegative
   public int getSMPRedirectCount ()
   {
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      return m_aMap.size ();
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    return getCount ();
   }
 
+  @Nullable
   public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
@@ -322,18 +227,8 @@ public final class XMLRedirectManager extends AbstractWALDAO <SMPRedirect> imple
     if (aDocTypeID == null)
       return null;
 
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      for (final ISMPRedirect aRedirect : m_aMap.values ())
-        if (aRedirect.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
-            IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID, aRedirect.getDocumentTypeIdentifier ()))
-          return aRedirect;
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
-    return null;
+    return findFirst (x -> x.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
+                           IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID,
+                                                                             x.getDocumentTypeIdentifier ()));
   }
 }

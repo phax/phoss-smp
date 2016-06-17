@@ -43,7 +43,6 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -56,7 +55,6 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
@@ -144,22 +142,17 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       return EChange.UNCHANGED;
 
     JPAExecutionResult <EChange> ret;
-    ret = doInTransaction (new Callable <EChange> ()
-    {
-      @Nonnull
-      public EChange call ()
-      {
-        final EntityManager aEM = getEntityManager ();
-        final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aSMPRedirect.getServiceGroup ()
-                                                                                                             .getParticpantIdentifier (),
-                                                                                                 aSMPRedirect.getDocumentTypeIdentifier ());
-        final DBServiceMetadataRedirection aDBRedirect = aEM.find (DBServiceMetadataRedirection.class, aDBRedirectID);
-        if (aDBRedirect == null)
-          return EChange.UNCHANGED;
+    ret = doInTransaction ( () -> {
+      final EntityManager aEM = getEntityManager ();
+      final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aSMPRedirect.getServiceGroup ()
+                                                                                                           .getParticpantIdentifier (),
+                                                                                               aSMPRedirect.getDocumentTypeIdentifier ());
+      final DBServiceMetadataRedirection aDBRedirect = aEM.find (DBServiceMetadataRedirection.class, aDBRedirectID);
+      if (aDBRedirect == null)
+        return EChange.UNCHANGED;
 
-        aEM.remove (aDBRedirect);
-        return EChange.CHANGED;
-      }
+      aEM.remove (aDBRedirect);
+      return EChange.CHANGED;
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
@@ -173,20 +166,14 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       return EChange.UNCHANGED;
 
     JPAExecutionResult <EChange> ret;
-    ret = doInTransaction (new Callable <EChange> ()
-    {
-      @Nonnull
-      public EChange call ()
-      {
-        final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
-                                                          DBServiceMetadataRedirection.class)
-                                            .setParameter ("scheme",
-                                                           aServiceGroup.getParticpantIdentifier ().getScheme ())
-                                            .setParameter ("value",
-                                                           aServiceGroup.getParticpantIdentifier ().getValue ())
-                                            .executeUpdate ();
-        return EChange.valueOf (nCnt > 0);
-      }
+    ret = doInTransaction ( () -> {
+      final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+                                                        DBServiceMetadataRedirection.class)
+                                          .setParameter ("scheme",
+                                                         aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                          .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
+                                          .executeUpdate ();
+      return EChange.valueOf (nCnt > 0);
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
@@ -206,23 +193,16 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirects ()
+  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirects ()
   {
     JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
-    ret = doInTransaction (new Callable <List <DBServiceMetadataRedirection>> ()
-    {
-      @Nonnull
-      public List <DBServiceMetadataRedirection> call ()
-      {
-        return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p",
-                                                DBServiceMetadataRedirection.class)
-                                  .getResultList ();
-      }
-    });
+    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p",
+                                                                   DBServiceMetadataRedirection.class)
+                                                     .getResultList ());
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList<> ();
+    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList <> ();
     for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
       aRedirects.add (_convert (aDBRedirect));
     return aRedirects;
@@ -230,9 +210,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList<> ();
+    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
       JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
@@ -258,15 +238,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
   public int getSMPRedirectCount ()
   {
     JPAExecutionResult <Long> ret;
-    ret = doSelect (new Callable <Long> ()
-    {
-      @Nonnull
-      @ReturnsMutableCopy
-      public Long call () throws Exception
-      {
-        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadataRedirection p"));
-        return Long.valueOf (nCount);
-      }
+    ret = doSelect ( () -> {
+      final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadataRedirection p"));
+      return Long.valueOf (nCount);
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
@@ -283,18 +257,13 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       return null;
 
     JPAExecutionResult <DBServiceMetadataRedirection> ret;
-    ret = doInTransaction (new Callable <DBServiceMetadataRedirection> ()
-    {
-      @Nonnull
-      public DBServiceMetadataRedirection call ()
-      {
-        // Disable caching here
-        final Map <String, Object> aProps = new HashMap<> ();
-        aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
-        final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
-                                                                                                 aDocTypeID);
-        return getEntityManager ().find (DBServiceMetadataRedirection.class, aDBRedirectID, aProps);
-      }
+    ret = doInTransaction ( () -> {
+      // Disable caching here
+      final Map <String, Object> aProps = new HashMap <> ();
+      aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
+      final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
+                                                                                               aDocTypeID);
+      return getEntityManager ().find (DBServiceMetadataRedirection.class, aDBRedirectID, aProps);
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());

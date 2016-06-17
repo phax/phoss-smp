@@ -40,7 +40,7 @@
  */
 package com.helger.peppol.smpserver.mock;
 
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
@@ -49,7 +49,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
  * Mock implementation of {@link ISMPRedirectManager}.
- * 
+ *
  * @author Philip Helger
  */
 final class MockSMPRedirectManager implements ISMPRedirectManager
@@ -65,12 +65,12 @@ final class MockSMPRedirectManager implements ISMPRedirectManager
     return 0;
   }
 
-  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirects ()
+  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirects ()
   {
     throw new UnsupportedOperationException ();
   }

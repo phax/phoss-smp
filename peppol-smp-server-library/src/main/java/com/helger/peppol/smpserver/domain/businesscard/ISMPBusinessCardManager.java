@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.domain.businesscard;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnegative;
@@ -48,6 +47,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
@@ -89,7 +89,7 @@ public interface ISMPBusinessCardManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends ISMPBusinessCard> getAllSMPBusinessCards ();
+  ICommonsList <? extends ISMPBusinessCard> getAllSMPBusinessCards ();
 
   /**
    * Get the business card of the passed service group.

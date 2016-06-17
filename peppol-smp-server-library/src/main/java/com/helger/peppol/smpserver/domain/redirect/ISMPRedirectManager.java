@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -110,7 +110,7 @@ public interface ISMPRedirectManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirects ();
+  ICommonsList <? extends ISMPRedirect> getAllSMPRedirects ();
 
   /**
    * Get all redirects of the passed service group.
@@ -122,7 +122,7 @@ public interface ISMPRedirectManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsCollection <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   /**
    * @return The count of all contained redirects. Always &ge; 0.

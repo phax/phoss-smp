@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -119,7 +119,7 @@ public interface ISMPServiceGroupManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroups ();
+  ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroups ();
 
   /**
    * Get all service groups that belong to the passed owner ID.
@@ -131,7 +131,7 @@ public interface ISMPServiceGroupManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull String sOwnerID);
+  ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull String sOwnerID);
 
   /**
    * Get the number of service groups owned by the passed owner.

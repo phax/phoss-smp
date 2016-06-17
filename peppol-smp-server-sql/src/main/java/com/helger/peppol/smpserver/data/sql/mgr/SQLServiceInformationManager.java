@@ -43,7 +43,6 @@ package com.helger.peppol.smpserver.data.sql.mgr;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -56,7 +55,6 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
@@ -237,37 +235,32 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
 
     JPAExecutionResult <DBServiceMetadata> ret;
-    ret = doInTransaction (new Callable <DBServiceMetadata> ()
-    {
-      @Nonnull
-      public DBServiceMetadata call ()
+    ret = doInTransaction ( () -> {
+      final EntityManager aEM = getEntityManager ();
+      final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceInformation.getServiceGroup ()
+                                                                                            .getParticpantIdentifier (),
+                                                                         aServiceInformation.getDocumentTypeIdentifier ());
+      DBServiceMetadata aDBMetadata = aEM.find (DBServiceMetadata.class, aDBMetadataID);
+      if (aDBMetadata != null)
       {
-        final EntityManager aEM = getEntityManager ();
-        final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceInformation.getServiceGroup ()
-                                                                                              .getParticpantIdentifier (),
-                                                                           aServiceInformation.getDocumentTypeIdentifier ());
-        DBServiceMetadata aDBMetadata = aEM.find (DBServiceMetadata.class, aDBMetadataID);
-        if (aDBMetadata != null)
-        {
-          // Edit an existing one
-          _update (aEM, aDBMetadata, aServiceInformation);
-          aEM.merge (aDBMetadata);
-        }
-        else
-        {
-          // Create a new one
-          final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aServiceInformation.getServiceGroup ()
-                                                                                              .getParticpantIdentifier ());
-          final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
-          if (aDBServiceGroup == null)
-            throw new IllegalStateException ("Failed to resolve service group for " + aServiceInformation);
-
-          aDBMetadata = new DBServiceMetadata (aDBMetadataID, aDBServiceGroup, aServiceInformation.getExtension ());
-          _update (aEM, aDBMetadata, aServiceInformation);
-          aEM.persist (aDBMetadata);
-        }
-        return aDBMetadata;
+        // Edit an existing one
+        _update (aEM, aDBMetadata, aServiceInformation);
+        aEM.merge (aDBMetadata);
       }
+      else
+      {
+        // Create a new one
+        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aServiceInformation.getServiceGroup ()
+                                                                                            .getParticpantIdentifier ());
+        final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
+        if (aDBServiceGroup == null)
+          throw new IllegalStateException ("Failed to resolve service group for " + aServiceInformation);
+
+        aDBMetadata = new DBServiceMetadata (aDBMetadataID, aDBServiceGroup, aServiceInformation.getExtension ());
+        _update (aEM, aDBMetadata, aServiceInformation);
+        aEM.persist (aDBMetadata);
+      }
+      return aDBMetadata;
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
@@ -301,22 +294,17 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return EChange.UNCHANGED;
 
     JPAExecutionResult <EChange> ret;
-    ret = doInTransaction (new Callable <EChange> ()
-    {
-      @Nonnull
-      public EChange call ()
-      {
-        final EntityManager aEM = getEntityManager ();
-        final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aSMPServiceInformation.getServiceGroup ()
-                                                                                                 .getParticpantIdentifier (),
-                                                                           aSMPServiceInformation.getDocumentTypeIdentifier ());
-        final DBServiceMetadata aDBMetadata = aEM.find (DBServiceMetadata.class, aDBMetadataID);
-        if (aDBMetadata == null)
-          return EChange.UNCHANGED;
+    ret = doInTransaction ( () -> {
+      final EntityManager aEM = getEntityManager ();
+      final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aSMPServiceInformation.getServiceGroup ()
+                                                                                               .getParticpantIdentifier (),
+                                                                         aSMPServiceInformation.getDocumentTypeIdentifier ());
+      final DBServiceMetadata aDBMetadata = aEM.find (DBServiceMetadata.class, aDBMetadataID);
+      if (aDBMetadata == null)
+        return EChange.UNCHANGED;
 
-        aEM.remove (aDBMetadata);
-        return EChange.CHANGED;
-      }
+      aEM.remove (aDBMetadata);
+      return EChange.CHANGED;
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
@@ -330,20 +318,14 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return EChange.UNCHANGED;
 
     JPAExecutionResult <EChange> ret;
-    ret = doInTransaction (new Callable <EChange> ()
-    {
-      @Nonnull
-      public EChange call ()
-      {
-        final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadata p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
-                                                          DBServiceMetadataRedirection.class)
-                                            .setParameter ("scheme",
-                                                           aServiceGroup.getParticpantIdentifier ().getScheme ())
-                                            .setParameter ("value",
-                                                           aServiceGroup.getParticpantIdentifier ().getValue ())
-                                            .executeUpdate ();
-        return EChange.valueOf (nCnt > 0);
-      }
+    ret = doInTransaction ( () -> {
+      final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadata p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+                                                        DBServiceMetadataRedirection.class)
+                                          .setParameter ("scheme",
+                                                         aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                          .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
+                                          .executeUpdate ();
+      return EChange.valueOf (nCnt > 0);
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
@@ -354,10 +336,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   private static SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
   {
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
     {
-      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
+      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
       for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
       {
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBEndpoint.getId ().getTransportProfile (),
@@ -387,22 +369,16 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
+  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     JPAExecutionResult <List <DBServiceMetadata>> ret;
-    ret = doInTransaction (new Callable <List <DBServiceMetadata>> ()
-    {
-      @Nonnull
-      public List <DBServiceMetadata> call ()
-      {
-        return getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p", DBServiceMetadata.class)
-                                  .getResultList ();
-      }
-    });
+    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p",
+                                                                   DBServiceMetadata.class)
+                                                     .getResultList ());
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
+    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
     for (final DBServiceMetadata aDBMetadata : ret.get ())
       aServiceInformations.add (_convert (aDBMetadata));
     return aServiceInformations;
@@ -412,15 +388,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   public int getSMPServiceInformationCount ()
   {
     JPAExecutionResult <Long> ret;
-    ret = doSelect (new Callable <Long> ()
-    {
-      @Nonnull
-      @ReturnsMutableCopy
-      public Long call () throws Exception
-      {
-        final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadata p"));
-        return Long.valueOf (nCount);
-      }
+    ret = doSelect ( () -> {
+      final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadata p"));
+      return Long.valueOf (nCount);
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
@@ -429,9 +399,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
+    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
       JPAExecutionResult <List <DBServiceMetadata>> ret;
@@ -455,9 +425,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
+    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
       for (final ISMPServiceInformation aServiceInformation : getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
@@ -474,18 +444,13 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return null;
 
     JPAExecutionResult <DBServiceMetadata> ret;
-    ret = doInTransaction (new Callable <DBServiceMetadata> ()
-    {
-      @Nonnull
-      public DBServiceMetadata call ()
-      {
-        // Disable caching here
-        final Map <String, Object> aProps = new HashMap<> ();
-        aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
-        final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceGroup.getParticpantIdentifier (),
-                                                                           aDocTypeID);
-        return getEntityManager ().find (DBServiceMetadata.class, aDBMetadataID, aProps);
-      }
+    ret = doInTransaction ( () -> {
+      // Disable caching here
+      final Map <String, Object> aProps = new HashMap <> ();
+      aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
+      final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceGroup.getParticpantIdentifier (),
+                                                                         aDocTypeID);
+      return getEntityManager ().find (DBServiceMetadata.class, aDBMetadataID, aProps);
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());

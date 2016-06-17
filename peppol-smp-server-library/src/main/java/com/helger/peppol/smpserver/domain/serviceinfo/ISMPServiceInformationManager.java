@@ -45,7 +45,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
@@ -131,7 +131,7 @@ public interface ISMPServiceInformationManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformation ();
+  ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformation ();
 
   /**
    * @return The count of all service information objects. Always &ge; 0.
@@ -153,7 +153,7 @@ public interface ISMPServiceInformationManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   /**
    * Get all SMP document types that are registered for the provided service
@@ -171,7 +171,7 @@ public interface ISMPServiceInformationManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsCollection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   /**
    * Get the service information for the passed tuple of service group and

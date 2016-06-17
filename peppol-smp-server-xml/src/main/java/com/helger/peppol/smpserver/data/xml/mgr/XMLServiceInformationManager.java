@@ -26,12 +26,8 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.CommonsHashMap;
-import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
-import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
@@ -43,88 +39,24 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
-import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
+import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
-import com.helger.photon.basic.app.dao.impl.EDAOActionType;
 import com.helger.photon.basic.audit.AuditHelper;
-import com.helger.xml.microdom.IMicroDocument;
-import com.helger.xml.microdom.IMicroElement;
-import com.helger.xml.microdom.MicroDocument;
-import com.helger.xml.microdom.convert.MicroTypeConverter;
 
 /**
  * Manager for all {@link SMPServiceInformation} objects.
  *
  * @author Philip Helger
  */
-public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServiceInformation>
+public final class XMLServiceInformationManager extends
+                                                AbstractMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
                                                 implements ISMPServiceInformationManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceInformationManager.class);
-  private static final String ELEMENT_ROOT = "serviceinformationlist";
-  private static final String ELEMENT_ITEM = "serviceinformation";
-
-  private final ICommonsMap <String, SMPServiceInformation> m_aMap = new CommonsHashMap<> ();
 
   public XMLServiceInformationManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceInformation.class, sFilename);
-    initialRead ();
-  }
-
-  @Override
-  protected void onRecoveryCreate (@Nonnull final SMPServiceInformation aElement)
-  {
-    _addSMPServiceInformation (aElement, false);
-  }
-
-  @Override
-  protected void onRecoveryUpdate (@Nonnull final SMPServiceInformation aElement)
-  {
-    _addSMPServiceInformation (aElement, true);
-  }
-
-  @Override
-  protected void onRecoveryDelete (@Nonnull final SMPServiceInformation aElement)
-  {
-    m_aMap.remove (aElement.getID ());
-  }
-
-  @Override
-  @Nonnull
-  protected EChange onRead (@Nonnull final IMicroDocument aDoc)
-  {
-    for (final IMicroElement eSMPServiceInformation : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
-    {
-      _addSMPServiceInformation (MicroTypeConverter.convertToNative (eSMPServiceInformation,
-                                                                     SMPServiceInformation.class),
-                                 false);
-    }
-    return EChange.UNCHANGED;
-  }
-
-  @Override
-  @Nonnull
-  protected IMicroDocument createWriteData ()
-  {
-    final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.appendElement (ELEMENT_ROOT);
-    for (final ISMPServiceInformation aSMPServiceInformation : CollectionHelper.getSortedByKey (m_aMap).values ())
-      eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aSMPServiceInformation, ELEMENT_ITEM));
-    return aDoc;
-  }
-
-  private void _addSMPServiceInformation (@Nonnull final SMPServiceInformation aSMPServiceInformation,
-                                          final boolean bUpdate)
-  {
-    ValueEnforcer.notNull (aSMPServiceInformation, "SMPServiceInformation");
-
-    final String sSMPServiceInformationID = aSMPServiceInformation.getID ();
-    if (!bUpdate && m_aMap.containsKey (sSMPServiceInformationID))
-      throw new IllegalArgumentException ("SMPServiceInformation ID '" +
-                                          sSMPServiceInformationID +
-                                          "' is already in use!");
-    m_aMap.put (sSMPServiceInformationID, aSMPServiceInformation);
   }
 
   @Nullable
@@ -171,7 +103,7 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
       m_aRWLock.writeLock ().lock ();
       try
       {
-        markAsChanged (aOldInformation, EDAOActionType.UPDATE);
+        internalUpdateItem (aOldInformation);
       }
       finally
       {
@@ -192,13 +124,9 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
       try
       {
         if (aOldInformation != null)
-          bRemovedOld = m_aMap.remove (aOldInformation.getID ()) == aOldInformation;
+          bRemovedOld = internalDeleteItem (aOldInformation.getID ()) == aOldInformation;
 
-        if (bRemovedOld)
-          markAsChanged (aOldInformation, EDAOActionType.DELETE);
-
-        _addSMPServiceInformation (aSMPServiceInformation, false);
-        markAsChanged (aSMPServiceInformation, EDAOActionType.CREATE);
+        internalCreateItem (aSMPServiceInformation);
       }
       finally
       {
@@ -235,14 +163,12 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     m_aRWLock.writeLock ().lock ();
     try
     {
-      final SMPServiceInformation aRealServiceInformation = m_aMap.remove (aSMPServiceInformation.getID ());
+      final SMPServiceInformation aRealServiceInformation = internalDeleteItem (aSMPServiceInformation.getID ());
       if (aRealServiceInformation == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
         return EChange.UNCHANGED;
       }
-
-      markAsChanged (aRealServiceInformation, EDAOActionType.DELETE);
     }
     finally
     {
@@ -266,58 +192,37 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
+  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
   {
-    return m_aRWLock.readLocked ( () -> m_aMap.copyOfValues ());
+    return getAll ();
   }
 
   @Nonnegative
   public int getSMPServiceInformationCount ()
   {
-    return m_aRWLock.readLocked ( () -> m_aMap.size ());
+    return getCount ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsCollection <ISMPServiceInformation> ret = new CommonsArrayList<> ();
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
-    {
-      m_aRWLock.readLock ().lock ();
-      try
-      {
-        for (final ISMPServiceInformation aServiceInformation : m_aMap.values ())
-          if (aServiceInformation.getServiceGroupID ().equals (aServiceGroup.getID ()))
-            ret.add (aServiceInformation);
-      }
-      finally
-      {
-        m_aRWLock.readLock ().unlock ();
-      }
-    }
+      findAll (x -> x.getServiceGroupID ().equals (aServiceGroup.getID ()), ret::add);
     return ret;
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsCollection <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
+    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
-      m_aRWLock.readLock ().lock ();
-      try
-      {
-        CollectionHelper.findAllMapped (m_aMap.values (),
-                                        aSI -> aSI.getServiceGroupID ().equals (aServiceGroup.getID ()),
-                                        aSI -> aSI.getDocumentTypeIdentifier (),
-                                        ret::add);
-      }
-      finally
-      {
-        m_aRWLock.readLock ().unlock ();
-      }
+      findAllMapped (aSI -> aSI.getServiceGroupID ().equals (aServiceGroup.getID ()),
+                     aSI -> aSI.getDocumentTypeIdentifier (),
+                     ret::add);
     }
     return ret;
   }
@@ -331,21 +236,10 @@ public final class XMLServiceInformationManager extends AbstractWALDAO <SMPServi
     if (aDocumentTypeIdentifier == null)
       return null;
 
-    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList<> ();
-
-    m_aRWLock.readLock ().lock ();
-    try
-    {
-      CollectionHelper.findAll (m_aMap.values (),
-                                aSI -> aSI.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
-                                       IdentifierHelper.areDocumentTypeIdentifiersEqual (aSI.getDocumentTypeIdentifier (),
-                                                                                         aDocumentTypeIdentifier),
-                                ret::add);
-    }
-    finally
-    {
-      m_aRWLock.readLock ().unlock ();
-    }
+    final ICommonsList <? extends ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ()
+                                                                                  .equals (aServiceGroup.getID ()) &&
+                                                                               IdentifierHelper.areDocumentTypeIdentifiersEqual (aSI.getDocumentTypeIdentifier (),
+                                                                                                                                 aDocumentTypeIdentifier));
 
     if (ret.isEmpty ())
       return null;

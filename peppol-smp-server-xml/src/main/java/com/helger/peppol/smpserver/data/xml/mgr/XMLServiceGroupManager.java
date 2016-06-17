@@ -23,15 +23,11 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
-import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -45,78 +41,21 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
-import com.helger.photon.basic.app.dao.impl.AbstractWALDAO;
+import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
-import com.helger.photon.basic.app.dao.impl.EDAOActionType;
 import com.helger.photon.basic.audit.AuditHelper;
-import com.helger.xml.microdom.IMicroDocument;
-import com.helger.xml.microdom.IMicroElement;
-import com.helger.xml.microdom.MicroDocument;
-import com.helger.xml.microdom.convert.MicroTypeConverter;
 
-public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGroup> implements ISMPServiceGroupManager
+public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPServiceGroup, SMPServiceGroup>
+                                          implements ISMPServiceGroupManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceGroupManager.class);
 
-  private static final String ELEMENT_ROOT = "servicegroups";
-  private static final String ELEMENT_ITEM = "servicegroup";
-
-  private final ICommonsMap <String, SMPServiceGroup> m_aMap = new CommonsHashMap <> ();
   private final IRegistrationHook m_aHook;
 
   public XMLServiceGroupManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceGroup.class, sFilename);
     m_aHook = RegistrationHookFactory.getOrCreateInstance ();
-    initialRead ();
-  }
-
-  @Override
-  protected void onRecoveryCreate (@Nonnull final SMPServiceGroup aElement)
-  {
-    _addSMPServiceGroup (aElement, false);
-  }
-
-  @Override
-  protected void onRecoveryUpdate (@Nonnull final SMPServiceGroup aElement)
-  {
-    _addSMPServiceGroup (aElement, true);
-  }
-
-  @Override
-  protected void onRecoveryDelete (@Nonnull final SMPServiceGroup aElement)
-  {
-    m_aMap.remove (aElement.getID ());
-  }
-
-  @Override
-  @Nonnull
-  protected EChange onRead (@Nonnull final IMicroDocument aDoc)
-  {
-    for (final IMicroElement eSMPServiceGroup : aDoc.getDocumentElement ().getAllChildElements (ELEMENT_ITEM))
-      _addSMPServiceGroup (MicroTypeConverter.convertToNative (eSMPServiceGroup, SMPServiceGroup.class), false);
-    return EChange.UNCHANGED;
-  }
-
-  @Override
-  @Nonnull
-  protected IMicroDocument createWriteData ()
-  {
-    final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.appendElement (ELEMENT_ROOT);
-    for (final ISMPServiceGroup aSMPServiceGroup : CollectionHelper.getSortedByKey (m_aMap).values ())
-      eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aSMPServiceGroup, ELEMENT_ITEM));
-    return aDoc;
-  }
-
-  private void _addSMPServiceGroup (@Nonnull final SMPServiceGroup aSMPServiceGroup, final boolean bUpdate)
-  {
-    ValueEnforcer.notNull (aSMPServiceGroup, "SMPServiceGroup");
-
-    final String sSMPServiceGroupID = aSMPServiceGroup.getID ();
-    if (!bUpdate && m_aMap.containsKey (sSMPServiceGroupID))
-      throw new IllegalArgumentException ("SMPServiceGroup ID '" + sSMPServiceGroupID + "' is already in use!");
-    m_aMap.put (aSMPServiceGroup.getID (), aSMPServiceGroup);
   }
 
   @Nonnull
@@ -140,8 +79,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     m_aRWLock.writeLock ().lock ();
     try
     {
-      _addSMPServiceGroup (aSMPServiceGroup, false);
-      markAsChanged (aSMPServiceGroup, EDAOActionType.CREATE);
+      internalCreateItem (aSMPServiceGroup);
     }
     catch (final RuntimeException ex)
     {
@@ -176,7 +114,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    final SMPServiceGroup aSMPServiceGroup = _getSMPServiceGroupOfID (sSMPServiceGroupID);
+    final SMPServiceGroup aSMPServiceGroup = getOfID (sSMPServiceGroupID);
     if (aSMPServiceGroup == null)
     {
       AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, sSMPServiceGroupID, "no-such-id");
@@ -191,7 +129,7 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
       eChange = eChange.or (aSMPServiceGroup.setExtension (sExtension));
       if (eChange.isUnchanged ())
         return EChange.UNCHANGED;
-      markAsChanged (aSMPServiceGroup, EDAOActionType.UPDATE);
+      internalUpdateItem (aSMPServiceGroup);
     }
     finally
     {
@@ -208,7 +146,8 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
   {
     s_aLogger.info ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
-    final SMPServiceGroup aSMPServiceGroup = getSMPServiceGroupOfID (aParticipantID);
+    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+    final SMPServiceGroup aSMPServiceGroup = getOfID (sServiceGroupID);
     if (aSMPServiceGroup == null)
     {
       AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
@@ -226,29 +165,27 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
     m_aRWLock.writeLock ().lock ();
     try
     {
-      if (m_aMap.remove (aSMPServiceGroup.getID ()) == null)
+      if (internalDeleteItem (aSMPServiceGroup.getID ()) == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aSMPServiceGroup.getID ());
         return EChange.UNCHANGED;
       }
 
-      // Save all redirects (in case of an error) and delete them
+      // Remember all redirects (in case of an error) and delete them
       aOldRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
       aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
 
-      // Save all service information (in case of an error) and delete them
+      // Remember all service information (in case of an error) and delete them
       aOldServiceInformation = aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (aSMPServiceGroup);
       aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
-
-      markAsChanged (aSMPServiceGroup, EDAOActionType.DELETE);
     }
     catch (final RuntimeException ex)
     {
       // Deletion failed - shit
 
       // Try to rollback the actions
-      if (!m_aMap.containsKey (aSMPServiceGroup.getID ()))
-        _addSMPServiceGroup (aSMPServiceGroup, false);
+      if (!containsWithID (aSMPServiceGroup.getID ()))
+        internalCreateItem (aSMPServiceGroup);
 
       // Restore redirects (if any)
       if (CollectionHelper.isNotEmpty (aOldRedirects))
@@ -280,45 +217,31 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
+  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
   {
-    return m_aRWLock.readLocked ( () -> m_aMap.copyOfValues ());
+    return getAll ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
+  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
-    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
-    m_aRWLock.readLocked ( () -> CollectionHelper.findAll (m_aMap.values (),
-                                                           aSG -> aSG.getOwnerID ().equals (sOwnerID),
-                                                           ret::add));
-    return ret;
+    return getAll (x -> x.getOwnerID ().equals (sOwnerID));
   }
 
   @Nonnegative
   public int getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
   {
-    return m_aRWLock.readLocked ( () -> CollectionHelper.getCount (m_aMap.values (),
-                                                                   aSG -> aSG.getOwnerID ().equals (sOwnerID)));
+    return getCount (x -> x.getOwnerID ().equals (sOwnerID));
   }
 
-  @Nullable
-  private SMPServiceGroup _getSMPServiceGroupOfID (@Nullable final String sID)
-  {
-    if (StringHelper.hasNoText (sID))
-      return null;
-
-    return m_aRWLock.readLocked ( () -> m_aMap.get (sID));
-  }
-
-  public SMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
+  public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
     if (aParticipantIdentifier == null)
       return null;
 
     final String sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
-    return _getSMPServiceGroupOfID (sID);
+    return getOfID (sID);
   }
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
@@ -327,12 +250,12 @@ public final class XMLServiceGroupManager extends AbstractWALDAO <SMPServiceGrou
       return false;
 
     final String sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
-    return m_aRWLock.readLocked ( () -> m_aMap.containsKey (sID));
+    return containsWithID (sID);
   }
 
   @Nonnegative
   public int getSMPServiceGroupCount ()
   {
-    return m_aRWLock.readLocked ( () -> m_aMap.size ());
+    return getCount ();
   }
 }

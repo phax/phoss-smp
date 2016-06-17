@@ -54,7 +54,7 @@ import org.eclipse.persistence.config.CacheUsage;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EChange;
@@ -244,17 +244,17 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
+  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     s_aLogger.info ("getAllSMPServiceGroups()");
 
-    JPAExecutionResult <ICommonsCollection <ISMPServiceGroup>> ret;
+    JPAExecutionResult <ICommonsList <ISMPServiceGroup>> ret;
     ret = doSelect ( () -> {
       final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p",
                                                                                       DBServiceGroup.class)
                                                                         .getResultList ();
 
-      final ICommonsCollection <ISMPServiceGroup> aList = new CommonsArrayList <> ();
+      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
         final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
@@ -277,18 +277,18 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
+  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
     s_aLogger.info ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
 
-    JPAExecutionResult <ICommonsCollection <ISMPServiceGroup>> ret;
+    JPAExecutionResult <ICommonsList <ISMPServiceGroup>> ret;
     ret = doSelect ( () -> {
       final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p WHERE p.ownership.user.userName = :user",
                                                                                       DBServiceGroup.class)
                                                                         .setParameter ("user", sOwnerID)
                                                                         .getResultList ();
 
-      final ICommonsCollection <ISMPServiceGroup> aList = new CommonsArrayList <> ();
+      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
         final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,
