@@ -71,9 +71,14 @@ public final class MenuSecure
     aMenuTree.createRootItem (new PageSecureTransportProfile (CMenuSecure.MENU_TRANSPORT_PROFILES));
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
     aMenuTree.createRootItem (new PageSecureTasks (CMenuSecure.MENU_TASKS));
-    aMenuTree.createRootItem (new PageSecureSMLInfo (CMenuSecure.MENU_SML_INFO));
-    aMenuTree.createRootItem (new PageSecureSMLSetup (CMenuSecure.MENU_SML_SETUP))
-             .setDisplayFilter (aFilterSMLConnectionActive);
+    {
+      final IMenuItemPage aPageSML = aMenuTree.createRootItem (new BasePageShowChildren <> (CMenuSecure.MENU_SML,
+                                                                                            "SML",
+                                                                                            aMenuTree));
+      aMenuTree.createItem (aPageSML, new PageSecureSMLInfo (CMenuSecure.MENU_SML_INFO));
+      aMenuTree.createItem (aPageSML, new PageSecureSMLSetup (CMenuSecure.MENU_SML_SETUP))
+               .setDisplayFilter (aFilterSMLConnectionActive);
+    }
     aMenuTree.createRootSeparator ();
 
     // Administrator
