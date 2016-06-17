@@ -61,6 +61,7 @@ import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
@@ -81,7 +82,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
   private IIdentifierFactory m_aIdentifierFactory;
   private IPeppolURLProvider m_aPeppolURLProvider;
-  private ISMPTransportProfileManager m_aTransportProfileManager;
+  private ISMLInfoManager m_aSMLInfoMgr;
+  private ISMPTransportProfileManager m_aTransportProfileMgr;
   private ISMPUserManager m_aUserMgr;
   private ISMPServiceGroupManager m_aServiceGroupMgr;
   private ISMPRedirectManager m_aRedirectMgr;
@@ -171,8 +173,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       // TODO make customizable
       m_aPeppolURLProvider = PeppolURLProvider.INSTANCE;
 
-      m_aTransportProfileManager = s_aManagerProvider.createTransportProfileMgr ();
-      if (m_aTransportProfileManager == null)
+      m_aSMLInfoMgr = s_aManagerProvider.createSMLInfoMgr ();
+      if (m_aSMLInfoMgr == null)
+        throw new IllegalStateException ("Failed to create SMLInfo manager!");
+
+      m_aTransportProfileMgr = s_aManagerProvider.createTransportProfileMgr ();
+      if (m_aTransportProfileMgr == null)
         throw new IllegalStateException ("Failed to create TransportProfile manager!");
 
       m_aUserMgr = s_aManagerProvider.createUserMgr ();
@@ -221,9 +227,15 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   }
 
   @Nonnull
+  public static ISMLInfoManager getSMLInfoMgr ()
+  {
+    return getInstance ().m_aSMLInfoMgr;
+  }
+
+  @Nonnull
   public static ISMPTransportProfileManager getTransportProfileMgr ()
   {
-    return getInstance ().m_aTransportProfileManager;
+    return getInstance ().m_aTransportProfileMgr;
   }
 
   @Nonnull
@@ -277,8 +289,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static void initBackendFromConfiguration () throws InitializationException
   {
     // Determine backend
-    final String sBackendID = SMPServerConfiguration.getBackend ();
     final SMPBackendRegistry aBackendRegistry = SMPBackendRegistry.getInstance ();
+    final String sBackendID = SMPServerConfiguration.getBackend ();
     final ISMPManagerProvider aManagerProvider = aBackendRegistry.getManagerProvider (sBackendID);
     if (aManagerProvider == null)
       throw new InitializationException ("Invalid backend '" +

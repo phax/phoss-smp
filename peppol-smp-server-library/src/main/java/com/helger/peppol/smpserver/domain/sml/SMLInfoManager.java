@@ -38,7 +38,7 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.domain.transportprofile;
+package com.helger.peppol.smpserver.domain.sml;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,20 +48,19 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
-import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppol.smp.ISMPTransportProfile;
-import com.helger.peppol.smp.SMPTransportProfile;
+import com.helger.peppol.sml.ESML;
+import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.sml.SMLInfo;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
 import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.photon.basic.audit.AuditHelper;
 
-public final class SMPTransportProfileManager extends AbstractMapBasedWALDAO <ISMPTransportProfile, SMPTransportProfile>
-                                              implements ISMPTransportProfileManager
+public final class SMLInfoManager extends AbstractMapBasedWALDAO <ISMLInfo, SMLInfo> implements ISMLInfoManager
 {
-  public SMPTransportProfileManager (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMLInfoManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
-    super (SMPTransportProfile.class, sFilename);
+    super (SMLInfo.class, sFilename);
   }
 
   @Override
@@ -69,36 +68,42 @@ public final class SMPTransportProfileManager extends AbstractMapBasedWALDAO <IS
   protected EChange onInit ()
   {
     // Add the default transport profiles
-    for (final ESMPTransportProfile eTransportProfile : ESMPTransportProfile.values ())
-      internalCreateItem (new SMPTransportProfile (eTransportProfile));
+    for (final ESML e : ESML.values ())
+      internalCreateItem (new SMLInfo (e));
     return EChange.CHANGED;
   }
 
-  @Nullable
-  public ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty final String sID,
-                                                         @Nonnull @Nonempty final String sName)
+  @Nonnull
+  public ISMLInfo createSMLInfo (@Nonnull @Nonempty final String sDisplayName,
+                                 @Nonnull @Nonempty final String sDNSZone,
+                                 @Nonnull @Nonempty final String sManagementServiceURL,
+                                 final boolean bClientCertificateRequired)
   {
-    // Double ID needs to be taken care of
-    if (containsWithID (sID))
-      return null;
-
-    final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID, sName);
+    final SMLInfo aSMLInfo = new SMLInfo (sDisplayName, sDNSZone, sManagementServiceURL, bClientCertificateRequired);
 
     m_aRWLock.writeLocked ( () -> {
-      internalCreateItem (aSMPTransportProfile);
+      internalCreateItem (aSMLInfo);
     });
-    AuditHelper.onAuditCreateSuccess (SMPTransportProfile.OT, sID, sName);
-    return aSMPTransportProfile;
+    AuditHelper.onAuditCreateSuccess (SMLInfo.OT,
+                                      aSMLInfo.getID (),
+                                      sDisplayName,
+                                      sDNSZone,
+                                      sManagementServiceURL,
+                                      Boolean.valueOf (bClientCertificateRequired));
+    return aSMLInfo;
   }
 
   @Nonnull
-  public EChange updateSMPTransportProfile (@Nullable final String sSMPTransportProfileID,
-                                            @Nonnull @Nonempty final String sName)
+  public EChange updateSMLInfo (@Nullable final String sSMLInfoID,
+                                @Nonnull @Nonempty final String sDisplayName,
+                                @Nonnull @Nonempty final String sDNSZone,
+                                @Nonnull @Nonempty final String sManagementServiceURL,
+                                final boolean bClientCertificateRequired)
   {
-    final SMPTransportProfile aSMPTransportProfile = getOfID (sSMPTransportProfileID);
-    if (aSMPTransportProfile == null)
+    final SMLInfo aSMLInfo = getOfID (sSMLInfoID);
+    if (aSMLInfo == null)
     {
-      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMLInfo.OT, sSMLInfoID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -106,33 +111,42 @@ public final class SMPTransportProfileManager extends AbstractMapBasedWALDAO <IS
     try
     {
       EChange eChange = EChange.UNCHANGED;
-      eChange = eChange.or (aSMPTransportProfile.setName (sName));
+      eChange = eChange.or (aSMLInfo.setDisplayName (sDisplayName));
+      eChange = eChange.or (aSMLInfo.setDNSZone (sDNSZone));
+      eChange = eChange.or (aSMLInfo.setManagementServiceURL (sManagementServiceURL));
+      eChange = eChange.or (aSMLInfo.setClientCertificateRequired (bClientCertificateRequired));
       if (eChange.isUnchanged ())
         return EChange.UNCHANGED;
 
-      internalUpdateItem (aSMPTransportProfile);
+      internalUpdateItem (aSMLInfo);
     }
     finally
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT, "all", sSMPTransportProfileID, sName);
+    AuditHelper.onAuditModifySuccess (SMLInfo.OT,
+                                      "all",
+                                      sSMLInfoID,
+                                      sDisplayName,
+                                      sDNSZone,
+                                      sManagementServiceURL,
+                                      Boolean.valueOf (bClientCertificateRequired));
     return EChange.CHANGED;
   }
 
   @Nullable
-  public EChange removeSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
+  public EChange removeSMLInfo (@Nullable final String sSMLInfoID)
   {
-    if (StringHelper.hasNoText (sSMPTransportProfileID))
+    if (StringHelper.hasNoText (sSMLInfoID))
       return EChange.UNCHANGED;
 
     m_aRWLock.writeLock ().lock ();
     try
     {
-      final SMPTransportProfile aSMPTransportProfile = internalDeleteItem (sSMPTransportProfileID);
-      if (aSMPTransportProfile == null)
+      final SMLInfo aSMLInfo = internalDeleteItem (sSMLInfoID);
+      if (aSMLInfo == null)
       {
-        AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", sSMPTransportProfileID);
+        AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", sSMLInfoID);
         return EChange.UNCHANGED;
       }
     }
@@ -140,24 +154,24 @@ public final class SMPTransportProfileManager extends AbstractMapBasedWALDAO <IS
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT, sSMPTransportProfileID);
+    AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT, sSMLInfoID);
     return EChange.CHANGED;
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPTransportProfile> getAllSMPTransportProfiles ()
+  public ICommonsList <? extends ISMLInfo> getAllSMLInfos ()
   {
     return getAll ();
   }
 
   @Nullable
-  public ISMPTransportProfile getSMPTransportProfileOfID (@Nullable final String sID)
+  public ISMLInfo getSMLInfoOfID (@Nullable final String sID)
   {
     return getOfID (sID);
   }
 
-  public boolean containsSMPTransportProfileWithID (@Nullable final String sID)
+  public boolean containsSMLInfoWithID (@Nullable final String sID)
   {
     return containsWithID (sID);
   }

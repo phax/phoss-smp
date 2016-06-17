@@ -40,20 +40,19 @@
  */
 package com.helger.peppol.smpserver.domain.transportprofile;
 
-import java.util.Collection;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.smp.ISMPTransportProfile;
 
 /**
  * Base interface for a manager that handles {@link ISMPTransportProfile}
  * objects.
- * 
+ *
  * @author Philip Helger
  */
 public interface ISMPTransportProfileManager
@@ -103,7 +102,7 @@ public interface ISMPTransportProfileManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends ISMPTransportProfile> getAllSMPTransportProfiles ();
+  ICommonsList <? extends ISMPTransportProfile> getAllSMPTransportProfiles ();
 
   /**
    * Get the transport profile with the passed ID.

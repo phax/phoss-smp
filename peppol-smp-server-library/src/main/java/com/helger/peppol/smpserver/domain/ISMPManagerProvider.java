@@ -47,6 +47,7 @@ import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 
@@ -59,6 +60,12 @@ import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
  */
 public interface ISMPManagerProvider
 {
+  /**
+   * @return A new SML information manager. May not be <code>null</code>.
+   */
+  @Nonnull
+  ISMLInfoManager createSMLInfoMgr ();
+
   /**
    * @return A new transport profile manager. May not be <code>null</code>.
    */

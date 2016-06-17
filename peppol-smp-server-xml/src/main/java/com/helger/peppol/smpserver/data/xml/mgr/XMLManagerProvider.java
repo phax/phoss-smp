@@ -25,6 +25,8 @@ import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
+import com.helger.peppol.smpserver.domain.sml.SMLInfoManager;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.transportprofile.SMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
@@ -37,6 +39,7 @@ import com.helger.photon.basic.app.dao.impl.DAOException;
  */
 public final class XMLManagerProvider implements ISMPManagerProvider
 {
+  private static final String SML_INFO_XML = "sml-info.xml";
   public static final String SMP_TRANSPORT_PROFILES_XML = "transportprofiles.xml";
   public static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";
   public static final String SMP_REDIRECT_XML = "smp-redirect.xml";
@@ -45,6 +48,19 @@ public final class XMLManagerProvider implements ISMPManagerProvider
 
   public XMLManagerProvider ()
   {}
+
+  @Nonnull
+  public ISMLInfoManager createSMLInfoMgr ()
+  {
+    try
+    {
+      return new SMLInfoManager (SML_INFO_XML);
+    }
+    catch (final DAOException ex)
+    {
+      throw new RuntimeException (ex.getMessage (), ex);
+    }
+  }
 
   @Nonnull
   public ISMPTransportProfileManager createTransportProfileMgr ()

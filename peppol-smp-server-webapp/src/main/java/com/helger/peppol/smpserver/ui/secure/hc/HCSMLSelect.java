@@ -30,7 +30,7 @@ public class HCSMLSelect extends HCExtSelect
   {
     super (aRF);
     ArrayHelper.forEach (ESML.values (),
-                         ISMLInfo::requiresClientCertificate,
+                         ISMLInfo::isClientCertificateRequired,
                          x -> addOption (x.getID (), "[" + x.getDisplayName () + "] " + x.getManagementServiceURL ()));
   }
 }
