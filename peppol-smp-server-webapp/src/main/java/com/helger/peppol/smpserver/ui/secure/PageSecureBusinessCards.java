@@ -93,6 +93,7 @@ import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapHelpBlock;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.panel.BootstrapPanel;
 import com.helger.photon.bootstrap3.table.BootstrapTable;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
@@ -142,6 +143,29 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   public PageSecureBusinessCards (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Business Cards");
+    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPBusinessCard, WebPageExecutionContext> ()
+    {
+      @Override
+      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                      @Nonnull final BootstrapForm aForm,
+                                      @Nonnull final ISMPBusinessCard aSelectedObject)
+      {
+        aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the Business Card for service group '" +
+                                                              aSelectedObject.getServiceGroupID () +
+                                                              "'?"));
+      }
+
+      @Override
+      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nonnull final ISMPBusinessCard aSelectedObject)
+      {
+        final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+        if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
+          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!"));
+        else
+          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
+      }
+    });
   }
 
   @Override
@@ -823,27 +847,6 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
 
       aForm.addChild (new BootstrapButton ().addChild ("Add Entity").setIcon (EDefaultIcon.PLUS).setOnClick (aOnAdd));
     }
-  }
-
-  @Override
-  protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final BootstrapForm aForm,
-                                  @Nonnull final ISMPBusinessCard aSelectedObject)
-  {
-    aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the Business Card for service group '" +
-                                                          aSelectedObject.getServiceGroupID () +
-                                                          "'?"));
-  }
-
-  @Override
-  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final ISMPBusinessCard aSelectedObject)
-  {
-    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-    if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
-      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!"));
-    else
-      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
   }
 
   private void _publishToIndexer (@Nonnull final WebPageExecutionContext aWPEC,

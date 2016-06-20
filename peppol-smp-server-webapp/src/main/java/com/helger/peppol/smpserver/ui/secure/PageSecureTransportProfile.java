@@ -49,6 +49,7 @@ import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.RequestField;
@@ -66,6 +67,29 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   public PageSecureTransportProfile (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Transport profiles");
+    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPTransportProfile, WebPageExecutionContext> ()
+    {
+      @Override
+      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                      @Nonnull final BootstrapForm aForm,
+                                      @Nonnull final ISMPTransportProfile aSelectedObject)
+      {
+        aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the transport profile '" +
+                                                                                     aSelectedObject.getID () +
+                                                                                     "'?")));
+      }
+
+      @Override
+      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nonnull final ISMPTransportProfile aSelectedObject)
+      {
+        final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+        aTransportProfileMgr.removeSMPTransportProfile (aSelectedObject.getID ());
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The transport profile '" +
+                                                                    aSelectedObject.getID () +
+                                                                    "' was successfully deleted!"));
+      }
+    });
   }
 
   @Override
@@ -185,27 +209,6 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
                                                                     "' was successfully created."));
       }
     }
-  }
-
-  @Override
-  protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final BootstrapForm aForm,
-                                  @Nonnull final ISMPTransportProfile aSelectedObject)
-  {
-    aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the transport profile '" +
-                                                                                 aSelectedObject.getID () +
-                                                                                 "'?")));
-  }
-
-  @Override
-  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final ISMPTransportProfile aSelectedObject)
-  {
-    final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
-    aTransportProfileMgr.removeSMPTransportProfile (aSelectedObject.getID ());
-    aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The transport profile '" +
-                                                                aSelectedObject.getID () +
-                                                                "' was successfully deleted!"));
   }
 
   @Override

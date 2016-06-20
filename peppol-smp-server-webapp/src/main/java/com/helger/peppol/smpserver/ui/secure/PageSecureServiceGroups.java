@@ -72,6 +72,7 @@ import com.helger.photon.bootstrap3.form.BootstrapViewForm;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.label.BootstrapLabel;
 import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
+import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
@@ -106,6 +107,48 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   public PageSecureServiceGroups (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Service groups");
+    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPServiceGroup, WebPageExecutionContext> ()
+    {
+      @Override
+      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                      @Nonnull final BootstrapForm aForm,
+                                      @Nonnull final ISMPServiceGroup aSelectedObject)
+      {
+        final BootstrapQuestionBox aQB = new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the complete service group '" +
+                                                                                                      aSelectedObject.getParticpantIdentifier ()
+                                                                                                                     .getURIEncoded () +
+                                                                                                      "'?"))
+                                                                    .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."));
+        if (RegistrationHookFactory.isSMLConnectionActive ())
+          aQB.addChild (new HCDiv ().addChild ("Since the connection to the SML is active this service group will also be deleted from the SML!"));
+
+        aForm.addChild (aQB);
+      }
+
+      @Override
+      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nonnull final ISMPServiceGroup aSelectedObject)
+      {
+        try
+        {
+          // Delete the service group both locally and on the SML (if active)!
+          final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+          aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier ());
+        }
+        catch (final Throwable t)
+        {
+          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error deleting the SMP ServiceGroup for participant '" +
+                                                                    aSelectedObject.getParticpantIdentifier ()
+                                                                                   .getURIEncoded () +
+                                                                    "'. Technical details: " +
+                                                                    t.getMessage ()));
+        }
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
+                                                                    aSelectedObject.getParticpantIdentifier ()
+                                                                                   .getURIEncoded () +
+                                                                    "' was successfully deleted!"));
+      }
+    });
   }
 
   @Override
@@ -290,46 +333,6 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                                     "' was successfully created."));
       }
     }
-  }
-
-  @Override
-  protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final BootstrapForm aForm,
-                                  @Nonnull final ISMPServiceGroup aSelectedObject)
-  {
-    final BootstrapQuestionBox aQB = new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the complete service group '" +
-                                                                                                  aSelectedObject.getParticpantIdentifier ()
-                                                                                                                 .getURIEncoded () +
-                                                                                                  "'?"))
-                                                                .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."));
-    if (RegistrationHookFactory.isSMLConnectionActive ())
-      aQB.addChild (new HCDiv ().addChild ("Since the connection to the SML is active this service group will also be deleted from the SML!"));
-
-    aForm.addChild (aQB);
-  }
-
-  @Override
-  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final ISMPServiceGroup aSelectedObject)
-  {
-    try
-    {
-      // Delete the service group both locally and on the SML (if active)!
-      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier ());
-    }
-    catch (final Throwable t)
-    {
-      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error deleting the SMP ServiceGroup for participant '" +
-                                                                aSelectedObject.getParticpantIdentifier ()
-                                                                               .getURIEncoded () +
-                                                                "'. Technical details: " +
-                                                                t.getMessage ()));
-    }
-    aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
-                                                                aSelectedObject.getParticpantIdentifier ()
-                                                                               .getURIEncoded () +
-                                                                "' was successfully deleted!"));
   }
 
   @Nullable

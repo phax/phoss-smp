@@ -50,6 +50,7 @@ import com.helger.photon.bootstrap3.form.BootstrapCheckBox;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
@@ -71,6 +72,33 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
   public PageSecureSMLInfo (@Nonnull @Nonempty final String sID)
   {
     super (sID, "SML information");
+    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMLInfo, WebPageExecutionContext> ()
+    {
+      @Override
+      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                      @Nonnull final BootstrapForm aForm,
+                                      @Nonnull final ISMLInfo aSelectedObject)
+      {
+        aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the SML information '" +
+                                                                                     aSelectedObject.getDisplayName () +
+                                                                                     "'?")));
+      }
+
+      @Override
+      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nonnull final ISMLInfo aSelectedObject)
+      {
+        final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
+        if (aSMLInfoMgr.removeSMLInfo (aSelectedObject.getID ()).isChanged ())
+          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SML information '" +
+                                                                      aSelectedObject.getDisplayName () +
+                                                                      "' was successfully deleted!"));
+        else
+          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("The SML information '" +
+                                                                    aSelectedObject.getDisplayName () +
+                                                                    "' could not be deleted!"));
+      }
+    });
   }
 
   @Override
@@ -225,30 +253,6 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
                                                                     "' was successfully created."));
       }
     }
-  }
-
-  @Override
-  protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final BootstrapForm aForm,
-                                  @Nonnull final ISMLInfo aSelectedObject)
-  {
-    aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the SML information '" +
-                                                                                 aSelectedObject.getDisplayName () +
-                                                                                 "'?")));
-  }
-
-  @Override
-  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMLInfo aSelectedObject)
-  {
-    final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
-    if (aSMLInfoMgr.removeSMLInfo (aSelectedObject.getID ()).isChanged ())
-      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SML information '" +
-                                                                  aSelectedObject.getDisplayName () +
-                                                                  "' was successfully deleted!"));
-    else
-      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("The SML information '" +
-                                                                aSelectedObject.getDisplayName () +
-                                                                "' could not be deleted!"));
   }
 
   @Override

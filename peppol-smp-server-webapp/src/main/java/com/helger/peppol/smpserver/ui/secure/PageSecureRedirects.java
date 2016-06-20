@@ -61,6 +61,7 @@ import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.RequestField;
@@ -91,6 +92,39 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   public PageSecureRedirects (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Redirects");
+    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPRedirect, WebPageExecutionContext> ()
+    {
+      @Override
+      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                      @Nonnull final BootstrapForm aForm,
+                                      @Nonnull final ISMPRedirect aSelectedObject)
+      {
+        aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
+                                           aSelectedObject.getServiceGroup ()
+                                                          .getParticpantIdentifier ()
+                                                          .getURIEncoded ()));
+        aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID,
+                                           aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
+
+        aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the Redirect for Service Group '" +
+                                                              aSelectedObject.getServiceGroupID () +
+                                                              "' and Document Type '" +
+                                                              aSelectedObject.getDocumentTypeIdentifier ()
+                                                                             .getURIEncoded () +
+                                                              "'?"));
+      }
+
+      @Override
+      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nonnull final ISMPRedirect aSelectedObject)
+      {
+        final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+        if (aRedirectMgr.deleteSMPRedirect (aSelectedObject).isChanged ())
+          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected Redirect was successfully deleted!"));
+        else
+          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Redirect!"));
+      }
+    });
   }
 
   @Override
@@ -356,35 +390,6 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                                                                                                              : null)))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
-  }
-
-  @Override
-  protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final BootstrapForm aForm,
-                                  @Nonnull final ISMPRedirect aSelectedObject)
-  {
-    aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
-                                       aSelectedObject.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ()));
-    aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID,
-                                       aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
-
-    aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the Redirect for Service Group '" +
-                                                          aSelectedObject.getServiceGroupID () +
-                                                          "' and Document Type '" +
-                                                          aSelectedObject.getDocumentTypeIdentifier ()
-                                                                         .getURIEncoded () +
-                                                          "'?"));
-  }
-
-  @Override
-  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final ISMPRedirect aSelectedObject)
-  {
-    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-    if (aRedirectMgr.deleteSMPRedirect (aSelectedObject).isChanged ())
-      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected Redirect was successfully deleted!"));
-    else
-      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Redirect!"));
   }
 
   @Override

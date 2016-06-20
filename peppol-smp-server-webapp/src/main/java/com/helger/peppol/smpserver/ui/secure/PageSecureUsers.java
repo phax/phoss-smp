@@ -49,6 +49,7 @@ import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
@@ -73,6 +74,29 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
   public PageSecureUsers (@Nonnull @Nonempty final String sID)
   {
     super (sID, "DB users");
+    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPUserEditable, WebPageExecutionContext> ()
+    {
+      @Override
+      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                      @Nonnull final BootstrapForm aForm,
+                                      @Nonnull final ISMPUserEditable aSelectedObject)
+      {
+        aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete user '" +
+                                                              aSelectedObject.getUserName () +
+                                                              "'?"));
+      }
+
+      @Override
+      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nonnull final ISMPUserEditable aSelectedObject)
+      {
+        final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
+        aUserManager.deleteUser (aSelectedObject.getID ());
+        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The user '" +
+                                                                    aSelectedObject.getUserName () +
+                                                                    "' was successfully deleted."));
+      }
+    });
   }
 
   @Override
@@ -187,27 +211,6 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
                                                                     "' was successfully created."));
       }
     }
-  }
-
-  @Override
-  protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final BootstrapForm aForm,
-                                  @Nonnull final ISMPUserEditable aSelectedObject)
-  {
-    aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete user '" +
-                                                          aSelectedObject.getUserName () +
-                                                          "'?"));
-  }
-
-  @Override
-  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final ISMPUserEditable aSelectedObject)
-  {
-    final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
-    aUserManager.deleteUser (aSelectedObject.getID ());
-    aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The user '" +
-                                                                aSelectedObject.getUserName () +
-                                                                "' was successfully deleted."));
   }
 
   @Override

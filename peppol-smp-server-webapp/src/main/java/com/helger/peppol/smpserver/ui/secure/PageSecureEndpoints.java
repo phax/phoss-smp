@@ -86,6 +86,7 @@ import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
+import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap3.uictrls.datetimepicker.BootstrapDateTimePicker;
@@ -130,6 +131,56 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   public PageSecureEndpoints (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Endpoints");
+    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPServiceInformation, WebPageExecutionContext> ()
+    {
+      @Override
+      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                      @Nonnull final BootstrapForm aForm,
+                                      @Nonnull final ISMPServiceInformation aSelectedObject)
+      {
+        final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
+        final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+
+        aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
+                                           aSelectedObject.getServiceGroup ()
+                                                          .getParticpantIdentifier ()
+                                                          .getURIEncoded ()));
+        aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_SCHEME,
+                                           aSelectedObject.getDocumentTypeIdentifier ().getScheme ()));
+        aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_VALUE,
+                                           aSelectedObject.getDocumentTypeIdentifier ().getValue ()));
+        aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID_SCHEME,
+                                           aSelectedProcess.getProcessIdentifier ().getScheme ()));
+        aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID_VALUE,
+                                           aSelectedProcess.getProcessIdentifier ().getValue ()));
+        aForm.addChild (new HCHiddenField (FIELD_TRANSPORT_PROFILE, aSelectedEndpoint.getTransportProfile ()));
+
+        aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the endpoint for service group '" +
+                                                              aSelectedObject.getServiceGroupID () +
+                                                              "' and document type '" +
+                                                              aSelectedObject.getDocumentTypeIdentifier ()
+                                                                             .getURIEncoded () +
+                                                              "'?"));
+      }
+
+      @Override
+      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nonnull final ISMPServiceInformation aSelectedObject)
+      {
+        final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+
+        final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
+        final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+
+        if (aSelectedProcess.deleteEndpoint (aSelectedEndpoint.getTransportProfile ()).isChanged ())
+        {
+          aServiceInfoMgr.mergeSMPServiceInformation (aSelectedObject);
+          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected endpoint was successfully deleted!"));
+        }
+        else
+          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error deleting the selected endpoint!"));
+      }
+    });
   }
 
   @Override
@@ -686,50 +737,6 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                                                "This could for example be a web site containing links to XML " +
                                                                "Schemas, WSDLs, Schematrons and other relevant resources.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_TECHNICAL_INFORMATION)));
-  }
-
-  @Override
-  protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final BootstrapForm aForm,
-                                  @Nonnull final ISMPServiceInformation aSelectedObject)
-  {
-    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
-    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
-
-    aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
-                                       aSelectedObject.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ()));
-    aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_SCHEME,
-                                       aSelectedObject.getDocumentTypeIdentifier ().getScheme ()));
-    aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_VALUE,
-                                       aSelectedObject.getDocumentTypeIdentifier ().getValue ()));
-    aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID_SCHEME, aSelectedProcess.getProcessIdentifier ().getScheme ()));
-    aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID_VALUE, aSelectedProcess.getProcessIdentifier ().getValue ()));
-    aForm.addChild (new HCHiddenField (FIELD_TRANSPORT_PROFILE, aSelectedEndpoint.getTransportProfile ()));
-
-    aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the endpoint for service group '" +
-                                                          aSelectedObject.getServiceGroupID () +
-                                                          "' and document type '" +
-                                                          aSelectedObject.getDocumentTypeIdentifier ()
-                                                                         .getURIEncoded () +
-                                                          "'?"));
-  }
-
-  @Override
-  protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final ISMPServiceInformation aSelectedObject)
-  {
-    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-
-    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
-    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
-
-    if (aSelectedProcess.deleteEndpoint (aSelectedEndpoint.getTransportProfile ()).isChanged ())
-    {
-      aServiceInfoMgr.mergeSMPServiceInformation (aSelectedObject);
-      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected endpoint was successfully deleted!"));
-    }
-    else
-      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error deleting the selected endpoint!"));
   }
 
   @Override
