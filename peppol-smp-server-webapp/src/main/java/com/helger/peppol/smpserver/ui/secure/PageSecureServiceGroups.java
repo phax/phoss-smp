@@ -72,6 +72,7 @@ import com.helger.photon.bootstrap3.form.BootstrapViewForm;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.label.BootstrapLabel;
 import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
+import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandler;
 import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
@@ -149,6 +150,79 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                                     "' was successfully deleted!"));
       }
     });
+    addCustomHandler (ACTION_CHECK_DNS,
+                      new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (false)
+                      {
+                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                     @Nullable final ISMPServiceGroup aSelectedObject)
+                        {
+                          final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+                          final HCNodeList aNodeList = aWPEC.getNodeList ();
+                          final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+
+                          aNodeList.addChild (getUIHandler ().createActionHeader ("Check DNS state of participants"));
+
+                          // Simple check if we're online or not
+                          try
+                          {
+                            InetAddress.getByName ("www.google.com");
+                          }
+                          catch (final UnknownHostException ex)
+                          {
+                            aNodeList.addChild (new BootstrapWarnBox ().addChild ("It seems like you are offline! So please interpret the results on this page with care!"));
+                          }
+
+                          final String sSMLZoneName = _getSMLHostName ();
+                          final IPeppolURLProvider aURLProvider = SMPMetaManager.getPeppolURLProvider ();
+
+                          final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
+                                                              new DTCol ("DNS name"),
+                                                              new DTCol ("IP address").setDataSort (2, 0),
+                                                              new DTCol ("Nice name")).setID (getID () + "checkdns");
+                          for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
+                          {
+                            final String sDNSName = aURLProvider.getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
+                                                                                          sSMLZoneName);
+
+                            InetAddress aInetAddress = null;
+                            try
+                            {
+                              aInetAddress = InetAddress.getByName (sDNSName);
+                            }
+                            catch (final UnknownHostException ex)
+                            {
+                              // Ignore
+                            }
+                            InetAddress aNice = null;
+                            if (aInetAddress != null)
+                              try
+                              {
+                                aNice = InetAddress.getByAddress (aInetAddress.getAddress ());
+                              }
+                              catch (final UnknownHostException ex)
+                              {
+                                // Ignore
+                              }
+
+                            final HCRow aRow = aTable.addBodyRow ();
+                            aRow.addCell (aServiceGroup.getParticpantIdentifier ().getURIEncoded ());
+                            aRow.addCell (new HCA (new SimpleURL ("http://" + sDNSName)).setTargetBlank ()
+                                                                                        .addChild (sDNSName));
+                            aRow.addCell (aInetAddress == null ? new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("is not registered in SML")
+                                                               : new HCTextNode (new IPV4Addr (aInetAddress).getAsString ()));
+                            aRow.addCell (aNice == null ? null : aNice.getCanonicalHostName ());
+                          }
+
+                          final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+                          aNodeList.addChild (aTable).addChild (aDataTables);
+
+                          final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+                          aToolbar.addButtonBack (aDisplayLocale);
+                          aNodeList.addChild (aToolbar);
+
+                          return false;
+                        }
+                      });
   }
 
   @Override
@@ -351,91 +425,6 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     {
       return null;
     }
-  }
-
-  /**
-   * Check the DNS state of all service groups
-   *
-   * @param aWPEC
-   *        Current web page execution context
-   * @return <code>true</code> to show the list of service groups
-   */
-  private boolean _customCheckDNS (@Nonnull final WebPageExecutionContext aWPEC)
-  {
-    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-
-    aNodeList.addChild (getUIHandler ().createActionHeader ("Check DNS state of participants"));
-
-    // Simple check if we're online or not
-    try
-    {
-      InetAddress.getByName ("www.google.com");
-    }
-    catch (final UnknownHostException ex)
-    {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("It seems like you are offline! So please interpret the results on this page with care!"));
-    }
-
-    final String sSMLZoneName = _getSMLHostName ();
-    final IPeppolURLProvider aURLProvider = SMPMetaManager.getPeppolURLProvider ();
-
-    final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("DNS name"),
-                                        new DTCol ("IP address").setDataSort (2, 0),
-                                        new DTCol ("Nice name")).setID (getID () + "checkdns");
-    for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
-    {
-      final String sDNSName = aURLProvider.getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
-                                                                    sSMLZoneName);
-
-      InetAddress aInetAddress = null;
-      try
-      {
-        aInetAddress = InetAddress.getByName (sDNSName);
-      }
-      catch (final UnknownHostException ex)
-      {
-        // Ignore
-      }
-      InetAddress aNice = null;
-      if (aInetAddress != null)
-        try
-        {
-          aNice = InetAddress.getByAddress (aInetAddress.getAddress ());
-        }
-        catch (final UnknownHostException ex)
-        {
-          // Ignore
-        }
-
-      final HCRow aRow = aTable.addBodyRow ();
-      aRow.addCell (aServiceGroup.getParticpantIdentifier ().getURIEncoded ());
-      aRow.addCell (new HCA (new SimpleURL ("http://" + sDNSName)).setTargetBlank ().addChild (sDNSName));
-      aRow.addCell (aInetAddress == null ? new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("is not registered in SML")
-                                         : new HCTextNode (new IPV4Addr (aInetAddress).getAsString ()));
-      aRow.addCell (aNice == null ? null : aNice.getCanonicalHostName ());
-    }
-
-    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-    aNodeList.addChild (aTable).addChild (aDataTables);
-
-    final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-    aToolbar.addButtonBack (aDisplayLocale);
-    aNodeList.addChild (aToolbar);
-
-    return false;
-  }
-
-  @Override
-  protected boolean handleCustomActions (@Nonnull final WebPageExecutionContext aWPEC,
-                                         @Nullable final ISMPServiceGroup aSelectedObject)
-  {
-    if (aWPEC.hasAction (ACTION_CHECK_DNS))
-      return _customCheckDNS (aWPEC);
-
-    return super.handleCustomActions (aWPEC, aSelectedObject);
   }
 
   @Override

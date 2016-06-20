@@ -93,6 +93,7 @@ import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapHelpBlock;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandler;
 import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.panel.BootstrapPanel;
 import com.helger.photon.bootstrap3.table.BootstrapTable;
@@ -138,7 +139,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   private static final String SUFFIX_ADDITIONAL_INFO = "additional";
   private static final String SUFFIX_REG_DATE = "regdate";
   private static final String TMP_ID_PREFIX = "tmp";
-  private static final String ACTION_PUBLIC_TO_INDEXER = "publishtoindexer";
+  private static final String ACTION_PUBLISH_TO_INDEXER = "publishtoindexer";
 
   public PageSecureBusinessCards (@Nonnull @Nonempty final String sID)
   {
@@ -166,6 +167,26 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
           aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
       }
     });
+    addCustomHandler (ACTION_PUBLISH_TO_INDEXER,
+                      new AbstractBootstrapWebPageActionHandler <ISMPBusinessCard, WebPageExecutionContext> (true)
+                      {
+                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                     @Nonnull final ISMPBusinessCard aSelectedObject)
+                        {
+                          final IParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ()
+                                                                                       .getParticpantIdentifier ();
+                          final ESuccess eSuccess = new PDClient (URLHelper.getAsURI (SMPServerConfiguration.getPEPPOLDirectoryHostName ())).addServiceGroupToIndex (aParticipantID);
+                          if (eSuccess.isSuccess ())
+                            aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
+                                                                                        aParticipantID.getURIEncoded () +
+                                                                                        "'"));
+                          else
+                            aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
+                                                                                      aParticipantID.getURIEncoded () +
+                                                                                      "'"));
+                          return true;
+                        }
+                      });
   }
 
   @Override
@@ -849,30 +870,6 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     }
   }
 
-  private void _publishToIndexer (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final ISMPBusinessCard aSelectedObject)
-  {
-    final IParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ().getParticpantIdentifier ();
-    final ESuccess eSuccess = new PDClient (URLHelper.getAsURI (SMPServerConfiguration.getPEPPOLDirectoryHostName ())).addServiceGroupToIndex (aParticipantID);
-    if (eSuccess.isSuccess ())
-      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
-                                                                  aParticipantID.getURIEncoded () +
-                                                                  "'"));
-    else
-      aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
-                                                                aParticipantID.getURIEncoded () +
-                                                                "'"));
-  }
-
-  @Override
-  protected boolean handleCustomActions (@Nonnull final WebPageExecutionContext aWPEC,
-                                         @Nullable final ISMPBusinessCard aSelectedObject)
-  {
-    if (aWPEC.hasAction (ACTION_PUBLIC_TO_INDEXER) && aSelectedObject != null)
-      _publishToIndexer (aWPEC, aSelectedObject);
-    return true;
-  }
-
   @Nonnull
   private IHCNode _createActionCell (@Nonnull final WebPageExecutionContext aWPEC,
                                      @Nonnull final ISMPBusinessCard aCurObject)
@@ -899,7 +896,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                                                                                               .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()),
                                           new HCTextNode (" "),
                                           new HCA (aWPEC.getSelfHref ()
-                                                        .add (CPageParam.PARAM_ACTION, ACTION_PUBLIC_TO_INDEXER)
+                                                        .add (CPageParam.PARAM_ACTION, ACTION_PUBLISH_TO_INDEXER)
                                                         .add (CPageParam.PARAM_OBJECT,
                                                               aCurObject.getID ())).setTitle ("Update Business Card in PEPPOL Directory")
                                                                                    .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
