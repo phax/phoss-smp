@@ -209,7 +209,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
-    aNodeList.addChild (createActionHeader ("Show details of Business Card"));
+    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of Business Card"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service Group")
@@ -805,7 +805,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
 
-    aForm.addChild (createActionHeader (bEdit ? "Edit Business Card" : "Create new Business Card"));
+    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Business Card" : "Create new Business Card"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
                                                  .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,

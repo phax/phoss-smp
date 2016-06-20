@@ -186,7 +186,9 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
-    aNodeList.addChild (createActionHeader ("Show details of service group '" + aSelectedObject.getID () + "'"));
+    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of service group '" +
+                                                            aSelectedObject.getID () +
+                                                            "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
@@ -212,8 +214,8 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final boolean bEdit = eFormAction.isEdit ();
 
     aForm.setLeft (2);
-    aForm.addChild (createActionHeader (bEdit ? "Edit service group '" + aSelectedObject.getID () + "'"
-                                              : "Create new service group"));
+    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit service group '" + aSelectedObject.getID () + "'"
+                                                              : "Create new service group"));
 
     {
       final BootstrapRow aRow = new BootstrapRow ();
@@ -364,7 +366,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
-    aNodeList.addChild (createActionHeader ("Check DNS state of participants"));
+    aNodeList.addChild (getUIHandler ().createActionHeader ("Check DNS state of participants"));
 
     // Simple check if we're online or not
     try

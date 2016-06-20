@@ -123,9 +123,9 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
-    aNodeList.addChild (createActionHeader ("Show details of SML information '" +
-                                            aSelectedObject.getDisplayName () +
-                                            "'"));
+    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of SML information '" +
+                                                            aSelectedObject.getDisplayName () +
+                                                            "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aSelectedObject.getDisplayName ()));
@@ -156,8 +156,10 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
   {
     final boolean bEdit = eFormAction.isEdit ();
 
-    aForm.addChild (createActionHeader (bEdit ? "Edit SML information '" + aSelectedObject.getDisplayName () + "'"
-                                              : "Create new SML information"));
+    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit SML information '" +
+                                                                aSelectedObject.getDisplayName () +
+                                                                "'"
+                                                              : "Create new SML information"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Name")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_DISPLAY_NAME,

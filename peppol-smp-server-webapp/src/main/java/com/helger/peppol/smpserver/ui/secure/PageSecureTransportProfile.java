@@ -129,7 +129,9 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
-    aNodeList.addChild (createActionHeader ("Show details of transport profile '" + aSelectedObject.getID () + "'"));
+    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of transport profile '" +
+                                                            aSelectedObject.getID () +
+                                                            "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("ID").setCtrl (aSelectedObject.getID ()));
@@ -147,8 +149,10 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   {
     final boolean bEdit = eFormAction.isEdit ();
 
-    aForm.addChild (createActionHeader (bEdit ? "Edit transport profile '" + aSelectedObject.getID () + "'"
-                                              : "Create new transport profile"));
+    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit transport profile '" +
+                                                                aSelectedObject.getID () +
+                                                                "'"
+                                                              : "Create new transport profile"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("ID")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_ID,

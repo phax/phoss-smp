@@ -159,8 +159,8 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
                                 @Nonnull final FormErrors aFormErrors)
   {
     final boolean bEdit = eFormAction.isEdit ();
-    aForm.addChild (createActionHeader (bEdit ? "Edit user '" + aSelectedObject.getUserName () + "'"
-                                              : "Create new user"));
+    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit user '" + aSelectedObject.getUserName () + "'"
+                                                              : "Create new user"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("User name")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_USERNAME,

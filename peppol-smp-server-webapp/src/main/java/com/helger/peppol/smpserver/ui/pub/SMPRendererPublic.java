@@ -35,7 +35,6 @@ import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCP;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.metadata.HCHead;
-import com.helger.html.hc.html.sections.HCH1;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
@@ -62,7 +61,7 @@ import com.helger.photon.bootstrap3.nav.BootstrapNav;
 import com.helger.photon.bootstrap3.navbar.BootstrapNavbar;
 import com.helger.photon.bootstrap3.navbar.EBootstrapNavbarPosition;
 import com.helger.photon.bootstrap3.navbar.EBootstrapNavbarType;
-import com.helger.photon.bootstrap3.pageheader.BootstrapPageHeader;
+import com.helger.photon.bootstrap3.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapMenuItemRenderer;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapMenuItemRendererHorz;
 import com.helger.photon.core.EPhotonCoreText;
@@ -227,8 +226,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
     }
 
     final String sHeaderText = aDisplayPage.getHeaderText (aWPEC);
-    if (StringHelper.hasText (sHeaderText))
-      aPageContainer.addChild (new BootstrapPageHeader ().addChild (new HCH1 ().addChild (sHeaderText)));
+    aPageContainer.addChild (BootstrapWebPageUIHandler.INSTANCE.createPageHeader (sHeaderText));
     // Main fill content
     aDisplayPage.getContent (aWPEC);
     // Add result

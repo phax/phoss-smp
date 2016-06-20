@@ -234,7 +234,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
-    aNodeList.addChild (createActionHeader ("Show details of Redirect"));
+    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of Redirect"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service Group")
@@ -349,7 +349,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
-    aForm.addChild (createActionHeader (bEdit ? "Edit Redirect" : "Create new Redirect"));
+    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Redirect" : "Create new Redirect"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
                                                  .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
