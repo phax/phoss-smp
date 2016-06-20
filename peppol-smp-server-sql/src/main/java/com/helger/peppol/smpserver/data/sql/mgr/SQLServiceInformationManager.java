@@ -40,9 +40,7 @@
  */
 package com.helger.peppol.smpserver.data.sql.mgr;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -55,7 +53,9 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.IdentifierHelper;
@@ -336,10 +336,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   private static SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
   {
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
     for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
     {
-      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
+      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
       for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
       {
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBEndpoint.getId ().getTransportProfile (),
@@ -378,7 +378,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
+    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
     for (final DBServiceMetadata aDBMetadata : ret.get ())
       aServiceInformations.add (_convert (aDBMetadata));
     return aServiceInformations;
@@ -401,7 +401,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   @ReturnsMutableCopy
   public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
+    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       JPAExecutionResult <List <DBServiceMetadata>> ret;
@@ -427,7 +427,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   @ReturnsMutableCopy
   public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
+    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       for (final ISMPServiceInformation aServiceInformation : getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
@@ -446,7 +446,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     JPAExecutionResult <DBServiceMetadata> ret;
     ret = doInTransaction ( () -> {
       // Disable caching here
-      final Map <String, Object> aProps = new HashMap <> ();
+      final ICommonsMap <String, Object> aProps = new CommonsHashMap<> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
       final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceGroup.getParticpantIdentifier (),
                                                                          aDocTypeID);

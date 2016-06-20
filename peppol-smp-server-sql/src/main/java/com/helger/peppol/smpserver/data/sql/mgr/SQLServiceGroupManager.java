@@ -40,9 +40,7 @@
  */
 package com.helger.peppol.smpserver.data.sql.mgr;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -54,7 +52,9 @@ import org.eclipse.persistence.config.CacheUsage;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EChange;
@@ -254,7 +254,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                                       DBServiceGroup.class)
                                                                         .getResultList ();
 
-      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
+      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList<> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
         final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
@@ -288,7 +288,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                         .setParameter ("user", sOwnerID)
                                                                         .getResultList ();
 
-      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
+      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList<> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
         final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,
@@ -361,7 +361,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     JPAExecutionResult <Boolean> ret;
     ret = doSelect ( () -> {
       // Disable caching here
-      final Map <String, Object> aProps = new HashMap <> ();
+      final ICommonsMap <String, Object> aProps = new CommonsHashMap<> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
       final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
                                                                        new DBServiceGroupID (aParticipantIdentifier),

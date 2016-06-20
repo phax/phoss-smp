@@ -40,9 +40,7 @@
  */
 package com.helger.peppol.smpserver.data.sql.mgr;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -55,7 +53,9 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
@@ -202,7 +202,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList <> ();
+    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList<> ();
     for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
       aRedirects.add (_convert (aDBRedirect));
     return aRedirects;
@@ -212,7 +212,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
   @ReturnsMutableCopy
   public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList <> ();
+    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
@@ -259,7 +259,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     JPAExecutionResult <DBServiceMetadataRedirection> ret;
     ret = doInTransaction ( () -> {
       // Disable caching here
-      final Map <String, Object> aProps = new HashMap <> ();
+      final ICommonsMap <String, Object> aProps = new CommonsHashMap<> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
       final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
                                                                                                aDocTypeID);
