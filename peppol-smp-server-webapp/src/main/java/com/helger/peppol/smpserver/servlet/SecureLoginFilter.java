@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.state.EContinue;
 import com.helger.peppol.smpserver.app.CApp;
-import com.helger.peppol.smpserver.ui.AppLoginManager;
+import com.helger.peppol.smpserver.ui.SMPLoginManager;
 import com.helger.photon.core.app.CApplication;
 import com.helger.photon.core.servlet.AbstractUnifiedResponseFilter;
 import com.helger.photon.security.login.LoggedInUserManager;
@@ -40,7 +40,7 @@ import com.helger.web.servlet.response.UnifiedResponse;
  */
 public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
 {
-  private AppLoginManager m_aLogin;
+  private SMPLoginManager m_aLogin;
 
   @Override
   @Nonnull
@@ -54,7 +54,7 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
   protected void onInit (@Nonnull final FilterConfig aFilterConfig) throws ServletException
   {
     // Make the application login configurable if you like
-    m_aLogin = new AppLoginManager ();
+    m_aLogin = new SMPLoginManager ();
   }
 
   @Override
