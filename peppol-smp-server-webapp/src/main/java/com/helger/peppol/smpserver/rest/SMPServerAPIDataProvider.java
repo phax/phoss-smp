@@ -69,31 +69,36 @@ public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
     if (m_bUseStaticServerInfo && StaticServerInfo.isSet ())
     {
       // Do not decode params - '#' lets URI parser fail!
-      return URLHelper.getAsURI (StaticServerInfo.getInstance ().getFullServerPath () +
+      return URLHelper.getAsURI (StaticServerInfo.getInstance ().getFullContextPath () +
                                  "/" +
                                  m_aUriInfo.getPath (false));
     }
     if (false)
     {
-      // http://172.31.14.98:90/
+      // First version in ROOT, second in context "/test"
+
+      // http://127.0.0.1:90/
+      // http://127.0.0.1:90/test/
       m_aUriInfo.getBaseUri ();
       // iso6523-actorid-upis:0088:5798000000112
       m_aUriInfo.getPath ();
-      // http://172.31.14.98:90/iso6523-actorid-upis%3A0088%3A5798000000112
+      // http://127.0.0.1:90/iso6523-actorid-upis%3A0088%3A5798000000112
+      // http://127.0.0.1:90/test/iso6523-actorid-upis%3A0088%3A5798000000112
       m_aUriInfo.getAbsolutePath ();
     }
     return m_aUriInfo.getAbsolutePath ();
   }
 
+  /**
+   * @return An UriBuilder that contains the full server name, port and context
+   *         path!
+   */
   @Nonnull
   protected UriBuilder getBaseUriBuilder ()
   {
     if (m_bUseStaticServerInfo && StaticServerInfo.isSet ())
     {
-      // Do not decode params - '#' lets URI parser fail!
-      return UriBuilder.fromUri (StaticServerInfo.getInstance ().getFullServerPath () +
-                                 "/" +
-                                 m_aUriInfo.getPath (false));
+      return UriBuilder.fromUri (StaticServerInfo.getInstance ().getFullContextPath () + "/");
     }
     return m_aUriInfo.getBaseUriBuilder ();
   }
