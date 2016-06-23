@@ -87,7 +87,7 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
     if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to create an endpoint for it."));
+      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to change endpoints."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
                                                 .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC,
                                                                                                   CMenuSecure.MENU_SERVICE_GROUPS))
