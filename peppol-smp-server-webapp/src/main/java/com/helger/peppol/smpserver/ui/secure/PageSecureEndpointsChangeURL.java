@@ -1,0 +1,253 @@
+/**
+ * Copyright (C) 2014-2016 Philip Helger (www.helger.com)
+ * philip[at]helger[dot]com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.helger.peppol.smpserver.ui.secure;
+
+import java.util.Locale;
+
+import javax.annotation.Nonnull;
+
+import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.annotation.WorkInProgress;
+import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsTreeSet;
+import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.ext.ICommonsSortedSet;
+import com.helger.commons.collection.multimap.MultiHashMapArrayListBased;
+import com.helger.commons.compare.ESortOrder;
+import com.helger.commons.errorlist.FormErrors;
+import com.helger.commons.state.EValidity;
+import com.helger.commons.state.IValidityIndicator;
+import com.helger.commons.string.StringHelper;
+import com.helger.commons.url.ISimpleURL;
+import com.helger.commons.url.URLValidator;
+import com.helger.html.hc.html.forms.HCEdit;
+import com.helger.html.hc.html.forms.HCHiddenField;
+import com.helger.html.hc.html.grouping.HCDiv;
+import com.helger.html.hc.html.grouping.HCUL;
+import com.helger.html.hc.html.tabular.HCRow;
+import com.helger.html.hc.html.tabular.HCTable;
+import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.impl.HCNodeList;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
+import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
+import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
+import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap3.button.BootstrapButton;
+import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap3.form.BootstrapForm;
+import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.core.form.RequestField;
+import com.helger.photon.uicore.css.CPageParam;
+import com.helger.photon.uicore.icon.EDefaultIcon;
+import com.helger.photon.uicore.page.AbstractWebPageForm;
+import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.photon.uictrls.datatables.DataTables;
+import com.helger.photon.uictrls.datatables.column.DTCol;
+import com.helger.photon.uictrls.datatables.column.EDTColType;
+
+@WorkInProgress
+public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
+{
+  private static final String FIELD_OLD_URL = "oldurl";
+  private static final String FIELD_NEW_URL = "newurl";
+
+  public PageSecureEndpointsChangeURL (@Nonnull @Nonempty final String sID)
+  {
+    super (sID, "Bulk change URL");
+  }
+
+  @Override
+  @Nonnull
+  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
+  {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
+    if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
+    {
+      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to create an endpoint for it."));
+      aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
+                                                .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC,
+                                                                                                  CMenuSecure.MENU_SERVICE_GROUPS))
+                                                .setIcon (EDefaultIcon.YES));
+      return EValidity.INVALID;
+    }
+    return super.isValidToDisplayPage (aWPEC);
+  }
+
+  @Override
+  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    boolean bShowList = true;
+
+    final MultiHashMapArrayListBased <String, ISMPEndpoint> aGroupedPerURL = new MultiHashMapArrayListBased<> ();
+    final ICommonsList <? extends ISMPServiceInformation> aAllSIs = aServiceInfoMgr.getAllSMPServiceInformation ();
+    int nTotalEndpointCount = 0;
+    int nTotalEndpointCountWithURL = 0;
+    for (final ISMPServiceInformation aSI : aAllSIs)
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+        {
+          ++nTotalEndpointCount;
+          if (aEndpoint.hasEndpointReference ())
+          {
+            aGroupedPerURL.putSingle (aEndpoint.getEndpointReference (), aEndpoint);
+            ++nTotalEndpointCountWithURL;
+          }
+        }
+
+    if (aWPEC.hasAction (CPageParam.ACTION_EDIT))
+    {
+      bShowList = false;
+      final FormErrors aFormErrors = new FormErrors ();
+
+      final String sOldURL = aWPEC.getAttributeAsString (FIELD_OLD_URL);
+
+      if (aWPEC.hasSubAction (CPageParam.ACTION_SAVE))
+      {
+        final String sNewURL = aWPEC.getAttributeAsString (FIELD_NEW_URL);
+
+        if (StringHelper.hasNoText (sOldURL))
+          aFormErrors.addFieldInfo (FIELD_OLD_URL, "An old URL must be provided");
+        else
+          if (!URLValidator.isValid (sOldURL))
+            aFormErrors.addFieldInfo (FIELD_OLD_URL, "The old URL is invalid");
+
+        if (StringHelper.hasNoText (sNewURL))
+          aFormErrors.addFieldInfo (FIELD_NEW_URL, "A new URL must be provided");
+        else
+          if (!URLValidator.isValid (sNewURL))
+            aFormErrors.addFieldInfo (FIELD_NEW_URL, "The new URL is invalid");
+          else
+            if (sNewURL.equals (sOldURL))
+              aFormErrors.addFieldInfo (FIELD_NEW_URL, "The new URL is identical to the old URL");
+
+        // Validate parameters
+        if (aFormErrors.isEmpty ())
+        {
+          // Modify all endpoints
+          int nChangedEndpoints = 0;
+          final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet<> ();
+          for (final ISMPServiceInformation aSI : aAllSIs)
+          {
+            boolean bChanged = false;
+            for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+              for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+                if (sOldURL.equals (aEndpoint.getEndpointReference ()))
+                {
+                  ((SMPEndpoint) aEndpoint).setEndpointReference (sNewURL);
+                  bChanged = true;
+                  ++nChangedEndpoints;
+                }
+            if (bChanged)
+            {
+              aServiceInfoMgr.mergeSMPServiceInformation (aSI);
+              aChangedServiceGroup.add (aSI.getServiceGroupID ());
+            }
+          }
+
+          if (nChangedEndpoints > 0)
+          {
+            final HCUL aUL = new HCUL ();
+            for (final String sServiceGroupID : aChangedServiceGroup)
+              aUL.addItem (sServiceGroupID);
+            aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChildren (new HCDiv ().addChild ("The old URL '" +
+                                                                                                  sOldURL +
+                                                                                                  "' was changed in " +
+                                                                                                  nChangedEndpoints +
+                                                                                                  " endpoints. Effected service groups are:"),
+                                                                           aUL));
+          }
+          else
+            aWPEC.postRedirectGet (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old URL '" +
+                                                                     sOldURL +
+                                                                     "'"));
+        }
+      }
+
+      final int nEPCount = CollectionHelper.getSize (aGroupedPerURL.get (sOldURL));
+      aNodeList.addChild (new BootstrapInfoBox ().addChild ("The selected old URL '" +
+                                                            sOldURL +
+                                                            "' is currently used in " +
+                                                            nEPCount +
+                                                            " " +
+                                                            (nEPCount == 1 ? "endpoint" : "endpoints") +
+                                                            "."));
+
+      // Show edit screen
+      final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
+      aForm.addChild (new HCHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT));
+      aForm.addChild (new HCHiddenField (CPageParam.PARAM_SUBACTION, CPageParam.ACTION_SAVE));
+
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Old endpoint URL")
+                                                   .setCtrl (new HCEdit (new RequestField (FIELD_OLD_URL, sOldURL)))
+                                                   .setHelpText ("The old URL that is to be changed in all matching endpoints")
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_OLD_URL)));
+
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New endpoint URL")
+                                                   .setCtrl (new HCEdit (new RequestField (FIELD_NEW_URL, sOldURL)))
+                                                   .setHelpText ("The new URL that is used instead")
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_NEW_URL)));
+
+      final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
+      aToolbar.addSubmitButton ("Save changes", EDefaultIcon.SAVE);
+      aToolbar.addButtonCancel (aDisplayLocale);
+    }
+
+    if (bShowList)
+    {
+      aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("This page lets you change the URLs of multiple endpoints at once. This is e.g. helpful when the underlying server got a new URL."),
+                                                               new HCDiv ().addChild ("Currently " +
+                                                                                      nTotalEndpointCount +
+                                                                                      " endpoints are registered" +
+                                                                                      (nTotalEndpointCountWithURL < nTotalEndpointCount ? " of which " +
+                                                                                                                                          nTotalEndpointCountWithURL +
+                                                                                                                                          " have an endpoint reference"
+                                                                                                                                        : "") +
+                                                                                      ".")));
+
+      final HCTable aTable = new HCTable (new DTCol ("Endpoint URL").setInitialSorting (ESortOrder.ASCENDING),
+                                          new DTCol ("Endpoint Count").setDisplayType (EDTColType.INT, aDisplayLocale),
+                                          new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
+      aGroupedPerURL.forEach ( (sURL, aEndpoints) -> {
+        final HCRow aRow = aTable.addBodyRow ();
+        aRow.addCell (sURL);
+        aRow.addCell (Integer.toString (aEndpoints.size ()));
+
+        final ISimpleURL aEditURL = aWPEC.getSelfHref ()
+                                         .add (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT)
+                                         .add (FIELD_OLD_URL, sURL);
+        aRow.addCell (new HCA (aEditURL).setTitle ("Change all endpoints pointing to " + sURL)
+                                        .addChild (EDefaultIcon.EDIT.getAsNode ()));
+      });
+
+      final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+      aNodeList.addChild (aTable).addChild (aDataTables);
+    }
+  }
+}

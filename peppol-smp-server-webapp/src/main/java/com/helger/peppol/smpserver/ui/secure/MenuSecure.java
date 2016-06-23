@@ -64,7 +64,10 @@ public final class MenuSecure
     if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
       aMenuTree.createRootItem (new PageSecureUsers (CMenuSecure.MENU_USERS));
     aMenuTree.createRootItem (new PageSecureServiceGroups (CMenuSecure.MENU_SERVICE_GROUPS));
-    aMenuTree.createRootItem (new PageSecureEndpoints (CMenuSecure.MENU_ENDPOINTS));
+    {
+      final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new PageSecureEndpoints (CMenuSecure.MENU_ENDPOINTS));
+      aMenuTree.createItem (aEndpoints, new PageSecureEndpointsChangeURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_URL));
+    }
     aMenuTree.createRootItem (new PageSecureRedirects (CMenuSecure.MENU_REDIRECTS));
     aMenuTree.createRootItem (new PageSecureBusinessCards (CMenuSecure.MENU_BUSINESS_CARDS))
              .setDisplayFilter (aFilterPEPPOLDirectory);
@@ -72,9 +75,9 @@ public final class MenuSecure
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
     aMenuTree.createRootItem (new PageSecureTasks (CMenuSecure.MENU_TASKS));
     {
-      final IMenuItemPage aPageSML = aMenuTree.createRootItem (new BasePageShowChildren <> (CMenuSecure.MENU_SML,
-                                                                                            "SML",
-                                                                                            aMenuTree));
+      final IMenuItemPage aPageSML = aMenuTree.createRootItem (new BasePageShowChildren<> (CMenuSecure.MENU_SML,
+                                                                                           "SML",
+                                                                                           aMenuTree));
       aMenuTree.createItem (aPageSML, new PageSecureSMLInfo (CMenuSecure.MENU_SML_INFO));
       aMenuTree.createItem (aPageSML, new PageSecureSMLSetup (CMenuSecure.MENU_SML_SETUP))
                .setDisplayFilter (aFilterSMLConnectionActive);
