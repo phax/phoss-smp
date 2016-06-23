@@ -67,6 +67,8 @@ public final class MenuSecure
     {
       final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new PageSecureEndpoints (CMenuSecure.MENU_ENDPOINTS));
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointsChangeURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_URL));
+      aMenuTree.createItem (aEndpoints,
+                            new PageSecureEndpointsChangeCertificate (CMenuSecure.MENU_ENDPOINTS_CHANGE_CERTIFICATE));
     }
     aMenuTree.createRootItem (new PageSecureRedirects (CMenuSecure.MENU_REDIRECTS));
     aMenuTree.createRootItem (new PageSecureBusinessCards (CMenuSecure.MENU_BUSINESS_CARDS))

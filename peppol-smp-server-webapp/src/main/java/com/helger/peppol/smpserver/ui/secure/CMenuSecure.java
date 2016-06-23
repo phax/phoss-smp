@@ -27,6 +27,7 @@ public final class CMenuSecure
 
   public static final String MENU_ENDPOINTS = "endpoints";
   public static final String MENU_ENDPOINTS_CHANGE_URL = "endpoints_change_url";
+  public static final String MENU_ENDPOINTS_CHANGE_CERTIFICATE = "endpoints_change_certificate";
 
   public static final String MENU_REDIRECTS = "redirects";
   public static final String MENU_BUSINESS_CARDS = "business_cards";
