@@ -20,10 +20,19 @@ import com.helger.settings.Settings;
 @NotThreadSafe
 public class SMPSettings implements ISMPSettings
 {
-  private boolean m_bPEPPOLDirectoryIntegrationEnabled = SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ();
+  private static final String KEY_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "peppol.directory.integration.enabled";
+
+  private boolean m_bPEPPOLDirectoryIntegrationEnabled;
 
   public SMPSettings ()
-  {}
+  {
+    setToConfigurationValues ();
+  }
+
+  public void setToConfigurationValues ()
+  {
+    m_bPEPPOLDirectoryIntegrationEnabled = SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ();
+  }
 
   public boolean isPEPPOLDirectoryIntegrationEnabled ()
   {
@@ -44,13 +53,13 @@ public class SMPSettings implements ISMPSettings
   public ISettings getAsSettings ()
   {
     final Settings ret = new Settings ("smp");
-    ret.setValue ("peppol.directory.integration.enabled", m_bPEPPOLDirectoryIntegrationEnabled);
+    ret.setValue (KEY_PEPPOL_DIRECTORY_INTEGRATION_ENABLED, m_bPEPPOLDirectoryIntegrationEnabled);
     return ret;
   }
 
   public void setFromSettings (@Nonnull final ISettings aSettings)
   {
     ValueEnforcer.notNull (aSettings, "settings");
-    m_bPEPPOLDirectoryIntegrationEnabled = aSettings.getAsBoolean ("peppol.directory.integration.enabled");
+    m_bPEPPOLDirectoryIntegrationEnabled = aSettings.getAsBoolean (KEY_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
   }
 }

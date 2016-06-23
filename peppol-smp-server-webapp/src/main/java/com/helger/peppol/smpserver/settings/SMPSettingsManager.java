@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.concurrent.SimpleReadWriteLock;
+import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.commons.state.EChange;
 import com.helger.photon.basic.app.dao.impl.AbstractSimpleDAO;
@@ -16,7 +16,13 @@ import com.helger.settings.factory.ISettingsFactory;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.MicroDocument;
 
+/**
+ * This class manages and persists the SMP settings.
+ * 
+ * @author Philip Helger
+ */
 @ThreadSafe
+@WorkInProgress
 public class SMPSettingsManager extends AbstractGlobalSingleton
 {
   private final class DAO extends AbstractSimpleDAO
@@ -46,13 +52,13 @@ public class SMPSettingsManager extends AbstractGlobalSingleton
       return ret;
     }
 
+    // Make method visible and lock it
     private void markAsChanged0 ()
     {
       super.m_aRWLock.writeLocked ( () -> super.markAsChanged ());
     }
   }
 
-  private final SimpleReadWriteLock m_aRWLock = new SimpleReadWriteLock ();
   private final SMPSettings m_aSMPS = new SMPSettings ();
   private final DAO m_aDAO;
 
@@ -79,7 +85,15 @@ public class SMPSettingsManager extends AbstractGlobalSingleton
   public EChange updateSettings (final boolean bPEPPOLDirectoryIntegrationEnabled)
   {
     EChange eChange = EChange.UNCHANGED;
-    eChange = eChange.or (m_aSMPS.setPEPPOLDirectoryIntegrationEnabled (bPEPPOLDirectoryIntegrationEnabled));
+    m_aRWLock.writeLock ().lock ();
+    try
+    {
+      eChange = eChange.or (m_aSMPS.setPEPPOLDirectoryIntegrationEnabled (bPEPPOLDirectoryIntegrationEnabled));
+    }
+    finally
+    {
+      m_aRWLock.writeLock ().unlock ();
+    }
     if (eChange.isChanged ())
       m_aDAO.markAsChanged0 ();
     return eChange;
