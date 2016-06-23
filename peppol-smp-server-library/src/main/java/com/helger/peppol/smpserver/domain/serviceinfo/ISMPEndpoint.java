@@ -49,6 +49,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.compare.IComparator;
+import com.helger.commons.string.StringHelper;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 
 /**
@@ -78,6 +79,16 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
   String getEndpointReference ();
 
   /**
+   * @return <code>true</code> if this endpoint has an endpoint reference URL,
+   *         <code>false</code> otherwise.
+   * @see #getEndpointReference()
+   */
+  default boolean hasEndpointReference ()
+  {
+    return StringHelper.hasText (getEndpointReference ());
+  }
+
+  /**
    * @return Set to ‘true’ if the recipient requires business-level signatures
    *         for the message, meaning a signature applied to the business
    *         message before the message is put on the transport. This is
@@ -101,6 +112,16 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
   String getMinimumAuthenticationLevel ();
 
   /**
+   * @return <code>true</code> if this endpoint has a minimum authentication
+   *         level, <code>false</code> otherwise.
+   * @see #getMinimumAuthenticationLevel()
+   */
+  default boolean hasMinimumAuthenticationLevel ()
+  {
+    return StringHelper.hasText (getMinimumAuthenticationLevel ());
+  }
+
+  /**
    * @return Activation date and time of the service. Senders should ignore
    *         services that are not yet activated.
    */
@@ -112,7 +133,21 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    *         are not yet activated.
    */
   @Nullable
-  LocalDate getServiceActivationDate ();
+  default LocalDate getServiceActivationDate ()
+  {
+    final LocalDateTime aServiceActivationDT = getServiceActivationDateTime ();
+    return aServiceActivationDT != null ? aServiceActivationDT.toLocalDate () : null;
+  }
+
+  /**
+   * @return <code>true</code> if this endpoint has a service activation
+   *         datetime, <code>false</code> otherwise.
+   * @see #getServiceActivationDate()
+   */
+  default boolean hasServiceActivationDate ()
+  {
+    return getServiceActivationDate () != null;
+  }
 
   /**
    * @return Expiration date and time of the service. Senders should ignore
@@ -126,7 +161,21 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    *         are expired.
    */
   @Nullable
-  LocalDate getServiceExpirationDate ();
+  default LocalDate getServiceExpirationDate ()
+  {
+    final LocalDateTime aServiceExpirationDT = getServiceExpirationDateTime ();
+    return aServiceExpirationDT != null ? aServiceExpirationDT.toLocalDate () : null;
+  }
+
+  /**
+   * @return <code>true</code> if this endpoint has a service expiration
+   *         datetime, <code>false</code> otherwise.
+   * @see #getServiceExpirationDateTime()
+   */
+  default boolean hasServiceExpirationDateTime ()
+  {
+    return getServiceExpirationDateTime () != null;
+  }
 
   /**
    * @return the complete signing certificate of the recipient AP, as a PEM base

@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.annotation.Nonnull;
@@ -155,12 +154,6 @@ public class SMPEndpoint implements ISMPEndpoint
     return m_aServiceActivationDT;
   }
 
-  @Nullable
-  public LocalDate getServiceActivationDate ()
-  {
-    return m_aServiceActivationDT != null ? m_aServiceActivationDT.toLocalDate () : null;
-  }
-
   public void setServiceActivationDateTime (@Nullable final LocalDateTime aServiceActivationDate)
   {
     m_aServiceActivationDT = aServiceActivationDate;
@@ -170,12 +163,6 @@ public class SMPEndpoint implements ISMPEndpoint
   public LocalDateTime getServiceExpirationDateTime ()
   {
     return m_aServiceExpirationDT;
-  }
-
-  @Nullable
-  public LocalDate getServiceExpirationDate ()
-  {
-    return m_aServiceExpirationDT != null ? m_aServiceExpirationDT.toLocalDate () : null;
   }
 
   public void setServiceExpirationDateTime (@Nullable final LocalDateTime aServiceExpirationDate)
