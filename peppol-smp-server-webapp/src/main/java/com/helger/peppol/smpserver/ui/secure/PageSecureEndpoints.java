@@ -26,7 +26,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.errorlist.FormErrors;
@@ -105,7 +104,12 @@ import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
-@WorkInProgress
+/**
+ * Class to manage endpoints that belong to a service group. To use this page at
+ * least one service group must exist.
+ *
+ * @author Philip Helger
+ */
 public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServiceInformation>
 {
   private final static String FIELD_SERVICE_GROUP_ID = "sgid";
@@ -793,7 +797,6 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-
     aNodeList.addChild (aTable).addChild (aDataTables);
   }
 }
