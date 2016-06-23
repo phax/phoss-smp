@@ -100,15 +100,10 @@ public final class XMLServiceInformationManager extends
     if (bChangedExisting)
     {
       // Edit existing
-      m_aRWLock.writeLock ().lock ();
-      try
-      {
+      m_aRWLock.writeLocked ( () -> {
         internalUpdateItem (aOldInformation);
-      }
-      finally
-      {
-        m_aRWLock.writeLock ().unlock ();
-      }
+      });
+
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
                                         aOldInformation.getID (),
                                         aOldInformation.getServiceGroupID (),
@@ -134,16 +129,20 @@ public final class XMLServiceInformationManager extends
       }
 
       if (bRemovedOld)
+      {
         AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
                                           aOldInformation.getID (),
                                           aOldInformation.getServiceGroupID (),
                                           aOldInformation.getDocumentTypeIdentifier ().getURIEncoded ());
+      }
       else
         if (aOldInformation != null)
+        {
           AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT,
                                             aOldInformation.getID (),
                                             aOldInformation.getServiceGroupID (),
                                             aOldInformation.getDocumentTypeIdentifier ().getURIEncoded ());
+        }
 
       AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
                                         aSMPServiceInformation.getID (),
@@ -207,7 +206,7 @@ public final class XMLServiceInformationManager extends
   @ReturnsMutableCopy
   public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)
       findAll (x -> x.getServiceGroupID ().equals (aServiceGroup.getID ()), ret::add);
     return ret;
@@ -217,7 +216,7 @@ public final class XMLServiceInformationManager extends
   @ReturnsMutableCopy
   public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
+    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       findAllMapped (aSI -> aSI.getServiceGroupID ().equals (aServiceGroup.getID ()),
