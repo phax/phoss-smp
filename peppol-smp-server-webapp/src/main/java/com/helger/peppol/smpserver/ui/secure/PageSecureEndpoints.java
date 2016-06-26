@@ -447,7 +447,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
 
     // validations
-    if (StringHelper.isEmpty (sServiceGroupID))
+    if (StringHelper.hasNoText (sServiceGroupID))
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A service group must be selected!");
     else
     {
@@ -456,10 +456,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided service group does not exist!");
     }
 
-    if (StringHelper.isEmpty (sDocTypeIDScheme))
+    if (StringHelper.hasNoText (sDocTypeIDScheme))
       aFormErrors.addFieldError (FIELD_DOCTYPE_ID_SCHEME, "Document type ID scheme must not be empty!");
     else
-      if (StringHelper.isEmpty (sDocTypeIDValue))
+      if (StringHelper.hasNoText (sDocTypeIDValue))
         aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "Document type ID value must not be empty!");
       else
       {
@@ -475,10 +475,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         }
       }
 
-    if (StringHelper.isEmpty (sProcessIDScheme))
+    if (StringHelper.hasNoText (sProcessIDScheme))
       aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID scheme must not be empty!");
     else
-      if (StringHelper.isEmpty (sProcessIDValue))
+      if (StringHelper.hasNoText (sProcessIDValue))
         aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID value must not be empty!");
       else
       {
@@ -487,7 +487,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, "The provided process ID has an invalid syntax!");
       }
 
-    if (StringHelper.isEmpty (sTransportProfileID))
+    if (StringHelper.hasNoText (sTransportProfileID))
       aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, "Transport Profile must not be empty!");
     else
       if (aTransportProfile == null)
@@ -504,7 +504,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                  "Another endpoint for the provided service group, document type, process and transport profile is already present.");
     }
 
-    if (StringHelper.isEmpty (sEndpointReference))
+    if (StringHelper.hasNoText (sEndpointReference))
     {
       if (false)
         aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "Endpoint Reference must not be empty!");
@@ -517,7 +517,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       if (aNotBeforeDate.isAfter (aNotAfterDate))
         aFormErrors.addFieldError (FIELD_NOT_BEFORE, "Not Before Date must not be after Not After Date!");
 
-    if (StringHelper.isEmpty (sCertificate))
+    if (StringHelper.hasNoText (sCertificate))
       aFormErrors.addFieldError (FIELD_CERTIFICATE, "Certificate must not be empty!");
     else
     {
@@ -535,10 +535,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
                                    "The provided certificate string is not a valid X509 certificate!");
     }
 
-    if (StringHelper.isEmpty (sServiceDescription))
+    if (StringHelper.hasNoText (sServiceDescription))
       aFormErrors.addFieldError (FIELD_SERVICE_DESCRIPTION, "Service Description must not be empty!");
 
-    if (StringHelper.isEmpty (sTechnicalContact))
+    if (StringHelper.hasNoText (sTechnicalContact))
       aFormErrors.addFieldError (FIELD_TECHNICAL_CONTACT, "Technical Contact must not be empty!");
 
     if (StringHelper.hasText (sExtension))

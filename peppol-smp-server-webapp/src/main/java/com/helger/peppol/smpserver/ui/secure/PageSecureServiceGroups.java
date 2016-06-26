@@ -365,7 +365,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                        "Another service group for the same participant ID is already present (case insensitive)!");
       }
 
-    if (StringHelper.isEmpty (sOwningUserID))
+    if (StringHelper.hasNoText (sOwningUserID))
       aFormErrors.addFieldError (FIELD_OWNING_USER_ID, "Owning User must not be empty!");
     else
       if (aOwningUser == null)

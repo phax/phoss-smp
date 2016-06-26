@@ -212,13 +212,13 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
     final boolean bClientCertificateRequired = aWPEC.getCheckBoxAttr (FIELD_CLIENT_CERTIFICATE_REQUIRED, true);
 
     // validations
-    if (StringHelper.isEmpty (sDisplayName))
+    if (StringHelper.hasNoText (sDisplayName))
       aFormErrors.addFieldError (FIELD_DISPLAY_NAME, "The SML information name must not be empty!");
 
-    if (StringHelper.isEmpty (sDNSZone))
+    if (StringHelper.hasNoText (sDNSZone))
       aFormErrors.addFieldError (FIELD_DNS_ZONE, "The DNS Zone must not be empty!");
 
-    if (StringHelper.isEmpty (sManagementAddressURL))
+    if (StringHelper.hasNoText (sManagementAddressURL))
       aFormErrors.addFieldError (FIELD_MANAGEMENT_ADDRESS_URL, "The Management Address URL must not be empty!");
     else
     {

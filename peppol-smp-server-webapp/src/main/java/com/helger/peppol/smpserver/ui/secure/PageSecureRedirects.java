@@ -279,7 +279,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
     final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
 
     // validations
-    if (StringHelper.isEmpty (sServiceGroupID))
+    if (StringHelper.hasNoText (sServiceGroupID))
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A Service Group must be selected!");
     else
     {
@@ -288,7 +288,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided Service Group does not exist!");
     }
 
-    if (StringHelper.isEmpty (sDocTypeID))
+    if (StringHelper.hasNoText (sDocTypeID))
       aFormErrors.addFieldError (FIELD_DOCTYPE_ID, "Document Type ID must not be empty!");
     else
     {
@@ -310,13 +310,13 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
       }
     }
 
-    if (StringHelper.isEmpty (sRedirectTo))
+    if (StringHelper.hasNoText (sRedirectTo))
       aFormErrors.addFieldError (FIELD_REDIRECT_TO, "The Redirect URL must not be empty!");
     else
       if (URLHelper.getAsURL (sRedirectTo) == null)
         aFormErrors.addFieldError (FIELD_REDIRECT_TO, "The Redirect URL is not a valid URL!");
 
-    if (StringHelper.isEmpty (sSubjectUniqueIdentifier))
+    if (StringHelper.hasNoText (sSubjectUniqueIdentifier))
       aFormErrors.addFieldError (FIELD_SUBJECT_UNIQUE_IDENTIFIER, "Subject Unique Identifier must not be empty!");
 
     if (StringHelper.hasText (sExtension))

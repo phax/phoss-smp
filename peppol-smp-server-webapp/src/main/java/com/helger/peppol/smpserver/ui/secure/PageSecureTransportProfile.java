@@ -193,7 +193,7 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
           aFormErrors.addFieldError (FIELD_ID, "Another transport profile with the same name already exists!");
       }
 
-    if (StringHelper.isEmpty (sName))
+    if (StringHelper.hasNoText (sName))
       aFormErrors.addFieldError (FIELD_NAME, "The transport profile name must not be empty!");
 
     if (aFormErrors.isEmpty ())
@@ -243,10 +243,11 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
                     new HCTextNode (" "),
                     createCopyLink (aWPEC, aCurObject, "Copy " + aCurObject.getID ()),
                     new HCTextNode (" "),
-                    isActionAllowed (aWPEC,
-                                     EWebPageFormAction.DELETE,
-                                     aCurObject) ? createDeleteLink (aWPEC, aCurObject, "Delete " + aCurObject.getID ())
-                                                 : createEmptyAction ());
+                    isActionAllowed (aWPEC, EWebPageFormAction.DELETE, aCurObject)
+                                                                                   ? createDeleteLink (aWPEC,
+                                                                                                       aCurObject,
+                                                                                                       "Delete " + aCurObject.getID ())
+                                                                                   : createEmptyAction ());
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
