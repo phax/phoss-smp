@@ -17,6 +17,7 @@
 package com.helger.peppol.smpserver.settings;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
@@ -24,7 +25,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.settings.ISettings;
-import com.helger.settings.Settings;
+import com.helger.settings.SettingsWithDefault;
 
 /**
  * This class contains the settings to be applied for the current SMP instance.
@@ -36,9 +37,7 @@ import com.helger.settings.Settings;
 @NotThreadSafe
 public class SMPSettings implements ISMPSettings
 {
-  private static final String KEY_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "peppol.directory.integration.enabled";
-
-  private boolean m_bPEPPOLDirectoryIntegrationEnabled;
+  private SettingsWithDefault m_aSettings;
 
   public SMPSettings ()
   {
@@ -47,35 +46,97 @@ public class SMPSettings implements ISMPSettings
 
   public void setToConfigurationValues ()
   {
-    m_bPEPPOLDirectoryIntegrationEnabled = SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ();
+    m_aSettings = new SettingsWithDefault (SMPServerConfiguration.getConfigFile ().getSettings ());
   }
 
+  public boolean isRESTWritableAPIDisabled ()
+  {
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_REST_WRITABLEAPI_DISABLED);
+  }
+
+  @Nonnull
+  public EChange setRESTWritableAPIDisabled (final boolean bRESTWritableAPIDisabled)
+  {
+    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_REST_WRITABLEAPI_DISABLED, bRESTWritableAPIDisabled);
+  }
+
+  /**
+   * Check if the PEPPOL Directory integration (offering the /businesscard API)
+   * is enabled.
+   *
+   * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
+   *         By default it is disabled.
+   */
   public boolean isPEPPOLDirectoryIntegrationEnabled ()
   {
-    return m_bPEPPOLDirectoryIntegrationEnabled;
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
   }
 
   @Nonnull
   public EChange setPEPPOLDirectoryIntegrationEnabled (final boolean bPEPPOLDirectoryIntegrationEnabled)
   {
-    if (bPEPPOLDirectoryIntegrationEnabled == m_bPEPPOLDirectoryIntegrationEnabled)
-      return EChange.UNCHANGED;
-    m_bPEPPOLDirectoryIntegrationEnabled = bPEPPOLDirectoryIntegrationEnabled;
-    return EChange.CHANGED;
+    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
+                                 bPEPPOLDirectoryIntegrationEnabled);
+  }
+
+  /**
+   * @return The host name of the PEPPOL Directory server. Never
+   *         <code>null</code>.
+   */
+  @Nonnull
+  public String getPEPPOLDirectoryHostName ()
+  {
+    return m_aSettings.getAsString (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME);
+  }
+
+  @Nonnull
+  public EChange setPEPPOLDirectoryHostName (final String sPEPPOLDirectoryHostName)
+  {
+    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, sPEPPOLDirectoryHostName);
+  }
+
+  /**
+   * @return <code>true</code> if the SML connection is active,
+   *         <code>false</code> if not. Property <code>sml.active</code>.
+   */
+  public boolean isWriteToSML ()
+  {
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_ACTIVE);
+  }
+
+  @Nonnull
+  public EChange setWriteToSML (final boolean bWriteToSML)
+  {
+    return m_aSettings.setValue (SMPServerConfiguration.KEY_SML_ACTIVE, bWriteToSML);
+  }
+
+  /**
+   * @return The SML URL to use. Only relevant when {@link #isWriteToSML()} is
+   *         <code>true</code>. Property <code>sml.url</code>.
+   */
+  @Nullable
+  public String getSMLURL ()
+  {
+    return m_aSettings.getAsString (SMPServerConfiguration.KEY_SML_URL);
+  }
+
+  @Nonnull
+  public EChange setSMLURL (final String sSMLURL)
+  {
+    return m_aSettings.setValue (SMPServerConfiguration.KEY_SML_URL, sSMLURL);
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public ISettings getAsSettings ()
   {
-    final Settings ret = new Settings ("smp");
-    ret.setValue (KEY_PEPPOL_DIRECTORY_INTEGRATION_ENABLED, m_bPEPPOLDirectoryIntegrationEnabled);
-    return ret;
+    return m_aSettings;
   }
 
   public void setFromSettings (@Nonnull final ISettings aSettings)
   {
     ValueEnforcer.notNull (aSettings, "settings");
-    m_bPEPPOLDirectoryIntegrationEnabled = aSettings.getAsBoolean (KEY_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
+    m_aSettings.clear ();
+    m_aSettings.setValues (aSettings);
   }
 }

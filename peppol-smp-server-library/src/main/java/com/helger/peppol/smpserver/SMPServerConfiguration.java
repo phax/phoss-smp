@@ -71,6 +71,22 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 @ThreadSafe
 public final class SMPServerConfiguration
 {
+  public static final String KEY_SMP_BACKEND = "smp.backend";
+  public static final String KEY_SMP_KEYSTORE_PATH = "smp.keystore.path";
+  public static final String KEY_SMP_KEYSTORE_PASSWORD = "smp.keystore.password";
+  public static final String KEY_SMP_KEYSTORE_KEY_ALIAS = "smp.keystore.key.alias";
+  public static final String KEY_SMP_KEYSTORE_KEY_PASSWORD = "smp.keystore.key.password";
+  public static final String KEY_SMP_TRUSTSTORE_PATH = "smp.truststore.path";
+  public static final String KEY_SMP_TRUSTSTORE_PASSWORD = "smp.truststore.password";
+  public static final String KEY_SMP_FORCEROOT = "smp.forceroot";
+  public static final String KEY_SMP_PUBLICURL = "smp.publicurl";
+  public static final String KEY_SMP_IDENTIFIERTYPE = "smp.identifiertype";
+  public static final String KEY_SMP_REST_WRITABLEAPI_DISABLED = "smp.rest.writableapi.disabled";
+  public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
+  public static final String KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
+  public static final String KEY_SML_ACTIVE = "sml.active";
+  public static final String KEY_SML_URL = "sml.url";
+  public static final String KEY_SML_SMPID = "sml.smpid";
   /**
    * The name of the primary system property which points to the
    * smp-server.properties files
@@ -148,7 +164,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getBackend ()
   {
-    return getConfigFile ().getAsString ("smp.backend");
+    return getConfigFile ().getAsString (KEY_SMP_BACKEND);
   }
 
   /**
@@ -158,7 +174,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeyStorePath ()
   {
-    return getConfigFile ().getAsString ("smp.keystore.path");
+    return getConfigFile ().getAsString (KEY_SMP_KEYSTORE_PATH);
   }
 
   /**
@@ -168,7 +184,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeyStorePassword ()
   {
-    return getConfigFile ().getAsString ("smp.keystore.password");
+    return getConfigFile ().getAsString (KEY_SMP_KEYSTORE_PASSWORD);
   }
 
   /**
@@ -178,7 +194,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeyStoreKeyAlias ()
   {
-    return getConfigFile ().getAsString ("smp.keystore.key.alias");
+    return getConfigFile ().getAsString (KEY_SMP_KEYSTORE_KEY_ALIAS);
   }
 
   /**
@@ -189,7 +205,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static char [] getKeyStoreKeyPassword ()
   {
-    return getConfigFile ().getAsCharArray ("smp.keystore.key.password");
+    return getConfigFile ().getAsCharArray (KEY_SMP_KEYSTORE_KEY_PASSWORD);
   }
 
   /**
@@ -199,7 +215,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getTrustStorePath ()
   {
-    return getConfigFile ().getAsString ("smp.truststore.path");
+    return getConfigFile ().getAsString (KEY_SMP_TRUSTSTORE_PATH);
   }
 
   /**
@@ -209,7 +225,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getTrustStorePassword ()
   {
-    return getConfigFile ().getAsString ("smp.truststore.password");
+    return getConfigFile ().getAsString (KEY_SMP_TRUSTSTORE_PASSWORD);
   }
 
   /**
@@ -219,7 +235,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isForceRoot ()
   {
-    return getConfigFile ().getAsBoolean ("smp.forceroot", false);
+    return getConfigFile ().getAsBoolean (KEY_SMP_FORCEROOT, false);
   }
 
   /**
@@ -230,7 +246,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getPublicServerURL ()
   {
-    return getConfigFile ().getAsString ("smp.publicurl");
+    return getConfigFile ().getAsString (KEY_SMP_PUBLICURL);
   }
 
   /**
@@ -241,7 +257,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESMPIdentifierType getIdentifierType ()
   {
-    final String sType = getConfigFile ().getAsString ("smp.identifiertype");
+    final String sType = getConfigFile ().getAsString (KEY_SMP_IDENTIFIERTYPE);
     return ESMPIdentifierType.getFromIDOrDefault (sType, ESMPIdentifierType.PEPPOL);
   }
 
@@ -256,7 +272,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isRESTWritableAPIDisabled ()
   {
-    return getConfigFile ().getAsBoolean ("smp.rest.writableapi.disabled", false);
+    return getConfigFile ().getAsBoolean (KEY_SMP_REST_WRITABLEAPI_DISABLED, false);
   }
 
   /**
@@ -268,7 +284,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isPEPPOLDirectoryIntegrationEnabled ()
   {
-    return getConfigFile ().getAsBoolean ("smp.peppol.directory.integration.enabled", false);
+    return getConfigFile ().getAsBoolean (KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED, false);
   }
 
   /**
@@ -278,7 +294,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static String getPEPPOLDirectoryHostName ()
   {
-    return getConfigFile ().getAsString ("smp.peppol.directory.hostname", "http://pyp.helger.com");
+    return getConfigFile ().getAsString (KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, "http://pyp.helger.com");
   }
 
   /**
@@ -287,7 +303,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isWriteToSML ()
   {
-    return getConfigFile ().getAsBoolean ("sml.active", false);
+    return getConfigFile ().getAsBoolean (KEY_SML_ACTIVE, false);
   }
 
   /**
@@ -297,7 +313,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLURL ()
   {
-    return getConfigFile ().getAsString ("sml.url");
+    return getConfigFile ().getAsString (KEY_SML_URL);
   }
 
   /**
@@ -308,6 +324,6 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLSMPID ()
   {
-    return getConfigFile ().getAsString ("sml.smpid");
+    return getConfigFile ().getAsString (KEY_SML_SMPID);
   }
 }

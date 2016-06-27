@@ -16,16 +16,52 @@
  */
 package com.helger.peppol.smpserver.settings;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Runtime settings for this SMP server instance.
- * 
+ *
  * @author Philip Helger
  */
 public interface ISMPSettings
 {
   /**
-   * @return <code>true</code> if PEPPOL Directory integration is enabled,
-   *         <code>false</code> otherwise.
+   * Check if the writable parts of the REST API are disabled. If this is the
+   * case, only the read-only part of the API can be used. The writable REST API
+   * will return an HTTP 404 error.
+   *
+   * @return <code>true</code> if it is disabled, <code>false</code> if it is
+   *         enabled. By the default the writable API is enabled.
+   */
+  boolean isRESTWritableAPIDisabled ();
+
+  /**
+   * Check if the PEPPOL Directory integration (offering the /businesscard API)
+   * is enabled.
+   *
+   * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
+   *         By default it is disabled.
    */
   boolean isPEPPOLDirectoryIntegrationEnabled ();
+
+  /**
+   * @return The host name of the PEPPOL Directory server. Never
+   *         <code>null</code>.
+   */
+  @Nonnull
+  String getPEPPOLDirectoryHostName ();
+
+  /**
+   * @return <code>true</code> if the SML connection is active,
+   *         <code>false</code> if not.
+   */
+  boolean isWriteToSML ();
+
+  /**
+   * @return The SML URL to use. Only relevant when {@link #isWriteToSML()} is
+   *         <code>true</code>.
+   */
+  @Nullable
+  String getSMLURL ();
 }
