@@ -127,19 +127,19 @@ public final class SMPServerConfiguration
   {
     final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromSystemProperty (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH)
                                                            .addPathFromSystemProperty (SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH)
-                                                           .addPaths (PATH_PRIVATE_SMP_SERVER_PROPERTIES,
-                                                                      PATH_SMP_SERVER_PROPERTIES);
+                                                           .addPath (PATH_PRIVATE_SMP_SERVER_PROPERTIES)
+                                                           .addPath (PATH_SMP_SERVER_PROPERTIES);
 
     return s_aRWLock.writeLocked ( () -> {
       s_aConfigFile = aCFB.build ();
-      if (!s_aConfigFile.isRead ())
+      if (s_aConfigFile.isRead ())
       {
-        s_aLogger.warn ("Failed to read smp-server.properties");
-        return ESuccess.FAILURE;
+        s_aLogger.info ("Read PEPPOL SMP server properties from " + s_aConfigFile.getReadResource ().getPath ());
+        return ESuccess.SUCCESS;
       }
 
-      s_aLogger.info ("Read smp-server.properties from " + s_aConfigFile.getReadResource ().getPath ());
-      return ESuccess.SUCCESS;
+      s_aLogger.warn ("Failed to read PEPPOL SMP server properties from " + aCFB.getAllPaths ());
+      return ESuccess.FAILURE;
     });
   }
 

@@ -26,7 +26,7 @@ import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppSecurity;
-import com.helger.peppol.smpserver.app.AppSettings;
+import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
@@ -49,25 +49,25 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
   @Override
   protected String getInitParameterDebug (@Nonnull final ServletContext aSC)
   {
-    return AppSettings.getGlobalDebug ();
+    return AppConfiguration.getGlobalDebug ();
   }
 
   @Override
   protected String getInitParameterProduction (@Nonnull final ServletContext aSC)
   {
-    return AppSettings.getGlobalProduction ();
+    return AppConfiguration.getGlobalProduction ();
   }
 
   @Override
   protected String getDataPath (@Nonnull final ServletContext aSC)
   {
-    return AppSettings.getDataPath ();
+    return AppConfiguration.getDataPath ();
   }
 
   @Override
   protected boolean shouldCheckFileAccess (@Nonnull final ServletContext aSC)
   {
-    return AppSettings.isCheckFileAccess ();
+    return AppConfiguration.isCheckFileAccess ();
   }
 
   @Override

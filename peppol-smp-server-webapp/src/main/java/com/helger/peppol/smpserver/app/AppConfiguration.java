@@ -41,9 +41,9 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
  *
  * @author Philip Helger
  */
-public final class AppSettings extends AbstractGlobalSingleton
+public final class AppConfiguration extends AbstractGlobalSingleton
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (AppSettings.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (AppConfiguration.class);
 
   private static final ConfigFile s_aConfigFile;
 
@@ -51,17 +51,18 @@ public final class AppSettings extends AbstractGlobalSingleton
   {
     final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromSystemProperty ("peppol.smp.webapp.properties.path")
                                                            .addPathFromSystemProperty ("smp.webapp.properties.path")
-                                                           .addPaths ("private-webapp.properties", "webapp.properties");
+                                                           .addPath ("private-webapp.properties")
+                                                           .addPath ("webapp.properties");
 
     s_aConfigFile = aCFB.build ();
     if (!s_aConfigFile.isRead ())
-      throw new IllegalStateException ("Failed to read PEPPOL SMP UI properties");
+      throw new IllegalStateException ("Failed to read PEPPOL SMP UI properties from " + aCFB.getAllPaths ());
     s_aLogger.info ("Read PEPPOL SMP UI properties from " + s_aConfigFile.getReadResource ().getPath ());
   }
 
   @Deprecated
   @UsedViaReflection
-  private AppSettings ()
+  private AppConfiguration ()
   {}
 
   @Nonnull

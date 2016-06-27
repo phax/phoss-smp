@@ -90,7 +90,7 @@ public final class CApp
   @Nonempty
   public static String getApplicationTitle ()
   {
-    return APPLICATION_TITLE + (AppSettings.isTestVersion () ? " [TEST]" : "");
+    return APPLICATION_TITLE + (AppConfiguration.isTestVersion () ? " [TEST]" : "");
   }
 
   @Nonnull

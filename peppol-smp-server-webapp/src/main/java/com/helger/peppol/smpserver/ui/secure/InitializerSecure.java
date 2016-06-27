@@ -22,7 +22,7 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.app.AppSettings;
+import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.ui.ajax.CAjaxSecure;
 import com.helger.photon.basic.app.locale.ILocaleManager;
@@ -69,7 +69,7 @@ public final class InitializerSecure implements IApplicationInitializer <LayoutE
     final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
     aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
                                                                                                 .setSyntaxHighlightLanguage (EPrismLanguage.MARKUP));
-    aCFM.registerConfigurationFile (new ConfigurationFile (AppSettings.getSettingsResource ()).setDescription ("SMP web application configuration")
+    aCFM.registerConfigurationFile (new ConfigurationFile (AppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
                                                                                               .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
     final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
     if (aConfigRes != null)
