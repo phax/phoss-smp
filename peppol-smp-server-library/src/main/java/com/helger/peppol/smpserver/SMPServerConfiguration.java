@@ -48,13 +48,10 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.state.ESuccess;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.system.SystemProperties;
-import com.helger.peppol.utils.ConfigFile;
+import com.helger.settings.exchange.configfile.ConfigFile;
+import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 
 /**
  * The central configuration for the SMP server. This class manages the content
@@ -112,24 +109,16 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESuccess reloadConfiguration ()
   {
-    final ICommonsList <String> aFilePaths = new CommonsArrayList <> ();
-    // Check if the system property is present
-    String sPropertyPath = SystemProperties.getPropertyValue (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH);
-    if (StringHelper.hasText (sPropertyPath))
-      aFilePaths.add (sPropertyPath);
-    sPropertyPath = SystemProperties.getPropertyValue (SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH);
-    if (StringHelper.hasText (sPropertyPath))
-      aFilePaths.add (sPropertyPath);
-
-    // Use the default paths
-    aFilePaths.add (PATH_PRIVATE_SMP_SERVER_PROPERTIES);
-    aFilePaths.add (PATH_SMP_SERVER_PROPERTIES);
+    final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromSystemProperty (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH)
+                                                           .addPathFromSystemProperty (SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH)
+                                                           .addPaths (PATH_PRIVATE_SMP_SERVER_PROPERTIES,
+                                                                      PATH_SMP_SERVER_PROPERTIES);
 
     return s_aRWLock.writeLocked ( () -> {
-      s_aConfigFile = ConfigFile.create (aFilePaths);
+      s_aConfigFile = aCFB.build ();
       if (!s_aConfigFile.isRead ())
       {
-        s_aLogger.warn ("Failed to read smp-server.properties from any of the paths: " + aFilePaths);
+        s_aLogger.warn ("Failed to read smp-server.properties");
         return ESuccess.FAILURE;
       }
 

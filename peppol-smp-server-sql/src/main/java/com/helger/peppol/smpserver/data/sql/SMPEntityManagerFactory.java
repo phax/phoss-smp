@@ -52,7 +52,7 @@ import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.db.jpa.AbstractGlobalEntityManagerFactory;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.utils.ConfigFile;
+import com.helger.settings.exchange.configfile.ConfigFile;
 
 /**
  * Specific SMP JPA entity manager factory
@@ -68,7 +68,7 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
     // Standard configuration file
     final ConfigFile aConfigFile = SMPServerConfiguration.getConfigFile ();
 
-    final ICommonsMap <String, Object> ret = new CommonsHashMap <> ();
+    final ICommonsMap <String, Object> ret = new CommonsHashMap<> ();
     // Read all properties from the standard configuration file
     // Connection pooling
     ret.put (PersistenceUnitProperties.CONNECTION_POOL_MAX,

@@ -23,15 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.system.SystemProperties;
-import com.helger.peppol.utils.ConfigFile;
 import com.helger.settings.ISettings;
+import com.helger.settings.exchange.configfile.ConfigFile;
+import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 
 /**
  * This class provides access to the web application settings. If the system
@@ -52,22 +49,13 @@ public final class AppSettings extends AbstractGlobalSingleton
 
   static
   {
-    final ICommonsList <String> aFilePaths = new CommonsArrayList <> ();
-    // Check if the system property is present
-    String sPropertyPath = SystemProperties.getPropertyValue ("peppol.smp.webapp.properties.path");
-    if (StringHelper.hasText (sPropertyPath))
-      aFilePaths.add (sPropertyPath);
-    sPropertyPath = SystemProperties.getPropertyValue ("smp.webapp.properties.path");
-    if (StringHelper.hasText (sPropertyPath))
-      aFilePaths.add (sPropertyPath);
+    final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromSystemProperty ("peppol.smp.webapp.properties.path")
+                                                           .addPathFromSystemProperty ("smp.webapp.properties.path")
+                                                           .addPaths ("private-webapp.properties", "webapp.properties");
 
-    // Use the default paths
-    aFilePaths.add ("private-webapp.properties");
-    aFilePaths.add ("webapp.properties");
-
-    s_aConfigFile = ConfigFile.create (aFilePaths);
+    s_aConfigFile = aCFB.build ();
     if (!s_aConfigFile.isRead ())
-      throw new IllegalStateException ("Failed to read PEPPOL SMP UI properties from any of the paths: " + aFilePaths);
+      throw new IllegalStateException ("Failed to read PEPPOL SMP UI properties");
     s_aLogger.info ("Read PEPPOL SMP UI properties from " + s_aConfigFile.getReadResource ().getPath ());
   }
 

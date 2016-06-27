@@ -32,13 +32,13 @@ import com.helger.commons.email.EmailAddress;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.SMap;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.utils.ConfigFile;
 import com.helger.photon.basic.longrun.ILongRunningJob;
 import com.helger.photon.core.app.error.InternalErrorBuilder;
 import com.helger.photon.core.app.error.InternalErrorHandler;
 import com.helger.photon.core.app.error.callback.AbstractErrorCallback;
 import com.helger.schedule.job.AbstractJob;
 import com.helger.schedule.job.IJobExceptionCallback;
+import com.helger.settings.exchange.configfile.ConfigFile;
 import com.helger.smtp.settings.SMTPSettings;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
