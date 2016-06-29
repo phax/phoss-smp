@@ -42,7 +42,6 @@ import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SMap;
-import com.helger.commons.url.URLHelper;
 import com.helger.commons.url.URLValidator;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
@@ -174,16 +173,19 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                         {
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ()
                                                                                        .getParticpantIdentifier ();
-                          final ESuccess eSuccess = new PDClient (URLHelper.getAsURI (SMPMetaManager.getSettings ()
-                                                                                                    .getPEPPOLDirectoryHostName ())).addServiceGroupToIndex (aParticipantID);
-                          if (eSuccess.isSuccess ())
-                            aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
+                          try (final PDClient aPDClient = new PDClient (SMPMetaManager.getSettings ()
+                                                                                      .getPEPPOLDirectoryHostName ()))
+                          {
+                            final ESuccess eSuccess = aPDClient.addServiceGroupToIndex (aParticipantID);
+                            if (eSuccess.isSuccess ())
+                              aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
+                                                                                          aParticipantID.getURIEncoded () +
+                                                                                          "'"));
+                            else
+                              aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
                                                                                         aParticipantID.getURIEncoded () +
                                                                                         "'"));
-                          else
-                            aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
-                                                                                      aParticipantID.getURIEncoded () +
-                                                                                      "'"));
+                          }
                           return true;
                         }
                       });
