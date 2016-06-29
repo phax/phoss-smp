@@ -43,92 +43,34 @@ package com.helger.peppol.smpserver.smlhook;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.concurrent.SimpleReadWriteLock;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 
 /**
+ * This class provides the {@link IRegistrationHook} instance that matches the
+ * current "write to SML" settings.
+ *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Immutable
 public final class RegistrationHookFactory
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationHookFactory.class);
-
-  private static final SimpleReadWriteLock s_aRWLock = new SimpleReadWriteLock ();
-  private static IRegistrationHook s_aInstance;
+  private static RegistrationHookDoNothing s_aDoNothing = new RegistrationHookDoNothing ();
+  private static RegistrationHookWriteToSML s_aWriteToSML = new RegistrationHookWriteToSML ();
 
   private RegistrationHookFactory ()
   {}
 
   /**
-   * Create a new instance every time this method is invoked.
-   *
-   * @param bWriteToSML
-   *        <code>true</code> if writing to SML should be enabled,
-   *        <code>false</code> otherwise.
-   * @return A new instance of {@link IRegistrationHook} according to the
-   *         configuration file.
-   * @throws IllegalStateException
-   *         If the class could not be instantiated
-   */
-  @Nonnull
-  public static IRegistrationHook createInstance (final boolean bWriteToSML)
-  {
-    s_aLogger.info ("Access to the SML is " + (bWriteToSML ? "enabled" : "disabled") + " in this SMP server!");
-    return bWriteToSML ? new RegistrationHookWriteToSML () : new RegistrationHookDoNothing ();
-  }
-
-  /**
    * Get the one and only instance.
    *
-   * @return A new instance of {@link IRegistrationHook} according to the
-   *         configuration file.
-   * @throws IllegalStateException
-   *         If the class could not be instantiated
+   * @return A non-<code>null</code> instance of {@link IRegistrationHook}
+   *         according to the current setting. This can be either an instance of
+   *         {@link RegistrationHookDoNothing} or an instance of
+   *         {@link RegistrationHookWriteToSML}.
    */
   @Nonnull
-  public static IRegistrationHook getOrCreateInstance ()
+  public static IRegistrationHook getInstance ()
   {
-    IRegistrationHook ret = s_aRWLock.readLocked ( () -> s_aInstance);
-
-    if (ret == null)
-    {
-      s_aRWLock.writeLock ().lock ();
-      try
-      {
-        // Try again in write lock
-        ret = s_aInstance;
-        if (ret == null)
-        {
-          final boolean bWriteToSML = SMPServerConfiguration.isWriteToSML ();
-          s_aInstance = ret = createInstance (bWriteToSML);
-        }
-      }
-      finally
-      {
-        s_aRWLock.writeLock ().unlock ();
-      }
-    }
-    return ret;
-  }
-
-  public static void setInstance (@Nonnull final IRegistrationHook aInstance)
-  {
-    ValueEnforcer.notNull (aInstance, "Instance");
-    s_aRWLock.writeLocked ( () -> s_aInstance = aInstance);
-  }
-
-  public static void setInstance (final boolean bWriteToSML)
-  {
-    setInstance (createInstance (bWriteToSML));
-  }
-
-  public static boolean isSMLConnectionActive ()
-  {
-    return getOrCreateInstance () instanceof RegistrationHookWriteToSML;
+    return SMPMetaManager.getSettings ().isWriteToSML () ? s_aWriteToSML : s_aDoNothing;
   }
 }

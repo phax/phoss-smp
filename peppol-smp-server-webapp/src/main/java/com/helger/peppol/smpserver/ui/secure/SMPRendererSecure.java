@@ -30,8 +30,8 @@ import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
-import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
 import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
@@ -101,7 +101,7 @@ public final class SMPRendererSecure implements ILayoutAreaContentProvider <Layo
     ret.addChild (BootstrapMenuItemRenderer.createSideBarMenu (aLEC));
 
     // Information on SML usage
-    if (RegistrationHookFactory.isSMLConnectionActive ())
+    if (SMPMetaManager.getSettings ().isWriteToSML ())
       ret.addChild (new BootstrapInfoBox ().addChild ("SML connection active!"));
     else
       ret.addChild (new BootstrapWarnBox ().addChild ("SML connection NOT active!"));

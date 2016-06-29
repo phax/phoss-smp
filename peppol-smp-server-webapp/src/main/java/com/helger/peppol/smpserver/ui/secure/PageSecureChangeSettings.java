@@ -29,6 +29,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageSimpleForm;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
@@ -103,6 +104,10 @@ public final class PageSecureChangeSettings extends AbstractSMPWebPageSimpleForm
       if (!URLValidator.isValid (sPEPPOLDirectoryHostName))
         aFormErrors.addFieldError (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME,
                                    "PEPPOL Directory hostname must be a valid URL.");
+
+    if (bSMLActive && !SMPKeyManager.isCertificateValid ())
+      aFormErrors.addFieldError (FIELD_SML_ACTIVE,
+                                 "SML connection cannot be activated, because the configured keystore is invalid!");
 
     if (StringHelper.hasNoText (sSMLURL))
       aFormErrors.addFieldError (FIELD_SML_URL, "SML management URL may not be empty.");

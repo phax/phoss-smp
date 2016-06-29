@@ -76,11 +76,8 @@ import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 
 public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager implements ISMPServiceGroupManager
 {
-  private final IRegistrationHook m_aHook;
-
   public SQLServiceGroupManager ()
   {
-    m_aHook = RegistrationHookFactory.getOrCreateInstance ();
     setUseTransactionsForSelect (true);
   }
 
@@ -114,7 +111,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
         throw new IllegalStateException ("User '" + sOwnerID + "' does not exist!");
 
       // It's a new service group - throws exception in case of an error
-      m_aHook.createServiceGroup (aParticipantIdentifier);
+      final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+      aHook.createServiceGroup (aParticipantIdentifier);
 
       try
       {
@@ -128,7 +126,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       catch (final RuntimeException ex)
       {
         // An error occurred - remove from SML again
-        m_aHook.undoCreateServiceGroup (aParticipantIdentifier);
+        aHook.undoCreateServiceGroup (aParticipantIdentifier);
         throw ex;
       }
     });
@@ -216,7 +214,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       }
 
       // Delete in SML - throws exception in case of error
-      m_aHook.deleteServiceGroup (aParticipantID);
+      final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+      aHook.deleteServiceGroup (aParticipantID);
 
       try
       {
@@ -225,7 +224,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       catch (final RuntimeException ex)
       {
         // An error occurred - remove from SML again
-        m_aHook.undoDeleteServiceGroup (aParticipantID);
+        aHook.undoDeleteServiceGroup (aParticipantID);
         throw ex;
       }
 

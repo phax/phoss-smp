@@ -47,7 +47,6 @@ import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -55,7 +54,6 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
-import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
@@ -120,7 +118,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                                                                                      .getURIEncoded () +
                                                                                                       "'?"))
                                                                     .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."));
-        if (RegistrationHookFactory.isSMLConnectionActive ())
+        if (SMPMetaManager.getSettings ().isWriteToSML ())
           aQB.addChild (new HCDiv ().addChild ("Since the connection to the SML is active this service group will also be deleted from the SML!"));
 
         aForm.addChild (aQB);
@@ -416,7 +414,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   {
     try
     {
-      String ret = new URL (SMPServerConfiguration.getSMLURL ()).getHost ();
+      String ret = new URL (SMPMetaManager.getSettings ().getSMLURL ()).getHost ();
       if (!ret.endsWith ("."))
         ret += '.';
       return ret;

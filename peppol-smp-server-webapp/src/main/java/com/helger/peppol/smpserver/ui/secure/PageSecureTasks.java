@@ -48,7 +48,6 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
-import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.utils.CertificateHelper;
 import com.helger.peppol.utils.LoadedKeyStore;
@@ -110,7 +109,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
 
     // Check SML configuration
     {
-      if (!RegistrationHookFactory.isSMLConnectionActive ())
+      if (!SMPMetaManager.getSettings ().isWriteToSML ())
         aOL.addItem (_createWarning ("The connection to the SML is not active."),
                      new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
     }

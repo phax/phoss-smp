@@ -19,10 +19,8 @@ package com.helger.peppol.smpserver.ui.secure;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.commons.debug.GlobalDebug;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.photon.basic.app.menu.IMenuItemPage;
 import com.helger.photon.basic.app.menu.IMenuObject;
 import com.helger.photon.basic.app.menu.IMenuObjectFilter;
@@ -56,7 +54,7 @@ public final class MenuSecure
     {
       public boolean test (@Nonnull final IMenuObject aValue)
       {
-        return GlobalDebug.isDebugMode () || RegistrationHookFactory.isSMLConnectionActive ();
+        return SMPMetaManager.getSettings ().isWriteToSML ();
       }
     };
 

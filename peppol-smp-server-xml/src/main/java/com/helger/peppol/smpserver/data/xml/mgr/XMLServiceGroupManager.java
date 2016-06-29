@@ -50,12 +50,9 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceGroupManager.class);
 
-  private final IRegistrationHook m_aHook;
-
   public XMLServiceGroupManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceGroup.class, sFilename);
-    m_aHook = RegistrationHookFactory.getOrCreateInstance ();
   }
 
   @Nonnull
@@ -74,7 +71,8 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
     final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
 
     // It's a new service group - throws exception in case of an error
-    m_aHook.createServiceGroup (aParticipantIdentifier);
+    final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+    aHook.createServiceGroup (aParticipantIdentifier);
 
     m_aRWLock.writeLock ().lock ();
     try
@@ -84,7 +82,7 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
     catch (final RuntimeException ex)
     {
       // An error occurred - remove from SML again
-      m_aHook.undoCreateServiceGroup (aParticipantIdentifier);
+      aHook.undoCreateServiceGroup (aParticipantIdentifier);
       throw ex;
     }
     finally
@@ -155,7 +153,8 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
     }
 
     // Delete in SML - throws exception in case of error
-    m_aHook.deleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
+    final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+    aHook.deleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
 
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -202,7 +201,7 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
           aServiceInfoMgr.mergeSMPServiceInformation (aOldServiceInfo);
 
       // An error occurred - restore in SML again
-      m_aHook.undoDeleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
+      aHook.undoDeleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());
       throw ex;
     }
     finally

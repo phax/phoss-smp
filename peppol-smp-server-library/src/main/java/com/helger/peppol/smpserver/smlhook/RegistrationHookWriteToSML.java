@@ -60,6 +60,7 @@ import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.NotFoundFault;
 import com.helger.peppol.smlclient.participant.UnauthorizedFault;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 
 /**
@@ -74,49 +75,11 @@ import com.helger.peppol.smpserver.security.SMPKeyManager;
 public final class RegistrationHookWriteToSML implements IRegistrationHook
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationHookWriteToSML.class);
-  private static final URL s_aSMLEndpointURL;
-  private static final String s_sSMPID;
-  private static final SSLSocketFactory s_aDefaultSocketFactory;
-  private static final HostnameVerifier s_aDefaultHostnameVerifier;
+  // SMP ID is static and cannot change
+  private static final String s_sSMPID = SMPServerConfiguration.getSMLSMPID ();
 
   static
-  {
-    // SML endpoint (incl. the service name)
-    final String sSMLURL = SMPServerConfiguration.getSMLURL ();
-    try
-    {
-      s_aSMLEndpointURL = new URL (sSMLURL);
-    }
-    catch (final MalformedURLException ex)
-    {
-      throw new InitializationException ("Failed to init SML endpoint URL from '" + sSMLURL + "'", ex);
-    }
-    s_aLogger.info ("Using the following SML address: " + s_aSMLEndpointURL);
-
-    // SMP ID
-    s_sSMPID = SMPServerConfiguration.getSMLSMPID ();
-    s_aLogger.info ("This SMP has the ID: " + s_sSMPID);
-
-    // SSL socket factory
-    if (!SMPKeyManager.isCertificateValid ())
-      throw new InitializationException ("Cannot init registration hook to SML, because private key/certificate setup has errors: " +
-                                         SMPKeyManager.getInitializationError ());
-
-    try
-    {
-      s_aDefaultSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
-    }
-    catch (final Exception ex)
-    {
-      throw new InitializationException ("Failed to init SSLContext for SML access", ex);
-    }
-
-    // Hostname verifier
-    if (s_aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US).contains ("localhost"))
-      s_aDefaultHostnameVerifier = new HostnameVerifierVerifyAll ();
-    else
-      s_aDefaultHostnameVerifier = null;
-  }
+  {}
 
   public RegistrationHookWriteToSML ()
   {}
@@ -124,9 +87,43 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
   @Nonnull
   private ManageParticipantIdentifierServiceCaller _createSMLCaller ()
   {
-    final ManageParticipantIdentifierServiceCaller ret = new ManageParticipantIdentifierServiceCaller (s_aSMLEndpointURL);
-    ret.setSSLSocketFactory (s_aDefaultSocketFactory);
-    ret.setHostnameVerifier (s_aDefaultHostnameVerifier);
+    // SML endpoint (incl. the service name)
+    final String sSMLURL = SMPMetaManager.getSettings ().getSMLURL ();
+    URL aSMLEndpointURL;
+    try
+    {
+      aSMLEndpointURL = new URL (sSMLURL);
+    }
+    catch (final MalformedURLException ex)
+    {
+      throw new IllegalStateException ("Failed to init SML endpoint URL from '" + sSMLURL + "'", ex);
+    }
+
+    // SSL socket factory
+    if (!SMPKeyManager.isCertificateValid ())
+      throw new InitializationException ("Cannot init registration hook to SML, because private key/certificate setup has errors: " +
+                                         SMPKeyManager.getInitializationError ());
+
+    SSLSocketFactory aDefaultSocketFactory;
+    try
+    {
+      aDefaultSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
+    }
+    catch (final Exception ex)
+    {
+      throw new IllegalStateException ("Failed to init SSLContext for SML access", ex);
+    }
+
+    // Hostname verifier
+    HostnameVerifier aDefaultHostnameVerifier;
+    if (aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US).contains ("localhost"))
+      aDefaultHostnameVerifier = new HostnameVerifierVerifyAll ();
+    else
+      aDefaultHostnameVerifier = null;
+
+    final ManageParticipantIdentifierServiceCaller ret = new ManageParticipantIdentifierServiceCaller (aSMLEndpointURL);
+    ret.setSSLSocketFactory (aDefaultSocketFactory);
+    ret.setHostnameVerifier (aDefaultHostnameVerifier);
     return ret;
   }
 

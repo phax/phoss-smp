@@ -206,7 +206,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                                            aSMLInfo.getManagementServiceURL ());
       }
       catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
-             | ClientTransportException ex)
+                   | ClientTransportException ex)
       {
         final String sMsg = "Error registering SMP '" +
                             sSMPID +
@@ -324,7 +324,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                                            aSMLInfo.getManagementServiceURL ());
       }
       catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
-             | NotFoundFault ex)
+                   | NotFoundFault ex)
       {
         final String sMsg = "Error updating SMP '" +
                             sSMPID +
@@ -377,7 +377,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
         AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, aSMLInfo.getManagementServiceURL ());
       }
       catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
-             | NotFoundFault ex)
+                   | NotFoundFault ex)
       {
         final String sMsg = "Error deleting SMP '" +
                             sSMPID +
@@ -409,7 +409,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
                                                .getAllSMLInfos ()
                                                .findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ()
                                                                  .toExternalForm ()
-                                                                 .equals (SMPServerConfiguration.getSMLURL ()));
+                                                                 .equals (SMPMetaManager.getSettings ().getSMLURL ()));
 
     if (aWPEC.hasAction (CPageParam.ACTION_PERFORM))
     {

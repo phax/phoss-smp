@@ -319,6 +319,7 @@ public final class SMPServerConfiguration
    * @return <code>true</code> if the SML connection is active,
    *         <code>false</code> if not. Property <code>sml.active</code>.
    */
+  @Deprecated
   public static boolean isWriteToSML ()
   {
     return getConfigFile ().getAsBoolean (KEY_SML_ACTIVE, DEFAULT_SML_ACTIVE);
@@ -331,6 +332,7 @@ public final class SMPServerConfiguration
    *         Property <code>sml.url</code>.
    */
   @Nullable
+  @Deprecated
   public static String getSMLURL ()
   {
     return getConfigFile ().getAsString (KEY_SML_URL);
