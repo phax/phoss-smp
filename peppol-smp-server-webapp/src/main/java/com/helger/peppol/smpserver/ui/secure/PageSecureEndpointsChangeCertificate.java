@@ -24,7 +24,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsTreeSet;
 import com.helger.commons.collection.ext.ICommonsList;
@@ -75,7 +74,6 @@ import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 
-@WorkInProgress
 public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPage
 {
   private static final String FIELD_OLD_CERTIFICATE = "oldcert";
