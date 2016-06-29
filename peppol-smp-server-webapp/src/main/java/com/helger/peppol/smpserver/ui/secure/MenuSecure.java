@@ -22,10 +22,8 @@ import javax.annotation.concurrent.Immutable;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.basic.app.menu.IMenuItemPage;
-import com.helger.photon.basic.app.menu.IMenuObject;
 import com.helger.photon.basic.app.menu.IMenuObjectFilter;
 import com.helger.photon.basic.app.menu.IMenuTree;
-import com.helger.photon.basic.app.menu.filter.AbstractMenuObjectFilter;
 import com.helger.photon.bootstrap3.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap3.pages.security.BasePageSecurityChangePassword;
 import com.helger.photon.security.menu.MenuObjectFilterUserAssignedToUserGroup;
@@ -40,23 +38,10 @@ public final class MenuSecure
 
   public static void init (@Nonnull final IMenuTree aMenuTree)
   {
-    // We need this additional indirection layer, as the pages are initialized
-    // statically!
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID);
-    final IMenuObjectFilter aFilterPEPPOLDirectory = new AbstractMenuObjectFilter ()
-    {
-      public boolean test (@Nonnull final IMenuObject aValue)
-      {
-        return SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ();
-      }
-    };
-    final IMenuObjectFilter aFilterSMLConnectionActive = new AbstractMenuObjectFilter ()
-    {
-      public boolean test (@Nonnull final IMenuObject aValue)
-      {
-        return SMPMetaManager.getSettings ().isWriteToSML ();
-      }
-    };
+    final IMenuObjectFilter aFilterPEPPOLDirectory = aValue -> SMPMetaManager.getSettings ()
+                                                                             .isPEPPOLDirectoryIntegrationEnabled ();
+    final IMenuObjectFilter aFilterSMLConnectionActive = aValue -> SMPMetaManager.getSettings ().isWriteToSML ();
 
     if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
       aMenuTree.createRootItem (new PageSecureUsers (CMenuSecure.MENU_USERS));
