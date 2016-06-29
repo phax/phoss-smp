@@ -66,6 +66,7 @@ import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileM
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
+import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.peppol.url.PeppolURLProvider;
@@ -242,6 +243,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static ISMPSettingsManager getSettingsMgr ()
   {
     return getInstance ().m_aSettingsMgr;
+  }
+
+  @Nonnull
+  public static ISMPSettings getSettings ()
+  {
+    return getSettingsMgr ().getSettings ();
   }
 
   @Nonnull

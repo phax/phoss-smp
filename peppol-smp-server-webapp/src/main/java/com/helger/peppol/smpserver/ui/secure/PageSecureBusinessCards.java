@@ -67,7 +67,6 @@ import com.helger.html.jscode.JSVar;
 import com.helger.pd.client.PDClient;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
@@ -175,7 +174,8 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                         {
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ()
                                                                                        .getParticpantIdentifier ();
-                          final ESuccess eSuccess = new PDClient (URLHelper.getAsURI (SMPServerConfiguration.getPEPPOLDirectoryHostName ())).addServiceGroupToIndex (aParticipantID);
+                          final ESuccess eSuccess = new PDClient (URLHelper.getAsURI (SMPMetaManager.getSettings ()
+                                                                                                    .getPEPPOLDirectoryHostName ())).addServiceGroupToIndex (aParticipantID);
                           if (eSuccess.isSuccess ())
                             aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
                                                                                         aParticipantID.getURIEncoded () +

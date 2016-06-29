@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.photon.core.app.CApplication;
 import com.helger.web.mock.MockHttpServletResponse;
@@ -88,7 +88,7 @@ public final class ServiceGroupInterface
                                     final ServiceGroupType aServiceGroup) throws Throwable
   {
     // Is the writable API disabled?
-    if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+    if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       s_aLogger.warn ("The writable REST API is disabled. saveServiceGroup will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
@@ -114,7 +114,7 @@ public final class ServiceGroupInterface
   public Response deleteServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
     // Is the writable API disabled?
-    if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+    if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       s_aLogger.warn ("The writable REST API is disabled. deleteServiceGroup will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();

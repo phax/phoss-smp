@@ -58,7 +58,7 @@ public final class PageSecureChangeSettings extends AbstractSMPWebPageSimpleForm
   @Override
   protected ISMPSettings getObject (@Nonnull final WebPageExecutionContext aWPEC)
   {
-    return SMPMetaManager.getSettingsMgr ().getSettings ();
+    return SMPMetaManager.getSettings ();
   }
 
   @Override

@@ -70,17 +70,14 @@ public final class InitializerSecure implements IApplicationInitializer <LayoutE
     aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
                                                                                                 .setSyntaxHighlightLanguage (EPrismLanguage.MARKUP));
     aCFM.registerConfigurationFile (new ConfigurationFile (AppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
-                                                                                              .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+                                                                                                   .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
     final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
     if (aConfigRes != null)
       aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
                                                                         .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
-    if (SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ())
-    {
-      final IReadableResource aPDClientConfig = PDClientConfiguration.getConfigFile ().getReadResource ();
-      if (aPDClientConfig != null)
-        aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription ("PEPPOL Directory client configuration")
-                                                                               .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
-    }
+    final IReadableResource aPDClientConfig = PDClientConfiguration.getConfigFile ().getReadResource ();
+    if (aPDClientConfig != null)
+      aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription ("PEPPOL Directory client configuration")
+                                                                             .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
   }
 }

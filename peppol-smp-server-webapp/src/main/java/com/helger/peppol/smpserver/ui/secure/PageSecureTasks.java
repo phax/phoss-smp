@@ -37,7 +37,6 @@ import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -116,9 +115,9 @@ public class PageSecureTasks extends AbstractSMPWebPage
                      new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
     }
 
-    if (SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ())
+    if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
-      if (StringHelper.hasNoText (SMPServerConfiguration.getPEPPOLDirectoryHostName ()))
+      if (StringHelper.hasNoText (SMPMetaManager.getSettings ().getPEPPOLDirectoryHostName ()))
         aOL.addItem (_createError ("An invalid PEPPOL Directory hostname is provided"),
                      new HCDiv ().addChild ("A connection to the PEPPOL Directory server cannot be establised!"));
 

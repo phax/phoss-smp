@@ -41,7 +41,7 @@ import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.jaxb.MarshallerSMPSignedServiceMetadataType;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
@@ -143,7 +143,7 @@ public final class ServiceMetadataInterface
                                            final ServiceMetadataType aServiceMetadata) throws Throwable
   {
     // Is the writable API disabled?
-    if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+    if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       s_aLogger.warn ("The writable REST API is disabled. saveServiceRegistration will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
@@ -171,7 +171,7 @@ public final class ServiceMetadataInterface
                                              @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
   {
     // Is the writable API disabled?
-    if (SMPServerConfiguration.isRESTWritableAPIDisabled ())
+    if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       s_aLogger.warn ("The writable REST API is disabled. deleteServiceRegistration will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();

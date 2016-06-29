@@ -278,6 +278,7 @@ public final class SMPServerConfiguration
    *         enabled. By the default the writable API is enabled. Property
    *         <code>smp.rest.writableapi.disabled</code>.
    */
+  @Deprecated
   public static boolean isRESTWritableAPIDisabled ()
   {
     return getConfigFile ().getAsBoolean (KEY_SMP_REST_WRITABLE_API_DISABLED, DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
@@ -290,6 +291,7 @@ public final class SMPServerConfiguration
    * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
    *         By default it is enabled (since 5.0.0).
    */
+  @Deprecated
   public static boolean isPEPPOLDirectoryIntegrationEnabled ()
   {
     return getConfigFile ().getAsBoolean (KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
@@ -301,6 +303,7 @@ public final class SMPServerConfiguration
    *         <code>null</code>.
    */
   @Nonnull
+  @Deprecated
   public static String getPEPPOLDirectoryHostName ()
   {
     return getConfigFile ().getAsString (KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME);

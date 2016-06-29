@@ -36,6 +36,7 @@ import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
@@ -217,7 +218,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     }
 
     // PEPPOL Directory client certificate
-    if (SMPServerConfiguration.isPEPPOLDirectoryIntegrationEnabled ())
+    if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
       final HCNodeList aTab = new HCNodeList ();
 
