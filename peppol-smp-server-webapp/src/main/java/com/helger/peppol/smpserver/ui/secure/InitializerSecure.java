@@ -24,6 +24,8 @@ import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.PDClientProvider;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.ajax.CAjaxSecure;
 import com.helger.photon.basic.app.locale.ILocaleManager;
 import com.helger.photon.basic.app.menu.IMenuTree;
@@ -79,5 +81,10 @@ public final class InitializerSecure implements IApplicationInitializer <LayoutE
     if (aPDClientConfig != null)
       aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription ("PEPPOL Directory client configuration")
                                                                              .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+
+    // If the SMP settings change, the PD client must be re-created
+    SMPMetaManager.getSettingsMgr ()
+                  .getCallbacks ()
+                  .addCallback (x -> PDClientProvider.getInstance ().resetPDClient ());
   }
 }

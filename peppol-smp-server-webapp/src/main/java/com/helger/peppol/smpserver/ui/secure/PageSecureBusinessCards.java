@@ -63,9 +63,9 @@ import com.helger.html.jscode.JSAnonymousFunction;
 import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
-import com.helger.pd.client.PDClient;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.smpserver.app.PDClientProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
@@ -173,19 +173,17 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                         {
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ()
                                                                                        .getParticpantIdentifier ();
-                          try (final PDClient aPDClient = new PDClient (SMPMetaManager.getSettings ()
-                                                                                      .getPEPPOLDirectoryHostName ()))
-                          {
-                            final ESuccess eSuccess = aPDClient.addServiceGroupToIndex (aParticipantID);
-                            if (eSuccess.isSuccess ())
-                              aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
-                                                                                          aParticipantID.getURIEncoded () +
-                                                                                          "'"));
-                            else
-                              aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
+                          final ESuccess eSuccess = PDClientProvider.getInstance ()
+                                                                    .getPDClient ()
+                                                                    .addServiceGroupToIndex (aParticipantID);
+                          if (eSuccess.isSuccess ())
+                            aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
                                                                                         aParticipantID.getURIEncoded () +
                                                                                         "'"));
-                          }
+                          else
+                            aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
+                                                                                      aParticipantID.getURIEncoded () +
+                                                                                      "'"));
                           return true;
                         }
                       });

@@ -20,7 +20,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
+import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.annotation.WorkInProgress;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
 import com.helger.photon.basic.app.dao.impl.AbstractSimpleDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
@@ -40,6 +42,7 @@ import com.helger.xml.microdom.MicroDocument;
 public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSettingsManager
 {
   private final SMPSettings m_aSMPS = new SMPSettings ();
+  private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList<> ();
 
   public SMPSettingsManager (@Nullable final String sFilename) throws DAOException
   {
@@ -65,6 +68,13 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
     final SettingsMicroDocumentConverter aConverter = new SettingsMicroDocumentConverter (ISettingsFactory.newInstance ());
     ret.appendChild (aConverter.convertToMicroElement (m_aSMPS.getAsSettings (), null, "root"));
     return ret;
+  }
+
+  @Nonnull
+  @ReturnsMutableObject ("by design")
+  public final CallbackList <ISMPSettingsCallback> getCallbacks ()
+  {
+    return m_aCallbacks;
   }
 
   @Nonnull
@@ -96,6 +106,11 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
     {
       m_aRWLock.writeLock ().unlock ();
     }
+
+    // Invoke callbacks
+    if (eChange.isChanged ())
+      m_aCallbacks.forEach (x -> x.onSMPSettingsChanged (m_aSMPS));
+
     return eChange;
   }
 }
