@@ -91,7 +91,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-settings</artifactId>
-        <version>3.0.2-SNAPSHOT</version>
+        <version>3.0.2</version>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
@@ -240,7 +240,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>1.5.2</version><!--$NO-MVN-MAN-VER$-->
+          <version>2.0.0</version><!--$NO-MVN-MAN-VER$-->
         </plugin>
       </plugins>
     </pluginManagement>
