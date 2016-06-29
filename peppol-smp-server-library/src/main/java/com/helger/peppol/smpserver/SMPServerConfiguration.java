@@ -65,6 +65,12 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
  * <li>The filename <code>smp-server.properties</code> in the root of the
  * classpath</li>
  * </ol>
+ * <p>
+ * Some of the properties contained in this class can be overwritten in the SMP
+ * settings at runtime. That's why the respective direct access methods are
+ * deprecated. Use the ones from
+ * {@link com.helger.peppol.smpserver.settings.ISMPSettings} instead!
+ * </p>
  *
  * @author Philip Helger
  */
