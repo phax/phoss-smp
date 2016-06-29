@@ -73,14 +73,6 @@ public final class MenuSecure
     aMenuTree.createRootItem (new PageSecureTransportProfile (CMenuSecure.MENU_TRANSPORT_PROFILES));
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
     aMenuTree.createRootItem (new PageSecureTasks (CMenuSecure.MENU_TASKS));
-    {
-      final IMenuItemPage aPageSML = aMenuTree.createRootItem (new BasePageShowChildren<> (CMenuSecure.MENU_SML,
-                                                                                           "SML",
-                                                                                           aMenuTree));
-      aMenuTree.createItem (aPageSML, new PageSecureSMLInfo (CMenuSecure.MENU_SML_INFO));
-      aMenuTree.createItem (aPageSML, new PageSecureSMLSetup (CMenuSecure.MENU_SML_SETUP))
-               .setDisplayFilter (aFilterSMLConnectionActive);
-    }
     aMenuTree.createRootSeparator ();
 
     // Administrator
@@ -88,9 +80,18 @@ public final class MenuSecure
       final IMenuItemPage aAdmin = aMenuTree.createRootItem (new BasePageShowChildren <WebPageExecutionContext> (CMenuSecure.MENU_ADMIN,
                                                                                                                  "Administration",
                                                                                                                  aMenuTree));
+      {
+        final IMenuItemPage aAdminSML = aMenuTree.createItem (aAdmin,
+                                                              new BasePageShowChildren<> (CMenuSecure.MENU_SML,
+                                                                                          "SML",
+                                                                                          aMenuTree));
+        aMenuTree.createItem (aAdminSML, new PageSecureSMLInfo (CMenuSecure.MENU_SML_INFO));
+        aMenuTree.createItem (aAdminSML, new PageSecureSMLRegistration (CMenuSecure.MENU_SML_REGISTRATION))
+                 .setDisplayFilter (aFilterSMLConnectionActive);
+      }
+      aMenuTree.createItem (aAdmin, new PageSecureSMPSettings (CMenuSecure.MENU_SMP_SETTINGS));
       aMenuTree.createItem (aAdmin,
                             new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
-      aMenuTree.createItem (aAdmin, new PageSecureChangeSettings (CMenuSecure.MENU_SMP_SETTINGS));
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CApp.DEFAULT_LOCALE);
     }
 

@@ -21,6 +21,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.SSLSocketFactory;
@@ -65,9 +66,9 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.dns.IPV4Addr;
 import com.sun.xml.ws.client.ClientTransportException;
 
-public class PageSecureSMLSetup extends AbstractSMPWebPage
+public class PageSecureSMLRegistration extends AbstractSMPWebPage
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (PageSecureSMLSetup.class);
+  private static final Logger s_aLogger = LoggerFactory.getLogger (PageSecureSMLRegistration.class);
 
   private static final String FIELD_SML_ID = "sml";
   private static final String FIELD_PHYSICAL_ADDRESS = "physicaladdr";
@@ -81,9 +82,9 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
   private static final String SUBACTION_SMP_UPDATE = "smpupdate";
   private static final String SUBACTION_SMP_DELETE = "smpdelete";
 
-  public PageSecureSMLSetup (@Nonnull @Nonempty final String sID)
+  public PageSecureSMLRegistration (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "SMP - SML tools");
+    super (sID, "SML registration");
   }
 
   @Nonnull
@@ -440,6 +441,7 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
       }
 
       final BootstrapTabBox aTabBox = new BootstrapTabBox ();
+      final Predicate <ISMLInfo> aSMLFilter = ISMLInfo::isClientCertificateRequired;
 
       // Register SMP at SML
       {
@@ -449,7 +451,8 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
                                                                                                   aDefaultSML),
-                                                                                aDisplayLocale))
+                                                                                aDisplayLocale,
+                                                                                aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
                                                      .setCtrl (new HCEM ().addChild (sSMPID))
@@ -481,7 +484,8 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
                                                                                                   aDefaultSML),
-                                                                                aDisplayLocale))
+                                                                                aDisplayLocale,
+                                                                                aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
                                                      .setCtrl (new HCEM ().addChild (sSMPID))
@@ -513,7 +517,8 @@ public class PageSecureSMLSetup extends AbstractSMPWebPage
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
                                                                                                   aDefaultSML),
-                                                                                aDisplayLocale))
+                                                                                aDisplayLocale,
+                                                                                aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
                                                      .setCtrl (new HCEM ().addChild (sSMPID))

@@ -17,8 +17,10 @@
 package com.helger.peppol.smpserver.ui.secure.hc;
 
 import java.util.Locale;
+import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.helger.commons.name.IHasDisplayName;
 import com.helger.peppol.sml.ISMLInfo;
@@ -28,15 +30,18 @@ import com.helger.photon.uicore.html.select.HCExtSelect;
 
 public class HCSMLSelect extends HCExtSelect
 {
-  public HCSMLSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
+  public HCSMLSelect (@Nonnull final RequestField aRF,
+                      @Nonnull final Locale aDisplayLocale,
+                      @Nullable final Predicate <? super ISMLInfo> aFilter)
   {
     super (aRF);
     SMPMetaManager.getSMLInfoMgr ()
                   .getAllSMLInfos ()
                   .getSortedInline (IHasDisplayName.getComparatorCollating (aDisplayLocale))
-                  .findAll (ISMLInfo::isClientCertificateRequired,
-                            x -> addOption (x.getID (),
-                                            "[" + x.getDisplayName () + "] " + x.getManagementServiceURL ()));
+                  .findAll (aFilter, x -> addOption (x.getID (), "[" +
+                                                                 x.getDisplayName () +
+                                                                 "] " +
+                                                                 x.getManagementServiceURL ()));
     addOptionPleaseSelect (aDisplayLocale);
   }
 }

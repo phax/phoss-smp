@@ -35,13 +35,12 @@ public final class CMenuSecure
   public static final String MENU_CERTIFICATE_INFORMATION = "certificate_information";
   public static final String MENU_TASKS = "tasks";
 
+  public static final String MENU_ADMIN = "admin";
   public static final String MENU_SML = "sml";
   public static final String MENU_SML_INFO = "sml_info";
-  public static final String MENU_SML_SETUP = "sml_setup";
-
-  public static final String MENU_ADMIN = "admin";
-  public static final String MENU_CHANGE_PASSWORD = "change_pw";
+  public static final String MENU_SML_REGISTRATION = "sml_registration";
   public static final String MENU_SMP_SETTINGS = "smp_settings";
+  public static final String MENU_CHANGE_PASSWORD = "change_pw";
 
   private CMenuSecure ()
   {}

@@ -100,30 +100,40 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     }
 
     // SSL socket factory
-    if (!SMPKeyManager.isCertificateValid ())
-      throw new InitializationException ("Cannot init registration hook to SML, because private key/certificate setup has errors: " +
-                                         SMPKeyManager.getInitializationError ());
+    SSLSocketFactory aSocketFactory;
+    if ("https".equals (aSMLEndpointURL.getProtocol ()))
+    {
+      // https connection
+      if (!SMPKeyManager.isCertificateValid ())
+        throw new InitializationException ("Cannot init registration hook to SML, because private key/certificate setup has errors: " +
+                                           SMPKeyManager.getInitializationError ());
 
-    SSLSocketFactory aDefaultSocketFactory;
-    try
-    {
-      aDefaultSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
+      try
+      {
+        aSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
+      }
+      catch (final Exception ex)
+      {
+        throw new IllegalStateException ("Failed to init SSLContext for SML access", ex);
+      }
     }
-    catch (final Exception ex)
+    else
     {
-      throw new IllegalStateException ("Failed to init SSLContext for SML access", ex);
+      // Local, http only access - no socket factory
+      aSocketFactory = null;
     }
 
     // Hostname verifier
-    HostnameVerifier aDefaultHostnameVerifier;
+    HostnameVerifier aHostnameVerifier;
     if (aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US).contains ("localhost"))
-      aDefaultHostnameVerifier = new HostnameVerifierVerifyAll ();
+      aHostnameVerifier = new HostnameVerifierVerifyAll ();
     else
-      aDefaultHostnameVerifier = null;
+      aHostnameVerifier = null;
 
+    // Build WS client
     final ManageParticipantIdentifierServiceCaller ret = new ManageParticipantIdentifierServiceCaller (aSMLEndpointURL);
-    ret.setSSLSocketFactory (aDefaultSocketFactory);
-    ret.setHostnameVerifier (aDefaultHostnameVerifier);
+    ret.setSSLSocketFactory (aSocketFactory);
+    ret.setHostnameVerifier (aHostnameVerifier);
     return ret;
   }
 

@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.ui.secure;
 
+import java.net.URL;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -23,10 +24,15 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.errorlist.FormErrors;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.url.URLHelper;
 import com.helger.commons.url.URLValidator;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.html.hc.impl.HCTextNode;
+import com.helger.peppol.sml.CSMLDefault;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
@@ -43,7 +49,7 @@ import com.helger.photon.core.form.RequestFieldBoolean;
 import com.helger.photon.uicore.page.EWebPageSimpleFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
-public final class PageSecureChangeSettings extends AbstractSMPWebPageSimpleForm <ISMPSettings>
+public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <ISMPSettings>
 {
   private static final String FIELD_SMP_REST_WRITABLE_API_DISABLED = "smprwad";
   private static final String FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "smppdie";
@@ -51,7 +57,7 @@ public final class PageSecureChangeSettings extends AbstractSMPWebPageSimpleForm
   private static final String FIELD_SML_ACTIVE = "smla";
   private static final String FIELD_SML_URL = "smlu";
 
-  public PageSecureChangeSettings (@Nonnull @Nonempty final String sID)
+  public PageSecureSMPSettings (@Nonnull @Nonempty final String sID)
   {
     super (sID, "SMP Settings");
   }
@@ -80,8 +86,21 @@ public final class PageSecureChangeSettings extends AbstractSMPWebPageSimpleForm
     aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
                                                   .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isWriteToSML (),
                                                                                         aDisplayLocale)));
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML management URL")
-                                                  .setCtrl (HCA.createLinkedWebsite (aObject.getSMLURL ())));
+
+    {
+      final String sSMLURL = aObject.getSMLURL ();
+      final ISMLInfo aAssignedSML = SMPMetaManager.getSMLInfoMgr ()
+                                                  .getAllSMLInfos ()
+                                                  .findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ()
+                                                                    .toExternalForm ()
+                                                                    .equals (sSMLURL));
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML management URL")
+                                                    .setCtrl (HCA.createLinkedWebsite (sSMLURL))
+                                                    .setHelpText (aAssignedSML == null ? null
+                                                                                       : "This belongs to the defined SML '" +
+                                                                                         aAssignedSML.getDisplayName () +
+                                                                                         "'"));
+    }
   }
 
   @Override
@@ -112,8 +131,21 @@ public final class PageSecureChangeSettings extends AbstractSMPWebPageSimpleForm
     if (StringHelper.hasNoText (sSMLURL))
       aFormErrors.addFieldError (FIELD_SML_URL, "SML management URL may not be empty.");
     else
-      if (!URLValidator.isValid (sSMLURL))
+    {
+      final URL aURL = URLHelper.getAsURL (sSMLURL);
+      if (aURL == null)
         aFormErrors.addFieldError (FIELD_SML_URL, "SML management URL must be a valid URL.");
+      else
+      {
+        if (SMPMetaManager.getSMLInfoMgr ()
+                          .getAllSMLInfos ()
+                          .containsNone (x -> x.getManageParticipantIdentifierEndpointAddress ()
+                                               .toExternalForm ()
+                                               .equals (sSMLURL)))
+          aFormErrors.addFieldError (FIELD_SML_URL,
+                                     "The SML management URL does not belong to any of the configured SMLs.");
+      }
+    }
 
     if (aFormErrors.isEmpty ())
     {
@@ -156,7 +188,10 @@ public final class PageSecureChangeSettings extends AbstractSMPWebPageSimpleForm
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML management URL")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_SML_URL,
                                                                                          aObject.getSMLURL ())))
-                                                 .setHelpText ("The SML manage participant endpoint. This URL is only used if the SML connection (see above) is enabled.")
+                                                 .setHelpText (new HCTextNode ("The SML manage participant endpoint. This URL is only used if the SML connection (see above) is enabled. The URL must end with "),
+                                                               new HCCode ().addChild ("/" +
+                                                                                       CSMLDefault.MANAGEMENT_SERVICE_PARTICIPANTIDENTIFIER),
+                                                               new HCTextNode ("."))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SML_URL)));
   }
 }
