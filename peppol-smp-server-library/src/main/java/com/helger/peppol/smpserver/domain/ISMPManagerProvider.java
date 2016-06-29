@@ -50,6 +50,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 
 /**
  * An abstract manager provider interface. This must be implemented for each
@@ -67,37 +68,44 @@ public interface ISMPManagerProvider
   ISMLInfoManager createSMLInfoMgr ();
 
   /**
-   * @return A new transport profile manager. May not be <code>null</code>.
+   * @return A new SMP settings manager. May not be <code>null</code>.
+   */
+  @Nonnull
+  ISMPSettingsManager createSettingsMgr ();
+
+  /**
+   * @return A new SMP transport profile manager. May not be <code>null</code>.
    */
   @Nonnull
   ISMPTransportProfileManager createTransportProfileMgr ();
 
   /**
-   * @return A new user manager. May not be <code>null</code>.
+   * @return A new SMP user manager. May not be <code>null</code>.
    */
   @Nonnull
   ISMPUserManager createUserMgr ();
 
   /**
-   * @return A new service group manager. May not be <code>null</code>.
+   * @return A new SMP service group manager. May not be <code>null</code>.
    */
   @Nonnull
   ISMPServiceGroupManager createServiceGroupMgr ();
 
   /**
-   * @return A new redirect manager. May not be <code>null</code>.
+   * @return A new SMP redirect manager. May not be <code>null</code>.
    */
   @Nonnull
   ISMPRedirectManager createRedirectMgr ();
 
   /**
-   * @return A new service information manager. May not be <code>null</code>.
+   * @return A new SMP service information manager. May not be
+   *         <code>null</code>.
    */
   @Nonnull
   ISMPServiceInformationManager createServiceInformationMgr ();
 
   /**
-   * @return A new business card manager. May be <code>null</code>!
+   * @return A new SMP business card manager. May be <code>null</code>!
    */
   @Nullable
   ISMPBusinessCardManager createBusinessCardMgr ();

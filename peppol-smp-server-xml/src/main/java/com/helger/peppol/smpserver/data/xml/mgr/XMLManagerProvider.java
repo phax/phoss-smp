@@ -30,6 +30,8 @@ import com.helger.peppol.smpserver.domain.sml.SMLInfoManager;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.transportprofile.SMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
+import com.helger.peppol.smpserver.settings.SMPSettingsManager;
 import com.helger.photon.basic.app.dao.impl.DAOException;
 
 /**
@@ -39,7 +41,8 @@ import com.helger.photon.basic.app.dao.impl.DAOException;
  */
 public final class XMLManagerProvider implements ISMPManagerProvider
 {
-  private static final String SML_INFO_XML = "sml-info.xml";
+  public static final String SML_INFO_XML = "sml-info.xml";
+  public static final String SMP_SETTINGS_XML = "smp-settings.xml";
   public static final String SMP_TRANSPORT_PROFILES_XML = "transportprofiles.xml";
   public static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";
   public static final String SMP_REDIRECT_XML = "smp-redirect.xml";
@@ -55,6 +58,19 @@ public final class XMLManagerProvider implements ISMPManagerProvider
     try
     {
       return new SMLInfoManager (SML_INFO_XML);
+    }
+    catch (final DAOException ex)
+    {
+      throw new RuntimeException (ex.getMessage (), ex);
+    }
+  }
+
+  @Nonnull
+  public ISMPSettingsManager createSettingsMgr ()
+  {
+    try
+    {
+      return new SMPSettingsManager (SMP_SETTINGS_XML);
     }
     catch (final DAOException ex)
     {

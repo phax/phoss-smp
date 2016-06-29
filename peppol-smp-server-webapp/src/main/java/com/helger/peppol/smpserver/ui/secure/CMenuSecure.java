@@ -41,6 +41,7 @@ public final class CMenuSecure
 
   public static final String MENU_ADMIN = "admin";
   public static final String MENU_CHANGE_PASSWORD = "change_pw";
+  public static final String MENU_SMP_SETTINGS = "smp_settings";
 
   private CMenuSecure ()
   {}

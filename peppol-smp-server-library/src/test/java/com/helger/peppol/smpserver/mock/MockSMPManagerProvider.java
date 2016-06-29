@@ -50,6 +50,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 
 /**
  * This {@link ISMPManagerProvider} implementation returns non-<code>null</code>
@@ -64,6 +65,12 @@ public class MockSMPManagerProvider implements ISMPManagerProvider
   public ISMLInfoManager createSMLInfoMgr ()
   {
     return new MockSMLInfoManager ();
+  }
+
+  @Nonnull
+  public ISMPSettingsManager createSettingsMgr ()
+  {
+    return new MockSMPSettingsManager ();
   }
 
   @Nonnull

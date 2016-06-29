@@ -49,7 +49,7 @@ import com.helger.commons.lang.EnumHelper;
 
 /**
  * Defines the identifier types to be used - PEPPOL or simple.
- * 
+ *
  * @author Philip Helger
  */
 public enum ESMPIdentifierType implements IHasID <String>

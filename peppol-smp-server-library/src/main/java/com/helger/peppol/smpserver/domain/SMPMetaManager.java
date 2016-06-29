@@ -66,6 +66,7 @@ import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileM
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
+import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.peppol.url.PeppolURLProvider;
 
@@ -83,6 +84,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private IIdentifierFactory m_aIdentifierFactory;
   private IPeppolURLProvider m_aPeppolURLProvider;
   private ISMLInfoManager m_aSMLInfoMgr;
+  private ISMPSettingsManager m_aSettingsMgr;
   private ISMPTransportProfileManager m_aTransportProfileMgr;
   private ISMPUserManager m_aUserMgr;
   private ISMPServiceGroupManager m_aServiceGroupMgr;
@@ -175,7 +177,11 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
       m_aSMLInfoMgr = s_aManagerProvider.createSMLInfoMgr ();
       if (m_aSMLInfoMgr == null)
-        throw new IllegalStateException ("Failed to create SMLInfo manager!");
+        throw new IllegalStateException ("Failed to create SML Info manager!");
+
+      m_aSettingsMgr = s_aManagerProvider.createSettingsMgr ();
+      if (m_aSettingsMgr == null)
+        throw new IllegalStateException ("Failed to create Settings manager!");
 
       m_aTransportProfileMgr = s_aManagerProvider.createTransportProfileMgr ();
       if (m_aTransportProfileMgr == null)
@@ -230,6 +236,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static ISMLInfoManager getSMLInfoMgr ()
   {
     return getInstance ().m_aSMLInfoMgr;
+  }
+
+  @Nonnull
+  public static ISMPSettingsManager getSettingsMgr ()
+  {
+    return getInstance ().m_aSettingsMgr;
   }
 
   @Nonnull

@@ -19,12 +19,14 @@ package com.helger.peppol.smpserver.settings;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.type.ITypedObject;
+
 /**
  * Runtime settings for this SMP server instance.
  *
  * @author Philip Helger
  */
-public interface ISMPSettings
+public interface ISMPSettings extends ITypedObject <String>
 {
   /**
    * Check if the writable parts of the REST API are disabled. If this is the
@@ -59,8 +61,9 @@ public interface ISMPSettings
   boolean isWriteToSML ();
 
   /**
-   * @return The SML URL to use. Only relevant when {@link #isWriteToSML()} is
-   *         <code>true</code>.
+   * @return The SML URL to use (the manage participant endpoint - e.g.
+   *         <code>https://edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier</code>).
+   *         Only relevant when {@link #isWriteToSML()} is <code>true</code>.
    */
   @Nullable
   String getSMLURL ();

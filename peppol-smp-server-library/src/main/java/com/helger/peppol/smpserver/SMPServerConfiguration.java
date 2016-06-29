@@ -78,15 +78,23 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_KEYSTORE_KEY_PASSWORD = "smp.keystore.key.password";
   public static final String KEY_SMP_TRUSTSTORE_PATH = "smp.truststore.path";
   public static final String KEY_SMP_TRUSTSTORE_PASSWORD = "smp.truststore.password";
-  public static final String KEY_SMP_FORCEROOT = "smp.forceroot";
-  public static final String KEY_SMP_PUBLICURL = "smp.publicurl";
-  public static final String KEY_SMP_IDENTIFIERTYPE = "smp.identifiertype";
-  public static final String KEY_SMP_REST_WRITABLEAPI_DISABLED = "smp.rest.writableapi.disabled";
+  public static final String KEY_SMP_FORCE_ROOT = "smp.forceroot";
+  public static final String KEY_SMP_PUBLIC_URL = "smp.publicurl";
+  public static final String KEY_SMP_IDENTIFIER_TYPE = "smp.identifiertype";
+  public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
   public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
   public static final String KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
   public static final String KEY_SML_ACTIVE = "sml.active";
   public static final String KEY_SML_URL = "sml.url";
   public static final String KEY_SML_SMPID = "sml.smpid";
+
+  public static final boolean DEFAULT_SMP_FORCEROOT = false;
+  public static final ESMPIdentifierType DEFAULT_SMP_IDENTIFIER_TYPE = ESMPIdentifierType.PEPPOL;
+  public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
+  public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = true;
+  public static final String DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME = "http://pyp.helger.com";
+  public static final boolean DEFAULT_SML_ACTIVE = false;
+
   /**
    * The name of the primary system property which points to the
    * smp-server.properties files
@@ -235,7 +243,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isForceRoot ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_FORCEROOT, false);
+    return getConfigFile ().getAsBoolean (KEY_SMP_FORCE_ROOT, DEFAULT_SMP_FORCEROOT);
   }
 
   /**
@@ -246,7 +254,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getPublicServerURL ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_PUBLICURL);
+    return getConfigFile ().getAsString (KEY_SMP_PUBLIC_URL);
   }
 
   /**
@@ -257,8 +265,8 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESMPIdentifierType getIdentifierType ()
   {
-    final String sType = getConfigFile ().getAsString (KEY_SMP_IDENTIFIERTYPE);
-    return ESMPIdentifierType.getFromIDOrDefault (sType, ESMPIdentifierType.PEPPOL);
+    final String sType = getConfigFile ().getAsString (KEY_SMP_IDENTIFIER_TYPE);
+    return ESMPIdentifierType.getFromIDOrDefault (sType, DEFAULT_SMP_IDENTIFIER_TYPE);
   }
 
   /**
@@ -272,7 +280,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isRESTWritableAPIDisabled ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_REST_WRITABLEAPI_DISABLED, false);
+    return getConfigFile ().getAsBoolean (KEY_SMP_REST_WRITABLE_API_DISABLED, DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
   }
 
   /**
@@ -280,11 +288,12 @@ public final class SMPServerConfiguration
    * is enabled.
    *
    * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
-   *         By default it is disabled.
+   *         By default it is enabled (since 5.0.0).
    */
   public static boolean isPEPPOLDirectoryIntegrationEnabled ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED, false);
+    return getConfigFile ().getAsBoolean (KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
+                                          DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
   }
 
   /**
@@ -294,7 +303,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static String getPEPPOLDirectoryHostName ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, "http://pyp.helger.com");
+    return getConfigFile ().getAsString (KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME);
   }
 
   /**
@@ -303,12 +312,14 @@ public final class SMPServerConfiguration
    */
   public static boolean isWriteToSML ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SML_ACTIVE, false);
+    return getConfigFile ().getAsBoolean (KEY_SML_ACTIVE, DEFAULT_SML_ACTIVE);
   }
 
   /**
-   * @return The SML URL to use. Only relevant when {@link #isWriteToSML()} is
-   *         <code>true</code>. Property <code>sml.url</code>.
+   * @return The SML URL to use (the manage participant endpoint - e.g.
+   *         <code>https://edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier</code>).
+   *         Only relevant when {@link #isWriteToSML()} is <code>true</code>.
+   *         Property <code>sml.url</code>.
    */
   @Nullable
   public static String getSMLURL ()

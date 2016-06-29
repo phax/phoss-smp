@@ -21,8 +21,10 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
+import com.helger.commons.type.ObjectType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.settings.ISettings;
 import com.helger.settings.SettingsWithDefault;
@@ -37,11 +39,26 @@ import com.helger.settings.SettingsWithDefault;
 @NotThreadSafe
 public class SMPSettings implements ISMPSettings
 {
+  private static final ObjectType OT = new ObjectType ("smp-settings");
+
   private SettingsWithDefault m_aSettings;
 
   public SMPSettings ()
   {
     setToConfigurationValues ();
+  }
+
+  @Nonnull
+  public ObjectType getObjectType ()
+  {
+    return OT;
+  }
+
+  @Nonnull
+  @Nonempty
+  public String getID ()
+  {
+    return "singleton";
   }
 
   public void setToConfigurationValues ()
@@ -51,13 +68,14 @@ public class SMPSettings implements ISMPSettings
 
   public boolean isRESTWritableAPIDisabled ()
   {
-    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_REST_WRITABLEAPI_DISABLED);
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_REST_WRITABLE_API_DISABLED,
+                                     SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
   }
 
   @Nonnull
   public EChange setRESTWritableAPIDisabled (final boolean bRESTWritableAPIDisabled)
   {
-    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_REST_WRITABLEAPI_DISABLED, bRESTWritableAPIDisabled);
+    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_REST_WRITABLE_API_DISABLED, bRESTWritableAPIDisabled);
   }
 
   /**
@@ -69,7 +87,8 @@ public class SMPSettings implements ISMPSettings
    */
   public boolean isPEPPOLDirectoryIntegrationEnabled ()
   {
-    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
+                                     SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
   }
 
   @Nonnull
@@ -86,11 +105,12 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public String getPEPPOLDirectoryHostName ()
   {
-    return m_aSettings.getAsString (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME);
+    return m_aSettings.getAsString (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME,
+                                    SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME);
   }
 
   @Nonnull
-  public EChange setPEPPOLDirectoryHostName (final String sPEPPOLDirectoryHostName)
+  public EChange setPEPPOLDirectoryHostName (@Nullable final String sPEPPOLDirectoryHostName)
   {
     return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, sPEPPOLDirectoryHostName);
   }
@@ -101,7 +121,7 @@ public class SMPSettings implements ISMPSettings
    */
   public boolean isWriteToSML ()
   {
-    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_ACTIVE);
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_ACTIVE, SMPServerConfiguration.DEFAULT_SML_ACTIVE);
   }
 
   @Nonnull
@@ -121,7 +141,7 @@ public class SMPSettings implements ISMPSettings
   }
 
   @Nonnull
-  public EChange setSMLURL (final String sSMLURL)
+  public EChange setSMLURL (@Nullable final String sSMLURL)
   {
     return m_aSettings.setValue (SMPServerConfiguration.KEY_SML_URL, sSMLURL);
   }
