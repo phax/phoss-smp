@@ -27,8 +27,10 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsTreeSet;
 import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.ext.ICommonsSet;
 import com.helger.commons.collection.ext.ICommonsSortedSet;
 import com.helger.commons.collection.multimap.MultiHashMapArrayListBased;
+import com.helger.commons.collection.multimap.MultiHashMapHashSetBased;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.errorlist.FormErrors;
@@ -47,6 +49,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
@@ -117,6 +120,36 @@ public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPa
     return aEndpointCert != null ? null : "Invalid input string provided";
   }
 
+  @Nonnull
+  private static IHCNode _getCertificateDisplay (@Nullable final String sCert, @Nonnull final Locale aDisplayLocale)
+  {
+    X509Certificate aEndpointCert = null;
+    try
+    {
+      aEndpointCert = CertificateHelper.convertStringToCertficate (sCert);
+    }
+    catch (final Exception ex)
+    {
+      // Ignore
+    }
+    if (aEndpointCert == null)
+    {
+      final int nDisplayLen = 20;
+      final String sCertPart = (sCert.length () > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert);
+      return new HCDiv ().addChild ("Invalid certificate" + (sCert.length () > nDisplayLen ? " starting with: " : ": "))
+                         .addChild (new HCCode ().addChild (sCertPart));
+    }
+
+    final HCNodeList ret = new HCNodeList ();
+    ret.addChild (new HCDiv ().addChild ("Issuer: " + aEndpointCert.getIssuerDN ().toString ()));
+    ret.addChild (new HCDiv ().addChild ("Subject: " + aEndpointCert.getSubjectDN ().toString ()));
+    final LocalDate aNotBefore = PDTFactory.createLocalDate (aEndpointCert.getNotBefore ());
+    ret.addChild (new HCDiv ().addChild ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+    final LocalDate aNotAfter = PDTFactory.createLocalDate (aEndpointCert.getNotAfter ());
+    ret.addChild (new HCDiv ().addChild ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+    return ret;
+  }
+
   @Override
   protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
   {
@@ -125,16 +158,21 @@ public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPa
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     boolean bShowList = true;
 
-    final MultiHashMapArrayListBased <String, ISMPEndpoint> aGroupedPerURL = new MultiHashMapArrayListBased<> ();
+    final MultiHashMapArrayListBased <String, ISMPEndpoint> aEndpointsGroupedPerURL = new MultiHashMapArrayListBased<> ();
+    final MultiHashMapHashSetBased <String, ISMPServiceGroup> aServiceGroupsGroupedPerURL = new MultiHashMapHashSetBased<> ();
     final ICommonsList <? extends ISMPServiceInformation> aAllSIs = aServiceInfoMgr.getAllSMPServiceInformation ();
     int nTotalEndpointCount = 0;
     for (final ISMPServiceInformation aSI : aAllSIs)
+    {
+      final ISMPServiceGroup aSG = aSI.getServiceGroup ();
       for (final ISMPProcess aProcess : aSI.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
+          aEndpointsGroupedPerURL.putSingle (aEndpoint.getCertificate (), aEndpoint);
+          aServiceGroupsGroupedPerURL.putSingle (aEndpoint.getCertificate (), aSG);
           ++nTotalEndpointCount;
-          aGroupedPerURL.putSingle (aEndpoint.getCertificate (), aEndpoint);
         }
+    }
 
     if (aWPEC.hasAction (CPageParam.ACTION_EDIT))
     {
@@ -196,8 +234,8 @@ public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPa
           if (nChangedEndpoints > 0)
           {
             final HCUL aUL = new HCUL ();
-            for (final String sServiceGroupID : aChangedServiceGroup)
-              aUL.addItem (sServiceGroupID);
+            for (final String sChangedServiceGroupID : aChangedServiceGroup)
+              aUL.addItem (sChangedServiceGroupID);
             aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChildren (new HCDiv ().addChild ("The old certificate was changed in " +
                                                                                                   nChangedEndpoints +
                                                                                                   " endpoints to the new certificate:"),
@@ -211,11 +249,17 @@ public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPa
         }
       }
 
-      final int nEPCount = CollectionHelper.getSize (aGroupedPerURL.get (sOldCert));
+      final ICommonsSet <ISMPServiceGroup> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldCert);
+      final int nSGCount = CollectionHelper.getSize (aServiceGroups);
+      final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldCert));
       aNodeList.addChild (new BootstrapInfoBox ().addChild ("The selected old certificate is currently used in " +
                                                             nEPCount +
                                                             " " +
                                                             (nEPCount == 1 ? "endpoint" : "endpoints") +
+                                                            " of " +
+                                                            nSGCount +
+                                                            " " +
+                                                            (nSGCount == 1 ? "service group" : "service groups") +
                                                             "."));
 
       // Show edit screen
@@ -248,11 +292,17 @@ public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPa
                                                                                       " endpoints are registered.")));
 
       final HCTable aTable = new HCTable (new DTCol ("Certificate").setInitialSorting (ESortOrder.ASCENDING),
+                                          new DTCol ("Service Group Count").setDisplayType (EDTColType.INT,
+                                                                                            aDisplayLocale),
                                           new DTCol ("Endpoint Count").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-      aGroupedPerURL.forEach ( (sCert, aEndpoints) -> {
+      aEndpointsGroupedPerURL.forEach ( (sCert, aEndpoints) -> {
         final HCRow aRow = aTable.addBodyRow ();
         aRow.addCell (_getCertificateDisplay (sCert, aDisplayLocale));
+
+        final int nSGCount = CollectionHelper.getSize (aServiceGroupsGroupedPerURL.get (sCert));
+        aRow.addCell (Integer.toString (nSGCount));
+
         aRow.addCell (Integer.toString (aEndpoints.size ()));
 
         final ISimpleURL aEditURL = aWPEC.getSelfHref ()
@@ -265,35 +315,5 @@ public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPa
       final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
       aNodeList.addChild (aTable).addChild (aDataTables);
     }
-  }
-
-  @Nonnull
-  private static IHCNode _getCertificateDisplay (@Nullable final String sCert, @Nonnull final Locale aDisplayLocale)
-  {
-    X509Certificate aEndpointCert = null;
-    try
-    {
-      aEndpointCert = CertificateHelper.convertStringToCertficate (sCert);
-    }
-    catch (final Exception ex)
-    {
-      // Ignore
-    }
-    if (aEndpointCert == null)
-    {
-      final int nDisplayLen = 20;
-      final String sCertPart = (sCert.length () > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert);
-      return new HCDiv ().addChild ("Invalid certificate" + (sCert.length () > nDisplayLen ? " starting with: " : ": "))
-                         .addChild (new HCCode ().addChild (sCertPart));
-    }
-
-    final HCNodeList ret = new HCNodeList ();
-    ret.addChild (new HCDiv ().addChild ("Issuer: " + aEndpointCert.getIssuerDN ().toString ()));
-    ret.addChild (new HCDiv ().addChild ("Subject: " + aEndpointCert.getSubjectDN ().toString ()));
-    final LocalDate aNotBefore = PDTFactory.createLocalDate (aEndpointCert.getNotBefore ());
-    ret.addChild (new HCDiv ().addChild ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
-    final LocalDate aNotAfter = PDTFactory.createLocalDate (aEndpointCert.getNotAfter ());
-    ret.addChild (new HCDiv ().addChild ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
-    return ret;
   }
 }
