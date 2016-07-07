@@ -155,10 +155,11 @@
         <artifactId>log4j-slf4j-impl</artifactId>
         <version>${log4j.version}</version>
       </dependency>
+      <!-- Use 5.1.x because of timezone exception in 6.0.3 -->
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>6.0.3</version>
+        <version>5.1.39</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
