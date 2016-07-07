@@ -29,8 +29,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.mock.SMPServerTestRule;
@@ -48,8 +49,11 @@ public final class ISMPServiceGroupManagerFuncTest
   @Test
   public void testBasic ()
   {
-    final IParticipantIdentifier aPI1 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
-    final IParticipantIdentifier aPI2 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest2");
+    final IIdentifierFactory aIDFactory = SMPMetaManager.getIdentifierFactory ();
+    final IParticipantIdentifier aPI1 = aIDFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                "9999:junittest1");
+    final IParticipantIdentifier aPI2 = aIDFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                "9999:junittest2");
     final String sSG1 = SMPServiceGroup.createSMPServiceGroupID (aPI1);
     final String sSG2 = SMPServiceGroup.createSMPServiceGroupID (aPI2);
     final String sOwner1ID = "junitsg1";
