@@ -55,8 +55,8 @@ import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.SMPExtensionConverter;
-import com.helger.peppol.utils.CertificateHelper;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
+import com.helger.security.certificate.CertificateHelper;
 
 /**
  * Default implementation of the {@link ISMPEndpoint} interface.

@@ -53,7 +53,9 @@ import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.utils.LoadedKeyStore;
+import com.helger.peppol.utils.PeppolKeyStoreHelper;
+import com.helger.security.keystore.KeyStoreHelper;
+import com.helger.security.keystore.LoadedKeyStore;
 
 /**
  * This class holds the global trust store.
@@ -77,11 +79,11 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
     m_aTrustStore = null;
 
     // Load the trust store
-    final LoadedKeyStore aTrustStoreLoading = LoadedKeyStore.loadTrustStore (SMPServerConfiguration.getTrustStorePath (),
-                                                                             SMPServerConfiguration.getTrustStorePassword ());
+    final LoadedKeyStore aTrustStoreLoading = KeyStoreHelper.loadKeyStore (SMPServerConfiguration.getTrustStorePath (),
+                                                                           SMPServerConfiguration.getTrustStorePassword ());
     if (aTrustStoreLoading.isFailure ())
     {
-      s_sInitError = aTrustStoreLoading.getErrorMessage ();
+      s_sInitError = PeppolKeyStoreHelper.getLoadError (aTrustStoreLoading);
       throw new InitializationException (s_sInitError);
     }
     m_aTrustStore = aTrustStoreLoading.getKeyStore ();

@@ -49,8 +49,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
-import com.helger.peppol.utils.CertificateHelper;
-import com.helger.peppol.utils.LoadedKeyStore;
+import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
@@ -58,6 +57,9 @@ import com.helger.photon.bootstrap3.label.BootstrapLabel;
 import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
 import com.helger.photon.uicore.css.CUICoreCSS;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.security.certificate.CertificateHelper;
+import com.helger.security.keystore.KeyStoreHelper;
+import com.helger.security.keystore.LoadedKeyStore;
 
 public class PageSecureTasks extends AbstractSMPWebPage
 {
@@ -120,11 +122,11 @@ public class PageSecureTasks extends AbstractSMPWebPage
         aOL.addItem (_createError ("An invalid PEPPOL Directory hostname is provided"),
                      new HCDiv ().addChild ("A connection to the PEPPOL Directory server cannot be establised!"));
 
-      final LoadedKeyStore aLoadedKeyStore = LoadedKeyStore.loadKeyStore (PDClientConfiguration.getKeyStorePath (),
+      final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (PDClientConfiguration.getKeyStorePath (),
                                                                           PDClientConfiguration.getKeyStorePassword ());
       if (aLoadedKeyStore.isFailure ())
         aOL.addItem (_createError ("The PEPPOL Directory client certificate configuration is invalid."),
-                     new HCDiv ().addChild (aLoadedKeyStore.getErrorMessage ()));
+                     new HCDiv ().addChild (PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore)));
     }
 
     // check service groups and redirects

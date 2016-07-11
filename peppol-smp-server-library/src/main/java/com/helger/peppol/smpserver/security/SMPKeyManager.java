@@ -82,8 +82,10 @@ import com.helger.commons.random.RandomHelper;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.utils.LoadedKey;
-import com.helger.peppol.utils.LoadedKeyStore;
+import com.helger.peppol.utils.PeppolKeyStoreHelper;
+import com.helger.security.keystore.KeyStoreHelper;
+import com.helger.security.keystore.LoadedKey;
+import com.helger.security.keystore.LoadedKeyStore;
 
 /**
  * This class holds the private key for signing and the certificate for
@@ -110,22 +112,22 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     m_aKeyEntry = null;
 
     // Load the key store and get the signing key
-    final LoadedKeyStore aLoadedKeyStore = LoadedKeyStore.loadKeyStore (SMPServerConfiguration.getKeyStorePath (),
+    final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (SMPServerConfiguration.getKeyStorePath (),
                                                                         SMPServerConfiguration.getKeyStorePassword ());
     if (aLoadedKeyStore.isFailure ())
     {
-      s_sInitError = aLoadedKeyStore.getErrorMessage ();
+      s_sInitError = PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore);
       throw new InitializationException (s_sInitError);
     }
     m_aKeyStore = aLoadedKeyStore.getKeyStore ();
 
-    final LoadedKey aLoadedKey = LoadedKey.loadKey (m_aKeyStore,
-                                                    SMPServerConfiguration.getKeyStorePath (),
-                                                    SMPServerConfiguration.getKeyStoreKeyAlias (),
-                                                    SMPServerConfiguration.getKeyStoreKeyPassword ());
+    final LoadedKey <KeyStore.PrivateKeyEntry> aLoadedKey = KeyStoreHelper.loadPrivateKey (m_aKeyStore,
+                                                                                           SMPServerConfiguration.getKeyStorePath (),
+                                                                                           SMPServerConfiguration.getKeyStoreKeyAlias (),
+                                                                                           SMPServerConfiguration.getKeyStoreKeyPassword ());
     if (aLoadedKey.isFailure ())
     {
-      s_sInitError = aLoadedKey.getErrorMessage ();
+      s_sInitError = PeppolKeyStoreHelper.getLoadError (aLoadedKey);
       throw new InitializationException (s_sInitError);
     }
 
@@ -223,8 +225,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     final Reference aReference = aSignatureFactory.newReference ("",
                                                                  aSignatureFactory.newDigestMethod (DigestMethod.SHA1,
                                                                                                     null),
-                                                                 new CommonsArrayList <> (aSignatureFactory.newTransform (Transform.ENVELOPED,
-                                                                                                                          (TransformParameterSpec) null)),
+                                                                 new CommonsArrayList<> (aSignatureFactory.newTransform (Transform.ENVELOPED,
+                                                                                                                         (TransformParameterSpec) null)),
                                                                  null,
                                                                  null);
 
@@ -233,16 +235,16 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                                                                  (C14NMethodParameterSpec) null),
                                                                     aSignatureFactory.newSignatureMethod (SignatureMethod.RSA_SHA1,
                                                                                                           null),
-                                                                    new CommonsArrayList <> (aReference));
+                                                                    new CommonsArrayList<> (aReference));
 
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
-    final ICommonsList <Object> aX509Content = new CommonsArrayList <> ();
+    final ICommonsList <Object> aX509Content = new CommonsArrayList<> ();
     final X509Certificate aCert = (X509Certificate) m_aKeyEntry.getCertificate ();
     aX509Content.add (aCert.getSubjectX500Principal ().getName ());
     aX509Content.add (aCert);
     final X509Data aX509Data = aKeyInfoFactory.newX509Data (aX509Content);
-    final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList <> (aX509Data));
+    final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList<> (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and
     // location of the resulting XMLSignature's parent element.

@@ -41,8 +41,7 @@ import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
-import com.helger.peppol.utils.LoadedKey;
-import com.helger.peppol.utils.LoadedKeyStore;
+import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
@@ -54,6 +53,9 @@ import com.helger.photon.bootstrap3.table.BootstrapTable;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.security.keystore.KeyStoreHelper;
+import com.helger.security.keystore.LoadedKey;
+import com.helger.security.keystore.LoadedKeyStore;
 
 /**
  * This page displays information about the certificate configured in the SMP
@@ -224,26 +226,26 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 
       final String sKeyStorePath = PDClientConfiguration.getKeyStorePath ();
 
-      final LoadedKeyStore aKeyStoreLR = LoadedKeyStore.loadKeyStore (sKeyStorePath,
+      final LoadedKeyStore aKeyStoreLR = KeyStoreHelper.loadKeyStore (sKeyStorePath,
                                                                       PDClientConfiguration.getKeyStorePassword ());
       if (aKeyStoreLR.isFailure ())
       {
-        aTab.addChild (new BootstrapErrorBox ().addChild (aKeyStoreLR.getErrorMessage ()));
+        aTab.addChild (new BootstrapErrorBox ().addChild (PeppolKeyStoreHelper.getLoadError (aKeyStoreLR)));
       }
       else
       {
         final KeyStore aKeyStore = aKeyStoreLR.getKeyStore ();
         final String sKeyStoreAlias = PDClientConfiguration.getKeyStoreKeyAlias ();
-        final LoadedKey aKeyLoading = LoadedKey.loadKey (aKeyStore,
-                                                         sKeyStorePath,
-                                                         sKeyStoreAlias,
-                                                         PDClientConfiguration.getKeyStoreKeyPassword ());
+        final LoadedKey <KeyStore.PrivateKeyEntry> aKeyLoading = KeyStoreHelper.loadPrivateKey (aKeyStore,
+                                                                                                sKeyStorePath,
+                                                                                                sKeyStoreAlias,
+                                                                                                PDClientConfiguration.getKeyStoreKeyPassword ());
         if (aKeyLoading.isFailure ())
         {
           aTab.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" +
                                                                                      sKeyStorePath +
                                                                                      "' and was successfully loaded.")));
-          aTab.addChild (new BootstrapErrorBox ().addChild (aKeyLoading.getErrorMessage ()));
+          aTab.addChild (new BootstrapErrorBox ().addChild (PeppolKeyStoreHelper.getLoadError (aKeyLoading)));
         }
         else
         {
