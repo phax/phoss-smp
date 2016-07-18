@@ -328,8 +328,9 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       }
       catch (final IllegalArgumentException ex)
       {
-        aCtrl.addChild (new BootstrapErrorBox ().addChild ("Failed to parse document type identifier: " +
-                                                           ex.getMessage ()));
+        if (false)
+          aCtrl.addChild (new BootstrapErrorBox ().addChild ("Failed to parse document type identifier: " +
+                                                             ex.getMessage ()));
       }
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Document type ID").setCtrl (aCtrl));
     }
