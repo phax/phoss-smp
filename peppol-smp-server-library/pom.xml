@@ -54,7 +54,6 @@
   <description>SMP library with all common parts used for a full SMP server web application</description>
   <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-library</url>
   <inceptionYear>2015</inceptionYear>
-
   <licenses>
     <license>
       <name>MPL 1.1</name>
@@ -67,12 +66,10 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
- 
   <organization>
     <name>Philip Helger</name>
     <url>http://www.helger.com</url>
   </organization>
-
   <developers>
     <developer>
       <id>philip</id>
@@ -81,7 +78,6 @@
       <url>http://www.helger.com</url>
     </developer>
   </developers>
-  
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
@@ -111,7 +107,6 @@
       <groupId>com.helger</groupId>
       <artifactId>peppol-directory-businesscard</artifactId>
     </dependency>
-
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -132,14 +127,12 @@
       <artifactId>ph-oton-security</artifactId>
       <optional>true</optional>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
     <resources>
       <!-- Hack to filter only properties files -->
@@ -158,7 +151,6 @@
         </excludes>
       </resource>
     </resources>
-
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
