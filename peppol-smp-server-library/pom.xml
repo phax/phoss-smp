@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Copyright (C) 2015-2016 Philip Helger (www.helger.com)
@@ -165,12 +166,10 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Export-Package>
-              com.helger.peppol.smpserver.*
-            </Export-Package>
-            <Import-Package>
-              !javax.annotation.*,*
-            </Import-Package>
+            <Export-Package>com.helger.peppol.smpserver.*</Export-Package>
+            <Import-Package>!javax.annotation.*,*</Import-Package>
+            <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)",
+osgi.serviceloader; filter:="(osgi.serviceloader=com.helger.peppol.smpserver.backend.ISMPBackendRegistrarSPI)"; cardinality:=multiple</Require-Capability>
           </instructions>
         </configuration>
       </plugin>
