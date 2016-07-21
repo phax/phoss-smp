@@ -22,7 +22,6 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.quartz.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +35,7 @@ import com.helger.photon.basic.longrun.ILongRunningJob;
 import com.helger.photon.core.app.error.InternalErrorBuilder;
 import com.helger.photon.core.app.error.InternalErrorHandler;
 import com.helger.photon.core.app.error.callback.AbstractErrorCallback;
+import com.helger.quartz.IJob;
 import com.helger.schedule.job.AbstractJob;
 import com.helger.schedule.job.IJobExceptionCallback;
 import com.helger.settings.exchange.configfile.ConfigFile;
@@ -70,12 +70,12 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback impleme
 
   public void onScheduledJobException (@Nonnull final Throwable t,
                                        @Nonnull final String sJobClassName,
-                                       @Nonnull final Job aJob)
+                                       @Nonnull final IJob aJob)
   {
     onError (t,
              null,
              "Error executing background Job " + sJobClassName,
-             new SMap ().add ("job-class", sJobClassName)
+             new SMap ().addIfNotNull ("job-class", sJobClassName)
                         .add ("job-object", aJob)
                         .add ("long-running", Boolean.toString (aJob instanceof ILongRunningJob)));
   }
