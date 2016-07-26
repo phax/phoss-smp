@@ -40,17 +40,16 @@
  */
 package com.helger.peppol.smpserver.domain.user;
 
-import java.util.Collection;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
-import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
  * Abstraction interface for the user management depending on the used backend.
@@ -80,10 +79,17 @@ public interface ISMPUserManager
 
   @Nonnull
   @ReturnsMutableCopy
-  Collection <? extends ISMPUser> getAllUsers ();
+  ICommonsCollection <? extends ISMPUser> getAllUsers ();
 
+  /**
+   * Get the user with the specified ID.
+   *
+   * @param sUserID
+   *        The user ID to search. May be <code>null</code>.
+   * @return <code>null</code> if no such user exists.
+   */
   @Nullable
-  ISMPUser getUserOfID (String sUserID);
+  ISMPUser getUserOfID (@Nullable String sUserID);
 
   /**
    * Check if an SMP user matching the user name of the BasicAuth credentials

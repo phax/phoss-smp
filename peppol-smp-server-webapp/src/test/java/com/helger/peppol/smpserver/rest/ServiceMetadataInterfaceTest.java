@@ -44,6 +44,8 @@ import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.http.CHTTPHeader;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
@@ -67,8 +69,6 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.photon.security.CSecurity;
-import com.helger.web.http.CHTTPHeader;
-import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
  * Test class for class {@link ServiceMetadataInterface}. This test class is

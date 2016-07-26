@@ -41,12 +41,12 @@
 package com.helger.peppol.smpserver.mock;
 
 import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
-import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
  * Mock implementation of {@link ISMPUserManager}.

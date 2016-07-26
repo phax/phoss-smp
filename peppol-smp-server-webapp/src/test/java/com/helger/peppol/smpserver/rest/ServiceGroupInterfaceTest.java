@@ -43,6 +43,8 @@ import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.http.CHTTPHeader;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.ParticipantIdentifierType;
 import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smp.ObjectFactory;
@@ -51,8 +53,6 @@ import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
 import com.helger.peppol.smpserver.data.xml.mgr.XMLServiceGroupManager;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.security.CSecurity;
-import com.helger.web.http.CHTTPHeader;
-import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
  * Test class for class {@link ServiceGroupInterface}. This test class is

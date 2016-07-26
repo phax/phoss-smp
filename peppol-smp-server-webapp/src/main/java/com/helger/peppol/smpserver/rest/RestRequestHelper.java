@@ -23,9 +23,9 @@ import javax.annotation.concurrent.Immutable;
 import javax.ws.rs.core.HttpHeaders;
 
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.http.basicauth.HTTPBasicAuth;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
-import com.helger.web.http.basicauth.BasicAuthClientCredentials;
-import com.helger.web.http.basicauth.HTTPBasicAuth;
 
 /**
  * This class is used for retrieving the HTTP BASIC AUTH header from the HTTP

@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.SSLSocketFactory;
+import javax.xml.ws.WebServiceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.network.dns.IPV4Addr;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
 import com.helger.peppol.smlclient.smp.BadRequestFault;
@@ -63,8 +65,6 @@ import com.helger.photon.bootstrap3.nav.BootstrapTabBox;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.web.dns.IPV4Addr;
-import com.sun.xml.ws.client.ClientTransportException;
 
 public class PageSecureSMLRegistration extends AbstractSMPWebPage
 {
@@ -206,8 +206,11 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                            sLogicalAddress,
                                            aSMLInfo.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
-                   | ClientTransportException ex)
+      catch (final GeneralSecurityException
+                   | BadRequestFault
+                   | InternalErrorFault
+                   | UnauthorizedFault
+                   | WebServiceException ex)
       {
         final String sMsg = "Error registering SMP '" +
                             sSMPID +
@@ -324,7 +327,10 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                            sLogicalAddress,
                                            aSMLInfo.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
+      catch (final GeneralSecurityException
+                   | BadRequestFault
+                   | InternalErrorFault
+                   | UnauthorizedFault
                    | NotFoundFault ex)
       {
         final String sMsg = "Error updating SMP '" +
@@ -377,7 +383,10 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, aSMLInfo.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
+      catch (final GeneralSecurityException
+                   | BadRequestFault
+                   | InternalErrorFault
+                   | UnauthorizedFault
                    | NotFoundFault ex)
       {
         final String sMsg = "Error deleting SMP '" +

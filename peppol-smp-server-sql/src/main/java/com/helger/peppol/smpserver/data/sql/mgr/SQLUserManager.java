@@ -48,8 +48,11 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
@@ -62,7 +65,6 @@ import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
-import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
  * A EclipseLink based implementation of the {@link ISMPUserManager} interface.
@@ -125,13 +127,13 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
   @Nonnull
   @ReturnsMutableCopy
-  public Collection <DBUser> getAllUsers ()
+  public ICommonsCollection <DBUser> getAllUsers ()
   {
     JPAExecutionResult <Collection <DBUser>> ret;
     ret = doSelect ( () -> getEntityManager ().createQuery ("SELECT p FROM DBUser p", DBUser.class).getResultList ());
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
-    return ret.get ();
+    return new CommonsArrayList<> (ret.get ());
   }
 
   @Nullable

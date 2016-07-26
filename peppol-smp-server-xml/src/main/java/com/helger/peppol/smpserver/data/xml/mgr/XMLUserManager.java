@@ -28,6 +28,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.data.xml.domain.XMLDataUser;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -40,7 +41,6 @@ import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.UserManager;
-import com.helger.web.http.basicauth.BasicAuthClientCredentials;
 
 /**
  * The DAO based {@link ISMPUserManager}.
@@ -84,14 +84,13 @@ public final class XMLUserManager implements ISMPUserManager
   @ReturnsMutableCopy
   public ICommonsCollection <XMLDataUser> getAllUsers ()
   {
-    final ICommonsList <XMLDataUser> ret = new CommonsArrayList <> ();
+    final ICommonsList <XMLDataUser> ret = new CommonsArrayList<> ();
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ().getAllActiveUsers ())
       ret.add (new XMLDataUser (aUser));
     return ret;
   }
 
-  @Nonnull
-  @ReturnsMutableCopy
+  @Nullable
   public XMLDataUser getUserOfID (@Nullable final String sUserID)
   {
     final IUser aUser = PhotonSecurityManager.getUserMgr ().getUserOfID (sUserID);
