@@ -22,6 +22,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -80,13 +81,14 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final LocalDateTime aNowLDT = PDTFactory.getCurrentLocalDateTime ();
+    final ZonedDateTime aNowZDT = PDTFactory.getCurrentZonedDateTime ();
+    final LocalDateTime aNowLDT = aNowZDT.toLocalDateTime ();
 
     if (aWPEC.hasAction (ACTION_RELOAD_KEYSTORE))
     {
       SMPKeyManager.reloadFromConfiguration ();
       aWPEC.postRedirectGet (new BootstrapInfoBox ().addChild ("The keystore was updated from the configuration at " +
-                                                               DateTimeFormatter.ISO_LOCAL_TIME.format (aNowLDT) +
+                                                               DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
                                                                ". The changes are reflected below."));
     }
     else
@@ -94,7 +96,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       {
         SMPTrustManager.reloadFromConfiguration ();
         aWPEC.postRedirectGet (new BootstrapInfoBox ().addChild ("The truststore was updated from the configuration at " +
-                                                                 DateTimeFormatter.ISO_LOCAL_TIME.format (aNowLDT) +
+                                                                 DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
                                                                  ". The changes are reflected below."));
       }
 
