@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.helger.commons.state.ESuccess;
-import com.helger.peppol.bdxrclient.BDXRMarshallerServiceGroupType;
-import com.helger.peppol.smpclient.SMPMarshallerServiceGroupType;
+import com.helger.peppol.bdxr.marshal.BDXRMarshallerServiceGroupType;
+import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BDXRServerAPI;

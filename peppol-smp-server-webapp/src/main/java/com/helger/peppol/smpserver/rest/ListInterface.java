@@ -28,7 +28,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.w3c.dom.Document;
 
-import com.helger.peppol.smpclient.SMPMarshallerServiceGroupReferenceListType;
+import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupReferenceListType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;

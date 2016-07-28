@@ -40,8 +40,8 @@ import org.w3c.dom.Document;
 
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.state.ESuccess;
-import com.helger.peppol.bdxrclient.BDXRMarshallerServiceMetadataType;
-import com.helger.peppol.smpclient.SMPMarshallerServiceMetadataType;
+import com.helger.peppol.bdxr.marshal.BDXRMarshallerServiceMetadataType;
+import com.helger.peppol.smp.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.jaxb.MarshallerBDXRSignedServiceMetadataType;
