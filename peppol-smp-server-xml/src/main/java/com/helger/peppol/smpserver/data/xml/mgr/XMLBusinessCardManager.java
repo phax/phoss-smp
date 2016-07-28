@@ -55,15 +55,9 @@ public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBu
   @IsLocked (ELockType.WRITE)
   private ISMPBusinessCard _createSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard)
   {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
+    m_aRWLock.writeLocked ( () -> {
       internalCreateItem (aSMPBusinessCard);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
+    });
     AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
                                       aSMPBusinessCard.getID (),
                                       aSMPBusinessCard.getServiceGroupID (),
@@ -75,15 +69,9 @@ public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBu
   @IsLocked (ELockType.WRITE)
   private ISMPBusinessCard _updateSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard)
   {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
+    m_aRWLock.writeLocked ( () -> {
       internalUpdateItem (aSMPBusinessCard);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
+    });
     AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
                                       aSMPBusinessCard.getID (),
                                       aSMPBusinessCard.getServiceGroupID (),

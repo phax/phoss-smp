@@ -56,15 +56,9 @@ public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedire
   @IsLocked (ELockType.WRITE)
   private ISMPRedirect _createSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
   {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
+    m_aRWLock.writeLocked ( () -> {
       internalCreateItem (aSMPRedirect);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
+    });
     AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
@@ -79,15 +73,9 @@ public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedire
   @IsLocked (ELockType.WRITE)
   private ISMPRedirect _updateSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
   {
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
+    m_aRWLock.writeLocked ( () -> {
       internalUpdateItem (aSMPRedirect);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
+    });
     AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
@@ -206,7 +194,7 @@ public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedire
   @ReturnsMutableCopy
   public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {
-    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
+    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList<> ();
     if (StringHelper.hasText (sServiceGroupID))
       findAll (x -> x.getServiceGroupID ().equals (sServiceGroupID), ret::add);
     return ret;
