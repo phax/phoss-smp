@@ -74,6 +74,15 @@ public enum ESMPRESTType implements IHasID <String>
     return m_sID;
   }
 
+  /**
+   * @return <code>true</code> if this REST type supports retrieving the
+   *         complete service group
+   */
+  public boolean isCompleteServiceGroupSupported ()
+  {
+    return this == PEPPOL;
+  }
+
   @Nullable
   public static ESMPRESTType getFromIDOrNull (@Nullable final String sID)
   {

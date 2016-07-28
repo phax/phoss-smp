@@ -47,6 +47,7 @@ import com.helger.network.dns.IPV4Addr;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.smpserver.ESMPRESTType;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -437,6 +438,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final ESMPRESTType eRESTType = SMPMetaManager.getSettings ().getRESTType ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
@@ -484,24 +486,29 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
       aRow.addCell (Integer.toString (nProcesses));
       aRow.addCell (Integer.toString (nEndpoints));
 
-      aRow.addCell (createEditLink (aWPEC, aCurObject, "Edit " + sDisplayName),
-                    new HCTextNode (" "),
-                    createCopyLink (aWPEC, aCurObject, "Copy " + sDisplayName),
-                    new HCTextNode (" "),
-                    createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
-                    new HCTextNode (" "),
-                    new HCA (LinkHelper.getURLWithServerAndContext (aCurObject.getParticpantIdentifier ()
-                                                                              .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
-                                                                                                                   sDisplayName)
-                                                                                                        .setTargetBlank ()
-                                                                                                        .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()),
-                    new HCTextNode (" "),
-                    new HCA (LinkHelper.getURLWithServerAndContext ("complete/" +
-                                                                    aCurObject.getParticpantIdentifier ()
-                                                                              .getURIPercentEncoded ())).setTitle ("Perform complete SMP query on " +
-                                                                                                                   sDisplayName)
-                                                                                                        .setTargetBlank ()
-                                                                                                        .addChild (EFamFamIcon.SCRIPT_LINK.getAsNode ()));
+      final HCNodeList aActions = new HCNodeList ();
+      aActions.addChildren (createEditLink (aWPEC, aCurObject, "Edit " + sDisplayName),
+                            new HCTextNode (" "),
+                            createCopyLink (aWPEC, aCurObject, "Copy " + sDisplayName),
+                            new HCTextNode (" "),
+                            createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
+                            new HCTextNode (" "),
+                            new HCA (LinkHelper.getURLWithServerAndContext (aCurObject.getParticpantIdentifier ()
+                                                                                      .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
+                                                                                                                           sDisplayName)
+                                                                                                                .setTargetBlank ()
+                                                                                                                .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+      if (eRESTType.isCompleteServiceGroupSupported ())
+      {
+        aActions.addChildren (new HCTextNode (" "),
+                              new HCA (LinkHelper.getURLWithServerAndContext ("complete/" +
+                                                                              aCurObject.getParticpantIdentifier ()
+                                                                                        .getURIPercentEncoded ())).setTitle ("Perform complete SMP query on " +
+                                                                                                                             sDisplayName)
+                                                                                                                  .setTargetBlank ()
+                                                                                                                  .addChild (EFamFamIcon.SCRIPT_LINK.getAsNode ()));
+      }
+      aRow.addCell (aActions);
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
