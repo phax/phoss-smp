@@ -288,8 +288,10 @@ public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPa
     {
       aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("This page lets you change the certificates of multiple endpoints at once. This is e.g. helpful when the old certificate expired."),
                                                                new HCDiv ().addChild ("Currently " +
-                                                                                      nTotalEndpointCount +
-                                                                                      " endpoints are registered.")));
+                                                                                      (nTotalEndpointCount == 1 ? "1 endpoint is"
+                                                                                                                : nTotalEndpointCount +
+                                                                                                                  " endpoints are") +
+                                                                                      " registered.")));
 
       final HCTable aTable = new HCTable (new DTCol ("Certificate").setInitialSorting (ESortOrder.ASCENDING),
                                           new DTCol ("Service Group Count").setDisplayType (EDTColType.INT,

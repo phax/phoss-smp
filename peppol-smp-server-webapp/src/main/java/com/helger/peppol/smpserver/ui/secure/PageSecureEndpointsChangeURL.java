@@ -278,8 +278,10 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
     {
       aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("This page lets you change the URLs of multiple endpoints at once. This is e.g. helpful when the underlying server got a new URL."),
                                                                new HCDiv ().addChild ("Currently " +
-                                                                                      nTotalEndpointCount +
-                                                                                      " endpoints are registered" +
+                                                                                      (nTotalEndpointCount == 1 ? "1 endpoint is"
+                                                                                                                : nTotalEndpointCount +
+                                                                                                                  " endpoints are") +
+                                                                                      " registered" +
                                                                                       (nTotalEndpointCountWithURL < nTotalEndpointCount ? " of which " +
                                                                                                                                           nTotalEndpointCountWithURL +
                                                                                                                                           " have an endpoint reference"
