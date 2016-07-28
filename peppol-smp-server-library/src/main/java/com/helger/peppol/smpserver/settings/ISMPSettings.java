@@ -44,7 +44,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.type.ITypedObject;
-import com.helger.peppol.smpserver.ESMPRESTType;
 
 /**
  * Runtime settings for this SMP server instance.
@@ -71,13 +70,6 @@ public interface ISMPSettings extends ITypedObject <String>
    *         By default it is disabled.
    */
   boolean isPEPPOLDirectoryIntegrationEnabled ();
-
-  /**
-   * @return The REST type to be used. Never <code>null</code>. Defaults to
-   *         {@link ESMPRESTType#PEPPOL}.
-   */
-  @Nonnull
-  ESMPRESTType getRESTType ();
 
   /**
    * @return The host name of the PEPPOL Directory server. Never

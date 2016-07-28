@@ -42,6 +42,7 @@ import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.state.ESuccess;
 import com.helger.peppol.bdxrclient.BDXRMarshallerServiceMetadataType;
 import com.helger.peppol.smpclient.SMPMarshallerServiceMetadataType;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.jaxb.MarshallerBDXRSignedServiceMetadataType;
 import com.helger.peppol.smpserver.jaxb.MarshallerSMPSignedServiceMetadataType;
@@ -91,7 +92,7 @@ public final class ServiceMetadataInterface
 
       // Create the unsigned response document
       Document aDoc;
-      switch (SMPMetaManager.getSettings ().getRESTType ())
+      switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
         {
@@ -181,7 +182,7 @@ public final class ServiceMetadataInterface
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       ESuccess eSuccess = ESuccess.FAILURE;
-      switch (SMPMetaManager.getSettings ().getRESTType ())
+      switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
         {
@@ -232,7 +233,7 @@ public final class ServiceMetadataInterface
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       ESuccess eSuccess;
-      switch (SMPMetaManager.getSettings ().getRESTType ())
+      switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
           eSuccess = new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID,

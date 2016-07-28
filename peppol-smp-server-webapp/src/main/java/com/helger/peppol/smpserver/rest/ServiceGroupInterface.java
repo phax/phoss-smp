@@ -38,6 +38,7 @@ import org.w3c.dom.Document;
 import com.helger.commons.state.ESuccess;
 import com.helger.peppol.bdxrclient.BDXRMarshallerServiceGroupType;
 import com.helger.peppol.smpclient.SMPMarshallerServiceGroupType;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
@@ -77,7 +78,7 @@ public final class ServiceGroupInterface
     try
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
-      switch (SMPMetaManager.getSettings ().getRESTType ())
+      switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
         {
@@ -116,7 +117,7 @@ public final class ServiceGroupInterface
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       ESuccess eSuccess = ESuccess.FAILURE;
-      switch (SMPMetaManager.getSettings ().getRESTType ())
+      switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
         {
@@ -164,7 +165,7 @@ public final class ServiceGroupInterface
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       ESuccess eSuccess;
-      switch (SMPMetaManager.getSettings ().getRESTType ())
+      switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
           eSuccess = new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID,

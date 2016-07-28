@@ -282,7 +282,6 @@ public final class SMPServerConfiguration
    *         {@link ESMPRESTType#PEPPOL}. Property <code>smp.rest.type</code>.
    */
   @Nonnull
-  @Deprecated
   public static ESMPRESTType getRESTType ()
   {
     final String sType = getConfigFile ().getAsString (KEY_SMP_REST_TYPE);

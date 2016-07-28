@@ -29,7 +29,7 @@ import javax.ws.rs.core.UriInfo;
 import org.w3c.dom.Document;
 
 import com.helger.peppol.smpclient.SMPMarshallerServiceGroupReferenceListType;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.photon.core.app.CApplication;
@@ -66,7 +66,7 @@ public final class ListInterface
     try
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
-      switch (SMPMetaManager.getSettings ().getRESTType ())
+      switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
         {
