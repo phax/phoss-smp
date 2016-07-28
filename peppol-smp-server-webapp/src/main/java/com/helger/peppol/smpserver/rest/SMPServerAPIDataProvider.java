@@ -36,7 +36,7 @@ import com.helger.web.servlet.server.StaticServerInfo;
  *
  * @author Philip Helger
  */
-public class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
+final class SMPServerAPIDataProvider implements ISMPServerAPIDataProvider
 {
   private final UriInfo m_aUriInfo;
   private final boolean m_bUseStaticServerInfo;

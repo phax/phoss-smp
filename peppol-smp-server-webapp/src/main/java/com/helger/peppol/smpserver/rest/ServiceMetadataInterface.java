@@ -17,6 +17,7 @@
 package com.helger.peppol.smpserver.rest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -38,11 +39,14 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
-import com.helger.commons.io.stream.StreamHelper;
-import com.helger.peppol.smp.ServiceMetadataType;
-import com.helger.peppol.smp.SignedServiceMetadataType;
+import com.helger.commons.state.ESuccess;
+import com.helger.peppol.bdxrclient.BDXRMarshallerServiceMetadataType;
+import com.helger.peppol.smpclient.SMPMarshallerServiceMetadataType;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.jaxb.MarshallerBDXRSignedServiceMetadataType;
 import com.helger.peppol.smpserver.jaxb.MarshallerSMPSignedServiceMetadataType;
+import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
+import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.photon.core.app.CApplication;
@@ -83,12 +87,35 @@ public final class ServiceMetadataInterface
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
-      final SignedServiceMetadataType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceRegistration (sServiceGroupID,
+      final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
+
+      // Create the unsigned response document
+      Document aDoc;
+      switch (SMPMetaManager.getSettings ().getRESTType ())
+      {
+        case PEPPOL:
+        {
+          final com.helger.peppol.smp.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
+                                                                                                                               sDocumentTypeID);
+
+          // Convert to DOM document
+          final MarshallerSMPSignedServiceMetadataType aMarshaller = new MarshallerSMPSignedServiceMetadataType ();
+          aDoc = aMarshaller.getAsDocument (ret);
+          break;
+        }
+        case BDXR:
+        {
+          final com.helger.peppol.bdxr.SignedServiceMetadataType ret = new BDXRServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
                                                                                                                                  sDocumentTypeID);
 
-      // Convert to DOM document
-      final MarshallerSMPSignedServiceMetadataType aMarshaller = new MarshallerSMPSignedServiceMetadataType ();
-      final Document aDoc = aMarshaller.getAsDocument (ret);
+          // Convert to DOM document
+          final MarshallerBDXRSignedServiceMetadataType aMarshaller = new MarshallerBDXRSignedServiceMetadataType ();
+          aDoc = aMarshaller.getAsDocument (ret);
+          break;
+        }
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
 
       // Sign the document
       try
@@ -100,36 +127,35 @@ public final class ServiceMetadataInterface
         throw new RuntimeException ("Error in signing xml", ex);
       }
 
-      final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ();
-      if (false)
+      try (final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ())
       {
-        // IMPORTANT: no indent and no align!
-        final IXMLWriterSettings aSettings = new XMLWriterSettings ().setIncorrectCharacterHandling (EXMLIncorrectCharacterHandling.THROW_EXCEPTION)
-                                                                     .setIndent (EXMLSerializeIndent.NONE);
+        if (false)
+        {
+          // IMPORTANT: no indent and no align!
+          final IXMLWriterSettings aSettings = new XMLWriterSettings ().setIncorrectCharacterHandling (EXMLIncorrectCharacterHandling.THROW_EXCEPTION)
+                                                                       .setIndent (EXMLSerializeIndent.NONE);
 
-        // Write the result to a byte array
-        if (XMLWriter.writeToStream (aDoc, aBAOS, aSettings).isFailure ())
-          throw new RuntimeException ("Failed to serialize signed node!");
-      }
-      else
-      {
-        // Use this because it correctly serializes &#13; which is important for
-        // validating the signature!
-        try
-        {
-          XMLTransformerFactory.newTransformer ().transform (new DOMSource (aDoc), new StreamResult (aBAOS));
+          // Write the result to a byte array
+          if (XMLWriter.writeToStream (aDoc, aBAOS, aSettings).isFailure ())
+            throw new RuntimeException ("Failed to serialize signed node!");
         }
-        catch (final TransformerException ex)
+        else
         {
-          throw new IllegalStateException ("Failed to save to XML", ex);
+          // Use this because it correctly serializes &#13; which is important
+          // for
+          // validating the signature!
+          try
+          {
+            XMLTransformerFactory.newTransformer ().transform (new DOMSource (aDoc), new StreamResult (aBAOS));
+          }
+          catch (final TransformerException ex)
+          {
+            throw new IllegalStateException ("Failed to save to XML", ex);
+          }
         }
-        finally
-        {
-          StreamHelper.close (aBAOS);
-        }
-      }
 
-      return aBAOS.toByteArray ();
+        return aBAOS.toByteArray ();
+      }
     }
     finally
     {
@@ -138,9 +164,10 @@ public final class ServiceMetadataInterface
   }
 
   @PUT
+  @Consumes ({ MediaType.TEXT_XML, MediaType.APPLICATION_XML })
   public Response saveServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                            @PathParam ("DocumentTypeId") final String sDocumentTypeID,
-                                           final ServiceMetadataType aServiceMetadata) throws Throwable
+                                           final Document aServiceMetadataDoc) throws Throwable
   {
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
@@ -152,11 +179,34 @@ public final class ServiceMetadataInterface
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
-      if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).saveServiceRegistration (sServiceGroupID,
-                                                                                                sDocumentTypeID,
-                                                                                                aServiceMetadata,
-                                                                                                RestRequestHelper.getAuth (m_aHttpHeaders))
-                                                                      .isFailure ())
+      final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
+      ESuccess eSuccess = ESuccess.FAILURE;
+      switch (SMPMetaManager.getSettings ().getRESTType ())
+      {
+        case PEPPOL:
+        {
+          final com.helger.peppol.smp.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType ().read (aServiceMetadataDoc);
+          if (aServiceMetadata != null)
+            eSuccess = new SMPServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
+                                                                                 sDocumentTypeID,
+                                                                                 aServiceMetadata,
+                                                                                 RestRequestHelper.getAuth (m_aHttpHeaders));
+          break;
+        }
+        case BDXR:
+        {
+          final com.helger.peppol.bdxr.ServiceMetadataType aServiceMetadata = new BDXRMarshallerServiceMetadataType ().read (aServiceMetadataDoc);
+          if (aServiceMetadata != null)
+            eSuccess = new BDXRServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
+                                                                                  sDocumentTypeID,
+                                                                                  aServiceMetadata,
+                                                                                  RestRequestHelper.getAuth (m_aHttpHeaders));
+          break;
+        }
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
+      if (eSuccess.isFailure ())
         return Response.status (Status.BAD_REQUEST).build ();
       return Response.ok ().build ();
     }
@@ -180,10 +230,25 @@ public final class ServiceMetadataInterface
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
-      if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).deleteServiceRegistration (sServiceGroupID,
-                                                                                                  sDocumentTypeID,
-                                                                                                  RestRequestHelper.getAuth (m_aHttpHeaders))
-                                                                      .isFailure ())
+      final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
+      ESuccess eSuccess;
+      switch (SMPMetaManager.getSettings ().getRESTType ())
+      {
+        case PEPPOL:
+          eSuccess = new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID,
+                                                                                 sDocumentTypeID,
+                                                                                 RestRequestHelper.getAuth (m_aHttpHeaders));
+          break;
+        case BDXR:
+          eSuccess = new BDXRServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID,
+                                                                                  sDocumentTypeID,
+                                                                                  RestRequestHelper.getAuth (m_aHttpHeaders));
+          break;
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
+
+      if (eSuccess.isFailure ())
         return Response.status (Status.BAD_REQUEST).build ();
       return Response.ok ().build ();
     }

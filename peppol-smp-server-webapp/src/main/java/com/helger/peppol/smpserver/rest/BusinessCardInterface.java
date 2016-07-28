@@ -53,7 +53,7 @@ public final class BusinessCardInterface
   @Context
   private UriInfo m_aUriInfo;
 
-  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
+  private final ObjectFactory m_aBDOF = new ObjectFactory ();
 
   public BusinessCardInterface ()
   {}
@@ -73,7 +73,7 @@ public final class BusinessCardInterface
     try
     {
       final PDBusinessCardType ret = new BusinessCardServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getBusinessCard (sServiceGroupID);
-      return m_aObjFactory.createBusinessCard (ret);
+      return m_aBDOF.createBusinessCard (ret);
     }
     finally
     {

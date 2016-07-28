@@ -38,65 +38,51 @@
  * the provisions above, a recipient may use your version of this file
  * under either the MPL or the EUPL License.
  */
-package com.helger.peppol.smpserver.settings;
+package com.helger.peppol.smpserver;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.commons.type.ITypedObject;
-import com.helger.peppol.smpserver.ESMPRESTType;
+import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.id.IHasID;
+import com.helger.commons.lang.EnumHelper;
 
 /**
- * Runtime settings for this SMP server instance.
+ * Defines the type of REST responses to be returned. Either PEPPOL (using
+ * objects in namespace http://busdox.org/serviceMetadata/publishing/1.0/) or
+ * BDXR (using objects in namespace
+ * http://docs.oasis-open.org/bdxr/ns/SMP/2016/05)
  *
  * @author Philip Helger
  */
-public interface ISMPSettings extends ITypedObject <String>
+public enum ESMPRESTType implements IHasID <String>
 {
-  /**
-   * Check if the writable parts of the REST API are disabled. If this is the
-   * case, only the read-only part of the API can be used. The writable REST API
-   * will return an HTTP 404 error.
-   *
-   * @return <code>true</code> if it is disabled, <code>false</code> if it is
-   *         enabled. By the default the writable API is enabled.
-   */
-  boolean isRESTWritableAPIDisabled ();
+  PEPPOL ("peppol"),
+  BDXR ("bdxr");
 
-  /**
-   * Check if the PEPPOL Directory integration (offering the /businesscard API)
-   * is enabled.
-   *
-   * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
-   *         By default it is disabled.
-   */
-  boolean isPEPPOLDirectoryIntegrationEnabled ();
+  private final String m_sID;
 
-  /**
-   * @return The REST type to be used. Never <code>null</code>. Defaults to
-   *         {@link ESMPRESTType#PEPPOL}.
-   */
+  private ESMPRESTType (@Nonnull @Nonempty final String sID)
+  {
+    m_sID = sID;
+  }
+
   @Nonnull
-  ESMPRESTType getRESTType ();
+  @Nonempty
+  public String getID ()
+  {
+    return m_sID;
+  }
 
-  /**
-   * @return The host name of the PEPPOL Directory server. Never
-   *         <code>null</code>.
-   */
-  @Nonnull
-  String getPEPPOLDirectoryHostName ();
-
-  /**
-   * @return <code>true</code> if the SML connection is active,
-   *         <code>false</code> if not.
-   */
-  boolean isWriteToSML ();
-
-  /**
-   * @return The SML URL to use (the manage participant endpoint - e.g.
-   *         <code>https://edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier</code>).
-   *         Only relevant when {@link #isWriteToSML()} is <code>true</code>.
-   */
   @Nullable
-  String getSMLURL ();
+  public static ESMPRESTType getFromIDOrNull (@Nullable final String sID)
+  {
+    return EnumHelper.getFromIDOrNull (ESMPRESTType.class, sID);
+  }
+
+  @Nullable
+  public static ESMPRESTType getFromIDOrDefault (@Nullable final String sID, @Nullable final ESMPRESTType eDefault)
+  {
+    return EnumHelper.getFromIDOrDefault (ESMPRESTType.class, sID, eDefault);
+  }
 }

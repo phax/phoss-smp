@@ -49,6 +49,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.commons.type.ObjectType;
+import com.helger.peppol.smpserver.ESMPRESTType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.settings.ISettings;
 import com.helger.settings.SettingsWithDefault;
@@ -88,6 +89,13 @@ public class SMPSettings implements ISMPSettings
   public void setToConfigurationValues ()
   {
     m_aSettings = new SettingsWithDefault (SMPServerConfiguration.getConfigFile ().getSettings ());
+  }
+
+  @Nonnull
+  public ESMPRESTType getRESTType ()
+  {
+    final String sType = m_aSettings.getAsString (SMPServerConfiguration.KEY_SMP_REST_TYPE);
+    return ESMPRESTType.getFromIDOrDefault (sType, SMPServerConfiguration.DEFAULT_SMP_REST_TYPE);
   }
 
   public boolean isRESTWritableAPIDisabled ()

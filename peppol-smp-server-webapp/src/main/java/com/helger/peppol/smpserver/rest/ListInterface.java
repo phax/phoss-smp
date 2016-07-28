@@ -25,10 +25,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBElement;
 
-import com.helger.peppol.smp.ObjectFactory;
-import com.helger.peppol.smp.ServiceGroupReferenceListType;
+import org.w3c.dom.Document;
+
+import com.helger.peppol.smpclient.SMPMarshallerServiceGroupReferenceListType;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.photon.core.app.CApplication;
 import com.helger.web.mock.MockHttpServletResponse;
@@ -53,21 +55,29 @@ public final class ListInterface
   @Context
   private UriInfo m_aUriInfo;
 
-  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
-
   public ListInterface ()
   {}
 
   @GET
   @Produces (MediaType.TEXT_XML)
-  public JAXBElement <ServiceGroupReferenceListType> getServiceGroupReferenceList (@PathParam ("UserId") final String sUserID) throws Throwable
+  public Document getServiceGroupReferenceList (@PathParam ("UserId") final String sUserID) throws Throwable
   {
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
-      final ServiceGroupReferenceListType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroupReferenceList (sUserID,
-                                                                                                                                           RestRequestHelper.getAuth (m_aHttpHeaders));
-      return m_aObjFactory.createServiceGroupReferenceList (ret);
+      final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
+      switch (SMPMetaManager.getSettings ().getRESTType ())
+      {
+        case PEPPOL:
+        {
+          final com.helger.peppol.smp.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
+                                                                                                                                         RestRequestHelper.getAuth (m_aHttpHeaders));
+          return new SMPMarshallerServiceGroupReferenceListType ().getAsDocument (ret);
+        }
+        // BDXR does not support list service group!
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
     }
     finally
     {

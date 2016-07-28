@@ -24,10 +24,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBElement;
 
-import com.helger.peppol.smp.CompleteServiceGroupType;
-import com.helger.peppol.smp.ObjectFactory;
+import org.w3c.dom.Document;
+
+import com.helger.peppol.smpclient.SMPMarshallerCompleteServiceGroupType;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.photon.core.app.CApplication;
 import com.helger.web.mock.MockHttpServletResponse;
@@ -51,20 +53,28 @@ public final class CompleteServiceGroupInterface
   @Context
   private UriInfo m_aUriInfo;
 
-  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
-
   public CompleteServiceGroupInterface ()
   {}
 
   @GET
   @Produces (MediaType.TEXT_XML)
-  public JAXBElement <CompleteServiceGroupType> getCompleteServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
+  public Document getCompleteServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
-      final CompleteServiceGroupType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getCompleteServiceGroup (sServiceGroupID);
-      return m_aObjFactory.createCompleteServiceGroup (ret);
+      final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
+      switch (SMPMetaManager.getSettings ().getRESTType ())
+      {
+        case PEPPOL:
+        {
+          final com.helger.peppol.smp.CompleteServiceGroupType ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
+          return new SMPMarshallerCompleteServiceGroupType ().getAsDocument (ret);
+        }
+        // BDXR does not support complete service group!
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
     }
     finally
     {

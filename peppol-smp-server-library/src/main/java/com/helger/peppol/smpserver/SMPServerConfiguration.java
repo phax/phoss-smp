@@ -87,6 +87,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_FORCE_ROOT = "smp.forceroot";
   public static final String KEY_SMP_PUBLIC_URL = "smp.publicurl";
   public static final String KEY_SMP_IDENTIFIER_TYPE = "smp.identifiertype";
+  public static final String KEY_SMP_REST_TYPE = "smp.rest.type";
   public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
   public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
   public static final String KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
@@ -96,6 +97,7 @@ public final class SMPServerConfiguration
 
   public static final boolean DEFAULT_SMP_FORCEROOT = false;
   public static final ESMPIdentifierType DEFAULT_SMP_IDENTIFIER_TYPE = ESMPIdentifierType.PEPPOL;
+  public static final ESMPRESTType DEFAULT_SMP_REST_TYPE = ESMPRESTType.PEPPOL;
   public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
   public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = true;
   public static final String DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME = "http://pyp.helger.com";
@@ -273,6 +275,18 @@ public final class SMPServerConfiguration
   {
     final String sType = getConfigFile ().getAsString (KEY_SMP_IDENTIFIER_TYPE);
     return ESMPIdentifierType.getFromIDOrDefault (sType, DEFAULT_SMP_IDENTIFIER_TYPE);
+  }
+
+  /**
+   * @return The REST type to be used. Never <code>null</code>. Defaults to
+   *         {@link ESMPRESTType#PEPPOL}. Property <code>smp.rest.type</code>.
+   */
+  @Nonnull
+  @Deprecated
+  public static ESMPRESTType getRESTType ()
+  {
+    final String sType = getConfigFile ().getAsString (KEY_SMP_REST_TYPE);
+    return ESMPRESTType.getFromIDOrDefault (sType, DEFAULT_SMP_REST_TYPE);
   }
 
   /**

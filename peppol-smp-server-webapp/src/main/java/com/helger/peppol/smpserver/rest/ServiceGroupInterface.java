@@ -17,6 +17,7 @@
 package com.helger.peppol.smpserver.rest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -29,14 +30,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
-import com.helger.peppol.smp.ObjectFactory;
-import com.helger.peppol.smp.ServiceGroupType;
+import com.helger.commons.state.ESuccess;
+import com.helger.peppol.bdxrclient.BDXRMarshallerServiceGroupType;
+import com.helger.peppol.smpclient.SMPMarshallerServiceGroupType;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
+import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.photon.core.app.CApplication;
 import com.helger.web.mock.MockHttpServletResponse;
@@ -62,20 +66,32 @@ public final class ServiceGroupInterface
   @Context
   private UriInfo m_aUriInfo;
 
-  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
-
   public ServiceGroupInterface ()
   {}
 
   @GET
   @Produces (MediaType.TEXT_XML)
-  public JAXBElement <ServiceGroupType> getServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
+  public Document getServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
-      final ServiceGroupType ret = new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).getServiceGroup (sServiceGroupID);
-      return m_aObjFactory.createServiceGroup (ret);
+      final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
+      switch (SMPMetaManager.getSettings ().getRESTType ())
+      {
+        case PEPPOL:
+        {
+          final com.helger.peppol.smp.ServiceGroupType ret = new SMPServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
+          return new SMPMarshallerServiceGroupType ().getAsDocument (ret);
+        }
+        case BDXR:
+        {
+          final com.helger.peppol.bdxr.ServiceGroupType ret = new BDXRServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
+          return new BDXRMarshallerServiceGroupType ().getAsDocument (ret);
+        }
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
     }
     finally
     {
@@ -84,8 +100,9 @@ public final class ServiceGroupInterface
   }
 
   @PUT
+  @Consumes ({ MediaType.TEXT_XML, MediaType.APPLICATION_XML })
   public Response saveServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID,
-                                    final ServiceGroupType aServiceGroup) throws Throwable
+                                    final Document aServiceGroupDoc) throws Throwable
   {
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
@@ -97,10 +114,32 @@ public final class ServiceGroupInterface
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
-      if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).saveServiceGroup (sServiceGroupID,
-                                                                                         aServiceGroup,
-                                                                                         RestRequestHelper.getAuth (m_aHttpHeaders))
-                                                                      .isFailure ())
+      final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
+      ESuccess eSuccess = ESuccess.FAILURE;
+      switch (SMPMetaManager.getSettings ().getRESTType ())
+      {
+        case PEPPOL:
+        {
+          final com.helger.peppol.smp.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType ().read (aServiceGroupDoc);
+          if (aServiceGroup != null)
+            eSuccess = new SMPServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID,
+                                                                          aServiceGroup,
+                                                                          RestRequestHelper.getAuth (m_aHttpHeaders));
+          break;
+        }
+        case BDXR:
+        {
+          final com.helger.peppol.bdxr.ServiceGroupType aServiceGroup = new BDXRMarshallerServiceGroupType ().read (aServiceGroupDoc);
+          if (aServiceGroup != null)
+            eSuccess = new BDXRServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID,
+                                                                           aServiceGroup,
+                                                                           RestRequestHelper.getAuth (m_aHttpHeaders));
+          break;
+        }
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
+      if (eSuccess.isFailure ())
         return Response.status (Status.BAD_REQUEST).build ();
       return Response.ok ().build ();
     }
@@ -123,9 +162,24 @@ public final class ServiceGroupInterface
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
-      if (new SMPServerAPI (new SMPServerAPIDataProvider (m_aUriInfo)).deleteServiceGroup (sServiceGroupID,
-                                                                                           RestRequestHelper.getAuth (m_aHttpHeaders))
-                                                                      .isFailure ())
+      final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
+      ESuccess eSuccess;
+      switch (SMPMetaManager.getSettings ().getRESTType ())
+      {
+        case PEPPOL:
+          eSuccess = new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID,
+                                                                          RestRequestHelper.getAuth (m_aHttpHeaders));
+
+          break;
+        case BDXR:
+          eSuccess = new BDXRServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID,
+                                                                           RestRequestHelper.getAuth (m_aHttpHeaders));
+
+          break;
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
+      if (eSuccess.isFailure ())
         return Response.status (Status.BAD_REQUEST).build ();
       return Response.ok ().build ();
     }
