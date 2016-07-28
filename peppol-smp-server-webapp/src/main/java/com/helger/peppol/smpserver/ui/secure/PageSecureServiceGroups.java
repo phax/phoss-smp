@@ -47,7 +47,6 @@ import com.helger.network.dns.IPV4Addr;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -284,30 +283,36 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bEdit = eFormAction.isEdit ();
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
     aForm.setLeft (2);
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit service group '" + aSelectedObject.getID () + "'"
                                                               : "Create new service group"));
 
     {
+      final String sDefaultScheme = aIdentifierFactory.getDefaultParticipantIdentifierScheme ();
       final BootstrapRow aRow = new BootstrapRow ();
       aRow.createColumn (GS_IDENTIFIER_SCHEME)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_SCHEME,
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
                                                                                             .getScheme ()
-                                                                           : PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                                .setReadOnly (bEdit));
+                                                                           : sDefaultScheme)).setPlaceholder ("Identifier scheme")
+                                                                                             .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
                                                    aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ()
                                                                                             .getValue ()
                                                                            : null)).setPlaceholder ("Identifier value")
                                                                                    .setReadOnly (bEdit));
+
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
-                                                   .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme (default: " +
-                                                                 PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME +
-                                                                 "), the right part is the identifier value (e.g. 9915:test)")
+                                                   .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme" +
+                                                                 (sDefaultScheme == null ? null
+                                                                                         : " (default: " +
+                                                                                           sDefaultScheme +
+                                                                                           ")") +
+                                                                 ", the right part is the identifier value (e.g. 9915:test)")
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PARTICIPANT_ID_SCHEME,
                                                                                                FIELD_PARTICIPANT_ID_VALUE)));
     }
@@ -347,7 +352,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
     final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
 
     // validations
-    if (StringHelper.hasNoText (sParticipantIDScheme))
+    if (aIdentifierFactory.isParticipantIdentifierSchemeMandatory () && StringHelper.hasNoText (sParticipantIDScheme))
       aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_SCHEME, "Participant ID scheme must not be empty!");
     else
       if (StringHelper.hasNoText (sParticipantIDValue))

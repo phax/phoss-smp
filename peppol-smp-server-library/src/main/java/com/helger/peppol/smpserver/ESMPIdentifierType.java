@@ -48,14 +48,16 @@ import com.helger.commons.id.IHasID;
 import com.helger.commons.lang.EnumHelper;
 
 /**
- * Defines the identifier types to be used - PEPPOL or simple.
+ * Defines the identifier types to be used - simple (allows all), PEPPOL
+ * (special schemes) or BDXR (different implementation type).
  *
  * @author Philip Helger
  */
 public enum ESMPIdentifierType implements IHasID <String>
 {
   SIMPLE ("simple"),
-  PEPPOL ("peppol");
+  PEPPOL ("peppol"),
+  BDXR ("bdxr");
 
   private final String m_sID;
 

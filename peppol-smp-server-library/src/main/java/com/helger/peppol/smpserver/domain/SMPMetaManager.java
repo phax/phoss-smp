@@ -51,6 +51,7 @@ import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.scope.IScope;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
+import com.helger.peppol.identifier.factory.BDXRIdentifierFactory;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.factory.SimpleIdentifierFactory;
@@ -149,6 +150,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
           break;
         case PEPPOL:
           m_aIdentifierFactory = new PeppolIdentifierFactory ();
+          break;
+        case BDXR:
+          m_aIdentifierFactory = new BDXRIdentifierFactory ();
           break;
         default:
           throw new IllegalStateException ("Failed to determine iddentifier types!");

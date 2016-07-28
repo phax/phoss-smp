@@ -457,7 +457,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided service group does not exist!");
     }
 
-    if (StringHelper.hasNoText (sDocTypeIDScheme))
+    if (aIdentifierFactory.isDocumentTypeIdentifierSchemeMandatory () && StringHelper.hasNoText (sDocTypeIDScheme))
       aFormErrors.addFieldError (FIELD_DOCTYPE_ID_SCHEME, "Document type ID scheme must not be empty!");
     else
       if (StringHelper.hasNoText (sDocTypeIDValue))
@@ -476,7 +476,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         }
       }
 
-    if (StringHelper.hasNoText (sProcessIDScheme))
+    if (aIdentifierFactory.isProcessIdentifierSchemeMandatory () && StringHelper.hasNoText (sProcessIDScheme))
       aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID scheme must not be empty!");
     else
       if (StringHelper.hasNoText (sProcessIDValue))
@@ -604,6 +604,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit endpoint" : "Create new endpoint"));
 
@@ -620,8 +621,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_SCHEME,
                                                    aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
                                                                                             .getScheme ()
-                                                                           : PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                                  .setReadOnly (bEdit));
+                                                                           : aIdentifierFactory.getDefaultDocumentTypeIdentifierScheme ())).setPlaceholder ("Identifier scheme")
+                                                                                                                                           .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_VALUE,
                                                    aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
@@ -640,8 +641,8 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
           .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_SCHEME,
                                                    aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()
                                                                                               .getScheme ()
-                                                                            : PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME)).setPlaceholder ("Identifier scheme")
-                                                                                                                             .setReadOnly (bEdit));
+                                                                            : aIdentifierFactory.getDefaultProcessIdentifierScheme ())).setPlaceholder ("Identifier scheme")
+                                                                                                                                       .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_VALUE,
                                                    aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()
