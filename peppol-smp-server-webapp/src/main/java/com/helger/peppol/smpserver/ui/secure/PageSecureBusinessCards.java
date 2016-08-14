@@ -160,7 +160,14 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       {
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
         if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
+        {
+          // Notify PD server
+          PDClientProvider.getInstance ()
+                          .getPDClient ()
+                          .deleteServiceGroupFromIndex (aSelectedObject.getServiceGroup ().getParticpantIdentifier ());
+
           aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!"));
+        }
         else
           aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
       }
@@ -513,8 +520,12 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     if (aFormErrors.isEmpty ())
     {
       // Store in a consistent manner
-      Collections.sort (aSMPEntities, (o1, o2) -> o1.getName ().compareToIgnoreCase (o2.getName ()));
+      aSMPEntities.sort ( (o1, o2) -> o1.getName ().compareToIgnoreCase (o2.getName ()));
       aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities);
+
+      // Notify PD server
+      PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aServiceGroup.getParticpantIdentifier ());
+
       aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
                                                                   aServiceGroup.getID () +
                                                                   "' was successfully saved."));
