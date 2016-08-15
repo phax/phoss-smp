@@ -30,6 +30,7 @@ import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.CompareHelper;
 import com.helger.commons.compare.ESortOrder;
+import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.errorlist.FormErrors;
 import com.helger.commons.errorlist.IError;
 import com.helger.commons.errorlist.IErrorList;
@@ -161,12 +162,20 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
         if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
         {
-          // Notify PD server
-          PDClientProvider.getInstance ()
-                          .getPDClient ()
-                          .deleteServiceGroupFromIndex (aSelectedObject.getServiceGroup ().getParticpantIdentifier ());
+          boolean bNotifiedServer = false;
+          if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+          {
+            // Notify PD server
+            bNotifiedServer = PDClientProvider.getInstance ()
+                                              .getPDClient ()
+                                              .deleteServiceGroupFromIndex (aSelectedObject.getServiceGroup ()
+                                                                                           .getParticpantIdentifier ())
+                                              .isSuccess ();
+          }
 
-          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!"));
+          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!" +
+                                                                      (bNotifiedServer ? " The PEPPOL Directory server was notified about this deletion."
+                                                                                       : "")));
         }
         else
           aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
@@ -523,12 +532,21 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aSMPEntities.sort ( (o1, o2) -> o1.getName ().compareToIgnoreCase (o2.getName ()));
       aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities);
 
-      // Notify PD server
-      PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aServiceGroup.getParticpantIdentifier ());
+      boolean bNotifiedServer = false;
+      if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+      {
+        // Notify PD server
+        bNotifiedServer = PDClientProvider.getInstance ()
+                                          .getPDClient ()
+                                          .addServiceGroupToIndex (aServiceGroup.getParticpantIdentifier ())
+                                          .isSuccess ();
+      }
 
       aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
                                                                   aServiceGroup.getID () +
-                                                                  "' was successfully saved."));
+                                                                  "' was successfully saved." +
+                                                                  (bNotifiedServer ? " The PEPPOL Directory server was notified about this modification."
+                                                                                   : "")));
     }
   }
 
@@ -886,31 +904,39 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                      @Nonnull final ISMPBusinessCard aCurObject)
   {
     final String sDisplayName = aCurObject.getServiceGroupID ();
-    return new HCNodeList ().addChildren (new HCA (createEditURL (aWPEC, aCurObject)).setTitle ("Edit " + sDisplayName)
-                                                                                     .addChild (EDefaultIcon.EDIT.getAsNode ()),
-                                          new HCTextNode (" "),
-                                          new HCA (createCopyURL (aWPEC,
-                                                                  aCurObject)).setTitle ("Create a copy of " +
-                                                                                         sDisplayName)
-                                                                              .addChild (EDefaultIcon.COPY.getAsNode ()),
-                                          new HCTextNode (" "),
-                                          new HCA (createDeleteURL (aWPEC,
-                                                                    aCurObject)).setTitle ("Delete " + sDisplayName)
-                                                                                .addChild (EDefaultIcon.DELETE.getAsNode ()),
-                                          new HCTextNode (" "),
-                                          new HCA (LinkHelper.getURLWithServerAndContext ("businesscard/" +
-                                                                                          aCurObject.getServiceGroup ()
-                                                                                                    .getParticpantIdentifier ()
-                                                                                                    .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
-                                                                                                                                         sDisplayName)
-                                                                                                                              .setTargetBlank ()
-                                                                                                                              .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()),
-                                          new HCTextNode (" "),
-                                          new HCA (aWPEC.getSelfHref ()
-                                                        .add (CPageParam.PARAM_ACTION, ACTION_PUBLISH_TO_INDEXER)
-                                                        .add (CPageParam.PARAM_OBJECT,
-                                                              aCurObject.getID ())).setTitle ("Update Business Card in PEPPOL Directory")
-                                                                                   .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
+    final HCNodeList ret = new HCNodeList ().addChildren (new HCA (createEditURL (aWPEC, aCurObject))
+                                                                                                     .setTitle ("Edit " +
+                                                                                                                sDisplayName)
+                                                                                                     .addChild (EDefaultIcon.EDIT.getAsNode ()),
+                                                          new HCTextNode (" "),
+                                                          new HCA (createCopyURL (aWPEC,
+                                                                                  aCurObject)).setTitle ("Create a copy of " +
+                                                                                                         sDisplayName)
+                                                                                              .addChild (EDefaultIcon.COPY.getAsNode ()),
+                                                          new HCTextNode (" "),
+                                                          new HCA (createDeleteURL (aWPEC,
+                                                                                    aCurObject)).setTitle ("Delete " +
+                                                                                                           sDisplayName)
+                                                                                                .addChild (EDefaultIcon.DELETE.getAsNode ()),
+                                                          new HCTextNode (" "),
+                                                          new HCA (LinkHelper.getURLWithServerAndContext ("businesscard/" +
+                                                                                                          aCurObject.getServiceGroup ()
+                                                                                                                    .getParticpantIdentifier ()
+                                                                                                                    .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
+                                                                                                                                                         sDisplayName)
+                                                                                                                                              .setTargetBlank ()
+                                                                                                                                              .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+    if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate () || GlobalDebug.isDebugMode ())
+    {
+      // When auto update is enabled, there is no need for a manual update
+      ret.addChildren (new HCTextNode (" "),
+                       new HCA (aWPEC.getSelfHref ()
+                                     .add (CPageParam.PARAM_ACTION, ACTION_PUBLISH_TO_INDEXER)
+                                     .add (CPageParam.PARAM_OBJECT,
+                                           aCurObject.getID ())).setTitle ("Update Business Card in PEPPOL Directory")
+                                                                .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
+    }
+    return ret;
   }
 
   @Override

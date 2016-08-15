@@ -110,6 +110,7 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
   @Nonnull
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
                                  final boolean bPEPPOLDirectoryIntegrationEnabled,
+                                 final boolean bPEPPOLDirectoryIntegrationAutoUpdate,
                                  @Nullable final String sPEPPOLDirectoryHostName,
                                  final boolean bWriteToSML,
                                  @Nullable final String sSMLURL)
@@ -120,6 +121,7 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
     {
       eChange = eChange.or (m_aSMPS.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
       eChange = eChange.or (m_aSMPS.setPEPPOLDirectoryIntegrationEnabled (bPEPPOLDirectoryIntegrationEnabled));
+      eChange = eChange.or (m_aSMPS.setPEPPOLDirectoryIntegrationAutoUpdate (bPEPPOLDirectoryIntegrationAutoUpdate));
       eChange = eChange.or (m_aSMPS.setPEPPOLDirectoryHostName (sPEPPOLDirectoryHostName));
       eChange = eChange.or (m_aSMPS.setWriteToSML (bWriteToSML));
       eChange = eChange.or (m_aSMPS.setSMLURL (sSMLURL));

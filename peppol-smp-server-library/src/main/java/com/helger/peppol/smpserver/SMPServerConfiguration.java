@@ -90,6 +90,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_TYPE = "smp.rest.type";
   public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
   public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
+  public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.peppol.directory.integration.autoupdate";
   public static final String KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
   public static final String KEY_SML_ACTIVE = "sml.active";
   public static final String KEY_SML_URL = "sml.url";
@@ -100,6 +101,7 @@ public final class SMPServerConfiguration
   public static final ESMPRESTType DEFAULT_SMP_REST_TYPE = ESMPRESTType.PEPPOL;
   public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
   public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = true;
+  public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = true;
   public static final String DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME = "http://pyp.helger.com";
   public static final boolean DEFAULT_SML_ACTIVE = false;
 

@@ -53,6 +53,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
 {
   private static final String FIELD_SMP_REST_WRITABLE_API_DISABLED = "smprwad";
   private static final String FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "smppdie";
+  private static final String FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smppdiau";
   private static final String FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smppdh";
   private static final String FIELD_SML_ACTIVE = "smla";
   private static final String FIELD_SML_URL = "smlu";
@@ -80,6 +81,9 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                                         aDisplayLocale)));
     aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory integration enabled?")
                                                   .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationEnabled (),
+                                                                                        aDisplayLocale)));
+    aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory integration automatic update?")
+                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationAutoUpdate (),
                                                                                         aDisplayLocale)));
     aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory hostname")
                                                   .setCtrl (HCA.createLinkedWebsite (aObject.getPEPPOLDirectoryHostName ())));
@@ -113,6 +117,8 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                     SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
     final boolean bPEPPOLDirectoryIntegrationEnabled = aWPEC.getCheckBoxAttr (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
                                                                               SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
+    final boolean bPEPPOLDirectoryIntegrationAutoUpdate = aWPEC.getCheckBoxAttr (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                                                                 SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE);
     final String sPEPPOLDirectoryHostName = aWPEC.getAttributeAsString (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME);
     final boolean bSMLActive = aWPEC.getCheckBoxAttr (FIELD_SML_ACTIVE, SMPServerConfiguration.DEFAULT_SML_ACTIVE);
     final String sSMLURL = aWPEC.getAttributeAsString (FIELD_SML_URL);
@@ -142,8 +148,10 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                           .containsNone (x -> x.getManageParticipantIdentifierEndpointAddress ()
                                                .toExternalForm ()
                                                .equals (sSMLURL)))
+        {
           aFormErrors.addFieldError (FIELD_SML_URL,
                                      "The SML management URL does not belong to any of the configured SMLs.");
+        }
       }
     }
 
@@ -151,6 +159,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     {
       SMPMetaManager.getSettingsMgr ().updateSettings (bRESTWritableAPIDisabled,
                                                        bPEPPOLDirectoryIntegrationEnabled,
+                                                       bPEPPOLDirectoryIntegrationAutoUpdate,
                                                        sPEPPOLDirectoryHostName,
                                                        bSMLActive,
                                                        sSMLURL);
@@ -174,6 +183,11 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
                                                                                                            aObject.isPEPPOLDirectoryIntegrationEnabled ())))
                                                  .setHelpText ("If this checkbox is checked, the PEPPOL Directory integration is enabled.")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED)));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory integration automatic update?")
+                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                                                                                           aObject.isPEPPOLDirectoryIntegrationAutoUpdate ())))
+                                                 .setHelpText ("If the PEPPOL Directory integration is enabled and this checkbox is checked, all business card creations, modifications and deletions are automatically pushed to the PEPPOL Directory server.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory hostname")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME,

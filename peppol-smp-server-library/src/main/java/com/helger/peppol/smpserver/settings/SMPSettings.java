@@ -102,13 +102,6 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_REST_WRITABLE_API_DISABLED, bRESTWritableAPIDisabled);
   }
 
-  /**
-   * Check if the PEPPOL Directory integration (offering the /businesscard API)
-   * is enabled.
-   *
-   * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
-   *         By default it is disabled.
-   */
   public boolean isPEPPOLDirectoryIntegrationEnabled ()
   {
     return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
@@ -122,10 +115,19 @@ public class SMPSettings implements ISMPSettings
                                  bPEPPOLDirectoryIntegrationEnabled);
   }
 
-  /**
-   * @return The host name of the PEPPOL Directory server. Never
-   *         <code>null</code>.
-   */
+  public boolean isPEPPOLDirectoryIntegrationAutoUpdate ()
+  {
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                     SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE);
+  }
+
+  @Nonnull
+  public EChange setPEPPOLDirectoryIntegrationAutoUpdate (final boolean bPEPPOLDirectoryIntegrationAutoUpdate)
+  {
+    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                 bPEPPOLDirectoryIntegrationAutoUpdate);
+  }
+
   @Nonnull
   public String getPEPPOLDirectoryHostName ()
   {
@@ -139,10 +141,6 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, sPEPPOLDirectoryHostName);
   }
 
-  /**
-   * @return <code>true</code> if the SML connection is active,
-   *         <code>false</code> if not. Property <code>sml.active</code>.
-   */
   public boolean isWriteToSML ()
   {
     return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_ACTIVE, SMPServerConfiguration.DEFAULT_SML_ACTIVE);
@@ -154,10 +152,6 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.setValue (SMPServerConfiguration.KEY_SML_ACTIVE, bWriteToSML);
   }
 
-  /**
-   * @return The SML URL to use. Only relevant when {@link #isWriteToSML()} is
-   *         <code>true</code>. Property <code>sml.url</code>.
-   */
   @Nullable
   public String getSMLURL ()
   {

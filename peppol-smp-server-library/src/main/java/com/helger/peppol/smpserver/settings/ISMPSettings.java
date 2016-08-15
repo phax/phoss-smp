@@ -72,6 +72,15 @@ public interface ISMPSettings extends ITypedObject <String>
   boolean isPEPPOLDirectoryIntegrationEnabled ();
 
   /**
+   * If the PEPPOL Directory integration is enabled, should the changes be
+   * pushed automatically?
+   *
+   * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
+   *         By default it is disabled.
+   */
+  boolean isPEPPOLDirectoryIntegrationAutoUpdate ();
+
+  /**
    * @return The host name of the PEPPOL Directory server. Never
    *         <code>null</code>.
    */

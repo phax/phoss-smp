@@ -47,6 +47,11 @@ import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.settings.ISMPSettingsCallback;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 
+/**
+ * Mock implementation of {@link ISMPSettingsManager}.
+ * 
+ * @author Philip Helger
+ */
 public final class MockSMPSettingsManager implements ISMPSettingsManager
 {
   @UnsupportedOperation
@@ -58,6 +63,7 @@ public final class MockSMPSettingsManager implements ISMPSettingsManager
   @UnsupportedOperation
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
                                  final boolean bPEPPOLDirectoryIntegrationEnabled,
+                                 final boolean bPEPPOLDirectoryIntegrationAutoUpdate,
                                  final String sPEPPOLDirectoryHostName,
                                  final boolean bWriteToSML,
                                  final String sSMLURL)

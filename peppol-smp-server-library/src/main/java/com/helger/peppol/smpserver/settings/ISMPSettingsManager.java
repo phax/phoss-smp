@@ -64,6 +64,7 @@ public interface ISMPSettingsManager
   @Nonnull
   EChange updateSettings (final boolean bRESTWritableAPIDisabled,
                           final boolean bPEPPOLDirectoryIntegrationEnabled,
+                          boolean bPEPPOLDirectoryIntegrationAutoUpdate,
                           @Nullable final String sPEPPOLDirectoryHostName,
                           final boolean bWriteToSML,
                           @Nullable final String sSMLURL);
