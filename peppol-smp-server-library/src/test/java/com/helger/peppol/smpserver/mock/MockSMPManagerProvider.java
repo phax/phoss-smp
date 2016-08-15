@@ -59,7 +59,7 @@ import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
  *
  * @author Philip Helger
  */
-public class MockSMPManagerProvider implements ISMPManagerProvider
+final class MockSMPManagerProvider implements ISMPManagerProvider
 {
   @Nonnull
   public ISMLInfoManager createSMLInfoMgr ()

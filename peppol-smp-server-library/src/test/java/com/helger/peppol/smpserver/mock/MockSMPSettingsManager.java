@@ -49,10 +49,10 @@ import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 
 /**
  * Mock implementation of {@link ISMPSettingsManager}.
- * 
+ *
  * @author Philip Helger
  */
-public final class MockSMPSettingsManager implements ISMPSettingsManager
+final class MockSMPSettingsManager implements ISMPSettingsManager
 {
   @UnsupportedOperation
   public CallbackList <ISMPSettingsCallback> getCallbacks ()
