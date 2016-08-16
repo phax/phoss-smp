@@ -55,11 +55,12 @@ import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 /**
  * This {@link ISMPManagerProvider} implementation returns non-<code>null</code>
  * managers that all do nothing. This is only needed to access the identifier
- * factory.
+ * factory.<br>
+ * Note: this class must be public
  *
  * @author Philip Helger
  */
-final class MockSMPManagerProvider implements ISMPManagerProvider
+public final class MockSMPManagerProvider implements ISMPManagerProvider
 {
   @Nonnull
   public ISMLInfoManager createSMLInfoMgr ()
