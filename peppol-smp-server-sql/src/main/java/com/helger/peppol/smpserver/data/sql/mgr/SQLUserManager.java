@@ -83,7 +83,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
   public void createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
-    doInTransaction ((Runnable) () -> {
+    doInTransaction ( () -> {
       final DBUser aDBUser = new DBUser (sUserName, sPassword);
       getEntityManager ().persist (aDBUser);
     });
@@ -91,7 +91,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
   public void updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
-    doInTransaction ((Runnable) () -> {
+    doInTransaction ( () -> {
       final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUserName);
       if (aDBUser != null)
       {
@@ -104,7 +104,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   public void deleteUser (@Nullable final String sUserName)
   {
     if (StringHelper.hasText (sUserName))
-      doInTransaction ((Runnable) () -> {
+      doInTransaction ( () -> {
         final EntityManager aEM = getEntityManager ();
         final DBUser aDBUser = aEM.find (DBUser.class, sUserName);
         if (aDBUser != null)

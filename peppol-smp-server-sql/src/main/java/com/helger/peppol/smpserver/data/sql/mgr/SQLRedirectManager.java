@@ -106,7 +106,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
 
     JPAExecutionResult <?> ret;
-    ret = doInTransaction ((Runnable) () -> {
+    ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
       final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
                                                                                                aDocumentTypeIdentifier);

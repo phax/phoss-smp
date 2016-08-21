@@ -95,7 +95,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                     ")");
 
     JPAExecutionResult <?> ret;
-    ret = doInTransaction ((Runnable) () -> {
+    ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
 
       // Check if the passed service group ID is already in use
