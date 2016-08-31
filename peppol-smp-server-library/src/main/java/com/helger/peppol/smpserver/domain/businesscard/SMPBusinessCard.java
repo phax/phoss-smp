@@ -43,6 +43,7 @@ package com.helger.peppol.smpserver.domain.businesscard;
 
 import java.util.List;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -50,7 +51,8 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
@@ -69,7 +71,7 @@ public class SMPBusinessCard implements ISMPBusinessCard
 
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
-  private final List <SMPBusinessCardEntity> m_aEntities;
+  private final ICommonsList <SMPBusinessCardEntity> m_aEntities;
 
   public SMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
                           @Nonnull final List <SMPBusinessCardEntity> aEntities)
@@ -79,7 +81,7 @@ public class SMPBusinessCard implements ISMPBusinessCard
 
     m_aServiceGroup = aServiceGroup;
     m_sID = m_aServiceGroup.getID ();
-    m_aEntities = CollectionHelper.newList (aEntities);
+    m_aEntities = new CommonsArrayList<> (aEntities);
   }
 
   @Nonnull
@@ -108,7 +110,7 @@ public class SMPBusinessCard implements ISMPBusinessCard
    */
   @Nonnull
   @ReturnsMutableObject ("design")
-  public List <SMPBusinessCardEntity> getEntities ()
+  public ICommonsList <SMPBusinessCardEntity> directGetEntities ()
   {
     return m_aEntities;
   }
@@ -119,11 +121,12 @@ public class SMPBusinessCard implements ISMPBusinessCard
    */
   @Nonnull
   @ReturnsMutableCopy
-  public List <SMPBusinessCardEntity> getAllEntities ()
+  public ICommonsList <SMPBusinessCardEntity> getAllEntities ()
   {
-    return CollectionHelper.newList (m_aEntities);
+    return m_aEntities.getClone ();
   }
 
+  @Nonnegative
   public int getEntityCount ()
   {
     return m_aEntities.size ();
