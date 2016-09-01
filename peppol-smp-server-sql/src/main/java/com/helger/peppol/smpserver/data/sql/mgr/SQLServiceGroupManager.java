@@ -199,6 +199,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @Nonnull
   public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
+    if (aParticipantID == null)
+      return EChange.UNCHANGED;
+
     s_aLogger.info ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
     JPAExecutionResult <EChange> ret;
