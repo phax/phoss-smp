@@ -163,7 +163,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                        sPEPPOLDirectoryHostName,
                                                        bSMLActive,
                                                        sSMLURL);
-      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SMP settings were successfully saved."));
+      aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP settings were successfully saved."));
     }
   }
 

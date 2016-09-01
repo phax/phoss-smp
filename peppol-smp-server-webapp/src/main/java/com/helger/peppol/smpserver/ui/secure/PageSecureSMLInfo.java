@@ -90,13 +90,13 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
       {
         final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
         if (aSMLInfoMgr.removeSMLInfo (aSelectedObject.getID ()).isChanged ())
-          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SML information '" +
-                                                                      aSelectedObject.getDisplayName () +
-                                                                      "' was successfully deleted!"));
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SML information '" +
+                                                                              aSelectedObject.getDisplayName () +
+                                                                              "' was successfully deleted!"));
         else
-          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("The SML information '" +
-                                                                    aSelectedObject.getDisplayName () +
-                                                                    "' could not be deleted!"));
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("The SML information '" +
+                                                                            aSelectedObject.getDisplayName () +
+                                                                            "' could not be deleted!"));
       }
     });
   }
@@ -243,16 +243,16 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
                                    sDNSZoneLC,
                                    sManagementAddressURL,
                                    bClientCertificateRequired);
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SML information '" +
-                                                                    sDisplayName +
-                                                                    "' was successfully edited."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SML information '" +
+                                                                            sDisplayName +
+                                                                            "' was successfully edited."));
       }
       else
       {
         aSMLInfoMgr.createSMLInfo (sDisplayName, sDNSZoneLC, sManagementAddressURL, bClientCertificateRequired);
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The new SML information '" +
-                                                                    sDisplayName +
-                                                                    "' was successfully created."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new SML information '" +
+                                                                            sDisplayName +
+                                                                            "' was successfully created."));
       }
     }
   }

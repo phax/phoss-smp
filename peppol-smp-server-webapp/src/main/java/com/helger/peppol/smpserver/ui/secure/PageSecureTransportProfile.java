@@ -85,9 +85,9 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
       {
         final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
         aTransportProfileMgr.removeSMPTransportProfile (aSelectedObject.getID ());
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The transport profile '" +
-                                                                    aSelectedObject.getID () +
-                                                                    "' was successfully deleted!"));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The transport profile '" +
+                                                                            aSelectedObject.getID () +
+                                                                            "' was successfully deleted!"));
       }
     });
   }
@@ -201,16 +201,16 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
       if (bEdit)
       {
         aTransportProfileMgr.updateSMPTransportProfile (sID, sName);
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The transport profile '" +
-                                                                    sID +
-                                                                    "' was successfully edited."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The transport profile '" +
+                                                                            sID +
+                                                                            "' was successfully edited."));
       }
       else
       {
         aTransportProfileMgr.createSMPTransportProfile (sID, sName);
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The new transport profile '" +
-                                                                    sID +
-                                                                    "' was successfully created."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new transport profile '" +
+                                                                            sID +
+                                                                            "' was successfully created."));
       }
     }
   }

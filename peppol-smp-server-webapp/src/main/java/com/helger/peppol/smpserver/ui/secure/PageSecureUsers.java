@@ -92,9 +92,9 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
       {
         final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
         aUserManager.deleteUser (aSelectedObject.getID ());
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The user '" +
-                                                                    aSelectedObject.getUserName () +
-                                                                    "' was successfully deleted."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The user '" +
+                                                                            aSelectedObject.getUserName () +
+                                                                            "' was successfully deleted."));
       }
     });
   }
@@ -199,16 +199,16 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
       if (bEdit)
       {
         aUserManager.updateUser (sUserName, sPassword);
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("User '" +
-                                                                    sUserName +
-                                                                    "' was successfully edited."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("User '" +
+                                                                            sUserName +
+                                                                            "' was successfully edited."));
       }
       else
       {
         aUserManager.createUser (sUserName, sPassword);
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("User '" +
-                                                                    sUserName +
-                                                                    "' was successfully created."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("User '" +
+                                                                            sUserName +
+                                                                            "' was successfully created."));
       }
     }
   }
@@ -241,11 +241,9 @@ public class PageSecureUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
                     new HCTextNode (" "),
                     isActionAllowed (aWPEC,
                                      EWebPageFormAction.DELETE,
-                                     (ISMPUserEditable) aCurObject) ? createDeleteLink (aWPEC,
-                                                                                        aCurObject,
-                                                                                        "Delete '" +
-                                                                                                    aCurObject.getUserName () +
-                                                                                                    "'")
+                                     (ISMPUserEditable) aCurObject) ? createDeleteLink (aWPEC, aCurObject, "Delete '" +
+                                                                                                           aCurObject.getUserName () +
+                                                                                                           "'")
                                                                     : createEmptyAction ());
     }
 

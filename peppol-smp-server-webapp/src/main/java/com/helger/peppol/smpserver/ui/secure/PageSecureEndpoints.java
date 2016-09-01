@@ -179,10 +179,10 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
         if (aSelectedProcess.deleteEndpoint (aSelectedEndpoint.getTransportProfile ()).isChanged ())
         {
           aServiceInfoMgr.mergeSMPServiceInformation (aSelectedObject);
-          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected endpoint was successfully deleted!"));
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected endpoint was successfully deleted!"));
         }
         else
-          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error deleting the selected endpoint!"));
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error deleting the selected endpoint!"));
       }
     });
   }
@@ -578,17 +578,17 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
       aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfo);
       if (bEdit)
       {
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint for service group '" +
-                                                                    aServiceGroup.getParticpantIdentifier ()
-                                                                                 .getURIEncoded () +
-                                                                    "'."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint for service group '" +
+                                                                            aServiceGroup.getParticpantIdentifier ()
+                                                                                         .getURIEncoded () +
+                                                                            "'."));
       }
       else
       {
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully created a new endpoint for service group '" +
-                                                                    aServiceGroup.getParticpantIdentifier ()
-                                                                                 .getURIEncoded () +
-                                                                    "'."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("Successfully created a new endpoint for service group '" +
+                                                                            aServiceGroup.getParticpantIdentifier ()
+                                                                                         .getURIEncoded () +
+                                                                            "'."));
       }
     }
   }

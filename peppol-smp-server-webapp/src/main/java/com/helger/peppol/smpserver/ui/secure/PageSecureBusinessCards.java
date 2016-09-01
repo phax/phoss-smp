@@ -42,7 +42,6 @@ import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
-import com.helger.commons.url.SMap;
 import com.helger.commons.url.URLValidator;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
@@ -173,12 +172,12 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                               .isSuccess ();
           }
 
-          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!" +
-                                                                      (bNotifiedServer ? " The PEPPOL Directory server was notified about this deletion."
-                                                                                       : "")));
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!" +
+                                                                              (bNotifiedServer ? " The PEPPOL Directory server was notified about this deletion."
+                                                                                               : "")));
         }
         else
-          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
       }
     });
     addCustomHandler (ACTION_PUBLISH_TO_INDEXER,
@@ -193,13 +192,13 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                                     .getPDClient ()
                                                                     .addServiceGroupToIndex (aParticipantID);
                           if (eSuccess.isSuccess ())
-                            aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
-                                                                                        aParticipantID.getURIEncoded () +
-                                                                                        "'"));
+                            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
+                                                                                                aParticipantID.getURIEncoded () +
+                                                                                                "'"));
                           else
-                            aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
-                                                                                      aParticipantID.getURIEncoded () +
-                                                                                      "'"));
+                            aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
+                                                                                              aParticipantID.getURIEncoded () +
+                                                                                              "'"));
                           return true;
                         }
                       });
@@ -542,11 +541,11 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                           .isSuccess ();
       }
 
-      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
-                                                                  aServiceGroup.getID () +
-                                                                  "' was successfully saved." +
-                                                                  (bNotifiedServer ? " The PEPPOL Directory server was notified about this modification."
-                                                                                   : "")));
+      aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
+                                                                          aServiceGroup.getID () +
+                                                                          "' was successfully saved." +
+                                                                          (bNotifiedServer ? " The PEPPOL Directory server was notified about this modification."
+                                                                                           : "")));
     }
   }
 
@@ -750,9 +749,9 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (AjaxHtmlResponse.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT.getInvocationURL (aRequestScope,
-                                                                                                                               new SMap ().add (AjaxExecutorSecureCreateBusinessCardIdentifierInput.PARAM_ENTITY_ID,
-                                                                                                                                                sEntityID)))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT.getInvocationURL (aRequestScope)
+                                                                                                            .add (AjaxExecutorSecureCreateBusinessCardIdentifierInput.PARAM_ENTITY_ID,
+                                                                                                                  sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());
@@ -810,9 +809,9 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (AjaxHtmlResponse.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT.getInvocationURL (aRequestScope,
-                                                                                                                            new SMap ().add (AjaxExecutorSecureCreateBusinessCardContactInput.PARAM_ENTITY_ID,
-                                                                                                                                             sEntityID)))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT.getInvocationURL (aRequestScope)
+                                                                                                         .add (AjaxExecutorSecureCreateBusinessCardContactInput.PARAM_ENTITY_ID,
+                                                                                                               sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());

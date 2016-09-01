@@ -87,17 +87,17 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     if (aWPEC.hasAction (ACTION_RELOAD_KEYSTORE))
     {
       SMPKeyManager.reloadFromConfiguration ();
-      aWPEC.postRedirectGet (new BootstrapInfoBox ().addChild ("The keystore was updated from the configuration at " +
-                                                               DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
-                                                               ". The changes are reflected below."));
+      aWPEC.postRedirectGetInternal (new BootstrapInfoBox ().addChild ("The keystore was updated from the configuration at " +
+                                                                       DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
+                                                                       ". The changes are reflected below."));
     }
     else
       if (aWPEC.hasAction (ACTION_RELOAD_TRUSTSTORE))
       {
         SMPTrustManager.reloadFromConfiguration ();
-        aWPEC.postRedirectGet (new BootstrapInfoBox ().addChild ("The truststore was updated from the configuration at " +
-                                                                 DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
-                                                                 ". The changes are reflected below."));
+        aWPEC.postRedirectGetInternal (new BootstrapInfoBox ().addChild ("The truststore was updated from the configuration at " +
+                                                                         DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
+                                                                         ". The changes are reflected below."));
       }
 
     {

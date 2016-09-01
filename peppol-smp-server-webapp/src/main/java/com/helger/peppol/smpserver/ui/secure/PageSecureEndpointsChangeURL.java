@@ -205,17 +205,17 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
             final HCUL aUL = new HCUL ();
             for (final String sChangedServiceGroupID : aChangedServiceGroup)
               aUL.addItem (sChangedServiceGroupID);
-            aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChildren (new HCDiv ().addChild ("The old URL '" +
-                                                                                                  sOldURL +
-                                                                                                  "' was changed in " +
-                                                                                                  nChangedEndpoints +
-                                                                                                  " endpoints. Effected service groups are:"),
-                                                                           aUL));
+            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChildren (new HCDiv ().addChild ("The old URL '" +
+                                                                                                          sOldURL +
+                                                                                                          "' was changed in " +
+                                                                                                          nChangedEndpoints +
+                                                                                                          " endpoints. Effected service groups are:"),
+                                                                                   aUL));
           }
           else
-            aWPEC.postRedirectGet (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old URL '" +
-                                                                     sOldURL +
-                                                                     "'"));
+            aWPEC.postRedirectGetInternal (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old URL '" +
+                                                                             sOldURL +
+                                                                             "'"));
         }
       }
 

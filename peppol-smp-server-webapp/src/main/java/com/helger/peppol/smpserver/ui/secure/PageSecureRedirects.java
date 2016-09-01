@@ -119,9 +119,9 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
       {
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         if (aRedirectMgr.deleteSMPRedirect (aSelectedObject).isChanged ())
-          aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The selected Redirect was successfully deleted!"));
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected Redirect was successfully deleted!"));
         else
-          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Failed to delete the selected Redirect!"));
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete the selected Redirect!"));
       }
     });
   }
@@ -332,9 +332,9 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                               sRedirectTo,
                                               sSubjectUniqueIdentifier,
                                               sExtension);
-      aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The Redirect for Service Group '" +
-                                                                  sServiceGroupID +
-                                                                  "' was successfully saved."));
+      aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Redirect for Service Group '" +
+                                                                          sServiceGroupID +
+                                                                          "' was successfully saved."));
     }
   }
 

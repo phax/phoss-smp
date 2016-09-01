@@ -137,16 +137,16 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         }
         catch (final Throwable t)
         {
-          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error deleting the SMP ServiceGroup for participant '" +
-                                                                    aSelectedObject.getParticpantIdentifier ()
-                                                                                   .getURIEncoded () +
-                                                                    "'. Technical details: " +
-                                                                    t.getMessage ()));
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error deleting the SMP ServiceGroup for participant '" +
+                                                                            aSelectedObject.getParticpantIdentifier ()
+                                                                                           .getURIEncoded () +
+                                                                            "'. Technical details: " +
+                                                                            t.getMessage ()));
         }
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
-                                                                    aSelectedObject.getParticpantIdentifier ()
-                                                                                   .getURIEncoded () +
-                                                                    "' was successfully deleted!"));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
+                                                                            aSelectedObject.getParticpantIdentifier ()
+                                                                                           .getURIEncoded () +
+                                                                            "' was successfully deleted!"));
       }
     });
     addCustomHandler (ACTION_CHECK_DNS,
@@ -390,9 +390,9 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         // Edit only the internal data objects because no change to the SML is
         // necessary. Only the owner and the extension can be edited!
         aServiceGroupMgr.updateSMPServiceGroup (aSelectedObject.getID (), aOwningUser.getID (), sExtension);
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
-                                                                    aParticipantID.getURIEncoded () +
-                                                                    "' was successfully edited."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
+                                                                            aParticipantID.getURIEncoded () +
+                                                                            "' was successfully edited."));
       }
       else
       {
@@ -403,15 +403,15 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         }
         catch (final Throwable t)
         {
-          aWPEC.postRedirectGet (new BootstrapErrorBox ().addChild ("Error creating the new SMP ServiceGroup for participant '" +
-                                                                    aParticipantID.getURIEncoded () +
-                                                                    "'. Technical details: " +
-                                                                    t.getMessage ()));
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the new SMP ServiceGroup for participant '" +
+                                                                            aParticipantID.getURIEncoded () +
+                                                                            "'. Technical details: " +
+                                                                            t.getMessage ()));
         }
 
-        aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
-                                                                    aParticipantID.getURIEncoded () +
-                                                                    "' was successfully created."));
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
+                                                                            aParticipantID.getURIEncoded () +
+                                                                            "' was successfully created."));
       }
     }
   }

@@ -236,16 +236,16 @@ public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPa
             final HCUL aUL = new HCUL ();
             for (final String sChangedServiceGroupID : aChangedServiceGroup)
               aUL.addItem (sChangedServiceGroupID);
-            aWPEC.postRedirectGet (new BootstrapSuccessBox ().addChildren (new HCDiv ().addChild ("The old certificate was changed in " +
-                                                                                                  nChangedEndpoints +
-                                                                                                  " endpoints to the new certificate:"),
-                                                                           _getCertificateDisplay (sNewCert,
-                                                                                                   aDisplayLocale),
-                                                                           new HCDiv ().addChild ("Effected service groups are:"),
-                                                                           aUL));
+            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChildren (new HCDiv ().addChild ("The old certificate was changed in " +
+                                                                                                          nChangedEndpoints +
+                                                                                                          " endpoints to the new certificate:"),
+                                                                                   _getCertificateDisplay (sNewCert,
+                                                                                                           aDisplayLocale),
+                                                                                   new HCDiv ().addChild ("Effected service groups are:"),
+                                                                                   aUL));
           }
           else
-            aWPEC.postRedirectGet (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old certificate"));
+            aWPEC.postRedirectGetInternal (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old certificate"));
         }
       }
 
