@@ -40,7 +40,8 @@ public final class AjaxExecutorSecureCreateBusinessCardIdentifierInput extends A
   {
     final String sEntityID = aLEC.getAttributeAsString (PARAM_ENTITY_ID);
 
-    final IHCNode aNode = PageSecureBusinessCards.createIdentifierInputForm (sEntityID,
+    final IHCNode aNode = PageSecureBusinessCards.createIdentifierInputForm (aLEC,
+                                                                             sEntityID,
                                                                              (SMPBusinessCardIdentifier) null,
                                                                              (String) null,
                                                                              new FormErrors ());

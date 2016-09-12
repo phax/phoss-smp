@@ -31,9 +31,9 @@ import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.CompareHelper;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.debug.GlobalDebug;
+import com.helger.commons.error.IError;
+import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.errorlist.FormErrors;
-import com.helger.commons.errorlist.IError;
-import com.helger.commons.errorlist.IErrorList;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.locale.country.CountryCache;
 import com.helger.commons.regex.RegExHelper;
@@ -99,6 +99,7 @@ import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap3.uictrls.datetimepicker.BootstrapDateTimePicker;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
+import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldDate;
@@ -550,23 +551,26 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   }
 
   @Nullable
-  public static IHCNode createStandaloneError (@Nullable final IErrorList aFormErrors)
+  public static IHCNode createStandaloneError (@Nullable final IErrorList aFormErrors,
+                                               @Nonnull final Locale aDisplayLocale)
   {
     if (aFormErrors == null || aFormErrors.isEmpty ())
       return null;
 
     final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.HAS_ERROR);
     for (final IError aError : aFormErrors)
-      aDiv.addChild (new BootstrapHelpBlock ().addChild (aError.getErrorText ()));
+      aDiv.addChild (new BootstrapHelpBlock ().addChild (aError.getErrorText (aDisplayLocale)));
     return aDiv;
   }
 
   @Nonnull
-  public static HCRow createIdentifierInputForm (@Nonnull final String sEntityID,
+  public static HCRow createIdentifierInputForm (@Nonnull final ILayoutExecutionContext aLEC,
+                                                 @Nonnull final String sEntityID,
                                                  @Nullable final SMPBusinessCardIdentifier aExistingIdentifier,
                                                  @Nullable final String sExistingID,
                                                  @Nonnull final FormErrors aFormErrors)
   {
+    final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sIdentifierID = aExistingIdentifier != null ? aExistingIdentifier.getID ()
                                                              : StringHelper.hasText (sExistingID) ? sExistingID
                                                                                                   : TMP_ID_PREFIX +
@@ -583,7 +587,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     aRow.addCell (new HCEdit (new RequestField (sFieldScheme,
                                                 aExistingIdentifier == null ? null : aExistingIdentifier.getScheme ()))
                                                                                                                        .setPlaceholder ("Identifier scheme"),
-                  createStandaloneError (aFormErrors.getListOfField (sFieldScheme)));
+                  createStandaloneError (aFormErrors.getListOfField (sFieldScheme), aDisplayLocale));
 
     // Identifier Value
     final String sFieldValue = RequestParamMap.getFieldName (PREFIX_ENTITY,
@@ -594,7 +598,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
     aRow.addCell (new HCEdit (new RequestField (sFieldValue,
                                                 aExistingIdentifier == null ? null : aExistingIdentifier.getValue ()))
                                                                                                                       .setPlaceholder ("Identifier value"),
-                  createStandaloneError (aFormErrors.getListOfField (sFieldValue)));
+                  createStandaloneError (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
                                                                  .setOnClick (JQuery.idRef (aRow).remove ()));
@@ -603,11 +607,13 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   }
 
   @Nonnull
-  public static HCRow createContactInputForm (@Nonnull final String sEntityID,
+  public static HCRow createContactInputForm (@Nonnull final ILayoutExecutionContext aLEC,
+                                              @Nonnull final String sEntityID,
                                               @Nullable final SMPBusinessCardContact aExistingContact,
                                               @Nullable final String sExistingID,
                                               @Nonnull final FormErrors aFormErrors)
   {
+    final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sContactID = aExistingContact != null ? aExistingContact.getID ()
                                                        : StringHelper.hasText (sExistingID) ? sExistingID
                                                                                             : TMP_ID_PREFIX +
@@ -625,7 +631,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aRow.addCell (new HCEdit (new RequestField (sFieldType,
                                                   aExistingContact == null ? null : aExistingContact.getType ()))
                                                                                                                  .setPlaceholder ("Contact type"),
-                    createStandaloneError (aFormErrors.getListOfField (sFieldType)));
+                    createStandaloneError (aFormErrors.getListOfField (sFieldType), aDisplayLocale));
     }
 
     // Name
@@ -638,7 +644,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aRow.addCell (new HCEdit (new RequestField (sFieldName,
                                                   aExistingContact == null ? null : aExistingContact.getName ()))
                                                                                                                  .setPlaceholder ("Contact name"),
-                    createStandaloneError (aFormErrors.getListOfField (sFieldName)));
+                    createStandaloneError (aFormErrors.getListOfField (sFieldName), aDisplayLocale));
     }
 
     // Phone number
@@ -651,7 +657,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aRow.addCell (new HCEdit (new RequestField (sFieldPhone,
                                                   aExistingContact == null ? null : aExistingContact.getPhoneNumber ()))
                                                                                                                         .setPlaceholder ("Contact phone number"),
-                    createStandaloneError (aFormErrors.getListOfField (sFieldPhone)));
+                    createStandaloneError (aFormErrors.getListOfField (sFieldPhone), aDisplayLocale));
     }
 
     // Email address
@@ -664,7 +670,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aRow.addCell (new HCEdit (new RequestField (sFieldEmail,
                                                   aExistingContact == null ? null : aExistingContact.getEmail ()))
                                                                                                                   .setPlaceholder ("Contact email address"),
-                    createStandaloneError (aFormErrors.getListOfField (sFieldEmail)));
+                    createStandaloneError (aFormErrors.getListOfField (sFieldEmail), aDisplayLocale));
     }
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
@@ -731,7 +737,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       {
         // Re-show of form
         for (final String sIdentifierRowID : aIdentifiers.keySet ())
-          aTable.addBodyRow (createIdentifierInputForm (sEntityID, null, sIdentifierRowID, aFormErrors));
+          aTable.addBodyRow (createIdentifierInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
       }
       else
       {
@@ -739,7 +745,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         {
           // add all existing stored entities
           for (final SMPBusinessCardIdentifier aIdentifier : aExistingEntity.getIdentifiers ())
-            aTable.addBodyRow (createIdentifierInputForm (sEntityID, aIdentifier, (String) null, aFormErrors));
+            aTable.addBodyRow (createIdentifierInputForm (aLEC, sEntityID, aIdentifier, (String) null, aFormErrors));
         }
       }
 
@@ -791,7 +797,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       {
         // Re-show of form
         for (final String sIdentifierRowID : aContacts.keySet ())
-          aTable.addBodyRow (createContactInputForm (sEntityID, null, sIdentifierRowID, aFormErrors));
+          aTable.addBodyRow (createContactInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
       }
       else
       {
@@ -799,7 +805,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         {
           // add all existing stored entities
           for (final SMPBusinessCardContact aContact : aExistingEntity.getContacts ())
-            aTable.addBodyRow (createContactInputForm (sEntityID, aContact, (String) null, aFormErrors));
+            aTable.addBodyRow (createContactInputForm (aLEC, sEntityID, aContact, (String) null, aFormErrors));
         }
       }
 

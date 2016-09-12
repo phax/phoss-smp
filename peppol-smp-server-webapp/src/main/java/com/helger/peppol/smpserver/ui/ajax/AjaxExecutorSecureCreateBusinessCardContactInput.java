@@ -40,7 +40,8 @@ public final class AjaxExecutorSecureCreateBusinessCardContactInput extends Abst
   {
     final String sEntityID = aLEC.getAttributeAsString (PARAM_ENTITY_ID);
 
-    final IHCNode aNode = PageSecureBusinessCards.createContactInputForm (sEntityID,
+    final IHCNode aNode = PageSecureBusinessCards.createContactInputForm (aLEC,
+                                                                          sEntityID,
                                                                           (SMPBusinessCardContact) null,
                                                                           (String) null,
                                                                           new FormErrors ());

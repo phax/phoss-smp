@@ -148,9 +148,9 @@ public final class AppCommonUI
     final String sIDPassword = GlobalIDFactory.getNewStringID ();
     final String sIDErrorField = GlobalIDFactory.getNewStringID ();
 
-    final BootstrapForm aForm = new BootstrapForm (aLEC.getSelfHref (),
-                                                   bFullUI ? EBootstrapFormType.HORIZONTAL
-                                                           : EBootstrapFormType.DEFAULT);
+    final BootstrapForm aForm = new BootstrapForm (aLEC).setAction (aLEC.getSelfHref ())
+                                                        .setFormType (bFullUI ? EBootstrapFormType.HORIZONTAL
+                                                                              : EBootstrapFormType.DEFAULT);
     aForm.setLeft (3);
 
     // User name field
