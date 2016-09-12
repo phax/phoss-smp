@@ -18,12 +18,12 @@ package com.helger.peppol.smpserver.ui.ajax;
 
 import javax.annotation.Nonnull;
 
-import com.helger.commons.errorlist.FormErrors;
 import com.helger.html.hc.IHCNode;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCards;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
+import com.helger.photon.core.form.FormErrorList;
 
 /**
  * Create a new business entity input row
@@ -39,7 +39,7 @@ public final class AjaxExecutorSecureCreateBusinessCardEntityInput extends Abstr
     final IHCNode aNode = PageSecureBusinessCards.createEntityInputForm (aLEC,
                                                                          (SMPBusinessCardEntity) null,
                                                                          (String) null,
-                                                                         new FormErrors ());
+                                                                         new FormErrorList ());
 
     // Build the HTML response
     return AjaxHtmlResponse.createSuccess (aLEC.getRequestScope (), aNode);

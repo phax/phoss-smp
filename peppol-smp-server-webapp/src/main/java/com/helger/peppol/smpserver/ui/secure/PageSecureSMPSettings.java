@@ -22,7 +22,6 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.errorlist.FormErrors;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.commons.url.URLValidator;
@@ -44,6 +43,7 @@ import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
 import com.helger.photon.core.EPhotonCoreText;
+import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
 import com.helger.photon.uicore.page.EWebPageSimpleFormAction;
@@ -110,7 +110,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   @Override
   protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
                                                  @Nonnull final ISMPSettings aObject,
-                                                 @Nonnull final FormErrors aFormErrors,
+                                                 @Nonnull final FormErrorList aFormErrors,
                                                  @Nonnull final EWebPageSimpleFormAction eSimpleFormAction)
   {
     final boolean bRESTWritableAPIDisabled = aWPEC.getCheckBoxAttr (FIELD_SMP_REST_WRITABLE_API_DISABLED,
@@ -172,7 +172,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                 @Nonnull final ISMPSettings aObject,
                                 @Nonnull final BootstrapForm aForm,
                                 @Nonnull final EWebPageSimpleFormAction eSimpleFormAction,
-                                @Nonnull final FormErrors aFormErrors)
+                                @Nonnull final FormErrorList aFormErrors)
   {
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_REST_WRITABLE_API_DISABLED,

@@ -33,7 +33,6 @@ import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.error.IError;
 import com.helger.commons.error.list.IErrorList;
-import com.helger.commons.errorlist.FormErrors;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.locale.country.CountryCache;
 import com.helger.commons.regex.RegExHelper;
@@ -101,6 +100,7 @@ import com.helger.photon.bootstrap3.uictrls.datetimepicker.BootstrapDateTimePick
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
+import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldDate;
 import com.helger.photon.core.url.LinkHelper;
@@ -326,7 +326,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   @Override
   protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPBusinessCard aSelectedObject,
-                                                 @Nonnull final FormErrors aFormErrors,
+                                                 @Nonnull final FormErrorList aFormErrors,
                                                  @Nonnull final EWebPageFormAction eFormAction)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -362,7 +362,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       for (final String sEntityRowID : aEntities.keySet ())
       {
         final Map <String, String> aEntityRow = aEntities.getValueMap (sEntityRowID);
-        final int nErrors = aFormErrors.getFieldItemCount ();
+        final int nErrors = aFormErrors.getSize ();
 
         // Entity name
         final String sFieldName = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityRowID, SUFFIX_NAME);
@@ -388,7 +388,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
           for (final String sIdentifierRowID : aIdentifiers.keySet ())
           {
             final Map <String, String> aIdentifierRow = aIdentifiers.getValueMap (sIdentifierRowID);
-            final int nErrors2 = aFormErrors.getFieldItemCount ();
+            final int nErrors2 = aFormErrors.getSize ();
 
             // Scheme
             final String sFieldScheme = RequestParamMap.getFieldName (PREFIX_ENTITY,
@@ -410,7 +410,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
             if (StringHelper.hasNoText (sValue))
               aFormErrors.addFieldError (sFieldValue, "The Value of the Identifier must be provided!");
 
-            if (aFormErrors.getFieldItemCount () == nErrors2)
+            if (aFormErrors.getSize () == nErrors2)
             {
               final boolean bIsNewIdentifier = sIdentifierRowID.startsWith (TMP_ID_PREFIX);
               aSMPIdentifiers.add (bIsNewIdentifier ? new SMPBusinessCardIdentifier (sScheme, sValue)
@@ -450,7 +450,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
           for (final String sContactRowID : aContacts.keySet ())
           {
             final Map <String, String> aContactRow = aContacts.getValueMap (sContactRowID);
-            final int nErrors2 = aFormErrors.getFieldItemCount ();
+            final int nErrors2 = aFormErrors.getSize ();
 
             final String sType = aContactRow.get (SUFFIX_TYPE);
             final String sName = aContactRow.get (SUFFIX_NAME);
@@ -471,7 +471,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                       StringHelper.hasText (sPhoneNumber) ||
                                       StringHelper.hasText (sEmail);
 
-            if (aFormErrors.getFieldItemCount () == nErrors2 && bIsAnySet)
+            if (aFormErrors.getSize () == nErrors2 && bIsAnySet)
             {
               final boolean bIsNewContact = sContactRowID.startsWith (TMP_ID_PREFIX);
               aSMPContacts.add (bIsNewContact ? new SMPBusinessCardContact (sType, sName, sPhoneNumber, sEmail)
@@ -508,7 +508,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
         if (aRegDate == null && StringHelper.hasText (sRegDate))
           aFormErrors.addFieldError (sFieldRegDate, "The entered registration date is invalid!");
 
-        if (aFormErrors.getFieldItemCount () == nErrors)
+        if (aFormErrors.getSize () == nErrors)
         {
           // Add to list
           final boolean bIsNewEntity = sEntityRowID.startsWith (TMP_ID_PREFIX);
@@ -568,7 +568,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                                  @Nonnull final String sEntityID,
                                                  @Nullable final SMPBusinessCardIdentifier aExistingIdentifier,
                                                  @Nullable final String sExistingID,
-                                                 @Nonnull final FormErrors aFormErrors)
+                                                 @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sIdentifierID = aExistingIdentifier != null ? aExistingIdentifier.getID ()
@@ -611,7 +611,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                               @Nonnull final String sEntityID,
                                               @Nullable final SMPBusinessCardContact aExistingContact,
                                               @Nullable final String sExistingID,
-                                              @Nonnull final FormErrors aFormErrors)
+                                              @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sContactID = aExistingContact != null ? aExistingContact.getID ()
@@ -683,7 +683,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   public static IHCNode createEntityInputForm (@Nonnull final LayoutExecutionContext aLEC,
                                                @Nullable final SMPBusinessCardEntity aExistingEntity,
                                                @Nullable final String sExistingID,
-                                               @Nonnull final FormErrors aFormErrors)
+                                               @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -854,7 +854,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
                                 @Nullable final ISMPBusinessCard aSelectedObject,
                                 @Nonnull final BootstrapForm aForm,
                                 @Nonnull final EWebPageFormAction eFormAction,
-                                @Nonnull final FormErrors aFormErrors)
+                                @Nonnull final FormErrorList aFormErrors)
   {
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();

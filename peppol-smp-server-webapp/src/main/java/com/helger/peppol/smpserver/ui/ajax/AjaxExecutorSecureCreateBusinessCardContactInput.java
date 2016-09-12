@@ -18,12 +18,12 @@ package com.helger.peppol.smpserver.ui.ajax;
 
 import javax.annotation.Nonnull;
 
-import com.helger.commons.errorlist.FormErrors;
 import com.helger.html.hc.IHCNode;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
 import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCards;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
+import com.helger.photon.core.form.FormErrorList;
 
 /**
  * Create a new business entity contact input row
@@ -44,7 +44,7 @@ public final class AjaxExecutorSecureCreateBusinessCardContactInput extends Abst
                                                                           sEntityID,
                                                                           (SMPBusinessCardContact) null,
                                                                           (String) null,
-                                                                          new FormErrors ());
+                                                                          new FormErrorList ());
 
     // Build the HTML response
     return AjaxHtmlResponse.createSuccess (aLEC.getRequestScope (), aNode);

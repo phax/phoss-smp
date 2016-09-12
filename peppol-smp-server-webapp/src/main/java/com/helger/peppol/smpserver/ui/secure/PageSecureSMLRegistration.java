@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.errorlist.FormErrors;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
@@ -61,6 +60,7 @@ import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.nav.BootstrapTabBox;
+import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
@@ -112,7 +112,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     return true;
   }
 
-  private void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrors aFormErrors)
+  private void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                  @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.getAttributeAsString (FIELD_SML_ID);
@@ -233,7 +234,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     }
   }
 
-  private void _updateSMPatSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrors aFormErrors)
+  private void _updateSMPatSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.getAttributeAsString (FIELD_SML_ID);
@@ -354,7 +355,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     }
   }
 
-  private void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrors aFormErrors)
+  private void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                  @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.getAttributeAsString (FIELD_SML_ID);
@@ -412,7 +414,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
 
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final FormErrors aFormErrors = new FormErrors ();
+    final FormErrorList aFormErrors = new FormErrorList ();
     final boolean bShowInput = true;
     final ISMLInfo aDefaultSML = SMPMetaManager.getSMLInfoMgr ()
                                                .getAllSMLInfos ()

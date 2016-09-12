@@ -33,7 +33,6 @@ import com.helger.commons.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.collection.multimap.MultiHashMapHashSetBased;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.errorlist.FormErrors;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
@@ -66,6 +65,7 @@ import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
@@ -177,7 +177,7 @@ public final class PageSecureEndpointsChangeCertificate extends AbstractSMPWebPa
     if (aWPEC.hasAction (CPageParam.ACTION_EDIT))
     {
       bShowList = false;
-      final FormErrors aFormErrors = new FormErrors ();
+      final FormErrorList aFormErrors = new FormErrorList ();
 
       final String sOldCert = aWPEC.getAttributeAsString (FIELD_OLD_CERTIFICATE);
 

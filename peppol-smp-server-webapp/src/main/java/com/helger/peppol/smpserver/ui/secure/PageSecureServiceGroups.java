@@ -29,7 +29,6 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.compare.ESortOrder;
-import com.helger.commons.errorlist.FormErrors;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
@@ -77,6 +76,7 @@ import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageAction
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
+import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.security.login.LoggedInUserManager;
@@ -281,7 +281,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                 @Nullable final ISMPServiceGroup aSelectedObject,
                                 @Nonnull final BootstrapForm aForm,
                                 @Nonnull final EWebPageFormAction eFormAction,
-                                @Nonnull final FormErrors aFormErrors)
+                                @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bEdit = eFormAction.isEdit ();
@@ -339,7 +339,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
   @Override
   protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPServiceGroup aSelectedObject,
-                                                 @Nonnull final FormErrors aFormErrors,
+                                                 @Nonnull final FormErrorList aFormErrors,
                                                  @Nonnull final EWebPageFormAction eFormAction)
   {
     final boolean bEdit = eFormAction.isEdit ();
