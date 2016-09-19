@@ -76,7 +76,7 @@
     <jaxws.version>2.2.9-b14002</jaxws.version>
     <log4j.version>2.6.2</log4j.version>
     <jersey.version>2.23.2</jersey.version>
-    <eclipselink.version>2.6.3</eclipselink.version>
+    <eclipselink.version>2.6.4</eclipselink.version>
   </properties>
   
   <dependencyManagement>
