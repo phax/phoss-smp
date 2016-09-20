@@ -121,7 +121,8 @@ public final class ServiceMetadataInterface
       // Sign the document
       try
       {
-        SMPKeyManager.getInstance ().signXML (aDoc.getDocumentElement ());
+        SMPKeyManager.getInstance ().signXML (aDoc.getDocumentElement (),
+                                              SMPServerConfiguration.getRESTType ().isBDXR ());
       }
       catch (final Exception ex)
       {

@@ -83,6 +83,11 @@ public enum ESMPRESTType implements IHasID <String>
     return this == PEPPOL;
   }
 
+  public boolean isBDXR ()
+  {
+    return this == BDXR;
+  }
+
   @Nullable
   public static ESMPRESTType getFromIDOrNull (@Nullable final String sID)
   {

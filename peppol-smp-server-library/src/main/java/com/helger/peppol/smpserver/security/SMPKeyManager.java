@@ -68,6 +68,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.SignatureMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 import org.slf4j.Logger;
@@ -76,7 +77,6 @@ import org.w3c.dom.Element;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.random.RandomHelper;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
@@ -209,10 +209,11 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     return aSSLCtx;
   }
 
-  public void signXML (@Nonnull final Element aElementToSign) throws NoSuchAlgorithmException,
-                                                              InvalidAlgorithmParameterException,
-                                                              MarshalException,
-                                                              XMLSignatureException
+  public void signXML (@Nonnull final Element aElementToSign,
+                       final boolean bBDXR) throws NoSuchAlgorithmException,
+                                            InvalidAlgorithmParameterException,
+                                            MarshalException,
+                                            XMLSignatureException
   {
     // Create a DOM XMLSignatureFactory that will be used to
     // generate the enveloped signature.
@@ -223,27 +224,31 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // that, and also specify the SHA1 digest algorithm and
     // the ENVELOPED Transform)
     final Reference aReference = aSignatureFactory.newReference ("",
-                                                                 aSignatureFactory.newDigestMethod (DigestMethod.SHA1,
+                                                                 aSignatureFactory.newDigestMethod (bBDXR ? DigestMethod.SHA256
+                                                                                                          : DigestMethod.SHA1,
                                                                                                     null),
                                                                  new CommonsArrayList<> (aSignatureFactory.newTransform (Transform.ENVELOPED,
                                                                                                                          (TransformParameterSpec) null)),
-                                                                 null,
-                                                                 null);
+                                                                 (String) null,
+                                                                 (String) null);
 
     // Create the SignedInfo.
-    final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (CanonicalizationMethod.INCLUSIVE,
+    // XXX should be EXCLUSIVE for PEPPOL but CIPA and this server always used
+    // EXCLUSIVE!
+    final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (bBDXR ? CanonicalizationMethod.INCLUSIVE
+                                                                                                                       : CanonicalizationMethod.INCLUSIVE,
                                                                                                                  (C14NMethodParameterSpec) null),
-                                                                    aSignatureFactory.newSignatureMethod (SignatureMethod.RSA_SHA1,
-                                                                                                          null),
+                                                                    aSignatureFactory.newSignatureMethod (bBDXR ? "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+                                                                                                                : SignatureMethod.RSA_SHA1,
+                                                                                                          (SignatureMethodParameterSpec) null),
                                                                     new CommonsArrayList<> (aReference));
 
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
-    final ICommonsList <Object> aX509Content = new CommonsArrayList<> ();
     final X509Certificate aCert = (X509Certificate) m_aKeyEntry.getCertificate ();
-    aX509Content.add (aCert.getSubjectX500Principal ().getName ());
-    aX509Content.add (aCert);
-    final X509Data aX509Data = aKeyInfoFactory.newX509Data (aX509Content);
+    final X509Data aX509Data = aKeyInfoFactory.newX509Data (new CommonsArrayList<> (aCert.getSubjectX500Principal ()
+                                                                                         .getName (),
+                                                                                    aCert));
     final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList<> (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and
