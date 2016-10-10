@@ -96,14 +96,24 @@ public class DBServiceMetadata implements Serializable
     return m_aID;
   }
 
+  @Deprecated
+  @UsedOnlyByJPA
   public void setId (final DBServiceMetadataID aID)
   {
     m_aID = aID;
   }
 
   @ManyToOne (fetch = FetchType.LAZY)
-  @JoinColumns ({ @JoinColumn (name = "businessIdentifier", referencedColumnName = "businessIdentifier", nullable = false, insertable = false, updatable = false),
-                  @JoinColumn (name = "businessIdentifierScheme", referencedColumnName = "businessIdentifierScheme", nullable = false, insertable = false, updatable = false) })
+  @JoinColumns ({ @JoinColumn (name = "businessIdentifier",
+                               referencedColumnName = "businessIdentifier",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "businessIdentifierScheme",
+                               referencedColumnName = "businessIdentifierScheme",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false) })
   public DBServiceGroup getServiceGroup ()
   {
     return m_aServiceGroup;

@@ -85,6 +85,8 @@ public class DBOwnership implements Serializable
     return m_aID;
   }
 
+  @Deprecated
+  @UsedOnlyByJPA
   public void setId (final DBOwnershipID aID)
   {
     m_aID = aID;
@@ -120,6 +122,8 @@ public class DBOwnership implements Serializable
     return m_aServiceGroup;
   }
 
+  @Deprecated
+  @UsedOnlyByJPA
   public void setServiceGroup (final DBServiceGroup aServiceGroup)
   {
     m_aServiceGroup = aServiceGroup;

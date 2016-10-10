@@ -95,6 +95,8 @@ public class DBServiceGroup implements Serializable
     return m_aID;
   }
 
+  @Deprecated
+  @UsedOnlyByJPA
   public void setId (final DBServiceGroupID aID)
   {
     m_aID = aID;

@@ -86,6 +86,8 @@ public class DBServiceMetadataRedirection implements Serializable
     return m_aID;
   }
 
+  @Deprecated
+  @UsedOnlyByJPA
   public void setId (final DBServiceMetadataRedirectionID aID)
   {
     m_aID = aID;

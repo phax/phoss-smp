@@ -75,11 +75,13 @@ public class DBServiceGroupID implements Serializable
   public DBServiceGroupID (@Nonnull final IParticipantIdentifier aBusinessID)
   {
     setBusinessIdentifierScheme (aBusinessID.getScheme ());
-    // Ensure lower case participat value
+    // Ensure lower case participant value
     setBusinessIdentifier (SMPServiceGroup.createUnifiedParticipantIdentifierValue (aBusinessID.getValue ()));
   }
 
-  @Column (name = "businessIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme",
+           nullable = false,
+           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;

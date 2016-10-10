@@ -126,18 +126,44 @@ public class DBEndpoint implements Serializable
     return m_aID;
   }
 
+  @Deprecated
+  @UsedOnlyByJPA
   public void setId (final DBEndpointID aID)
   {
     m_aID = aID;
   }
 
   @ManyToOne (fetch = FetchType.LAZY)
-  @JoinColumns ({ @JoinColumn (name = "processIdentifier", referencedColumnName = "processIdentifier", nullable = false, insertable = false, updatable = false),
-                  @JoinColumn (name = "processIdentifierType", referencedColumnName = "processIdentifierType", nullable = false, insertable = false, updatable = false),
-                  @JoinColumn (name = "businessIdentifier", referencedColumnName = "businessIdentifier", nullable = false, insertable = false, updatable = false),
-                  @JoinColumn (name = "businessIdentifierScheme", referencedColumnName = "businessIdentifierScheme", nullable = false, insertable = false, updatable = false),
-                  @JoinColumn (name = "documentIdentifier", referencedColumnName = "documentIdentifier", nullable = false, insertable = false, updatable = false),
-                  @JoinColumn (name = "documentIdentifierScheme", referencedColumnName = "documentIdentifierScheme", nullable = false, insertable = false, updatable = false) })
+  @JoinColumns ({ @JoinColumn (name = "processIdentifier",
+                               referencedColumnName = "processIdentifier",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "processIdentifierType",
+                               referencedColumnName = "processIdentifierType",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "businessIdentifier",
+                               referencedColumnName = "businessIdentifier",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "businessIdentifierScheme",
+                               referencedColumnName = "businessIdentifierScheme",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "documentIdentifier",
+                               referencedColumnName = "documentIdentifier",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "documentIdentifierScheme",
+                               referencedColumnName = "documentIdentifierScheme",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false) })
   public DBProcess getProcess ()
   {
     return m_aProcess;

@@ -98,16 +98,34 @@ public class DBProcess implements Serializable
     return m_aID;
   }
 
+  @Deprecated
+  @UsedOnlyByJPA
   public void setId (final DBProcessID aID)
   {
     m_aID = aID;
   }
 
   @ManyToOne (fetch = FetchType.LAZY)
-  @JoinColumns ({ @JoinColumn (name = "documentIdentifier", referencedColumnName = "documentIdentifier", nullable = false, insertable = false, updatable = false),
-                  @JoinColumn (name = "documentIdentifierScheme", referencedColumnName = "documentIdentifierScheme", nullable = false, insertable = false, updatable = false),
-                  @JoinColumn (name = "businessIdentifier", referencedColumnName = "businessIdentifier", nullable = false, insertable = false, updatable = false),
-                  @JoinColumn (name = "businessIdentifierScheme", referencedColumnName = "businessIdentifierScheme", nullable = false, insertable = false, updatable = false) })
+  @JoinColumns ({ @JoinColumn (name = "documentIdentifier",
+                               referencedColumnName = "documentIdentifier",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "documentIdentifierScheme",
+                               referencedColumnName = "documentIdentifierScheme",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "businessIdentifier",
+                               referencedColumnName = "businessIdentifier",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false),
+                  @JoinColumn (name = "businessIdentifierScheme",
+                               referencedColumnName = "businessIdentifierScheme",
+                               nullable = false,
+                               insertable = false,
+                               updatable = false) })
   public DBServiceMetadata getServiceMetadata ()
   {
     return m_aServiceMetadata;
