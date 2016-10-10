@@ -47,6 +47,7 @@
              version="2.0">
   <persistence-unit name="peppol-smp" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.helger.peppol.smpserver.data.sql.model.DBBusinessCardEntity</class>
     <class>com.helger.peppol.smpserver.data.sql.model.DBEndpoint</class>
     <class>com.helger.peppol.smpserver.data.sql.model.DBOwnership</class>
     <class>com.helger.peppol.smpserver.data.sql.model.DBProcess</class>
