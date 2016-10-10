@@ -139,9 +139,9 @@ public final class SQLManagerProvider implements ISMPManagerProvider
   }
 
   @Nullable
-  public ISMPBusinessCardManager createBusinessCardMgr ()
+  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return null;
+    return new SQLBusinessCardManager (aServiceGroupMgr);
   }
 
   @Override

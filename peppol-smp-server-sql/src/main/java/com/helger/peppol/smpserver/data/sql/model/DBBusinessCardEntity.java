@@ -69,7 +69,8 @@ import com.helger.db.jpa.eclipselink.converter.JPALocalDateConverter;
 @Converter (name = "localdate", converterClass = JPALocalDateConverter.class)
 public class DBBusinessCardEntity implements Serializable
 {
-  private DBBusinessCardEntityID m_aID;
+  private DBBusinessCardEntityID m_aServiceGroupID;
+  private String m_sID;
   private DBServiceGroup m_aServiceGroup;
   private String m_sName;
   private String m_sCountryCode;
@@ -85,7 +86,8 @@ public class DBBusinessCardEntity implements Serializable
   public DBBusinessCardEntity ()
   {}
 
-  public DBBusinessCardEntity (@Nonnull final DBServiceGroup aServiceGroup,
+  public DBBusinessCardEntity (@Nonnull final DBBusinessCardEntityID aID,
+                               final String sID,
                                final String sName,
                                final String sCountryCode,
                                final String sGeographicalInformation,
@@ -95,8 +97,8 @@ public class DBBusinessCardEntity implements Serializable
                                final String sAdditionalnformation,
                                final LocalDate aRegistrationDate)
   {
-    m_aID = new DBBusinessCardEntityID (aServiceGroup.getId ());
-    m_aServiceGroup = aServiceGroup;
+    m_aServiceGroupID = aID;
+    m_sID = sID;
     m_sName = sName;
     m_sCountryCode = sCountryCode;
     m_sGeographicalInformation = sGeographicalInformation;
@@ -108,16 +110,16 @@ public class DBBusinessCardEntity implements Serializable
   }
 
   @EmbeddedId
-  public DBBusinessCardEntityID getId ()
+  public DBBusinessCardEntityID getServiceGroupId ()
   {
-    return m_aID;
+    return m_aServiceGroupID;
   }
 
   @Deprecated
   @UsedOnlyByJPA
-  public void setId (final DBBusinessCardEntityID aID)
+  public void setServiceGroupId (final DBBusinessCardEntityID aServiceGroupID)
   {
-    m_aID = aID;
+    m_aServiceGroupID = aServiceGroupID;
   }
 
   @ManyToOne (fetch = FetchType.LAZY)
@@ -141,6 +143,17 @@ public class DBBusinessCardEntity implements Serializable
   public void setServiceGroup (final DBServiceGroup aServiceGroup)
   {
     m_aServiceGroup = aServiceGroup;
+  }
+
+  @Column (name = "id", nullable = false)
+  public String getId ()
+  {
+    return m_sID;
+  }
+
+  public void setId (final String sID)
+  {
+    m_sID = sID;
   }
 
   @Column (name = "name", nullable = false)

@@ -53,8 +53,6 @@ import javax.persistence.JoinColumns;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.eclipse.persistence.annotations.Convert;
@@ -225,7 +223,6 @@ public class DBEndpoint implements Serializable
     m_sMinimumAuthenticationLevel = sMinimumAuthenticationLevel;
   }
 
-  @Temporal (TemporalType.TIMESTAMP)
   @Column (name = "serviceActivationDate", length = 19)
   @Convert ("localdatetime")
   public LocalDateTime getServiceActivationDate ()
@@ -238,7 +235,6 @@ public class DBEndpoint implements Serializable
     m_aServiceActivationDate = aServiceActivationDate;
   }
 
-  @Temporal (TemporalType.TIMESTAMP)
   @Column (name = "serviceExpirationDate", length = 19)
   @Convert ("localdatetime")
   public LocalDateTime getServiceExpirationDate ()

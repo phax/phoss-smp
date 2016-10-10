@@ -137,7 +137,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   }
 
   @Nullable
-  public ISMPBusinessCardManager createBusinessCardMgr ()
+  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     try
     {

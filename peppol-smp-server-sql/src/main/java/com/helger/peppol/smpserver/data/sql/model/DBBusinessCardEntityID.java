@@ -51,8 +51,10 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
+import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 
 /**
  * Business Card Entity ID == Service GroupID = PEPPOL participant ID
@@ -74,6 +76,13 @@ public class DBBusinessCardEntityID implements Serializable
   {
     setBusinessIdentifierScheme (aID.getBusinessIdentifierScheme ());
     setBusinessIdentifier (aID.getBusinessIdentifier ());
+  }
+
+  public DBBusinessCardEntityID (@Nonnull final IParticipantIdentifier aBusinessID)
+  {
+    setBusinessIdentifierScheme (aBusinessID.getScheme ());
+    // Ensure lower case participant value
+    setBusinessIdentifier (SMPServiceGroup.createUnifiedParticipantIdentifierValue (aBusinessID.getValue ()));
   }
 
   @Column (name = "businessIdentifierScheme",

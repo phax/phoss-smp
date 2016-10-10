@@ -210,7 +210,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 
       // May be null!
-      m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr ();
+      m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aServiceGroupMgr);
 
       s_aLogger.info (ClassHelper.getClassLocalName (this) + " was initialized");
     }

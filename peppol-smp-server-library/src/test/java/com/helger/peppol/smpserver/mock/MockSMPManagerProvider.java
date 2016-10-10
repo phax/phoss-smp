@@ -105,7 +105,7 @@ public final class MockSMPManagerProvider implements ISMPManagerProvider
   }
 
   @Nonnull
-  public ISMPBusinessCardManager createBusinessCardMgr ()
+  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new MockSMPBusinessCardManager ();
   }

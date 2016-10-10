@@ -105,8 +105,10 @@ public interface ISMPManagerProvider
   ISMPServiceInformationManager createServiceInformationMgr ();
 
   /**
+   * @param aServiceGroupMgr
+   *        The service group manager to use. May not be <code>null</code>.
    * @return A new SMP business card manager. May be <code>null</code>!
    */
   @Nullable
-  ISMPBusinessCardManager createBusinessCardMgr ();
+  ISMPBusinessCardManager createBusinessCardMgr (@Nonnull ISMPServiceGroupManager aServiceGroupMgr);
 }

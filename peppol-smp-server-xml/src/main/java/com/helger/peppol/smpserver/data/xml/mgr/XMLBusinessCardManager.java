@@ -152,7 +152,7 @@ public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBu
     if (aServiceGroup == null)
       return null;
 
-    return getOfID (aServiceGroup.getID ());
+    return getSMPBusinessCardOfID (aServiceGroup.getID ());
   }
 
   @Nullable
