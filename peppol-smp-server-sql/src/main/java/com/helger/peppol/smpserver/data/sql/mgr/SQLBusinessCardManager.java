@@ -47,6 +47,9 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
@@ -56,7 +59,6 @@ import com.helger.commons.collection.multimap.IMultiMapListBased;
 import com.helger.commons.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
-import com.helger.db.jpa.JPAEnabledManager;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.json.IJson;
 import com.helger.json.IJsonObject;
@@ -179,12 +181,19 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aEntities, "Entities");
 
+    s_aLogger.info ("createOrUpdateSMPBusinessCard (" +
+                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                    ", " +
+                    aEntities.size () +
+                    " entities" +
+                    ")");
+
     JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
       final DBBusinessCardEntityID aDBID = new DBBusinessCardEntityID (aServiceGroup.getParticpantIdentifier ());
       // Delete all existing entities
-      aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+      aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.serviceGroupId.businessIdentifierScheme = :scheme AND p.serviceGroupId.businessIdentifier = :value",
                        DBBusinessCardEntity.class)
          .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
          .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
@@ -207,6 +216,14 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
+
+    s_aLogger.info ("Finished creating BusinessCard (" +
+                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                    ", " +
+                    aEntities.size () +
+                    " entities" +
+                    ")");
+
     return new SMPBusinessCard (aServiceGroup, aEntities);
   }
 
@@ -216,11 +233,13 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     if (aSMPBusinessCard == null)
       return EChange.UNCHANGED;
 
+    s_aLogger.info ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
+
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
       final ISMPServiceGroup aServiceGroup = aSMPBusinessCard.getServiceGroup ();
       final EntityManager aEM = getEntityManager ();
-      final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+      final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.serviceGroupId.businessIdentifierScheme = :scheme AND p.serviceGroupId.businessIdentifier = :value",
                                           DBBusinessCardEntity.class)
                             .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
                             .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
@@ -230,6 +249,12 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
+
+    s_aLogger.info ("Deleted BusinessCard (" +
+                    aSMPBusinessCard.getID () +
+                    ") succeeded. Change=" +
+                    ret.get ().isChanged ());
+
     return ret.get ();
   }
 
@@ -285,7 +310,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       return null;
 
     JPAExecutionResult <List <DBBusinessCardEntity>> ret;
-    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
+    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p WHERE p.serviceGroupId.businessIdentifierScheme = :scheme AND p.serviceGroupId.businessIdentifier = :value",
                                                                    DBBusinessCardEntity.class)
                                                      .setParameter ("scheme",
                                                                     aServiceGroup.getParticpantIdentifier ()
@@ -319,8 +344,14 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   public int getSMPBusinessCardCount ()
   {
     JPAExecutionResult <Number> ret;
-    ret = doInTransaction ( () -> JPAEnabledManager.getSelectCountResultObj (getEntityManager ().createQuery ("SELECT DISTINCT  p.id.businessIdentifierScheme, p.id.businessIdentifier FROM DBBusinessCardEntity p",
-                                                                                                              DBBusinessCardEntity.class)));
+    ret = doInTransaction ( () -> {
+      final CriteriaBuilder cb = getEntityManager ().getCriteriaBuilder ();
+      final CriteriaQuery <Long> c = cb.createQuery (Long.class);
+      final Root <DBBusinessCardEntity> aRoot = c.from (DBBusinessCardEntity.class);
+      c.select (cb.countDistinct (cb.and (aRoot.get ("serviceGroupId").get ("businessIdentifierScheme"),
+                                          aRoot.get ("serviceGroupId").get ("businessIdentifier"))));
+      return getEntityManager ().createQuery (c).getSingleResult ();
+    });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
