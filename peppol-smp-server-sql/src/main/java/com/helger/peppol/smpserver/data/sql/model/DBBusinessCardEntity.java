@@ -43,14 +43,9 @@ package com.helger.peppol.smpserver.data.sql.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-import javax.annotation.Nonnull;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.eclipse.persistence.annotations.Convert;
@@ -58,6 +53,7 @@ import org.eclipse.persistence.annotations.Converter;
 
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.db.jpa.eclipselink.converter.JPALocalDateConverter;
+import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 
 /**
  * DB Business Card Entity representation
@@ -69,9 +65,9 @@ import com.helger.db.jpa.eclipselink.converter.JPALocalDateConverter;
 @Converter (name = "localdate", converterClass = JPALocalDateConverter.class)
 public class DBBusinessCardEntity implements Serializable
 {
-  private DBBusinessCardEntityID m_aServiceGroupID;
   private String m_sID;
-  private DBServiceGroup m_aServiceGroup;
+  private String m_sParticipantIdentifierScheme;
+  private String m_sParticipantIdentifier;
   private String m_sName;
   private String m_sCountryCode;
   private String m_sGeographicalInformation;
@@ -86,8 +82,9 @@ public class DBBusinessCardEntity implements Serializable
   public DBBusinessCardEntity ()
   {}
 
-  public DBBusinessCardEntity (@Nonnull final DBBusinessCardEntityID aID,
-                               final String sID,
+  public DBBusinessCardEntity (final String sID,
+                               final String sParticipantIdentifierScheme,
+                               final String sParticipantIdentifier,
                                final String sName,
                                final String sCountryCode,
                                final String sGeographicalInformation,
@@ -97,54 +94,20 @@ public class DBBusinessCardEntity implements Serializable
                                final String sAdditionalnformation,
                                final LocalDate aRegistrationDate)
   {
-    m_aServiceGroupID = aID;
     m_sID = sID;
-    m_sName = sName;
-    m_sCountryCode = sCountryCode;
-    m_sGeographicalInformation = sGeographicalInformation;
-    m_sIdentifiers = sIdentifiers;
-    m_sWebsiteURIs = sWebsiteURIs;
-    m_sContacts = sContacts;
-    m_sAdditionalInformation = sAdditionalnformation;
-    m_aRegistrationDate = aRegistrationDate;
+    setBusinessIdentifierScheme (sParticipantIdentifierScheme);
+    setBusinessIdentifier (sParticipantIdentifier);
+    setName (sName);
+    setCountryCode (sCountryCode);
+    setGeographicalInformation (sGeographicalInformation);
+    setIdentifiers (sIdentifiers);
+    setWebsiteURIs (sWebsiteURIs);
+    setContacts (sContacts);
+    setAdditionalInformation (sAdditionalnformation);
+    setRegistrationDate (aRegistrationDate);
   }
 
-  @EmbeddedId
-  public DBBusinessCardEntityID getServiceGroupId ()
-  {
-    return m_aServiceGroupID;
-  }
-
-  @Deprecated
-  @UsedOnlyByJPA
-  public void setServiceGroupId (final DBBusinessCardEntityID aServiceGroupID)
-  {
-    m_aServiceGroupID = aServiceGroupID;
-  }
-
-  @ManyToOne (fetch = FetchType.LAZY)
-  @JoinColumns ({ @JoinColumn (name = "businessIdentifier",
-                               referencedColumnName = "businessIdentifier",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false),
-                  @JoinColumn (name = "businessIdentifierScheme",
-                               referencedColumnName = "businessIdentifierScheme",
-                               nullable = false,
-                               insertable = false,
-                               updatable = false) })
-  public DBServiceGroup getServiceGroup ()
-  {
-    return m_aServiceGroup;
-  }
-
-  @Deprecated
-  @UsedOnlyByJPA
-  public void setServiceGroup (final DBServiceGroup aServiceGroup)
-  {
-    m_aServiceGroup = aServiceGroup;
-  }
-
+  @Id
   @Column (name = "id", nullable = false)
   public String getId ()
   {
@@ -154,6 +117,30 @@ public class DBBusinessCardEntity implements Serializable
   public void setId (final String sID)
   {
     m_sID = sID;
+  }
+
+  @Column (name = "businessIdentifierScheme",
+           nullable = false,
+           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  public String getBusinessIdentifierScheme ()
+  {
+    return m_sParticipantIdentifierScheme;
+  }
+
+  public void setBusinessIdentifierScheme (final String sBusinessIdentifierScheme)
+  {
+    m_sParticipantIdentifierScheme = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
+  }
+
+  @Column (name = "businessIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_PARTICIPANT_VALUE_LENGTH)
+  public String getBusinessIdentifier ()
+  {
+    return m_sParticipantIdentifier;
+  }
+
+  public void setBusinessIdentifier (final String sBusinessIdentifier)
+  {
+    m_sParticipantIdentifier = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifier);
   }
 
   @Column (name = "name", nullable = false)

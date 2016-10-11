@@ -47,6 +47,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Transient;
 
+import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
@@ -62,6 +63,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
  * @author Philip Helger
  */
 @Embeddable
+@MustImplementEqualsAndHashcode
 public class DBBusinessCardEntityID implements Serializable
 {
   private String m_sParticipantIdentifierScheme;
