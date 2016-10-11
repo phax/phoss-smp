@@ -65,10 +65,10 @@ import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonReader;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBBusinessCardEntity;
-import com.helger.peppol.smpserver.data.sql.model.DBBusinessCardEntityID;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
@@ -191,9 +191,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
-      final DBBusinessCardEntityID aDBID = new DBBusinessCardEntityID (aServiceGroup.getParticpantIdentifier ());
       // Delete all existing entities
-      final int nDeleted = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.serviceGroupId.businessIdentifierScheme = :scheme AND p.serviceGroupId.businessIdentifier = :value",
+      final int nDeleted = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.businessIdentifierScheme = :scheme AND p.businessIdentifier = :value",
                                             DBBusinessCardEntity.class)
                               .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
                               .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
@@ -202,8 +201,11 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
 
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
-        final DBBusinessCardEntity aDBBCE = new DBBusinessCardEntity (aDBID,
-                                                                      aEntity.getID (),
+        final DBBusinessCardEntity aDBBCE = new DBBusinessCardEntity (aEntity.getID (),
+                                                                      aServiceGroup.getParticpantIdentifier ()
+                                                                                   .getScheme (),
+                                                                      aServiceGroup.getParticpantIdentifier ()
+                                                                                   .getValue (),
                                                                       aEntity.getName (),
                                                                       aEntity.getCountryCode (),
                                                                       aEntity.getGeographicalInformation (),
@@ -235,7 +237,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     ret = doInTransaction ( () -> {
       final ISMPServiceGroup aServiceGroup = aSMPBusinessCard.getServiceGroup ();
       final EntityManager aEM = getEntityManager ();
-      final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.serviceGroupId.businessIdentifierScheme = :scheme AND p.serviceGroupId.businessIdentifier = :value",
+      final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.businessIdentifierScheme = :scheme AND p.businessIdentifier = :value",
                                           DBBusinessCardEntity.class)
                             .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
                             .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
@@ -252,10 +254,10 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   }
 
   @Nonnull
-  private SMPBusinessCard _convert (@Nonnull final DBBusinessCardEntityID aID,
+  private SMPBusinessCard _convert (@Nonnull final IParticipantIdentifier aID,
                                     @Nonnull final List <DBBusinessCardEntity> aDBEntities)
   {
-    final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aID.getAsBusinessIdentifier ());
+    final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aID);
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
     for (final DBBusinessCardEntity aDBEntity : aDBEntities)
     {
@@ -285,13 +287,13 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       throw new RuntimeException (ret.getThrowable ());
 
     /// Group by ID
-    final IMultiMapListBased <DBBusinessCardEntityID, DBBusinessCardEntity> aGrouped = new MultiHashMapArrayListBased <> ();
-    for (final DBBusinessCardEntity aDBRedirect : ret.get ())
-      aGrouped.putSingle (aDBRedirect.getServiceGroupId (), aDBRedirect);
+    final IMultiMapListBased <IParticipantIdentifier, DBBusinessCardEntity> aGrouped = new MultiHashMapArrayListBased <> ();
+    for (final DBBusinessCardEntity aDBItem : ret.get ())
+      aGrouped.putSingle (aDBItem.getAsBusinessIdentifier (), aDBItem);
 
     // Convert
     final ICommonsList <SMPBusinessCard> aRedirects = new CommonsArrayList <> ();
-    for (final Map.Entry <DBBusinessCardEntityID, ICommonsList <DBBusinessCardEntity>> aEntry : aGrouped.entrySet ())
+    for (final Map.Entry <IParticipantIdentifier, ICommonsList <DBBusinessCardEntity>> aEntry : aGrouped.entrySet ())
       aRedirects.add (_convert (aEntry.getKey (), aEntry.getValue ()));
     return aRedirects;
   }
@@ -303,7 +305,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       return null;
 
     JPAExecutionResult <List <DBBusinessCardEntity>> ret;
-    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p WHERE p.serviceGroupId.businessIdentifierScheme = :scheme AND p.serviceGroupId.businessIdentifier = :value",
+    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p WHERE p.businessIdentifierScheme = :scheme AND p.businessIdentifier = :value",
                                                                    DBBusinessCardEntity.class)
                                                      .setParameter ("scheme",
                                                                     aServiceGroup.getParticpantIdentifier ()
@@ -318,7 +320,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     if (ret.get ().isEmpty ())
       return null;
 
-    return _convert (new DBBusinessCardEntityID (aServiceGroup.getParticpantIdentifier ()), ret.get ());
+    return _convert (aServiceGroup.getParticpantIdentifier (), ret.get ());
   }
 
   @Nullable
@@ -342,8 +344,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       final CriteriaBuilder cb = em.getCriteriaBuilder ();
       final CriteriaQuery <Number> c = cb.createQuery (Number.class);
       final Root <DBBusinessCardEntity> aRoot = c.from (DBBusinessCardEntity.class);
-      c.select (cb.countDistinct (cb.and (aRoot.get ("serviceGroupId").get ("businessIdentifierScheme"),
-                                          aRoot.get ("serviceGroupId").get ("businessIdentifier"))));
+      c.select (cb.countDistinct (cb.and (aRoot.get ("businessIdentifierScheme"), aRoot.get ("businessIdentifier"))));
       return em.createQuery (c).getSingleResult ();
     });
     if (ret.hasThrowable ())

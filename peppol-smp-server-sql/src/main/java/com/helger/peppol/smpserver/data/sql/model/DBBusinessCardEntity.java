@@ -43,16 +43,19 @@ package com.helger.peppol.smpserver.data.sql.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.eclipse.persistence.annotations.Convert;
 import org.eclipse.persistence.annotations.Converter;
 
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.db.jpa.eclipselink.converter.JPALocalDateConverter;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 
 /**
@@ -141,6 +144,13 @@ public class DBBusinessCardEntity implements Serializable
   public void setBusinessIdentifier (final String sBusinessIdentifier)
   {
     m_sParticipantIdentifier = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifier);
+  }
+
+  @Nonnull
+  @Transient
+  public SimpleParticipantIdentifier getAsBusinessIdentifier ()
+  {
+    return new SimpleParticipantIdentifier (m_sParticipantIdentifierScheme, m_sParticipantIdentifier);
   }
 
   @Column (name = "name", nullable = false)

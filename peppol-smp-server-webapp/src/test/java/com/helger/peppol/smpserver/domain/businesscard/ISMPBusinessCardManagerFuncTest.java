@@ -76,6 +76,10 @@ public final class ISMPBusinessCardManagerFuncTest
             .add (new SMPBusinessCardContact ("support", "Unit test support", null, "support@peppol.eu"));
     aEntity2.setAdditionalInformation ("Bla foo fasel");
     aEntity2.setRegistrationDate (PDTFactory.getCurrentLocalDate ());
+    final SMPBusinessCardEntity aEntity3 = new SMPBusinessCardEntity ();
+    aEntity3.setName ("Test entity3");
+    aEntity3.setCountryCode ("AT");
+    aEntity3.setAdditionalInformation ("Entity 3");
 
     try
     {
@@ -118,7 +122,7 @@ public final class ISMPBusinessCardManagerFuncTest
         try
         {
           final ISMPBusinessCard aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG2,
-                                                                                                  new CommonsArrayList <> (aEntity2));
+                                                                                                  new CommonsArrayList <> (aEntity3));
           assertSame (aSG2, aBusinessCard2.getServiceGroup ());
           assertEquals (1, aBusinessCard2.getEntityCount ());
           assertEquals (2, aBusinessCardMgr.getSMPBusinessCardCount ());
