@@ -47,9 +47,6 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
@@ -334,15 +331,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     JPAExecutionResult <Number> ret;
     ret = doInTransaction ( () -> {
       final EntityManager em = getEntityManager ();
-
-      if (true)
-        return (Number) em.createNativeQuery ("SELECT COUNT(DISTINCT pid) FROM smp_bce").getSingleResult ();
-
-      final CriteriaBuilder cb = em.getCriteriaBuilder ();
-      final CriteriaQuery <Number> c = cb.createQuery (Number.class);
-      final Root <DBBusinessCardEntity> aRoot = c.from (DBBusinessCardEntity.class);
-      c.select (cb.countDistinct (aRoot.get ("participantId")));
-      return em.createQuery (c).getSingleResult ();
+      return getSelectCountResultObj (em.createQuery ("SELECT COUNT(DISTINCT p.participantId) FROM DBBusinessCardEntity p"));
     });
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
