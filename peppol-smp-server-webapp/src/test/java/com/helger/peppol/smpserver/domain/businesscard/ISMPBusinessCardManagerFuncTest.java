@@ -140,12 +140,14 @@ public final class ISMPBusinessCardManagerFuncTest
         }
         finally
         {
+          // Real cleanup
           aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard2);
           aSGMgr.deleteSMPServiceGroup (aPI2);
         }
       }
       finally
       {
+        // Real cleanup
         aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
         aSGMgr.deleteSMPServiceGroup (aPI1);
       }

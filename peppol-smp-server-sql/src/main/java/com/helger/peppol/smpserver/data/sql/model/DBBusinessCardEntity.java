@@ -118,7 +118,7 @@ public class DBBusinessCardEntity implements Serializable
     m_sID = sID;
   }
 
-  @Column (name = "pid", nullable = false, length = 256)
+  @Column (name = "pid", nullable = false, length = 255)
   public String getParticipantId ()
   {
     return m_sParticipantID;
