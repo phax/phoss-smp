@@ -192,10 +192,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
       // Delete all existing entities
-      final int nDeleted = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.businessIdentifierScheme = :scheme AND p.businessIdentifier = :value",
+      final int nDeleted = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id",
                                             DBBusinessCardEntity.class)
-                              .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
-                              .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
+                              .setParameter ("id", aServiceGroup.getParticpantIdentifier ().getURIEncoded ())
                               .executeUpdate ();
       s_aLogger.info ("Deleted " + nDeleted + " DBBusinessCardEntity rows");
 
@@ -203,9 +202,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       {
         final DBBusinessCardEntity aDBBCE = new DBBusinessCardEntity (aEntity.getID (),
                                                                       aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getScheme (),
-                                                                      aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getValue (),
+                                                                                   .getURIEncoded (),
                                                                       aEntity.getName (),
                                                                       aEntity.getCountryCode (),
                                                                       aEntity.getGeographicalInformation (),
@@ -237,10 +234,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     ret = doInTransaction ( () -> {
       final ISMPServiceGroup aServiceGroup = aSMPBusinessCard.getServiceGroup ();
       final EntityManager aEM = getEntityManager ();
-      final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.businessIdentifierScheme = :scheme AND p.businessIdentifier = :value",
+      final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id",
                                           DBBusinessCardEntity.class)
-                            .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
-                            .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
+                            .setParameter ("id", aServiceGroup.getParticpantIdentifier ().getURIEncoded ())
                             .executeUpdate ();
 
       return EChange.valueOf (nCount > 0);
@@ -305,14 +301,11 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       return null;
 
     JPAExecutionResult <List <DBBusinessCardEntity>> ret;
-    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p WHERE p.businessIdentifierScheme = :scheme AND p.businessIdentifier = :value",
+    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p WHERE p.participantId = :id",
                                                                    DBBusinessCardEntity.class)
-                                                     .setParameter ("scheme",
+                                                     .setParameter ("id",
                                                                     aServiceGroup.getParticpantIdentifier ()
-                                                                                 .getScheme ())
-                                                     .setParameter ("value",
-                                                                    aServiceGroup.getParticpantIdentifier ()
-                                                                                 .getValue ())
+                                                                                 .getURIEncoded ())
                                                      .getResultList ());
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
@@ -341,10 +334,14 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     JPAExecutionResult <Number> ret;
     ret = doInTransaction ( () -> {
       final EntityManager em = getEntityManager ();
+
+      if (true)
+        return (Number) em.createNativeQuery ("SELECT COUNT(DISTINCT pid) FROM smp_bce").getSingleResult ();
+
       final CriteriaBuilder cb = em.getCriteriaBuilder ();
       final CriteriaQuery <Number> c = cb.createQuery (Number.class);
       final Root <DBBusinessCardEntity> aRoot = c.from (DBBusinessCardEntity.class);
-      c.select (cb.countDistinct (cb.and (aRoot.get ("businessIdentifierScheme"), aRoot.get ("businessIdentifier"))));
+      c.select (cb.countDistinct (aRoot.get ("participantId")));
       return em.createQuery (c).getSingleResult ();
     });
     if (ret.hasThrowable ())

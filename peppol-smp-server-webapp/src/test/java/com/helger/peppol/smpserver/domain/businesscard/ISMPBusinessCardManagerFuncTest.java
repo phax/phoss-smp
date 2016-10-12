@@ -51,6 +51,8 @@ public final class ISMPBusinessCardManagerFuncTest
   public void testBusinessCard ()
   {
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+
     final String sUserID = "junitredir";
     try
     {
@@ -88,13 +90,11 @@ public final class ISMPBusinessCardManagerFuncTest
 
       final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
+      ISMPBusinessCard aBusinessCard = null;
       try
       {
-        final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-
         // Create new one
-        ISMPBusinessCard aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG,
-                                                                                         new CommonsArrayList <> (aEntity1));
+        aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG, new CommonsArrayList <> (aEntity1));
         assertSame (aSG, aBusinessCard.getServiceGroup ());
         assertEquals (aPI1.getScheme (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getScheme ());
         assertEquals (aPI1.getValue (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getValue ());
@@ -119,10 +119,10 @@ public final class ISMPBusinessCardManagerFuncTest
 
         // Add second one
         final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
+        ISMPBusinessCard aBusinessCard2 = null;
         try
         {
-          final ISMPBusinessCard aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG2,
-                                                                                                  new CommonsArrayList <> (aEntity3));
+          aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG2, new CommonsArrayList <> (aEntity3));
           assertSame (aSG2, aBusinessCard2.getServiceGroup ());
           assertEquals (1, aBusinessCard2.getEntityCount ());
           assertEquals (2, aBusinessCardMgr.getSMPBusinessCardCount ());
@@ -140,11 +140,13 @@ public final class ISMPBusinessCardManagerFuncTest
         }
         finally
         {
+          aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard2);
           aSGMgr.deleteSMPServiceGroup (aPI2);
         }
       }
       finally
       {
+        aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
         aSGMgr.deleteSMPServiceGroup (aPI1);
       }
     }

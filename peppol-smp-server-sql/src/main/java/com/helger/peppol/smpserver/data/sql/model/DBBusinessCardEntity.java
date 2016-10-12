@@ -56,7 +56,6 @@ import org.eclipse.persistence.annotations.Converter;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.db.jpa.eclipselink.converter.JPALocalDateConverter;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 
 /**
  * DB Business Card Entity representation
@@ -69,8 +68,7 @@ import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 public class DBBusinessCardEntity implements Serializable
 {
   private String m_sID;
-  private String m_sParticipantIdentifierScheme;
-  private String m_sParticipantIdentifier;
+  private String m_sParticipantID;
   private String m_sName;
   private String m_sCountryCode;
   private String m_sGeographicalInformation;
@@ -86,8 +84,7 @@ public class DBBusinessCardEntity implements Serializable
   {}
 
   public DBBusinessCardEntity (final String sID,
-                               final String sParticipantIdentifierScheme,
-                               final String sParticipantIdentifier,
+                               final String sParticipantID,
                                final String sName,
                                final String sCountryCode,
                                final String sGeographicalInformation,
@@ -98,8 +95,7 @@ public class DBBusinessCardEntity implements Serializable
                                final LocalDate aRegistrationDate)
   {
     m_sID = sID;
-    setBusinessIdentifierScheme (sParticipantIdentifierScheme);
-    setBusinessIdentifier (sParticipantIdentifier);
+    setParticipantId (sParticipantID);
     setName (sName);
     setCountryCode (sCountryCode);
     setGeographicalInformation (sGeographicalInformation);
@@ -122,35 +118,22 @@ public class DBBusinessCardEntity implements Serializable
     m_sID = sID;
   }
 
-  @Column (name = "businessIdentifierScheme",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
-  public String getBusinessIdentifierScheme ()
+  @Column (name = "pid", nullable = false, length = 256)
+  public String getParticipantId ()
   {
-    return m_sParticipantIdentifierScheme;
+    return m_sParticipantID;
   }
 
-  public void setBusinessIdentifierScheme (final String sBusinessIdentifierScheme)
+  public void setParticipantId (final String sParticipantID)
   {
-    m_sParticipantIdentifierScheme = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
-  }
-
-  @Column (name = "businessIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_PARTICIPANT_VALUE_LENGTH)
-  public String getBusinessIdentifier ()
-  {
-    return m_sParticipantIdentifier;
-  }
-
-  public void setBusinessIdentifier (final String sBusinessIdentifier)
-  {
-    m_sParticipantIdentifier = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifier);
+    m_sParticipantID = DBHelper.getUnifiedParticipantDBValue (sParticipantID);
   }
 
   @Nonnull
   @Transient
   public SimpleParticipantIdentifier getAsBusinessIdentifier ()
   {
-    return new SimpleParticipantIdentifier (m_sParticipantIdentifierScheme, m_sParticipantIdentifier);
+    return SimpleParticipantIdentifier.createFromURIPart (m_sParticipantID);
   }
 
   @Column (name = "name", nullable = false)
