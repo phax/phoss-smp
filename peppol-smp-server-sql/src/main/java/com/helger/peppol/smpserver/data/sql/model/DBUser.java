@@ -67,7 +67,7 @@ public class DBUser implements ISMPUserEditable
 {
   private String m_sUserName;
   private String m_sPassword;
-  private Set <DBOwnership> m_aOwnerships = new CommonsHashSet<> ();
+  private Set <DBOwnership> m_aOwnerships = new CommonsHashSet <> ();
 
   @Deprecated
   @UsedOnlyByJPA
@@ -87,7 +87,7 @@ public class DBUser implements ISMPUserEditable
   }
 
   @Id
-  @Column (name = "username", unique = true, nullable = false, length = 256)
+  @Column (name = "username", nullable = false, length = 256)
   public String getUserName ()
   {
     return m_sUserName;

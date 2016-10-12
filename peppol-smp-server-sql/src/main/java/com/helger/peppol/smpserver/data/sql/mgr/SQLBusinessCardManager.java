@@ -183,12 +183,13 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aEntities, "Entities");
 
-    s_aLogger.info ("createOrUpdateSMPBusinessCard (" +
-                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                    ", " +
-                    aEntities.size () +
-                    " entities" +
-                    ")");
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("createOrUpdateSMPBusinessCard (" +
+                       aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                       ", " +
+                       aEntities.size () +
+                       " entities" +
+                       ")");
 
     JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
@@ -198,7 +199,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                             DBBusinessCardEntity.class)
                               .setParameter ("id", aServiceGroup.getParticpantIdentifier ().getURIEncoded ())
                               .executeUpdate ();
-      s_aLogger.info ("Deleted " + nDeleted + " DBBusinessCardEntity rows");
+
+      if (s_aLogger.isDebugEnabled () && nDeleted > 0)
+        s_aLogger.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
 
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
@@ -219,7 +222,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    s_aLogger.info ("Finished createOrUpdateSMPBusinessCard");
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("Finished createOrUpdateSMPBusinessCard");
 
     return new SMPBusinessCard (aServiceGroup, aEntities);
   }
@@ -230,7 +234,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     if (aSMPBusinessCard == null)
       return EChange.UNCHANGED;
 
-    s_aLogger.info ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
@@ -246,7 +251,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    s_aLogger.info ("Finished deleteSMPBusinessCard. Change=" + ret.get ().isChanged ());
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("Finished deleteSMPBusinessCard. Change=" + ret.get ().isChanged ());
 
     return ret.get ();
   }
