@@ -62,6 +62,7 @@ import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonReader;
+import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
@@ -82,6 +83,10 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
  */
 public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager implements ISMPBusinessCardManager
 {
+  // Create as minimal as possible
+  private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false)
+                                                                         .setWriteNewlineAtEnd (false);
+
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
 
   public SQLBusinessCardManager (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
@@ -203,9 +208,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                                                       aEntity.getName (),
                                                                       aEntity.getCountryCode (),
                                                                       aEntity.getGeographicalInformation (),
-                                                                      getBCIAsJson (aEntity.getIdentifiers ()).getAsJsonString (),
-                                                                      getStringAsJson (aEntity.getWebsiteURIs ()).getAsJsonString (),
-                                                                      getBCCAsJson (aEntity.getContacts ()).getAsJsonString (),
+                                                                      getBCIAsJson (aEntity.getIdentifiers ()).getAsJsonString (JWS),
+                                                                      getStringAsJson (aEntity.getWebsiteURIs ()).getAsJsonString (JWS),
+                                                                      getBCCAsJson (aEntity.getContacts ()).getAsJsonString (JWS),
                                                                       aEntity.getAdditionalInformation (),
                                                                       aEntity.getRegistrationDate ());
         aEM.persist (aDBBCE);
