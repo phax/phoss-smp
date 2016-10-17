@@ -45,7 +45,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
 import com.helger.photon.basic.app.dao.impl.AbstractSimpleDAO;
@@ -57,15 +56,16 @@ import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.MicroDocument;
 
 /**
- * This class manages and persists the SMP settings.
+ * This class manages and persists the SMP settings.<br>
+ * Use <code>SMPMetaManager.getSettingsMgr()</code> to get the singleton
+ * instance.
  *
  * @author Philip Helger
  */
 @ThreadSafe
-@WorkInProgress
 public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSettingsManager
 {
-  private final SMPSettings m_aSMPS = new SMPSettings ();
+  private final SMPSettings m_aSettings = new SMPSettings ();
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList<> ();
 
   public SMPSettingsManager (@Nullable final String sFilename) throws DAOException
@@ -80,7 +80,7 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
   {
     final SettingsMicroDocumentConverter aConverter = new SettingsMicroDocumentConverter (ISettingsFactory.newInstance ());
     final ISettings aSettings = aConverter.convertToNative (aDoc.getDocumentElement ());
-    m_aSMPS.setFromSettings (aSettings);
+    m_aSettings.setFromSettings (aSettings);
     return EChange.UNCHANGED;
   }
 
@@ -90,7 +90,7 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
   {
     final IMicroDocument ret = new MicroDocument ();
     final SettingsMicroDocumentConverter aConverter = new SettingsMicroDocumentConverter (ISettingsFactory.newInstance ());
-    ret.appendChild (aConverter.convertToMicroElement (m_aSMPS.getAsSettings (), null, "root"));
+    ret.appendChild (aConverter.convertToMicroElement (m_aSettings.getAsSettings (), null, "root"));
     return ret;
   }
 
@@ -104,7 +104,7 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
   @Nonnull
   public ISMPSettings getSettings ()
   {
-    return m_aSMPS;
+    return m_aSettings;
   }
 
   @Nonnull
@@ -119,12 +119,12 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
     m_aRWLock.writeLock ().lock ();
     try
     {
-      eChange = eChange.or (m_aSMPS.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
-      eChange = eChange.or (m_aSMPS.setPEPPOLDirectoryIntegrationEnabled (bPEPPOLDirectoryIntegrationEnabled));
-      eChange = eChange.or (m_aSMPS.setPEPPOLDirectoryIntegrationAutoUpdate (bPEPPOLDirectoryIntegrationAutoUpdate));
-      eChange = eChange.or (m_aSMPS.setPEPPOLDirectoryHostName (sPEPPOLDirectoryHostName));
-      eChange = eChange.or (m_aSMPS.setWriteToSML (bWriteToSML));
-      eChange = eChange.or (m_aSMPS.setSMLURL (sSMLURL));
+      eChange = eChange.or (m_aSettings.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
+      eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationEnabled (bPEPPOLDirectoryIntegrationEnabled));
+      eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationAutoUpdate (bPEPPOLDirectoryIntegrationAutoUpdate));
+      eChange = eChange.or (m_aSettings.setPEPPOLDirectoryHostName (sPEPPOLDirectoryHostName));
+      eChange = eChange.or (m_aSettings.setWriteToSML (bWriteToSML));
+      eChange = eChange.or (m_aSettings.setSMLURL (sSMLURL));
       if (eChange.isChanged ())
         markAsChanged ();
     }
@@ -135,7 +135,7 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
 
     // Invoke callbacks
     if (eChange.isChanged ())
-      m_aCallbacks.forEach (x -> x.onSMPSettingsChanged (m_aSMPS));
+      m_aCallbacks.forEach (x -> x.onSMPSettingsChanged (m_aSettings));
 
     return eChange;
   }

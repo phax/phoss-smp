@@ -54,18 +54,44 @@ import com.helger.commons.state.EChange;
  */
 public interface ISMPSettingsManager
 {
+  /**
+   * @return A non-<code>null</code> mutable list of callbacks.
+   */
   @Nonnull
   @ReturnsMutableObject ("by design")
   CallbackList <ISMPSettingsCallback> getCallbacks ();
 
+  /**
+   * @return The contained settings. Never <code>null</code>.
+   */
   @Nonnull
   ISMPSettings getSettings ();
 
+  /**
+   * Update the existing settings
+   *
+   * @param bRESTWritableAPIDisabled
+   *        <code>true</code> to enable writable access by REST services
+   * @param bPEPPOLDirectoryIntegrationEnabled
+   *        <code>true</code> to enable PEPPOL Directory integration
+   * @param bPEPPOLDirectoryIntegrationAutoUpdate
+   *        <code>true</code> to automatically update the PEPPOL Directory if a
+   *        business card changes
+   * @param sPEPPOLDirectoryHostName
+   *        The hostname of the PEPPOL Directory server to use. Must be fully
+   *        qualified including the protocol.
+   * @param bWriteToSML
+   *        <code>true</code> to enable write access to the SML
+   * @param sSMLURL
+   *        The hostname of the SMP to use. Must be fully qualified including
+   *        the protocol.
+   * @return {@link EChange}
+   */
   @Nonnull
-  EChange updateSettings (final boolean bRESTWritableAPIDisabled,
-                          final boolean bPEPPOLDirectoryIntegrationEnabled,
+  EChange updateSettings (boolean bRESTWritableAPIDisabled,
+                          boolean bPEPPOLDirectoryIntegrationEnabled,
                           boolean bPEPPOLDirectoryIntegrationAutoUpdate,
-                          @Nullable final String sPEPPOLDirectoryHostName,
-                          final boolean bWriteToSML,
-                          @Nullable final String sSMLURL);
+                          @Nullable String sPEPPOLDirectoryHostName,
+                          boolean bWriteToSML,
+                          @Nullable String sSMLURL);
 }

@@ -48,6 +48,7 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
+import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.settings.ISettings;
@@ -85,7 +86,7 @@ public class SMPSettings implements ISMPSettings
     return "singleton";
   }
 
-  public void setToConfigurationValues ()
+  public final void setToConfigurationValues ()
   {
     m_aSettings = new SettingsWithDefault (SMPServerConfiguration.getConfigFile ().getSettings ());
   }
@@ -176,5 +177,11 @@ public class SMPSettings implements ISMPSettings
     ValueEnforcer.notNull (aSettings, "settings");
     m_aSettings.clear ();
     m_aSettings.setValues (aSettings);
+  }
+
+  @Override
+  public String toString ()
+  {
+    return new ToStringGenerator (this).append ("Settings", m_aSettings).toString ();
   }
 }

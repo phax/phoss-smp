@@ -44,11 +44,16 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.callback.ICallback;
 
+/**
+ * Interface for an SMP settings callback.
+ * 
+ * @author Philip Helger
+ */
 public interface ISMPSettingsCallback extends ICallback
 {
   /**
    * Invoked after the SMP settings were changed.
-   * 
+   *
    * @param aSettings
    *        The settings object that changed.
    */
