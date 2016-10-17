@@ -73,6 +73,7 @@ import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorSecureCreateBusinessCardContactInput;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorSecureCreateBusinessCardIdentifierInput;
@@ -210,6 +211,17 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+
+    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
+    if (!aSettingsMgr.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
+    {
+      aNodeList.addChild (new BootstrapWarnBox ().addChild ("PEPPOL Directory integration is disabled hence no Business Cards can be created."));
+      aNodeList.addChild (new BootstrapButton ().addChild ("Change settings")
+                                                .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SMP_SETTINGS))
+                                                .setIcon (EDefaultIcon.YES));
+      return EValidity.INVALID;
+    }
+
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
     if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
     {
