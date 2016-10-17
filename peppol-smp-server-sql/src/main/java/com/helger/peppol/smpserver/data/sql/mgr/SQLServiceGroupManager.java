@@ -51,6 +51,8 @@ import org.eclipse.persistence.config.CacheUsage;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsList;
@@ -70,6 +72,7 @@ import com.helger.peppol.smpserver.data.sql.model.DBServiceGroupID;
 import com.helger.peppol.smpserver.data.sql.model.DBUser;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
@@ -77,9 +80,18 @@ import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 
 public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager implements ISMPServiceGroupManager
 {
+  private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList<> ();
+
   public SQLServiceGroupManager ()
   {
     setUseTransactionsForSelect (true);
+  }
+
+  @Nonnull
+  @ReturnsMutableObject ("by design")
+  public CallbackList <ISMPServiceGroupCallback> getServiceGroupCallbacks ()
+  {
+    return m_aCBs;
   }
 
   @Nonnull
@@ -138,7 +150,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("createSMPServiceGroup succeeded");
-    return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
+
+    final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
+    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aServiceGroup));
+    return aServiceGroup;
   }
 
   @Nonnull
@@ -157,6 +172,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aParticipantIdentifier = aIdentifierFactory.parseParticipantIdentifier (sSMPServiceGroupID);
+
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
       // Check if the passed service group ID is already in use
@@ -197,8 +213,13 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    s_aLogger.info ("updateSMPServiceGroup succeeded");
-    return ret.get ();
+    final EChange eChange = ret.get ();
+    s_aLogger.info ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
+
+    if (eChange.isChanged ())
+      m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (sSMPServiceGroupID));
+
+    return eChange;
   }
 
   @Nonnull
@@ -246,9 +267,17 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       throw new RuntimeException (ret.getThrowable ());
     }
 
+    final EChange eChange = ret.get ();
     if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPServiceGroup succeeded. Change=" + ret.get ().isChanged ());
-    return ret.get ();
+      s_aLogger.debug ("deleteSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
+
+    if (eChange.isChanged ())
+    {
+      final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+      m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (sServiceGroupID));
+    }
+
+    return eChange;
   }
 
   @Nonnull

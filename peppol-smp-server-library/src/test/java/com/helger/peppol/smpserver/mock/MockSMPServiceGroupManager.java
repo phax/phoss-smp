@@ -40,10 +40,15 @@
  */
 package com.helger.peppol.smpserver.mock;
 
+import javax.annotation.Nonnull;
+
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 
 /**
@@ -53,6 +58,15 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
  */
 final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
 {
+  private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList<> ();
+
+  @Nonnull
+  @ReturnsMutableObject ("by design")
+  public CallbackList <ISMPServiceGroupCallback> getServiceGroupCallbacks ()
+  {
+    return m_aCBs;
+  }
+
   public EChange updateSMPServiceGroup (final String sSMPServiceGroupID, final String sOwnerID, final String sExtension)
   {
     throw new UnsupportedOperationException ();

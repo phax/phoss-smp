@@ -46,6 +46,8 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -59,6 +61,13 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
  */
 public interface ISMPServiceGroupManager
 {
+  /**
+   * @return A non-<code>null</code> mutable list of callbacks.
+   */
+  @Nonnull
+  @ReturnsMutableObject ("by design")
+  CallbackList <ISMPServiceGroupCallback> getServiceGroupCallbacks ();
+
   /**
    * Create a new service group.
    *

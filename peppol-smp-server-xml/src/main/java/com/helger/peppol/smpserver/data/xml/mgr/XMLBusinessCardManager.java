@@ -22,11 +22,15 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ELockType;
 import com.helger.commons.annotation.IsLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
@@ -46,6 +50,8 @@ import com.helger.photon.basic.audit.AuditHelper;
 public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard>
                                           implements ISMPBusinessCardManager
 {
+  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLBusinessCardManager.class);
+
   public XMLBusinessCardManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPBusinessCard.class, sFilename);
@@ -96,17 +102,25 @@ public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBu
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aEntities, "Entities");
 
+    s_aLogger.info ("createOrUpdateSMPBusinessCard (" +
+                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                    ", " +
+                    CollectionHelper.getSize (aEntities) +
+                    " entities)");
+
     final ISMPBusinessCard aOldBusinessCard = getSMPBusinessCardOfServiceGroup (aServiceGroup);
     final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aServiceGroup, aEntities);
     if (aOldBusinessCard != null)
     {
       // Reuse old ID
       _updateSMPBusinessCard (aNewBusinessCard);
+      s_aLogger.info ("createOrUpdateSMPBusinessCard update successful");
     }
     else
     {
       // Create new ID
       _createSMPBusinessCard (aNewBusinessCard);
+      s_aLogger.info ("createOrUpdateSMPBusinessCard create successful");
     }
     return aNewBusinessCard;
   }
@@ -116,6 +130,8 @@ public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBu
   {
     if (aSMPBusinessCard == null)
       return EChange.UNCHANGED;
+
+    s_aLogger.info ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
     m_aRWLock.writeLock ().lock ();
     try
@@ -135,6 +151,8 @@ public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBu
                                       aSMPBusinessCard.getID (),
                                       aSMPBusinessCard.getServiceGroupID (),
                                       Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    s_aLogger.info ("deleteSMPBusinessCard successful");
+
     return EChange.CHANGED;
   }
 

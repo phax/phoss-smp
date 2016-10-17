@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
@@ -35,6 +37,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
@@ -50,9 +53,18 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceGroupManager.class);
 
+  private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList<> ();
+
   public XMLServiceGroupManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceGroup.class, sFilename);
+  }
+
+  @Nonnull
+  @ReturnsMutableObject ("by design")
+  public CallbackList <ISMPServiceGroupCallback> getServiceGroupCallbacks ()
+  {
+    return m_aCBs;
   }
 
   @Nonnull
@@ -96,6 +108,9 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
                                       aParticipantIdentifier.getURIEncoded (),
                                       sExtension);
     s_aLogger.info ("createSMPServiceGroup succeeded");
+
+    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aSMPServiceGroup));
+
     return aSMPServiceGroup;
   }
 
@@ -136,6 +151,9 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
 
     AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sSMPServiceGroupID, sNewOwnerID, sExtension);
     s_aLogger.info ("updateSMPServiceGroup succeeded");
+
+    m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (sSMPServiceGroupID));
+
     return EChange.CHANGED;
   }
 
@@ -211,6 +229,9 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID ());
     s_aLogger.info ("deleteSMPServiceGroup succeeded");
+
+    m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (sServiceGroupID));
+
     return EChange.CHANGED;
   }
 

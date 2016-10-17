@@ -58,8 +58,10 @@ import com.helger.peppol.identifier.factory.SimpleIdentifierFactory;
 import com.helger.peppol.smpserver.ESMPIdentifierType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.backend.SMPBackendRegistry;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
@@ -133,6 +135,23 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   @UsedViaReflection
   public SMPMetaManager ()
   {}
+
+  private void _initCallbacks ()
+  {
+    if (m_aBusinessCardMgr != null)
+    {
+      // If service group is deleted, also delete respective business card
+      m_aServiceGroupMgr.getServiceGroupCallbacks ().addCallback (new ISMPServiceGroupCallback ()
+      {
+        public void onSMPServiceGroupDeleted (@Nonnull final String sServiceGroupID)
+        {
+          final ISMPBusinessCard aBusinessCard = m_aBusinessCardMgr.getSMPBusinessCardOfID (sServiceGroupID);
+          if (aBusinessCard != null)
+            m_aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
+        }
+      });
+    }
+  }
 
   @Override
   protected void onAfterInstantiation (@Nonnull final IScope aScope)
@@ -211,6 +230,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
       // May be null!
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aServiceGroupMgr);
+
+      _initCallbacks ();
 
       s_aLogger.info (ClassHelper.getClassLocalName (this) + " was initialized");
     }
