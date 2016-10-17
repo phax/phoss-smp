@@ -341,7 +341,6 @@ public final class ServiceMetadataInterfaceTest
     {
       // DELETE ServiceGroup
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
-      // May be 500 if no MySQL is running
       _testResponse (aResponseMsg, 200, 404);
 
       _testResponse (aTarget.path (sPI_LC).request ().get (), 404);

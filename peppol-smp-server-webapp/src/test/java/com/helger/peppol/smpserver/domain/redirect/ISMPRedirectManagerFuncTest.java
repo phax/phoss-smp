@@ -80,36 +80,36 @@ public final class ISMPRedirectManagerFuncTest
                                                                          aDocTypeID,
                                                                          "target",
                                                                          "suid",
-                                                                         "extredirect");
+                                                                         "<extredirect />");
         assertSame (aSG, aRedirect.getServiceGroup ());
         assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID,
                                                                       aRedirect.getDocumentTypeIdentifier ()));
         assertEquals ("target", aRedirect.getTargetHref ());
         assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
-        assertEquals ("extredirect", aRedirect.getExtensionAsString ());
+        assertEquals ("<extredirect />", aRedirect.getFirstExtensionXML ().trim ());
         final int nCount = aRedirectMgr.getSMPRedirectCount ();
 
         // Update existing
-        aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target2", "suid2", "extredirect2");
+        aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target2", "suid2", "<extredirect2 />");
         assertSame (aSG, aRedirect.getServiceGroup ());
         assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID,
                                                                       aRedirect.getDocumentTypeIdentifier ()));
         assertEquals ("target2", aRedirect.getTargetHref ());
         assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
-        assertEquals ("extredirect2", aRedirect.getExtensionAsString ());
+        assertEquals ("<extredirect2 />", aRedirect.getFirstExtensionXML ().trim ());
         assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
 
         // Add second one
         final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
         try
         {
-          aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", "extredirect2");
+          aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", "<extredirect2 />");
           assertSame (aSG2, aRedirect.getServiceGroup ());
           assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID,
                                                                         aRedirect.getDocumentTypeIdentifier ()));
           assertEquals ("target2", aRedirect.getTargetHref ());
           assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
-          assertEquals ("extredirect2", aRedirect.getExtensionAsString ());
+          assertEquals ("<extredirect2 />", aRedirect.getFirstExtensionXML ().trim ());
           assertEquals (nCount + 1, aRedirectMgr.getSMPRedirectCount ());
 
           // Cleanup

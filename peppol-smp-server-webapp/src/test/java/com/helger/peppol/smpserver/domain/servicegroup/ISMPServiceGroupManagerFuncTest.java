@@ -58,7 +58,7 @@ public final class ISMPServiceGroupManagerFuncTest
     final String sSG2 = SMPServiceGroup.createSMPServiceGroupID (aPI2);
     final String sOwner1ID = "junitsg1";
     final String sOwner2ID = "junitsg2";
-    final String sExtension = "<ext val='a' />";
+    final String sExtension = "<ext val=\"a\" />";
 
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     try
@@ -73,11 +73,10 @@ public final class ISMPServiceGroupManagerFuncTest
     }
 
     aUserMgr.createUser (sOwner2ID, "any");
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+    assertNotNull (aSGMgr);
     try
     {
-      final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-      assertNotNull (aSGMgr);
-
       // Check empty state
       final int nCount = aSGMgr.getSMPServiceGroupCount ();
       assertEquals (nCount, aSGMgr.getAllSMPServiceGroups ().size ());
@@ -100,7 +99,7 @@ public final class ISMPServiceGroupManagerFuncTest
       assertEquals (aPI1, aSG1.getParticpantIdentifier ());
       assertEquals (sSG1, aSG1.getID ());
       assertEquals (sOwner1ID, aSG1.getOwnerID ());
-      assertEquals (sExtension, aSG1.getExtensionAsString ());
+      assertEquals (sExtension, aSG1.getFirstExtensionXML ().trim ());
 
       // Check manager state
       assertEquals (nCount + 1, aSGMgr.getSMPServiceGroupCount ());
@@ -130,7 +129,7 @@ public final class ISMPServiceGroupManagerFuncTest
       assertEquals (aPI2, aSG2.getParticpantIdentifier ());
       assertEquals (sSG2, aSG2.getID ());
       assertEquals (sOwner2ID, aSG2.getOwnerID ());
-      assertEquals (sExtension, aSG2.getExtensionAsString ());
+      assertEquals (sExtension, aSG2.getFirstExtensionXML ().trim ());
 
       // Check manager state
       assertEquals (nCount + 2, aSGMgr.getSMPServiceGroupCount ());
@@ -184,6 +183,8 @@ public final class ISMPServiceGroupManagerFuncTest
     }
     finally
     {
+      aSGMgr.deleteSMPServiceGroup (aPI1);
+      aSGMgr.deleteSMPServiceGroup (aPI2);
       aUserMgr.deleteUser (sOwner1ID);
       aUserMgr.deleteUser (sOwner2ID);
     }
