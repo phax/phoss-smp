@@ -41,7 +41,7 @@
 package com.helger.peppol.smpserver.domain.servicegroup;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
@@ -71,10 +71,33 @@ public final class SMPServiceGroupTest
     final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
                                                      .createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                                    "0088:dummy");
-    final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
+    final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, "<foobar />");
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticpantIdentifier ());
-    assertNull (aSG.getExtension ());
+    assertEquals ("<foobar />", aSG.getExtension ());
+
+    final com.helger.peppol.smp.ServiceGroupType aSGPeppol = aSG.getAsJAXBObjectPeppol ();
+    assertNotNull (aSGPeppol.getExtension ());
+  }
+
+  @Test
+  public void testBDXRExtension ()
+  {
+    final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
+                                                     .createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                   "0088:dummy");
+
+    // Must be an array!
+    final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID,
+                                                     aPI,
+                                                     "[{\"Any\":\"<foobar />\"},{\"Any\":\"<bla />\"}]");
+    assertTrue (StringHelper.hasText (aSG.getID ()));
+    assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
+    assertEquals (aPI, aSG.getParticpantIdentifier ());
+    assertNotNull (aSG.getExtension ());
+
+    final com.helger.peppol.bdxr.ServiceGroupType aSGBDXR = aSG.getAsJAXBObjectBDXR ();
+    assertEquals (2, aSGBDXR.getExtension ().size ());
   }
 }
