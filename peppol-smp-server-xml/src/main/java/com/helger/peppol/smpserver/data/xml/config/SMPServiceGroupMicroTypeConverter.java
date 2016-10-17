@@ -55,7 +55,7 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
                                                                     sNamespaceURI,
                                                                     ELEMENT_PARTICIPANT_ID));
     if (aValue.hasExtension ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtension ());
+      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionAsString ());
     return aElement;
   }
 

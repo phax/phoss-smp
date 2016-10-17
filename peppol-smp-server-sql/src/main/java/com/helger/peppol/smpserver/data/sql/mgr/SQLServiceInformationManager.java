@@ -128,7 +128,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                 aDBEndpoint.setServiceDescription (aEndpoint.getServiceDescription ());
                 aDBEndpoint.setTechnicalContactUrl (aEndpoint.getTechnicalContactUrl ());
                 aDBEndpoint.setTechnicalInformationUrl (aEndpoint.getTechnicalInformationUrl ());
-                aDBEndpoint.setExtension (aEndpoint.getExtension ());
+                aDBEndpoint.setExtension (aEndpoint.getExtensionAsString ());
                 break;
               }
 
@@ -166,14 +166,14 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                              aEndpoint.getServiceDescription (),
                                                              aEndpoint.getTechnicalContactUrl (),
                                                              aEndpoint.getTechnicalInformationUrl (),
-                                                             aEndpoint.getExtension ());
+                                                             aEndpoint.getExtensionAsString ());
               aDBProcess.getEndpoints ().add (aDBEndpoint);
               aEM.persist (aDBEndpoint);
             }
           }
 
           aDBProcess.setServiceMetadata (aDBMetadata);
-          aDBProcess.setExtension (aProcess.getExtension ());
+          aDBProcess.setExtension (aProcess.getExtensionAsString ());
           break;
         }
 
@@ -203,7 +203,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
         final DBProcess aDBProcess = new DBProcess (new DBProcessID (aDBMetadata.getId (),
                                                                      aProcess.getProcessIdentifier ()),
                                                     aDBMetadata,
-                                                    aProcess.getExtension ());
+                                                    aProcess.getExtensionAsString ());
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
           final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (),
@@ -218,7 +218,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                          aEndpoint.getServiceDescription (),
                                                          aEndpoint.getTechnicalContactUrl (),
                                                          aEndpoint.getTechnicalInformationUrl (),
-                                                         aEndpoint.getExtension ());
+                                                         aEndpoint.getExtensionAsString ());
           aDBProcess.getEndpoints ().add (aDBEndpoint);
           aEM.persist (aDBEndpoint);
         }
@@ -227,7 +227,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       }
     }
 
-    aDBMetadata.setExtension (aServiceInfo.getExtension ());
+    aDBMetadata.setExtension (aServiceInfo.getExtensionAsString ());
   }
 
   public void mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aServiceInformation)
@@ -256,7 +256,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
         if (aDBServiceGroup == null)
           throw new IllegalStateException ("Failed to resolve service group for " + aServiceInformation);
 
-        aDBMetadata = new DBServiceMetadata (aDBMetadataID, aDBServiceGroup, aServiceInformation.getExtension ());
+        aDBMetadata = new DBServiceMetadata (aDBMetadataID, aDBServiceGroup, aServiceInformation.getExtensionAsString ());
         _update (aEM, aDBMetadata, aServiceInformation);
         aEM.persist (aDBMetadata);
       }

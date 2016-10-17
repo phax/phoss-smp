@@ -42,18 +42,16 @@ package com.helger.peppol.smpserver.domain.redirect;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.hashcode.HashCodeGenerator;
-import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.smp.SMPExtensionConverter;
+import com.helger.peppol.smpserver.domain.extension.AbstractSMPHasExtension;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -61,7 +59,8 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
  *
  * @author Philip Helger
  */
-public class SMPRedirect implements ISMPRedirect
+@NotThreadSafe
+public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
 {
   public static final ObjectType OT = new ObjectType ("smpredirect");
 
@@ -70,7 +69,6 @@ public class SMPRedirect implements ISMPRedirect
   private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
   private String m_sTargetHref;
   private String m_sSubjectUniqueIdentifier;
-  private String m_sExtension;
 
   public SMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
                       @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
@@ -82,7 +80,7 @@ public class SMPRedirect implements ISMPRedirect
     setDocumentTypeIdentifier (aDocumentTypeIdentifier);
     setTargetHref (sTargetHref);
     setSubjectUniqueIdentifier (sSubjectUniqueIdentifier);
-    setExtension (sExtension);
+    setExtensionAsString (sExtension);
     m_sID = aServiceGroup.getID () + "-" + aDocumentTypeIdentifier.getURIEncoded ();
   }
 
@@ -145,24 +143,13 @@ public class SMPRedirect implements ISMPRedirect
     m_sSubjectUniqueIdentifier = sSubjectUniqueIdentifier;
   }
 
-  @Nullable
-  public String getExtension ()
-  {
-    return m_sExtension;
-  }
-
-  public void setExtension (@Nullable final String sExtension)
-  {
-    m_sExtension = sExtension;
-  }
-
   @Nonnull
   public com.helger.peppol.smp.ServiceMetadataType getAsJAXBObjectPeppol ()
   {
     final com.helger.peppol.smp.RedirectType aRedirect = new com.helger.peppol.smp.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
-    aRedirect.setExtension (SMPExtensionConverter.convertOrNull (m_sExtension));
+    aRedirect.setExtension (getAsPeppolExtension ());
 
     final com.helger.peppol.smp.ServiceMetadataType ret = new com.helger.peppol.smp.ServiceMetadataType ();
     ret.setRedirect (aRedirect);
@@ -175,7 +162,7 @@ public class SMPRedirect implements ISMPRedirect
     final com.helger.peppol.bdxr.RedirectType aRedirect = new com.helger.peppol.bdxr.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
-    aRedirect.setExtension (new CommonsArrayList <> (BDXRExtensionConverter.convertOrNull (m_sExtension)));
+    aRedirect.setExtension (getAsBDXRExtension ());
 
     final com.helger.peppol.bdxr.ServiceMetadataType ret = new com.helger.peppol.bdxr.ServiceMetadataType ();
     ret.setRedirect (aRedirect);
@@ -203,12 +190,12 @@ public class SMPRedirect implements ISMPRedirect
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("ID", m_sID)
-                                       .append ("ServiceGroup", m_aServiceGroup)
-                                       .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
-                                       .append ("TargetHref", m_sTargetHref)
-                                       .append ("SubjectUniqueIdentifier", m_sSubjectUniqueIdentifier)
-                                       .appendIf ("Extension", m_sExtension, StringHelper::hasText)
-                                       .toString ();
+    return ToStringGenerator.getDerived (super.toString ())
+                            .append ("ID", m_sID)
+                            .append ("ServiceGroup", m_aServiceGroup)
+                            .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
+                            .append ("TargetHref", m_sTargetHref)
+                            .append ("SubjectUniqueIdentifier", m_sSubjectUniqueIdentifier)
+                            .toString ();
   }
 }

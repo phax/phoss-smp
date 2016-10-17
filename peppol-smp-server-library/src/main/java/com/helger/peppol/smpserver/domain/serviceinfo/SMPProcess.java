@@ -59,7 +59,6 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.identifier.bdxr.process.BDXRProcessIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
@@ -67,6 +66,7 @@ import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
+import com.helger.peppol.smpserver.domain.extension.AbstractSMPHasExtension;
 
 /**
  * Default implementation of the {@link ISMPProcess} interface.
@@ -74,11 +74,10 @@ import com.helger.peppol.smp.SMPExtensionConverter;
  * @author Philip Helger
  */
 @NotThreadSafe
-public class SMPProcess implements ISMPProcess
+public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
 {
   private IProcessIdentifier m_aProcessIdentifier;
-  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap <> ();
-  private String m_sExtension;
+  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap<> ();
 
   public SMPProcess (@Nonnull final IProcessIdentifier aProcessIdentifier,
                      @Nullable final List <SMPEndpoint> aEndpoints,
@@ -88,7 +87,7 @@ public class SMPProcess implements ISMPProcess
     if (aEndpoints != null)
       for (final SMPEndpoint aEndpoint : aEndpoints)
         addEndpoint (aEndpoint);
-    setExtension (sExtension);
+    setExtensionAsString (sExtension);
   }
 
   @Nonnull
@@ -157,17 +156,6 @@ public class SMPProcess implements ISMPProcess
     return EChange.valueOf (m_aEndpoints.remove (sTransportProfile) != null);
   }
 
-  @Nullable
-  public String getExtension ()
-  {
-    return m_sExtension;
-  }
-
-  public void setExtension (@Nullable final String sExtension)
-  {
-    m_sExtension = sExtension;
-  }
-
   @Nonnull
   public com.helger.peppol.smp.ProcessType getAsJAXBObjectPeppol ()
   {
@@ -177,7 +165,7 @@ public class SMPProcess implements ISMPProcess
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
       aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectPeppol ());
     ret.setServiceEndpointList (aEndpointList);
-    ret.setExtension (SMPExtensionConverter.convertOrNull (m_sExtension));
+    ret.setExtension (getAsPeppolExtension ());
     return ret;
   }
 
@@ -190,7 +178,7 @@ public class SMPProcess implements ISMPProcess
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
       aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectBDXR ());
     ret.setServiceEndpointList (aEndpointList);
-    ret.setExtension (BDXRExtensionConverter.convertOrNull (m_sExtension));
+    ret.setExtension (getAsBDXRExtension ());
     return ret;
   }
 
@@ -199,37 +187,36 @@ public class SMPProcess implements ISMPProcess
   {
     if (o == this)
       return true;
-    if (o == null || !getClass ().equals (o.getClass ()))
+    if (!super.equals (o))
       return false;
 
     final SMPProcess rhs = (SMPProcess) o;
     return EqualsHelper.equals (m_aProcessIdentifier, rhs.m_aProcessIdentifier) &&
-           EqualsHelper.equals (m_aEndpoints, rhs.m_aEndpoints) &&
-           EqualsHelper.equals (m_sExtension, rhs.m_sExtension);
+           EqualsHelper.equals (m_aEndpoints, rhs.m_aEndpoints);
   }
 
   @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_aProcessIdentifier)
-                                       .append (m_aEndpoints)
-                                       .append (m_sExtension)
-                                       .getHashCode ();
+    return HashCodeGenerator.getDerived (super.hashCode ())
+                            .append (m_aProcessIdentifier)
+                            .append (m_aEndpoints)
+                            .getHashCode ();
   }
 
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("ProcessIdentifier", m_aProcessIdentifier)
-                                       .append ("Endpoints", m_aEndpoints)
-                                       .append ("extension", m_sExtension)
-                                       .toString ();
+    return ToStringGenerator.getDerived (super.toString ())
+                            .append ("ProcessIdentifier", m_aProcessIdentifier)
+                            .append ("Endpoints", m_aEndpoints)
+                            .toString ();
   }
 
   @Nonnull
   public static SMPProcess createFromJAXB (@Nonnull final ProcessType aProcess)
   {
-    final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
+    final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
     for (final EndpointType aEndpoint : aProcess.getServiceEndpointList ().getEndpoint ())
       aEndpoints.add (SMPEndpoint.createFromJAXB (aEndpoint));
     return new SMPProcess (aProcess.getProcessIdentifier (),

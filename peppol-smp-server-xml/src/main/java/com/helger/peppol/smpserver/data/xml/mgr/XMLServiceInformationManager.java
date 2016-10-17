@@ -109,7 +109,7 @@ public final class XMLServiceInformationManager extends
                                         aOldInformation.getServiceGroupID (),
                                         aOldInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aOldInformation.getAllProcesses (),
-                                        aOldInformation.getExtension ());
+                                        aOldInformation.getExtensionAsString ());
     }
     else
     {
@@ -149,7 +149,7 @@ public final class XMLServiceInformationManager extends
                                         aSMPServiceInformation.getServiceGroupID (),
                                         aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aSMPServiceInformation.getAllProcesses (),
-                                        aSMPServiceInformation.getExtension ());
+                                        aSMPServiceInformation.getExtensionAsString ());
     }
   }
 

@@ -271,7 +271,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                  .setCtrl (AppCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
     if (aSelectedObject.hasExtension ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (new HCPrismJS (EPrismLanguage.MARKUP).addChild (aSelectedObject.getExtension ())));
+                                                   .setCtrl (new HCPrismJS (EPrismLanguage.MARKUP).addChild (aSelectedObject.getExtensionAsString ())));
 
     aNodeList.addChild (aForm);
   }
@@ -330,7 +330,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                  .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_EXTENSION,
-                                                                                                     aSelectedObject != null ? aSelectedObject.getExtension ()
+                                                                                                     aSelectedObject != null ? aSelectedObject.getExtensionAsString ()
                                                                                                                              : null)))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));

@@ -124,7 +124,7 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
     {
       EChange eChange = EChange.UNCHANGED;
       eChange = eChange.or (aSMPServiceGroup.setOwnerID (sNewOwnerID));
-      eChange = eChange.or (aSMPServiceGroup.setExtension (sExtension));
+      eChange = eChange.or (aSMPServiceGroup.setExtensionAsString (sExtension));
       if (eChange.isUnchanged ())
         return EChange.UNCHANGED;
       internalUpdateItem (aSMPServiceGroup);
@@ -193,7 +193,7 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
                                                   aOldRedirect.getDocumentTypeIdentifier (),
                                                   aOldRedirect.getTargetHref (),
                                                   aOldRedirect.getSubjectUniqueIdentifier (),
-                                                  aOldRedirect.getExtension ());
+                                                  aOldRedirect.getExtensionAsString ());
 
       // Restore service information (if any)
       if (CollectionHelper.isNotEmpty (aOldServiceInformation))

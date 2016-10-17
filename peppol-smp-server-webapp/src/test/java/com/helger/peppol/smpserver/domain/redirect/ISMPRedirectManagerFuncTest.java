@@ -86,7 +86,7 @@ public final class ISMPRedirectManagerFuncTest
                                                                       aRedirect.getDocumentTypeIdentifier ()));
         assertEquals ("target", aRedirect.getTargetHref ());
         assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
-        assertEquals ("extredirect", aRedirect.getExtension ());
+        assertEquals ("extredirect", aRedirect.getExtensionAsString ());
         final int nCount = aRedirectMgr.getSMPRedirectCount ();
 
         // Update existing
@@ -96,7 +96,7 @@ public final class ISMPRedirectManagerFuncTest
                                                                       aRedirect.getDocumentTypeIdentifier ()));
         assertEquals ("target2", aRedirect.getTargetHref ());
         assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
-        assertEquals ("extredirect2", aRedirect.getExtension ());
+        assertEquals ("extredirect2", aRedirect.getExtensionAsString ());
         assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
 
         // Add second one
@@ -109,7 +109,7 @@ public final class ISMPRedirectManagerFuncTest
                                                                         aRedirect.getDocumentTypeIdentifier ()));
           assertEquals ("target2", aRedirect.getTargetHref ());
           assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
-          assertEquals ("extredirect2", aRedirect.getExtension ());
+          assertEquals ("extredirect2", aRedirect.getExtensionAsString ());
           assertEquals (nCount + 1, aRedirectMgr.getSMPRedirectCount ());
 
           // Cleanup

@@ -94,7 +94,7 @@ public final class SMPServiceInformationTest
                                              "sd",
                                              "tc",
                                              "ti",
-                                             "extep");
+                                             "<extep/>");
     assertEquals ("tp", aEP.getTransportProfile ());
     assertEquals ("http://localhost/as2", aEP.getEndpointReference ());
     assertFalse (aEP.isRequireBusinessLevelSignature ());
@@ -105,25 +105,25 @@ public final class SMPServiceInformationTest
     assertEquals ("sd", aEP.getServiceDescription ());
     assertEquals ("tc", aEP.getTechnicalContactUrl ());
     assertEquals ("ti", aEP.getTechnicalInformationUrl ());
-    assertEquals ("extep", aEP.getExtension ());
+    assertEquals ("[{\"Any\":\"<extep />\"}]", aEP.getExtensionAsString ());
 
     final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                        "testproc");
-    final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
+    final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "<extproc/>");
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
-    assertEquals ("extproc", aProcess.getExtension ());
+    assertEquals ("[{\"Any\":\"<extproc />\"}]", aProcess.getExtensionAsString ());
 
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
                                                                                  "testdoctype");
     final SMPServiceInformation aSI = new SMPServiceInformation (aSG,
                                                                  aDocTypeID,
                                                                  CollectionHelper.newList (aProcess),
-                                                                 "extsi");
+                                                                 "<extsi/>");
     assertSame (aSG, aSI.getServiceGroup ());
     assertEquals (aDocTypeID, aSI.getDocumentTypeIdentifier ());
     assertEquals (1, aSI.getAllProcesses ().size ());
-    assertEquals ("extsi", aSI.getExtension ());
+    assertEquals ("[{\"Any\":\"<extsi />\"}]", aSI.getExtensionAsString ());
   }
 
   @Test
@@ -154,14 +154,14 @@ public final class SMPServiceInformationTest
     assertEquals ("sd", aEP.getServiceDescription ());
     assertEquals ("tc", aEP.getTechnicalContactUrl ());
     assertNull (aEP.getTechnicalInformationUrl ());
-    assertNull (aEP.getExtension ());
+    assertNull (aEP.getExtensionAsString ());
 
     final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                        "testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), (String) null);
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
-    assertNull (aProcess.getExtension ());
+    assertNull (aProcess.getExtensionAsString ());
 
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
                                                                                  "testdoctype");
@@ -172,6 +172,6 @@ public final class SMPServiceInformationTest
     assertSame (aSG, aSI.getServiceGroup ());
     assertEquals (aDocTypeID, aSI.getDocumentTypeIdentifier ());
     assertEquals (1, aSI.getAllProcesses ().size ());
-    assertNull (aSI.getExtension ());
+    assertNull (aSI.getExtensionAsString ());
   }
 }

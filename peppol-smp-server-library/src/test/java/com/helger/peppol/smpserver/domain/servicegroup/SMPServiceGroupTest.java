@@ -83,7 +83,7 @@ public final class SMPServiceGroupTest
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticpantIdentifier ());
-    assertEquals ("<foobar />", aSG.getExtension ());
+    assertEquals ("[{\"Any\":\"<foobar />\"}]", aSG.getExtensionAsString ());
 
     final com.helger.peppol.smp.ServiceGroupType aSGPeppol = aSG.getAsJAXBObjectPeppol ();
     assertNotNull (aSGPeppol.getExtension ());
@@ -113,7 +113,7 @@ public final class SMPServiceGroupTest
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticpantIdentifier ());
-    assertNotNull (aSG.getExtension ());
+    assertNotNull (aSG.getExtensionAsString ());
 
     final com.helger.peppol.bdxr.ServiceGroupType aSGBDXR = aSG.getAsJAXBObjectBDXR ();
     assertEquals (2, aSGBDXR.getExtension ().size ());

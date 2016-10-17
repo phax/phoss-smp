@@ -50,11 +50,9 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
-import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.SMPExtensionConverter;
+import com.helger.peppol.smpserver.domain.extension.AbstractSMPHasExtension;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.security.certificate.CertificateHelper;
 
@@ -64,7 +62,7 @@ import com.helger.security.certificate.CertificateHelper;
  * @author Philip Helger
  */
 @NotThreadSafe
-public class SMPEndpoint implements ISMPEndpoint
+public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
 {
   private String m_sTransportProfile;
   private String m_sEndpointReference;
@@ -76,7 +74,6 @@ public class SMPEndpoint implements ISMPEndpoint
   private String m_sServiceDescription;
   private String m_sTechnicalContactUrl;
   private String m_sTechnicalInformationUrl;
-  private String m_sExtension;
 
   public SMPEndpoint (@Nonnull @Nonempty final String sTransportProfile,
                       @Nullable final String sEndpointReference,
@@ -100,7 +97,7 @@ public class SMPEndpoint implements ISMPEndpoint
     setServiceDescription (sServiceDescription);
     setTechnicalContactUrl (sTechnicalContactUrl);
     setTechnicalInformationUrl (sTechnicalInformationUrl);
-    setExtension (sExtension);
+    setExtensionAsString (sExtension);
   }
 
   @Nonnull
@@ -221,49 +218,10 @@ public class SMPEndpoint implements ISMPEndpoint
   }
 
   @Nullable
-  public String getExtension ()
-  {
-    return m_sExtension;
-  }
-
-  public void setExtension (@Nullable final String sExtension)
-  {
-    m_sExtension = sExtension;
-  }
-
-  // XXX replace with CertificateHelper version in peppol-commons >= 4.3.4
-  @Nullable
+  @Deprecated
   public static String getRFC1421CompliantString (@Nullable final String sCertificate, final boolean bIncludePEMHeader)
   {
-    // Remove special begin and end stuff
-    String sPlainString = CertificateHelper.getWithoutPEMHeader (sCertificate);
-    if (StringHelper.hasNoText (sPlainString))
-      return null;
-
-    // Start building the result
-    final int nMaxLineLength = 64;
-    final String sCRLF = "\r\n";
-    // Start with the prefix
-    final StringBuilder aSB = new StringBuilder ();
-    if (bIncludePEMHeader)
-      aSB.append (CertificateHelper.BEGIN_CERTIFICATE).append ('\n');
-    while (sPlainString.length () > nMaxLineLength)
-    {
-      // Append line + CRLF
-      aSB.append (sPlainString, 0, nMaxLineLength).append (sCRLF);
-
-      // Remove the start of the string
-      sPlainString = sPlainString.substring (nMaxLineLength);
-    }
-
-    // Append the rest
-    aSB.append (sPlainString);
-
-    // Add trailer
-    if (bIncludePEMHeader)
-      aSB.append ('\n').append (CertificateHelper.END_CERTIFICATE);
-
-    return aSB.toString ();
+    return CertificateHelper.getRFC1421CompliantString (sCertificate, bIncludePEMHeader);
   }
 
   @Nonnull
@@ -276,11 +234,11 @@ public class SMPEndpoint implements ISMPEndpoint
     ret.setServiceActivationDate (m_aServiceActivationDT);
     ret.setServiceExpirationDate (m_aServiceExpirationDT);
     // For compatibility, don't add BEGIN_CERTIFCATE and END_CERTIFICATE
-    ret.setCertificate (getRFC1421CompliantString (m_sCertificate, false));
+    ret.setCertificate (CertificateHelper.getRFC1421CompliantString (m_sCertificate, false));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
-    ret.setExtension (SMPExtensionConverter.convertOrNull (m_sExtension));
+    ret.setExtension (getAsPeppolExtension ());
     ret.setTransportProfile (m_sTransportProfile);
     return ret;
   }
@@ -298,7 +256,7 @@ public class SMPEndpoint implements ISMPEndpoint
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
-    ret.setExtension (BDXRExtensionConverter.convertOrNull (m_sExtension));
+    ret.setExtension (getAsBDXRExtension ());
     ret.setTransportProfile (m_sTransportProfile);
     return ret;
   }
@@ -308,7 +266,7 @@ public class SMPEndpoint implements ISMPEndpoint
   {
     if (o == this)
       return true;
-    if (o == null || !getClass ().equals (o.getClass ()))
+    if (!super.equals (o))
       return false;
 
     final SMPEndpoint rhs = ((SMPEndpoint) o);
@@ -321,46 +279,45 @@ public class SMPEndpoint implements ISMPEndpoint
            EqualsHelper.equals (m_sCertificate, rhs.m_sCertificate) &&
            EqualsHelper.equals (m_sServiceDescription, rhs.m_sServiceDescription) &&
            EqualsHelper.equals (m_sTechnicalContactUrl, rhs.m_sTechnicalContactUrl) &&
-           EqualsHelper.equals (m_sTechnicalInformationUrl, rhs.m_sTechnicalInformationUrl) &&
-           EqualsHelper.equals (m_sExtension, rhs.m_sExtension);
+           EqualsHelper.equals (m_sTechnicalInformationUrl, rhs.m_sTechnicalInformationUrl);
   }
 
   @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_sTransportProfile)
-                                       .append (m_sEndpointReference)
-                                       .append (m_bRequireBusinessLevelSignature)
-                                       .append (m_sMinimumAuthenticationLevel)
-                                       .append (m_aServiceActivationDT)
-                                       .append (m_aServiceExpirationDT)
-                                       .append (m_sCertificate)
-                                       .append (m_sServiceDescription)
-                                       .append (m_sTechnicalContactUrl)
-                                       .append (m_sTechnicalInformationUrl)
-                                       .append (m_sExtension)
-                                       .getHashCode ();
+    return HashCodeGenerator.getDerived (super.hashCode ())
+                            .append (m_sTransportProfile)
+                            .append (m_sEndpointReference)
+                            .append (m_bRequireBusinessLevelSignature)
+                            .append (m_sMinimumAuthenticationLevel)
+                            .append (m_aServiceActivationDT)
+                            .append (m_aServiceExpirationDT)
+                            .append (m_sCertificate)
+                            .append (m_sServiceDescription)
+                            .append (m_sTechnicalContactUrl)
+                            .append (m_sTechnicalInformationUrl)
+                            .getHashCode ();
   }
 
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("transportProfile", m_sTransportProfile)
-                                       .append ("endpointReference", m_sEndpointReference)
-                                       .append ("requireBusinessLevelSignature", m_bRequireBusinessLevelSignature)
-                                       .append ("minimumAuthenticationLevel", m_sMinimumAuthenticationLevel)
-                                       .append ("serviceActivationDate", m_aServiceActivationDT)
-                                       .append ("serviceExpirationDate", m_aServiceExpirationDT)
-                                       .append ("certificate", m_sCertificate)
-                                       .append ("serviceDescription", m_sServiceDescription)
-                                       .append ("technicalContactUrl", m_sTechnicalContactUrl)
-                                       .append ("technicalInformationUrl", m_sTechnicalInformationUrl)
-                                       .append ("extension", m_sExtension)
-                                       .toString ();
+    return ToStringGenerator.getDerived (super.toString ())
+                            .append ("transportProfile", m_sTransportProfile)
+                            .append ("endpointReference", m_sEndpointReference)
+                            .append ("requireBusinessLevelSignature", m_bRequireBusinessLevelSignature)
+                            .append ("minimumAuthenticationLevel", m_sMinimumAuthenticationLevel)
+                            .append ("serviceActivationDate", m_aServiceActivationDT)
+                            .append ("serviceExpirationDate", m_aServiceExpirationDT)
+                            .append ("certificate", m_sCertificate)
+                            .append ("serviceDescription", m_sServiceDescription)
+                            .append ("technicalContactUrl", m_sTechnicalContactUrl)
+                            .append ("technicalInformationUrl", m_sTechnicalInformationUrl)
+                            .toString ();
   }
 
   @Nonnull
-  public static SMPEndpoint createFromJAXB (@Nonnull final EndpointType aEndpoint)
+  public static SMPEndpoint createFromJAXB (@Nonnull final com.helger.peppol.smp.EndpointType aEndpoint)
   {
     return new SMPEndpoint (aEndpoint.getTransportProfile (),
                             W3CEndpointReferenceHelper.getAddress (aEndpoint.getEndpointReference ()),

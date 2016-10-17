@@ -48,19 +48,16 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
-import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.identifier.bdxr.participant.BDXRParticipantIdentifier;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.domain.extension.AbstractSMPHasExtension;
 
 /**
  * This class represents a single service group.
@@ -68,13 +65,12 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
  * @author Philip Helger
  */
 @NotThreadSafe
-public class SMPServiceGroup implements ISMPServiceGroup
+public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServiceGroup
 {
   public static final ObjectType OT = new ObjectType ("smpservicegroup");
 
   private final String m_sID;
   private String m_sOwnerID;
-  private String m_sExtension;
 
   // Status member
   private final IParticipantIdentifier m_aParticipantIdentifier;
@@ -120,7 +116,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
   {
     m_sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
     setOwnerID (sOwnerID);
-    setExtension (sExtension);
+    setExtensionAsString (sExtension);
     // Make a copy to avoid unwanted changes
     m_aParticipantIdentifier = createUnifiedParticipantIdentifier (aParticipantIdentifier);
   }
@@ -149,20 +145,6 @@ public class SMPServiceGroup implements ISMPServiceGroup
     return EChange.CHANGED;
   }
 
-  public String getExtension ()
-  {
-    return m_sExtension;
-  }
-
-  @Nonnull
-  public EChange setExtension (@Nullable final String sExtension)
-  {
-    if (EqualsHelper.equals (sExtension, m_sExtension))
-      return EChange.UNCHANGED;
-    m_sExtension = sExtension;
-    return EChange.CHANGED;
-  }
-
   @Nonnull
   public IParticipantIdentifier getParticpantIdentifier ()
   {
@@ -179,7 +161,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
       // This is set by the REST server
       ret.setServiceMetadataReferenceCollection (null);
     }
-    ret.setExtension (SMPExtensionConverter.convertOrNull (m_sExtension));
+    ret.setExtension (getAsPeppolExtension ());
     return ret;
   }
 
@@ -193,7 +175,7 @@ public class SMPServiceGroup implements ISMPServiceGroup
       // This is set by the REST server
       ret.setServiceMetadataReferenceCollection (null);
     }
-    ret.setExtension (BDXRExtensionConverter.convertOrNull (m_sExtension));
+    ret.setExtension (getAsBDXRExtension ());
     return ret;
   }
 
@@ -217,11 +199,11 @@ public class SMPServiceGroup implements ISMPServiceGroup
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("ID", m_sID)
-                                       .append ("OwnerID", m_sOwnerID)
-                                       .appendIf ("Extension", m_sExtension, StringHelper::hasText)
-                                       .append ("ParticipantIdentifier", m_aParticipantIdentifier)
-                                       .toString ();
+    return ToStringGenerator.getDerived (super.toString ())
+                            .append ("ID", m_sID)
+                            .append ("OwnerID", m_sOwnerID)
+                            .append ("ParticipantIdentifier", m_aParticipantIdentifier)
+                            .toString ();
   }
 
   @Nonnull

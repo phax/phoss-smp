@@ -64,7 +64,7 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
     for (final ISMPProcess aProcess : aValue.getAllProcesses ())
       aElement.appendChild (MicroTypeConverter.convertToMicroElement (aProcess, sNamespaceURI, ELEMENT_PROCESS));
     if (aValue.hasExtension ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtension ());
+      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionAsString ());
     return aElement;
   }
 

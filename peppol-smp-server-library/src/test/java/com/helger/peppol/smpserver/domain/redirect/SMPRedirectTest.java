@@ -77,11 +77,11 @@ public final class SMPRedirectTest
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     // Create new one
-    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", "extredirect");
+    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", "<extredirect/>");
     assertSame (aSG, aRedirect.getServiceGroup ());
     assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
     assertEquals ("target", aRedirect.getTargetHref ());
     assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
-    assertEquals ("extredirect", aRedirect.getExtension ());
+    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionAsString ());
   }
 }

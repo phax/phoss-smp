@@ -65,7 +65,7 @@ public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedire
                                       aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
-                                      aSMPRedirect.getExtension ());
+                                      aSMPRedirect.getExtensionAsString ());
     return aSMPRedirect;
   }
 
@@ -82,7 +82,7 @@ public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedire
                                       aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
-                                      aSMPRedirect.getExtension ());
+                                      aSMPRedirect.getExtensionAsString ());
     return aSMPRedirect;
   }
 
