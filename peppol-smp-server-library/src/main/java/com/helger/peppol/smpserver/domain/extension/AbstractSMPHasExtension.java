@@ -15,6 +15,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
 import com.helger.peppol.bdxr.ExtensionType;
+import com.helger.xml.serialize.write.XMLWriter;
 
 /**
  * Abstract implementation class for {@link ISMPHasExtension}. All extensions
@@ -45,6 +46,17 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
     if (m_aExtensions.isEmpty ())
       return null;
     return BDXRExtensionConverter.convertToString (m_aExtensions);
+  }
+
+  @Nullable
+  public String getFirstExtensionXML ()
+  {
+    if (m_aExtensions.isEmpty ())
+      return null;
+
+    // Use only the XML element of the first extension
+    final Element aAny = (Element) m_aExtensions.getFirst ().getAny ();
+    return XMLWriter.getXMLString (aAny);
   }
 
   @Nonnull

@@ -250,7 +250,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
                                                  .setCtrl (aSelectedObject.getSubjectUniqueIdentifier ()));
     if (aSelectedObject.hasExtension ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (new HCPrismJS (EPrismLanguage.MARKUP).addChild (aSelectedObject.getExtensionAsString ())));
+                                                   .setCtrl (new HCPrismJS (EPrismLanguage.JAVASCRIPT).addChild (aSelectedObject.getExtensionAsString ())));
 
     aNodeList.addChild (aForm);
   }
@@ -386,7 +386,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                  .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_EXTENSION,
-                                                                                                     aSelectedObject != null ? aSelectedObject.getExtensionAsString ()
+                                                                                                     aSelectedObject != null ? aSelectedObject.getFirstExtensionXML ()
                                                                                                                              : null)))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));

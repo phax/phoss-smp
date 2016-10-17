@@ -76,6 +76,13 @@ public interface ISMPHasExtension
   String getExtensionAsString ();
 
   /**
+   * @return The XML content of the first extension or <code>null</code> if no
+   *         extension is present.
+   */
+  @Nullable
+  String getFirstExtensionXML ();
+
+  /**
    * @return <code>true</code> if an extension is present, <code>false</code>
    *         otherwise.
    */
