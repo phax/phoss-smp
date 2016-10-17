@@ -60,14 +60,15 @@ import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnershipID;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceGroup;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceGroupID;
 import com.helger.peppol.smpserver.data.sql.model.DBUser;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
@@ -154,7 +155,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                        (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                        ")");
 
-    final IParticipantIdentifier aParticipantIdentifier = SimpleParticipantIdentifier.createFromURIPartOrNull (sSMPServiceGroupID);
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final IParticipantIdentifier aParticipantIdentifier = aIdentifierFactory.parseParticipantIdentifier (sSMPServiceGroupID);
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
       // Check if the passed service group ID is already in use
@@ -262,7 +264,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                                       DBServiceGroup.class)
                                                                         .getResultList ();
 
-      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
+      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList<> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
         final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
@@ -297,7 +299,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                         .setParameter ("user", sOwnerID)
                                                                         .getResultList ();
 
-      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
+      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList<> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
         final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,
@@ -373,7 +375,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     JPAExecutionResult <Boolean> ret;
     ret = doSelect ( () -> {
       // Disable caching here
-      final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
+      final ICommonsMap <String, Object> aProps = new CommonsHashMap<> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
       final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
                                                                        new DBServiceGroupID (aParticipantIdentifier),

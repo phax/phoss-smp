@@ -55,7 +55,9 @@ import org.eclipse.persistence.annotations.Converter;
 
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.db.jpa.eclipselink.converter.JPALocalDateConverter;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 
 /**
  * DB Business Card Entity representation
@@ -131,9 +133,10 @@ public class DBBusinessCardEntity implements Serializable
 
   @Nonnull
   @Transient
-  public SimpleParticipantIdentifier getAsBusinessIdentifier ()
+  public IParticipantIdentifier getAsBusinessIdentifier ()
   {
-    return SimpleParticipantIdentifier.createFromURIPart (m_sParticipantID);
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    return aIdentifierFactory.parseParticipantIdentifier (m_sParticipantID);
   }
 
   @Column (name = "name", nullable = false)

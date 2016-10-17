@@ -45,7 +45,6 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.network.dns.IPV4Addr;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.ESMPRESTType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -250,7 +249,8 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
       return null;
 
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    return aServiceGroupMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sID));
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    return aServiceGroupMgr.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sID));
   }
 
   @Override

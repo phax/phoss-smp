@@ -63,10 +63,11 @@ import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBBusinessCardEntity;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
@@ -109,7 +110,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   @Nonnull
   public static ICommonsList <SMPBusinessCardIdentifier> getJsonAsBCI (@Nullable final String sJson)
   {
-    final ICommonsList <SMPBusinessCardIdentifier> ret = new CommonsArrayList <> ();
+    final ICommonsList <SMPBusinessCardIdentifier> ret = new CommonsArrayList<> ();
     final IJson aJson = JsonReader.readFromString (sJson);
     if (aJson != null && aJson.isArray ())
       for (final IJson aItem : aJson.getAsArray ())
@@ -132,7 +133,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   @Nonnull
   public static ICommonsList <String> getJsonAsString (@Nullable final String sJson)
   {
-    final ICommonsList <String> ret = new CommonsArrayList <> ();
+    final ICommonsList <String> ret = new CommonsArrayList<> ();
     final IJson aJson = JsonReader.readFromString (sJson);
     if (aJson != null && aJson.isArray ())
       for (final IJson aItem : aJson.getAsArray ())
@@ -160,7 +161,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   @Nonnull
   public static ICommonsList <SMPBusinessCardContact> getJsonAsBCC (@Nullable final String sJson)
   {
-    final ICommonsList <SMPBusinessCardContact> ret = new CommonsArrayList <> ();
+    final ICommonsList <SMPBusinessCardContact> ret = new CommonsArrayList<> ();
     final IJson aJson = JsonReader.readFromString (sJson);
     if (aJson != null && aJson.isArray ())
       for (final IJson aItem : aJson.getAsArray ())
@@ -262,7 +263,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                     @Nonnull final List <DBBusinessCardEntity> aDBEntities)
   {
     final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aID);
-    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
+    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList<> ();
     for (final DBBusinessCardEntity aDBEntity : aDBEntities)
     {
       final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aDBEntity.getId ());
@@ -291,12 +292,12 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       throw new RuntimeException (ret.getThrowable ());
 
     /// Group by ID
-    final IMultiMapListBased <IParticipantIdentifier, DBBusinessCardEntity> aGrouped = new MultiHashMapArrayListBased <> ();
+    final IMultiMapListBased <IParticipantIdentifier, DBBusinessCardEntity> aGrouped = new MultiHashMapArrayListBased<> ();
     for (final DBBusinessCardEntity aDBItem : ret.get ())
       aGrouped.putSingle (aDBItem.getAsBusinessIdentifier (), aDBItem);
 
     // Convert
-    final ICommonsList <SMPBusinessCard> aRedirects = new CommonsArrayList <> ();
+    final ICommonsList <SMPBusinessCard> aRedirects = new CommonsArrayList<> ();
     for (final Map.Entry <IParticipantIdentifier, ICommonsList <DBBusinessCardEntity>> aEntry : aGrouped.entrySet ())
       aRedirects.add (_convert (aEntry.getKey (), aEntry.getValue ()));
     return aRedirects;
@@ -329,7 +330,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   {
     if (StringHelper.hasText (sID))
     {
-      final SimpleParticipantIdentifier aPI = SimpleParticipantIdentifier.createFromURIPartOrNull (sID);
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aPI = aIdentifierFactory.parseParticipantIdentifier (sID);
       if (aPI != null)
         return getSMPBusinessCardOfServiceGroup (m_aServiceGroupMgr.getSMPServiceGroupOfID (aPI));
     }

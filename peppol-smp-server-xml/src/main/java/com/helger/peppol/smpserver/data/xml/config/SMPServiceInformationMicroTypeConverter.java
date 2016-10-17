@@ -22,8 +22,8 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -71,9 +71,10 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   @Nonnull
   public ISMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement)
   {
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);
-    final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID));
+    final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
     if (aServiceGroup == null)
       throw new IllegalStateException ("Failed to resolve service group with ID '" + sServiceGroupID + "'");
 

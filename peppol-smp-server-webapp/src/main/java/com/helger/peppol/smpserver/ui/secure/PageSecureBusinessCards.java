@@ -62,8 +62,8 @@ import com.helger.html.jscode.JSAnonymousFunction;
 import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smpserver.app.PDClientProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
@@ -331,6 +331,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bEdit = eFormAction.isEdit ();
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
 
@@ -344,7 +345,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A Service Group must be selected!");
     else
     {
-      aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (SimpleParticipantIdentifier.createFromURIPartOrNull (sServiceGroupID));
+      aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
       if (aServiceGroup == null)
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided Service Group does not exist!");
       else
