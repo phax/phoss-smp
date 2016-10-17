@@ -53,7 +53,7 @@ import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 
 /**
- * BAse interface for a manager for {@link ISMPServiceGroup} objects.
+ * Base interface for a manager for {@link ISMPServiceGroup} objects.
  *
  * @author Philip Helger
  */
@@ -68,9 +68,11 @@ public interface ISMPServiceGroupManager
    * @param aParticipantIdentifier
    *        The underlying participant identifier. May not be <code>null</code>.
    * @param sExtension
-   *        The optional extension element that must be well-formed XML if
-   *        present.
+   *        The optional extension element that must be either a well-formed XML
+   *        string (for PEPPOL SMP) or a valid JSON string (for BDXR SMP).
    * @return The created service group object. Never <code>null</code>.
+   * @see com.helger.peppol.smp.SMPExtensionConverter
+   * @see com.helger.peppol.bdxr.BDXRExtensionConverter
    */
   @Nonnull
   ISMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty String sOwnerID,
