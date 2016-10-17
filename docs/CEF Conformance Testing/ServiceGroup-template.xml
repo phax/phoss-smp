@@ -1,0 +1,7 @@
+<ServiceGroup xmlns="http://docs.oasis-open.org/bdxr/ns/SMP/2016/05">
+  <ParticipantIdentifier scheme="ID_SCHEME">ID</ParticipantIdentifier>
+  <ServiceMetadataReferenceCollection>
+    <ServiceMetadataReference href="SMP_SERVER_URL/ID_SCHEME%3A%3AID/services/DOCUMENT_SCHEME%3A%3ADOCUMENT_ID"/>
+  </ServiceMetadataReferenceCollection>
+  <Extension>EXTENSION</Extension>
+</ServiceGroup>

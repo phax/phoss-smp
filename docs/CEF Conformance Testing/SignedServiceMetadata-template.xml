@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SignedServiceMetadata
+  xmlns="http://docs.oasis-open.org/bdxr/ns/SMP/2016/05"
+  xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+  <ServiceMetadata>
+    <ServiceInformation>
+      <ParticipantIdentifier scheme="ID_SCHEME">ID</ParticipantIdentifier>
+      <DocumentIdentifier scheme="DOCUMENT_SCHEME">
+        DOCUMENT_ID
+      </DocumentIdentifier>
+      <ProcessList>
+        <Process>
+          <ProcessIdentifier scheme="PROCESS_IDENTIFIER_TYPE">
+            PROCESS_IDENTIFIER
+          </ProcessIdentifier>
+          <ServiceEndpointList>
+            <Endpoint transportProfile="TRANSPORT_PROFILE">
+              <EndpointURI>ENDPOINT_REFERENCE</EndpointURI>
+              <RequireBusinessLevelSignature>REQUIRE_BUSINESSLEVEL_SIGNATURE</RequireBusinessLevelSignature>
+              <ServiceActivationDate>
+                SERVICE_ACTIVATION_DATE
+              </ServiceActivationDate>
+              <ServiceExpirationDate>
+                SERVICE_EXPIRATION_DATE
+              </ServiceExpirationDate>
+              <Certificate>CERTIFICATE</Certificate>
+              <ServiceDescription>SERVICE_DESCRIPTION</ServiceDescription>
+              <TechnicalContactUrl>TECHNICAL_CONTACT_URL</TechnicalContactUrl>
+            </Endpoint>
+          </ServiceEndpointList>
+        </Process>
+      </ProcessList>
+      <Extension>EXTENSION</Extension>
+    </ServiceInformation>
+  </ServiceMetadata>
+  <!-- Message signature, details omitted for brevity -->
+  <ds:Signature/>
+</SignedServiceMetadata>
