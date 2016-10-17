@@ -26,7 +26,7 @@ import org.eclipse.persistence.exceptions.DatabaseException;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -90,14 +90,14 @@ public final class ISMPServiceInformationManagerFuncTest
                                                  "sd",
                                                  "tc",
                                                  "ti",
-                                                 "extep");
+                                                 "<extep />");
 
-        final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
+        final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList<> (aEP), "<extproc/>");
 
         final SMPServiceInformation aServiceInformation = new SMPServiceInformation (aSG,
                                                                                      aDocTypeID,
-                                                                                     CollectionHelper.newList (aProcess),
-                                                                                     "extsi");
+                                                                                     new CommonsArrayList<> (aProcess),
+                                                                                     "<extsi/>");
         aServiceInfoMgr.mergeSMPServiceInformation (aServiceInformation);
       }
       finally
