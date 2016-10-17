@@ -312,10 +312,9 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
                                                    .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme" +
-                                                                 (sDefaultScheme == null ? null
-                                                                                         : " (default: " +
-                                                                                           sDefaultScheme +
-                                                                                           ")") +
+                                                                 (sDefaultScheme == null ? "" : " (default: " +
+                                                                                                sDefaultScheme +
+                                                                                                ")") +
                                                                  ", the right part is the identifier value (e.g. 9915:test)")
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PARTICIPANT_ID_SCHEME,
                                                                                                FIELD_PARTICIPANT_ID_VALUE)));
