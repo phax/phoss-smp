@@ -145,7 +145,7 @@ CREATE TABLE `smp_bce` (
   `regdate` date DEFAULT NULL COMMENT 'Registration date',
   PRIMARY KEY (`id`),
   KEY `FK_pid` (`pid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='SMP Business Card Entitiy';
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='SMP Business Card Entity';
 
 ALTER TABLE `smp_ownership` ADD CONSTRAINT `FK_smp_ownership_id`
   FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`) 
