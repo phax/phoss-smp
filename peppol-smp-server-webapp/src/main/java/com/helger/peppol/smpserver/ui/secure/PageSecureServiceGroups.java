@@ -48,6 +48,8 @@ import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.ESMPRESTType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
@@ -132,7 +134,19 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
         {
           // Delete the service group both locally and on the SML (if active)!
           final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-          aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier ());
+          if (aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier ()).isChanged ())
+          {
+            // Delete Business card as well
+            // TODO move to generic callback so that it works with REST API as
+            // well
+            final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+            if (aBusinessCardMgr != null)
+            {
+              final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSelectedObject);
+              if (aBusinessCard != null)
+                aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
+            }
+          }
         }
         catch (final Throwable t)
         {
