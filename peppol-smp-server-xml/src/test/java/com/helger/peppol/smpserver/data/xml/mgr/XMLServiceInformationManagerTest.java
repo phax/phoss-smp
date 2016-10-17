@@ -96,12 +96,12 @@ public final class XMLServiceInformationManagerTest
                                                  "sd",
                                                  "tc",
                                                  "ti",
-                                                 "extep");
-        final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "extproc");
+                                                 "<extep />");
+        final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "<extproc />");
         aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
                                                                                       aDocTypeID,
                                                                                       CollectionHelper.newList (aProcess),
-                                                                                      "extsi"));
+                                                                                      "<extsi />"));
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -131,7 +131,7 @@ public final class XMLServiceInformationManagerTest
                                                "sd",
                                                "tc",
                                                "ti",
-                                               "extep"));
+                                               "<extep />"));
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
@@ -170,7 +170,7 @@ public final class XMLServiceInformationManagerTest
                                                "sd",
                                                "tc",
                                                "ti",
-                                               "extep"));
+                                               "<extep />"));
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
@@ -200,10 +200,10 @@ public final class XMLServiceInformationManagerTest
                                                  "sd",
                                                  "tc",
                                                  "ti",
-                                                 "extep");
+                                                 "<extep />");
         aSI.addProcess (new SMPProcess (PeppolProcessIdentifier.createWithDefaultScheme ("testproc2"),
                                         CollectionHelper.newList (aEP),
-                                        "extproc"));
+                                        "<extproc />"));
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
