@@ -117,7 +117,9 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
                                                                                                       aSelectedObject.getParticpantIdentifier ()
                                                                                                                      .getURIEncoded () +
                                                                                                       "'?"))
-                                                                    .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."));
+                                                                    .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."))
+                                                                    .addChild (SMPMetaManager.hasBusinessCardMgr () ? new HCDiv ().addChild ("If a Business Card for this service group exists, it will also be deleted.")
+                                                                                                                    : null);
         if (SMPMetaManager.getSettings ().isWriteToSML ())
           aQB.addChild (new HCDiv ().addChild ("Since the connection to the SML is active this service group will also be deleted from the SML!"));
 
