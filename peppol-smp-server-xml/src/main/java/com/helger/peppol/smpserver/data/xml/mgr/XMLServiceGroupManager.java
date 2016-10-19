@@ -160,9 +160,12 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
   @Nonnull
   public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    s_aLogger.info ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
+    s_aLogger.info ("deleteSMPServiceGroup (" +
+                    (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) +
+                    ")");
 
-    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+    final String sServiceGroupID = aParticipantID == null ? null
+                                                          : SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     final SMPServiceGroup aSMPServiceGroup = getOfID (sServiceGroupID);
     if (aSMPServiceGroup == null)
     {
