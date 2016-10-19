@@ -111,7 +111,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   public static ICommonsList <SMPBusinessCardIdentifier> getJsonAsBCI (@Nullable final String sJson)
   {
     final ICommonsList <SMPBusinessCardIdentifier> ret = new CommonsArrayList<> ();
-    final IJson aJson = JsonReader.readFromString (sJson);
+    final IJson aJson = sJson == null ? null : JsonReader.readFromString (sJson);
     if (aJson != null && aJson.isArray ())
       for (final IJson aItem : aJson.getAsArray ())
       {
@@ -134,7 +134,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   public static ICommonsList <String> getJsonAsString (@Nullable final String sJson)
   {
     final ICommonsList <String> ret = new CommonsArrayList<> ();
-    final IJson aJson = JsonReader.readFromString (sJson);
+    final IJson aJson = sJson == null ? null : JsonReader.readFromString (sJson);
     if (aJson != null && aJson.isArray ())
       for (final IJson aItem : aJson.getAsArray ())
       {
@@ -162,7 +162,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   public static ICommonsList <SMPBusinessCardContact> getJsonAsBCC (@Nullable final String sJson)
   {
     final ICommonsList <SMPBusinessCardContact> ret = new CommonsArrayList<> ();
-    final IJson aJson = JsonReader.readFromString (sJson);
+    final IJson aJson = sJson == null ? null : JsonReader.readFromString (sJson);
     if (aJson != null && aJson.isArray ())
       for (final IJson aItem : aJson.getAsArray ())
       {
