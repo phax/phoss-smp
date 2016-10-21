@@ -239,7 +239,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>5.0.1</version><!--$NO-MVN-MAN-VER$-->
+          <version>5.0.2</version><!--$NO-MVN-MAN-VER$-->
         </plugin>
       </plugins>
     </pluginManagement>
