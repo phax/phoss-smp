@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml.config;
+package com.helger.peppol.smpserver.domain.businesscard;
 
 import java.time.LocalDate;
 
@@ -26,11 +26,6 @@ import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.xml.microdom.IMicroElement;

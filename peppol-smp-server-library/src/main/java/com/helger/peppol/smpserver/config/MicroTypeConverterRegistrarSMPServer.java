@@ -14,17 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml.config;
+package com.helger.peppol.smpserver.config;
 
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
+import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
+import com.helger.peppol.smpserver.domain.redirect.SMPRedirectMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroupMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
+import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpointMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
+import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcessMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformationMicroTypeConverter;
 import com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI;
 import com.helger.xml.microdom.convert.IMicroTypeConverterRegistry;
 

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml.config;
+package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import java.time.LocalDateTime;
 
@@ -23,8 +23,6 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.string.StringParser;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;

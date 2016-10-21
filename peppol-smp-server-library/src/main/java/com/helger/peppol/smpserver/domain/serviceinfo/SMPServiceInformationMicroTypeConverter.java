@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml.config;
+package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -27,10 +27,6 @@ import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;

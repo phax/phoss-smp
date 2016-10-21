@@ -14,17 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml.config;
+package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
-import com.helger.photon.security.mgr.PhotonSecurityManager;
-import com.helger.photon.security.user.IUser;
+import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
@@ -32,15 +30,14 @@ import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
 
 /**
- * This class is internally used to convert {@link SMPServiceGroup} from and to
- * XML.
+ * This class is internally used to convert {@link SMPProcess} from and to XML.
  *
  * @author Philip Helger
  */
-public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConverter
+public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter
 {
-  private static final String ATTR_OWNER_ID = "ownerid";
-  private static final String ELEMENT_PARTICIPANT_ID = "participant";
+  private static final String ELEMENT_PROCESS_IDENTIFIER = "processidentifier";
+  private static final String ELEMENT_ENDPOINT = "endpoint";
   private static final String ELEMENT_EXTENSION = "extension";
 
   @Nonnull
@@ -48,30 +45,28 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final ISMPServiceGroup aValue = (ISMPServiceGroup) aObject;
+    final ISMPProcess aValue = (ISMPProcess) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
-    aElement.setAttribute (ATTR_OWNER_ID, aValue.getOwnerID ());
-    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticpantIdentifier (),
+    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getProcessIdentifier (),
                                                                     sNamespaceURI,
-                                                                    ELEMENT_PARTICIPANT_ID));
+                                                                    ELEMENT_PROCESS_IDENTIFIER));
+    for (final ISMPEndpoint aEndpoint : aValue.getAllEndpoints ())
+      aElement.appendChild (MicroTypeConverter.convertToMicroElement (aEndpoint, sNamespaceURI, ELEMENT_ENDPOINT));
     if (aValue.hasExtension ())
       aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionAsString ());
     return aElement;
   }
 
   @Nonnull
-  public ISMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement)
+  public ISMPProcess convertToNative (@Nonnull final IMicroElement aElement)
   {
-    final String sOwnerID = aElement.getAttributeValue (ATTR_OWNER_ID);
-    final IUser aOwner = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwnerID);
-    if (aOwner == null)
-      throw new IllegalStateException ("Failed to resolve user ID '" + sOwnerID + "'");
-
-    final SimpleParticipantIdentifier aParticipantIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PARTICIPANT_ID),
-                                                                                                   SimpleParticipantIdentifier.class);
-
+    final SimpleProcessIdentifier aProcessIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PROCESS_IDENTIFIER),
+                                                                                           SimpleProcessIdentifier.class);
+    final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
+    for (final IMicroElement aEndpoint : aElement.getAllChildElements (ELEMENT_ENDPOINT))
+      aEndpoints.add (MicroTypeConverter.convertToNative (aEndpoint, SMPEndpoint.class));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
+    return new SMPProcess (aProcessIdentifier, aEndpoints, sExtension);
   }
 }
