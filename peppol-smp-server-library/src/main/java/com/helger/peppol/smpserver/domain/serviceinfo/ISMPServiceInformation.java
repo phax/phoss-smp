@@ -111,7 +111,7 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <? extends ISMPProcess> getAllProcesses ();
+  ICommonsList <ISMPProcess> getAllProcesses ();
 
   /**
    * @return The overall endpoint count for all processes in this object. Always

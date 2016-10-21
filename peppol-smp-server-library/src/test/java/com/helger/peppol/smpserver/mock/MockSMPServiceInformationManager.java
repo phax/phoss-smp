@@ -70,12 +70,12 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     return 0;
   }
 
-  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     throw new UnsupportedOperationException ();
   }

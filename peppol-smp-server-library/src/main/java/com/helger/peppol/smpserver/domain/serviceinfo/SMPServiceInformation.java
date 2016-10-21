@@ -162,9 +162,9 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   }
 
   @Nonnull
-  public ICommonsList <SMPProcess> getAllProcesses ()
+  public ICommonsList <ISMPProcess> getAllProcesses ()
   {
-    return m_aProcesses.copyOfValues ();
+    return new CommonsArrayList<> (m_aProcesses.values ());
   }
 
   public void addProcess (@Nonnull final SMPProcess aProcess)
@@ -179,8 +179,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   public void setProcesses (@Nonnull @Nonempty final Map <String, ? extends SMPProcess> aProcesses)
   {
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
-    m_aProcesses.clear ();
-    m_aProcesses.putAll (aProcesses);
+    m_aProcesses.setAll (aProcesses);
   }
 
   @Nonnegative

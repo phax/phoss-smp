@@ -240,14 +240,14 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     return getAll ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
     return getAll (x -> x.getOwnerID ().equals (sOwnerID));
   }

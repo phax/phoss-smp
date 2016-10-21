@@ -130,7 +130,7 @@ public interface ISMPServiceGroupManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroups ();
+  ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ();
 
   /**
    * Get all service groups that belong to the passed owner ID.
@@ -142,7 +142,7 @@ public interface ISMPServiceGroupManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull String sOwnerID);
+  ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull String sOwnerID);
 
   /**
    * Get the number of service groups owned by the passed owner.

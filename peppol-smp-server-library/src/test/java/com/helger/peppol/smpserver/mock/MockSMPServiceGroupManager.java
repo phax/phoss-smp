@@ -87,12 +87,12 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
     return 0;
   }
 
-  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (final String sOwnerID)
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (final String sOwnerID)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     throw new UnsupportedOperationException ();
   }

@@ -41,13 +41,13 @@
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IdentifierHelper;
@@ -77,7 +77,7 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
    */
   @Nonnull
   @ReturnsMutableCopy
-  List <? extends ISMPEndpoint> getAllEndpoints ();
+  ICommonsList <ISMPEndpoint> getAllEndpoints ();
 
   /**
    * @return The number of contained endpoint information. Always &ge; 0.

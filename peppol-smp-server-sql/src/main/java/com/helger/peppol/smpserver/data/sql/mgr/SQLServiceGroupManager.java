@@ -282,7 +282,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroups ()
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("getAllSMPServiceGroups()");
@@ -316,7 +316,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");

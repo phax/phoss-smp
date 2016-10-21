@@ -191,7 +191,7 @@ public final class XMLServiceInformationManager extends
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     return getAll ();
   }
@@ -204,7 +204,7 @@ public final class XMLServiceInformationManager extends
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)

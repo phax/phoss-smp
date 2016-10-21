@@ -49,7 +49,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.CommonsLinkedHashMap;
 import com.helger.commons.collection.ext.ICommonsList;
@@ -125,9 +124,9 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
 
   @Nonnull
   @ReturnsMutableCopy
-  public List <SMPEndpoint> getAllEndpoints ()
+  public ICommonsList <ISMPEndpoint> getAllEndpoints ()
   {
-    return CollectionHelper.newList (m_aEndpoints.values ());
+    return new CommonsArrayList<> (m_aEndpoints.values ());
   }
 
   public void addEndpoint (@Nonnull final SMPEndpoint aEndpoint)

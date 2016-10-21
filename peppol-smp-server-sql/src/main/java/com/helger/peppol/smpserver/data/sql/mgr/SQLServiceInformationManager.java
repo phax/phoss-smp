@@ -256,7 +256,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
         if (aDBServiceGroup == null)
           throw new IllegalStateException ("Failed to resolve service group for " + aServiceInformation);
 
-        aDBMetadata = new DBServiceMetadata (aDBMetadataID, aDBServiceGroup, aServiceInformation.getExtensionAsString ());
+        aDBMetadata = new DBServiceMetadata (aDBMetadataID,
+                                             aDBServiceGroup,
+                                             aServiceInformation.getExtensionAsString ());
         _update (aEM, aDBMetadata, aServiceInformation);
         aEM.persist (aDBMetadata);
       }
@@ -336,10 +338,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   private static SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
   {
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
     for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
     {
-      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
+      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
       for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
       {
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBEndpoint.getId ().getTransportProfile (),
@@ -369,7 +371,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformation ()
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     JPAExecutionResult <List <DBServiceMetadata>> ret;
     ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p",
@@ -378,7 +380,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
+    final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
     for (final DBServiceMetadata aDBMetadata : ret.get ())
       aServiceInformations.add (_convert (aDBMetadata));
     return aServiceInformations;
@@ -399,9 +401,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <SMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
+    final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       JPAExecutionResult <List <DBServiceMetadata>> ret;
@@ -427,7 +429,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   @ReturnsMutableCopy
   public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
+    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       for (final ISMPServiceInformation aServiceInformation : getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
@@ -446,7 +448,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     JPAExecutionResult <DBServiceMetadata> ret;
     ret = doInTransaction ( () -> {
       // Disable caching here
-      final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
+      final ICommonsMap <String, Object> aProps = new CommonsHashMap<> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
       final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceGroup.getParticpantIdentifier (),
                                                                          aDocTypeID);

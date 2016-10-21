@@ -45,6 +45,7 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -55,6 +56,7 @@ import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
  *
  * @author Philip Helger
  */
+@MustImplementEqualsAndHashcode
 public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHasExtension
 {
   /**
