@@ -40,8 +40,6 @@
  */
 package com.helger.peppol.smpserver.domain.servicegroup;
 
-import java.util.Locale;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -80,23 +78,6 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
    * according to the PEPPOL policy for identifiers, the values must be treated
    * case-sensitive.
    *
-   * @param sValue
-   *        The original participant identifier value. May not be
-   *        <code>null</code>.
-   * @return The new participant identifier value with a lower cased value.
-   */
-  @Nonnull
-  public static String createUnifiedParticipantIdentifierValue (@Nonnull final String sValue)
-  {
-    ValueEnforcer.notNull (sValue, "Value");
-    return sValue.toLowerCase (Locale.US);
-  }
-
-  /**
-   * Create a unified participant identifier with a lower cased value, because
-   * according to the PEPPOL policy for identifiers, the values must be treated
-   * case-sensitive.
-   *
    * @param aParticipantIdentifier
    *        The original participant identifier. May not be <code>null</code>.
    * @return The new participant identifier with a lower cased value.
@@ -106,8 +87,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   {
     ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    return aIdentifierFactory.createParticipantIdentifier (aParticipantIdentifier.getScheme (),
-                                                           createUnifiedParticipantIdentifierValue (aParticipantIdentifier.getValue ()));
+    return aIdentifierFactory.getClone (aParticipantIdentifier);
   }
 
   public SMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,

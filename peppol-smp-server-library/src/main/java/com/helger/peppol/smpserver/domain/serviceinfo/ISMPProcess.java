@@ -50,7 +50,6 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
@@ -146,7 +145,6 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
   @Nonnull
   static IComparator <ISMPProcess> comparator ()
   {
-    return (aElement1, aElement2) -> IdentifierHelper.compareProcessIdentifiers (aElement1.getProcessIdentifier (),
-                                                                                 aElement2.getProcessIdentifier ());
+    return (aElement1, aElement2) -> aElement1.getProcessIdentifier ().compareTo (aElement2.getProcessIdentifier ());
   }
 }

@@ -43,8 +43,8 @@ package com.helger.peppol.smpserver.smlhook;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 
 /**
  * Test class for class {@link RegistrationHookWriteToSML}.
@@ -58,7 +58,7 @@ public final class RegistrationHookWriteToSMLTest
   public void testCreateAndDelete () throws RegistrationHookException
   {
     final RegistrationHookWriteToSML aHook = new RegistrationHookWriteToSML ();
-    final IParticipantIdentifier aPI = PeppolParticipantIdentifier.createWithDefaultScheme ("0088:12345test");
+    final IParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("0088:12345test");
     aHook.createServiceGroup (aPI);
     aHook.deleteServiceGroup (aPI);
     // Throws ExceptionInInitializerError:

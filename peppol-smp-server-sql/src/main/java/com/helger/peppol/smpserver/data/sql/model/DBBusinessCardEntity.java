@@ -128,7 +128,7 @@ public class DBBusinessCardEntity implements Serializable
 
   public void setParticipantId (final String sParticipantID)
   {
-    m_sParticipantID = DBHelper.getUnifiedParticipantDBValue (sParticipantID);
+    m_sParticipantID = sParticipantID;
   }
 
   @Nonnull

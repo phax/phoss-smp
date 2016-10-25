@@ -28,12 +28,10 @@ import org.junit.Test;
 
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -56,9 +54,9 @@ public final class ISMPServiceInformationManagerFuncTest
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    final IParticipantIdentifier aPI1 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
-    final IDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("junit::testdoc#ext:1.0");
-    final IProcessIdentifier aProcessID = PeppolProcessIdentifier.createWithDefaultScheme ("junit-proc");
+    final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
+    final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc#ext:1.0");
+    final IProcessIdentifier aProcessID = PeppolIdentifierFactory.INSTANCE.createProcessIdentifierWithDefaultScheme ("junit-proc");
 
     final String sUserID = "junitserviceinfo";
     try

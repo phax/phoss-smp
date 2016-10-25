@@ -28,11 +28,11 @@ import org.junit.rules.TestRule;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
+import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -201,7 +201,7 @@ public final class XMLServiceInformationManagerTest
                                                  "tc",
                                                  "ti",
                                                  "<extep />");
-        aSI.addProcess (new SMPProcess (PeppolProcessIdentifier.createWithDefaultScheme ("testproc2"),
+        aSI.addProcess (new SMPProcess (PeppolIdentifierFactory.INSTANCE.createProcessIdentifierWithDefaultScheme ("testproc2"),
                                         CollectionHelper.newList (aEP),
                                         "<extproc />"));
         aServiceInformationMgr.mergeSMPServiceInformation (aSI);

@@ -51,7 +51,6 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
@@ -150,8 +149,7 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
     return (aElement1, aElement2) -> {
       int ret = aElement1.getServiceGroupID ().compareTo (aElement2.getServiceGroupID ());
       if (ret == 0)
-        ret = IdentifierHelper.compareDocumentTypeIdentifiers (aElement1.getDocumentTypeIdentifier (),
-                                                               aElement2.getDocumentTypeIdentifier ());
+        ret = aElement1.getDocumentTypeIdentifier ().compareTo (aElement2.getDocumentTypeIdentifier ());
       return ret;
     };
   }

@@ -27,11 +27,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import com.helger.peppol.identifier.IdentifierHelper;
+import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -65,9 +63,9 @@ public final class ISMPRedirectManagerFuncTest
     }
     try
     {
-      final IParticipantIdentifier aPI1 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
-      final IParticipantIdentifier aPI2 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest2");
-      final IDocumentTypeIdentifier aDocTypeID = PeppolDocumentTypeIdentifier.createWithDefaultScheme ("junit::testdoc#ext:1.0");
+      final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
+      final IParticipantIdentifier aPI2 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest2");
+      final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc#ext:1.0");
 
       final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
@@ -82,8 +80,7 @@ public final class ISMPRedirectManagerFuncTest
                                                                          "suid",
                                                                          "<extredirect />");
         assertSame (aSG, aRedirect.getServiceGroup ());
-        assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID,
-                                                                      aRedirect.getDocumentTypeIdentifier ()));
+        assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
         assertEquals ("target", aRedirect.getTargetHref ());
         assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
         assertEquals ("<extredirect />", aRedirect.getFirstExtensionXML ().trim ());
@@ -92,8 +89,7 @@ public final class ISMPRedirectManagerFuncTest
         // Update existing
         aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target2", "suid2", "<extredirect2 />");
         assertSame (aSG, aRedirect.getServiceGroup ());
-        assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID,
-                                                                      aRedirect.getDocumentTypeIdentifier ()));
+        assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
         assertEquals ("target2", aRedirect.getTargetHref ());
         assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
         assertEquals ("<extredirect2 />", aRedirect.getFirstExtensionXML ().trim ());
@@ -105,8 +101,7 @@ public final class ISMPRedirectManagerFuncTest
         {
           aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", "<extredirect2 />");
           assertSame (aSG2, aRedirect.getServiceGroup ());
-          assertTrue (IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID,
-                                                                        aRedirect.getDocumentTypeIdentifier ()));
+          assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
           assertEquals ("target2", aRedirect.getTargetHref ());
           assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
           assertEquals ("<extredirect2 />", aRedirect.getFirstExtensionXML ().trim ());

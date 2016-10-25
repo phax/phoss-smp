@@ -94,7 +94,7 @@ public class DBServiceMetadataRedirectionID implements Serializable
 
   public void setBusinessIdentifierScheme (final String sBusinessIdentifierScheme)
   {
-    m_sParticipantIdentifierScheme = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
+    m_sParticipantIdentifierScheme = sBusinessIdentifierScheme;
   }
 
   @Column (name = "businessIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_PARTICIPANT_VALUE_LENGTH)
@@ -105,7 +105,7 @@ public class DBServiceMetadataRedirectionID implements Serializable
 
   public void setBusinessIdentifier (final String sBusinessIdentifier)
   {
-    m_sParticipantIdentifier = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifier);
+    m_sParticipantIdentifier = sBusinessIdentifier;
   }
 
   @Transient

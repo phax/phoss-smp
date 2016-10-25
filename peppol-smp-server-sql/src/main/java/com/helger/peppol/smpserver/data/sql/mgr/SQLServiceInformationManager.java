@@ -58,7 +58,6 @@ import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -100,12 +99,11 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   {
     // For all DB processes
     // Create a copy to avoid concurrent modification
-    for (final DBProcess aDBProcess : CollectionHelper.newList (aDBMetadata.getProcesses ()))
+    for (final DBProcess aDBProcess : new CommonsArrayList<> (aDBMetadata.getProcesses ()))
     {
       boolean bProcessFound = false;
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
-        if (IdentifierHelper.areProcessIdentifiersEqual (aDBProcess.getId ().getAsProcessIdentifier (),
-                                                         aProcess.getProcessIdentifier ()))
+        if (aDBProcess.getId ().getAsProcessIdentifier ().hasSameContent (aProcess.getProcessIdentifier ()))
         {
           bProcessFound = true;
 
@@ -190,8 +188,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     {
       boolean bProcessFound = false;
       for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
-        if (IdentifierHelper.areProcessIdentifiersEqual (aDBProcess.getId ().getAsProcessIdentifier (),
-                                                         aProcess.getProcessIdentifier ()))
+        if (aDBProcess.getId ().getAsProcessIdentifier ().hasSameContent (aProcess.getProcessIdentifier ()))
         {
           bProcessFound = true;
           break;

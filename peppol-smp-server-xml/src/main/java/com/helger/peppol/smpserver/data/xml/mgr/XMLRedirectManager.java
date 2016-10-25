@@ -29,7 +29,6 @@ import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -216,7 +215,6 @@ public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedire
       return null;
 
     return findFirst (x -> x.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
-                           IdentifierHelper.areDocumentTypeIdentifiersEqual (aDocTypeID,
-                                                                             x.getDocumentTypeIdentifier ()));
+                           aDocTypeID.hasSameContent (x.getDocumentTypeIdentifier ()));
   }
 }

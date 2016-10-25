@@ -54,7 +54,6 @@ import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 
 /**
  * ServiceGroupId == participant ID
@@ -75,8 +74,7 @@ public class DBServiceGroupID implements Serializable
   public DBServiceGroupID (@Nonnull final IParticipantIdentifier aBusinessID)
   {
     setBusinessIdentifierScheme (aBusinessID.getScheme ());
-    // Ensure lower case participant value
-    setBusinessIdentifier (SMPServiceGroup.createUnifiedParticipantIdentifierValue (aBusinessID.getValue ()));
+    setBusinessIdentifier (aBusinessID.getValue ());
   }
 
   @Column (name = "businessIdentifierScheme",
@@ -89,7 +87,7 @@ public class DBServiceGroupID implements Serializable
 
   public void setBusinessIdentifierScheme (final String sBusinessIdentifierScheme)
   {
-    m_sParticipantIdentifierScheme = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifierScheme);
+    m_sParticipantIdentifierScheme = sBusinessIdentifierScheme;
   }
 
   @Column (name = "businessIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_PARTICIPANT_VALUE_LENGTH)
@@ -100,7 +98,7 @@ public class DBServiceGroupID implements Serializable
 
   public void setBusinessIdentifier (final String sBusinessIdentifier)
   {
-    m_sParticipantIdentifier = DBHelper.getUnifiedParticipantDBValue (sBusinessIdentifier);
+    m_sParticipantIdentifier = sBusinessIdentifier;
   }
 
   @Transient

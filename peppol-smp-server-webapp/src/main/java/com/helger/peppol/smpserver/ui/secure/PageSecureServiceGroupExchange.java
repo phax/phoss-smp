@@ -32,7 +32,6 @@ import com.helger.commons.log.LogMessage;
 import com.helger.html.hc.html.forms.HCEditFile;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.smpserver.app.CSMPExchange;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
@@ -173,14 +172,12 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         {
           final ISMPServiceGroupProvider aSGProvider = x -> {
             // First look in service groups to import
-            ISMPServiceGroup aSG = aImportServiceGroups.findFirstKey (y -> IdentifierHelper.areParticipantIdentifiersEqual (x,
-                                                                                                                            y.getKey ()
-                                                                                                                             .getParticpantIdentifier ()));
+            ISMPServiceGroup aSG = aImportServiceGroups.findFirstKey (y -> x.hasSameContent (y.getKey ()
+                                                                                              .getParticpantIdentifier ()));
             if (aSG == null)
             {
               // Lookup in all existing service group
-              aSG = aAllServiceGroups.findFirst (y -> IdentifierHelper.areParticipantIdentifiersEqual (x,
-                                                                                                       y.getParticpantIdentifier ()));
+              aSG = aAllServiceGroups.findFirst (y -> x.hasSameContent (y.getParticpantIdentifier ()));
             }
             return aSG;
           };

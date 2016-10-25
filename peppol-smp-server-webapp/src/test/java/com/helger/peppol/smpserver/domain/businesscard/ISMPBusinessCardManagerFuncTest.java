@@ -29,8 +29,8 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -85,8 +85,8 @@ public final class ISMPBusinessCardManagerFuncTest
 
     try
     {
-      final IParticipantIdentifier aPI1 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest1");
-      final IParticipantIdentifier aPI2 = PeppolParticipantIdentifier.createWithDefaultScheme ("9999:junittest2");
+      final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
+      final IParticipantIdentifier aPI2 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest2");
 
       final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
@@ -96,7 +96,7 @@ public final class ISMPBusinessCardManagerFuncTest
         final int nBCCount = aBusinessCardMgr.getSMPBusinessCardCount ();
 
         // Create new one
-        aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG, new CommonsArrayList <> (aEntity1));
+        aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG, new CommonsArrayList<> (aEntity1));
         assertSame (aSG, aBusinessCard.getServiceGroup ());
         assertEquals (aPI1.getScheme (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getScheme ());
         assertEquals (aPI1.getValue (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getValue ());
@@ -108,7 +108,7 @@ public final class ISMPBusinessCardManagerFuncTest
 
         // Update existing
         aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG,
-                                                                        new CommonsArrayList <> (aEntity1, aEntity2));
+                                                                        new CommonsArrayList<> (aEntity1, aEntity2));
         assertSame (aSG, aBusinessCard.getServiceGroup ());
         assertEquals (aPI1.getScheme (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getScheme ());
         assertEquals (aPI1.getValue (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getValue ());
@@ -124,7 +124,7 @@ public final class ISMPBusinessCardManagerFuncTest
         ISMPBusinessCard aBusinessCard2 = null;
         try
         {
-          aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG2, new CommonsArrayList <> (aEntity3));
+          aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG2, new CommonsArrayList<> (aEntity3));
           assertSame (aSG2, aBusinessCard2.getServiceGroup ());
           assertEquals (1, aBusinessCard2.getEntityCount ());
           assertEquals (nBCCount + 2, aBusinessCardMgr.getSMPBusinessCardCount ());

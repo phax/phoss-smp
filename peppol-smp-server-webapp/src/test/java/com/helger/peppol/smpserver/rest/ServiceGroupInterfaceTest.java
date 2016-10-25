@@ -45,8 +45,9 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.http.CHTTPHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
@@ -118,13 +119,13 @@ public final class ServiceGroupInterfaceTest
   public void testCreateAndDeleteServiceGroup ()
   {
     // Lower case version
-    final ParticipantIdentifierType aPI_LC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
     final String sPI_LC = aPI_LC.getURIEncoded ();
     // Upper case version
-    final ParticipantIdentifierType aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
+    final IParticipantIdentifier aPI_UC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:XXX");
     final String sPI_UC = aPI_UC.getURIEncoded ();
     final ServiceGroupType aSG = new ServiceGroupType ();
-    aSG.setParticipantIdentifier (aPI_LC);
+    aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
     final WebTarget aTarget = m_aRule.getWebTarget ();
     Response aResponseMsg;

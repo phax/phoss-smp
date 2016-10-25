@@ -69,7 +69,6 @@ import com.helger.peppol.bdxr.ServiceMetadataReferenceCollectionType;
 import com.helger.peppol.bdxr.ServiceMetadataReferenceType;
 import com.helger.peppol.bdxr.ServiceMetadataType;
 import com.helger.peppol.bdxr.SignedServiceMetadataType;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -192,7 +191,7 @@ public final class BDXRServerAPI
                                         m_aAPIProvider.getCurrentURI ());
       }
 
-      if (!IdentifierHelper.areParticipantIdentifiersEqual (aServiceGroupID, aServiceGroup.getParticipantIdentifier ()))
+      if (!aServiceGroupID.hasSameContent (aServiceGroup.getParticipantIdentifier ()))
       {
         // Business identifiers must be equal
         throw new SMPNotFoundException ("ServiceGroup inconsistency", m_aAPIProvider.getCurrentURI ());
@@ -401,8 +400,7 @@ public final class BDXRServerAPI
       {
         // Business identifiers from path (ServiceGroupID) and from service
         // metadata (body) must equal path
-        if (!IdentifierHelper.areParticipantIdentifiersEqual (aServiceInformation.getParticipantIdentifier (),
-                                                              aServiceGroupID))
+        if (!aServiceInformation.getParticipantIdentifier ().hasSameContent (aServiceGroupID))
         {
           s_aLogger.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +
@@ -412,8 +410,7 @@ public final class BDXRServerAPI
           return ESuccess.FAILURE;
         }
 
-        if (!IdentifierHelper.areDocumentTypeIdentifiersEqual (aServiceInformation.getDocumentIdentifier (),
-                                                               aDocTypeID))
+        if (!aServiceInformation.getDocumentIdentifier ().hasSameContent (aDocTypeID))
         {
           s_aLogger.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +

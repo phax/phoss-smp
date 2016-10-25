@@ -46,11 +46,12 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.http.CHTTPHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
+import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.PeppolDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.peppol.identifier.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppol.smp.ESMPTransportProfile;
@@ -134,10 +135,10 @@ public final class ServiceMetadataInterfaceTest
   public void testCreateAndDeleteServiceInformation ()
   {
     // Lower case
-    final ParticipantIdentifierType aPI_LC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
     final String sPI_LC = aPI_LC.getURIEncoded ();
     // Upper case
-    final ParticipantIdentifierType aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
+    final IParticipantIdentifier aPI_UC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:XXX");
     final String sPI_UC = aPI_UC.getURIEncoded ();
 
     final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
@@ -146,11 +147,11 @@ public final class ServiceMetadataInterfaceTest
     final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V20.getAsProcessIdentifier ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
-    aSG.setParticipantIdentifier (aPI_LC);
+    aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
     final ServiceMetadataType aSM = new ServiceMetadataType ();
     final ServiceInformationType aSI = new ServiceInformationType ();
-    aSI.setParticipantIdentifier (aPI_LC);
+    aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
     aSI.setDocumentIdentifier (aDT);
     {
       final ProcessListType aPL = new ProcessListType ();
@@ -255,17 +256,17 @@ public final class ServiceMetadataInterfaceTest
   public void testCreateAndDeleteRedirect ()
   {
     // Lower case
-    final PeppolParticipantIdentifier aPI_LC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:xxx");
+    final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
     final String sPI_LC = aPI_LC.getURIEncoded ();
     // Upper case
-    final PeppolParticipantIdentifier aPI_UC = PeppolParticipantIdentifier.createWithDefaultScheme ("9915:XXX");
+    final IParticipantIdentifier aPI_UC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:XXX");
     final String sPI_UC = aPI_UC.getURIEncoded ();
 
     final IDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
     final String sDT = aDT.getURIEncoded ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
-    aSG.setParticipantIdentifier (aPI_LC);
+    aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
     final ServiceMetadataType aSM = new ServiceMetadataType ();
     final RedirectType aRedir = new RedirectType ();

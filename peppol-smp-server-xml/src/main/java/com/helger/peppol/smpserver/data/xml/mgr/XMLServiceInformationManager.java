@@ -29,7 +29,6 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.IdentifierHelper;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -237,8 +236,8 @@ public final class XMLServiceInformationManager extends
 
     final ICommonsList <? extends ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ()
                                                                                   .equals (aServiceGroup.getID ()) &&
-                                                                               IdentifierHelper.areDocumentTypeIdentifiersEqual (aSI.getDocumentTypeIdentifier (),
-                                                                                                                                 aDocumentTypeIdentifier));
+                                                                               aSI.getDocumentTypeIdentifier ()
+                                                                                  .hasSameContent (aDocumentTypeIdentifier));
 
     if (ret.isEmpty ())
       return null;
