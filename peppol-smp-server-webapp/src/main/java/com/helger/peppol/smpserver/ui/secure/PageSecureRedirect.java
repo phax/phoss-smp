@@ -370,7 +370,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_REDIRECT_TO,
                                                                                          aSelectedObject != null ? aSelectedObject.getTargetHref ()
                                                                                                                  : null)))
-                                                 .setHelpText ("URL to redirect to.")
+                                                 .setHelpText ("URL to redirect to. Must include the service group and the document type in the URL!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_REDIRECT_TO)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Subject Unique Identifier")
