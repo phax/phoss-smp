@@ -16,6 +16,9 @@
  */
 package com.helger.peppol.smpserver.ui.secure;
 
+import java.util.Locale;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
@@ -29,6 +32,7 @@ import com.helger.commons.error.level.EErrorLevel;
 import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.log.InMemoryLogger;
 import com.helger.commons.log.LogMessage;
+import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.html.forms.HCEditFile;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
@@ -40,12 +44,16 @@ import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardMicroTypeC
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupProvider;
-import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
+import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroupMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformationMicroTypeConverter;
+import com.helger.peppol.smpserver.domain.user.ISMPUser;
+import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.smpserver.ui.ajax.CAjaxSecure;
+import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.button.BootstrapButton;
@@ -59,6 +67,7 @@ import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
 import com.helger.photon.bootstrap3.nav.BootstrapTabBox;
 import com.helger.photon.bootstrap3.panel.BootstrapPanel;
 import com.helger.photon.core.form.FormErrorList;
+import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
@@ -67,7 +76,6 @@ import com.helger.web.fileupload.IFileItem;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
-import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.serialize.MicroReader;
 import com.helger.xml.serialize.read.SAXReaderSettings;
 
@@ -80,6 +88,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 {
   private static final String FIELD_IMPORT_FILE = "importfile";
   private static final String FIELD_OVERWRITE_EXISTING = "overwriteexisting";
+  private static final String FIELD_DEFAULT_OWNER = "defaultowner";
   private static final boolean DEFAULT_OVERWRITE_EXISTING = false;
 
   public PageSecureServiceGroupExchange (@Nonnull @Nonempty final String sID)
@@ -89,6 +98,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
   public static void importXMLVer10 (@Nonnull final IMicroElement eRoot,
                                      final boolean bOverwriteExisting,
+                                     @Nonnull final ISMPUser aDefaultOwner,
                                      @Nonnull final ICommonsList <ISMPServiceGroup> aAllServiceGroups,
                                      @Nonnull final ICommonsList <ISMPBusinessCard> aAllBusinessCards,
                                      @Nonnull final InMemoryLogger aLogger)
@@ -104,7 +114,15 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     for (final IMicroElement eServiceGroup : eRoot.getAllChildElements (CSMPExchange.ELEMENT_SERVICEGROUP))
     {
       // Read service group and service information
-      final ISMPServiceGroup aServiceGroup = MicroTypeConverter.convertToNative (eServiceGroup, SMPServiceGroup.class);
+      final ISMPServiceGroup aServiceGroup = SMPServiceGroupMicroTypeConverter.convertToNative (eServiceGroup, x -> {
+        ISMPUser ret = SMPMetaManager.getUserMgr ().getUserOfID (x);
+        if (ret == null)
+        {
+          // Select the default owner if an unknown user is contained
+          ret = aDefaultOwner;
+        }
+        return ret;
+      });
       if (aServiceGroup == null)
       {
         aLogger.error ("Failed to read service group at index " + nSGIndex);
@@ -247,16 +265,79 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         // Start importing
         aLogger.info ("Import is performed!");
 
+        final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+        final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+        final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+
         // 1. delete all existing service groups to be imported (if overwrite);
         // this may implicitly delete business cards
+        for (final ISMPServiceGroup aDeleteServiceGroup : aDeleteServiceGroups)
+          if (aServiceGroupMgr.deleteSMPServiceGroup (aDeleteServiceGroup.getParticpantIdentifier ()).isChanged ())
+            aLogger.log (EErrorLevel.SUCCESS, "Successfully deleted service group " + aDeleteServiceGroup.getID ());
+          else
+            aLogger.error ("Failed to delete service group " + aDeleteServiceGroup.getID ());
 
         // 2. create all service groups
-
-        // 3. create all endpoints
+        for (final Map.Entry <ISMPServiceGroup, ICommonsList <ISMPServiceInformation>> aEntry : aImportServiceGroups.entrySet ())
+        {
+          final ISMPServiceGroup aImportServiceGroup = aEntry.getKey ();
+          ISMPServiceGroup aNewServiceGroup = null;
+          try
+          {
+            aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
+                                                                       aImportServiceGroup.getParticpantIdentifier (),
+                                                                       aImportServiceGroup.getExtensionAsString ());
+            aLogger.log (EErrorLevel.SUCCESS, "Successfully created service group " + aImportServiceGroup.getID ());
+          }
+          catch (final Throwable t)
+          {
+            // E.g. if SML connection failed
+            aLogger.error ("Error creating the new service group " + aImportServiceGroup.getID (), t);
+          }
+          if (aNewServiceGroup != null)
+          {
+            // 3. create all endpoints
+            for (final ISMPServiceInformation aImportServiceInfo : aEntry.getValue ())
+              try
+              {
+                aServiceInfoMgr.mergeSMPServiceInformation (aImportServiceInfo);
+                aLogger.log (EErrorLevel.SUCCESS,
+                             "Successfully created service information for " + aImportServiceGroup.getID ());
+              }
+              catch (final Throwable t)
+              {
+                // E.g. if SML connection failed
+                aLogger.error ("Error creating the new service information for " + aImportServiceGroup.getID (), t);
+              }
+          }
+        }
 
         // 4. delete all existing business cards to be imported (if overwrite)
+        for (final ISMPBusinessCard aDeleteBusinessCard : aDeleteBusinessCards)
+          try
+          {
+            if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard).isChanged ())
+              aLogger.log (EErrorLevel.SUCCESS, "Successfully deleted business card " + aDeleteBusinessCard.getID ());
+            else
+              aLogger.error ("Failed to delete business card " + aDeleteBusinessCard.getID ());
+          }
+          catch (final Throwable t)
+          {
+            aLogger.error ("Failed to delete business card " + aDeleteBusinessCard.getID (), t);
+          }
 
         // 5. create all new business cards
+        for (final ISMPBusinessCard aImportBusinessCard : aDeleteBusinessCards)
+          try
+          {
+            aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getServiceGroup (),
+                                                            aImportBusinessCard.getAllEntities ());
+            aLogger.log (EErrorLevel.SUCCESS, "Successfully created business card " + aImportBusinessCard.getID ());
+          }
+          catch (final Throwable t)
+          {
+            aLogger.error ("Failed to create business card " + aImportBusinessCard.getID (), t);
+          }
       }
   }
 
@@ -264,9 +345,11 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
   protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
     final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
     final FormErrorList aFormErrors = new FormErrorList ();
@@ -281,10 +364,19 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       // Start import
       final IFileItem aImportFile = aWPEC.getFileItem (FIELD_IMPORT_FILE);
       final boolean bOverwriteExisting = aWPEC.getCheckBoxAttr (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
+      final String sDefaultOwnerID = aWPEC.getAttributeAsString (FIELD_DEFAULT_OWNER);
+      final ISMPUser aDefaultOwner = aUserMgr.getUserOfID (sDefaultOwnerID);
 
       if (aImportFile == null || aImportFile.getSize () == 0)
         aFormErrors.addFieldError (FIELD_IMPORT_FILE, "A file to import must be selected!");
+
+      if (StringHelper.hasNoText (sDefaultOwnerID))
+        aFormErrors.addFieldError (FIELD_DEFAULT_OWNER, "A default owner must be selected!");
       else
+        if (aDefaultOwner == null)
+          aFormErrors.addFieldError (FIELD_DEFAULT_OWNER, "A valid default owner must be selected!");
+
+      if (aFormErrors.isEmpty ())
       {
         final SAXReaderSettings aSRS = new SAXReaderSettings ();
         final IMicroDocument aDoc = MicroReader.readMicroXML (aImportFile, aSRS);
@@ -300,6 +392,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             final InMemoryLogger aLogger = new InMemoryLogger ();
             importXMLVer10 (aDoc.getDocumentElement (),
                             bOverwriteExisting,
+                            aDefaultOwner,
                             aAllServiceGroups,
                             aAllBusinessCards,
                             aLogger);
@@ -317,7 +410,11 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                     eLabelType = EBootstrapLabelType.INFO;
                   else
                     eLabelType = EBootstrapLabelType.SUCCESS;
-              aImportResultUL.addItem (new BootstrapLabel (eLabelType).addChild (aLogMsg.getMessage ().toString ()));
+
+              String sMsg = aLogMsg.getMessage ().toString ();
+              if (aLogMsg.getThrowable () != null)
+                sMsg += " Technical details: " + aLogMsg.getThrowable ().getMessage ();
+              aImportResultUL.addItem (new BootstrapLabel (eLabelType).addChild (sMsg));
             }
           }
           else
@@ -376,6 +473,11 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                                                                                                              DEFAULT_OVERWRITE_EXISTING)))
                                                    .setHelpText ("If this box is checked, all existing endpoints etc. of a service group are deleted and new endpoints are created! If the PEPPOL directory integration is enabled, existing business cards contained in the import are also overwritten!")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_OVERWRITE_EXISTING)));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owner of the new service groups")
+                                                   .setCtrl (new HCSMPUserSelect (new RequestField (FIELD_DEFAULT_OWNER),
+                                                                                  aDisplayLocale))
+                                                   .setHelpText ("This owner is only selected, if the owner contained in the import file is unknown.")
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_DEFAULT_OWNER)));
 
       final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
       aToolbar.addHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM);

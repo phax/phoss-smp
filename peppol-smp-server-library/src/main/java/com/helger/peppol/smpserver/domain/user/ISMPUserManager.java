@@ -56,7 +56,7 @@ import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public interface ISMPUserManager
+public interface ISMPUserManager extends ISMPUserProvider
 {
   /**
    * @return <code>true</code> for SQL, <code>false</code> for XML. If this
@@ -80,16 +80,6 @@ public interface ISMPUserManager
   @Nonnull
   @ReturnsMutableCopy
   ICommonsList <ISMPUser> getAllUsers ();
-
-  /**
-   * Get the user with the specified ID.
-   *
-   * @param sUserID
-   *        The user ID to search. May be <code>null</code>.
-   * @return <code>null</code> if no such user exists.
-   */
-  @Nullable
-  ISMPUser getUserOfID (@Nullable String sUserID);
 
   /**
    * Check if an SMP user matching the user name of the BasicAuth credentials

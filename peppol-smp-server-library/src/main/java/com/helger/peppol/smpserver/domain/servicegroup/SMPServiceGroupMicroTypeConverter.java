@@ -21,8 +21,9 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.photon.security.mgr.PhotonSecurityManager;
-import com.helger.photon.security.user.IUser;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.domain.user.ISMPUser;
+import com.helger.peppol.smpserver.domain.user.ISMPUserProvider;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
@@ -58,10 +59,11 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   }
 
   @Nonnull
-  public ISMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement)
+  public static ISMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement,
+                                                  @Nonnull final ISMPUserProvider aUserProvider)
   {
     final String sOwnerID = aElement.getAttributeValue (ATTR_OWNER_ID);
-    final IUser aOwner = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwnerID);
+    final ISMPUser aOwner = aUserProvider.getUserOfID (sOwnerID);
     if (aOwner == null)
       throw new IllegalStateException ("Failed to resolve user ID '" + sOwnerID + "'");
 
@@ -71,5 +73,11 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
     return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
+  }
+
+  @Nonnull
+  public ISMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement)
+  {
+    return convertToNative (aElement, SMPMetaManager.getUserMgr ());
   }
 }

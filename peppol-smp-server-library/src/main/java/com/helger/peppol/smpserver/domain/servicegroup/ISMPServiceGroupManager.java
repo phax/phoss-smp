@@ -69,7 +69,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   CallbackList <ISMPServiceGroupCallback> getServiceGroupCallbacks ();
 
   /**
-   * Create a new service group.
+   * Create a new service group. The implementation of this class is responsible
+   * for creating the service group in the SML!
    *
    * @param sOwnerID
    *        The ID of the owning user. May neither be <code>null</code> nor
@@ -112,7 +113,9 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   /**
    * Delete an existing service group. If the service group exists and can be
    * deleted, the implementation of this method is responsible to remove all
-   * related service information and redirects of the service group.
+   * related service information and redirects of the service group. The
+   * implementation of this class is responsible for deleting the service group
+   * in the SML!
    *
    * @param aParticipantIdentifier
    *        The participant identifier to be deleted. May be <code>null</code>.
