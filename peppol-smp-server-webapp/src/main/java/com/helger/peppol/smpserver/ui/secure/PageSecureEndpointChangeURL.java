@@ -90,8 +90,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    if (aServiceGroupMgr.getSMPServiceGroupCount () == 0)
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to change endpoints."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")

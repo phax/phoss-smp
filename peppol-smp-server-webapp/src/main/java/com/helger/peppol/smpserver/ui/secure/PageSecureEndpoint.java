@@ -206,8 +206,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    if (aServiceGroupMgr.getSMPServiceGroupCount () == 0)
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to create an endpoint for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
@@ -426,7 +426,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
-    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
@@ -468,7 +468,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A service group must be selected!");
     else
     {
-      aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
+      aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
       if (aServiceGroup == null)
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided service group does not exist!");
     }
