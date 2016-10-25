@@ -27,6 +27,8 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardMicroTypeConverter;
+import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
+import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
@@ -55,6 +57,7 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
     final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
 
     final IMicroDocument aDoc = new MicroDocument ();
@@ -62,15 +65,25 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
     eRoot.setAttribute (CSMPExchange.ATTR_VERSION, CSMPExchange.VERSION_10);
 
     // Add all service groups
-    for (final ISMPServiceGroup aServiceGroup : aAllServiceGroups)
+    for (final ISMPServiceGroup aServiceGroup : aAllServiceGroups.getSortedInline (ISMPServiceGroup.comparator ()))
     {
       final IMicroElement eServiceGroup = eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aServiceGroup,
                                                                                                        CSMPExchange.ELEMENT_SERVICEGROUP));
+
+      // Add all service information
       final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
-      for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos)
+      for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos.getSortedInline (ISMPServiceInformation.comparator ()))
       {
         eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
                                                                              CSMPExchange.ELEMENT_SERVICEINFO));
+      }
+
+      // Add all redirects
+      final ICommonsList <ISMPRedirect> aAllRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aServiceGroup);
+      for (final ISMPRedirect aServiceInfo : aAllRedirects.getSortedInline (ISMPRedirect.comparator ()))
+      {
+        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
+                                                                             CSMPExchange.ELEMENT_REDIRECT));
       }
     }
 
@@ -80,7 +93,7 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
       // Add all business cards
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
-      for (final ISMPBusinessCard aBusinessCard : aAllBusinessCards)
+      for (final ISMPBusinessCard aBusinessCard : aAllBusinessCards.getSortedInline (ISMPBusinessCard.comparator ()))
         eRoot.appendChild (SMPBusinessCardMicroTypeConverter.convertToMicroElement (aBusinessCard,
                                                                                     null,
                                                                                     CSMPExchange.ELEMENT_BUSINESSCARD,

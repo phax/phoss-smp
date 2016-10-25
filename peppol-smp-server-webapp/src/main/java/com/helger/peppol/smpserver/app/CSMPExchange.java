@@ -31,6 +31,7 @@ public final class CSMPExchange
   public static final String ATTR_VERSION = "version";
   public static final String ELEMENT_SERVICEGROUP = "servicegroup";
   public static final String ELEMENT_SERVICEINFO = "serviceinfo";
+  public static final String ELEMENT_REDIRECT = "redirect";
   public static final String ELEMENT_BUSINESSCARD = "businesscard";
 
   private CSMPExchange ()

@@ -41,6 +41,7 @@
 package com.helger.peppol.smpserver.domain.businesscard;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nonnegative;
@@ -96,4 +97,10 @@ public interface ISMPBusinessCard extends IHasID <String>, Serializable
    */
   @Nonnull
   PDBusinessCardType getAsJAXBObject ();
+
+  @Nonnull
+  static Comparator <ISMPBusinessCard> comparator ()
+  {
+    return Comparator.comparing (ISMPBusinessCard::getServiceGroupID);
+  }
 }
