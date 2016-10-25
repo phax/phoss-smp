@@ -96,6 +96,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
     final ICommonsOrderedMap <ISMPServiceGroup, ICommonsList <ISMPServiceInformation>> aImportServiceGroups = new CommonsLinkedHashMap<> ();
+    final ICommonsList <ISMPServiceGroup> aDeleteServiceGroups = new CommonsArrayList<> ();
 
     // First read all service groups as they are dependents of the
     // business cards
@@ -125,7 +126,12 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           // Remember to create/overwrite the service group
           final ICommonsList <ISMPServiceInformation> aSGInfo = new CommonsArrayList<> ();
           aImportServiceGroups.put (aServiceGroup, aSGInfo);
-          aLogger.log (EErrorLevel.SUCCESS, "Read service group " + sServiceGroupID);
+          if (bIsServiceGroupContained)
+            aDeleteServiceGroups.add (aServiceGroup);
+          aLogger.log (EErrorLevel.SUCCESS, "Will " +
+                                            (bIsServiceGroupContained ? "overwrite" : "import") +
+                                            " service group " +
+                                            sServiceGroupID);
 
           // read all contained service information
           int nSIIndex = 0;
@@ -160,6 +166,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
     // Now read the business cards
     final ICommonsOrderedSet <ISMPBusinessCard> aImportBusinessCards = new CommonsLinkedHashSet<> ();
+    final ICommonsList <ISMPBusinessCard> aDeleteBusinessCards = new CommonsArrayList<> ();
     if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
     {
       // Read them only if the PEPPOL Directory integration is enabled
@@ -195,9 +202,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         else
         {
           final String sBusinessCardID = aBusinessCard.getID ();
-          final boolean bIsServiceGroupContained = aAllBusinessCards.containsAny (x -> x.getID ()
+          final boolean bIsBusinessCardContained = aAllBusinessCards.containsAny (x -> x.getID ()
                                                                                         .equals (sBusinessCardID));
-          if (!bIsServiceGroupContained || bOverwriteExisting)
+          if (!bIsBusinessCardContained || bOverwriteExisting)
           {
             final ISMPServiceGroup aBCSG = aBusinessCard.getServiceGroup ();
             if (aImportBusinessCards.removeIf (x -> x.getServiceGroup ().equals (aBCSG)))
@@ -207,7 +214,12 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                              " is already contained in the file. Will overwrite the previous definition.");
             }
             aImportBusinessCards.add (aBusinessCard);
-            aLogger.log (EErrorLevel.SUCCESS, "Read business card for " + sBusinessCardID);
+            if (bIsBusinessCardContained)
+              aDeleteBusinessCards.add (aBusinessCard);
+            aLogger.log (EErrorLevel.SUCCESS, "Will " +
+                                              (bIsBusinessCardContained ? "overwrite" : "import") +
+                                              " business card for " +
+                                              sBusinessCardID);
           }
           else
           {
@@ -233,12 +245,18 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       else
       {
         // Start importing
-        aLogger.error ("Import is performed!");
+        aLogger.info ("Import is performed!");
 
         // 1. delete all existing service groups to be imported (if overwrite);
-        // this may delete business cards
+        // this may implicitly delete business cards
 
         // 2. create all service groups
+
+        // 3. create all endpoints
+
+        // 4. delete all existing business cards to be imported (if overwrite)
+
+        // 5. create all new business cards
       }
   }
 
