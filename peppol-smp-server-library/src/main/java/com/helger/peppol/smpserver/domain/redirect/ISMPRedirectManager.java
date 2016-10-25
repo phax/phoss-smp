@@ -110,7 +110,7 @@ public interface ISMPRedirectManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <? extends ISMPRedirect> getAllSMPRedirects ();
+  ICommonsList <ISMPRedirect> getAllSMPRedirects ();
 
   /**
    * Get all redirects of the passed service group.
@@ -122,7 +122,7 @@ public interface ISMPRedirectManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   /**
    * @return The count of all contained redirects. Always &ge; 0.

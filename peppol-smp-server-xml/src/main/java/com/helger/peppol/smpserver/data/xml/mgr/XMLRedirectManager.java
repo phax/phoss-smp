@@ -178,21 +178,21 @@ public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedire
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirects ()
+  public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
     return getAll ();
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
     return getAllSMPRedirectsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
+  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList<> ();
     if (StringHelper.hasText (sServiceGroupID))

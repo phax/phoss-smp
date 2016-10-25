@@ -144,7 +144,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
                                                                                 ISMPServiceGroup.comparator ()))
         {
           final HCUL aULPerSG = new HCUL ();
-          final Collection <? extends ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (aServiceGroup);
+          final Collection <? extends ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
           if (aServiceInfos.isEmpty ())
           {
             aULPerSG.addItem (_createWarning ("No endpoint is configured for this service group."));

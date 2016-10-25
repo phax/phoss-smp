@@ -158,7 +158,7 @@ public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBu
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPBusinessCard> getAllSMPBusinessCards ()
+  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     return getAll ();
   }

@@ -65,12 +65,12 @@ final class MockSMPRedirectManager implements ISMPRedirectManager
     return 0;
   }
 
-  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirects ()
+  public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
     throw new UnsupportedOperationException ();
   }

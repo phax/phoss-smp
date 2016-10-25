@@ -102,7 +102,7 @@ public interface ISMPTransportProfileManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <? extends ISMPTransportProfile> getAllSMPTransportProfiles ();
+  ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ();
 
   /**
    * Get the transport profile with the passed ID.

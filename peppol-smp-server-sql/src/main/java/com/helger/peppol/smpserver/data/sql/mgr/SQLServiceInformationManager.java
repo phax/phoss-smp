@@ -401,7 +401,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
     final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
     if (aServiceGroup != null)
@@ -432,7 +432,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
-      for (final ISMPServiceInformation aServiceInformation : getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
+      for (final ISMPServiceInformation aServiceInformation : getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
         ret.add (aServiceInformation.getDocumentTypeIdentifier ());
     }
     return ret;

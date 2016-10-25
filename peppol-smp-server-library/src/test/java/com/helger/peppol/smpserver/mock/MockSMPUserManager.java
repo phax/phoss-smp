@@ -40,7 +40,7 @@
  */
 package com.helger.peppol.smpserver.mock;
 
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
@@ -84,7 +84,7 @@ final class MockSMPUserManager implements ISMPUserManager
     return 0;
   }
 
-  public ICommonsCollection <? extends ISMPUser> getAllUsers ()
+  public ICommonsList <ISMPUser> getAllUsers ()
   {
     throw new UnsupportedOperationException ();
   }

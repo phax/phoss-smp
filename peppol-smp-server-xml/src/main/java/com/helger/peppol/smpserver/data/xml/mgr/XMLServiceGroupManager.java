@@ -196,7 +196,7 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
       aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
 
       // Remember all service information (in case of an error) and delete them
-      aOldServiceInformation = aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (aSMPServiceGroup);
+      aOldServiceInformation = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
       aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
     }
     catch (final RuntimeException ex)

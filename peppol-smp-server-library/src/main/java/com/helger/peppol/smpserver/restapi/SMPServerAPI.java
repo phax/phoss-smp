@@ -40,7 +40,6 @@
  */
 package com.helger.peppol.smpserver.restapi;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -164,7 +163,7 @@ public final class SMPServerAPI
       final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
       aCompleteServiceGroup.setServiceGroup (aSG);
 
-      for (final ISMPServiceInformation aService : aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
+      for (final ISMPServiceInformation aService : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
         aCompleteServiceGroup.addServiceMetadata (aService.getAsJAXBObjectPeppol ());
 
       s_aLogger.info (LOG_PREFIX + "Finished getCompleteServiceGroup(" + sServiceGroupID + ")");
@@ -204,8 +203,8 @@ public final class SMPServerAPI
 
       final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
       final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-      final Collection <? extends ISMPServiceGroup> aServiceGroups = SMPMetaManager.getServiceGroupMgr ()
-                                                                                   .getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
+      final ICommonsList <ISMPServiceGroup> aServiceGroups = SMPMetaManager.getServiceGroupMgr ()
+                                                                           .getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
 
       final ServiceGroupReferenceListType aRefList = new ServiceGroupReferenceListType ();
       final List <ServiceGroupReferenceType> aReferenceTypes = aRefList.getServiceGroupReference ();

@@ -71,7 +71,7 @@ final class MockSMLInfoManager implements ISMLInfoManager
     return null;
   }
 
-  public ICommonsList <? extends ISMLInfo> getAllSMLInfos ()
+  public ICommonsList <ISMLInfo> getAllSMLInfos ()
   {
     throw new UnsupportedOperationException ();
   }

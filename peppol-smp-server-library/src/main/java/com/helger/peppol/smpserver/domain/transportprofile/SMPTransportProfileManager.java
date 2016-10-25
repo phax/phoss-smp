@@ -146,7 +146,7 @@ public final class SMPTransportProfileManager extends AbstractMapBasedWALDAO <IS
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPTransportProfile> getAllSMPTransportProfiles ()
+  public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
   {
     return getAll ();
   }

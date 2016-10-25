@@ -193,7 +193,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirects ()
+  public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
     JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
     ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p",
@@ -202,7 +202,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     if (ret.hasThrowable ())
       throw new RuntimeException (ret.getThrowable ());
 
-    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList<> ();
+    final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList<> ();
     for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
       aRedirects.add (_convert (aDBRedirect));
     return aRedirects;
@@ -210,9 +210,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <SMPRedirect> aRedirects = new CommonsArrayList<> ();
+    final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList<> ();
     if (aServiceGroup != null)
     {
       JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;

@@ -49,7 +49,7 @@ import javax.persistence.EntityManager;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
@@ -127,7 +127,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <DBUser> getAllUsers ()
+  public ICommonsList <ISMPUser> getAllUsers ()
   {
     JPAExecutionResult <Collection <DBUser>> ret;
     ret = doSelect ( () -> getEntityManager ().createQuery ("SELECT p FROM DBUser p", DBUser.class).getResultList ());

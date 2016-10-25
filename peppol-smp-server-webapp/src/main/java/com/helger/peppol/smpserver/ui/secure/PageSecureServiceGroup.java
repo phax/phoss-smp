@@ -468,7 +468,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceGroup aCurObject : aServiceGroupMgr.getAllSMPServiceGroups ())
     {
-      final Collection <? extends ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationsOfServiceGroup (aCurObject);
+      final Collection <? extends ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurObject);
       int nProcesses = 0;
       int nEndpoints = 0;
       for (final ISMPServiceInformation aSI : aSIs)

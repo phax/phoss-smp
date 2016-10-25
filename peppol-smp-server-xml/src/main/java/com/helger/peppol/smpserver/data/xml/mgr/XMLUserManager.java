@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -82,9 +81,9 @@ public final class XMLUserManager implements ISMPUserManager
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsCollection <XMLDataUser> getAllUsers ()
+  public ICommonsList <ISMPUser> getAllUsers ()
   {
-    final ICommonsList <XMLDataUser> ret = new CommonsArrayList<> ();
+    final ICommonsList <ISMPUser> ret = new CommonsArrayList<> ();
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ().getAllActiveUsers ())
       ret.add (new XMLDataUser (aUser));
     return ret;

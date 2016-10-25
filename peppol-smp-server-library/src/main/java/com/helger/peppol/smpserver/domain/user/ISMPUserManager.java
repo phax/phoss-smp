@@ -45,7 +45,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.ext.ICommonsCollection;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
@@ -79,7 +79,7 @@ public interface ISMPUserManager
 
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsCollection <? extends ISMPUser> getAllUsers ();
+  ICommonsList <ISMPUser> getAllUsers ();
 
   /**
    * Get the user with the specified ID.

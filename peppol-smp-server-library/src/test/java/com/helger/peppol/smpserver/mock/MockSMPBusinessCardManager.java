@@ -71,7 +71,7 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
     return 0;
   }
 
-  public ICommonsList <? extends ISMPBusinessCard> getAllSMPBusinessCards ()
+  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     throw new UnsupportedOperationException ();
   }

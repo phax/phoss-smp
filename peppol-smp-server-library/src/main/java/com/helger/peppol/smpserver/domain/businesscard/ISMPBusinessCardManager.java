@@ -89,7 +89,7 @@ public interface ISMPBusinessCardManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <? extends ISMPBusinessCard> getAllSMPBusinessCards ();
+  ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ();
 
   /**
    * Get the business card of the passed service group.

@@ -153,7 +153,7 @@ public interface ISMPServiceInformationManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   /**
    * Get all SMP document types that are registered for the provided service

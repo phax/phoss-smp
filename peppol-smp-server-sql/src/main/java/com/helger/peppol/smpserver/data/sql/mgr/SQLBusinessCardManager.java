@@ -282,7 +282,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMPBusinessCard> getAllSMPBusinessCards ()
+  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     JPAExecutionResult <List <DBBusinessCardEntity>> ret;
     ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p",
@@ -297,7 +297,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       aGrouped.putSingle (aDBItem.getAsBusinessIdentifier (), aDBItem);
 
     // Convert
-    final ICommonsList <SMPBusinessCard> aRedirects = new CommonsArrayList<> ();
+    final ICommonsList <ISMPBusinessCard> aRedirects = new CommonsArrayList<> ();
     for (final Map.Entry <IParticipantIdentifier, ICommonsList <DBBusinessCardEntity>> aEntry : aGrouped.entrySet ())
       aRedirects.add (_convert (aEntry.getKey (), aEntry.getValue ()));
     return aRedirects;

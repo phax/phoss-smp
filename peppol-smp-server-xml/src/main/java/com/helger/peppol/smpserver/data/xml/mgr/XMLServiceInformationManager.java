@@ -184,7 +184,7 @@ public final class XMLServiceInformationManager extends
   public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
     EChange eChange = EChange.UNCHANGED;
-    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationsOfServiceGroup (aServiceGroup))
+    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
       eChange = eChange.or (deleteSMPServiceInformation (aSMPServiceInformation));
     return eChange;
   }
@@ -204,7 +204,7 @@ public final class XMLServiceInformationManager extends
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList<> ();
     if (aServiceGroup != null)

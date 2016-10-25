@@ -160,7 +160,7 @@ public final class SMLInfoManager extends AbstractMapBasedWALDAO <ISMLInfo, SMLI
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <? extends ISMLInfo> getAllSMLInfos ()
+  public ICommonsList <ISMLInfo> getAllSMLInfos ()
   {
     return getAll ();
   }

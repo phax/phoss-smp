@@ -67,7 +67,7 @@ final class MockSMPTransportProfileManager implements ISMPTransportProfileManage
     return null;
   }
 
-  public ICommonsList <? extends ISMPTransportProfile> getAllSMPTransportProfiles ()
+  public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
   {
     throw new UnsupportedOperationException ();
   }
