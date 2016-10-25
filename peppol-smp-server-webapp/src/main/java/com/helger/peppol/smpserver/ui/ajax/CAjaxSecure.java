@@ -37,6 +37,8 @@ public final class CAjaxSecure
                                                                                                                                               AjaxExecutorSecureCreateBusinessCardIdentifierInput.class);
   public static final IAjaxFunctionDeclaration FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT = new SecureApplicationAjaxFunctionDeclaration ("createBusinessCardContactInput",
                                                                                                                                            AjaxExecutorSecureCreateBusinessCardContactInput.class);
+  public static final IAjaxFunctionDeclaration FUNCTION_EXPORT_ALL_SERVICE_GROUPS = new SecureApplicationAjaxFunctionDeclaration ("exportAllServiceGroups",
+                                                                                                                                  AjaxExecutorSecureExportAllServiceGroups.class);
 
   private CAjaxSecure ()
   {}
@@ -46,5 +48,6 @@ public final class CAjaxSecure
     aAjaxInvoker.registerFunction (FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT);
     aAjaxInvoker.registerFunction (FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT);
     aAjaxInvoker.registerFunction (FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT);
+    aAjaxInvoker.registerFunction (FUNCTION_EXPORT_ALL_SERVICE_GROUPS);
   }
 }

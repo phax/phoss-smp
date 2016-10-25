@@ -46,7 +46,12 @@ public final class MenuSecure
 
     if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
       aMenuTree.createRootItem (new PageSecureUser (CMenuSecure.MENU_USERS));
-    aMenuTree.createRootItem (new PageSecureServiceGroup (CMenuSecure.MENU_SERVICE_GROUPS));
+
+    {
+      final IMenuItemPage aServiceGroups = aMenuTree.createRootItem (new PageSecureServiceGroup (CMenuSecure.MENU_SERVICE_GROUPS));
+      aMenuTree.createItem (aServiceGroups,
+                            new PageSecureServiceGroupExchange (CMenuSecure.MENU_SERVICE_GROUPS_EXCHANGE));
+    }
     {
       final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new PageSecureEndpoint (CMenuSecure.MENU_ENDPOINTS));
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointChangeURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_URL));

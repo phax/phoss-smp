@@ -24,6 +24,7 @@ public final class CMenuSecure
   // Menu item IDs
   public static final String MENU_USERS = "users";
   public static final String MENU_SERVICE_GROUPS = "service_groups";
+  public static final String MENU_SERVICE_GROUPS_EXCHANGE = "service_groups_exchange";
 
   public static final String MENU_ENDPOINTS = "endpoints";
   public static final String MENU_ENDPOINTS_CHANGE_URL = "endpoints_change_url";
