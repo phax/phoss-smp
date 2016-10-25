@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.html.hc.IHCNode;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
-import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCards;
+import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCard;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
@@ -36,7 +36,7 @@ public final class AjaxExecutorSecureCreateBusinessCardEntityInput extends Abstr
   @Nonnull
   protected AjaxHtmlResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
   {
-    final IHCNode aNode = PageSecureBusinessCards.createEntityInputForm (aLEC,
+    final IHCNode aNode = PageSecureBusinessCard.createEntityInputForm (aLEC,
                                                                          (SMPBusinessCardEntity) null,
                                                                          (String) null,
                                                                          new FormErrorList ());

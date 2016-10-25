@@ -94,7 +94,7 @@ import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
 @WorkInProgress
-public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPServiceGroup>
+public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPServiceGroup>
 {
   private static final String FIELD_PARTICIPANT_ID_SCHEME = "participantidscheme";
   private static final String FIELD_PARTICIPANT_ID_VALUE = "participantidvalue";
@@ -103,7 +103,7 @@ public final class PageSecureServiceGroups extends AbstractSMPWebPageForm <ISMPS
 
   private static final String ACTION_CHECK_DNS = "checkdns";
 
-  public PageSecureServiceGroups (@Nonnull @Nonempty final String sID)
+  public PageSecureServiceGroup (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Service groups");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPServiceGroup, WebPageExecutionContext> ()

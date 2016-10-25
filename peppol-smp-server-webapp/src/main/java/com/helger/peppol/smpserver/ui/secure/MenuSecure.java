@@ -45,16 +45,16 @@ public final class MenuSecure
     final IMenuObjectFilter aFilterSMLConnectionActive = aValue -> SMPMetaManager.getSettings ().isWriteToSML ();
 
     if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
-      aMenuTree.createRootItem (new PageSecureUsers (CMenuSecure.MENU_USERS));
-    aMenuTree.createRootItem (new PageSecureServiceGroups (CMenuSecure.MENU_SERVICE_GROUPS));
+      aMenuTree.createRootItem (new PageSecureUser (CMenuSecure.MENU_USERS));
+    aMenuTree.createRootItem (new PageSecureServiceGroup (CMenuSecure.MENU_SERVICE_GROUPS));
     {
-      final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new PageSecureEndpoints (CMenuSecure.MENU_ENDPOINTS));
-      aMenuTree.createItem (aEndpoints, new PageSecureEndpointsChangeURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_URL));
+      final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new PageSecureEndpoint (CMenuSecure.MENU_ENDPOINTS));
+      aMenuTree.createItem (aEndpoints, new PageSecureEndpointChangeURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_URL));
       aMenuTree.createItem (aEndpoints,
-                            new PageSecureEndpointsChangeCertificate (CMenuSecure.MENU_ENDPOINTS_CHANGE_CERTIFICATE));
+                            new PageSecureEndpointChangeCertificate (CMenuSecure.MENU_ENDPOINTS_CHANGE_CERTIFICATE));
     }
-    aMenuTree.createRootItem (new PageSecureRedirects (CMenuSecure.MENU_REDIRECTS));
-    aMenuTree.createRootItem (new PageSecureBusinessCards (CMenuSecure.MENU_BUSINESS_CARDS))
+    aMenuTree.createRootItem (new PageSecureRedirect (CMenuSecure.MENU_REDIRECTS));
+    aMenuTree.createRootItem (new PageSecureBusinessCard (CMenuSecure.MENU_BUSINESS_CARDS))
              .setDisplayFilter (aFilterPEPPOLDirectory);
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
     aMenuTree.createRootItem (new PageSecureTasks (CMenuSecure.MENU_TASKS));

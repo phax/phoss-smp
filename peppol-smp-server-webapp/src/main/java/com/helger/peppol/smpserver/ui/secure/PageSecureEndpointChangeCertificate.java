@@ -16,9 +16,12 @@
  */
 package com.helger.peppol.smpserver.ui.secure;
 
+import java.security.cert.X509Certificate;
+import java.time.LocalDate;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
@@ -29,22 +32,21 @@ import com.helger.commons.collection.ext.ICommonsSortedSet;
 import com.helger.commons.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.collection.multimap.MultiHashMapHashSetBased;
 import com.helger.commons.compare.ESortOrder;
+import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
-import com.helger.commons.url.URLValidator;
-import com.helger.html.hc.html.forms.HCEdit;
+import com.helger.datetime.format.PDTToString;
+import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCHiddenField;
-import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.peppol.identifier.factory.IIdentifierFactory;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -69,20 +71,20 @@ import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
+import com.helger.security.certificate.CertificateHelper;
 
-public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
+public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPage
 {
-  private static final String SERVICE_GROUP_ALL = "all";
-  private static final String FIELD_SERVICE_GROUP = "servicegroup";
-  private static final String FIELD_OLD_URL = "oldurl";
-  private static final String FIELD_NEW_URL = "newurl";
+  private static final String FIELD_OLD_CERTIFICATE = "oldcert";
+  private static final String FIELD_NEW_CERTIFICATE = "newcert";
 
-  public PageSecureEndpointsChangeURL (@Nonnull @Nonempty final String sID)
+  public PageSecureEndpointChangeCertificate (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "Bulk change URL");
+    super (sID, "Bulk change certificate");
   }
 
   @Override
@@ -103,13 +105,56 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
     return super.isValidToDisplayPage (aWPEC);
   }
 
+  @Nullable
+  private static String _getCertificateParsingError (@Nonnull final String sCert)
+  {
+    X509Certificate aEndpointCert = null;
+    try
+    {
+      aEndpointCert = CertificateHelper.convertStringToCertficate (sCert);
+    }
+    catch (final Exception ex)
+    {
+      return ex.getMessage ();
+    }
+    return aEndpointCert != null ? null : "Invalid input string provided";
+  }
+
+  @Nonnull
+  private static IHCNode _getCertificateDisplay (@Nullable final String sCert, @Nonnull final Locale aDisplayLocale)
+  {
+    X509Certificate aEndpointCert = null;
+    try
+    {
+      aEndpointCert = CertificateHelper.convertStringToCertficate (sCert);
+    }
+    catch (final Exception ex)
+    {
+      // Ignore
+    }
+    if (aEndpointCert == null)
+    {
+      final int nDisplayLen = 20;
+      final String sCertPart = (sCert.length () > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert);
+      return new HCDiv ().addChild ("Invalid certificate" + (sCert.length () > nDisplayLen ? " starting with: " : ": "))
+                         .addChild (new HCCode ().addChild (sCertPart));
+    }
+
+    final HCNodeList ret = new HCNodeList ();
+    ret.addChild (new HCDiv ().addChild ("Issuer: " + aEndpointCert.getIssuerDN ().toString ()));
+    ret.addChild (new HCDiv ().addChild ("Subject: " + aEndpointCert.getSubjectDN ().toString ()));
+    final LocalDate aNotBefore = PDTFactory.createLocalDate (aEndpointCert.getNotBefore ());
+    ret.addChild (new HCDiv ().addChild ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+    final LocalDate aNotAfter = PDTFactory.createLocalDate (aEndpointCert.getNotAfter ());
+    ret.addChild (new HCDiv ().addChild ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+    return ret;
+  }
+
   @Override
   protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     boolean bShowList = true;
 
@@ -117,20 +162,15 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
     final MultiHashMapHashSetBased <String, ISMPServiceGroup> aServiceGroupsGroupedPerURL = new MultiHashMapHashSetBased<> ();
     final ICommonsList <? extends ISMPServiceInformation> aAllSIs = aServiceInfoMgr.getAllSMPServiceInformation ();
     int nTotalEndpointCount = 0;
-    int nTotalEndpointCountWithURL = 0;
     for (final ISMPServiceInformation aSI : aAllSIs)
     {
       final ISMPServiceGroup aSG = aSI.getServiceGroup ();
       for (final ISMPProcess aProcess : aSI.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
+          aEndpointsGroupedPerURL.putSingle (aEndpoint.getCertificate (), aEndpoint);
+          aServiceGroupsGroupedPerURL.putSingle (aEndpoint.getCertificate (), aSG);
           ++nTotalEndpointCount;
-          if (aEndpoint.hasEndpointReference ())
-          {
-            aEndpointsGroupedPerURL.putSingle (aEndpoint.getEndpointReference (), aEndpoint);
-            aServiceGroupsGroupedPerURL.putSingle (aEndpoint.getEndpointReference (), aSG);
-            ++nTotalEndpointCountWithURL;
-          }
         }
     }
 
@@ -139,36 +179,33 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
       bShowList = false;
       final FormErrorList aFormErrors = new FormErrorList ();
 
-      final String sOldURL = aWPEC.getAttributeAsString (FIELD_OLD_URL);
+      final String sOldCert = aWPEC.getAttributeAsString (FIELD_OLD_CERTIFICATE);
 
       if (aWPEC.hasSubAction (CPageParam.ACTION_SAVE))
       {
-        // Find selected service group (if any)
-        final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP);
-        ISMPServiceGroup aServiceGroup = null;
-        if (StringHelper.hasText (sServiceGroupID))
+        final String sNewCert = aWPEC.getAttributeAsString (FIELD_NEW_CERTIFICATE);
+
+        if (StringHelper.hasNoText (sOldCert))
+          aFormErrors.addFieldInfo (FIELD_OLD_CERTIFICATE, "An old certificate must be provided");
+        else
         {
-          final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-          if (aParticipantID != null)
-            aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
+          final String sErrorDetails = _getCertificateParsingError (sOldCert);
+          if (sErrorDetails != null)
+            aFormErrors.addFieldInfo (FIELD_OLD_CERTIFICATE, "The old certificate is invalid: " + sErrorDetails);
         }
 
-        final String sNewURL = aWPEC.getAttributeAsString (FIELD_NEW_URL);
-
-        if (StringHelper.hasNoText (sOldURL))
-          aFormErrors.addFieldInfo (FIELD_OLD_URL, "An old URL must be provided");
+        if (StringHelper.hasNoText (sNewCert))
+          aFormErrors.addFieldInfo (FIELD_NEW_CERTIFICATE, "A new certificate must be provided");
         else
-          if (!URLValidator.isValid (sOldURL))
-            aFormErrors.addFieldInfo (FIELD_OLD_URL, "The old URL is invalid");
-
-        if (StringHelper.hasNoText (sNewURL))
-          aFormErrors.addFieldInfo (FIELD_NEW_URL, "A new URL must be provided");
-        else
-          if (!URLValidator.isValid (sNewURL))
-            aFormErrors.addFieldInfo (FIELD_NEW_URL, "The new URL is invalid");
+        {
+          final String sErrorDetails = _getCertificateParsingError (sNewCert);
+          if (sErrorDetails != null)
+            aFormErrors.addFieldInfo (FIELD_NEW_CERTIFICATE, "The new certificate is invalid: " + sErrorDetails);
           else
-            if (sNewURL.equals (sOldURL))
-              aFormErrors.addFieldInfo (FIELD_NEW_URL, "The new URL is identical to the old URL");
+            if (sNewCert.equals (sOldCert))
+              aFormErrors.addFieldInfo (FIELD_NEW_CERTIFICATE,
+                                        "The new certificate is identical to the old certificate");
+        }
 
         // Validate parameters
         if (aFormErrors.isEmpty ())
@@ -178,18 +215,12 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
           final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet<> ();
           for (final ISMPServiceInformation aSI : aAllSIs)
           {
-            if (aServiceGroup != null && !aSI.getServiceGroup ().equals (aServiceGroup))
-            {
-              // Wrong service group
-              continue;
-            }
-
             boolean bChanged = false;
             for (final ISMPProcess aProcess : aSI.getAllProcesses ())
               for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-                if (sOldURL.equals (aEndpoint.getEndpointReference ()))
+                if (sOldCert.equals (aEndpoint.getCertificate ()))
                 {
-                  ((SMPEndpoint) aEndpoint).setEndpointReference (sNewURL);
+                  ((SMPEndpoint) aEndpoint).setCertificate (sNewCert);
                   bChanged = true;
                   ++nChangedEndpoints;
                 }
@@ -205,26 +236,23 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
             final HCUL aUL = new HCUL ();
             for (final String sChangedServiceGroupID : aChangedServiceGroup)
               aUL.addItem (sChangedServiceGroupID);
-            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChildren (new HCDiv ().addChild ("The old URL '" +
-                                                                                                          sOldURL +
-                                                                                                          "' was changed in " +
+            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChildren (new HCDiv ().addChild ("The old certificate was changed in " +
                                                                                                           nChangedEndpoints +
-                                                                                                          " endpoints. Effected service groups are:"),
+                                                                                                          " endpoints to the new certificate:"),
+                                                                                   _getCertificateDisplay (sNewCert,
+                                                                                                           aDisplayLocale),
+                                                                                   new HCDiv ().addChild ("Effected service groups are:"),
                                                                                    aUL));
           }
           else
-            aWPEC.postRedirectGetInternal (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old URL '" +
-                                                                             sOldURL +
-                                                                             "'"));
+            aWPEC.postRedirectGetInternal (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old certificate"));
         }
       }
 
-      final ICommonsSet <ISMPServiceGroup> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldURL);
+      final ICommonsSet <ISMPServiceGroup> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldCert);
       final int nSGCount = CollectionHelper.getSize (aServiceGroups);
-      final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldURL));
-      aNodeList.addChild (new BootstrapInfoBox ().addChild ("The selected old URL '" +
-                                                            sOldURL +
-                                                            "' is currently used in " +
+      final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldCert));
+      aNodeList.addChild (new BootstrapInfoBox ().addChild ("The selected old certificate is currently used in " +
                                                             nEPCount +
                                                             " " +
                                                             (nEPCount == 1 ? "endpoint" : "endpoints") +
@@ -238,36 +266,18 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT));
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_SUBACTION, CPageParam.ACTION_SAVE));
+      aForm.addChild (new HCHiddenField (FIELD_OLD_CERTIFICATE, sOldCert));
 
-      if (nSGCount > 1)
-      {
-        // Select the affected service groups if more than one is available
-        final HCSelect aSGSelect = new HCSelect (new RequestField (FIELD_SERVICE_GROUP));
-        aSGSelect.addOption (SERVICE_GROUP_ALL, "All affected Service Groups");
-        if (aServiceGroups != null)
-          for (final ISMPServiceGroup aSG : aServiceGroups.getSorted (ISMPServiceGroup.comparator ()))
-            aSGSelect.addOption (aSG.getID (), aSG.getParticpantIdentifier ().getURIEncoded ());
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service group")
-                                                     .setCtrl (aSGSelect)
-                                                     .setHelpText ("If a specific service group is selected, the URL change will only happen in the endpoints of the selected service group. Othwerwise the endpoint is changed in ALL service groups with matching endpoints.")
-                                                     .setErrorList (aFormErrors.getListOfField (FIELD_OLD_URL)));
-      }
-      else
-      {
-        // If less than 2 service groups are affected, use the 0/1
-        // automatically.
-        aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP, SERVICE_GROUP_ALL));
-      }
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Old certificate")
+                                                   .setCtrl (_getCertificateDisplay (sOldCert, aDisplayLocale))
+                                                   .setHelpText ("The old certificate that is to be changed in all matching endpoints")
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_OLD_CERTIFICATE)));
 
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Old endpoint URL")
-                                                   .setCtrl (new HCEdit (new RequestField (FIELD_OLD_URL, sOldURL)))
-                                                   .setHelpText ("The old URL that is to be changed in all matching endpoints")
-                                                   .setErrorList (aFormErrors.getListOfField (FIELD_OLD_URL)));
-
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New endpoint URL")
-                                                   .setCtrl (new HCEdit (new RequestField (FIELD_NEW_URL, sOldURL)))
-                                                   .setHelpText ("The new URL that is used instead")
-                                                   .setErrorList (aFormErrors.getListOfField (FIELD_NEW_URL)));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New certificate")
+                                                   .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_NEW_CERTIFICATE,
+                                                                                                       sOldCert)))
+                                                   .setHelpText ("The new certificate that is used instead")
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_NEW_CERTIFICATE)));
 
       final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
       aToolbar.addSubmitButton ("Save changes", EDefaultIcon.SAVE);
@@ -276,36 +286,31 @@ public final class PageSecureEndpointsChangeURL extends AbstractSMPWebPage
 
     if (bShowList)
     {
-      aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("This page lets you change the URLs of multiple endpoints at once. This is e.g. helpful when the underlying server got a new URL."),
+      aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("This page lets you change the certificates of multiple endpoints at once. This is e.g. helpful when the old certificate expired."),
                                                                new HCDiv ().addChild ("Currently " +
                                                                                       (nTotalEndpointCount == 1 ? "1 endpoint is"
                                                                                                                 : nTotalEndpointCount +
                                                                                                                   " endpoints are") +
-                                                                                      " registered" +
-                                                                                      (nTotalEndpointCountWithURL < nTotalEndpointCount ? " of which " +
-                                                                                                                                          nTotalEndpointCountWithURL +
-                                                                                                                                          " have an endpoint reference"
-                                                                                                                                        : "") +
-                                                                                      ".")));
+                                                                                      " registered.")));
 
-      final HCTable aTable = new HCTable (new DTCol ("Endpoint URL").setInitialSorting (ESortOrder.ASCENDING),
+      final HCTable aTable = new HCTable (new DTCol ("Certificate").setInitialSorting (ESortOrder.ASCENDING),
                                           new DTCol ("Service Group Count").setDisplayType (EDTColType.INT,
                                                                                             aDisplayLocale),
                                           new DTCol ("Endpoint Count").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-      aEndpointsGroupedPerURL.forEach ( (sURL, aEndpoints) -> {
+      aEndpointsGroupedPerURL.forEach ( (sCert, aEndpoints) -> {
         final HCRow aRow = aTable.addBodyRow ();
-        aRow.addCell (sURL);
+        aRow.addCell (_getCertificateDisplay (sCert, aDisplayLocale));
 
-        final int nSGCount = CollectionHelper.getSize (aServiceGroupsGroupedPerURL.get (sURL));
+        final int nSGCount = CollectionHelper.getSize (aServiceGroupsGroupedPerURL.get (sCert));
         aRow.addCell (Integer.toString (nSGCount));
 
         aRow.addCell (Integer.toString (aEndpoints.size ()));
 
         final ISimpleURL aEditURL = aWPEC.getSelfHref ()
                                          .add (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT)
-                                         .add (FIELD_OLD_URL, sURL);
-        aRow.addCell (new HCA (aEditURL).setTitle ("Change all endpoints pointing to " + sURL)
+                                         .add (FIELD_OLD_CERTIFICATE, sCert);
+        aRow.addCell (new HCA (aEditURL).setTitle ("Change all endpoints using this certificate")
                                         .addChild (EDefaultIcon.EDIT.getAsNode ()));
       });
 

@@ -121,7 +121,7 @@ import com.helger.web.servlet.request.IRequestParamMap;
 import com.helger.web.servlet.request.RequestParamMap;
 
 @WorkInProgress
-public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPBusinessCard>
+public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBusinessCard>
 {
   private static final String FIELD_SERVICE_GROUP_ID = "sgid";
   private static final String PREFIX_ENTITY = "entity";
@@ -141,7 +141,7 @@ public final class PageSecureBusinessCards extends AbstractSMPWebPageForm <ISMPB
   private static final String TMP_ID_PREFIX = "tmp";
   private static final String ACTION_PUBLISH_TO_INDEXER = "publishtoindexer";
 
-  public PageSecureBusinessCards (@Nonnull @Nonempty final String sID)
+  public PageSecureBusinessCard (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Business Cards");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPBusinessCard, WebPageExecutionContext> ()

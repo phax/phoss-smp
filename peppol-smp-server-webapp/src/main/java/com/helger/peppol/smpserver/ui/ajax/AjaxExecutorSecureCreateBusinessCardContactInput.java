@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.html.hc.IHCNode;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
-import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCards;
+import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCard;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
@@ -40,7 +40,7 @@ public final class AjaxExecutorSecureCreateBusinessCardContactInput extends Abst
   {
     final String sEntityID = aLEC.getAttributeAsString (PARAM_ENTITY_ID);
 
-    final IHCNode aNode = PageSecureBusinessCards.createContactInputForm (aLEC,
+    final IHCNode aNode = PageSecureBusinessCard.createContactInputForm (aLEC,
                                                                           sEntityID,
                                                                           (SMPBusinessCardContact) null,
                                                                           (String) null,

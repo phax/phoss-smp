@@ -77,7 +77,7 @@ import com.helger.photon.uictrls.prism.HCPrismJS;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
-public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedirect>
+public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedirect>
 {
   private static final String FIELD_SERVICE_GROUP_ID = "sgid";
   private static final String FIELD_DOCTYPE_ID = "doctypeid";
@@ -88,7 +88,7 @@ public final class PageSecureRedirects extends AbstractSMPWebPageForm <ISMPRedir
   private static final String ATTR_SERVICE_GROUP = "$servicegroup";
   private static final String ATTR_DOCTYPE_ID = "$doctypeid";
 
-  public PageSecureRedirects (@Nonnull @Nonempty final String sID)
+  public PageSecureRedirect (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Redirects");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPRedirect, WebPageExecutionContext> ()

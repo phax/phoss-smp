@@ -120,7 +120,7 @@ import com.helger.xml.microdom.serialize.MicroReader;
  *
  * @author Philip Helger
  */
-public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServiceInformation>
+public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServiceInformation>
 {
   private final static String FIELD_SERVICE_GROUP_ID = "sgid";
   private final static String FIELD_DOCTYPE_ID_SCHEME = "doctypeidscheme";
@@ -146,7 +146,7 @@ public final class PageSecureEndpoints extends AbstractSMPWebPageForm <ISMPServi
   private static final String VIEW_FLAT = "flat";
   private static final String VIEW_TREE = "tree";
 
-  public PageSecureEndpoints (@Nonnull @Nonempty final String sID)
+  public PageSecureEndpoint (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Endpoints");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPServiceInformation, WebPageExecutionContext> ()
