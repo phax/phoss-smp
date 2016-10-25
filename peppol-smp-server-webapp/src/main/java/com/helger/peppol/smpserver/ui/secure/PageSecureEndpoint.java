@@ -517,8 +517,10 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
         aTransportProfile != null &&
         aServiceInfoMgr.findServiceInformation (aServiceGroup, aDocTypeID, aProcessID, aTransportProfile) != null)
     {
-      aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE,
-                                 "Another endpoint for the provided service group, document type, process and transport profile is already present.");
+      final String sMsg = "Another endpoint for the provided service group, document type, process and transport profile is already present. Some of the identifiers may be treated case insensitive!";
+      aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, sMsg);
+      aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, sMsg);
+      aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, sMsg);
     }
 
     if (StringHelper.hasNoText (sEndpointReference))
