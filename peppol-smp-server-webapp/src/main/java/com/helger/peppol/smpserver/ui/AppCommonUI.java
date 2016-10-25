@@ -256,7 +256,7 @@ public final class AppCommonUI
   {
     EPredefinedDocumentTypeIdentifier ePredefined = null;
     for (final EPredefinedDocumentTypeIdentifier e : EPredefinedDocumentTypeIdentifier.values ())
-      if (e.getAsDocumentTypeIdentifier ().equals (aDocTypeID))
+      if (e.getAsDocumentTypeIdentifier ().hasSameContent (aDocTypeID))
       {
         ePredefined = e;
         break;
@@ -273,7 +273,7 @@ public final class AppCommonUI
   {
     EPredefinedProcessIdentifier ePredefined = null;
     for (final EPredefinedProcessIdentifier e : EPredefinedProcessIdentifier.values ())
-      if (e.getAsProcessIdentifier ().equals (aDocTypeID))
+      if (e.getAsProcessIdentifier ().hasSameContent (aDocTypeID))
       {
         ePredefined = e;
         break;

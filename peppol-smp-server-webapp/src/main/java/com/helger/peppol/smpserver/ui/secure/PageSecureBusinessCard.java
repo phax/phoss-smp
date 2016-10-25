@@ -37,6 +37,7 @@ import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.locale.country.CountryCache;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.state.ETriState;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
@@ -545,21 +546,22 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aSMPEntities.sort ( (o1, o2) -> o1.getName ().compareToIgnoreCase (o2.getName ()));
       aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities);
 
-      boolean bNotifiedServer = false;
+      ETriState eNotifiedServer = ETriState.UNDEFINED;
       if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
       {
         // Notify PD server
-        bNotifiedServer = PDClientProvider.getInstance ()
-                                          .getPDClient ()
-                                          .addServiceGroupToIndex (aServiceGroup.getParticpantIdentifier ())
-                                          .isSuccess ();
+        eNotifiedServer = ETriState.valueOf (PDClientProvider.getInstance ()
+                                                             .getPDClient ()
+                                                             .addServiceGroupToIndex (aServiceGroup.getParticpantIdentifier ())
+                                                             .isSuccess ());
       }
 
       aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
                                                                           aServiceGroup.getID () +
                                                                           "' was successfully saved." +
-                                                                          (bNotifiedServer ? " The PEPPOL Directory server was notified about this modification."
-                                                                                           : "")));
+                                                                          (eNotifiedServer.isTrue () ? " The PEPPOL Directory server was notified about this modification."
+                                                                                                     : eNotifiedServer.isFalse () ? " An error occurred when notifying the PEPPOL Directory server about the change."
+                                                                                                                                  : "")));
     }
   }
 
