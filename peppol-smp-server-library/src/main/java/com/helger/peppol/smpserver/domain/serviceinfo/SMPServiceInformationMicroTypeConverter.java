@@ -26,7 +26,7 @@ import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupProvider;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
@@ -65,12 +65,12 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   }
 
   @Nonnull
-  public ISMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement)
+  public static ISMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement,
+                                                        @Nonnull final ISMPServiceGroupProvider aSGProvider)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);
-    final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
+    final ISMPServiceGroup aServiceGroup = aSGProvider.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
     if (aServiceGroup == null)
       throw new IllegalStateException ("Failed to resolve service group with ID '" + sServiceGroupID + "'");
 
@@ -82,5 +82,11 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
     return new SMPServiceInformation (aServiceGroup, aDocTypeIdentifier, aProcesses, sExtension);
+  }
+
+  @Nonnull
+  public ISMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement)
+  {
+    return convertToNative (aElement, SMPMetaManager.getServiceGroupMgr ());
   }
 }

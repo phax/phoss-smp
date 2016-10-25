@@ -59,7 +59,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
  *
  * @author Philip Helger
  */
-public interface ISMPServiceGroupManager
+public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
 {
   /**
    * @return A non-<code>null</code> mutable list of callbacks.
@@ -153,17 +153,6 @@ public interface ISMPServiceGroupManager
    */
   @Nonnegative
   int getSMPServiceGroupCountOfOwner (@Nonnull String sOwnerID);
-
-  /**
-   * Get the service group of the passed participant identifier.
-   *
-   * @param aParticipantIdentifier
-   *        The participant identifier to search. May be <code>null</code>.
-   * @return <code>null</code> if the participant identifier is
-   *         <code>null</code> or if it is not contained.
-   */
-  @Nullable
-  ISMPServiceGroup getSMPServiceGroupOfID (@Nullable IParticipantIdentifier aParticipantIdentifier);
 
   /**
    * Check if a service group with the passed participant identifier is

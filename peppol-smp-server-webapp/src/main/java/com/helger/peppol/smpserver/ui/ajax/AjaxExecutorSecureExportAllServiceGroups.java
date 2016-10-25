@@ -47,7 +47,6 @@ import com.helger.xml.microdom.serialize.MicroWriter;
  */
 public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPAjaxExecutor
 {
-
   @Override
   @Nonnull
   protected AjaxBinaryResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
