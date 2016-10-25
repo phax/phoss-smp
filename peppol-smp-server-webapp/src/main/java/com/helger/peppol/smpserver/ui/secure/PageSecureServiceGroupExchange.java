@@ -347,6 +347,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
@@ -413,7 +414,10 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
               String sMsg = aLogMsg.getMessage ().toString ();
               if (aLogMsg.getThrowable () != null)
-                sMsg += " Technical details: " + aLogMsg.getThrowable ().getMessage ();
+                sMsg += " Technical details: " +
+                        aLogMsg.getThrowable ().getClass ().getName () +
+                        " - " +
+                        aLogMsg.getThrowable ().getMessage ();
               aImportResultUL.addItem (new BootstrapLabel (eLabelType).addChild (sMsg));
             }
           }
@@ -432,6 +436,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     }
 
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
+    final boolean bHandleBusinessCards = aSettings.isPEPPOLDirectoryIntegrationEnabled ();
 
     // Export tab
     {
@@ -441,7 +446,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       else
         aExport.addChild (new BootstrapInfoBox ().addChild ("Export all " +
                                                             aAllServiceGroups.size () +
-                                                            " service groups to an XML file."));
+                                                            " service groups" +
+                                                            (bHandleBusinessCards ? " and business cards" : "") +
+                                                            " to an XML file."));
 
       final BootstrapButtonToolbar aToolbar = aExport.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
       aToolbar.addChild (new BootstrapButton ().addChild ("Export all Service Groups")
@@ -462,6 +469,10 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         aPanel.getBody ().addChild (aImportResultUL);
         aImport.addChild (aPanel);
       }
+
+      aImport.addChild (new BootstrapInfoBox ().addChild ("Import service groups incl. all endpoints" +
+                                                          (bHandleBusinessCards ? " and business cards" : "") +
+                                                          " from a file."));
 
       final BootstrapForm aForm = aImport.addAndReturnChild (getUIHandler ().createFormFileUploadSelf (aWPEC));
 
