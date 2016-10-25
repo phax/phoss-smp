@@ -21,6 +21,8 @@ import javax.annotation.Nonnull;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.mime.CMimeType;
+import com.helger.datetime.util.PDTIOHelper;
+import com.helger.peppol.smpserver.app.CSMPExchange;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
@@ -38,12 +40,14 @@ import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.serialize.MicroWriter;
 
 /**
- * Export all service groups to XML.
+ * Export all service groups incl. service information and business cards (if
+ * enabled) to XML.
  *
  * @author Philip Helger
  */
 public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPAjaxExecutor
 {
+
   @Override
   @Nonnull
   protected AjaxBinaryResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
@@ -54,18 +58,19 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
 
     final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.appendElement ("smp-data");
-    eRoot.setAttribute ("version", "1.0");
+    final IMicroElement eRoot = aDoc.appendElement (CSMPExchange.ELEMENT_SMP_DATA);
+    eRoot.setAttribute (CSMPExchange.ATTR_VERSION, CSMPExchange.VERSION_10);
 
     // Add all service groups
     for (final ISMPServiceGroup aServiceGroup : aAllServiceGroups)
     {
       final IMicroElement eServiceGroup = eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aServiceGroup,
-                                                                                                       "servicegroup"));
+                                                                                                       CSMPExchange.ELEMENT_SERVICEGROUP));
       final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
       for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos)
       {
-        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo, "serviceinfo"));
+        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
+                                                                             CSMPExchange.ELEMENT_SERVICEINFO));
       }
     }
 
@@ -76,13 +81,14 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
       for (final ISMPBusinessCard aBusinessCard : aAllBusinessCards)
-        eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aBusinessCard, "businesscard"));
+        eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aBusinessCard, CSMPExchange.ELEMENT_BUSINESSCARD));
     }
 
     // Build the XML response
     final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ();
     MicroWriter.writeToStream (aDoc, aBAOS);
 
-    return new AjaxBinaryResponse (aBAOS.toByteArray (), CMimeType.APPLICATION_XML, "service-groups.xml");
+    final String sFilename = "smp-data-" + PDTIOHelper.getCurrentLocalDateTimeForFilename () + ".xml";
+    return new AjaxBinaryResponse (aBAOS.toByteArray (), CMimeType.APPLICATION_XML, sFilename);
   }
 }
