@@ -50,7 +50,6 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.extension.AbstractSMPHasExtension;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
@@ -113,8 +112,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   public void setDocumentTypeIdentifier (@Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
-    // Make a copy to avoid external changes
-    m_aDocumentTypeIdentifier = new SimpleDocumentTypeIdentifier (aDocumentTypeIdentifier);
+    m_aDocumentTypeIdentifier = aDocumentTypeIdentifier;
   }
 
   @Nonnull

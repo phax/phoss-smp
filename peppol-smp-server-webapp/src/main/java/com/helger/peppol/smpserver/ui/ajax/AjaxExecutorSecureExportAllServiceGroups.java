@@ -26,6 +26,7 @@ import com.helger.peppol.smpserver.app.CSMPExchange;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
@@ -80,7 +81,10 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
       for (final ISMPBusinessCard aBusinessCard : aAllBusinessCards)
-        eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aBusinessCard, CSMPExchange.ELEMENT_BUSINESSCARD));
+        eRoot.appendChild (SMPBusinessCardMicroTypeConverter.convertToMicroElement (aBusinessCard,
+                                                                                    null,
+                                                                                    CSMPExchange.ELEMENT_BUSINESSCARD,
+                                                                                    true));
     }
 
     // Build the XML response

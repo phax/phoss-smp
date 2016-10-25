@@ -165,13 +165,13 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       switch (eIdentifierType)
       {
         case SIMPLE:
-          m_aIdentifierFactory = new SimpleIdentifierFactory ();
+          m_aIdentifierFactory = SimpleIdentifierFactory.INSTANCE;
           break;
         case PEPPOL:
-          m_aIdentifierFactory = new PeppolIdentifierFactory ();
+          m_aIdentifierFactory = PeppolIdentifierFactory.INSTANCE;
           break;
         case BDXR:
-          m_aIdentifierFactory = new BDXRIdentifierFactory ();
+          m_aIdentifierFactory = BDXRIdentifierFactory.INSTANCE;
           break;
         default:
           throw new IllegalStateException ("Failed to determine iddentifier types!");

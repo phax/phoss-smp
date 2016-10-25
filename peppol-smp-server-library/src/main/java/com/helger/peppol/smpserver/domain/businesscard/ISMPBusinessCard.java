@@ -46,6 +46,7 @@ import java.util.List;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
+import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.id.IHasID;
@@ -58,6 +59,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
  *
  * @author Philip Helger
  */
+@MustImplementEqualsAndHashcode
 public interface ISMPBusinessCard extends IHasID <String>, Serializable
 {
   /**

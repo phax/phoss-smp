@@ -137,8 +137,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   public void setDocumentTypeIdentifier (@Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
-    // Make a copy to avoid external changes
-    m_aDocumentTypeIdentifier = new SimpleDocumentTypeIdentifier (aDocumentTypeIdentifier);
+    m_aDocumentTypeIdentifier = aDocumentTypeIdentifier;
   }
 
   @Nonnegative

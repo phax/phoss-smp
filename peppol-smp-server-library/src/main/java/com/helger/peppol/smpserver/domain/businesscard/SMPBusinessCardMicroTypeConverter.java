@@ -24,10 +24,11 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupProvider;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
@@ -41,7 +42,7 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConverter
 {
-  private static final String ATTR_SERVICE_GROUPD_ID = "servicegroupid";
+  private static final String ATTR_SERVICE_GROUP_ID = "servicegroupid";
   private static final String ELEMENT_ENTITY = "entity";
   private static final String ATTR_ID = "id";
   private static final String ATTR_NAME = "name";
@@ -59,17 +60,18 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
   private static final String ATTR_REGISTRATION_DATE = "regdate";
 
   @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final Object aObject,
-                                              @Nullable final String sNamespaceURI,
-                                              @Nonnull @Nonempty final String sTagName)
+  public static IMicroElement convertToMicroElement (@Nonnull final ISMPBusinessCard aValue,
+                                                     @Nullable final String sNamespaceURI,
+                                                     @Nonnull @Nonempty final String sTagName,
+                                                     final boolean bManualExport)
   {
-    final ISMPBusinessCard aValue = (ISMPBusinessCard) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
-    aElement.setAttribute (ATTR_SERVICE_GROUPD_ID, aValue.getServiceGroupID ());
+    aElement.setAttribute (ATTR_SERVICE_GROUP_ID, aValue.getServiceGroupID ());
     for (final SMPBusinessCardEntity aEntity : aValue.getAllEntities ())
     {
       final IMicroElement eEntity = aElement.appendElement (sNamespaceURI, ELEMENT_ENTITY);
-      eEntity.setAttribute (ATTR_ID, aEntity.getID ());
+      if (!bManualExport)
+        eEntity.setAttribute (ATTR_ID, aEntity.getID ());
       eEntity.setAttribute (ATTR_NAME, aEntity.getName ());
       eEntity.setAttribute (ATTR_COUNTRY_CODE, aEntity.getCountryCode ());
       if (aEntity.hasGeographicalInformation ())
@@ -108,20 +110,35 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
   }
 
   @Nonnull
-  public ISMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement)
+  public IMicroElement convertToMicroElement (@Nonnull final Object aObject,
+                                              @Nullable final String sNamespaceURI,
+                                              @Nonnull @Nonempty final String sTagName)
+  {
+    return convertToMicroElement ((ISMPBusinessCard) aObject, sNamespaceURI, sTagName, false);
+  }
+
+  @Nonnull
+  public static ISMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement,
+                                                  @Nonnull final ISMPServiceGroupProvider aSGProvider)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUPD_ID);
+    final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);
 
-    final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
+    final ISMPServiceGroup aServiceGroup = aSGProvider.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
     if (aServiceGroup == null)
       throw new IllegalStateException ("Failed to resolve service group with ID '" + sServiceGroupID + "'");
 
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList<> ();
     for (final IMicroElement eEntity : aElement.getAllChildElements (ELEMENT_ENTITY))
     {
-      final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (eEntity.getAttributeValue (ATTR_ID));
+      String sEntityID = eEntity.getAttributeValue (ATTR_ID);
+      if (sEntityID == null)
+      {
+        // In manual import/export the ID is not exported!
+        sEntityID = GlobalIDFactory.getNewPersistentStringID ();
+      }
+
+      final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (sEntityID);
       aEntity.setName (eEntity.getAttributeValue (ATTR_NAME));
       aEntity.setCountryCode (eEntity.getAttributeValue (ATTR_COUNTRY_CODE));
       aEntity.setGeographicalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
@@ -153,5 +170,11 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
     }
 
     return new SMPBusinessCard (aServiceGroup, aEntities);
+  }
+
+  @Nonnull
+  public ISMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement)
+  {
+    return convertToNative (aElement, SMPMetaManager.getServiceGroupMgr ());
   }
 }
