@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.StringParser;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
@@ -55,16 +56,21 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter
     final ISMPEndpoint aValue = (ISMPEndpoint) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_TRANSPORT_PROFILE, aValue.getTransportProfile ());
-    aElement.setAttribute (ATTR_ENDPOINT_REFERENCE, aValue.getEndpointReference ());
-    aElement.setAttribute (ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE,
-                           Boolean.toString (aValue.isRequireBusinessLevelSignature ()));
-    aElement.setAttribute (ATTR_MINIMUM_AUTHENTICATION_LEVEL, aValue.getMinimumAuthenticationLevel ());
+    if (StringHelper.hasText (aValue.getEndpointReference ()))
+      aElement.setAttribute (ATTR_ENDPOINT_REFERENCE, aValue.getEndpointReference ());
+    aElement.setAttribute (ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE, aValue.isRequireBusinessLevelSignature ());
+    if (StringHelper.hasText (aValue.getMinimumAuthenticationLevel ()))
+      aElement.setAttribute (ATTR_MINIMUM_AUTHENTICATION_LEVEL, aValue.getMinimumAuthenticationLevel ());
     aElement.setAttributeWithConversion (ATTR_SERVICE_ACTIVATION_DATE, aValue.getServiceActivationDateTime ());
     aElement.setAttributeWithConversion (ATTR_SERVICE_EXPIRATION_DATE, aValue.getServiceExpirationDateTime ());
-    aElement.appendElement (sNamespaceURI, ELEMENT_CERTIFICATE).appendText (aValue.getCertificate ());
-    aElement.appendElement (sNamespaceURI, ELEMENT_SERVICE_DESCRIPTION).appendText (aValue.getServiceDescription ());
-    aElement.setAttribute (ATTR_TECHNICAL_CONTACT_URL, aValue.getTechnicalContactUrl ());
-    aElement.setAttribute (ATTR_TECHNICAL_INFORMATION_URL, aValue.getTechnicalInformationUrl ());
+    if (StringHelper.hasText (aValue.getCertificate ()))
+      aElement.appendElement (sNamespaceURI, ELEMENT_CERTIFICATE).appendText (aValue.getCertificate ());
+    if (StringHelper.hasText (aValue.getServiceDescription ()))
+      aElement.appendElement (sNamespaceURI, ELEMENT_SERVICE_DESCRIPTION).appendText (aValue.getServiceDescription ());
+    if (StringHelper.hasText (aValue.getTechnicalContactUrl ()))
+      aElement.setAttribute (ATTR_TECHNICAL_CONTACT_URL, aValue.getTechnicalContactUrl ());
+    if (StringHelper.hasText (aValue.getTechnicalInformationUrl ()))
+      aElement.setAttribute (ATTR_TECHNICAL_INFORMATION_URL, aValue.getTechnicalInformationUrl ());
     if (aValue.hasExtension ())
       aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionAsString ());
     return aElement;
