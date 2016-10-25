@@ -84,7 +84,9 @@ public class DBServiceMetadataRedirectionID implements Serializable
     setDocumentTypeIdentifier (aDocTypeID.getValue ());
   }
 
-  @Column (name = "businessIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme",
+           nullable = false,
+           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;
@@ -108,12 +110,14 @@ public class DBServiceMetadataRedirectionID implements Serializable
 
   @Transient
   @Nonnull
-  public SimpleParticipantIdentifier getAsBusinessIdentifier ()
+  public IParticipantIdentifier getAsBusinessIdentifier ()
   {
     return new SimpleParticipantIdentifier (m_sParticipantIdentifierScheme, m_sParticipantIdentifier);
   }
 
-  @Column (name = "documentIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "documentIdentifierScheme",
+           nullable = false,
+           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getDocumentTypeIdentifierScheme ()
   {
     return m_sDocumentTypeIdentifierScheme;
@@ -124,7 +128,9 @@ public class DBServiceMetadataRedirectionID implements Serializable
     m_sDocumentTypeIdentifierScheme = sDocumentIdentifierScheme;
   }
 
-  @Column (name = "documentIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_DOCUEMNT_TYPE_VALUE_LENGTH)
+  @Column (name = "documentIdentifier",
+           nullable = false,
+           length = PeppolIdentifierHelper.MAX_DOCUEMNT_TYPE_VALUE_LENGTH)
   public String getDocumentTypeIdentifier ()
   {
     return m_sDocumentTypeIdentifier;
@@ -137,7 +143,7 @@ public class DBServiceMetadataRedirectionID implements Serializable
 
   @Transient
   @Nonnull
-  public SimpleDocumentTypeIdentifier getAsDocumentTypeIdentifier ()
+  public IDocumentTypeIdentifier getAsDocumentTypeIdentifier ()
   {
     return new SimpleDocumentTypeIdentifier (m_sDocumentTypeIdentifierScheme, m_sDocumentTypeIdentifier);
   }

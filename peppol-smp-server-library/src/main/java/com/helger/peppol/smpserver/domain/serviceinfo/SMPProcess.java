@@ -98,8 +98,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   public void setProcessIdentifier (@Nonnull final IProcessIdentifier aProcessIdentifier)
   {
     ValueEnforcer.notNull (aProcessIdentifier, "ProcessIdentifier");
-    // Make a copy to avoid unavoided changes
-    m_aProcessIdentifier = new SimpleProcessIdentifier (aProcessIdentifier);
+    m_aProcessIdentifier = aProcessIdentifier;
   }
 
   @Nonnegative
@@ -159,6 +158,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   public com.helger.peppol.smp.ProcessType getAsJAXBObjectPeppol ()
   {
     final com.helger.peppol.smp.ProcessType ret = new com.helger.peppol.smp.ProcessType ();
+    // Explicit constructor call is needed here!
     ret.setProcessIdentifier (new SimpleProcessIdentifier (m_aProcessIdentifier));
     final com.helger.peppol.smp.ServiceEndpointList aEndpointList = new com.helger.peppol.smp.ServiceEndpointList ();
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
@@ -172,6 +172,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   public com.helger.peppol.bdxr.ProcessType getAsJAXBObjectBDXR ()
   {
     final com.helger.peppol.bdxr.ProcessType ret = new com.helger.peppol.bdxr.ProcessType ();
+    // Explicit constructor call is needed here!
     ret.setProcessIdentifier (new BDXRProcessIdentifier (m_aProcessIdentifier));
     final com.helger.peppol.bdxr.ServiceEndpointList aEndpointList = new com.helger.peppol.bdxr.ServiceEndpointList ();
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())

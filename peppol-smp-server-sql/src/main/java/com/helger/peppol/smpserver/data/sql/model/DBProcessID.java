@@ -51,9 +51,6 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
-import com.helger.peppol.identifier.DocumentIdentifierType;
-import com.helger.peppol.identifier.ParticipantIdentifierType;
-import com.helger.peppol.identifier.ProcessIdentifierType;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -82,14 +79,16 @@ public class DBProcessID implements Serializable
   public DBProcessID ()
   {}
 
-  public DBProcessID (@Nonnull final DBServiceMetadataID aSMID, @Nonnull final IProcessIdentifier aPrI)
+  public DBProcessID (@Nonnull final DBServiceMetadataID aSMID, @Nonnull final IProcessIdentifier aProcessID)
   {
     setBusinessIdentifier (aSMID.getAsBusinessIdentifier ());
     setDocumentTypeIdentifier (aSMID.getAsDocumentTypeIdentifier ());
-    setProcessIdentifier (aPrI);
+    setProcessIdentifier (aProcessID);
   }
 
-  @Column (name = "businessIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme",
+           nullable = false,
+           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;
@@ -118,7 +117,9 @@ public class DBProcessID implements Serializable
     setBusinessIdentifier (aBusinessIdentifier.getValue ());
   }
 
-  @Column (name = "documentIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "documentIdentifierScheme",
+           nullable = false,
+           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getDocumentIdentifierScheme ()
   {
     return m_sDocumentTypeIdentifierScheme;
@@ -129,7 +130,9 @@ public class DBProcessID implements Serializable
     m_sDocumentTypeIdentifierScheme = sDocumentIdentifierScheme;
   }
 
-  @Column (name = "documentIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_DOCUEMNT_TYPE_VALUE_LENGTH)
+  @Column (name = "documentIdentifier",
+           nullable = false,
+           length = PeppolIdentifierHelper.MAX_DOCUEMNT_TYPE_VALUE_LENGTH)
   public String getDocumentIdentifier ()
   {
     return m_sDocumentTypeIdentifier;
@@ -147,7 +150,9 @@ public class DBProcessID implements Serializable
     setDocumentIdentifier (aDocumentTypeID.getValue ());
   }
 
-  @Column (name = "processIdentifierType", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "processIdentifierType",
+           nullable = false,
+           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getProcessIdentifierScheme ()
   {
     return m_sProcessIdentifierScheme;
@@ -178,21 +183,21 @@ public class DBProcessID implements Serializable
 
   @Transient
   @Nonnull
-  public ParticipantIdentifierType getAsBusinessIdentifier ()
+  public IParticipantIdentifier getAsBusinessIdentifier ()
   {
     return new SimpleParticipantIdentifier (m_sParticipantIdentifierScheme, m_sParticipantIdentifier);
   }
 
   @Transient
   @Nonnull
-  public DocumentIdentifierType getAsDocumentTypeIdentifier ()
+  public IDocumentTypeIdentifier getAsDocumentTypeIdentifier ()
   {
     return new SimpleDocumentTypeIdentifier (m_sDocumentTypeIdentifierScheme, m_sDocumentTypeIdentifier);
   }
 
   @Transient
   @Nonnull
-  public ProcessIdentifierType getAsProcessIdentifier ()
+  public IProcessIdentifier getAsProcessIdentifier ()
   {
     return new SimpleProcessIdentifier (m_sProcessIdentifierScheme, m_sProcessIdentifier);
   }

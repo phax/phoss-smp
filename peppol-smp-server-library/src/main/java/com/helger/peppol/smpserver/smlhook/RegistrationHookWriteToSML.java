@@ -144,6 +144,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
 
     try
     {
+      // Explicit constructor call is needed here!
       _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       s_aLogger.info ("Succeeded in CREATE business " + sParticipantID + " in SML");
     }
@@ -173,6 +174,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     try
     {
       // Undo create
+      // Explicit constructor call is needed here!
       _createSMLCaller ().delete (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       s_aLogger.warn ("Succeeded in deleting again business " + sParticipantID + " from SML.");
     }
@@ -192,6 +194,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     try
     {
       // Use the version with the SMP ID to be on the safe side
+      // Explicit constructor call is needed here!
       _createSMLCaller ().delete (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       s_aLogger.info ("Succeeded in deleting business " + sParticipantID + " from SML");
     }
@@ -223,6 +226,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     try
     {
       // Undo delete
+      // Explicit constructor call is needed here!
       _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       s_aLogger.warn ("Succeeded in creating again business " + sParticipantID + " in SML.");
     }

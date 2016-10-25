@@ -155,6 +155,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   public com.helger.peppol.smp.ServiceGroupType getAsJAXBObjectPeppol ()
   {
     final com.helger.peppol.smp.ServiceGroupType ret = new com.helger.peppol.smp.ServiceGroupType ();
+    // Explicit constructor call is needed here!
     ret.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aParticipantIdentifier));
     if (false)
     {
@@ -169,6 +170,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   public com.helger.peppol.bdxr.ServiceGroupType getAsJAXBObjectBDXR ()
   {
     final com.helger.peppol.bdxr.ServiceGroupType ret = new com.helger.peppol.bdxr.ServiceGroupType ();
+    // Explicit constructor call is needed here!
     ret.setParticipantIdentifier (new BDXRParticipantIdentifier (m_aParticipantIdentifier));
     if (false)
     {

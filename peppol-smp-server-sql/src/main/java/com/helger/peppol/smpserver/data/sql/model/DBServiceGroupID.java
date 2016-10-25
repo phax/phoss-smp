@@ -105,7 +105,7 @@ public class DBServiceGroupID implements Serializable
 
   @Transient
   @Nonnull
-  public SimpleParticipantIdentifier getAsBusinessIdentifier ()
+  public IParticipantIdentifier getAsBusinessIdentifier ()
   {
     return new SimpleParticipantIdentifier (m_sParticipantIdentifierScheme, m_sParticipantIdentifier);
   }

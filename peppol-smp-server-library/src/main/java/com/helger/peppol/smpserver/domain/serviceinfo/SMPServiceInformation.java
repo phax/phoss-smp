@@ -194,6 +194,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   public com.helger.peppol.smp.ServiceMetadataType getAsJAXBObjectPeppol ()
   {
     final com.helger.peppol.smp.ServiceInformationType aSI = new com.helger.peppol.smp.ServiceInformationType ();
+    // Explicit constructor call is needed here!
     aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
     aSI.setDocumentIdentifier (new SimpleDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.peppol.smp.ProcessListType aProcesses = new com.helger.peppol.smp.ProcessListType ();
@@ -211,6 +212,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   public com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ()
   {
     final com.helger.peppol.bdxr.ServiceInformationType aSI = new com.helger.peppol.bdxr.ServiceInformationType ();
+    // Explicit constructor call is needed here!
     aSI.setParticipantIdentifier (new BDXRParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
     aSI.setDocumentIdentifier (new BDXRDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.peppol.bdxr.ProcessListType aProcesses = new com.helger.peppol.bdxr.ProcessListType ();
