@@ -31,6 +31,11 @@ import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginHTMLProvider;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 
+/**
+ * The login screen HTML provider.
+ * 
+ * @author Philip Helger
+ */
 public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
 {
   public SMPLoginHTMLProvider (final boolean bLoginError,

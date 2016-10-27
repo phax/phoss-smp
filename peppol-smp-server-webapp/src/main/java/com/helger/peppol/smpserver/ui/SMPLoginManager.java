@@ -23,6 +23,11 @@ import com.helger.photon.basic.auth.credentials.ICredentialValidationResult;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginManager;
 import com.helger.photon.core.app.html.IHTMLProvider;
 
+/**
+ * The login manager to be used. Manages login process incl. UI.
+ * 
+ * @author Philip Helger
+ */
 public final class SMPLoginManager extends BootstrapLoginManager
 {
   public SMPLoginManager ()

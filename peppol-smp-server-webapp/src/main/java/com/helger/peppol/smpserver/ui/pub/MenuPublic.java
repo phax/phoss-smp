@@ -21,6 +21,11 @@ import javax.annotation.concurrent.Immutable;
 
 import com.helger.photon.basic.app.menu.IMenuTree;
 
+/**
+ * This class contains the menu structure for the public application.
+ * 
+ * @author Philip Helger
+ */
 @Immutable
 public final class MenuPublic
 {

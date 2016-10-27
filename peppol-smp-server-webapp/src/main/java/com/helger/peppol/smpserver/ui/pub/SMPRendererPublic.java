@@ -39,6 +39,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.photon.basic.app.menu.ApplicationMenuTree;
@@ -80,7 +81,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
- * The viewport renderer (menu + content area)
+ * The public application viewport renderer (menu + content area)
  *
  * @author Philip Helger
  */
@@ -88,11 +89,10 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
 {
   private static final ICSSClassProvider CSS_CLASS_FOOTER_LINKS = DefaultCSSClassProvider.create ("footer-links");
 
-  private final ICommonsList <IMenuObject> m_aFooterObjects;
+  private final ICommonsList <IMenuObject> m_aFooterObjects = new CommonsArrayList<> ();
 
   public SMPRendererPublic ()
   {
-    m_aFooterObjects = new CommonsArrayList <> ();
     ApplicationMenuTree.getTree ().iterateAllMenuObjects (aCurrentObject -> {
       if (aCurrentObject.containsAttribute (CMenuPublic.FLAG_FOOTER))
         m_aFooterObjects.add (aCurrentObject);
@@ -238,7 +238,10 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   public static BootstrapContainer createDefaultFooter ()
   {
     final BootstrapContainer aDiv = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
-    aDiv.addChild (new HCP ().addChild (CApp.getApplicationTitleAndVersion ()));
+    aDiv.addChild (new HCP ().addChild (CApp.getApplicationTitleAndVersion () +
+                                        " with " +
+                                        SMPServerConfiguration.getRESTType ().getDisplayName () +
+                                        " API"));
     aDiv.addChild (new HCP ().addChild ("Created by ")
                              .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"))
                              .addChild (" - Twitter: ")
@@ -246,7 +249,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
                                                                                                     .addChild ("@philiphelger"))
                              .addChild (" - ")
                              .addChild (new HCA (new SimpleURL ("https://github.com/phax/peppol-smp-server")).setTargetBlank ()
-                                                                                                             .addChild ("Source on GitHub")));
+                                                                                                             .addChild ("ph-peppol-smp-server on GitHub")));
     return aDiv;
   }
 

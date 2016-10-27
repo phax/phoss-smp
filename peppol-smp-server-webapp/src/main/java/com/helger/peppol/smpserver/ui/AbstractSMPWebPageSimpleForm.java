@@ -23,6 +23,13 @@ import com.helger.commons.id.IHasID;
 import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageSimpleForm;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
+/**
+ * Base class for simple form pages.
+ * 
+ * @author Philip Helger
+ * @param <DATATYPE>
+ *        The handled data type
+ */
 public abstract class AbstractSMPWebPageSimpleForm <DATATYPE extends IHasID <String>> extends
                                                    AbstractBootstrapWebPageSimpleForm <DATATYPE, WebPageExecutionContext>
 {

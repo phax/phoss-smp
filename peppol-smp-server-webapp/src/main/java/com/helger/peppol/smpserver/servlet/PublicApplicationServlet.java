@@ -23,6 +23,11 @@ import com.helger.photon.core.app.html.IHTMLProvider;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
+/**
+ * Main servlet to show the public part of the SMP server web UI
+ * 
+ * @author Philip Helger
+ */
 public class PublicApplicationServlet extends AbstractPublicApplicationServlet
 {
   @Override

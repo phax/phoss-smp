@@ -24,7 +24,7 @@ import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.photon.core.ajax.decl.SecureApplicationAjaxFunctionDeclaration;
 
 /**
- * This class registers the available ajax functions
+ * This class defines the available ajax functions for the secure application.
  *
  * @author Philip Helger
  */

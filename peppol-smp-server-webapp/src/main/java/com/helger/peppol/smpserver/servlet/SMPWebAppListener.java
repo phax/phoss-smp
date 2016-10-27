@@ -42,7 +42,8 @@ import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
 import com.helger.web.servlet.ServletContextPathHolder;
 
 /**
- * Special SMP web app listener
+ * Special SMP web app listener. This is the entry point for application
+ * startup.
  *
  * @author Philip Helger
  */

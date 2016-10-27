@@ -81,6 +81,11 @@ import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
 import com.helger.photon.uictrls.datatables.plugins.DataTablesPluginSearchHighlight;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
+/**
+ * Common UI helper methods
+ * 
+ * @author Philip Helger
+ */
 @Immutable
 public final class AppCommonUI
 {

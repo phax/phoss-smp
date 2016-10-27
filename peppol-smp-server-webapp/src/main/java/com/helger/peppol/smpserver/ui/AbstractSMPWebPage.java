@@ -22,6 +22,11 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPage;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
+/**
+ * Base class for simple pages.
+ *
+ * @author Philip Helger
+ */
 public abstract class AbstractSMPWebPage extends AbstractBootstrapWebPage <WebPageExecutionContext>
 {
   public AbstractSMPWebPage (@Nonnull @Nonempty final String sID, @Nonnull final String sName)

@@ -18,6 +18,11 @@ package com.helger.peppol.smpserver.ui.pub;
 
 import javax.annotation.concurrent.Immutable;
 
+/**
+ * This class contains all the menu item constants for the public application.
+ * 
+ * @author Philip Helger
+ */
 @Immutable
 public final class CMenuPublic
 {

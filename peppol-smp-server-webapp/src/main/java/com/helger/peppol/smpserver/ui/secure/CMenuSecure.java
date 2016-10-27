@@ -18,6 +18,11 @@ package com.helger.peppol.smpserver.ui.secure;
 
 import javax.annotation.concurrent.Immutable;
 
+/**
+ * This class defines the menu item constants for the secure application
+ * 
+ * @author Philip Helger
+ */
 @Immutable
 public final class CMenuSecure
 {

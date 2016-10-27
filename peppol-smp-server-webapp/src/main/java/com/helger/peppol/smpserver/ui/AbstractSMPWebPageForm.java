@@ -24,6 +24,13 @@ import com.helger.photon.bootstrap3.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap3.pages.AbstractBootstrapWebPageForm;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
+/**
+ * Base class for form based pages
+ * 
+ * @author Philip Helger
+ * @param <DATATYPE>
+ *        The handled data type.
+ */
 public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>>
                                              extends AbstractBootstrapWebPageForm <DATATYPE, WebPageExecutionContext>
 {

@@ -21,6 +21,11 @@ import javax.annotation.Nonnull;
 import com.helger.photon.core.ajax.response.AjaxJsonResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 
+/**
+ * Base class for AJAX executors that produce JSON output.
+ *
+ * @author Philip Helger
+ */
 public abstract class AbstractSMPAjaxExecutorJson extends AbstractSMPAjaxExecutor
 {
   // Change the return type to JSON

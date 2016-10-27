@@ -41,6 +41,8 @@ import com.helger.web.scope.mgr.WebScopeManager;
 /**
  * This class implements the "Business Card" interface to be used with the
  * PEPPOL Directory.
+ *
+ * @author Philip Helger
  */
 @Path ("/businesscard/{ServiceGroupId}")
 public final class BusinessCardInterface

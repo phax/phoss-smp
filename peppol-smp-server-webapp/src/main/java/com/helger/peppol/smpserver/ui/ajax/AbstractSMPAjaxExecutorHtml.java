@@ -21,6 +21,11 @@ import javax.annotation.Nonnull;
 import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 
+/**
+ * Base class for AJAX executors that produce HTML output.
+ * 
+ * @author Philip Helger
+ */
 public abstract class AbstractSMPAjaxExecutorHtml extends AbstractSMPAjaxExecutor
 {
   // Change the return type to HTML

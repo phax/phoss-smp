@@ -27,7 +27,7 @@ import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
 
 /**
- * This class defines the available ajax functions for the view application.
+ * This class defines the available ajax functions for the public application.
  *
  * @author Philip Helger
  */

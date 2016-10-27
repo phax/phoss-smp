@@ -37,7 +37,7 @@ import com.helger.photon.security.login.ELoginResult;
 import com.helger.photon.security.login.LoggedInUserManager;
 
 /**
- * Ajax executor to login a user from view application.
+ * Ajax executor to login a user from public application.
  *
  * @author Philip Helger
  */

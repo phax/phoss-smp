@@ -22,6 +22,11 @@ import com.helger.photon.core.ajax.executor.AbstractAjaxExecutorWithContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
+/**
+ * Base class for AJAX executors
+ * 
+ * @author Philip Helger
+ */
 public abstract class AbstractSMPAjaxExecutor extends AbstractAjaxExecutorWithContext <LayoutExecutionContext>
 {
   @Override

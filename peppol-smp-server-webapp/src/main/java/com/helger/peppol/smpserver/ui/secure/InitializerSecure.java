@@ -39,7 +39,7 @@ import com.helger.photon.core.app.layout.ILayoutManager;
 import com.helger.photon.uictrls.prism.EPrismLanguage;
 
 /**
- * Initialize the config application stuff
+ * Initialize the secure application stuff
  *
  * @author Philip Helger
  */

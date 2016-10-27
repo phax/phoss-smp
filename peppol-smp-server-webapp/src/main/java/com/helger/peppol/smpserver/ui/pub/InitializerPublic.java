@@ -29,7 +29,7 @@ import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.app.layout.ILayoutManager;
 
 /**
- * Initialize the view application stuff
+ * Initialize the public application stuff
  *
  * @author Philip Helger
  */

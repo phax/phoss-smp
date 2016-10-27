@@ -25,17 +25,27 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
+import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
+import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
+import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
+import com.helger.photon.uictrls.famfam.EFamFamIcon;
 
+/**
+ * This is the start page of the public application. It lists all available
+ * service groups.
+ * 
+ * @author Philip Helger
+ */
 public final class PagePublicStart extends AbstractSMPWebPage
 {
   public PagePublicStart (@Nonnull @Nonempty final String sID)
@@ -58,12 +68,20 @@ public final class PagePublicStart extends AbstractSMPWebPage
     final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("Extension?").setDataSort (1, 0)).setID (getID ());
+                                        new DTCol ("Extension?").setDataSort (1, 0),
+                                        new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceGroup aServiceGroup : aSMPServiceGroupMgr.getAllSMPServiceGroups ())
     {
+      final String sDisplayName = aServiceGroup.getParticpantIdentifier ().getURIEncoded ();
+
       final HCRow aRow = aTable.addBodyRow ();
-      aRow.addCell (aServiceGroup.getParticpantIdentifier ().getURIEncoded ());
+      aRow.addCell (sDisplayName);
       aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
+      aRow.addCell (new HCA (LinkHelper.getURLWithServerAndContext (aServiceGroup.getParticpantIdentifier ()
+                                                                                 .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
+                                                                                                                      sDisplayName)
+                                                                                                           .setTargetBlank ()
+                                                                                                           .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);

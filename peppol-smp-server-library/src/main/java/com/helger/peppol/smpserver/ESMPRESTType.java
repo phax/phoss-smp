@@ -46,6 +46,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
 import com.helger.commons.lang.EnumHelper;
+import com.helger.commons.name.IHasDisplayName;
 
 /**
  * Defines the type of REST responses to be returned. Either PEPPOL (using
@@ -55,16 +56,18 @@ import com.helger.commons.lang.EnumHelper;
  *
  * @author Philip Helger
  */
-public enum ESMPRESTType implements IHasID <String>
+public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
 {
-  PEPPOL ("peppol"),
-  BDXR ("bdxr");
+  PEPPOL ("peppol", "PEPPOL"),
+  BDXR ("bdxr", "OASIS BDXR");
 
   private final String m_sID;
+  private final String m_sDisplayName;
 
-  private ESMPRESTType (@Nonnull @Nonempty final String sID)
+  private ESMPRESTType (@Nonnull @Nonempty final String sID, @Nonnull @Nonempty final String sDisplayName)
   {
     m_sID = sID;
+    m_sDisplayName = sDisplayName;
   }
 
   @Nonnull
@@ -72,6 +75,13 @@ public enum ESMPRESTType implements IHasID <String>
   public String getID ()
   {
     return m_sID;
+  }
+
+  @Nonnull
+  @Nonempty
+  public String getDisplayName ()
+  {
+    return m_sDisplayName;
   }
 
   /**
