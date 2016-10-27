@@ -43,6 +43,7 @@ import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
+import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirectMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -322,6 +323,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
         final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+        final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
 
         // 1. delete all existing service groups to be imported (if overwrite);
@@ -351,7 +353,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           }
           if (aNewServiceGroup != null)
           {
-            // 3. create all endpoints
+            // 3a. create all endpoints
             for (final ISMPServiceInformation aImportServiceInfo : aEntry.getValue ().getServiceInfo ())
               try
               {
@@ -361,13 +363,29 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
               }
               catch (final Throwable t)
               {
-                // E.g. if SML connection failed
                 aLogger.error ("Error creating the new service information for " + aImportServiceGroup.getID (), t);
+              }
+
+            // 3b. create all redirects
+            for (final ISMPRedirect aImportRedirect : aEntry.getValue ().getRedirects ())
+              try
+              {
+                aRedirectMgr.createOrUpdateSMPRedirect (aNewServiceGroup,
+                                                        aImportRedirect.getDocumentTypeIdentifier (),
+                                                        aImportRedirect.getTargetHref (),
+                                                        aImportRedirect.getSubjectUniqueIdentifier (),
+                                                        aImportRedirect.getExtensionAsString ());
+                aLogger.log (EErrorLevel.SUCCESS, "Successfully created redirect for " + aImportServiceGroup.getID ());
+              }
+              catch (final Throwable t)
+              {
+                aLogger.error ("Error creating the new redirect for " + aImportServiceGroup.getID (), t);
               }
           }
         }
 
         // 4. delete all existing business cards to be imported (if overwrite)
+        // Note: if PD integration is disabled, the list is empty
         for (final ISMPBusinessCard aDeleteBusinessCard : aDeleteBusinessCards)
           try
           {
@@ -382,6 +400,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           }
 
         // 5. create all new business cards
+        // Note: if PD integration is disabled, the list is empty
         for (final ISMPBusinessCard aImportBusinessCard : aDeleteBusinessCards)
           try
           {
