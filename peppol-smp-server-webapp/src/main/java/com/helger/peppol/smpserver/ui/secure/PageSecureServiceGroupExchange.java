@@ -25,6 +25,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.CommonsLinkedHashMap;
 import com.helger.commons.collection.ext.CommonsLinkedHashSet;
+import com.helger.commons.collection.ext.ICommonsIterable;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsOrderedMap;
 import com.helger.commons.collection.ext.ICommonsOrderedSet;
@@ -41,6 +42,8 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardMicroTypeConverter;
+import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
+import com.helger.peppol.smpserver.domain.redirect.SMPRedirectMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupProvider;
@@ -91,6 +94,34 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
   private static final String FIELD_DEFAULT_OWNER = "defaultowner";
   private static final boolean DEFAULT_OVERWRITE_EXISTING = false;
 
+  private static final class SGImportData
+  {
+    private final ICommonsList <ISMPServiceInformation> m_aServiceInfos = new CommonsArrayList<> ();
+    private final ICommonsList <ISMPRedirect> m_aRedirects = new CommonsArrayList<> ();
+
+    public void addServiceInfo (@Nonnull final ISMPServiceInformation aServiceInfo)
+    {
+      m_aServiceInfos.add (aServiceInfo);
+    }
+
+    @Nonnull
+    public ICommonsIterable <ISMPServiceInformation> getServiceInfo ()
+    {
+      return m_aServiceInfos;
+    }
+
+    public void addRedirect (@Nonnull final ISMPRedirect aRedirect)
+    {
+      m_aRedirects.add (aRedirect);
+    }
+
+    @Nonnull
+    public ICommonsIterable <ISMPRedirect> getRedirects ()
+    {
+      return m_aRedirects;
+    }
+  }
+
   public PageSecureServiceGroupExchange (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Import/Export");
@@ -105,7 +136,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
   {
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
-    final ICommonsOrderedMap <ISMPServiceGroup, ICommonsList <ISMPServiceInformation>> aImportServiceGroups = new CommonsLinkedHashMap<> ();
+    final ICommonsOrderedMap <ISMPServiceGroup, SGImportData> aImportServiceGroups = new CommonsLinkedHashMap<> ();
     final ICommonsList <ISMPServiceGroup> aDeleteServiceGroups = new CommonsArrayList<> ();
 
     // First read all service groups as they are dependents of the
@@ -142,7 +173,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           }
 
           // Remember to create/overwrite the service group
-          final ICommonsList <ISMPServiceInformation> aSGInfo = new CommonsArrayList<> ();
+          final SGImportData aSGInfo = new SGImportData ();
           aImportServiceGroups.put (aServiceGroup, aSGInfo);
           if (bIsServiceGroupContained)
             aDeleteServiceGroups.add (aServiceGroup);
@@ -152,27 +183,51 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                                             sServiceGroupID);
 
           // read all contained service information
-          int nSIIndex = 0;
-          int nSIFound = 0;
-          for (final IMicroElement eServiceInfo : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_SERVICEINFO))
           {
-            final ISMPServiceInformation aServiceInfo = SMPServiceInformationMicroTypeConverter.convertToNative (eServiceInfo,
-                                                                                                                 x -> aServiceGroup);
-            if (aServiceInfo == null)
+            int nSIIndex = 0;
+            int nSIFound = 0;
+            for (final IMicroElement eServiceInfo : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_SERVICEINFO))
             {
-              aLogger.error ("Failed to read service group " +
-                             sServiceGroupID +
-                             " service information at index " +
-                             nSIIndex);
+              final ISMPServiceInformation aServiceInfo = SMPServiceInformationMicroTypeConverter.convertToNative (eServiceInfo,
+                                                                                                                   x -> aServiceGroup);
+              if (aServiceInfo == null)
+              {
+                aLogger.error ("Failed to read service group " +
+                               sServiceGroupID +
+                               " service information at index " +
+                               nSIIndex);
+              }
+              else
+              {
+                aSGInfo.addServiceInfo (aServiceInfo);
+                ++nSIFound;
+              }
+              ++nSIIndex;
             }
-            else
-            {
-              aSGInfo.add (aServiceInfo);
-              ++nSIFound;
-            }
-            ++nSIIndex;
+            aLogger.info ("Read " + nSIFound + " service information of service group " + sServiceGroupID);
           }
-          aLogger.info ("Read " + nSIFound + " service information of service group " + sServiceGroupID);
+
+          // read all contained redirects
+          {
+            int nRDIndex = 0;
+            int nRDFound = 0;
+            for (final IMicroElement eRedirect : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_REDIRECT))
+            {
+              final ISMPRedirect aRedirect = SMPRedirectMicroTypeConverter.convertToNative (eRedirect,
+                                                                                            x -> aServiceGroup);
+              if (aRedirect == null)
+              {
+                aLogger.error ("Failed to read service group " + sServiceGroupID + " redirect at index " + nRDIndex);
+              }
+              else
+              {
+                aSGInfo.addRedirect (aRedirect);
+                ++nRDFound;
+              }
+              ++nRDIndex;
+            }
+            aLogger.info ("Read " + nRDFound + " readirects of service group " + sServiceGroupID);
+          }
         }
         else
         {
@@ -278,7 +333,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             aLogger.error ("Failed to delete service group " + aDeleteServiceGroup.getID ());
 
         // 2. create all service groups
-        for (final Map.Entry <ISMPServiceGroup, ICommonsList <ISMPServiceInformation>> aEntry : aImportServiceGroups.entrySet ())
+        for (final Map.Entry <ISMPServiceGroup, SGImportData> aEntry : aImportServiceGroups.entrySet ())
         {
           final ISMPServiceGroup aImportServiceGroup = aEntry.getKey ();
           ISMPServiceGroup aNewServiceGroup = null;
@@ -297,7 +352,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           if (aNewServiceGroup != null)
           {
             // 3. create all endpoints
-            for (final ISMPServiceInformation aImportServiceInfo : aEntry.getValue ())
+            for (final ISMPServiceInformation aImportServiceInfo : aEntry.getValue ().getServiceInfo ())
               try
               {
                 aServiceInfoMgr.mergeSMPServiceInformation (aImportServiceInfo);
