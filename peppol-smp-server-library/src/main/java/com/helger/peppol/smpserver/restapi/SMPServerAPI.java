@@ -151,6 +151,12 @@ public final class SMPServerAPI
 
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
       {
+        // Ignore all service information without endpoints
+        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                                           aDocTypeID);
+        if (aServiceInfo == null || aServiceInfo.getTotalEndpointCount () == 0)
+          continue;
+
         final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
         aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
         aMetadataReferences.add (aMetadataReference);
@@ -162,8 +168,14 @@ public final class SMPServerAPI
       final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
       aCompleteServiceGroup.setServiceGroup (aSG);
 
-      for (final ISMPServiceInformation aService : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
-        aCompleteServiceGroup.addServiceMetadata (aService.getAsJAXBObjectPeppol ());
+      for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
+      {
+        // Ignore all service information without endpoints
+        if (aServiceInfo.getTotalEndpointCount () == 0)
+          continue;
+
+        aCompleteServiceGroup.addServiceMetadata (aServiceInfo.getAsJAXBObjectPeppol ());
+      }
 
       s_aLogger.info (LOG_PREFIX + "Finished getCompleteServiceGroup(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("getCompleteServiceGroup");
@@ -272,6 +284,12 @@ public final class SMPServerAPI
       final List <ServiceMetadataReferenceType> aMetadataReferences = aCollectionType.getServiceMetadataReference ();
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
       {
+        // Ignore all service information without endpoints
+        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                                           aDocTypeID);
+        if (aServiceInfo == null || aServiceInfo.getTotalEndpointCount () == 0)
+          continue;
+
         final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
         aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
         aMetadataReferences.add (aMetadataReference);
@@ -448,7 +466,7 @@ public final class SMPServerAPI
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                            aDocTypeID);
-        if (aServiceInfo != null)
+        if (aServiceInfo != null && aServiceInfo.getTotalEndpointCount () > 0)
         {
           aSignedServiceMetadata.setServiceMetadata (aServiceInfo.getAsJAXBObjectPeppol ());
         }
@@ -608,11 +626,12 @@ public final class SMPServerAPI
         }
 
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+        final String sExtensionXML = SMPExtensionConverter.convertToString (aServiceMetadata.getServiceInformation ()
+                                                                                            .getExtension ());
         aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
                                                                                aDocTypeID,
                                                                                aProcesses,
-                                                                               SMPExtensionConverter.convertToString (aServiceMetadata.getServiceInformation ()
-                                                                                                                                      .getExtension ())));
+                                                                               sExtensionXML));
       }
 
       s_aLogger.info (LOG_PREFIX +

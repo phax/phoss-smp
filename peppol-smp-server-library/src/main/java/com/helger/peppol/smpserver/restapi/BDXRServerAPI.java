@@ -147,6 +147,12 @@ public final class BDXRServerAPI
       final List <ServiceMetadataReferenceType> aMetadataReferences = aCollectionType.getServiceMetadataReference ();
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
       {
+        // Ignore all service information without endpoints
+        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                                           aDocTypeID);
+        if (aServiceInfo == null || aServiceInfo.getTotalEndpointCount () == 0)
+          continue;
+
         final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
         aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
         aMetadataReferences.add (aMetadataReference);
@@ -323,7 +329,7 @@ public final class BDXRServerAPI
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                            aDocTypeID);
-        if (aServiceInfo != null)
+        if (aServiceInfo != null && aServiceInfo.getTotalEndpointCount () > 0)
         {
           aSignedServiceMetadata.setServiceMetadata (aServiceInfo.getAsJAXBObjectBDXR ());
         }
