@@ -75,7 +75,7 @@
     <!-- Must correspond to jaxws-tools.version in jaxws-maven-plugin POM -->
     <jaxws.version>2.2.9-b14002</jaxws.version>
     <log4j.version>2.7</log4j.version>
-    <jersey.version>2.23.2</jersey.version>
+    <jersey.version>2.24</jersey.version>
     <eclipselink.version>2.6.4</eclipselink.version>
   </properties>
   
@@ -133,7 +133,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-jaxws</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <type>pom</type>
       </dependency>
       
