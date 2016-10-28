@@ -154,7 +154,7 @@ public final class SMPServerAPI
         // Ignore all service information without endpoints
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                            aDocTypeID);
-        if (aServiceInfo == null || aServiceInfo.getTotalEndpointCount () == 0)
+        if (aServiceInfo == null)
           continue;
 
         final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
@@ -170,10 +170,6 @@ public final class SMPServerAPI
 
       for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
       {
-        // Ignore all service information without endpoints
-        if (aServiceInfo.getTotalEndpointCount () == 0)
-          continue;
-
         aCompleteServiceGroup.addServiceMetadata (aServiceInfo.getAsJAXBObjectPeppol ());
       }
 
@@ -287,7 +283,7 @@ public final class SMPServerAPI
         // Ignore all service information without endpoints
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                            aDocTypeID);
-        if (aServiceInfo == null || aServiceInfo.getTotalEndpointCount () == 0)
+        if (aServiceInfo == null)
           continue;
 
         final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
@@ -466,7 +462,7 @@ public final class SMPServerAPI
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                            aDocTypeID);
-        if (aServiceInfo != null && aServiceInfo.getTotalEndpointCount () > 0)
+        if (aServiceInfo != null)
         {
           aSignedServiceMetadata.setServiceMetadata (aServiceInfo.getAsJAXBObjectPeppol ());
         }

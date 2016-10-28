@@ -20,7 +20,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.Collection;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -28,6 +27,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
@@ -468,7 +468,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceGroup aCurObject : aServiceGroupMgr.getAllSMPServiceGroups ())
     {
-      final Collection <? extends ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurObject);
+      final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurObject);
       int nProcesses = 0;
       int nEndpoints = 0;
       for (final ISMPServiceInformation aSI : aSIs)
