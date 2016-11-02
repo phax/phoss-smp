@@ -72,7 +72,8 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
 
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
+    // Use the new ID in case the ID was changed!
+    return new SMPServiceGroup (aOwner.getID (), aParticipantIdentifier, sExtension);
   }
 
   @Nonnull
