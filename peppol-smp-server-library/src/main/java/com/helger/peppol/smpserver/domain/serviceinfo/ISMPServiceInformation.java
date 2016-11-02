@@ -51,6 +51,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
+import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
@@ -128,6 +129,18 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    *         If a process with the same process ID is already registered.
    */
   void addProcess (@Nonnull SMPProcess aProcess);
+
+  /**
+   * Delete the provided process from this object.
+   *
+   * @param aProcess
+   *        The process to be deleted. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if deletion was successfully,
+   *         {@link EChange#UNCHANGED} otherwise.
+   * @since 5.0.0
+   */
+  @Nonnull
+  EChange deleteProcess (@Nullable ISMPProcess aProcess);
 
   /**
    * @return This service information object as a PEPPOL SMP JAXB object for the

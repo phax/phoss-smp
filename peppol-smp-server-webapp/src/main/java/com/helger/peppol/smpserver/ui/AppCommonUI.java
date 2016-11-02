@@ -83,7 +83,7 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
  * Common UI helper methods
- * 
+ *
  * @author Philip Helger
  */
 @Immutable
@@ -241,7 +241,7 @@ public final class AppCommonUI
   }
 
   @Nonnull
-  private static HCDiv _getWBRList (@Nonnull final String s)
+  private static IHCNode _getWBRList (@Nonnull final String s)
   {
     final HCDiv ret = new HCDiv ();
     String sRest = s;
@@ -253,7 +253,7 @@ public final class AppCommonUI
     }
     if (sRest.length () > 0)
       ret.addChild (sRest);
-    return ret;
+    return ret.getChildCount () == 1 ? ret.getFirstChild () : ret;
   }
 
   @Nonnull
@@ -268,7 +268,8 @@ public final class AppCommonUI
       }
 
     if (ePredefined != null)
-      return new HCTextNode (ePredefined.getCommonName () + " [predefined]");
+      return new HCNodeList ().addChild (ePredefined.getCommonName () + " ")
+                              .addChild (new BootstrapLabel (EBootstrapLabelType.INFO).addChild ("predefined"));
 
     return _getWBRList (aDocTypeID.getURIEncoded ());
   }
@@ -285,7 +286,8 @@ public final class AppCommonUI
       }
 
     if (ePredefined != null)
-      return new HCTextNode (ePredefined.getValue () + " [predefined]");
+      return new HCNodeList ().addChild (ePredefined.getValue () + " ")
+                              .addChild (new BootstrapLabel (EBootstrapLabelType.INFO).addChild ("predefined"));
 
     return _getWBRList (aDocTypeID.getURIEncoded ());
   }

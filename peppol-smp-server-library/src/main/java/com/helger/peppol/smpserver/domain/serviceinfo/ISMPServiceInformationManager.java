@@ -102,7 +102,7 @@ public interface ISMPServiceInformationManager
    * Delete the provided service information object.
    *
    * @param aSMPServiceInformation
-   *        The service information objects to be deleted. May be
+   *        The service information object to be deleted. May be
    *        <code>null</code>.
    * @return {@link EChange#CHANGED} if the parameter is not <code>null</code>
    *         and was successfully deleted from the internal data structures.
@@ -124,6 +124,22 @@ public interface ISMPServiceInformationManager
    */
   @Nonnull
   EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+
+  /**
+   * Delete a single process with all endpoints from this service information.
+   * 
+   * @param aSMPServiceInformation
+   *        The service information object where the process should be deleted.
+   *        May be <code>null</code>.
+   * @param aProcess
+   *        The process within the service information to be deleted. May be
+   *        <code>null</code>.
+   * @return {@link EChange#CHANGED} if the the process was successfully
+   *         deleted, {@link EChange#UNCHANGED} otherwise.
+   * @since 5.0.0
+   */
+  @Nonnull
+  EChange deleteSMPProcess (@Nullable ISMPServiceInformation aSMPServiceInformation, @Nullable ISMPProcess aProcess);
 
   /**
    * @return All service information objects in arbitrary order. Never

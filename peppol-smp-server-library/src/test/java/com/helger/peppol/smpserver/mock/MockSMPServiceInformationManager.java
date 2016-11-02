@@ -40,12 +40,16 @@
  */
 package com.helger.peppol.smpserver.mock;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 
@@ -99,6 +103,13 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
   }
 
   public EChange deleteAllSMPServiceInformationOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Nonnull
+  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
+                                   @Nullable final ISMPProcess aProcess)
   {
     throw new UnsupportedOperationException ();
   }

@@ -332,6 +332,44 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   }
 
   @Nonnull
+  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
+                                   @Nullable final ISMPProcess aProcess)
+  {
+    if (aSMPServiceInformation == null || aProcess == null)
+      return EChange.UNCHANGED;
+
+    JPAExecutionResult <EChange> ret;
+    ret = doInTransaction ( () -> {
+      final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBProcess p WHERE" +
+                                                        " p.id.businessIdentifierScheme = :bischeme AND p.id.businessIdentifier = :bivalue AND" +
+                                                        " p.id.documentIdentifierScheme = :discheme AND p.id.documentIdentifier = :divalue AND" +
+                                                        " p.id.processIdentifierScheme = :pischeme AND p.id.processIdentifier = :pivalue",
+                                                        DBServiceMetadataRedirection.class)
+                                          .setParameter ("bischeme",
+                                                         aSMPServiceInformation.getServiceGroup ()
+                                                                               .getParticpantIdentifier ()
+                                                                               .getScheme ())
+                                          .setParameter ("bivalue",
+                                                         aSMPServiceInformation.getServiceGroup ()
+                                                                               .getParticpantIdentifier ()
+                                                                               .getValue ())
+                                          .setParameter ("discheme",
+                                                         aSMPServiceInformation.getDocumentTypeIdentifier ()
+                                                                               .getScheme ())
+                                          .setParameter ("divalue",
+                                                         aSMPServiceInformation.getDocumentTypeIdentifier ()
+                                                                               .getValue ())
+                                          .setParameter ("pischeme", aProcess.getProcessIdentifier ().getScheme ())
+                                          .setParameter ("pivalue", aProcess.getProcessIdentifier ().getValue ())
+                                          .executeUpdate ();
+      return EChange.valueOf (nCnt > 0);
+    });
+    if (ret.hasThrowable ())
+      throw new RuntimeException (ret.getThrowable ());
+    return ret.get ();
+  }
+
+  @Nonnull
   private static SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
   {
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();

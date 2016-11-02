@@ -172,10 +172,7 @@ public final class XMLServiceInformationManager extends
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
-                                      aSMPServiceInformation.getID (),
-                                      aSMPServiceInformation.getServiceGroupID (),
-                                      aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded ());
+    AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
     return EChange.CHANGED;
   }
 
@@ -186,6 +183,44 @@ public final class XMLServiceInformationManager extends
     for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
       eChange = eChange.or (deleteSMPServiceInformation (aSMPServiceInformation));
     return eChange;
+  }
+
+  @Nonnull
+  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
+                                   @Nullable final ISMPProcess aProcess)
+  {
+    if (aSMPServiceInformation == null || aProcess == null)
+      return EChange.UNCHANGED;
+
+    // Find implementation object
+    final SMPServiceInformation aRealServiceInformation = getOfID (aSMPServiceInformation.getID ());
+    if (aRealServiceInformation == null)
+    {
+      AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
+      return EChange.UNCHANGED;
+    }
+
+    m_aRWLock.writeLock ().lock ();
+    try
+    {
+      // Main deletion in write lock
+      if (aRealServiceInformation.deleteProcess (aProcess).isUnchanged ())
+      {
+        AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT,
+                                          "no-such-process",
+                                          aSMPServiceInformation.getID (),
+                                          aProcess.getProcessIdentifier ().getURIEncoded ());
+        return EChange.UNCHANGED;
+      }
+    }
+    finally
+    {
+      m_aRWLock.writeLock ().unlock ();
+    }
+    AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
+                                      aSMPServiceInformation.getID (),
+                                      aProcess.getProcessIdentifier ().getURIEncoded ());
+    return EChange.CHANGED;
   }
 
   @Nonnull

@@ -55,6 +55,7 @@ import com.helger.commons.collection.ext.CommonsLinkedHashMap;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsOrderedMap;
 import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.commons.state.EChange;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.identifier.bdxr.doctype.BDXRDocumentTypeIdentifier;
@@ -179,6 +180,16 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   {
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
     m_aProcesses.setAll (aProcesses);
+  }
+
+  @Nonnull
+  public EChange deleteProcess (@Nullable final ISMPProcess aProcess)
+  {
+    if (aProcess == null)
+      return EChange.UNCHANGED;
+
+    final String sProcessID = _getKey (aProcess.getProcessIdentifier ());
+    return m_aProcesses.removeObject (sProcessID);
   }
 
   @Nonnegative
