@@ -1,6 +1,6 @@
 # peppol-smp-server Vagrant integration
 
-This Vagrant setup was originally provided by [@jerouris](https://github.com/jerouris).
+This Vagrant setup was originally provided by [@jerouris](https://github.com/jerouris) - thanks a lot for this!
 
 How to use it:
   * Download and install Vagrant from https://www.vagrantup.com/downloads.html
@@ -13,3 +13,17 @@ How to use it:
   * The default login is:
     * User: admin@helger.com
     * Password: password
+
+## Using a proxy server
+
+If a proxy server is needed to download all the relevant information, the following steps are necessary:
+
+  * Install the Vagrant plugin using `vagrant plugin install vagrant-proxyconf`
+  * Modify `Vagrantfile` and add the following entries:
+```
+  config.proxy.http     = "http://1.2.3.4:8080"
+  config.proxy.https    = "http://1.2.3.4:8080"
+  config.proxy.no_proxy = "localhost,127.0.0.1"
+```
+  * Modify `playbook-xml.yml`:
+    * Search the line containing `mvn clean install` and add the following parameters afterwards: ` -Dhttp.proxyHost=1.2.3.4 -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts="localhost|127.0.0.1" -Dhttps.proxyHost=1.2.3.4 -Dhttps.proxyPort=8080 -Dhttps.nonProxyHosts="localhost|127.0.0.1"`
