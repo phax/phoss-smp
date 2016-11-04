@@ -7,6 +7,9 @@ How to use it:
   * Download and install VirtualBox from https://www.virtualbox.org/wiki/Downloads
   * Have the SMP keystore JKS at hand and copy it into the `provision/keystore` folder
   * Copy `provision/keystore/keystore_vars.template.yml` to `provision/keystore/keystore_vars.yml`
-  * Modify the created file `provision/keystore/keystore_vars.yml` with your keystore configuration
+  * Modify the created file `provision/keystore/keystore_vars.yml` with your keystore configuration and the unique SMP-ID
   * Run `vagrant up` and wait for the initial setup
   * Once it is finished, open `http://192.168.20.10:8080` in your browser
+  * The default login is:
+    * User: admin@helger.com
+    * Password: password

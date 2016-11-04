@@ -40,7 +40,7 @@
   remote_user: ubuntu
 
   vars_files:
-  # File containing the information of the AP keystore
+  # File containing the information of the SMP keystore
     - provision/keystore/keystore_vars.yml  
   vars:
    
@@ -53,8 +53,6 @@
     tomcat_dir: "{{home_dir}}/apache-tomcat-8.0.38"
     smp_data: "{{tomcat_dir}}/smp-data"
     smp_keystore_path: "{{tomcat_dir}}/conf/smpKeystore.jks"
-
-    smp_id: TEST-SMP
     
   tasks:
       
@@ -114,7 +112,7 @@
     copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp/target/peppol-smp-server-webapp-5.0.0-SNAPSHOT.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
 
   - name: Copy SMP Keystore to tomcat
-    copy: src="{{smp_keystore}}" dest="{{smp_keystore_path}}"  mode=0600 backup=yes
+    copy: src="{{smp_keystore}}" dest="{{smp_keystore_path}}" mode=0600 backup=yes
 
   - name: Configure SMP Server (smp-server.properties)
     template: src=smp-server-xml.properties.j2 dest="{{tomcat_dir}}/conf/smpserver.properties" mode=600 backup=yes
