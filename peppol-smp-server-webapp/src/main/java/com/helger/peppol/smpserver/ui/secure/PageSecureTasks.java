@@ -19,13 +19,13 @@ package com.helger.peppol.smpserver.ui.secure;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.datetime.format.PDTToString;
@@ -38,8 +38,6 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
-import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
@@ -87,7 +85,6 @@ public class PageSecureTasks extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final LocalDateTime aNowDT = PDTFactory.getCurrentLocalDateTime ();
     final LocalDateTime aNowPlusDT = aNowDT.plusMonths (3);
 
@@ -119,7 +116,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
     if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
       if (StringHelper.hasNoText (SMPMetaManager.getSettings ().getPEPPOLDirectoryHostName ()))
-        aOL.addItem (_createError ("An invalid PEPPOL Directory hostname is provided"),
+        aOL.addItem (_createError ("An empty PEPPOL Directory hostname is provided"),
                      new HCDiv ().addChild ("A connection to the PEPPOL Directory server cannot be establised!"));
 
       final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (PDClientConfiguration.getKeyStorePath (),
@@ -131,11 +128,10 @@ public class PageSecureTasks extends AbstractSMPWebPage
 
     // check service groups and redirects
     {
-      final Collection <? extends ISMPServiceGroup> aServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
-      final Collection <? extends ISMPRedirect> aRedirects = aRedirectMgr.getAllSMPRedirects ();
-      if (aServiceGroups.isEmpty () && aRedirects.isEmpty ())
+      final ICommonsList <ISMPServiceGroup> aServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+      if (aServiceGroups.isEmpty ())
       {
-        aOL.addItem (_createWarning ("Neither a service group nor a redirect is configured. This SMP is currently empty."));
+        aOL.addItem (_createWarning ("No service group is configured. This SMP is currently empty."));
       }
       else
       {
@@ -144,7 +140,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
                                                                                 ISMPServiceGroup.comparator ()))
         {
           final HCUL aULPerSG = new HCUL ();
-          final Collection <? extends ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
+          final ICommonsList <ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
           if (aServiceInfos.isEmpty ())
           {
             aULPerSG.addItem (_createWarning ("No endpoint is configured for this service group."));
@@ -154,11 +150,11 @@ public class PageSecureTasks extends AbstractSMPWebPage
             for (final ISMPServiceInformation aServiceInfo : aServiceInfos)
             {
               final HCUL aULPerDocType = new HCUL ();
-              final Collection <? extends ISMPProcess> aProcesses = aServiceInfo.getAllProcesses ();
+              final ICommonsList <ISMPProcess> aProcesses = aServiceInfo.getAllProcesses ();
               for (final ISMPProcess aProcess : aProcesses)
               {
                 final HCUL aULPerProcess = new HCUL ();
-                final Collection <? extends ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ();
+                final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ();
                 for (final ISMPEndpoint aEndpoint : aEndpoints)
                 {
                   final HCUL aULPerEndpoint = new HCUL ();
