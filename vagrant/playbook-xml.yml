@@ -95,6 +95,9 @@
   - name: Configure smp-server.properties.path (required for config files)
     lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^smp.server.properties.path=" line="smp.server.properties.path={{tomcat_dir}}/conf/smpserver.properties"    
 
+  - name: Configure smp-server.properties.path (required for config files)
+    lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^peppol.pd.client.properties.path=" line="peppol.pd.client.properties.path={{tomcat_dir}}/conf/pdclient.properties"    
+
   - name: Clone the PHAX SMP Server in {{ sources_dir }}/peppol-smp-server
 #   git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-4.1.2
     git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=master
@@ -110,14 +113,17 @@
 #    copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp/target/peppol-smp-server-webapp-4.1.2.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
     copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp/target/peppol-smp-server-webapp-5.0.0-SNAPSHOT.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
 
-  - name: Copy AP Keystore to tomcat
+  - name: Copy SMP Keystore to tomcat
     copy: src="{{smp_keystore}}" dest="{{smp_keystore_path}}"  mode=0600 backup=yes
 
-  - name: Configure SMP Server Test
+  - name: Configure SMP Server (smp-server.properties)
     template: src=smp-server.properties.j2 dest="{{tomcat_dir}}/conf/smpserver.properties" mode=600 backup=yes
 
-  - name: Configure SMP Server Test (2)
+  - name: Configure SMP Server (webapp.properties)
     template: src=webapp.properties.j2 dest="{{tomcat_dir}}/conf/webapp.properties" mode=600 backup=yes
+
+  - name: Configure SMP Server (pd-client.properties)
+    template: src=pd-client.properties.j2 dest="{{tomcat_dir}}/conf/pdclient.properties" mode=600 backup=yes
     
   - name: Create systemd service for tomcat
     template: src=tomcat.service.j2 dest=/etc/systemd/system/tomcat.service mode=600 backup=yes
