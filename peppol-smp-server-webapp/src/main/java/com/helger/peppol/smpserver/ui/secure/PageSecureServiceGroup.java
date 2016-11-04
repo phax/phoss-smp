@@ -442,14 +442,17 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
 
+    final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
     // Disable button if no SML URL is configured
+    // Disable button if no service group is present
     aToolbar.addAndReturnButton ("Check DNS state",
                                  aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                  EDefaultIcon.MAGNIFIER)
-            .setDisabled (_getSMLHostName () == null);
+            .setDisabled (_getSMLHostName () == null || aAllServiceGroups.isEmpty ());
     aNodeList.addChild (aToolbar);
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
@@ -466,7 +469,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                 .setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
                                                                                                                             aDisplayLocale),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPServiceGroup aCurObject : aServiceGroupMgr.getAllSMPServiceGroups ())
+    for (final ISMPServiceGroup aCurObject : aAllServiceGroups)
     {
       final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurObject);
       int nProcesses = 0;
