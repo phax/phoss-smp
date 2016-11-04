@@ -90,12 +90,12 @@
     lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^shared.loader=" line="shared.loader=${catalina.base}/conf"  
 
   - name: Configure smp.webapp.properties.path (required for config files)
-    lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^smp.webapp.properties.path=" line="smp.webapp.properties.path={{tomcat_dir}}/conf/webapp.properties"
+    lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^peppol.smp.webapp.properties.path=" line="peppol.smp.webapp.properties.path={{tomcat_dir}}/conf/webapp.properties"
 
   - name: Configure smp-server.properties.path (required for config files)
-    lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^smp.server.properties.path=" line="smp.server.properties.path={{tomcat_dir}}/conf/smpserver.properties"    
+    lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^peppol.smp.server.properties.path=" line="peppol.smp.server.properties.path={{tomcat_dir}}/conf/smpserver.properties"    
 
-  - name: Configure smp-server.properties.path (required for config files)
+  - name: Configure pd-client.properties.path (required for config files)
     lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^peppol.pd.client.properties.path=" line="peppol.pd.client.properties.path={{tomcat_dir}}/conf/pdclient.properties"    
 
   - name: Clone the PHAX SMP Server in {{ sources_dir }}/peppol-smp-server
@@ -117,7 +117,7 @@
     copy: src="{{smp_keystore}}" dest="{{smp_keystore_path}}"  mode=0600 backup=yes
 
   - name: Configure SMP Server (smp-server.properties)
-    template: src=smp-server.properties.j2 dest="{{tomcat_dir}}/conf/smpserver.properties" mode=600 backup=yes
+    template: src=smp-server-xml.properties.j2 dest="{{tomcat_dir}}/conf/smpserver.properties" mode=600 backup=yes
 
   - name: Configure SMP Server (webapp.properties)
     template: src=webapp.properties.j2 dest="{{tomcat_dir}}/conf/webapp.properties" mode=600 backup=yes

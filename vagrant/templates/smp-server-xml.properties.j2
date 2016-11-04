@@ -27,7 +27,7 @@ smp.keystore.key.password = {{smp_keystore_password}}
 
 # Force all paths (links) to be "/" instead of the context path
 # This is helpful if the web application runs in a context like "/smp" but is proxied to a root path
-smp.forceroot = false
+smp.forceroot = true
 
 ## Write to SML? true or false
 sml.active=true
@@ -36,11 +36,3 @@ sml.smpid={{smp_id}}
 # SML URL (incl. the service name)
 #sml.url=https://edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier
 sml.url=https://acc.edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier
-
-## Required when using the SQL backend
-jdbc.driver = com.mysql.jdbc.Driver
-jdbc.url = jdbc:mysql://localhost:3306/smp
-jdbc.user = smp
-jdbc.password = smp
-target-database = MySQL
-jdbc.read-connections.max = 10
