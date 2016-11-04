@@ -103,7 +103,7 @@
 
   - name: Build SMP Server from {{ sources_dir }}/peppol-smp-server 
     when: smp_result | changed
-    command: "mvn -DskipTests clean install"
+    command: "mvn clean install -DskipTests"
     args:
       chdir: "{{ sources_dir }}/peppol-smp-server"
 

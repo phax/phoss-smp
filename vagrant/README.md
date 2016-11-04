@@ -26,4 +26,4 @@ If a proxy server is needed to download all the relevant information, the follow
   config.proxy.no_proxy = "localhost,127.0.0.1"
 ```
   * Modify `playbook-xml.yml`:
-    * Search the line containing `mvn clean install` and add the following parameters afterwards: ` -Dhttp.proxyHost=1.2.3.4 -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts="localhost|127.0.0.1" -Dhttps.proxyHost=1.2.3.4 -Dhttps.proxyPort=8080 -Dhttps.nonProxyHosts="localhost|127.0.0.1"`
+    * Search the line containing `mvn clean install` and add the following parameters afterwards: ` -Dhttp.proxyHost=1.2.3.4 -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts="localhost|127.0.0.1" -Dhttps.proxyHost=1.2.3.4 -Dhttps.proxyPort=8080` (note: there is no `-Dhttps.nonProxyHosts`!)
