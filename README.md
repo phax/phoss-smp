@@ -1,4 +1,6 @@
 # peppol-smp-server
+
+[![Join the chat at https://gitter.im/phax/peppol-smp-server](https://badges.gitter.im/phax/peppol-smp-server.svg)](https://gitter.im/phax/peppol-smp-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A complete PEPPOL SMP server. Compared to the CIPA implementation this SMP comes with a management GUI and optionally an XML backend for simplified operations.
 
 Latest version: **[5.0.0 Release Candidate 2](https://github.com/phax/peppol-smp-server/releases/tag/peppol-smp-server-parent-pom-5.0.0-rc2)** (2016-11-07) - see the special [Upgrade guide to v5.0.0](https://github.com/phax/peppol-smp-server/wiki/Upgrade-Guide-V5)
