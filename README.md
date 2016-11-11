@@ -9,6 +9,8 @@ Please read the **[Wiki](https://github.com/phax/peppol-smp-server/wiki)** for a
 
 For querying an SMP server you may want to have a look at the OSS [peppol-smp-client](https://github.com/phax/peppol-commons/).
 
+If you like (and use) this SMP it is highly appreciated if you could star this project on GitHub - thanks :)
+
 ---
 
 Note: [Version 4.1.2](https://github.com/phax/peppol-smp-server/releases/tag/peppol-smp-server-parent-pom-4.1.2) was the last version supporting JDK 7. Version 5+ targets only JDK 8! 
