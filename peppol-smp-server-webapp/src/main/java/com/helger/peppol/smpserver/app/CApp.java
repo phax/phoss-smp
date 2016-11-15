@@ -52,8 +52,8 @@ public final class CApp
   public static final String ROLE_VIEW_DESCRIPTION = null;
   public static final ICommonsMap <String, String> ROLE_VIEW_CUSTOMATTRS = null;
 
-  public static final List <String> REQUIRED_ROLE_IDS_CONFIG = new CommonsArrayList<> (ROLE_CONFIG_ID).getAsUnmodifiable ();
-  public static final List <String> REQUIRED_ROLE_IDS_VIEW = new CommonsArrayList<> (ROLE_VIEW_ID).getAsUnmodifiable ();
+  public static final List <String> REQUIRED_ROLE_IDS_CONFIG = new CommonsArrayList <> (ROLE_CONFIG_ID).getAsUnmodifiable ();
+  public static final List <String> REQUIRED_ROLE_IDS_VIEW = new CommonsArrayList <> (ROLE_VIEW_ID).getAsUnmodifiable ();
 
   // User groups
   public static final String USERGROUP_ADMINISTRATORS_ID = CSecurity.USERGROUP_ADMINISTRATORS_ID;
@@ -87,7 +87,6 @@ public final class CApp
   {}
 
   @Nonnull
-  @Nonempty
   public static String getApplicationSuffix ()
   {
     return AppConfiguration.isTestVersion () ? " [Test version]" : "";

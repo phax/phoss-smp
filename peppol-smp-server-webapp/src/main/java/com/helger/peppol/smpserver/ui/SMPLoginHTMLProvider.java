@@ -19,17 +19,18 @@ package com.helger.peppol.smpserver.ui;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.commons.annotation.OverrideOnDemand;
 import com.helger.css.ECSSUnit;
 import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
+import com.helger.html.hc.html.sections.HCH2;
 import com.helger.html.hc.html.textlevel.HCSmall;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
 import com.helger.photon.basic.auth.credentials.ICredentialValidationResult;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
+import com.helger.photon.bootstrap3.pageheader.BootstrapPageHeader;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginHTMLProvider;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 
@@ -48,10 +49,11 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
   }
 
   @Override
-  @OverrideOnDemand
-  protected void onBeforeContainer (@Nonnull final ISimpleWebExecutionContext aSWEC,
-                                    @Nonnull final BootstrapContainer aContainer)
-  {}
+  @Nonnull
+  protected IHCNode createPageHeader (@Nullable final IHCNode aPageTitle)
+  {
+    return new BootstrapPageHeader ().addChild (new HCH2 ().addChild ("Administration - Login"));
+  }
 
   @Override
   protected void onAfterContainer (@Nonnull final ISimpleWebExecutionContext aSWEC,
