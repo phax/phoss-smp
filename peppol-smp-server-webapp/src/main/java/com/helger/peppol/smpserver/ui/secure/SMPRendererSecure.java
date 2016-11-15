@@ -21,10 +21,10 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.url.ISimpleURL;
+import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.metadata.HCHead;
-import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
@@ -40,6 +40,7 @@ import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbs;
 import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbsProvider;
+import com.helger.photon.bootstrap3.button.BootstrapButton;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.nav.BootstrapNav;
 import com.helger.photon.bootstrap3.navbar.BootstrapNavbar;
@@ -50,6 +51,7 @@ import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.app.layout.ILayoutAreaContentProvider;
+import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.security.login.LoggedInUserManager;
@@ -72,27 +74,36 @@ public final class SMPRendererSecure implements ILayoutAreaContentProvider <Layo
 
     final ISimpleURL aLinkToStartPage = aLEC.getLinkToMenuItem (aLEC.getMenuTree ().getDefaultMenuItemID ());
 
-    final BootstrapNavbar aNavbar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
-    aNavbar.getContainer ().setFluid (true);
-    aNavbar.addBrand (SMPRendererPublic.createLogo (), aLinkToStartPage);
-    aNavbar.addBrand (new HCSpan ().addChild (CApp.getApplicationSuffix () +
-                                              " Administration [" +
-                                              SMPServerConfiguration.getSMLSMPID () +
-                                              "]"),
-                      aLinkToStartPage);
+    final BootstrapNavbar aNavBar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
+    aNavBar.getContainer ().setFluid (true);
+    aNavBar.addBrand (SMPRendererPublic.createLogo (), aLinkToStartPage);
+    aNavBar.addBrand (new HCSpan ().addChild (CApp.getApplicationSuffix () + " Administration"), aLinkToStartPage);
+    aNavBar.addText (EBootstrapNavbarPosition.COLLAPSIBLE_LEFT, " [" + SMPServerConfiguration.getSMLSMPID () + "]");
+    aNavBar.addButton (EBootstrapNavbarPosition.COLLAPSIBLE_LEFT,
+                       new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH +
+                                                                                        "/"))
+                                             .addChild ("Goto public view")
+                                             .addClass (CBootstrapCSS.NAVBAR_BTN)
+                                             .addStyle (CCSSProperties.MARGIN_LEFT.newValue ("8px"))
+                                             .addStyle (CCSSProperties.MARGIN_RIGHT.newValue ("8px")));
 
-    final BootstrapNav aNav = new BootstrapNav ();
-    final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
-    aNav.addItem (new HCSpan ().addChild ("Logged in as ")
-                               .addClass (CBootstrapCSS.NAVBAR_TEXT)
-                               .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser,
-                                                                                                       aDisplayLocale))));
+    {
+      final BootstrapNav aNav = new BootstrapNav ();
+      final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
+      aNav.addItem (new HCSpan ().addChild ("Logged in as ")
+                                 .addClass (CBootstrapCSS.NAVBAR_TEXT)
+                                 .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser,
+                                                                                                         aDisplayLocale))));
+      aNav.addItem (new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (aRequestScope,
+                                                                                     LogoutServlet.SERVLET_DEFAULT_PATH))
+                                          .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale))
+                                          .addClass (CBootstrapCSS.NAVBAR_BTN)
+                                          .addStyle (CCSSProperties.MARGIN_LEFT.newValue ("8px"))
+                                          .addStyle (CCSSProperties.MARGIN_RIGHT.newValue ("8px")));
 
-    aNav.addItem (new HCA (LinkHelper.getURLWithContext (aRequestScope,
-                                                         LogoutServlet.SERVLET_DEFAULT_PATH)).addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
-    aNavbar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_RIGHT, aNav);
-
-    return aNavbar;
+      aNavBar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_RIGHT, aNav);
+    }
+    return aNavBar;
   }
 
   @Nonnull
