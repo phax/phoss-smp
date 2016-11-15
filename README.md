@@ -1,4 +1,4 @@
-[Logo](https://github.com/phax/peppol-smp-server/blob/master/docs/logo/logo-gradient.png)
+![Logo](https://github.com/phax/peppol-smp-server/blob/master/docs/logo/logo-gradient.png)
 
 phoss SMP is a complete PEPPOL SMP server. Compared to the CIPA reference implementation this SMP comes with a management GUI and optionally an XML backend for simplified operations. It also supports the OASIS BDXR specification.
 
