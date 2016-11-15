@@ -249,7 +249,8 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
                                                                                                     .addChild ("@philiphelger"))
                              .addChild (" - ")
                              .addChild (new HCA (new SimpleURL ("https://github.com/phax/peppol-smp-server")).setTargetBlank ()
-                                                                                                             .addChild ("ph-peppol-smp-server on GitHub")));
+                                                                                                             .addChild (CApp.APPLICATION_TITLE +
+                                                                                                                        " on GitHub")));
     return aDiv;
   }
 
