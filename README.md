@@ -1,5 +1,8 @@
-# peppol-smp-server
-A complete PEPPOL SMP server. Compared to the CIPA implementation this SMP comes with a management GUI and optionally an XML backend for simplified operations.
+# phoss SMP
+
+[![Logo](https://github.com/phax/peppol-smp-server/blob/master/docs/logo/logo-gradient.png)]
+
+A complete PEPPOL SMP server. Compared to the CIPA reference implementation this SMP comes with a management GUI and optionally an XML backend for simplified operations.
 
 [![Gitter](https://badges.gitter.im/phax/peppol-smp-server.svg)](https://gitter.im/phax/peppol-smp-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
