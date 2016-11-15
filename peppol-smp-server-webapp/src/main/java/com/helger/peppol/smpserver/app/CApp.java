@@ -88,9 +88,16 @@ public final class CApp
 
   @Nonnull
   @Nonempty
+  public static String getApplicationSuffix ()
+  {
+    return AppConfiguration.isTestVersion () ? " [Test version]" : "";
+  }
+
+  @Nonnull
+  @Nonempty
   public static String getApplicationTitle ()
   {
-    return APPLICATION_TITLE + (AppConfiguration.isTestVersion () ? " [Test version]" : "");
+    return APPLICATION_TITLE + getApplicationSuffix ();
   }
 
   @Nonnull

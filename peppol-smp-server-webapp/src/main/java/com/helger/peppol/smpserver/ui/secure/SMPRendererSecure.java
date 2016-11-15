@@ -74,7 +74,8 @@ public final class SMPRendererSecure implements ILayoutAreaContentProvider <Layo
 
     final BootstrapNavbar aNavbar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
     aNavbar.getContainer ().setFluid (true);
-    aNavbar.addBrand (new HCSpan ().addChild (CApp.getApplicationTitle () +
+    aNavbar.addBrand (SMPRendererPublic.createLogo (), aLinkToStartPage);
+    aNavbar.addBrand (new HCSpan ().addChild (CApp.getApplicationSuffix () +
                                               " Administration [" +
                                               SMPServerConfiguration.getSMLSMPID () +
                                               "]"),

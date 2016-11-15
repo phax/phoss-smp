@@ -26,11 +26,13 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
 import com.helger.css.property.CCSSProperties;
+import com.helger.css.propertyvalue.CCSSValue;
 import com.helger.html.css.DefaultCSSClassProvider;
 import com.helger.html.css.ICSSClassProvider;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.IHCElement;
+import com.helger.html.hc.html.embedded.HCImg;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCP;
 import com.helger.html.hc.html.grouping.HCUL;
@@ -137,6 +139,21 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   }
 
   @Nonnull
+  public static final IHCNode createLogo ()
+  {
+    return new HCImg ().setSrc (LinkHelper.getURLWithContext ("/image/logo-gradient-223-50-transparent.png"))
+                       .addStyle (CCSSProperties.MARGIN.newValue ("-15px"))
+                       .addStyle (CCSSProperties.VERTICAL_ALIGN.newValue (CCSSValue.TOP))
+                       .addStyle (CCSSProperties.PADDING.newValue ("0 6px"));
+  }
+
+  @Nonnull
+  public static final IHCNode createLogoBig ()
+  {
+    return new HCImg ().setSrc (LinkHelper.getURLWithContext ("/image/logo-gradient-446-100-transparent.png"));
+  }
+
+  @Nonnull
   private static BootstrapNavbar _getNavbar (final LayoutExecutionContext aLEC)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
@@ -144,6 +161,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
 
     final BootstrapNavbar aNavbar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
     aNavbar.getContainer ().setFluid (true);
+    aNavbar.addBrand (createLogo (), aLinkToStartPage);
     aNavbar.addBrand (new HCSpan ().addChild (CApp.getApplicationTitle ()), aLinkToStartPage);
 
     _addNavbarLoginLogout (aLEC, aNavbar);

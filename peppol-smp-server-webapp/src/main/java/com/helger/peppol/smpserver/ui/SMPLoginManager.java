@@ -18,6 +18,8 @@ package com.helger.peppol.smpserver.ui;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.string.StringHelper;
+import com.helger.html.hc.html.sections.HCH2;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.photon.basic.auth.credentials.ICredentialValidationResult;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginManager;
@@ -25,7 +27,7 @@ import com.helger.photon.core.app.html.IHTMLProvider;
 
 /**
  * The login manager to be used. Manages login process incl. UI.
- * 
+ *
  * @author Philip Helger
  */
 public final class SMPLoginManager extends BootstrapLoginManager
@@ -40,6 +42,10 @@ public final class SMPLoginManager extends BootstrapLoginManager
   protected IHTMLProvider createLoginScreen (final boolean bLoginError,
                                              @Nonnull final ICredentialValidationResult aLoginResult)
   {
-    return new SMPLoginHTMLProvider (bLoginError, aLoginResult, getPageTitle ());
+    return new SMPLoginHTMLProvider (bLoginError,
+                                     aLoginResult,
+                                     new HCH2 ().addChild (StringHelper.getConcatenatedOnDemand (CApp.getApplicationSuffix (),
+                                                                                                 " ",
+                                                                                                 "Administration - Login")));
   }
 }
