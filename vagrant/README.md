@@ -1,4 +1,4 @@
-# peppol-smp-server Vagrant integration
+# phoss SMP Vagrant integration
 
 This Vagrant setup was originally provided by [@jerouris](https://github.com/jerouris) - thanks a lot for this!
 
