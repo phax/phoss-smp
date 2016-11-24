@@ -61,6 +61,7 @@ import com.helger.peppol.smp.ServiceInformationType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.photon.security.CSecurity;
 

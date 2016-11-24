@@ -47,6 +47,7 @@ import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
 
 /**
  * Test class for class {@link ServiceGroupInterface}. This test class is

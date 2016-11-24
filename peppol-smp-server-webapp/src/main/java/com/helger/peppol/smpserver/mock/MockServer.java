@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.rest;
+package com.helger.peppol.smpserver.mock;
 
 import java.net.URI;
 import java.util.Map;
@@ -77,7 +77,7 @@ final class MockServer
   @Nonnull
   private static WebappContext _createContext (final String sURI)
   {
-    final ICommonsMap <String, String> aInitParams = new CommonsHashMap <> ();
+    final ICommonsMap <String, String> aInitParams = new CommonsHashMap<> ();
     aInitParams.put ("jersey.config.server.provider.packages",
                      com.helger.peppol.smpserver.rest.ServiceGroupInterface.class.getPackage ().getName () +
                                                                "," +
