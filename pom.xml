@@ -226,6 +226,8 @@
     <module>peppol-smp-server-sql</module>
     <module>peppol-smp-server-xml</module>
     <module>peppol-smp-server-webapp</module>
+    <module>peppol-smp-server-webapp-sql</module>
+    <module>peppol-smp-server-webapp-xml</module>
   </modules>
   
   <build>
@@ -235,11 +237,36 @@
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-jscompress-maven-plugin</artifactId>
           <version>2.1.1</version><!--$NO-MVN-MAN-VER$-->
+          <executions>
+            <execution>
+              <goals>
+                <goal>jscompress</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <forceCreation>false</forceCreation>
+            <sourceDirectory>${basedir}/src/main/webapp</sourceDirectory>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
           <version>5.0.2</version><!--$NO-MVN-MAN-VER$-->
+          <executions>
+            <execution>
+              <goals>
+                <goal>csscompress</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <forceCompress>false</forceCompress>
+            <removeUnnecessaryCode>true</removeUnnecessaryCode>
+            <quoteURLs>true</quoteURLs>
+            <verbose>true</verbose>
+            <sourceDirectory>${basedir}/src/main/webapp</sourceDirectory>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

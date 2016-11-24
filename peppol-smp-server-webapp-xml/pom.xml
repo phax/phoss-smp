@@ -23,11 +23,11 @@
     <artifactId>peppol-smp-server-parent-pom</artifactId>
     <version>5.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>peppol-smp-server-webapp</artifactId>
-  <packaging>jar</packaging>
-  <name>peppol-smp-server-webapp</name>
+  <artifactId>peppol-smp-server-webapp-xml</artifactId>
+  <packaging>war</packaging>
+  <name>peppol-smp-server-webapp-xml</name>
   <description>SMP webapp with management GUI</description>
-  <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-webapp</url>
+  <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-webapp-xml</url>
   <inceptionYear>2015</inceptionYear>
 
   <licenses>
@@ -61,40 +61,11 @@
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>peppol-smp-server-library</artifactId>
+      <artifactId>peppol-smp-server-webapp</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-commons</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-jaxb</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>peppol-commons</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>peppol-sml-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-oton-bootstrap3-stub</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-settings</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>peppol-directory-client</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-servlet</artifactId>
+      <artifactId>peppol-smp-server-xml</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -107,16 +78,52 @@
       <artifactId>peppol-smp-client</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-grizzly2-servlet</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-oton-jetty</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <targetPath>${project.build.directory}/classes</targetPath>
+      </resource>
+      <resource>
+        <directory>${basedir}/src/test/resources</directory>
+        <targetPath>${project.build.directory}/test-classes</targetPath>
+      </resource>
+      <resource>
+        <directory>${basedir}/src/main/webapp</directory>
+        <targetPath>${project.build.directory}/webapp-classes</targetPath>
+      </resource>
+    </resources>
+
     <plugins>
+      <plugin>
+        <groupId>com.helger.maven</groupId>
+        <artifactId>ph-jscompress-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.helger.maven</groupId>
+        <artifactId>ph-csscompress-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
           <excludes>
             <exclude>conf/**</exclude>
+            <exclude>src/main/webapp/*.jsp</exclude>
+            <exclude>**/*.min.js</exclude>
+            <exclude>**/*.min.css</exclude>
           </excludes>
         </configuration>
       </plugin>
