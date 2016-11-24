@@ -79,7 +79,7 @@ public final class TimeZoneCorrectorListener implements ServletContextListener
       throw new InitializationException (sErrorMsg);
     }
 
-    // Set the default timezone both in joda as well as in java util Timezone
+    // Set the default timezone
     if (PDTConfig.setDefaultDateTimeZoneID (DEFAULT_TIMEZONE).isFailure ())
     {
       final String sErrorMsg = "Failed to set default time zone to '" + DEFAULT_TIMEZONE + "'!";
