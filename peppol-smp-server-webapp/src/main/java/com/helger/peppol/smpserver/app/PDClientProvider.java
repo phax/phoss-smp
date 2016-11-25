@@ -17,6 +17,7 @@
 package com.helger.peppol.smpserver.app;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
@@ -32,6 +33,7 @@ import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
  *
  * @author Philip Helger
  */
+@ThreadSafe
 public final class PDClientProvider extends AbstractGlobalWebSingleton
 {
   private PDClient m_aPDClient;
