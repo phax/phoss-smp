@@ -217,13 +217,6 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     m_sTechnicalInformationUrl = sTechnicalInformationUrl;
   }
 
-  @Nullable
-  @Deprecated
-  public static String getRFC1421CompliantString (@Nullable final String sCertificate, final boolean bIncludePEMHeader)
-  {
-    return CertificateHelper.getRFC1421CompliantString (sCertificate, bIncludePEMHeader);
-  }
-
   @Nonnull
   public com.helger.peppol.smp.EndpointType getAsJAXBObjectPeppol ()
   {
@@ -234,7 +227,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     ret.setServiceActivationDate (m_aServiceActivationDT);
     ret.setServiceExpirationDate (m_aServiceExpirationDT);
     // For compatibility, don't add BEGIN_CERTIFCATE and END_CERTIFICATE
-    ret.setCertificate (CertificateHelper.getRFC1421CompliantString (m_sCertificate, false));
+    // For .NET compatibility only use "\n" as line separator
+    ret.setCertificate (CertificateHelper.getRFC1421CompliantString (m_sCertificate, false, "\n"));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
