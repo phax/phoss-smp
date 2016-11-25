@@ -57,20 +57,6 @@ public interface ISMPHasExtension
    *         <code>null</code>. If an extension is present it must be
    *         well-formed XML content.
    * @see #hasExtension()
-   * @deprecated Use {@link #getExtensionAsString()} instead
-   */
-  @Nullable
-  @Deprecated
-  default String getExtension ()
-  {
-    return getExtensionAsString ();
-  }
-
-  /**
-   * @return The string representation of the extension element. May be
-   *         <code>null</code>. If an extension is present it must be
-   *         well-formed XML content.
-   * @see #hasExtension()
    */
   @Nullable
   String getExtensionAsString ();

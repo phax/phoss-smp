@@ -291,72 +291,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * Check if the writable parts of the REST API are disabled. If this is the
-   * case, only the read-only part of the API can be used. The writable REST API
-   * will return an HTTP 404 error.
-   *
-   * @return <code>true</code> if it is disabled, <code>false</code> if it is
-   *         enabled. By the default the writable API is enabled. Property
-   *         <code>smp.rest.writableapi.disabled</code>.
-   */
-  @Deprecated
-  public static boolean isRESTWritableAPIDisabled ()
-  {
-    return getConfigFile ().getAsBoolean (KEY_SMP_REST_WRITABLE_API_DISABLED, DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
-  }
-
-  /**
-   * Check if the PEPPOL Directory integration (offering the /businesscard API)
-   * is enabled.
-   *
-   * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
-   *         By default it is enabled (since 5.0.0).
-   */
-  @Deprecated
-  public static boolean isPEPPOLDirectoryIntegrationEnabled ()
-  {
-    return getConfigFile ().getAsBoolean (KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
-                                          DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
-  }
-
-  /**
-   * @return The host name of the PEPPOL Directory server. Never
-   *         <code>null</code>.
-   */
-  @Nonnull
-  @Deprecated
-  public static String getPEPPOLDirectoryHostName ()
-  {
-    return getConfigFile ().getAsString (KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME);
-  }
-
-  /**
-   * @return <code>true</code> if the SML connection is active,
-   *         <code>false</code> if not. Property <code>sml.active</code>.
-   */
-  @Deprecated
-  public static boolean isWriteToSML ()
-  {
-    return getConfigFile ().getAsBoolean (KEY_SML_ACTIVE, DEFAULT_SML_ACTIVE);
-  }
-
-  /**
-   * @return The SML URL to use (the manage participant endpoint - e.g.
-   *         <code>https://edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier</code>).
-   *         Only relevant when {@link #isWriteToSML()} is <code>true</code>.
-   *         Property <code>sml.url</code>.
-   */
-  @Nullable
-  @Deprecated
-  public static String getSMLURL ()
-  {
-    return getConfigFile ().getAsString (KEY_SML_URL);
-  }
-
-  /**
-   * @return The SMP-ID to be used in the SML. Only relevant when
-   *         {@link #isWriteToSML()} is <code>true</code>. Property
-   *         <code>sml.smpid</code>.
+   * @return The SMP-ID to be used in the SML. Only relevant when SML connection
+   *         is active. Property <code>sml.smpid</code>.
    */
   @Nullable
   public static String getSMLSMPID ()
