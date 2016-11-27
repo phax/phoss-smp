@@ -98,7 +98,7 @@
 
   - name: Clone the PHAX SMP Server in {{ sources_dir }}/peppol-smp-server
 #   git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-4.1.2
-    git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-5.0.0
+    git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-5.0.1
     register: smp_result
 
   - name: Build SMP Server from {{ sources_dir }}/peppol-smp-server 
