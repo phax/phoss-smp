@@ -68,6 +68,8 @@ import com.helger.photon.bootstrap3.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapMenuItemRenderer;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapMenuItemRendererHorz;
 import com.helger.photon.core.EPhotonCoreText;
+import com.helger.photon.core.app.context.ILayoutExecutionContext;
+import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.app.layout.ILayoutAreaContentProvider;
@@ -101,7 +103,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
     });
   }
 
-  private static void _addNavbarLoginLogout (@Nonnull final LayoutExecutionContext aLEC,
+  private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC,
                                              @Nonnull final BootstrapNavbar aNavbar)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -139,29 +141,32 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   }
 
   @Nonnull
-  public static final IHCNode createLogo ()
+  public static final IHCNode createLogo (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
-    return new HCImg ().setSrc (LinkHelper.getURLWithContext ("/image/logo-gradient-223-50-transparent.png"))
+    final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
+    return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope, "/image/logo-gradient-223-50-transparent.png"))
                        .addStyle (CCSSProperties.MARGIN.newValue ("-15px"))
                        .addStyle (CCSSProperties.VERTICAL_ALIGN.newValue (CCSSValue.TOP))
                        .addStyle (CCSSProperties.PADDING.newValue ("0 6px"));
   }
 
   @Nonnull
-  public static final IHCNode createLogoBig ()
+  public static final IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
-    return new HCImg ().setSrc (LinkHelper.getURLWithContext ("/image/logo-gradient-446-100-transparent.png"));
+    final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
+    return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope,
+                                                         "/image/logo-gradient-446-100-transparent.png"));
   }
 
   @Nonnull
-  private static BootstrapNavbar _getNavbar (final LayoutExecutionContext aLEC)
+  private static BootstrapNavbar _getNavbar (@Nonnull final ILayoutExecutionContext aLEC)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final ISimpleURL aLinkToStartPage = aLEC.getLinkToMenuItem (aLEC.getMenuTree ().getDefaultMenuItemID ());
 
     final BootstrapNavbar aNavbar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
     aNavbar.getContainer ().setFluid (true);
-    aNavbar.addBrand (createLogo (), aLinkToStartPage);
+    aNavbar.addBrand (createLogo (aLEC), aLinkToStartPage);
     aNavbar.addBrand (new HCSpan ().addChild (CApp.getApplicationTitle ()), aLinkToStartPage);
 
     _addNavbarLoginLogout (aLEC, aNavbar);

@@ -64,7 +64,7 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
     // Add the logo on top
     aContentCol.addChildAt (0,
                             new HCDiv ().addStyle (CCSSProperties.MARGIN_TOP.newValue (ECSSUnit.em (1)))
-                                        .addChild (SMPRendererPublic.createLogoBig ()));
+                                        .addChild (SMPRendererPublic.createLogoBig (aSWEC)));
 
     // Add the version number in the login screen
     aContentCol.addChild (new HCDiv ().addStyle (CCSSProperties.MARGIN_TOP.newValue (ECSSUnit.em (1)))

@@ -69,7 +69,7 @@ import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
 import com.helger.photon.bootstrap3.table.BootstrapTable;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
-import com.helger.photon.core.app.context.LayoutExecutionContext;
+import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.login.CLogin;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -140,7 +140,7 @@ public final class AppCommonUI
   }
 
   @Nonnull
-  public static BootstrapForm createViewLoginForm (@Nonnull final LayoutExecutionContext aLEC,
+  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC,
                                                    @Nullable final String sPreselectedUserName,
                                                    final boolean bFullUI)
   {

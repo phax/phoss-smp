@@ -18,5 +18,6 @@
 
 -->
 <items>
-  <css path="/css/default.css"/>
+  <!-- Path starting with "slash" means project file, else classpath file -->
+  <css path="css/default.css"/>
 </items>

@@ -39,7 +39,7 @@
     </init-param>
     <init-param>
       <param-name>jersey.config.servlet.filter.staticContentRegex</param-name>
-      <param-value>/(js|css|image|stream|public|secure|publicajax|secureajax|publicaction|secureaction|resbundle)/.*|/favicon.ico|/logout</param-value>
+      <param-value>/(stream|public|secure|publicajax|secureajax|publicaction|secureaction|resbundle)/.*|/favicon.ico|/logout</param-value>
     </init-param>
   </filter>
   <filter-mapping>

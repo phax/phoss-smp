@@ -18,5 +18,6 @@
 
 -->
 <items>
-  <js path="/js/default.js" />
+  <!-- Path starting with "slash" means project file, else classpath file -->
+  <js path="js/default.js" />
 </items>
