@@ -160,8 +160,10 @@
           <instructions>
             <Export-Package>com.helger.peppol.smpserver.*</Export-Package>
             <Import-Package>!javax.annotation.*,*</Import-Package>
-            <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)",
+            <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)",
+osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)",
 osgi.serviceloader; filter:="(osgi.serviceloader=com.helger.peppol.smpserver.backend.ISMPBackendRegistrarSPI)"; cardinality:=multiple</Require-Capability>
+            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.peppol.smpserver.config.MicroTypeConverterRegistrarSMPServer</Provide-Capability>
           </instructions>
         </configuration>
       </plugin>

@@ -80,8 +80,7 @@
             <Export-Package>com.helger.peppol.smpserver.data.xml.*</Export-Package>
             <Import-Package>!javax.annotation.*,*</Import-Package>
             <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
-            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.peppol.smpserver.data.xml.spi.XMLSMPBackendRegistrarSPI,
-osgi.serviceloader; osgi.serviceloader=com.helger.peppol.smpserver.data.xml.config.MicroTypeConverterRegistrarSMPServer</Provide-Capability>
+            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.peppol.smpserver.data.xml.spi.XMLSMPBackendRegistrarSPI</Provide-Capability>
           </instructions>
         </configuration>
       </plugin>
