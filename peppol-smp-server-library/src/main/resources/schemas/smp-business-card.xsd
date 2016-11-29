@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="" 
+           elementFormDefault="unqualified"
+           attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="IdentifierType">
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="scheme" type="xs:string" use="required" />
+    <xs:attribute name="value" type="xs:string" use="required"/>
+  </xs:complexType>          
+           
+  <xs:complexType name="ContactType">
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="type" type="xs:string" use="optional" />
+    <xs:attribute name="name" type="xs:string" use="optional" />
+    <xs:attribute name="phone" type="xs:string" use="optional" />
+    <xs:attribute name="email" type="xs:string" use="optional"/>
+  </xs:complexType>          
+           
+  <xs:complexType name="EntityType">
+    <xs:sequence>
+      <xs:element name="geoinfo" type="xs:string" minOccurs="0" />
+      <xs:element name="identifier" type="IdentifierType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="website" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="contact" type="ContactType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="additional" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="optional" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="country" type="xs:string" use="required"/>
+    <xs:attribute name="regdate" type="xs:date" use="optional" />
+  </xs:complexType>
+  
+  <xs:complexType name="BusinessCardType">
+    <xs:sequence>
+      <xs:element name="entity" type="EntityType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="servicegroupid" type="xs:string" use="required" />
+  </xs:complexType>
+</xs:schema>
