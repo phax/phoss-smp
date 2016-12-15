@@ -333,7 +333,11 @@ public final class SMPServerAPI
       if (!aServiceGroupID.hasSameContent (aServiceGroup.getParticipantIdentifier ()))
       {
         // Business identifiers must be equal
-        throw new SMPNotFoundException ("ServiceGroup inconsistency", m_aAPIProvider.getCurrentURI ());
+        throw new SMPNotFoundException ("ServiceGroup Inconsistency. The URL points to " +
+                                        aServiceGroupID +
+                                        " whereas the ServiceGroup contains " +
+                                        aServiceGroup.getParticipantIdentifier (),
+                                        m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
