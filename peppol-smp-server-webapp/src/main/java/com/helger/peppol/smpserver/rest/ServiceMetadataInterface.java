@@ -51,7 +51,7 @@ import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.photon.core.app.CApplication;
-import com.helger.web.mock.MockHttpServletResponse;
+import com.helger.servlet.mock.MockHttpServletResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
 import com.helger.xml.serialize.write.EXMLIncorrectCharacterHandling;
 import com.helger.xml.serialize.write.EXMLSerializeIndent;

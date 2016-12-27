@@ -116,10 +116,10 @@ import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.servlet.request.IRequestParamMap;
+import com.helger.servlet.request.RequestParamMap;
 import com.helger.smtp.util.EmailAddressValidator;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.web.servlet.request.IRequestParamMap;
-import com.helger.web.servlet.request.RequestParamMap;
 
 @WorkInProgress
 public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBusinessCard>

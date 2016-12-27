@@ -28,7 +28,7 @@ import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
-import com.helger.web.servlet.server.StaticServerInfo;
+import com.helger.servlet.StaticServerInfo;
 
 /**
  * {@link ISMPServerAPIDataProvider} implementation based on {@link UriInfo}

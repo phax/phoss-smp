@@ -29,8 +29,8 @@ import com.helger.photon.core.app.CApplication;
 import com.helger.photon.core.servlet.AbstractUnifiedResponseFilter;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.util.SecurityHelper;
+import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.web.servlet.response.UnifiedResponse;
 
 /**
  * A special servlet filter that checks that a user can only access the config

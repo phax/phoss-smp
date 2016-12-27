@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 
 import com.helger.commons.exception.InitializationException;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
-import com.helger.web.servlet.ServletContextPathHolder;
+import com.helger.servlet.ServletContextPathHolder;
 
 /**
  * REST Web Service for redirection. It is called if the server root ("/") is

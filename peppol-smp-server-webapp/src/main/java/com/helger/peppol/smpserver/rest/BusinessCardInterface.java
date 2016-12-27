@@ -35,7 +35,7 @@ import com.helger.pd.businesscard.PDBusinessCardType;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.photon.core.app.CApplication;
-import com.helger.web.mock.MockHttpServletResponse;
+import com.helger.servlet.mock.MockHttpServletResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
 
 /**

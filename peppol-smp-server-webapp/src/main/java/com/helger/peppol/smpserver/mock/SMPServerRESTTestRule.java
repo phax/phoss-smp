@@ -24,8 +24,7 @@ import javax.ws.rs.client.WebTarget;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 
-import com.helger.peppol.smpserver.mock.SMPServerTestRule;
-import com.helger.web.servlet.server.StaticServerInfo;
+import com.helger.servlet.StaticServerInfo;
 
 public class SMPServerRESTTestRule extends SMPServerTestRule
 {

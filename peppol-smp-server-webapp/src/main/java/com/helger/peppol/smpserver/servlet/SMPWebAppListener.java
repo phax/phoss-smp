@@ -34,12 +34,13 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.pub.InitializerPublic;
 import com.helger.peppol.smpserver.ui.secure.InitializerSecure;
-import com.helger.photon.basic.app.request.ApplicationRequestManager;
+import com.helger.photon.basic.app.request.RequestParameterHandlerURLPathNamed;
+import com.helger.photon.basic.app.request.RequestParameterManager;
 import com.helger.photon.core.app.CApplication;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
-import com.helger.web.servlet.ServletContextPathHolder;
+import com.helger.servlet.ServletContextPathHolder;
 
 /**
  * Special SMP web app listener. This is the entry point for application
@@ -97,7 +98,7 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
       // Enforce an empty context path according to the specs!
       ServletContextPathHolder.setCustomContextPath ("");
     }
-    ApplicationRequestManager.getRequestMgr ().setUsePaths (true);
+    RequestParameterManager.getInstance ().setParameterHandler (new RequestParameterHandlerURLPathNamed ());
 
     // UI stuff
     AppCommonUI.init ();
