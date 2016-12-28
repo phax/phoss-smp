@@ -39,7 +39,6 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.URLHelper;
 import com.helger.http.CHTTPHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
@@ -69,7 +68,7 @@ import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.peppol.smpserver.mock.MockWebServer;
+import com.helger.peppol.smpserver.mock.MockSMPClient;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 
@@ -274,7 +273,7 @@ public final class ServiceMetadataInterfaceTest
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aSIMgr = SMPMetaManager.getServiceInformationMgr ();
-    final SMPClient aSMPClient = new SMPClient (URLHelper.getAsURI (MockWebServer.BASE_URI_HTTP));
+    final SMPClient aSMPClient = new MockSMPClient ();
 
     assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
     assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
@@ -465,7 +464,7 @@ public final class ServiceMetadataInterfaceTest
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPRedirectManager aSRMgr = SMPMetaManager.getRedirectMgr ();
-    final SMPClient aSMPClient = new SMPClient (URLHelper.getAsURI (MockWebServer.BASE_URI_HTTP));
+    final SMPClient aSMPClient = new MockSMPClient ();
 
     assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
     assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));

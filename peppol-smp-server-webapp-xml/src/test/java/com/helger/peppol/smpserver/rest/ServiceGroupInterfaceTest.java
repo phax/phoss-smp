@@ -39,7 +39,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.URLHelper;
 import com.helger.http.CHTTPHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
@@ -52,7 +51,7 @@ import com.helger.peppol.smpclient.exception.SMPClientException;
 import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.mock.MockWebServer;
+import com.helger.peppol.smpserver.mock.MockSMPClient;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
 import com.helger.photon.security.CSecurity;
 
@@ -181,7 +180,7 @@ public final class ServiceGroupInterfaceTest
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    final SMPClient aSMPClient = new SMPClient (URLHelper.getAsURI (MockWebServer.BASE_URI_HTTP));
+    final SMPClient aSMPClient = new MockSMPClient ();
 
     // GET
     assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));

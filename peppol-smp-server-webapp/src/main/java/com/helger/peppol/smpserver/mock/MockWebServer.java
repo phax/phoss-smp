@@ -33,9 +33,11 @@ import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsMap;
 
 /**
- * Main class.
+ * WebServer based on Grizzly for standalone SMP server testing.
+ *
+ * @author Philip Helger
  */
-public final class MockWebServer
+final class MockWebServer
 {
   // Base URI the Grizzly HTTP server will listen on
   public static final String BASE_URI_HTTP = "http://localhost:9090/unittest/";
