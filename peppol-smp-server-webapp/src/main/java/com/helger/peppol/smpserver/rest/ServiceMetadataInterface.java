@@ -251,7 +251,7 @@ public final class ServiceMetadataInterface
       }
 
       if (eSuccess.isFailure ())
-        return Response.status (Status.BAD_REQUEST).build ();
+        return Response.status (Status.NOT_FOUND).build ();
       return Response.ok ().build ();
     }
     finally
