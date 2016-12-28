@@ -58,7 +58,6 @@ import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsMap;
 import com.helger.commons.equals.EqualsHelper;
-import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
@@ -83,9 +82,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList<> ();
 
   public SQLServiceGroupManager ()
-  {
-    setUseTransactionsForSelect (true);
-  }
+  {}
 
   @Nonnull
   @ReturnsMutableObject ("by design")
@@ -94,7 +91,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     return m_aCBs;
   }
 
-  @Nonnull
+  @Nullable
   public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
                                                 @Nonnull final IParticipantIdentifier aParticipantIdentifier,
                                                 @Nullable final String sExtension)
@@ -146,7 +143,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
 
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
 
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("createSMPServiceGroup succeeded");
@@ -211,7 +211,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       return eChange;
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return EChange.UNCHANGED;
+    }
 
     final EChange eChange = ret.get ();
     s_aLogger.info ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
@@ -262,9 +265,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      s_aLogger.info ("deleteSMPServiceGroup failed. Throwable: " +
-                      ClassHelper.getClassLocalName (ret.getThrowable ()));
-      throw new RuntimeException (ret.getThrowable ());
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return EChange.UNCHANGED;
     }
 
     final EChange eChange = ret.get ();
@@ -280,7 +282,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     return eChange;
   }
 
-  @Nonnull
+  @Nullable
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
@@ -310,11 +312,14 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       return aList;
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
     return ret.get ();
   }
 
-  @Nonnull
+  @Nullable
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
@@ -339,7 +344,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       return aList;
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
     return ret.get ();
   }
 
@@ -357,7 +365,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       return Long.valueOf (nCount);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return 0;
+    }
     return ret.get ().intValue ();
   }
 
@@ -387,7 +398,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       return aServiceGroup;
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
     return ret.get ();
   }
 
@@ -412,7 +426,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       return Boolean.valueOf (aDBServiceGroup != null);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return false;
+    }
     return ret.get ().booleanValue ();
   }
 
@@ -428,7 +445,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       return Long.valueOf (nCount);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return 0;
+    }
     return ret.get ().intValue ();
   }
 }

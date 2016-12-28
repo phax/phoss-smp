@@ -43,6 +43,8 @@ package com.helger.peppol.smpserver.data.sql;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
+import javax.persistence.PersistenceException;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
@@ -50,6 +52,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.collection.ext.CommonsHashMap;
 import com.helger.commons.collection.ext.ICommonsMap;
+import com.helger.commons.scope.IScope;
 import com.helger.db.jpa.AbstractGlobalEntityManagerFactory;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.settings.exchange.configfile.ConfigFile;
@@ -68,7 +71,7 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
     // Standard configuration file
     final ConfigFile aConfigFile = SMPServerConfiguration.getConfigFile ();
 
-    final ICommonsMap <String, Object> ret = new CommonsHashMap <> ();
+    final ICommonsMap <String, Object> ret = new CommonsHashMap<> ();
     // Read all properties from the standard configuration file
     // Connection pooling
     ret.put (PersistenceUnitProperties.CONNECTION_POOL_MAX,
@@ -112,5 +115,19 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
   public static SMPEntityManagerFactory getInstance ()
   {
     return getGlobalSingleton (SMPEntityManagerFactory.class);
+  }
+
+  @Override
+  @OverridingMethodsMustInvokeSuper
+  protected void onDestroy (@Nonnull final IScope aScopeInDestruction) throws Exception
+  {
+    try
+    {
+      super.onDestroy (aScopeInDestruction);
+    }
+    catch (final PersistenceException ex)
+    {
+      // Ignore
+    }
   }
 }

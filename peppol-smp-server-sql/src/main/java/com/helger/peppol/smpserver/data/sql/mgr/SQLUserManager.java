@@ -121,18 +121,24 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
       return Long.valueOf (nCount);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return 0;
+    }
     return ret.get ().intValue ();
   }
 
-  @Nonnull
+  @Nullable
   @ReturnsMutableCopy
   public ICommonsList <ISMPUser> getAllUsers ()
   {
     JPAExecutionResult <Collection <DBUser>> ret;
     ret = doSelect ( () -> getEntityManager ().createQuery ("SELECT p FROM DBUser p", DBUser.class).getResultList ());
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
     return new CommonsArrayList<> (ret.get ());
   }
 
@@ -145,7 +151,10 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
     JPAExecutionResult <DBUser> ret;
     ret = doSelect ( () -> getEntityManager ().find (DBUser.class, sID));
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
     return ret.get ();
   }
 

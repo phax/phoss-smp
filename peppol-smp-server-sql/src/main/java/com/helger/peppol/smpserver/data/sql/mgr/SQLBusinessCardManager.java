@@ -177,7 +177,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     return ret;
   }
 
-  @Nonnull
+  @Nullable
   public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
                                                          @Nonnull final List <SMPBusinessCardEntity> aEntities)
   {
@@ -221,7 +221,10 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       }
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
 
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("Finished createOrUpdateSMPBusinessCard");
@@ -250,7 +253,10 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       return EChange.valueOf (nCount > 0);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return EChange.UNCHANGED;
+    }
 
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("Finished deleteSMPBusinessCard. Change=" + ret.get ().isChanged ());
@@ -280,7 +286,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     return new SMPBusinessCard (aServiceGroup, aEntities);
   }
 
-  @Nonnull
+  @Nullable
   @ReturnsMutableCopy
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
@@ -289,7 +295,10 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                                                    DBBusinessCardEntity.class)
                                                      .getResultList ());
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
 
     /// Group by ID
     final IMultiMapListBased <IParticipantIdentifier, DBBusinessCardEntity> aGrouped = new MultiHashMapArrayListBased<> ();
@@ -317,7 +326,10 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                                                                  .getURIEncoded ())
                                                      .getResultList ());
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
 
     if (ret.get ().isEmpty ())
       return null;
@@ -347,7 +359,10 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       return getSelectCountResultObj (em.createQuery ("SELECT COUNT(DISTINCT p.participantId) FROM DBBusinessCardEntity p"));
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return 0;
+    }
 
     if (ret.get () == null)
       return 0;

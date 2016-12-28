@@ -93,9 +93,10 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
    *        sign its resources.
    * @param sExtension
    *        Optional extension element
-   * @return The new or updated {@link ISMPRedirect}. Never <code>null</code>.
+   * @return The new or updated {@link ISMPRedirect}. Only <code>null</code> in
+   *         case of unthrown exception.
    */
-  @Nonnull
+  @Nullable
   public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
                                                  @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                                  @Nonnull @Nonempty final String sTargetHref,
@@ -131,7 +132,10 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       }
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
     return new SMPRedirect (aServiceGroup, aDocumentTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, sExtension);
   }
 
@@ -155,7 +159,10 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       return EChange.CHANGED;
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return EChange.UNCHANGED;
+    }
     return ret.get ();
   }
 
@@ -176,7 +183,10 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       return EChange.valueOf (nCnt > 0);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return EChange.UNCHANGED;
+    }
     return ret.get ();
   }
 
@@ -191,7 +201,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                             aDBRedirect.getExtension ());
   }
 
-  @Nonnull
+  @Nullable
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
@@ -200,7 +210,10 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                                                                    DBServiceMetadataRedirection.class)
                                                      .getResultList ());
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
 
     final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList<> ();
     for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
@@ -208,7 +221,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     return aRedirects;
   }
 
-  @Nonnull
+  @Nullable
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
@@ -226,7 +239,10 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                                                                                    .getValue ())
                                                        .getResultList ());
       if (ret.hasThrowable ())
-        throw new RuntimeException (ret.getThrowable ());
+      {
+        getExceptionHandler ().onException (ret.getThrowable ());
+        return null;
+      }
 
       for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
         aRedirects.add (_convert (aDBRedirect));
@@ -243,7 +259,10 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       return Long.valueOf (nCount);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return 0;
+    }
     return ret.get ().intValue ();
   }
 
@@ -266,7 +285,10 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       return getEntityManager ().find (DBServiceMetadataRedirection.class, aDBRedirectID, aProps);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
     final DBServiceMetadataRedirection aDBRedirect = ret.get ();
     if (aDBRedirect == null)
       return null;

@@ -40,14 +40,22 @@
  */
 package com.helger.peppol.smpserver.data.sql;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
+import com.helger.commons.callback.exception.IExceptionCallback;
 import com.helger.db.jpa.JPAEnabledManager;
 
 public abstract class AbstractSMPJPAEnabledManager extends JPAEnabledManager
 {
   protected static final Logger s_aLogger = LoggerFactory.getLogger (AbstractSMPJPAEnabledManager.class);
+
+  private IExceptionCallback <Throwable> m_aExceptionHandler = x -> {
+    throw new RuntimeException (x);
+  };
 
   public AbstractSMPJPAEnabledManager ()
   {
@@ -55,5 +63,20 @@ public abstract class AbstractSMPJPAEnabledManager extends JPAEnabledManager
 
     // To avoid some EclipseLink logging issues
     setUseTransactionsForSelect (true);
+  }
+
+  /**
+   * @return The exception handler to be used. Never <code>null</code>.
+   */
+  @Nonnull
+  public IExceptionCallback <Throwable> getExceptionHandler ()
+  {
+    return m_aExceptionHandler;
+  }
+
+  public void setExceptionHandler (@Nonnull final IExceptionCallback <Throwable> aExceptionHandler)
+  {
+    ValueEnforcer.notNull (aExceptionHandler, "ExceptionHandler");
+    m_aExceptionHandler = aExceptionHandler;
   }
 }

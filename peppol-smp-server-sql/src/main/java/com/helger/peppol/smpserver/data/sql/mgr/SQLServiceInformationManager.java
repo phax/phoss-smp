@@ -262,7 +262,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return aDBMetadata;
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+    }
   }
 
   @Nullable
@@ -306,7 +308,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return EChange.CHANGED;
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return EChange.UNCHANGED;
+    }
     return ret.get ();
   }
 
@@ -327,7 +332,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return EChange.valueOf (nCnt > 0);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return EChange.UNCHANGED;
+    }
     return ret.get ();
   }
 
@@ -365,7 +373,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return EChange.valueOf (nCnt > 0);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return EChange.UNCHANGED;
+    }
     return ret.get ();
   }
 
@@ -404,7 +415,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                       aDBMetadata.getExtension ());
   }
 
-  @Nonnull
+  @Nullable
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
@@ -413,7 +424,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                                    DBServiceMetadata.class)
                                                      .getResultList ());
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
 
     final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
     for (final DBServiceMetadata aDBMetadata : ret.get ())
@@ -430,11 +444,14 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return Long.valueOf (nCount);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return 0;
+    }
     return ret.get ().intValue ();
   }
 
-  @Nonnull
+  @Nullable
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
@@ -452,7 +469,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                                                    .getValue ())
                                                        .getResultList ());
       if (ret.hasThrowable ())
-        throw new RuntimeException (ret.getThrowable ());
+      {
+        getExceptionHandler ().onException (ret.getThrowable ());
+        return null;
+      }
 
       for (final DBServiceMetadata aDBMetadata : ret.get ())
         aServiceInformations.add (_convert (aDBMetadata));
@@ -490,7 +510,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return getEntityManager ().find (DBServiceMetadata.class, aDBMetadataID, aProps);
     });
     if (ret.hasThrowable ())
-      throw new RuntimeException (ret.getThrowable ());
+    {
+      getExceptionHandler ().onException (ret.getThrowable ());
+      return null;
+    }
     return ret.get ();
   }
 
