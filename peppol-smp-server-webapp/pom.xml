@@ -91,6 +91,12 @@
       <groupId>com.helger</groupId>
       <artifactId>peppol-directory-client</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>peppol-smp-client</artifactId>
+      <optional>true</optional>
+    </dependency>
     
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
@@ -114,11 +120,6 @@
       <optional>true</optional>
     </dependency>
 
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>peppol-smp-client</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>peppol-smp-server-sql</artifactId>
