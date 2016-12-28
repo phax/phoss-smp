@@ -18,6 +18,7 @@ package com.helger.peppol.smpserver.rest;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -38,6 +39,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.url.URLHelper;
 import com.helger.http.CHTTPHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
@@ -45,8 +47,13 @@ import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
+import com.helger.peppol.smpclient.SMPClient;
+import com.helger.peppol.smpclient.exception.SMPClientException;
+import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
 import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.mock.MockServer;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
 
 /**
@@ -58,6 +65,8 @@ import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
 public final class ServiceGroupInterfaceTest
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceGroupInterfaceTest.class);
+  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials ("peppol_user",
+                                                                                                "Test1234");
 
   @Rule
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-sql.properties")
@@ -69,11 +78,11 @@ public final class ServiceGroupInterfaceTest
   private static Builder _addCredentials (@Nonnull final Builder aBuilder)
   {
     // Use default credentials for SQL backend
-    return aBuilder.header (CHTTPHeader.AUTHORIZATION,
-                            new BasicAuthClientCredentials ("peppol_user", "Test1234").getRequestValue ());
+    return aBuilder.header (CHTTPHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
-  private static int _testResponse (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
+  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+                                                @Nonempty final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
@@ -91,7 +100,7 @@ public final class ServiceGroupInterfaceTest
   }
 
   @Test
-  public void testCreateAndDeleteServiceGroup ()
+  public void testCreateAndDeleteServiceGroupJerseyClient ()
   {
     // Lower case version
     final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
@@ -107,21 +116,21 @@ public final class ServiceGroupInterfaceTest
 
     // GET
     final boolean bIsSQL = SMPMetaManager.getManagerProvider () instanceof SQLManagerProvider;
-    final int nStatus = _testResponse (aTarget.path (sPI_LC).request ().get (),
-                                       bIsSQL ? new int [] { 404, 500 } : new int [] { 404 });
+    final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (),
+                                                   bIsSQL ? new int [] { 404, 500 } : new int [] { 404 });
     if (bIsSQL && nStatus == 500)
     {
       // Seems like MySQL is not running
       return;
     }
-    _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+    _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
 
     try
     {
       // PUT 1 - create
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                              .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
-      _testResponse (aResponseMsg, 200);
+      _testResponseJerseyClient (aResponseMsg, 200);
 
       // Both regular and upper case must work
       assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
@@ -132,10 +141,10 @@ public final class ServiceGroupInterfaceTest
       // PUT 2 - overwrite
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                              .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
-      _testResponse (aResponseMsg, 200);
+      _testResponseJerseyClient (aResponseMsg, 200);
       aResponseMsg = _addCredentials (aTarget.path (sPI_UC)
                                              .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
-      _testResponse (aResponseMsg, 200);
+      _testResponseJerseyClient (aResponseMsg, 200);
 
       // Both regular and upper case must work
       assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
@@ -145,11 +154,11 @@ public final class ServiceGroupInterfaceTest
 
       // DELETE 1
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
-      _testResponse (aResponseMsg, 200);
+      _testResponseJerseyClient (aResponseMsg, 200);
 
       // Both must be deleted
-      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
-      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+      _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
     }
@@ -158,13 +167,79 @@ public final class ServiceGroupInterfaceTest
       // DELETE 2
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
       // May be 500 if no MySQL is running
-      _testResponse (aResponseMsg, 200, 404);
+      _testResponseJerseyClient (aResponseMsg, 200, 404);
 
       // Both must be deleted
-      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
-      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+      _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+    }
+  }
+
+  @Test
+  public void testCreateAndDeleteServiceGroupSMPClient () throws SMPClientException
+  {
+    // Lower case version
+    final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9930:de203827312");
+    // Upper case version
+    final IParticipantIdentifier aPI_UC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9930:DE203827312");
+    final ServiceGroupType aSG = new ServiceGroupType ();
+    aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+    final SMPClient aSMPClient = new SMPClient (URLHelper.getAsURI (MockServer.BASE_URI_HTTP));
+
+    // GET
+    assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+    assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
+
+    try
+    {
+      // PUT 1 - create
+      aSMPClient.saveServiceGroup (aSG, CREDENTIALS);
+
+      // Both regular and upper case must work
+      assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+      assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
+
+      // PUT 2 - overwrite
+      aSMPClient.saveServiceGroup (aSG, CREDENTIALS);
+
+      // Both regular and upper case must work
+      assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+      assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
+
+      // DELETE 1
+      aSMPClient.deleteServiceGroup (aPI_LC, CREDENTIALS);
+
+      // Both must be deleted
+      assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+      assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
+    }
+    finally
+    {
+      // DELETE 2
+      try
+      {
+        aSMPClient.deleteServiceGroup (aPI_LC, CREDENTIALS);
+      }
+      catch (final SMPClientNotFoundException ex)
+      {
+        // Expected
+      }
+
+      // Both must be deleted
+      assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+      assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
     }
   }
 }

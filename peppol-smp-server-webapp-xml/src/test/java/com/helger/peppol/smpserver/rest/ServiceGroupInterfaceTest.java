@@ -51,6 +51,7 @@ import com.helger.peppol.smpclient.SMPClient;
 import com.helger.peppol.smpclient.exception.SMPClientException;
 import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.mock.MockServer;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
 import com.helger.photon.security.CSecurity;
@@ -109,6 +110,7 @@ public final class ServiceGroupInterfaceTest
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final WebTarget aTarget = m_aRule.getWebTarget ();
     Response aResponseMsg;
 
@@ -126,8 +128,8 @@ public final class ServiceGroupInterfaceTest
       // Both regular and upper case must work
       assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
       assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
 
       // PUT 2 - overwrite
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
@@ -140,8 +142,8 @@ public final class ServiceGroupInterfaceTest
       // Both regular and upper case must work
       assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
       assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
 
       // DELETE 1
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
@@ -150,8 +152,8 @@ public final class ServiceGroupInterfaceTest
       // Both must be deleted
       _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
       _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
     }
     finally
     {
@@ -163,8 +165,8 @@ public final class ServiceGroupInterfaceTest
       // Both must be deleted
       _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
       _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
     }
   }
 
@@ -178,47 +180,48 @@ public final class ServiceGroupInterfaceTest
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
-    final SMPClient aClient = new SMPClient (URLHelper.getAsURI (MockServer.BASE_URI_HTTP));
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+    final SMPClient aSMPClient = new SMPClient (URLHelper.getAsURI (MockServer.BASE_URI_HTTP));
 
     // GET
-    assertNull (aClient.getServiceGroupOrNull (aPI_LC));
-    assertNull (aClient.getServiceGroupOrNull (aPI_UC));
+    assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+    assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
 
     try
     {
       // PUT 1 - create
-      aClient.saveServiceGroup (aSG, CREDENTIALS);
+      aSMPClient.saveServiceGroup (aSG, CREDENTIALS);
 
       // Both regular and upper case must work
-      assertNotNull (aClient.getServiceGroupOrNull (aPI_LC));
-      assertNotNull (aClient.getServiceGroupOrNull (aPI_UC));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+      assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
 
       // PUT 2 - overwrite
-      aClient.saveServiceGroup (aSG, CREDENTIALS);
+      aSMPClient.saveServiceGroup (aSG, CREDENTIALS);
 
       // Both regular and upper case must work
-      assertNotNull (aClient.getServiceGroupOrNull (aPI_LC));
-      assertNotNull (aClient.getServiceGroupOrNull (aPI_UC));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+      assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
 
       // DELETE 1
-      aClient.deleteServiceGroup (aPI_LC, CREDENTIALS);
+      aSMPClient.deleteServiceGroup (aPI_LC, CREDENTIALS);
 
       // Both must be deleted
-      assertNull (aClient.getServiceGroupOrNull (aPI_LC));
-      assertNull (aClient.getServiceGroupOrNull (aPI_UC));
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+      assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
     }
     finally
     {
       // DELETE 2
       try
       {
-        aClient.deleteServiceGroup (aPI_LC, CREDENTIALS);
+        aSMPClient.deleteServiceGroup (aPI_LC, CREDENTIALS);
       }
       catch (final SMPClientNotFoundException ex)
       {
@@ -226,10 +229,10 @@ public final class ServiceGroupInterfaceTest
       }
 
       // Both must be deleted
-      assertNull (aClient.getServiceGroupOrNull (aPI_LC));
-      assertNull (aClient.getServiceGroupOrNull (aPI_UC));
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
+      assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
     }
   }
 }
