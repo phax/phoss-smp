@@ -84,6 +84,9 @@ public final class XMLServiceInformationManager extends
     final SMPServiceInformation aSMPServiceInformation = (SMPServiceInformation) aSMPServiceInformationObj;
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
 
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("mergeSMPServiceInformation (" + aSMPServiceInformationObj + ")");
+
     // Check for an update
     boolean bChangedExisting = false;
     final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroup (),
@@ -109,6 +112,9 @@ public final class XMLServiceInformationManager extends
                                         aOldInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aOldInformation.getAllProcesses (),
                                         aOldInformation.getExtensionAsString ());
+
+      if (s_aLogger.isDebugEnabled ())
+        s_aLogger.debug ("mergeSMPServiceInformation - success - updated");
     }
     else
     {
@@ -149,14 +155,23 @@ public final class XMLServiceInformationManager extends
                                         aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aSMPServiceInformation.getAllProcesses (),
                                         aSMPServiceInformation.getExtensionAsString ());
+      if (s_aLogger.isDebugEnabled ())
+        s_aLogger.debug ("mergeSMPServiceInformation - success - created");
     }
   }
 
   @Nonnull
   public EChange deleteSMPServiceInformation (@Nullable final ISMPServiceInformation aSMPServiceInformation)
   {
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("deleteSMPServiceInformation (" + aSMPServiceInformation + ")");
+
     if (aSMPServiceInformation == null)
+    {
+      if (s_aLogger.isDebugEnabled ())
+        s_aLogger.debug ("deleteSMPServiceInformation - failure");
       return EChange.UNCHANGED;
+    }
 
     m_aRWLock.writeLock ().lock ();
     try
@@ -165,6 +180,8 @@ public final class XMLServiceInformationManager extends
       if (aRealServiceInformation == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
+        if (s_aLogger.isDebugEnabled ())
+          s_aLogger.debug ("deleteSMPServiceInformation - failure");
         return EChange.UNCHANGED;
       }
     }
@@ -172,7 +189,11 @@ public final class XMLServiceInformationManager extends
     {
       m_aRWLock.writeLock ().unlock ();
     }
+
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("deleteSMPServiceInformation - success");
+
     return EChange.CHANGED;
   }
 
@@ -189,14 +210,23 @@ public final class XMLServiceInformationManager extends
   public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
                                    @Nullable final ISMPProcess aProcess)
   {
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("deleteSMPProcess (" + aSMPServiceInformation + ", " + aProcess + ")");
+
     if (aSMPServiceInformation == null || aProcess == null)
+    {
+      if (s_aLogger.isDebugEnabled ())
+        s_aLogger.debug ("deleteSMPProcess - failure");
       return EChange.UNCHANGED;
+    }
 
     // Find implementation object
     final SMPServiceInformation aRealServiceInformation = getOfID (aSMPServiceInformation.getID ());
     if (aRealServiceInformation == null)
     {
       AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
+      if (s_aLogger.isDebugEnabled ())
+        s_aLogger.debug ("deleteSMPProcess - failure");
       return EChange.UNCHANGED;
     }
 
@@ -210,6 +240,8 @@ public final class XMLServiceInformationManager extends
                                           "no-such-process",
                                           aSMPServiceInformation.getID (),
                                           aProcess.getProcessIdentifier ().getURIEncoded ());
+        if (s_aLogger.isDebugEnabled ())
+          s_aLogger.debug ("deleteSMPProcess - failure");
         return EChange.UNCHANGED;
       }
     }
@@ -220,6 +252,8 @@ public final class XMLServiceInformationManager extends
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
                                       aSMPServiceInformation.getID (),
                                       aProcess.getProcessIdentifier ().getURIEncoded ());
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("deleteSMPProcess - success");
     return EChange.CHANGED;
   }
 

@@ -27,8 +27,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.ext.ICommonsCollection;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
@@ -69,16 +67,17 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
 
   @Nonnull
   public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
-                                                @Nullable @Nonnull final IParticipantIdentifier aParticipantIdentifier,
+                                                @Nonnull final IParticipantIdentifier aParticipantIdentifier,
                                                 @Nullable final String sExtension)
   {
-    s_aLogger.info ("createSMPServiceGroup (" +
-                    sOwnerID +
-                    ", " +
-                    aParticipantIdentifier.getURIEncoded () +
-                    ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
-                    ")");
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("createSMPServiceGroup (" +
+                       sOwnerID +
+                       ", " +
+                       aParticipantIdentifier.getURIEncoded () +
+                       ", " +
+                       (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                       ")");
 
     final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
 
@@ -95,6 +94,8 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
     {
       // An error occurred - remove from SML again
       aHook.undoCreateServiceGroup (aParticipantIdentifier);
+      if (s_aLogger.isDebugEnabled ())
+        s_aLogger.debug ("createSMPServiceGroup - failure");
       throw ex;
     }
     finally
@@ -107,7 +108,8 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
                                       sOwnerID,
                                       aParticipantIdentifier.getURIEncoded (),
                                       sExtension);
-    s_aLogger.info ("createSMPServiceGroup succeeded");
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("createSMPServiceGroup - success");
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aSMPServiceGroup));
 
@@ -119,18 +121,21 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
                                         @Nonnull @Nonempty final String sNewOwnerID,
                                         @Nullable final String sExtension)
   {
-    s_aLogger.info ("updateSMPServiceGroup (" +
-                    sSMPServiceGroupID +
-                    ", " +
-                    sNewOwnerID +
-                    ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
-                    ")");
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("updateSMPServiceGroup (" +
+                       sSMPServiceGroupID +
+                       ", " +
+                       sNewOwnerID +
+                       ", " +
+                       (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                       ")");
 
     final SMPServiceGroup aSMPServiceGroup = getOfID (sSMPServiceGroupID);
     if (aSMPServiceGroup == null)
     {
       AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, sSMPServiceGroupID, "no-such-id");
+      if (s_aLogger.isDebugEnabled ())
+        s_aLogger.debug ("updateSMPServiceGroup - failure");
       return EChange.UNCHANGED;
     }
 
@@ -141,7 +146,11 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
       eChange = eChange.or (aSMPServiceGroup.setOwnerID (sNewOwnerID));
       eChange = eChange.or (aSMPServiceGroup.setExtensionAsString (sExtension));
       if (eChange.isUnchanged ())
+      {
+        if (s_aLogger.isDebugEnabled ())
+          s_aLogger.debug ("updateSMPServiceGroup - unchanged");
         return EChange.UNCHANGED;
+      }
       internalUpdateItem (aSMPServiceGroup);
     }
     finally
@@ -150,7 +159,8 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
     }
 
     AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sSMPServiceGroupID, sNewOwnerID, sExtension);
-    s_aLogger.info ("updateSMPServiceGroup succeeded");
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("updateSMPServiceGroup - success");
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (sSMPServiceGroupID));
 
@@ -160,9 +170,10 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
   @Nonnull
   public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    s_aLogger.info ("deleteSMPServiceGroup (" +
-                    (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) +
-                    ")");
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("deleteSMPServiceGroup (" +
+                       (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) +
+                       ")");
 
     final String sServiceGroupID = aParticipantID == null ? null
                                                           : SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
@@ -170,6 +181,8 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
     if (aSMPServiceGroup == null)
     {
       AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
+      if (s_aLogger.isDebugEnabled ())
+        s_aLogger.debug ("deleteSMPServiceGroup - failure");
       return EChange.UNCHANGED;
     }
 
@@ -179,8 +192,8 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
 
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    ICommonsCollection <? extends ISMPRedirect> aOldRedirects = null;
-    ICommonsCollection <? extends ISMPServiceInformation> aOldServiceInformation = null;
+    ICommonsList <ISMPRedirect> aOldRedirects = null;
+    ICommonsList <ISMPServiceInformation> aOldServiceInformation = null;
 
     m_aRWLock.writeLock ().lock ();
     try
@@ -188,6 +201,8 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
       if (internalDeleteItem (aSMPServiceGroup.getID ()) == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aSMPServiceGroup.getID ());
+        if (s_aLogger.isDebugEnabled ())
+          s_aLogger.debug ("deleteSMPServiceGroup - failure");
         return EChange.UNCHANGED;
       }
 
@@ -208,7 +223,7 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
         internalCreateItem (aSMPServiceGroup);
 
       // Restore redirects (if any)
-      if (CollectionHelper.isNotEmpty (aOldRedirects))
+      if (aOldRedirects != null)
         for (final ISMPRedirect aOldRedirect : aOldRedirects)
           aRedirectMgr.createOrUpdateSMPRedirect (aSMPServiceGroup,
                                                   aOldRedirect.getDocumentTypeIdentifier (),
@@ -217,7 +232,7 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
                                                   aOldRedirect.getExtensionAsString ());
 
       // Restore service information (if any)
-      if (CollectionHelper.isNotEmpty (aOldServiceInformation))
+      if (aOldServiceInformation != null)
         for (final ISMPServiceInformation aOldServiceInfo : aOldServiceInformation)
           aServiceInfoMgr.mergeSMPServiceInformation (aOldServiceInfo);
 
@@ -231,7 +246,8 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
     }
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID ());
-    s_aLogger.info ("deleteSMPServiceGroup succeeded");
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("deleteSMPServiceGroup - success");
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (sServiceGroupID));
 
