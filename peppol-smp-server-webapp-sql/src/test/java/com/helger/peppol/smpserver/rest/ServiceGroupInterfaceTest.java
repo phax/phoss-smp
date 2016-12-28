@@ -53,7 +53,7 @@ import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
 import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.mock.MockServer;
+import com.helger.peppol.smpserver.mock.MockWebServer;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
 
 /**
@@ -188,7 +188,7 @@ public final class ServiceGroupInterfaceTest
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    final SMPClient aSMPClient = new SMPClient (URLHelper.getAsURI (MockServer.BASE_URI_HTTP));
+    final SMPClient aSMPClient = new SMPClient (URLHelper.getAsURI (MockWebServer.BASE_URI_HTTP));
 
     // GET
     assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));

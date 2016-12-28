@@ -46,10 +46,10 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
       StaticServerInfo.init ("http", "localhost", 80, "");
 
     // http only
-    m_aServer = MockServer.startRegularServer ();
+    m_aServer = MockWebServer.startRegularServer ();
 
     final Client aClient = ClientBuilder.newClient ();
-    m_aTarget = aClient.target (MockServer.BASE_URI_HTTP);
+    m_aTarget = aClient.target (MockWebServer.BASE_URI_HTTP);
   }
 
   @Override
