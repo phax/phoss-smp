@@ -35,7 +35,7 @@ import com.helger.commons.collection.ext.ICommonsMap;
 /**
  * Main class.
  */
-final class MockServer
+public final class MockServer
 {
   // Base URI the Grizzly HTTP server will listen on
   public static final String BASE_URI_HTTP = "http://localhost:9090/unittest/";

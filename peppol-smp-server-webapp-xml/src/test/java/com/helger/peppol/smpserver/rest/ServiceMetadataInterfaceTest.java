@@ -73,6 +73,8 @@ import com.helger.photon.security.CSecurity;
 public final class ServiceMetadataInterfaceTest
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceMetadataInterfaceTest.class);
+  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_LOGIN,
+                                                                                                CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   @Rule
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-xml.properties")
@@ -84,12 +86,10 @@ public final class ServiceMetadataInterfaceTest
   private static Builder _addCredentials (@Nonnull final Builder aBuilder)
   {
     // Use default credentials for XML backend
-    return aBuilder.header (CHTTPHeader.AUTHORIZATION,
-                            new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_LOGIN,
-                                                            CSecurity.USER_ADMINISTRATOR_PASSWORD).getRequestValue ());
+    return aBuilder.header (CHTTPHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
-  private static int _testResponse (final Response aResponseMsg, final int... aStatusCodes)
+  private static int _testResponseJerseyClient (final Response aResponseMsg, final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
@@ -107,7 +107,7 @@ public final class ServiceMetadataInterfaceTest
   }
 
   @Test
-  public void testCreateAndDeleteServiceInformation ()
+  public void testCreateAndDeleteServiceInformationJerseyClient ()
   {
     // Lower case
     final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
@@ -150,15 +150,15 @@ public final class ServiceMetadataInterfaceTest
     final WebTarget aTarget = m_aRule.getWebTarget ();
     Response aResponseMsg;
 
-    _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
-    _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+    _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+    _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
 
     try
     {
       // PUT ServiceGroup
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                              .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
-      _testResponse (aResponseMsg, 200);
+      _testResponseJerseyClient (aResponseMsg, 200);
 
       // Read both
       assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
@@ -176,7 +176,7 @@ public final class ServiceMetadataInterfaceTest
                                                .path ("services")
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
-        _testResponse (aResponseMsg, 200);
+        _testResponseJerseyClient (aResponseMsg, 200);
         assertNotNull (SMPMetaManager.getServiceInformationMgr ()
                                      .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
@@ -185,13 +185,13 @@ public final class ServiceMetadataInterfaceTest
                                                .path ("services")
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
-        _testResponse (aResponseMsg, 200);
+        _testResponseJerseyClient (aResponseMsg, 200);
         assertNotNull (SMPMetaManager.getServiceInformationMgr ()
                                      .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
         // DELETE 1 ServiceInformation
         aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
-        _testResponse (aResponseMsg, 200);
+        _testResponseJerseyClient (aResponseMsg, 200);
         assertNull (SMPMetaManager.getServiceInformationMgr ()
                                   .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
       }
@@ -199,7 +199,7 @@ public final class ServiceMetadataInterfaceTest
       {
         // DELETE 2 ServiceInformation
         aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
-        _testResponse (aResponseMsg, 200, 400);
+        _testResponseJerseyClient (aResponseMsg, 200, 400);
         assertNull (SMPMetaManager.getServiceInformationMgr ()
                                   .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
       }
@@ -211,10 +211,10 @@ public final class ServiceMetadataInterfaceTest
       // DELETE ServiceGroup
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
       // May be 500 if no MySQL is running
-      _testResponse (aResponseMsg, 200, 404);
+      _testResponseJerseyClient (aResponseMsg, 200, 404);
 
-      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
-      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+      _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
     }
@@ -245,15 +245,15 @@ public final class ServiceMetadataInterfaceTest
     final WebTarget aTarget = m_aRule.getWebTarget ();
     Response aResponseMsg;
 
-    _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
-    _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+    _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+    _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
 
     try
     {
       // PUT ServiceGroup
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
                                              .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
-      _testResponse (aResponseMsg, 200);
+      _testResponseJerseyClient (aResponseMsg, 200);
 
       assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
       assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
@@ -270,7 +270,7 @@ public final class ServiceMetadataInterfaceTest
                                                .path ("services")
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
-        _testResponse (aResponseMsg, 200);
+        _testResponseJerseyClient (aResponseMsg, 200);
         assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                      aDT));
 
@@ -279,20 +279,20 @@ public final class ServiceMetadataInterfaceTest
                                                .path ("services")
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
-        _testResponse (aResponseMsg, 200);
+        _testResponseJerseyClient (aResponseMsg, 200);
         assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                      aDT));
 
         // DELETE 1 Redirect
         aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
-        _testResponse (aResponseMsg, 200);
+        _testResponseJerseyClient (aResponseMsg, 200);
         assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
       }
       finally
       {
         // DELETE 2 Redirect
         aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
-        _testResponse (aResponseMsg, 200, 400);
+        _testResponseJerseyClient (aResponseMsg, 200, 400);
         assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
       }
 
@@ -302,10 +302,10 @@ public final class ServiceMetadataInterfaceTest
     {
       // DELETE ServiceGroup
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
-      _testResponse (aResponseMsg, 200, 404);
+      _testResponseJerseyClient (aResponseMsg, 200, 404);
 
-      _testResponse (aTarget.path (sPI_LC).request ().get (), 404);
-      _testResponse (aTarget.path (sPI_UC).request ().get (), 404);
+      _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+      _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
       assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
     }
