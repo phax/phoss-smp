@@ -251,7 +251,6 @@ public final class ServiceMetadataInterfaceTest
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
-    final ServiceMetadataType aSM = new ServiceMetadataType ();
     final ServiceInformationType aSI = new ServiceInformationType ();
     aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
     aSI.setDocumentIdentifier (aDT);
@@ -272,7 +271,6 @@ public final class ServiceMetadataInterfaceTest
       aPL.addProcess (aProcess);
       aSI.setProcessList (aPL);
     }
-    aSM.setServiceInformation (aSI);
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aSIMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -302,11 +300,11 @@ public final class ServiceMetadataInterfaceTest
       try
       {
         // PUT 1 ServiceInformation
-        aSMPClient.saveServiceRegistration (aSM, CREDENTIALS);
+        aSMPClient.saveServiceInformation (aSI, CREDENTIALS);
         assertNotNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
         // PUT 2 ServiceInformation
-        aSMPClient.saveServiceRegistration (aSM, CREDENTIALS);
+        aSMPClient.saveServiceInformation (aSI, CREDENTIALS);
         assertNotNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
         // DELETE 1 ServiceInformation
