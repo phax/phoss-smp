@@ -99,7 +99,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
                                                                        CSecurity.USER_ADMINISTRATOR_PASSWORD))
     {
       aOL.addItem (_createError ("Please change the password of the default user " +
-                                 CSecurity.USER_ADMINISTRATOR_LOGIN +
+                                 CSecurity.USER_ADMINISTRATOR_EMAIL +
                                  "!"));
     }
 
