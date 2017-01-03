@@ -53,6 +53,8 @@ import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.label.BootstrapLabel;
 import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
+import com.helger.photon.security.CSecurity;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.uicore.css.CUICoreCSS;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.certificate.CertificateHelper;
@@ -91,6 +93,15 @@ public class PageSecureTasks extends AbstractSMPWebPage
     aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page tries to identify upcoming tasks and potential problems in the SMP configuration. It is meant to highlight immediate and upcoming action items as well as potential misconfiguration."));
 
     final HCOL aOL = new HCOL ();
+
+    // Check for default password
+    if (PhotonSecurityManager.getUserMgr ().areUserIDAndPasswordValid (CSecurity.USER_ADMINISTRATOR_ID,
+                                                                       CSecurity.USER_ADMINISTRATOR_PASSWORD))
+    {
+      aOL.addItem (_createError ("Please change the password of the default user " +
+                                 CSecurity.USER_ADMINISTRATOR_LOGIN +
+                                 "!"));
+    }
 
     // check keystore configuration
     {

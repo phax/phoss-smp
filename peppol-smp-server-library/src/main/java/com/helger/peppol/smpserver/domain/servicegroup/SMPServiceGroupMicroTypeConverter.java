@@ -69,6 +69,9 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
 
     final SimpleParticipantIdentifier aParticipantIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PARTICIPANT_ID),
                                                                                                    SimpleParticipantIdentifier.class);
+    if (aParticipantIdentifier == null)
+      throw new IllegalStateException ("Failed to parse participant identifier " +
+                                       MicroHelper.getChildTextContent (aElement, ELEMENT_PARTICIPANT_ID));
 
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 

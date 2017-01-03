@@ -87,7 +87,13 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   {
     ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    return aIdentifierFactory.getClone (aParticipantIdentifier);
+    final IParticipantIdentifier ret = aIdentifierFactory.getClone (aParticipantIdentifier);
+    if (ret == null)
+      throw new IllegalStateException ("Failed to clone " +
+                                       aParticipantIdentifier +
+                                       " with identifier factory " +
+                                       aParticipantIdentifier);
+    return ret;
   }
 
   public SMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
