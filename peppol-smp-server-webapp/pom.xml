@@ -140,6 +140,8 @@
         <configuration>
           <excludes>
             <exclude>conf/**</exclude>
+            <exclude>**/*.min.css</exclude>
+            <exclude>**/*.min.js</exclude>
           </excludes>
         </configuration>
       </plugin>
