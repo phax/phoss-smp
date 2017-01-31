@@ -76,19 +76,19 @@
   - name: Create Downloads Directory
     file: path="{{home_dir}}/Downloads" state=directory
 
-  - name: Download Tomcat 8.0.38
+  - name: Download Tomcat 8.0.41
     get_url: 
-      url: "http://www-eu.apache.org/dist/tomcat/tomcat-8/v8.0.38/bin/apache-tomcat-8.0.38.tar.gz"
-      dest: "{{home_dir}}/Downloads/apache-tomcat-8.0.38.tar.gz"
-      checksum: md5:cb1f5e098024df2bb19c581eca180a2a
+      url: "http://www-eu.apache.org/dist/tomcat/tomcat-8/v8.0.41/bin/apache-tomcat-8.0.41.tar.gz"
+      dest: "{{home_dir}}/Downloads/apache-tomcat-8.0.41.tar.gz"
+      checksum: md5:ae4cedb59d6dd66bcbcd4e3822ebcfab
   
-  - name: Deploy Tomcat 8.0.38
+  - name: Deploy Tomcat 8.0.41
     unarchive:
     args:
-      src: "{{home_dir}}/Downloads/apache-tomcat-8.0.38.tar.gz"
+      src: "{{home_dir}}/Downloads/apache-tomcat-8.0.41.tar.gz"
       dest: "{{home_dir}}"
       remote_src: yes
-      creates: "{{home_dir}}/apache-tomcat-8.0.38"
+      creates: "{{home_dir}}/apache-tomcat-8.0.41"
     register: tomcat_deploy_result
 
   - name: Remove default ROOT webapp
@@ -113,7 +113,7 @@
   - name: Configure pd-client.properties.path (required for config files)
     lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^peppol.pd.client.properties.path=" line="peppol.pd.client.properties.path={{tomcat_dir}}/conf/pdclient.properties"    
 
-  - name: Clone the PHAX SMP Server in {{ sources_dir }}/peppol-smp-server
+  - name: Clone the phoss SMP Server in {{ sources_dir }}/peppol-smp-server
 #   git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-4.1.2
     git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-5.0.1
     register: smp_result
@@ -126,7 +126,7 @@
 
   - name: Deploy SMP Server to tomcat
 #    copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp/target/peppol-smp-server-webapp-4.1.2.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
-    copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp/target/peppol-smp-server-webapp-5.0.0.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
+    copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-5.0.1.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
 
   - name: Copy SMP Keystore to tomcat
     copy: src="{{smp_keystore}}" dest="{{smp_keystore_path}}" mode=0600 backup=yes
