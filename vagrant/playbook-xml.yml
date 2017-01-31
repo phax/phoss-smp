@@ -20,7 +20,7 @@
 - name: Installation of prerequisistes (Bootstrapping)
   hosts: all
   become: yes
-  remote_user: ububtu
+  remote_user: ubuntu
     
   tasks:
 
@@ -67,7 +67,11 @@
 
     home_dir: "/home/{{ansible_user_id}}"    
     sources_dir: "{{ home_dir }}/sources"
-    tomcat_dir: "{{home_dir}}/apache-tomcat-8.0.38"
+#    tomcat_ver: "8.0.41"
+#    tomcat_md5: "ae4cedb59d6dd66bcbcd4e3822ebcfab"
+    tomcat_ver: "8.5.11"
+    tomcat_md5: "56839d68e04d02f7e832978d27633b96"
+    tomcat_dir: "{{home_dir}}/apache-tomcat-{{tomcat_ver}}"
     smp_data: "{{tomcat_dir}}/smp-data"
     smp_keystore_path: "{{tomcat_dir}}/conf/smpKeystore.jks"
     
@@ -76,19 +80,19 @@
   - name: Create Downloads Directory
     file: path="{{home_dir}}/Downloads" state=directory
 
-  - name: Download Tomcat 8.0.41
+  - name: Download Tomcat {{tomcat_ver}}
     get_url: 
-      url: "http://www-eu.apache.org/dist/tomcat/tomcat-8/v8.0.41/bin/apache-tomcat-8.0.41.tar.gz"
-      dest: "{{home_dir}}/Downloads/apache-tomcat-8.0.41.tar.gz"
-      checksum: md5:ae4cedb59d6dd66bcbcd4e3822ebcfab
+      url: "http://www-eu.apache.org/dist/tomcat/tomcat-8/v{{tomcat_ver}}/bin/apache-tomcat-{{tomcat_ver}}.tar.gz"
+      dest: "{{home_dir}}/Downloads/apache-tomcat-{{tomcat_ver}}.tar.gz"
+      checksum: md5:{{tomcat_md5}}
   
-  - name: Deploy Tomcat 8.0.41
+  - name: Deploy Tomcat {{tomcat_ver}}
     unarchive:
     args:
-      src: "{{home_dir}}/Downloads/apache-tomcat-8.0.41.tar.gz"
+      src: "{{home_dir}}/Downloads/apache-tomcat-{{tomcat_ver}}.tar.gz"
       dest: "{{home_dir}}"
       remote_src: yes
-      creates: "{{home_dir}}/apache-tomcat-8.0.41"
+      creates: "{{tomcat_dir}}"
     register: tomcat_deploy_result
 
   - name: Remove default ROOT webapp
@@ -121,6 +125,7 @@
   - name: Build SMP Server from {{ sources_dir }}/peppol-smp-server 
     when: smp_result | changed
     command: "mvn clean install -DskipTests"
+#    command: 'mvn clean install -DskipTests -Dhttp.proxyHost=1.2.3.4 -Dhttp.proxyPort=8080 -Dhttps.proxyHost=1.2.3.4 -Dhttps.proxyPort=8080 -Dhttp.nonProxyHosts="localhost|127.0.0.1"'
     args:
       chdir: "{{ sources_dir }}/peppol-smp-server"
 

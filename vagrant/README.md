@@ -27,3 +27,16 @@ If a proxy server is needed to download all the relevant information, the follow
 ```
   * Modify `playbook-xml.yml`:
     * Search the line containing `mvn clean install` and add the following parameters afterwards: ` -Dhttp.proxyHost=1.2.3.4 -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts="localhost|127.0.0.1" -Dhttps.proxyHost=1.2.3.4 -Dhttps.proxyPort=8080` (note: there is no `-Dhttps.nonProxyHosts`!)
+
+##Connect to the virtual machine
+
+There is not direct login with username and password!
+You need to open an SSH connection to the machine using `vagrant ssh` and than
+call `sudo passwd ubuntu` inside the SSH session.
+This allows you to define a password for the `ubuntu` user which you can than use to login to the box.
+
+Note: Windows users need an ssh executable in their PATH. Get one at https://github.com/PowerShell/Win32-OpenSSH/releases/
+
+Note: because the `ubuntu/xenial64` box is used as the basis, the default user is `ubuntu` and **NOT** `vagrant`!
+
+Note: the virtual machine has an English keyboard layout! Use `sudo dpkg-reconfigure keyboard-configuration` to change it.
