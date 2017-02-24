@@ -41,6 +41,16 @@
       <param-name>jersey.config.servlet.filter.staticContentRegex</param-name>
       <param-value>/(stream|public|secure|publicajax|secureajax|publicaction|secureaction|resbundle)/.*|/favicon.ico|/logout</param-value>
     </init-param>
+    <init-param>
+      <param-name>jersey.config.server.tracing.type</param-name>
+      <!-- OFF|ON_DEMAND|ALL -->
+      <param-value>ON_DEMAND</param-value>
+    </init-param>
+    <init-param>
+      <param-name>jersey.config.server.tracing.threshold</param-name>
+      <!-- SUMMARY|TRACE|VERBOSE -->
+      <param-value>TRACE</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>RestFilter</filter-name>

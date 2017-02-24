@@ -17,7 +17,7 @@
     limitations under the License.
 
 -->
-<Configuration status="info" strict="true">
+<Configuration status="warn" strict="true" verbose="false">
   <Appenders>
     <Console name="STDOUT" target="SYSTEM_OUT">
       <!-- Location may be an issue when async logging is used! -->
@@ -28,5 +28,8 @@
     <Root level="info">
       <AppenderRef ref="STDOUT" />
     </Root>
+    <Logger name="org.glassfish.jersey.tracing.general" level="debug">
+      <AppenderRef ref="STDOUT" />
+    </Logger>
   </Loggers>
 </Configuration>
