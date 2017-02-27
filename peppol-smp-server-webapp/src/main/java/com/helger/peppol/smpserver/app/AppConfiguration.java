@@ -77,18 +77,30 @@ public final class AppConfiguration extends AbstractGlobalSingleton
     return s_aConfigFile.getReadResource ();
   }
 
+  /**
+   * @return <code>true</code> if global debug is enabled. Should be turned off
+   *         in production systems!
+   */
   @Nullable
   public static String getGlobalDebug ()
   {
     return s_aConfigFile.getAsString ("global.debug");
   }
 
+  /**
+   * @return <code>true</code> if global production mode is enabled. Should only
+   *         be turned on in production systems!
+   */
   @Nullable
   public static String getGlobalProduction ()
   {
     return s_aConfigFile.getAsString ("global.production");
   }
 
+  /**
+   * @return The path where the application stores its data. Should be an
+   *         absolute path.
+   */
   @Nullable
   public static String getDataPath ()
   {
@@ -100,8 +112,21 @@ public final class AppConfiguration extends AbstractGlobalSingleton
     return s_aConfigFile.getAsBoolean ("webapp.checkfileaccess", true);
   }
 
+  /**
+   * @return <code>true</code> if this is a public testable version,
+   *         <code>false</code> if not.
+   */
   public static boolean isTestVersion ()
   {
     return s_aConfigFile.getAsBoolean ("webapp.testversion", GlobalDebug.isDebugMode ());
+  }
+
+  /**
+   * @return <code>true</code> if the start page should show a dynamic table
+   * @since 5.0.2
+   */
+  public static boolean isStartPageDynamicTable ()
+  {
+    return s_aConfigFile.getAsBoolean ("webapp.startpage.dynamictable", false);
   }
 }

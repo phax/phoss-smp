@@ -16,34 +16,38 @@
  */
 package com.helger.peppol.smpserver.ui.pub;
 
+import java.util.Comparator;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.compare.ESortOrder;
+import com.helger.html.hc.html.tabular.AbstractHCTable;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
+import com.helger.photon.bootstrap3.table.BootstrapTable;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
 
 /**
  * This is the start page of the public application. It lists all available
  * service groups.
- * 
+ *
  * @author Philip Helger
  */
 public final class PagePublicStart extends AbstractSMPWebPage
@@ -66,15 +70,42 @@ public final class PagePublicStart extends AbstractSMPWebPage
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups ();
 
-    final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("Extension?").setDataSort (1, 0),
-                                        new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPServiceGroup aServiceGroup : aSMPServiceGroupMgr.getAllSMPServiceGroups ())
+    // Use dynamic or static table?
+    final boolean bUseDataTables = AppConfiguration.isStartPageDynamicTable ();
+
+    AbstractHCTable <?> aFinalTable;
+    if (bUseDataTables)
+    {
+      // Dynamic
+      final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
+                                          new DTCol ("Extension?").setDataSort (1, 0),
+                                          new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
+      aFinalTable = aTable;
+    }
+    else
+    {
+      // Static
+      final BootstrapTable aTable = new BootstrapTable ();
+      aTable.setBordered (true);
+      aTable.setCondensed (false);
+      aTable.setStriped (true);
+      aTable.addHeaderRow ()
+            .addCell ("Participant ID")
+            .addCell ("Extension?")
+            .addCell (EPhotonCoreText.ACTIONS.getDisplayText (aDisplayLocale));
+      aFinalTable = aTable;
+
+      // Sort manually
+      aServiceGroups.sort (Comparator.comparing (x -> x.getParticpantIdentifier ().getURIEncoded ()));
+    }
+
+    for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
     {
       final String sDisplayName = aServiceGroup.getParticpantIdentifier ().getURIEncoded ();
 
-      final HCRow aRow = aTable.addBodyRow ();
+      final HCRow aRow = aFinalTable.addBodyRow ();
       aRow.addCell (sDisplayName);
       aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
       aRow.addCell (new HCA (LinkHelper.getURLWithServerAndContext (aServiceGroup.getParticpantIdentifier ()
@@ -83,9 +114,12 @@ public final class PagePublicStart extends AbstractSMPWebPage
                                                                                                            .setTargetBlank ()
                                                                                                            .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
     }
+    aNodeList.addChild (aFinalTable);
 
-    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-
-    aNodeList.addChild (aTable).addChild (aDataTables);
+    if (bUseDataTables)
+    {
+      final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
+      aNodeList.addChild (aDataTables);
+    }
   }
 }
