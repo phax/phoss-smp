@@ -206,6 +206,6 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
                                        .append ("name", m_sName)
                                        .append ("phoneNumber", m_sPhoneNumber)
                                        .append ("email", m_sEmail)
-                                       .toString ();
+                                       .getToString ();
   }
 }

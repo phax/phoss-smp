@@ -239,6 +239,6 @@ public class DBProcessID implements Serializable
                                        .append ("documentTypeIDValue", m_sDocumentTypeIdentifier)
                                        .append ("processIDScheme", m_sProcessIdentifierScheme)
                                        .append ("processIDValue", m_sProcessIdentifier)
-                                       .toString ();
+                                       .getToString ();
   }
 }

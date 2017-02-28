@@ -133,6 +133,6 @@ public class DBServiceGroupID implements Serializable
   {
     return new ToStringGenerator (this).append ("participantIDScheme", m_sParticipantIdentifierScheme)
                                        .append ("participantIDValue", m_sParticipantIdentifier)
-                                       .toString ();
+                                       .getToString ();
   }
 }

@@ -401,6 +401,6 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
                                        .append ("contact", m_aContacts)
                                        .append ("additionalInformation", m_sAdditionalInformation)
                                        .append ("registrationDate", m_aRegistrationDate)
-                                       .toString ();
+                                       .getToString ();
   }
 }

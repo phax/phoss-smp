@@ -81,7 +81,7 @@ public class SMPBusinessCard implements ISMPBusinessCard
 
     m_aServiceGroup = aServiceGroup;
     m_sID = m_aServiceGroup.getID ();
-    m_aEntities = new CommonsArrayList<> (aEntities);
+    m_aEntities = new CommonsArrayList <> (aEntities);
   }
 
   @Nonnull
@@ -167,6 +167,6 @@ public class SMPBusinessCard implements ISMPBusinessCard
   {
     return new ToStringGenerator (this).append ("serviceGroup", m_aServiceGroup)
                                        .append ("entities", m_aEntities)
-                                       .toString ();
+                                       .getToString ();
   }
 }

@@ -28,7 +28,7 @@ import com.helger.xml.serialize.write.XMLWriter;
 @NotThreadSafe
 public abstract class AbstractSMPHasExtension implements ISMPHasExtension
 {
-  private final ICommonsList <com.helger.peppol.bdxr.ExtensionType> m_aExtensions = new CommonsArrayList<> ();
+  private final ICommonsList <com.helger.peppol.bdxr.ExtensionType> m_aExtensions = new CommonsArrayList <> ();
 
   protected AbstractSMPHasExtension ()
   {}
@@ -121,6 +121,6 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("Extensions", m_aExtensions).toString ();
+    return new ToStringGenerator (this).append ("Extensions", m_aExtensions).getToString ();
   }
 }

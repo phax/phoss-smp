@@ -194,6 +194,6 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
                             .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
                             .append ("TargetHref", m_sTargetHref)
                             .append ("SubjectUniqueIdentifier", m_sSubjectUniqueIdentifier)
-                            .toString ();
+                            .getToString ();
   }
 }

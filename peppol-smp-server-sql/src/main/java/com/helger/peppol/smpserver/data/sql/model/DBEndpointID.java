@@ -231,6 +231,6 @@ public class DBEndpointID implements Serializable
                                        .append ("processIDScheme", m_sProcessIdentifierScheme)
                                        .append ("processIDValue", m_sProcessIdentifier)
                                        .append ("transportProfile", m_sTransportProfile)
-                                       .toString ();
+                                       .getToString ();
   }
 }

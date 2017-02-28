@@ -179,6 +179,6 @@ public class DBServiceMetadataRedirectionID implements Serializable
                                        .append ("participantIDValue", m_sParticipantIdentifier)
                                        .append ("documentTypeIDScheme", m_sDocumentTypeIdentifierScheme)
                                        .append ("documentTypeIDValue", m_sDocumentTypeIdentifier)
-                                       .toString ();
+                                       .getToString ();
   }
 }

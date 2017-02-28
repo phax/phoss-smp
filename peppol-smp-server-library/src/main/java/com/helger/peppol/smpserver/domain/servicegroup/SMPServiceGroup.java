@@ -191,7 +191,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
                             .append ("ID", m_sID)
                             .append ("OwnerID", m_sOwnerID)
                             .append ("ParticipantIdentifier", m_aParticipantIdentifier)
-                            .toString ();
+                            .getToString ();
   }
 
   @Nonnull

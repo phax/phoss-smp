@@ -147,6 +147,6 @@ public class DBOwnershipID implements Serializable
     return new ToStringGenerator (this).append ("username", m_sUsername)
                                        .append ("participantIDScheme", m_sParticipantIdentifierScheme)
                                        .append ("participantIDValue", m_sParticipantIdentifier)
-                                       .toString ();
+                                       .getToString ();
   }
 }

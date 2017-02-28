@@ -158,6 +158,6 @@ public class SMPBusinessCardIdentifier implements IHasID <String>, Serializable
     return new ToStringGenerator (this).append ("ID", m_sID)
                                        .append ("value", m_sValue)
                                        .append ("scheme", m_sScheme)
-                                       .toString ();
+                                       .getToString ();
   }
 }

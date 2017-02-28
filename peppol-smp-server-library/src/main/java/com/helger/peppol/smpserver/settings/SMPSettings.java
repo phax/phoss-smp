@@ -182,6 +182,6 @@ public class SMPSettings implements ISMPSettings
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("Settings", m_aSettings).toString ();
+    return new ToStringGenerator (this).append ("Settings", m_aSettings).getToString ();
   }
 }

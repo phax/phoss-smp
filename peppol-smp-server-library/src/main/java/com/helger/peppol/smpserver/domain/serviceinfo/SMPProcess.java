@@ -76,7 +76,7 @@ import com.helger.peppol.smpserver.domain.extension.AbstractSMPHasExtension;
 public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
 {
   private IProcessIdentifier m_aProcessIdentifier;
-  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap<> ();
+  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap <> ();
 
   public SMPProcess (@Nonnull final IProcessIdentifier aProcessIdentifier,
                      @Nullable final List <SMPEndpoint> aEndpoints,
@@ -125,7 +125,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   @ReturnsMutableCopy
   public ICommonsList <ISMPEndpoint> getAllEndpoints ()
   {
-    return new CommonsArrayList<> (m_aEndpoints.values ());
+    return new CommonsArrayList <> (m_aEndpoints.values ());
   }
 
   public void addEndpoint (@Nonnull final SMPEndpoint aEndpoint)
@@ -210,13 +210,13 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return ToStringGenerator.getDerived (super.toString ())
                             .append ("ProcessIdentifier", m_aProcessIdentifier)
                             .append ("Endpoints", m_aEndpoints)
-                            .toString ();
+                            .getToString ();
   }
 
   @Nonnull
   public static SMPProcess createFromJAXB (@Nonnull final ProcessType aProcess)
   {
-    final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
+    final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
     for (final EndpointType aEndpoint : aProcess.getServiceEndpointList ().getEndpoint ())
       aEndpoints.add (SMPEndpoint.createFromJAXB (aEndpoint));
     return new SMPProcess (aProcess.getProcessIdentifier (),

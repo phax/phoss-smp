@@ -307,7 +307,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                             .append ("serviceDescription", m_sServiceDescription)
                             .append ("technicalContactUrl", m_sTechnicalContactUrl)
                             .append ("technicalInformationUrl", m_sTechnicalInformationUrl)
-                            .toString ();
+                            .getToString ();
   }
 
   @Nonnull

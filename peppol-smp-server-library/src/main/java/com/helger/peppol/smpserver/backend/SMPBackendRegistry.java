@@ -131,10 +131,8 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     if (StringHelper.hasNoText (sBackendID))
       return null;
 
-    return m_aRWLock.readLocked ( () -> {
-      final IFactory <? extends ISMPManagerProvider> aFactory = m_aMap.get (sBackendID);
-      return aFactory == null ? null : aFactory.get ();
-    });
+    final IFactory <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLocked ( () -> m_aMap.get (sBackendID));
+    return aFactory == null ? null : aFactory.get ();
   }
 
   /**
@@ -173,6 +171,6 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("map", m_aMap).toString ();
+    return new ToStringGenerator (this).append ("map", m_aMap).getToString ();
   }
 }

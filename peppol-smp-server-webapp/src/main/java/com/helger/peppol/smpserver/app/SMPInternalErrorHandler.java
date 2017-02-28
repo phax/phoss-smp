@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.app;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Map;
 
@@ -26,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.charset.CCharset;
 import com.helger.commons.email.EmailAddress;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.SMap;
@@ -100,7 +100,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback impleme
                                                                                                 nSMTPPort,
                                                                                                 sSMTPUserName,
                                                                                                 sSMTPPassword,
-                                                                                                CCharset.CHARSET_UTF_8_OBJ,
+                                                                                                StandardCharsets.UTF_8,
                                                                                                 bSMTPSSLEnabled,
                                                                                                 bSMTPSTARTTLSEnabled,
                                                                                                 nSMTPConnectionTimeoutMS,

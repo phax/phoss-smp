@@ -81,7 +81,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   private final String m_sID;
   private final ISMPServiceGroup m_aServiceGroup;
   private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
-  private final ICommonsOrderedMap <String, SMPProcess> m_aProcesses = new CommonsLinkedHashMap<> ();
+  private final ICommonsOrderedMap <String, SMPProcess> m_aProcesses = new CommonsLinkedHashMap <> ();
 
   /**
    * Constructor for new service information
@@ -164,7 +164,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   @Nonnull
   public ICommonsList <ISMPProcess> getAllProcesses ()
   {
-    return new CommonsArrayList<> (m_aProcesses.values ());
+    return new CommonsArrayList <> (m_aProcesses.values ());
   }
 
   public void addProcess (@Nonnull final SMPProcess aProcess)
@@ -263,14 +263,14 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
                             .append ("ServiceGroup", m_aServiceGroup)
                             .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
                             .append ("Processes", m_aProcesses)
-                            .toString ();
+                            .getToString ();
   }
 
   @Nonnull
   public static SMPServiceInformation createFromJAXB (@Nonnull final ISMPServiceGroup aServiceGroup,
                                                       @Nonnull final com.helger.peppol.smp.ServiceInformationType aServiceInformation)
   {
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     for (final com.helger.peppol.smp.ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,
