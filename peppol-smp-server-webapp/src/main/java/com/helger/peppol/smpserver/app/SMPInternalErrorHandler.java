@@ -17,7 +17,6 @@
 package com.helger.peppol.smpserver.app;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -29,20 +28,15 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.email.EmailAddress;
 import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.SMap;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.photon.basic.longrun.ILongRunningJob;
 import com.helger.photon.core.app.error.InternalErrorBuilder;
 import com.helger.photon.core.app.error.InternalErrorSettings;
 import com.helger.photon.core.app.error.callback.AbstractErrorCallback;
-import com.helger.quartz.IJob;
-import com.helger.schedule.job.AbstractJob;
-import com.helger.schedule.job.IJobExceptionCallback;
 import com.helger.settings.exchange.configfile.ConfigFile;
 import com.helger.smtp.settings.SMTPSettings;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-public final class SMPInternalErrorHandler extends AbstractErrorCallback implements IJobExceptionCallback
+public final class SMPInternalErrorHandler extends AbstractErrorCallback
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPInternalErrorHandler.class);
 
@@ -59,25 +53,11 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback impleme
                           @Nonnull @Nonempty final String sErrorCode,
                           @Nullable final Map <String, String> aCustomAttrs)
   {
-    final Locale aDisplayLocale = getSafeDisplayLocale (CApp.DEFAULT_LOCALE);
     createInternalErrorBuilder ().setThrowable (t)
                                  .setRequestScope (aRequestScope)
                                  .addErrorMessage (sErrorCode)
                                  .addCustomData (aCustomAttrs)
-                                 .setDisplayLocale (aDisplayLocale)
                                  .handle ();
-  }
-
-  public void onScheduledJobException (@Nonnull final Throwable t,
-                                       @Nonnull final String sJobClassName,
-                                       @Nonnull final IJob aJob)
-  {
-    onError (t,
-             null,
-             "Error executing background Job " + sJobClassName,
-             new SMap ().addIfNotNull ("job-class", sJobClassName)
-                        .add ("job-object", aJob)
-                        .add ("long-running", Boolean.toString (aJob instanceof ILongRunningJob)));
   }
 
   public static void doSetup ()
@@ -113,13 +93,12 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback impleme
         aSMTPSettings.areRequiredFieldsSet ())
     {
       // Set global internal error handlers
-      final SMPInternalErrorHandler aIntErrHdl = new SMPInternalErrorHandler ();
-      AbstractErrorCallback.install (aIntErrHdl);
-      AbstractJob.getExceptionCallbacks ().addCallback (aIntErrHdl);
+      new SMPInternalErrorHandler ().install ();
 
       InternalErrorSettings.setSMTPSenderAddress (new EmailAddress (sSenderAddress, sSenderName));
       InternalErrorSettings.setSMTPReceiverAddresses (new EmailAddress (sReceiverAddress, sReceiverName));
       InternalErrorSettings.setSMTPSettings (aSMTPSettings);
+      InternalErrorSettings.setFallbackLocale (CApp.DEFAULT_LOCALE);
       s_aLogger.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);
     }
   }
