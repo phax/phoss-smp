@@ -33,7 +33,7 @@ import com.helger.commons.url.SMap;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.photon.basic.longrun.ILongRunningJob;
 import com.helger.photon.core.app.error.InternalErrorBuilder;
-import com.helger.photon.core.app.error.InternalErrorHandler;
+import com.helger.photon.core.app.error.InternalErrorSettings;
 import com.helger.photon.core.app.error.callback.AbstractErrorCallback;
 import com.helger.quartz.IJob;
 import com.helger.schedule.job.AbstractJob;
@@ -62,7 +62,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback impleme
     final Locale aDisplayLocale = getSafeDisplayLocale (CApp.DEFAULT_LOCALE);
     createInternalErrorBuilder ().setThrowable (t)
                                  .setRequestScope (aRequestScope)
-                                 .addCustomData ("error code", sErrorCode)
+                                 .addErrorMessage (sErrorCode)
                                  .addCustomData (aCustomAttrs)
                                  .setDisplayLocale (aDisplayLocale)
                                  .handle ();
@@ -117,9 +117,9 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback impleme
       AbstractErrorCallback.install (aIntErrHdl);
       AbstractJob.getExceptionCallbacks ().addCallback (aIntErrHdl);
 
-      InternalErrorHandler.setSMTPSenderAddress (new EmailAddress (sSenderAddress, sSenderName));
-      InternalErrorHandler.setSMTPReceiverAddresses (new EmailAddress (sReceiverAddress, sReceiverName));
-      InternalErrorHandler.setSMTPSettings (aSMTPSettings);
+      InternalErrorSettings.setSMTPSenderAddress (new EmailAddress (sSenderAddress, sSenderName));
+      InternalErrorSettings.setSMTPReceiverAddresses (new EmailAddress (sReceiverAddress, sReceiverName));
+      InternalErrorSettings.setSMTPSettings (aSMTPSettings);
       s_aLogger.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);
     }
   }
