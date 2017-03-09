@@ -57,6 +57,7 @@ import com.helger.commons.ws.HostnameVerifierVerifyAll;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
+import com.helger.peppol.smlclient.SMLExceptionHelper;
 import com.helger.peppol.smlclient.participant.NotFoundFault;
 import com.helger.peppol.smlclient.participant.UnauthorizedFault;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
@@ -151,7 +152,7 @@ public final class RegistrationHookWriteToSML implements IRegistrationHook
     catch (final UnauthorizedFault ex)
     {
       final String sMsg = "Seems like this SMP is not registered to the SML, or you're providing invalid credentials!";
-      s_aLogger.error (sMsg);
+      s_aLogger.error (sMsg + " " + SMLExceptionHelper.getFaultMessage (ex));
       throw new RegistrationHookException (sMsg, ex);
     }
     catch (final Throwable t)
