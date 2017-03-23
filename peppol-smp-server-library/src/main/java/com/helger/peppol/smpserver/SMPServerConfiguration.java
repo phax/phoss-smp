@@ -59,6 +59,8 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
  * resolving is as follows:
  * <ol>
  * <li>Check for the value of the system property
+ * <code>peppol.smp.server.properties.path</code></li>
+ * <li>Check for the value of the system property
  * <code>smp.server.properties.path</code></li>
  * <li>The filename <code>private-smp-server.properties</code> in the root of
  * the classpath</li>
