@@ -31,13 +31,18 @@ import com.helger.settings.exchange.configfile.ConfigFile;
 import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 
 /**
- * This class provides access to the web application settings. If the system
- * property <code>peppol.smp.webapp.properties.path</code> or
- * <code>smp.webapp.properties.path</code> is defined, the configuration file is
- * read from the absolute path stated there. Otherwise (by default) the
- * configuration settings contained in the
- * <code>src/main/resources/private-webapp.properties</code> or
- * <code>src/main/resources/webapp.properties</code> file are read.
+ * This class provides access to the web application settings. The order of the
+ * properties file resolving is as follows:
+ * <ol>
+ * <li>Check for the value of the system property
+ * <code>peppol.smp.webapp.properties.path</code></li>
+ * <li>Check for the value of the system property
+ * <code>smp.webapp.properties.path</code></li>
+ * <li>The filename <code>private-webapp.properties</code> in the root of the
+ * classpath</li>
+ * <li>The filename <code>webapp.properties</code> in the root of the
+ * classpath</li>
+ * </ol>
  *
  * @author Philip Helger
  */
