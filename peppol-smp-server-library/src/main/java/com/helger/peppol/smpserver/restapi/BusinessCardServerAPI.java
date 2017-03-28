@@ -44,12 +44,15 @@ import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.lang.ClassHelper;
+import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.pd.businesscard.PDBusinessCardType;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -58,6 +61,8 @@ import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.peppol.smpserver.domain.user.ISMPUser;
+import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
 
 /**
@@ -115,7 +120,6 @@ public final class BusinessCardServerAPI
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr == null)
       {
-        // No such business card
         throw new SMPNotFoundException ("This SMP server does not support the BusinessCard API",
                                         m_aAPIProvider.getCurrentURI ());
       }
@@ -137,6 +141,76 @@ public final class BusinessCardServerAPI
     {
       s_aLogger.warn (LOG_PREFIX +
                       "Error in getBusinessCard(" +
+                      sServiceGroupID +
+                      ") - " +
+                      ClassHelper.getClassLocalName (t) +
+                      " - " +
+                      t.getMessage ());
+      throw t;
+    }
+  }
+
+  @Nonnull
+  public ESuccess createBusinessCard (@Nonnull final String sServiceGroupID,
+                                      final Document aServiceGroupDoc,
+                                      @Nonnull final BasicAuthClientCredentials aAuth) throws Throwable
+  {
+    // TODO implement createBusinessCard
+    return ESuccess.FAILURE;
+  }
+
+  @Nonnull
+  public ESuccess deleteBusinessCard (@Nonnull final String sServiceGroupID,
+                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
+  {
+    s_aLogger.info (LOG_PREFIX + "DELETE /" + sServiceGroupID);
+    s_aStatsCounterInvocation.increment ("deleteBusinessCard");
+
+    try
+    {
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      if (aServiceGroupID == null)
+      {
+        // Invalid identifier
+        s_aLogger.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
+        return ESuccess.FAILURE;
+      }
+
+      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
+      aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
+
+      final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+      if (aBusinessCardMgr == null)
+      {
+        throw new SMPNotFoundException ("This SMP server does not support the BusinessCard API",
+                                        m_aAPIProvider.getCurrentURI ());
+      }
+      final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (sServiceGroupID);
+      if (aBusinessCard == null)
+      {
+        // No such business card
+        throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" +
+                                        sServiceGroupID +
+                                        "'",
+                                        m_aAPIProvider.getCurrentURI ());
+      }
+
+      if (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard).isUnchanged ())
+        s_aLogger.error ("Internal error deleting SMP business card " +
+                         aBusinessCard.toString () +
+                         " from " +
+                         sServiceGroupID);
+
+      s_aLogger.info (LOG_PREFIX + "Finished deleteBusinessCard(" + sServiceGroupID + ")");
+      s_aStatsCounterSuccess.increment ("deleteBusinessCard");
+      return ESuccess.SUCCESS;
+    }
+    catch (final Throwable t)
+    {
+      s_aLogger.warn (LOG_PREFIX +
+                      "Error in deleteBusinessCard(" +
                       sServiceGroupID +
                       ") - " +
                       ClassHelper.getClassLocalName (t) +
