@@ -68,7 +68,7 @@ import com.helger.xml.serialize.write.XMLWriter;
 @NotThreadSafe
 public abstract class AbstractSMPHasExtension implements ISMPHasExtension
 {
-  private final ICommonsList <com.helger.peppol.bdxr.ExtensionType> m_aExtensions = new CommonsArrayList <> ();
+  private final ICommonsList <com.helger.peppol.bdxr.ExtensionType> m_aExtensions = new CommonsArrayList<> ();
 
   protected AbstractSMPHasExtension ()
   {}
