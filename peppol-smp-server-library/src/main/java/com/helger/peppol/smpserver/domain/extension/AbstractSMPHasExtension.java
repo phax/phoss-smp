@@ -68,7 +68,7 @@ import com.helger.xml.serialize.write.XMLWriter;
 @NotThreadSafe
 public abstract class AbstractSMPHasExtension implements ISMPHasExtension
 {
-  private final ICommonsList <com.helger.peppol.bdxr.ExtensionType> m_aExtensions = new CommonsArrayList <> ();
+  private final ICommonsList <com.helger.peppol.bdxr.ExtensionType> m_aExtensions = new CommonsArrayList<> ();
 
   protected AbstractSMPHasExtension ()
   {}
@@ -96,7 +96,7 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
 
     // Use only the XML element of the first extension
     final Element aAny = (Element) m_aExtensions.getFirst ().getAny ();
-    return XMLWriter.getXMLString (aAny);
+    return XMLWriter.getNodeAsString (aAny);
   }
 
   @Nonnull
