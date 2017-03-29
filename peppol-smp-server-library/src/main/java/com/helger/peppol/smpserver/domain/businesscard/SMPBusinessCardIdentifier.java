@@ -52,7 +52,7 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.id.IHasID;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.pd.businesscard.PDIdentifierType;
+import com.helger.pd.businesscard.v1.PD1IdentifierType;
 
 /**
  * A single business card identifier.
@@ -112,16 +112,16 @@ public class SMPBusinessCardIdentifier implements IHasID <String>, Serializable
   }
 
   @Nonnull
-  public PDIdentifierType getAsJAXBObject ()
+  public PD1IdentifierType getAsJAXBObject ()
   {
     return getAsJAXBObject (m_sScheme, m_sValue);
   }
 
   @Nonnull
-  public static PDIdentifierType getAsJAXBObject (@Nonnull @Nonempty final String sScheme,
-                                                  @Nonnull @Nonempty final String sValue)
+  public static PD1IdentifierType getAsJAXBObject (@Nonnull @Nonempty final String sScheme,
+                                                   @Nonnull @Nonempty final String sValue)
   {
-    final PDIdentifierType ret = new PDIdentifierType ();
+    final PD1IdentifierType ret = new PD1IdentifierType ();
     ret.setScheme (sScheme);
     ret.setValue (sValue);
     return ret;

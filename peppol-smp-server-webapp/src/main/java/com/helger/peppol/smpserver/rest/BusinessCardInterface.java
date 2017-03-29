@@ -38,8 +38,11 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.helger.commons.state.ESuccess;
-import com.helger.pd.businesscard.ObjectFactory;
-import com.helger.pd.businesscard.PDBusinessCardType;
+import com.helger.pd.businesscard.v1.ObjectFactory;
+import com.helger.pd.businesscard.v1.PD1BusinessCardMarshaller;
+import com.helger.pd.businesscard.v1.PD1BusinessCardType;
+import com.helger.pd.businesscard.v2.PD2BusinessCardMarshaller;
+import com.helger.pd.businesscard.v2.PD2BusinessCardType;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
@@ -74,7 +77,7 @@ public final class BusinessCardInterface
 
   @GET
   @Produces (MediaType.TEXT_XML)
-  public JAXBElement <PDBusinessCardType> getBusinessCard (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
+  public JAXBElement <PD1BusinessCardType> getBusinessCard (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
     // Is the PEPPOL Directory integration enabled?
     if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
@@ -87,9 +90,8 @@ public final class BusinessCardInterface
     try
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
-
-      // getBusinessCard trows an exception if non is found
-      final PDBusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
+      // getBusinessCard throws an exception if non is found
+      final PD1BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
       return m_aBDOF.createBusinessCard (ret);
     }
     finally
@@ -113,9 +115,23 @@ public final class BusinessCardInterface
     WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
+      PD1BusinessCardType aV1 = new PD1BusinessCardMarshaller ().read (aServiceGroupDoc);
+      if (aV1 == null)
+      {
+        final PD2BusinessCardType aV2 = new PD2BusinessCardMarshaller ().read (aServiceGroupDoc);
+        if (aV2 != null)
+        {
+          // Convert to wider format
+          aV1 = PD2BusinessCardMarshaller.getAsV1 (aV2);
+        }
+      }
+
+      if (aV1 == null)
+        return Response.status (Response.Status.BAD_REQUEST).build ();
+
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
-                                                                                              aServiceGroupDoc,
+                                                                                              aV1,
                                                                                               RestRequestHelper.getAuth (m_aHttpHeaders));
       if (eSuccess.isFailure ())
         return Response.status (Status.BAD_REQUEST).build ();

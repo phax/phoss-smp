@@ -51,7 +51,7 @@ import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.id.IHasID;
-import com.helger.pd.businesscard.PDBusinessCardType;
+import com.helger.pd.businesscard.v1.PD1BusinessCardType;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -96,7 +96,7 @@ public interface ISMPBusinessCard extends IHasID <String>, Serializable
    *         <code>null</code>.
    */
   @Nonnull
-  PDBusinessCardType getAsJAXBObject ();
+  PD1BusinessCardType getAsJAXBObject ();
 
   @Nonnull
   static Comparator <ISMPBusinessCard> comparator ()

@@ -44,7 +44,6 @@ import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.lang.ClassHelper;
@@ -53,7 +52,7 @@ import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.pd.businesscard.PDBusinessCardType;
+import com.helger.pd.businesscard.v1.PD1BusinessCardType;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -88,7 +87,7 @@ public final class BusinessCardServerAPI
   }
 
   @Nonnull
-  public PDBusinessCardType getBusinessCard (final String sServiceGroupID) throws Throwable
+  public PD1BusinessCardType getBusinessCard (final String sServiceGroupID) throws Throwable
   {
     s_aLogger.info (LOG_PREFIX + "GET /businesscard/" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("getBusinessCard");
@@ -152,18 +151,33 @@ public final class BusinessCardServerAPI
 
   @Nonnull
   public ESuccess createBusinessCard (@Nonnull final String sServiceGroupID,
-                                      final Document aServiceGroupDoc,
+                                      @Nonnull final PD1BusinessCardType aBusinessCard,
                                       @Nonnull final BasicAuthClientCredentials aAuth) throws Throwable
   {
+    s_aLogger.info (LOG_PREFIX + "PUT /businesscard/" + sServiceGroupID + " ==> " + aBusinessCard);
+    s_aStatsCounterInvocation.increment ("createBusinessCard");
+
     // TODO implement createBusinessCard
     return ESuccess.FAILURE;
   }
 
+  /**
+   * Delete an existing business card.
+   *
+   * @param sServiceGroupID
+   *        The service group (participant) ID.
+   * @param aCredentials
+   *        The credentials to be used. May not be <code>null</code>.
+   * @return {@link ESuccess}
+   * @throws Throwable
+   *         In case of error
+   * @since 5.0.2
+   */
   @Nonnull
   public ESuccess deleteBusinessCard (@Nonnull final String sServiceGroupID,
                                       @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "DELETE /" + sServiceGroupID);
+    s_aLogger.info (LOG_PREFIX + "DELETE /businesscard/" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("deleteBusinessCard");
 
     try

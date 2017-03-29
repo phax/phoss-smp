@@ -59,7 +59,7 @@ import com.helger.commons.id.IHasID;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.pd.businesscard.PDBusinessEntityType;
+import com.helger.pd.businesscard.v1.PD1BusinessEntityType;
 
 @NotThreadSafe
 public class SMPBusinessCardEntity implements IHasID <String>, Serializable
@@ -338,9 +338,9 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   }
 
   @Nonnull
-  public PDBusinessEntityType getAsJAXBObject ()
+  public PD1BusinessEntityType getAsJAXBObject ()
   {
-    final PDBusinessEntityType ret = new PDBusinessEntityType ();
+    final PD1BusinessEntityType ret = new PD1BusinessEntityType ();
     ret.setName (m_sName);
     ret.setCountryCode (m_sCountryCode);
     if (hasGeographicalInformation ())
