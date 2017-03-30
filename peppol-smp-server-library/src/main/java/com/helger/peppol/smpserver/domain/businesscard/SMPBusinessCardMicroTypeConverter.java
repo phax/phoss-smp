@@ -61,6 +61,9 @@ import com.helger.xml.microdom.util.MicroHelper;
 /**
  * This class is internally used to convert {@link SMPBusinessCard} from and to
  * XML.
+ * <p>
+ * The files in this package are licensed under Apache 2.0 license
+ * </p>
  *
  * @author Philip Helger
  */

@@ -63,6 +63,15 @@ import com.helger.pd.businesscard.v1.PD1BusinessEntityType;
 import com.helger.pd.businesscard.v1.PD1ContactType;
 import com.helger.pd.businesscard.v1.PD1IdentifierType;
 
+/**
+ * This class represents a single Business Card entity - a part of a Business
+ * card.
+ * <p>
+ * The files in this package are licensed under Apache 2.0 license
+ * </p>
+ *
+ * @author Philip Helger
+ */
 @NotThreadSafe
 public class SMPBusinessCardEntity implements IHasID <String>, Serializable
 {

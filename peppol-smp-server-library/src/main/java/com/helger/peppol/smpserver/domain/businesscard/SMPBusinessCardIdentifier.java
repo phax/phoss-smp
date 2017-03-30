@@ -57,6 +57,9 @@ import com.helger.pd.businesscard.v1.PD1IdentifierType;
 
 /**
  * A single business card identifier.
+ * <p>
+ * The files in this package are licensed under Apache 2.0 license
+ * </p>
  *
  * @author Philip Helger
  */

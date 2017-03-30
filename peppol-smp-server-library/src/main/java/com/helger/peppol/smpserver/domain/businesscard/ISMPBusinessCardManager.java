@@ -54,6 +54,9 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 /**
  * Manager for {@link ISMPBusinessCard} objects. Business card objects require a
  * service group to be present first.
+ * <p>
+ * The files in this package are licensed under Apache 2.0 license
+ * </p>
  *
  * @author Philip Helger
  */

@@ -58,6 +58,9 @@ import com.helger.pd.businesscard.v1.PD1ContactType;
 
 /**
  * A single business card contact.
+ * <p>
+ * The files in this package are licensed under Apache 2.0 license
+ * </p>
  *
  * @author Philip Helger
  */

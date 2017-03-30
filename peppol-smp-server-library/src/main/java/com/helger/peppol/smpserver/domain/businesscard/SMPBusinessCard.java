@@ -59,6 +59,9 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
  * A single business card.
+ * <p>
+ * The files in this package are licensed under Apache 2.0 license
+ * </p>
  *
  * @author Philip Helger
  */

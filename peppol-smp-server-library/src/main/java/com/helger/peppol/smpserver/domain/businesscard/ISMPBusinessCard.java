@@ -57,6 +57,9 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 /**
  * This interface represents a single SMP business card for a certain service
  * group.
+ * <p>
+ * The files in this package are licensed under Apache 2.0 license
+ * </p>
  *
  * @author Philip Helger
  */
