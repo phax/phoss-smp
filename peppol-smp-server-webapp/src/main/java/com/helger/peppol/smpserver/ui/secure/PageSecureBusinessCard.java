@@ -300,7 +300,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       if (aEntity.hasWebsiteURIs ())
       {
         final HCNodeList aNL = new HCNodeList ();
-        for (final String sWebsiteURI : aEntity.getWebsiteURIs ())
+        for (final String sWebsiteURI : aEntity.getAllWebsiteURIs ())
           aNL.addChild (new HCDiv ().addChild (HCA.createLinkedWebsite (sWebsiteURI)));
         aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs").setCtrl (aNL));
       }
@@ -791,7 +791,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                  .setCtrl (new HCTextAreaAutosize (new RequestField (sFieldWebsiteURIs,
                                                                                                      aExistingEntity == null ? null
                                                                                                                              : StringHelper.getImploded ('\n',
-                                                                                                                                                         aExistingEntity.getWebsiteURIs ()))))
+                                                                                                                                                         aExistingEntity.getAllWebsiteURIs ()))))
                                                  .setHelpText ("Put each Website URI in a separate line")
                                                  .setErrorList (aFormErrors.getListOfField (sFieldWebsiteURIs)));
 

@@ -207,4 +207,13 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
                                        .append ("email", m_sEmail)
                                        .getToString ();
   }
+
+  @Nonnull
+  public static SMPBusinessCardContact createFromJAXBObject (@Nonnull final PD1ContactType aEntity)
+  {
+    return new SMPBusinessCardContact (aEntity.getType (),
+                                       aEntity.getName (),
+                                       aEntity.getPhoneNumber (),
+                                       aEntity.getEmail ());
+  }
 }

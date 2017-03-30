@@ -16,7 +16,7 @@
  */
 package com.helger.peppol.smpserver.data.xml.mgr;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -97,7 +97,7 @@ public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBu
    */
   @Nonnull
   public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
-                                                         @Nonnull final List <SMPBusinessCardEntity> aEntities)
+                                                         @Nonnull final Collection <SMPBusinessCardEntity> aEntities)
   {
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aEntities, "Entities");

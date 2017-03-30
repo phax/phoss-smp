@@ -40,7 +40,7 @@
  */
 package com.helger.peppol.smpserver.domain.businesscard;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -71,7 +71,7 @@ public interface ISMPBusinessCardManager
    */
   @Nonnull
   ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull ISMPServiceGroup aServiceGroup,
-                                                  @Nonnull List <SMPBusinessCardEntity> aEntities);
+                                                  @Nonnull Collection <SMPBusinessCardEntity> aEntities);
 
   /**
    * Delete the passed SMP business card.

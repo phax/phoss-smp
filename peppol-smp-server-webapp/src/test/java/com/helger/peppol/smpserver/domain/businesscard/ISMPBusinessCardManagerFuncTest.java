@@ -72,10 +72,9 @@ public final class ISMPBusinessCardManagerFuncTest
     aEntity2.setName ("Test entity2");
     aEntity2.setCountryCode ("AT");
     aEntity2.setGeographicalInformation ("Address here");
-    aEntity2.getIdentifiers ().add (new SMPBusinessCardIdentifier ("gln", "1234567890123"));
-    aEntity2.getWebsiteURIs ().add ("https://www.peppol-directory.org/fake");
-    aEntity2.getContacts ()
-            .add (new SMPBusinessCardContact ("support", "Unit test support", null, "support@peppol.eu"));
+    aEntity2.addIdentifier (new SMPBusinessCardIdentifier ("gln", "1234567890123"));
+    aEntity2.addWebsiteURI ("https://www.peppol-directory.org/fake");
+    aEntity2.addContact (new SMPBusinessCardContact ("support", "Unit test support", null, "support@peppol.eu"));
     aEntity2.setAdditionalInformation ("Bla foo fasel");
     aEntity2.setRegistrationDate (PDTFactory.getCurrentLocalDate ());
     final SMPBusinessCardEntity aEntity3 = new SMPBusinessCardEntity ();

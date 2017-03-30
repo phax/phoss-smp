@@ -50,7 +50,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.equals.EqualsHelper;
@@ -60,6 +60,8 @@ import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.pd.businesscard.v1.PD1BusinessEntityType;
+import com.helger.pd.businesscard.v1.PD1ContactType;
+import com.helger.pd.businesscard.v1.PD1IdentifierType;
 
 @NotThreadSafe
 public class SMPBusinessCardEntity implements IHasID <String>, Serializable
@@ -68,9 +70,9 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   private String m_sName;
   private String m_sCountryCode;
   private String m_sGeographicalInformation;
-  private final ICommonsList <SMPBusinessCardIdentifier> m_aIdentifiers = new CommonsArrayList <> ();
-  private final ICommonsList <String> m_aWebsiteURIs = new CommonsArrayList <> ();
-  private final ICommonsList <SMPBusinessCardContact> m_aContacts = new CommonsArrayList <> ();
+  private final ICommonsList <SMPBusinessCardIdentifier> m_aIdentifiers = new CommonsArrayList<> ();
+  private final ICommonsList <String> m_aWebsiteURIs = new CommonsArrayList<> ();
+  private final ICommonsList <SMPBusinessCardContact> m_aContacts = new CommonsArrayList<> ();
   private String m_sAdditionalInformation;
   private LocalDate m_aRegistrationDate;
 
@@ -170,35 +172,22 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
     m_sGeographicalInformation = value;
   }
 
-  /**
-   * Gets the value of the identifier property.
-   * <p>
-   * This accessor method returns a reference to the live list, not a snapshot.
-   * Therefore any modification you make to the returned list will be present
-   * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
-   * for the identifier property.
-   * <p>
-   * For example, to add a new item, do as follows:
-   *
-   * <pre>
-   * getIdentifier ().add (newItem);
-   * </pre>
-   * <p>
-   * Objects of the following type(s) are allowed in the list
-   * {@link SMPBusinessCardIdentifier }
-   *
-   * @return The identifier list. Never <code>null</code>.
-   */
   @Nonnull
-  @ReturnsMutableObject ("JAXB implementation style")
-  public List <SMPBusinessCardIdentifier> getIdentifiers ()
+  @ReturnsMutableCopy
+  public ICommonsList <SMPBusinessCardIdentifier> getIdentifiers ()
   {
-    return m_aIdentifiers;
+    return m_aIdentifiers.getClone ();
   }
 
   public boolean hasIdentifiers ()
   {
-    return !m_aIdentifiers.isEmpty ();
+    return m_aIdentifiers.isNotEmpty ();
+  }
+
+  public void addIdentifier (@Nonnull final SMPBusinessCardIdentifier aIdentifier)
+  {
+    ValueEnforcer.notNull (aIdentifier, "Identifier");
+    m_aIdentifiers.add (aIdentifier);
   }
 
   public void setIdentifiers (@Nonnull final List <SMPBusinessCardIdentifier> aIdentifiers)
@@ -208,34 +197,22 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
     m_aIdentifiers.addAll (aIdentifiers);
   }
 
-  /**
-   * Gets the value of the websiteURI property.
-   * <p>
-   * This accessor method returns a reference to the live list, not a snapshot.
-   * Therefore any modification you make to the returned list will be present
-   * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
-   * for the websiteURI property.
-   * <p>
-   * For example, to add a new item, do as follows:
-   *
-   * <pre>
-   * getWebsiteURI ().add (newItem);
-   * </pre>
-   * <p>
-   * Objects of the following type(s) are allowed in the list {@link String }
-   *
-   * @return The website URI list. Never <code>null</code>.
-   */
   @Nonnull
-  @ReturnsMutableObject ("JAXB implementation style")
-  public List <String> getWebsiteURIs ()
+  @ReturnsMutableCopy
+  public ICommonsList <String> getAllWebsiteURIs ()
   {
-    return m_aWebsiteURIs;
+    return m_aWebsiteURIs.getClone ();
   }
 
   public boolean hasWebsiteURIs ()
   {
-    return !m_aWebsiteURIs.isEmpty ();
+    return m_aWebsiteURIs.isNotEmpty ();
+  }
+
+  public void addWebsiteURI (@Nonnull final String sWebsiteURI)
+  {
+    ValueEnforcer.notNull (sWebsiteURI, "WebsiteURI");
+    m_aWebsiteURIs.add (sWebsiteURI);
   }
 
   public void setWebsiteURIs (@Nonnull final List <String> aWebsiteURIs)
@@ -245,35 +222,22 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
     m_aWebsiteURIs.addAll (aWebsiteURIs);
   }
 
-  /**
-   * Gets the value of the contact property.
-   * <p>
-   * This accessor method returns a reference to the live list, not a snapshot.
-   * Therefore any modification you make to the returned list will be present
-   * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
-   * for the contact property.
-   * <p>
-   * For example, to add a new item, do as follows:
-   *
-   * <pre>
-   * getContact ().add (newItem);
-   * </pre>
-   * <p>
-   * Objects of the following type(s) are allowed in the list
-   * {@link SMPBusinessCardContact }
-   *
-   * @return The contact list. Never <code>null</code>.
-   */
   @Nonnull
-  @ReturnsMutableObject ("JAXB implementation style")
-  public List <SMPBusinessCardContact> getContacts ()
+  @ReturnsMutableCopy
+  public ICommonsList <SMPBusinessCardContact> getContacts ()
   {
-    return m_aContacts;
+    return m_aContacts.getClone ();
   }
 
   public boolean hasContacts ()
   {
-    return !m_aContacts.isEmpty ();
+    return m_aContacts.isNotEmpty ();
+  }
+
+  public void addContact (@Nonnull final SMPBusinessCardContact aContact)
+  {
+    ValueEnforcer.notNull (aContact, "Contact");
+    m_aContacts.add (aContact);
   }
 
   public void setContacts (@Nonnull final List <SMPBusinessCardContact> aContacts)
@@ -401,5 +365,23 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
                                        .append ("additionalInformation", m_sAdditionalInformation)
                                        .append ("registrationDate", m_aRegistrationDate)
                                        .getToString ();
+  }
+
+  @Nonnull
+  public static SMPBusinessCardEntity createFromJAXBObject (final PD1BusinessEntityType aEntity)
+  {
+    final SMPBusinessCardEntity ret = new SMPBusinessCardEntity ();
+    ret.setName (aEntity.getName ());
+    ret.setCountryCode (aEntity.getCountryCode ());
+    ret.setGeographicalInformation (aEntity.getGeographicalInformation ());
+    for (final PD1IdentifierType aItem : aEntity.getIdentifier ())
+      ret.addIdentifier (SMPBusinessCardIdentifier.createFromJAXBObject (aItem));
+    for (final String sItem : aEntity.getWebsiteURI ())
+      ret.addWebsiteURI (sItem);
+    for (final PD1ContactType aItem : aEntity.getContact ())
+      ret.addContact (SMPBusinessCardContact.createFromJAXBObject (aItem));
+    ret.setAdditionalInformation (aEntity.getAdditionalInformation ());
+    ret.setRegistrationDate (aEntity.getRegistrationDate ());
+    return ret;
   }
 }

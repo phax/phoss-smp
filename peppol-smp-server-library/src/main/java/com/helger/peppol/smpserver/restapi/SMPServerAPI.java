@@ -334,7 +334,7 @@ public final class SMPServerAPI
       {
         // Business identifiers must be equal
         throw new SMPNotFoundException ("ServiceGroup Inconsistency. The URL points to " +
-                                        aServiceGroupID +
+                                        aServiceGroupID.getURIEncoded () +
                                         " whereas the ServiceGroup contains " +
                                         aServiceGroup.getParticipantIdentifier (),
                                         m_aAPIProvider.getCurrentURI ());

@@ -40,8 +40,6 @@
  */
 package com.helger.peppol.smpserver.domain.businesscard;
 
-import java.util.List;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -55,6 +53,7 @@ import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
+import com.helger.pd.businesscard.v1.PD1APIHelper;
 import com.helger.pd.businesscard.v1.PD1BusinessCardType;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
@@ -73,14 +72,14 @@ public class SMPBusinessCard implements ISMPBusinessCard
   private final ICommonsList <SMPBusinessCardEntity> m_aEntities;
 
   public SMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
-                          @Nonnull final List <SMPBusinessCardEntity> aEntities)
+                          @Nonnull final Iterable <? extends SMPBusinessCardEntity> aEntities)
   {
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aEntities, "Entities");
 
     m_aServiceGroup = aServiceGroup;
     m_sID = m_aServiceGroup.getID ();
-    m_aEntities = new CommonsArrayList <> (aEntities);
+    m_aEntities = new CommonsArrayList<> (aEntities);
   }
 
   @Nonnull
@@ -135,10 +134,10 @@ public class SMPBusinessCard implements ISMPBusinessCard
   public PD1BusinessCardType getAsJAXBObject ()
   {
     final PD1BusinessCardType ret = new PD1BusinessCardType ();
-    ret.setParticipantIdentifier (SMPBusinessCardIdentifier.getAsJAXBObject (m_aServiceGroup.getParticpantIdentifier ()
-                                                                                            .getScheme (),
-                                                                             m_aServiceGroup.getParticpantIdentifier ()
-                                                                                            .getValue ()));
+    ret.setParticipantIdentifier (PD1APIHelper.createIdentifier (m_aServiceGroup.getParticpantIdentifier ()
+                                                                                .getScheme (),
+                                                                 m_aServiceGroup.getParticpantIdentifier ()
+                                                                                .getValue ()));
     for (final SMPBusinessCardEntity aItem : m_aEntities)
       ret.addBusinessEntity (aItem.getAsJAXBObject ());
     return ret;

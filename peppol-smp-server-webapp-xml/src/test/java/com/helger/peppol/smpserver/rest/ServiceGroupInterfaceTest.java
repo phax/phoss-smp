@@ -158,7 +158,6 @@ public final class ServiceGroupInterfaceTest
     {
       // DELETE 2
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
-      // May be 500 if no MySQL is running
       _testResponseJerseyClient (aResponseMsg, 200, 404);
 
       // Both must be deleted

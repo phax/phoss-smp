@@ -110,7 +110,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
                .setAttribute (ATTR_SCHEME, aIdentifier.getScheme ())
                .setAttribute (ATTR_VALUE, aIdentifier.getValue ());
       }
-      for (final String sWebsiteURI : aEntity.getWebsiteURIs ())
+      for (final String sWebsiteURI : aEntity.getAllWebsiteURIs ())
       {
         eEntity.appendElement (sNamespaceURI, ELEMENT_WEBSITE_URI).appendText (sWebsiteURI);
       }
@@ -169,23 +169,21 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
                                                                                   ELEMENT_GEOGRAPHICAL_INFORMATION));
       for (final IMicroElement eIdentifier : eEntity.getAllChildElements (ELEMENT_IDENTIFIER))
       {
-        aEntity.getIdentifiers ()
-               .add (new SMPBusinessCardIdentifier (eIdentifier.getAttributeValue (ATTR_ID),
-                                                    eIdentifier.getAttributeValue (ATTR_SCHEME),
-                                                    eIdentifier.getAttributeValue (ATTR_VALUE)));
+        aEntity.addIdentifier (new SMPBusinessCardIdentifier (eIdentifier.getAttributeValue (ATTR_ID),
+                                                              eIdentifier.getAttributeValue (ATTR_SCHEME),
+                                                              eIdentifier.getAttributeValue (ATTR_VALUE)));
       }
       for (final IMicroElement eWebsite : eEntity.getAllChildElements (ELEMENT_WEBSITE_URI))
       {
-        aEntity.getWebsiteURIs ().add (eWebsite.getTextContentTrimmed ());
+        aEntity.addWebsiteURI (eWebsite.getTextContentTrimmed ());
       }
       for (final IMicroElement eContact : eEntity.getAllChildElements (ELEMENT_CONTACT))
       {
-        aEntity.getContacts ()
-               .add (new SMPBusinessCardContact (eContact.getAttributeValue (ATTR_ID),
-                                                 eContact.getAttributeValue (ATTR_TYPE),
-                                                 eContact.getAttributeValue (ATTR_NAME),
-                                                 eContact.getAttributeValue (ATTR_PHONE),
-                                                 eContact.getAttributeValue (ATTR_EMAIL)));
+        aEntity.addContact (new SMPBusinessCardContact (eContact.getAttributeValue (ATTR_ID),
+                                                        eContact.getAttributeValue (ATTR_TYPE),
+                                                        eContact.getAttributeValue (ATTR_NAME),
+                                                        eContact.getAttributeValue (ATTR_PHONE),
+                                                        eContact.getAttributeValue (ATTR_EMAIL)));
       }
       aEntity.setAdditionalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
                                                                                 ELEMENT_ADDITIONAL_INFORMATION));

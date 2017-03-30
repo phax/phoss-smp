@@ -40,7 +40,7 @@
  */
 package com.helger.peppol.smpserver.mock;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
@@ -82,7 +82,7 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
   }
 
   public ISMPBusinessCard createOrUpdateSMPBusinessCard (final ISMPServiceGroup aServiceGroup,
-                                                         final List <SMPBusinessCardEntity> aEntities)
+                                                         final Collection <SMPBusinessCardEntity> aEntities)
   {
     throw new UnsupportedOperationException ();
   }
