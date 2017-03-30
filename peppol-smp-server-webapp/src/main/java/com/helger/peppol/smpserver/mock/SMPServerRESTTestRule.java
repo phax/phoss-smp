@@ -16,6 +16,9 @@
  */
 package com.helger.peppol.smpserver.mock;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.client.Client;
@@ -23,6 +26,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.logging.LoggingFeature;
+import org.glassfish.jersey.logging.LoggingFeature.Verbosity;
 
 import com.helger.servlet.StaticServerInfo;
 
@@ -49,6 +54,14 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
     m_aServer = MockWebServer.startRegularServer ();
 
     final Client aClient = ClientBuilder.newClient ();
+
+    // Enable the feature to activate logging of HTTP requests
+    if (false)
+      aClient.register (new LoggingFeature (Logger.getLogger ("SMPServerRESTTestRule"),
+                                            Level.INFO,
+                                            Verbosity.PAYLOAD_ANY,
+                                            null));
+
     m_aTarget = aClient.target (MockWebServer.BASE_URI_HTTP);
   }
 
