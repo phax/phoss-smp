@@ -51,8 +51,9 @@ import com.helger.servlet.mock.MockHttpServletResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
 
 /**
- * This class implements the "Business Card" interface to be used with the
- * PEPPOL Directory.
+ * This class implements the "Business Card" REST interface to be used with the
+ * PEPPOL Directory. The main logic behind the interfaces are available in class
+ * {@link BusinessCardServerAPI}.
  *
  * @author Philip Helger
  */
