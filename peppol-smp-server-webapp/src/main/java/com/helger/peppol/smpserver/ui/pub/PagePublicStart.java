@@ -35,6 +35,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
+import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.table.BootstrapTable;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
@@ -114,12 +115,17 @@ public final class PagePublicStart extends AbstractSMPWebPage
                                                                                                            .setTargetBlank ()
                                                                                                            .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
     }
-    aNodeList.addChild (aFinalTable);
-
-    if (bUseDataTables)
+    if (aFinalTable.hasBodyRows ())
     {
-      final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
-      aNodeList.addChild (aDataTables);
+      aNodeList.addChild (aFinalTable);
+
+      if (bUseDataTables)
+      {
+        final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
+        aNodeList.addChild (aDataTables);
+      }
     }
+    else
+      aNodeList.addChild (new BootstrapInfoBox ().addChild ("This SMP does not manage any participant yet."));
   }
 }
