@@ -5,6 +5,8 @@ It is based on the official `tomcat:8.5` image.
 
 Prebuild images are available from https://hub.docker.com/r/phelger/smp/
 
+**Note:** The SMP comes pretty unconfigured - this is work in progress (2017-04-21)
+
 ## Building
 
 To build the SMP image use the following command:
