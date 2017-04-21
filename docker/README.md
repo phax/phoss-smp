@@ -34,7 +34,7 @@ Short explanation
   * `-p 8888:8080` - proxy container port 8080 to host port 8888
   * `phoss-smp` - the tag to be run
 
-Upon successful completion opening (http://localhost:8888) in your browser should show you the start page of phoss SMP.
+Upon successful completion opening http://localhost:8888 in your browser should show you the start page of phoss SMP.
  
 ## Stopping
 
