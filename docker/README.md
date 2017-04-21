@@ -28,5 +28,5 @@ Once the image is build you can run it with the following command.
 docker run -d --name phoss-smp -p 8888:8080 phoss-smp
 ```
 
-Upon successful completion opening `http://localhost:8888` in your browser should show you the start page of phoss SMP.
+Upon successful completion opening [http://localhost:8888] in your browser should show you the start page of phoss SMP.
  
