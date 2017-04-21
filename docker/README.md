@@ -45,3 +45,15 @@ When you don't need the image anymore stop and remove it like this:
 docker stop phoss-smp
 docker rm phoss-smp
 ```
+
+## Pushing changes
+
+Once a new version is available the image needs to be build and pushed to Docker hub:
+```
+docker login
+docker tag phoss-smp-x.y.z phelger/smp:x.y.z
+docker push phelger/smp:x.y.z
+docker tag phoss-smp-x.y.z phelger/smp:latest
+docker push phelger/smp:latest
+docker logout
+```
