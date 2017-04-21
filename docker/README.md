@@ -28,5 +28,18 @@ Once the image is build you can run it with the following command.
 docker run -d --name phoss-smp -p 8888:8080 phoss-smp
 ```
 
-Upon successful completion opening [http://localhost:8888] in your browser should show you the start page of phoss SMP.
+Short explanation
+  * `-d` - run in daemon mode
+  * `--name phoss-smp` - internal nice name for `docker ps` etc.
+  * `-p 8888:8080` - proxy container port 8080 to host port 8888
+  * `phoss-smp` - the tag to be run
+
+Upon successful completion opening (http://localhost:8888) in your browser should show you the start page of phoss SMP.
  
+## Stopping
+
+When you don't need the image anymore stop and remove it like this:
+```
+docker stop phoss-smp
+docker rm phoss-smp
+```
