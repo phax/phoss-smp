@@ -3,6 +3,8 @@
 This folder contains the Docker configuration file for phoss SMP.
 It is based on the official `tomcat:8.5` image.
 
+Prebuild images are available from https://hub.docker.com/r/phelger/smp/
+
 ## Building
 
 To build the SMP image use the following command:
