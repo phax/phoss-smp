@@ -1,10 +1,6 @@
 # Use an official Tomcat runtime as a base image
 FROM tomcat:8.5
 
-ARG SMP_VERSION=5.0.2
-LABEL vendor="Philip Helger"
-LABEL version=$SMP_VERSION
-
 # Install Java 8 JDK, Maven and Git
 RUN apt-get update \
   && apt-get install -y openjdk-8-jdk-headless git maven \
@@ -14,13 +10,21 @@ RUN apt-get update \
 RUN rm -r $CATALINA_HOME/webapps/ROOT \
   && rm -r $CATALINA_HOME/webapps/docs \
   && rm -r $CATALINA_HOME/webapps/examples
+
+# Set arguments and labels after initial cleanup was performed :)
+# Minimum version for this layout is 5.0.1
+ARG VERSION=5.0.2
+# Set to environment to be persistent
+ENV SMP_VERSION=$VERSION
+LABEL vendor="Philip Helger"
+LABEL version=$SMP_VERSION
  
 # Checkout from git and build
 WORKDIR /home/git
-RUN git clone https://github.com/phax/peppol-smp-server.git . \
+RUN echo Building phoss SMP $SMP_VERSION \
+  && git clone https://github.com/phax/peppol-smp-server.git . \
   && git checkout tags/peppol-smp-server-parent-pom-$SMP_VERSION -b work \
   && mvn clean install -DskipTests
 
 # Copy result to Tomcat webapps dir
-RUN cp -r peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT \
-  && ls $CATALINA_HOME/webapps/ROOT
+RUN cp -r peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT
