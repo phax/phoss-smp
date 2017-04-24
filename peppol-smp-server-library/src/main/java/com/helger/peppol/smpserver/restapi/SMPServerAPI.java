@@ -549,8 +549,16 @@ public final class SMPServerAPI
       {
         // Business identifiers from path (ServiceGroupID) and from service
         // metadata (body) must equal path
+        if (aServiceInformation.getParticipantIdentifier () == null)
+        {
+          s_aLogger.info (LOG_PREFIX +
+                          "Save service metadata was called with bad parameters. serviceInfo:!NO PARTICIPANT ID! param:" +
+                          aServiceGroupID);
+          return ESuccess.FAILURE;
+        }
         if (!aServiceInformation.getParticipantIdentifier ().hasSameContent (aServiceGroupID))
         {
+          // Participant ID in URL mist match the one in XML structure
           s_aLogger.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +
                           aServiceInformation.getParticipantIdentifier ().getURIEncoded () +
@@ -559,14 +567,21 @@ public final class SMPServerAPI
           return ESuccess.FAILURE;
         }
 
+        if (aServiceInformation.getDocumentIdentifier () == null)
+        {
+          s_aLogger.info (LOG_PREFIX +
+                          "Save service metadata was called with bad parameters. serviceInfo:!NO DOCUMENT TYPE ID! param:" +
+                          aDocTypeID);
+          return ESuccess.FAILURE;
+        }
         if (!aServiceInformation.getDocumentIdentifier ().hasSameContent (aDocTypeID))
         {
+          // Document type ID in URL must match the one in XML structure
           s_aLogger.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +
                           aServiceInformation.getDocumentIdentifier ().getURIEncoded () +
                           " param:" +
                           aDocTypeID);
-          // Document type must equal path
           return ESuccess.FAILURE;
         }
       }
@@ -600,10 +615,10 @@ public final class SMPServerAPI
       {
         // Handle service information
         final ProcessListType aJAXBProcesses = aServiceMetadata.getServiceInformation ().getProcessList ();
-        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
+        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
         for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
         {
-          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
+          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
           for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
           {
             final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),
