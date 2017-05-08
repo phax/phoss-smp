@@ -97,8 +97,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
   private static final class SGImportData
   {
-    private final ICommonsList <ISMPServiceInformation> m_aServiceInfos = new CommonsArrayList<> ();
-    private final ICommonsList <ISMPRedirect> m_aRedirects = new CommonsArrayList<> ();
+    private final ICommonsList <ISMPServiceInformation> m_aServiceInfos = new CommonsArrayList <> ();
+    private final ICommonsList <ISMPRedirect> m_aRedirects = new CommonsArrayList <> ();
 
     public void addServiceInfo (@Nonnull final ISMPServiceInformation aServiceInfo)
     {
@@ -137,8 +137,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
   {
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
-    final ICommonsOrderedMap <ISMPServiceGroup, SGImportData> aImportServiceGroups = new CommonsLinkedHashMap<> ();
-    final ICommonsList <ISMPServiceGroup> aDeleteServiceGroups = new CommonsArrayList<> ();
+    final ICommonsOrderedMap <ISMPServiceGroup, SGImportData> aImportServiceGroups = new CommonsLinkedHashMap <> ();
+    final ICommonsList <ISMPServiceGroup> aDeleteServiceGroups = new CommonsArrayList <> ();
 
     // First read all service groups as they are dependents of the
     // business cards
@@ -227,7 +227,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
               }
               ++nRDIndex;
             }
-            aLogger.info ("Read " + nRDFound + " readirects of service group " + sServiceGroupID);
+            aLogger.info ("Read " + nRDFound + " redirects of service group " + sServiceGroupID);
           }
         }
         else
@@ -239,8 +239,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     }
 
     // Now read the business cards
-    final ICommonsOrderedSet <ISMPBusinessCard> aImportBusinessCards = new CommonsLinkedHashSet<> ();
-    final ICommonsList <ISMPBusinessCard> aDeleteBusinessCards = new CommonsArrayList<> ();
+    final ICommonsOrderedSet <ISMPBusinessCard> aImportBusinessCards = new CommonsLinkedHashSet <> ();
+    final ICommonsList <ISMPBusinessCard> aDeleteBusinessCards = new CommonsArrayList <> ();
     if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
     {
       // Read them only if the PEPPOL Directory integration is enabled
