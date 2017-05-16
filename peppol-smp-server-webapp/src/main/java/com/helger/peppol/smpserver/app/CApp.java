@@ -22,6 +22,7 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ext.CommonsArrayList;
 import com.helger.commons.collection.ext.ICommonsMap;
@@ -52,7 +53,9 @@ public final class CApp
   public static final String ROLE_VIEW_DESCRIPTION = null;
   public static final ICommonsMap <String, String> ROLE_VIEW_CUSTOMATTRS = null;
 
+  @CodingStyleguideUnaware
   public static final List <String> REQUIRED_ROLE_IDS_CONFIG = new CommonsArrayList <> (ROLE_CONFIG_ID).getAsUnmodifiable ();
+  @CodingStyleguideUnaware
   public static final List <String> REQUIRED_ROLE_IDS_VIEW = new CommonsArrayList <> (ROLE_VIEW_ID).getAsUnmodifiable ();
 
   // User groups

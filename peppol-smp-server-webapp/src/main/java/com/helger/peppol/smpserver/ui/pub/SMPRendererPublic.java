@@ -93,7 +93,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
 {
   private static final ICSSClassProvider CSS_CLASS_FOOTER_LINKS = DefaultCSSClassProvider.create ("footer-links");
 
-  private final ICommonsList <IMenuObject> m_aFooterObjects = new CommonsArrayList<> ();
+  private final ICommonsList <IMenuObject> m_aFooterObjects = new CommonsArrayList <> ();
 
   public SMPRendererPublic ()
   {
@@ -141,7 +141,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   }
 
   @Nonnull
-  public static final IHCNode createLogo (@Nonnull final ISimpleWebExecutionContext aSWEC)
+  public static IHCNode createLogo (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
     return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope, "/image/logo-gradient-223-50-transparent.png"))
@@ -151,7 +151,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
   }
 
   @Nonnull
-  public static final IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
+  public static IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
     return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope,
