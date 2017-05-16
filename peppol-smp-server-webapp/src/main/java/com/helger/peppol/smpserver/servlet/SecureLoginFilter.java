@@ -17,7 +17,6 @@
 package com.helger.peppol.smpserver.servlet;
 
 import javax.annotation.Nonnull;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,14 +44,15 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
   @Override
   @Nonnull
   @Nonempty
-  protected String getApplicationID (@Nonnull final FilterConfig aFilterConfig)
+  protected String getApplicationID ()
   {
     return CApplication.APP_ID_SECURE;
   }
 
   @Override
-  protected void onInit (@Nonnull final FilterConfig aFilterConfig) throws ServletException
+  public void init () throws ServletException
   {
+    super.init ();
     // Make the application login configurable if you like
     m_aLogin = new SMPLoginManager ();
   }
