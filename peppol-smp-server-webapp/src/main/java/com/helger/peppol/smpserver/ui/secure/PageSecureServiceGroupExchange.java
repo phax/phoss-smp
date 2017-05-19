@@ -475,13 +475,13 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             {
               final IErrorLevel aErrorLevel = aLogMsg.getErrorLevel ();
               EBootstrapLabelType eLabelType;
-              if (aErrorLevel.isMoreOrEqualSevereThan (EErrorLevel.ERROR))
+              if (aErrorLevel.isGE (EErrorLevel.ERROR))
                 eLabelType = EBootstrapLabelType.DANGER;
               else
-                if (aErrorLevel.isMoreOrEqualSevereThan (EErrorLevel.WARN))
+                if (aErrorLevel.isGE (EErrorLevel.WARN))
                   eLabelType = EBootstrapLabelType.WARNING;
                 else
-                  if (aErrorLevel.isMoreOrEqualSevereThan (EErrorLevel.INFO))
+                  if (aErrorLevel.isGE (EErrorLevel.INFO))
                     eLabelType = EBootstrapLabelType.INFO;
                   else
                     eLabelType = EBootstrapLabelType.SUCCESS;
