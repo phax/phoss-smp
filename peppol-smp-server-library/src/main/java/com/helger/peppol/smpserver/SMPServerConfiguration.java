@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.string.StringHelper;
 import com.helger.settings.exchange.configfile.ConfigFile;
 import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 
@@ -97,6 +98,8 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_ACTIVE = "sml.active";
   public static final String KEY_SML_URL = "sml.url";
   public static final String KEY_SML_SMPID = "sml.smpid";
+  public static final String KEY_SML_SMP_IP = "sml.smp.ip";
+  public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";
 
   public static final boolean DEFAULT_SMP_FORCEROOT = false;
   public static final ESMPIdentifierType DEFAULT_SMP_IDENTIFIER_TYPE = ESMPIdentifierType.PEPPOL;
@@ -300,5 +303,35 @@ public final class SMPServerConfiguration
   public static String getSMLSMPID ()
   {
     return getConfigFile ().getAsString (KEY_SML_SMPID);
+  }
+
+  /**
+   * @return The default IP address to be used for the SML registration (in the
+   *         form <code>1.2.3.4</code>). May be <code>null</code> in which case
+   *         the name must be manually provided.
+   * @since 5.0.3
+   */
+  @Nullable
+  public static String getSMLSMPIP ()
+  {
+    return getConfigFile ().getAsString (KEY_SML_SMP_IP);
+  }
+
+  /**
+   * @return The default hostname to be used for the SML registration including
+   *         an "http://" prefix as in <code>http://smp.example.org</code>. May
+   *         be <code>null</code> in which case the name must be manually
+   *         provided.
+   * @since 5.0.3
+   */
+  @Nullable
+  public static String getSMLSMPHostname ()
+  {
+    String ret = getConfigFile ().getAsString (KEY_SML_SMP_HOSTNAME);
+
+    // Ensure prefix
+    if (StringHelper.hasText (ret) && !ret.startsWith ("http://"))
+      ret = "http://" + ret;
+    return ret;
   }
 }

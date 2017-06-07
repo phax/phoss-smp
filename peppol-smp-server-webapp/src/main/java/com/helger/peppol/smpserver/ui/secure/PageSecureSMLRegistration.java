@@ -437,13 +437,18 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     if (bShowInput)
     {
       final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
-      String sPhysicalAddress = "";
-      String sLogicalAddress = "";
+
+      // Get default from configuration
+      String sPhysicalAddress = SMPServerConfiguration.getSMLSMPIP ();
+      String sLogicalAddress = SMPServerConfiguration.getSMLSMPHostname ();
+
       try
       {
         final InetAddress aLocalHost = InetAddress.getLocalHost ();
-        sPhysicalAddress = aLocalHost.getHostAddress ();
-        sLogicalAddress = "http://" + aLocalHost.getCanonicalHostName ();
+        if (StringHelper.hasNoText (sPhysicalAddress))
+          sPhysicalAddress = aLocalHost.getHostAddress ();
+        if (StringHelper.hasNoText (sLogicalAddress))
+          sLogicalAddress = "http://" + aLocalHost.getCanonicalHostName ();
       }
       catch (final UnknownHostException ex)
       {
