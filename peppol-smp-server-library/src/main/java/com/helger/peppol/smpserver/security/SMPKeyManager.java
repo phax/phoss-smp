@@ -83,6 +83,7 @@ import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
+import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
@@ -98,6 +99,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPKeyManager.class);
 
   private static final AtomicBoolean s_aCertificateValid = new AtomicBoolean (false);
+  private static EKeyStoreLoadError s_eInitError;
   private static String s_sInitError;
 
   private KeyStore m_aKeyStore;
@@ -116,6 +118,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                         SMPServerConfiguration.getKeyStorePassword ());
     if (aLoadedKeyStore.isFailure ())
     {
+      s_eInitError = aLoadedKeyStore.getError ();
       s_sInitError = PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore);
       throw new InitializationException (s_sInitError);
     }
@@ -227,8 +230,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                  aSignatureFactory.newDigestMethod (bBDXR ? DigestMethod.SHA256
                                                                                                           : DigestMethod.SHA1,
                                                                                                     null),
-                                                                 new CommonsArrayList<> (aSignatureFactory.newTransform (Transform.ENVELOPED,
-                                                                                                                         (TransformParameterSpec) null)),
+                                                                 new CommonsArrayList <> (aSignatureFactory.newTransform (Transform.ENVELOPED,
+                                                                                                                          (TransformParameterSpec) null)),
                                                                  (String) null,
                                                                  (String) null);
 
@@ -242,15 +245,15 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                     aSignatureFactory.newSignatureMethod (bBDXR ? "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
                                                                                                                 : SignatureMethod.RSA_SHA1,
                                                                                                           (SignatureMethodParameterSpec) null),
-                                                                    new CommonsArrayList<> (aReference));
+                                                                    new CommonsArrayList <> (aReference));
 
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
     final X509Certificate aCert = (X509Certificate) m_aKeyEntry.getCertificate ();
-    final X509Data aX509Data = aKeyInfoFactory.newX509Data (new CommonsArrayList<> (aCert.getSubjectX500Principal ()
-                                                                                         .getName (),
-                                                                                    aCert));
-    final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList<> (aX509Data));
+    final X509Data aX509Data = aKeyInfoFactory.newX509Data (new CommonsArrayList <> (aCert.getSubjectX500Principal ()
+                                                                                          .getName (),
+                                                                                     aCert));
+    final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList <> (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and
     // location of the resulting XMLSignature's parent element.
@@ -275,7 +278,19 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
   /**
    * If the certificate is not valid according to {@link #isCertificateValid()}
-   * this method can be used to determine the error details.
+   * this method can be used to determine the error detail code.
+   *
+   * @return <code>null</code> if initialization was successful.
+   */
+  @Nullable
+  public static EKeyStoreLoadError getInitializationErrorCode ()
+  {
+    return s_eInitError;
+  }
+
+  /**
+   * If the certificate is not valid according to {@link #isCertificateValid()}
+   * this method can be used to determine the error detail message.
    *
    * @return <code>null</code> if initialization was successful.
    */

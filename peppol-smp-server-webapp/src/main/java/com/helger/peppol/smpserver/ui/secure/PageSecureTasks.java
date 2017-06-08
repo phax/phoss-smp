@@ -58,6 +58,7 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.uicore.css.CUICoreCSS;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.certificate.CertificateHelper;
+import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKeyStore;
 
@@ -113,8 +114,12 @@ public class PageSecureTasks extends AbstractSMPWebPage
     // check truststore configuration
     {
       if (!SMPTrustManager.isCertificateValid ())
-        aOL.addItem (_createWarning ("Problem with the truststore configuration"),
-                     new HCDiv ().addChild (SMPTrustManager.getInitializationError ()));
+      {
+        // Ignore error if no trust store is configured
+        if (SMPTrustManager.getInitializationErrorCode () != EKeyStoreLoadError.KEYSTORE_NO_PATH)
+          aOL.addItem (_createWarning ("Problem with the truststore configuration"),
+                       new HCDiv ().addChild (SMPTrustManager.getInitializationError ()));
+      }
     }
 
     // Check SML configuration

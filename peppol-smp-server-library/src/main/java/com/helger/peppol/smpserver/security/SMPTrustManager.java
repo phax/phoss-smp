@@ -54,6 +54,7 @@ import com.helger.commons.exception.InitializationException;
 import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
+import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKeyStore;
 
@@ -67,6 +68,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPTrustManager.class);
 
   private static final AtomicBoolean s_aCertificateValid = new AtomicBoolean (false);
+  private static EKeyStoreLoadError s_eInitError;
   private static String s_sInitError;
 
   private KeyStore m_aTrustStore;
@@ -83,6 +85,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
                                                                            SMPServerConfiguration.getTrustStorePassword ());
     if (aTrustStoreLoading.isFailure ())
     {
+      s_eInitError = aTrustStoreLoading.getError ();
       s_sInitError = PeppolKeyStoreHelper.getLoadError (aTrustStoreLoading);
       throw new InitializationException (s_sInitError);
     }
@@ -129,7 +132,19 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
 
   /**
    * If the certificate is not valid according to {@link #isCertificateValid()}
-   * this method can be used to determine the error details.
+   * this method can be used to determine the error detail code.
+   *
+   * @return <code>null</code> if initialization was successful.
+   */
+  @Nullable
+  public static EKeyStoreLoadError getInitializationErrorCode ()
+  {
+    return s_eInitError;
+  }
+
+  /**
+   * If the certificate is not valid according to {@link #isCertificateValid()}
+   * this method can be used to determine the error detail message.
    *
    * @return <code>null</code> if initialization was successful.
    */
