@@ -33,6 +33,7 @@ import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
+import com.helger.commons.url.SMap;
 import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -54,6 +55,9 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
+import com.helger.peppol.smpserver.smlhook.RegistrationHookException;
+import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
@@ -65,6 +69,7 @@ import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.button.BootstrapButton;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap3.button.EBootstrapButtonSize;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
@@ -103,6 +108,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private static final String FIELD_EXTENSION = "extension";
 
   private static final String ACTION_CHECK_DNS = "checkdns";
+  private static final String ACTION_REGISTER_TO_SML = "register-to-sml";
 
   public PageSecureServiceGroup (@Nonnull @Nonempty final String sID)
   {
@@ -163,14 +169,25 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
                           aNodeList.addChild (getUIHandler ().createActionHeader ("Check DNS state of participants"));
 
+                          {
+                            final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+                            aToolbar.addButton ("Refresh",
+                                                aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
+                                                EDefaultIcon.REFRESH);
+                            aNodeList.addChild (aToolbar);
+                          }
+
                           // Simple check if we're online or not
+                          boolean bOffLine = false;
                           try
                           {
+                            // Throws exception in case of error
                             InetAddress.getByName ("www.google.com");
                             aNodeList.addChild (new BootstrapInfoBox ().addChild ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
                           }
                           catch (final UnknownHostException ex)
                           {
+                            bOffLine = true;
                             aNodeList.addChild (new BootstrapWarnBox ().addChild ("It seems like you are offline! So please interpret the results on this page with care!"));
                           }
 
@@ -210,18 +227,67 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             aRow.addCell (aServiceGroup.getParticpantIdentifier ().getURIEncoded ());
                             aRow.addCell (new HCA (new SimpleURL ("http://" + sDNSName)).setTargetBlank ()
                                                                                         .addChild (sDNSName));
-                            aRow.addCell (aInetAddress == null ? new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("is not registered in SML")
-                                                               : new HCTextNode (new IPV4Addr (aInetAddress).getAsString ()));
-                            aRow.addCell (aNice == null ? null : aNice.getCanonicalHostName ());
+                            if (aInetAddress != null)
+                            {
+                              aRow.addCell (new IPV4Addr (aInetAddress).getAsString ());
+                              aRow.addCell (aNice == null ? null : aNice.getCanonicalHostName ());
+                            }
+                            else
+                            {
+                              aRow.addCell (new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("is not registered in SML"));
+                              aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).addChild ("Register in SML")
+                                                                                           .setOnClick (aWPEC.getSelfHref ()
+                                                                                                             .add (CPageParam.PARAM_ACTION,
+                                                                                                                   ACTION_REGISTER_TO_SML)
+                                                                                                             .add (CPageParam.PARAM_OBJECT,
+                                                                                                                   aServiceGroup.getID ()))
+                                                                                           .setDisabled (bOffLine ||
+                                                                                                         !SMPMetaManager.getSettings ()
+                                                                                                                        .isWriteToSML ()));
+                            }
                           }
 
                           final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
                           aNodeList.addChild (aTable).addChild (aDataTables);
 
-                          final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-                          aToolbar.addButtonBack (aDisplayLocale);
-                          aNodeList.addChild (aToolbar);
+                          {
+                            final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+                            aToolbar.addButtonBack (aDisplayLocale);
+                            aNodeList.addChild (aToolbar);
+                          }
 
+                          return false;
+                        }
+                      });
+    addCustomHandler (ACTION_REGISTER_TO_SML,
+                      new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (true)
+                      {
+                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                     @Nonnull final ISMPServiceGroup aSelectedObject)
+                        {
+                          final SMap aTargetParams = new SMap ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
+                          final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+                          try
+                          {
+                            aHook.createServiceGroup (aSelectedObject.getParticpantIdentifier ());
+                            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Service group '" +
+                                                                                                aSelectedObject.getParticpantIdentifier ()
+                                                                                                               .getURIEncoded () +
+                                                                                                "' was successfully registered at the configured SML!"),
+                                                           aTargetParams);
+                          }
+                          catch (final RegistrationHookException ex)
+                          {
+                            aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error registering the Service group '" +
+                                                                                              aSelectedObject.getParticpantIdentifier ()
+                                                                                                             .getURIEncoded () +
+                                                                                              "' at the configured SML! Technical details: " +
+                                                                                              (ex.getCause () != null ? ex.getCause ()
+                                                                                                                          .getMessage ()
+                                                                                                                      : ex.getMessage ())),
+                                                           aTargetParams);
+                          }
+                          // Never reached
                           return false;
                         }
                       });
