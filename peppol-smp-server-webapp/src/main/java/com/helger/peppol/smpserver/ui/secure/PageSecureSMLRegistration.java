@@ -37,6 +37,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.StringParser;
 import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.html.forms.HCEdit;
+import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.network.dns.IPV4Addr;
@@ -416,10 +417,34 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final FormErrorList aFormErrors = new FormErrorList ();
     final boolean bShowInput = true;
-    final ISMLInfo aDefaultSML = SMPMetaManager.getSMLInfoMgr ()
-                                               .findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ()
-                                                                 .toExternalForm ()
-                                                                 .equals (SMPMetaManager.getSettings ().getSMLURL ()));
+    final String sDefaultSMLURL = SMPMetaManager.getSettings ().getSMLURL ();
+    final ISMLInfo aDefaultSML = sDefaultSMLURL == null ? null
+                                                        : SMPMetaManager.getSMLInfoMgr ()
+                                                                        .findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ()
+                                                                                          .toExternalForm ()
+                                                                                          .equals (sDefaultSMLURL));
+    final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
+
+    if (aDefaultSML != null)
+    {
+      // Check if this SMP is already registered
+      final String sPublisherDNSName = sSMPID + "." + aDefaultSML.getPublisherDNSZone ();
+      try
+      {
+        final InetAddress aIA = InetAddress.getByName (sPublisherDNSName);
+        aNodeList.addChild (new BootstrapInfoBox ().addChild (new HCDiv ().addChild ("An SMP is already registered at the configured SML using the DNS name '" +
+                                                                                     sPublisherDNSName +
+                                                                                     "'. The determined IP address is " +
+                                                                                     aIA.getHostAddress ()))
+                                                   .addChild (new HCDiv ().addChild ("Note: this can be a different machine than this one, if another SMP uses the same ID as this one (" +
+                                                                                     sSMPID +
+                                                                                     ")")));
+      }
+      catch (final UnknownHostException ex)
+      {
+        // continue
+      }
+    }
 
     if (aWPEC.hasAction (CPageParam.ACTION_PERFORM))
     {
@@ -435,8 +460,6 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
 
     if (bShowInput)
     {
-      final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
-
       // Get default from configuration
       String sPhysicalAddress = SMPServerConfiguration.getSMLSMPIP ();
       String sLogicalAddress = SMPServerConfiguration.getSMLSMPHostname ();
