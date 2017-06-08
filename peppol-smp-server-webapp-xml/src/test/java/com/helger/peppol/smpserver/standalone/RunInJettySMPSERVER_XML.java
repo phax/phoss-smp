@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.standalone;
 
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.photon.jetty.JettyStarter;
 
 /**
@@ -32,6 +33,7 @@ public final class RunInJettySMPSERVER_XML
 {
   public static void main (final String... args) throws Exception
   {
+    SMPServerConfiguration.getConfigFile ().applyAllNetworkSystemProperties ();
     new JettyStarter (RunInJettySMPSERVER_XML.class).setPort (90).setStopPort (8078).run ();
   }
 }
