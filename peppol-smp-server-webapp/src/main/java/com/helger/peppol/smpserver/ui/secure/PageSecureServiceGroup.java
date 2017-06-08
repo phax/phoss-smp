@@ -59,6 +59,7 @@ import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
 import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
@@ -166,6 +167,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                           try
                           {
                             InetAddress.getByName ("www.google.com");
+                            aNodeList.addChild (new BootstrapInfoBox ().addChild ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
                           }
                           catch (final UnknownHostException ex)
                           {
