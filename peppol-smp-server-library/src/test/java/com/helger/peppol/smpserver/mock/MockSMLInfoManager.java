@@ -40,6 +40,8 @@
  */
 package com.helger.peppol.smpserver.mock;
 
+import java.util.function.Predicate;
+
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.sml.ISMLInfo;
@@ -67,6 +69,11 @@ final class MockSMLInfoManager implements ISMLInfoManager
   }
 
   public ISMLInfo getSMLInfoOfID (final String sID)
+  {
+    return null;
+  }
+
+  public ISMLInfo findFirst (final Predicate <? super ISMLInfo> aFilter)
   {
     return null;
   }

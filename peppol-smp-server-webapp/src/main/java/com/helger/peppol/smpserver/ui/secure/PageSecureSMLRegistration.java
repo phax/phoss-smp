@@ -417,7 +417,6 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     final FormErrorList aFormErrors = new FormErrorList ();
     final boolean bShowInput = true;
     final ISMLInfo aDefaultSML = SMPMetaManager.getSMLInfoMgr ()
-                                               .getAllSMLInfos ()
                                                .findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ()
                                                                  .toExternalForm ()
                                                                  .equals (SMPMetaManager.getSettings ().getSMLURL ()));

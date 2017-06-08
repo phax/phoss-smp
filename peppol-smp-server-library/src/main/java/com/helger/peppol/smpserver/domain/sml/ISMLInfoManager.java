@@ -40,6 +40,8 @@
  */
 package com.helger.peppol.smpserver.domain.sml;
 
+import java.util.function.Predicate;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -113,10 +115,10 @@ public interface ISMLInfoManager
    */
   @Nonnull
   EChange updateSMLInfo (@Nullable String sSMLInfoID,
-                         @Nonnull @Nonempty final String sDisplayName,
-                         @Nonnull @Nonempty final String sDNSZone,
-                         @Nonnull @Nonempty final String sManagementServiceURL,
-                         final boolean bClientCertificateRequired);
+                         @Nonnull @Nonempty String sDisplayName,
+                         @Nonnull @Nonempty String sDNSZone,
+                         @Nonnull @Nonempty String sManagementServiceURL,
+                         boolean bClientCertificateRequired);
 
   /**
    * Delete an existing SML information.
@@ -146,6 +148,17 @@ public interface ISMLInfoManager
    */
   @Nullable
   ISMLInfo getSMLInfoOfID (@Nullable String sID);
+
+  /**
+   * Find the first SML information that matches the provided predicate.
+   *
+   * @param aFilter
+   *        The predicate to be applied for searching. May not be
+   *        <code>null</code>.
+   * @return <code>null</code> if no such SML information exists.
+   */
+  @Nullable
+  ISMLInfo findFirst (@Nullable Predicate <? super ISMLInfo> aFilter);
 
   /**
    * Check if a SML information with the passed ID is contained.
