@@ -73,7 +73,7 @@ import com.helger.peppol.smpserver.security.SMPKeyManager;
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @NotThreadSafe
-public final class RegistrationHookWriteToSML implements IRegistrationHook
+public class RegistrationHookWriteToSML implements IRegistrationHook
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationHookWriteToSML.class);
   // SMP ID is static and cannot change
