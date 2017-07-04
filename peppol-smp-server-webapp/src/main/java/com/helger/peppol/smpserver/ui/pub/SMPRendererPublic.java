@@ -116,8 +116,7 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
                          new BootstrapButton ().addChild ("Goto manager")
                                                .setOnClick (LinkHelper.getURLWithContext (AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH +
                                                                                           "/")));
-      aNav.addItem (new HCSpan ().addClass (CBootstrapCSS.NAVBAR_TEXT)
-                                 .addChild ("Logged in as ")
+      aNav.addText (new HCSpan ().addChild ("Logged in as ")
                                  .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser,
                                                                                                          aDisplayLocale))));
 

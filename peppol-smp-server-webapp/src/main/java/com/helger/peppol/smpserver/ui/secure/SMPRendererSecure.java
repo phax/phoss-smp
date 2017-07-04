@@ -91,16 +91,14 @@ public final class SMPRendererSecure implements ILayoutAreaContentProvider <Layo
     {
       final BootstrapNav aNav = new BootstrapNav ();
       final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
-      aNav.addItem (new HCSpan ().addChild ("Logged in as ")
-                                 .addClass (CBootstrapCSS.NAVBAR_TEXT)
+      aNav.addText (new HCSpan ().addChild ("Logged in as ")
                                  .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser,
                                                                                                          aDisplayLocale))));
-      aNav.addItem (new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (aRequestScope,
-                                                                                     LogoutServlet.SERVLET_DEFAULT_PATH))
-                                          .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale))
-                                          .addClass (CBootstrapCSS.NAVBAR_BTN)
-                                          .addStyle (CCSSProperties.MARGIN_LEFT.newValue ("8px"))
-                                          .addStyle (CCSSProperties.MARGIN_RIGHT.newValue ("8px")));
+      aNav.addButton (new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (aRequestScope,
+                                                                                       LogoutServlet.SERVLET_DEFAULT_PATH))
+                                            .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale))
+                                            .addStyle (CCSSProperties.MARGIN_LEFT.newValue ("8px"))
+                                            .addStyle (CCSSProperties.MARGIN_RIGHT.newValue ("8px")));
 
       aNavBar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_RIGHT, aNav);
     }
