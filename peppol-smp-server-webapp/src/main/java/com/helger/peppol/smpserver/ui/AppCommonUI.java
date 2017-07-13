@@ -61,6 +61,7 @@ import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.peppol.smpserver.ui.ajax.CAjaxPublic;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap3.ext.BootstrapSystemMessage;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.EBootstrapFormType;
@@ -111,6 +112,9 @@ public final class AppCommonUI
                                      AjaxExecutorDataTablesI18N.LANGUAGE_ID)
                  .addPlugin (new DataTablesPluginSearchHighlight ());
     });
+
+    // By default allow markdown in system message
+    BootstrapSystemMessage.setDefaultUseMarkdown (true);
   }
 
   private static String _getPeriod (@Nonnull final LocalDateTime aNowLDT, @Nonnull final LocalDateTime aNotAfter)
