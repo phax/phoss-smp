@@ -178,7 +178,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           aImportServiceGroups.put (aServiceGroup, aSGInfo);
           if (bIsServiceGroupContained)
             aDeleteServiceGroups.add (aServiceGroup);
-          aLogger.log (EErrorLevel.SUCCESS, "Will " +
+          aLogger.log (EErrorLevel.SUCCESS,
+                       "Will " +
                                             (bIsServiceGroupContained ? "overwrite" : "import") +
                                             " service group " +
                                             sServiceGroupID);
@@ -290,7 +291,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             aImportBusinessCards.add (aBusinessCard);
             if (bIsBusinessCardContained)
               aDeleteBusinessCards.add (aBusinessCard);
-            aLogger.log (EErrorLevel.SUCCESS, "Will " +
+            aLogger.log (EErrorLevel.SUCCESS,
+                         "Will " +
                                               (bIsBusinessCardContained ? "overwrite" : "import") +
                                               " business card for " +
                                               sBusinessCardID);
@@ -426,6 +428,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+    final int nServiceGroupCount = aAllServiceGroups.size ();
     final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
     final FormErrorList aFormErrors = new FormErrorList ();
 
@@ -515,14 +518,20 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     // Export tab
     {
       final HCNodeList aExport = new HCNodeList ();
-      if (aAllServiceGroups.isEmpty ())
+      if (nServiceGroupCount == 0)
         aExport.addChild (new BootstrapWarnBox ().addChild ("Since no service group is present, nothing can be exported!"));
       else
-        aExport.addChild (new BootstrapInfoBox ().addChild ("Export all " +
-                                                            aAllServiceGroups.size () +
-                                                            " service groups" +
-                                                            (bHandleBusinessCards ? " and business cards" : "") +
+      {
+        aExport.addChild (new BootstrapInfoBox ().addChild ("Export " +
+                                                            (nServiceGroupCount == 1 ? "service group"
+                                                                                     : "all " +
+                                                                                       aAllServiceGroups.size () +
+                                                                                       " service groups") +
+                                                            (bHandleBusinessCards ? " and business card" +
+                                                                                    (nServiceGroupCount == 1 ? "" : "s")
+                                                                                  : "") +
                                                             " to an XML file."));
+      }
 
       final BootstrapButtonToolbar aToolbar = aExport.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
       aToolbar.addChild (new BootstrapButton ().addChild ("Export all Service Groups")
