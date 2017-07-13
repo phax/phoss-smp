@@ -1,6 +1,11 @@
 # Use an official Tomcat runtime as a base image
 FROM tomcat:8.5
 
+# Install vim
+RUN apt-get update \
+  && apt-get install -y vim \
+  && rm -rf /var/lib/apt/lists/*
+
 # Remove predefined Tomcat webapps
 RUN rm -r $CATALINA_HOME/webapps/ROOT \
   && rm -r $CATALINA_HOME/webapps/docs \

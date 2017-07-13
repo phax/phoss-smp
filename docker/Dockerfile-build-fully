@@ -1,9 +1,9 @@
 # Use an official Tomcat runtime as a base image
 FROM tomcat:8.5
 
-# Install Java 8 JDK, Maven and Git
+# Install vim, Java 8 JDK, Maven and Git
 RUN apt-get update \
-  && apt-get install -y openjdk-8-jdk-headless git maven \
+  && apt-get install -y vim, openjdk-8-jdk-headless git maven \
   && rm -rf /var/lib/apt/lists/*
 
 # Remove predefined Tomcat webapps

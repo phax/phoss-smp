@@ -5,7 +5,7 @@ It is based on the official `tomcat:8.5` image.
 
 Prebuild images are available from https://hub.docker.com/r/phelger/smp/
 
-**Note:** The SMP comes pretty unconfigured - this is work in progress (2017-04-21)
+**Note:** The SMP comes pretty unconfigured
 
 ## Building
 
@@ -20,7 +20,7 @@ It exposes port 8080 where Tomcat is running.
 To change the version build you can specify the version on the commandline:
 
 ```
-docker build --build-arg VERSION=5.0.1 -t phoss-smp-5.0.1 .
+docker build --build-arg VERSION=5.0.2 -t phoss-smp-5.0.2 .
 ```
 
 Note: since the file system layout changed between 5.0.0 and 5.0.1, the current version is only applicable to versions &ge; 5.0.1
