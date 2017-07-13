@@ -107,7 +107,7 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
   public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = true;
   public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = true;
-  public static final String DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME = "http://pyp.helger.com";
+  public static final String DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME = "https://directory.peppol.eu";
   public static final boolean DEFAULT_SML_ACTIVE = false;
 
   /**
