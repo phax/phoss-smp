@@ -88,6 +88,8 @@ public class SMPSettings implements ISMPSettings
 
   public final void setToConfigurationValues ()
   {
+    // Create settings and use the values from the configuration file as the
+    // default values
     m_aSettings = new SettingsWithDefault (SMPServerConfiguration.getConfigFile ().getSettings ());
   }
 
