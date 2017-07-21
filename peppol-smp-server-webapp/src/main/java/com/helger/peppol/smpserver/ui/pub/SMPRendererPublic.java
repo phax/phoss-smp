@@ -120,8 +120,9 @@ public final class SMPRendererPublic implements ILayoutAreaContentProvider <Layo
                                  .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser,
                                                                                                          aDisplayLocale))));
 
-      aNav.addItem (new HCA (LinkHelper.getURLWithContext (aRequestScope,
-                                                           LogoutServlet.SERVLET_DEFAULT_PATH)).addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
+      aNav.addButton (new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (aRequestScope,
+                                                                                       LogoutServlet.SERVLET_DEFAULT_PATH))
+                                            .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
       aNavbar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_RIGHT, aNav);
     }
     else
