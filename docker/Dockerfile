@@ -13,7 +13,7 @@ RUN rm -r $CATALINA_HOME/webapps/ROOT \
 
 # Set arguments and labels after initial cleanup was performed :)
 # Minimum version for this layout is 5.0.1
-ARG VERSION=5.0.2
+ARG VERSION=5.0.3
 # Set to environment to be persistent
 ENV SMP_VERSION=$VERSION
 LABEL vendor="Philip Helger"
