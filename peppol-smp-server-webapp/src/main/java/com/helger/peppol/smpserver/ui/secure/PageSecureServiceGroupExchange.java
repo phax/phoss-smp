@@ -23,12 +23,14 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.CommonsHashSet;
 import com.helger.commons.collection.ext.CommonsLinkedHashMap;
 import com.helger.commons.collection.ext.CommonsLinkedHashSet;
 import com.helger.commons.collection.ext.ICommonsIterable;
 import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.collection.ext.ICommonsOrderedMap;
 import com.helger.commons.collection.ext.ICommonsOrderedSet;
+import com.helger.commons.collection.ext.ICommonsSet;
 import com.helger.commons.error.level.EErrorLevel;
 import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.log.InMemoryLogger;
@@ -37,6 +39,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.html.forms.HCEditFile;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.app.CSMPExchange;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
@@ -268,7 +271,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         catch (final IllegalStateException ex)
         {
           // Service group not found
-          aLogger.error ("Business card at index " + nBCIndex + " contains an invalid service group!");
+          aLogger.error ("Business card at index " + nBCIndex + " contains an invalid/unknown service group!");
         }
         if (aBusinessCard == null)
         {
@@ -330,11 +333,18 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
         // 1. delete all existing service groups to be imported (if overwrite);
         // this may implicitly delete business cards
+        final ICommonsSet <IParticipantIdentifier> aDeletedServiceGroups = new CommonsHashSet <> ();
         for (final ISMPServiceGroup aDeleteServiceGroup : aDeleteServiceGroups)
-          if (aServiceGroupMgr.deleteSMPServiceGroup (aDeleteServiceGroup.getParticpantIdentifier ()).isChanged ())
+        {
+          final IParticipantIdentifier aPI = aDeleteServiceGroup.getParticpantIdentifier ();
+          if (aServiceGroupMgr.deleteSMPServiceGroup (aPI).isChanged ())
+          {
             aLogger.log (EErrorLevel.SUCCESS, "Successfully deleted service group " + aDeleteServiceGroup.getID ());
+            aDeletedServiceGroups.add (aPI);
+          }
           else
             aLogger.error ("Failed to delete service group " + aDeleteServiceGroup.getID ());
+        }
 
         // 2. create all service groups
         for (final Map.Entry <ISMPServiceGroup, SGImportData> aEntry : aImportServiceGroups.entrySet ())
@@ -394,16 +404,26 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard).isChanged ())
               aLogger.log (EErrorLevel.SUCCESS, "Successfully deleted business card " + aDeleteBusinessCard.getID ());
             else
-              aLogger.error ("Failed to delete business card " + aDeleteBusinessCard.getID ());
+            {
+              // If the service group to which the business card belongs was
+              // already deleted, don't display an error, as the business card
+              // was automatically deleted afterwards
+              if (!aDeletedServiceGroups.contains (aDeleteBusinessCard.getServiceGroup ().getParticpantIdentifier ()))
+                aLogger.error ("Failed to delete business card " + aDeleteBusinessCard.getID ());
+            }
           }
           catch (final Throwable t)
           {
-            aLogger.error ("Failed to delete business card " + aDeleteBusinessCard.getID (), t);
+            aLogger.error ("Failed to delete business card " +
+                           aDeleteBusinessCard.getID () +
+                           "; Technical details: " +
+                           t.getMessage (),
+                           t);
           }
 
         // 5. create all new business cards
         // Note: if PD integration is disabled, the list is empty
-        for (final ISMPBusinessCard aImportBusinessCard : aDeleteBusinessCards)
+        for (final ISMPBusinessCard aImportBusinessCard : aImportBusinessCards)
           try
           {
             aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getServiceGroup (),
