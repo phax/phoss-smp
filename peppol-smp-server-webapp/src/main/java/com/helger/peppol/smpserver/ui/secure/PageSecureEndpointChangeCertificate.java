@@ -158,9 +158,9 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     boolean bShowList = true;
 
-    final MultiHashMapArrayListBased <String, ISMPEndpoint> aEndpointsGroupedPerURL = new MultiHashMapArrayListBased<> ();
-    final MultiHashMapHashSetBased <String, ISMPServiceGroup> aServiceGroupsGroupedPerURL = new MultiHashMapHashSetBased<> ();
-    final ICommonsList <? extends ISMPServiceInformation> aAllSIs = aServiceInfoMgr.getAllSMPServiceInformation ();
+    final MultiHashMapArrayListBased <String, ISMPEndpoint> aEndpointsGroupedPerURL = new MultiHashMapArrayListBased <> ();
+    final MultiHashMapHashSetBased <String, ISMPServiceGroup> aServiceGroupsGroupedPerURL = new MultiHashMapHashSetBased <> ();
+    final ICommonsList <ISMPServiceInformation> aAllSIs = aServiceInfoMgr.getAllSMPServiceInformation ();
     int nTotalEndpointCount = 0;
     for (final ISMPServiceInformation aSI : aAllSIs)
     {
@@ -212,7 +212,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         {
           // Modify all endpoints
           int nChangedEndpoints = 0;
-          final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet<> ();
+          final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
           for (final ISMPServiceInformation aSI : aAllSIs)
           {
             boolean bChanged = false;

@@ -49,7 +49,8 @@ import com.helger.photon.basic.audit.AuditHelper;
  */
 public final class XMLServiceInformationManager extends
                                                 AbstractMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
-                                                implements ISMPServiceInformationManager
+                                                implements
+                                                ISMPServiceInformationManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceInformationManager.class);
 
@@ -274,7 +275,7 @@ public final class XMLServiceInformationManager extends
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList<> ();
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
       findAll (x -> x.getServiceGroupID ().equals (aServiceGroup.getID ()), ret::add);
     return ret;
@@ -284,7 +285,7 @@ public final class XMLServiceInformationManager extends
   @ReturnsMutableCopy
   public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
+    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
       findAllMapped (aSI -> aSI.getServiceGroupID ().equals (aServiceGroup.getID ()),
@@ -303,10 +304,10 @@ public final class XMLServiceInformationManager extends
     if (aDocumentTypeIdentifier == null)
       return null;
 
-    final ICommonsList <? extends ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ()
-                                                                                  .equals (aServiceGroup.getID ()) &&
-                                                                               aSI.getDocumentTypeIdentifier ()
-                                                                                  .hasSameContent (aDocumentTypeIdentifier));
+    final ICommonsList <ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ()
+                                                                        .equals (aServiceGroup.getID ()) &&
+                                                                     aSI.getDocumentTypeIdentifier ()
+                                                                        .hasSameContent (aDocumentTypeIdentifier));
 
     if (ret.isEmpty ())
       return null;
