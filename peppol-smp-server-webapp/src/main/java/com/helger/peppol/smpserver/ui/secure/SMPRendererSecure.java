@@ -32,10 +32,12 @@ import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
+import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
 import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
+import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbs;
@@ -109,13 +111,23 @@ public final class SMPRendererSecure implements ILayoutAreaContentProvider <Layo
   public static IHCNode getMenuContent (@Nonnull final LayoutExecutionContext aLEC)
   {
     final HCNodeList ret = new HCNodeList ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+
     ret.addChild (BootstrapMenuItemRenderer.createSideBarMenu (aLEC));
 
     // Information on SML usage
-    if (SMPMetaManager.getSettings ().isWriteToSML ())
+    if (aSettings.isWriteToSML ())
       ret.addChild (new BootstrapInfoBox ().addChild ("SML connection active!"));
     else
       ret.addChild (new BootstrapWarnBox ().addChild ("SML connection NOT active!"));
+
+    if (SMPServerConfiguration.getRESTType ().isPEPPOL ())
+    {
+      if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
+        ret.addChild (new BootstrapSuccessBox ().addChild ("Directory support is enabled!"));
+      else
+        ret.addChild (new BootstrapWarnBox ().addChild ("Directory support is disabled!"));
+    }
 
     // Information on certificate
     if (!SMPKeyManager.isCertificateValid ())
