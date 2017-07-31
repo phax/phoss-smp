@@ -113,14 +113,18 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                  @Nonnull final FormErrorList aFormErrors,
                                                  @Nonnull final EWebPageSimpleFormAction eSimpleFormAction)
   {
-    final boolean bRESTWritableAPIDisabled = aWPEC.getCheckBoxAttr (FIELD_SMP_REST_WRITABLE_API_DISABLED,
-                                                                    SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
-    final boolean bPEPPOLDirectoryIntegrationEnabled = aWPEC.getCheckBoxAttr (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
-                                                                              SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
-    final boolean bPEPPOLDirectoryIntegrationAutoUpdate = aWPEC.getCheckBoxAttr (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                                                                 SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE);
+    final boolean bRESTWritableAPIDisabled = aWPEC.params ()
+                                                  .isCheckBoxChecked (FIELD_SMP_REST_WRITABLE_API_DISABLED,
+                                                                      SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
+    final boolean bPEPPOLDirectoryIntegrationEnabled = aWPEC.params ()
+                                                            .isCheckBoxChecked (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
+                                                                                SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
+    final boolean bPEPPOLDirectoryIntegrationAutoUpdate = aWPEC.params ()
+                                                               .isCheckBoxChecked (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                                                                   SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE);
     final String sPEPPOLDirectoryHostName = aWPEC.getAttributeAsString (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME);
-    final boolean bSMLActive = aWPEC.getCheckBoxAttr (FIELD_SML_ACTIVE, SMPServerConfiguration.DEFAULT_SML_ACTIVE);
+    final boolean bSMLActive = aWPEC.params ().isCheckBoxChecked (FIELD_SML_ACTIVE,
+                                                                  SMPServerConfiguration.DEFAULT_SML_ACTIVE);
     final String sSMLURL = aWPEC.getAttributeAsString (FIELD_SML_URL);
 
     if (StringHelper.hasNoText (sPEPPOLDirectoryHostName))

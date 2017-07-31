@@ -209,7 +209,8 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
     final String sDisplayName = aWPEC.getAttributeAsString (FIELD_DISPLAY_NAME);
     final String sDNSZone = aWPEC.getAttributeAsString (FIELD_DNS_ZONE);
     final String sManagementAddressURL = aWPEC.getAttributeAsString (FIELD_MANAGEMENT_ADDRESS_URL);
-    final boolean bClientCertificateRequired = aWPEC.getCheckBoxAttr (FIELD_CLIENT_CERTIFICATE_REQUIRED, true);
+    final boolean bClientCertificateRequired = aWPEC.params ().isCheckBoxChecked (FIELD_CLIENT_CERTIFICATE_REQUIRED,
+                                                                                  true);
 
     // validations
     if (StringHelper.hasNoText (sDisplayName))
@@ -289,11 +290,9 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
                     new HCTextNode (" "),
                     createCopyLink (aWPEC, aCurObject, "Copy " + aCurObject.getID ()),
                     new HCTextNode (" "),
-                    isActionAllowed (aWPEC, EWebPageFormAction.DELETE, aCurObject)
-                                                                                   ? createDeleteLink (aWPEC,
-                                                                                                       aCurObject,
-                                                                                                       "Delete " + aCurObject.getDisplayName ())
-                                                                                   : createEmptyAction ());
+                    isActionAllowed (aWPEC,
+                                     EWebPageFormAction.DELETE,
+                                     aCurObject) ? createDeleteLink (aWPEC, aCurObject, "Delete " + aCurObject.getDisplayName ()) : createEmptyAction ());
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);

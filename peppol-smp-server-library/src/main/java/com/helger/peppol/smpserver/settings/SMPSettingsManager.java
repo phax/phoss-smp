@@ -50,6 +50,7 @@ import com.helger.commons.state.EChange;
 import com.helger.photon.basic.app.dao.impl.AbstractSimpleDAO;
 import com.helger.photon.basic.app.dao.impl.DAOException;
 import com.helger.settings.ISettings;
+import com.helger.settings.Settings;
 import com.helger.settings.exchange.xml.SettingsMicroDocumentConverter;
 import com.helger.settings.factory.ISettingsFactory;
 import com.helger.xml.microdom.IMicroDocument;
@@ -66,7 +67,7 @@ import com.helger.xml.microdom.MicroDocument;
 public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSettingsManager
 {
   private final SMPSettings m_aSettings = new SMPSettings ();
-  private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList<> ();
+  private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
 
   public SMPSettingsManager (@Nullable final String sFilename) throws DAOException
   {
@@ -78,7 +79,7 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
   @Nonnull
   protected EChange onRead (@Nonnull final IMicroDocument aDoc)
   {
-    final SettingsMicroDocumentConverter aConverter = new SettingsMicroDocumentConverter (ISettingsFactory.newInstance ());
+    final SettingsMicroDocumentConverter <Settings> aConverter = new SettingsMicroDocumentConverter <> (ISettingsFactory.newInstance ());
     final ISettings aSettings = aConverter.convertToNative (aDoc.getDocumentElement ());
     m_aSettings.setFromSettings (aSettings);
     return EChange.UNCHANGED;
@@ -89,14 +90,14 @@ public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSetting
   protected IMicroDocument createWriteData ()
   {
     final IMicroDocument ret = new MicroDocument ();
-    final SettingsMicroDocumentConverter aConverter = new SettingsMicroDocumentConverter (ISettingsFactory.newInstance ());
+    final SettingsMicroDocumentConverter <Settings> aConverter = new SettingsMicroDocumentConverter <> (ISettingsFactory.newInstance ());
     ret.appendChild (aConverter.convertToMicroElement (m_aSettings.getAsSettings (), null, "root"));
     return ret;
   }
 
   @Nonnull
   @ReturnsMutableObject ("by design")
-  public final CallbackList <ISMPSettingsCallback> getCallbacks ()
+  public final CallbackList <ISMPSettingsCallback> callbacks ()
   {
     return m_aCallbacks;
   }

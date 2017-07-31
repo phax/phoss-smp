@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.helger.commons.collection.ext.CommonsHashMap;
-import com.helger.commons.collection.ext.ICommonsMap;
+import com.helger.commons.collection.impl.CommonsHashMap;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppConfiguration;
@@ -34,9 +34,9 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.pub.InitializerPublic;
 import com.helger.peppol.smpserver.ui.secure.InitializerSecure;
+import com.helger.photon.basic.app.CApplicationID;
 import com.helger.photon.basic.app.request.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.basic.app.request.RequestParameterManager;
-import com.helger.photon.core.app.CApplication;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
@@ -124,9 +124,9 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
   @Nonnull
   protected ICommonsMap <String, IApplicationInitializer <LayoutExecutionContext>> getAllInitializers ()
   {
-    final ICommonsMap <String, IApplicationInitializer <LayoutExecutionContext>> ret = new CommonsHashMap<> ();
-    ret.put (CApplication.APP_ID_PUBLIC, new InitializerPublic ());
-    ret.put (CApplication.APP_ID_SECURE, new InitializerSecure ());
+    final ICommonsMap <String, IApplicationInitializer <LayoutExecutionContext>> ret = new CommonsHashMap <> ();
+    ret.put (CApplicationID.APP_ID_PUBLIC, new InitializerPublic ());
+    ret.put (CApplicationID.APP_ID_SECURE, new InitializerSecure ());
     return ret;
   }
 }

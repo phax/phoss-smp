@@ -46,8 +46,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -67,7 +67,7 @@ import com.helger.xml.microdom.util.MicroHelper;
  *
  * @author Philip Helger
  */
-public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConverter
+public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConverter <SMPBusinessCard>
 {
   private static final String ATTR_SERVICE_GROUP_ID = "servicegroupid";
   private static final String ELEMENT_ENTITY = "entity";
@@ -137,16 +137,16 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
   }
 
   @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final Object aObject,
+  public IMicroElement convertToMicroElement (@Nonnull final SMPBusinessCard aValue,
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    return convertToMicroElement ((ISMPBusinessCard) aObject, sNamespaceURI, sTagName, false);
+    return convertToMicroElement (aValue, sNamespaceURI, sTagName, false);
   }
 
   @Nonnull
-  public static ISMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement,
-                                                  @Nonnull final ISMPServiceGroupProvider aSGProvider)
+  public static SMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement,
+                                                 @Nonnull final ISMPServiceGroupProvider aSGProvider)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);
@@ -155,7 +155,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
     if (aServiceGroup == null)
       throw new IllegalStateException ("Failed to resolve service group with ID '" + sServiceGroupID + "'");
 
-    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList<> ();
+    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
     for (final IMicroElement eEntity : aElement.getAllChildElements (ELEMENT_ENTITY))
     {
       String sEntityID = eEntity.getAttributeValue (ATTR_ID);
@@ -198,7 +198,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
   }
 
   @Nonnull
-  public ISMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement)
+  public SMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement)
   {
     return convertToNative (aElement, SMPMetaManager.getServiceGroupMgr ());
   }

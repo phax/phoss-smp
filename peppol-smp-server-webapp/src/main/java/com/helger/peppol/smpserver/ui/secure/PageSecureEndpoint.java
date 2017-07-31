@@ -25,20 +25,20 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.collection.multimap.IMultiMapListBased;
+import com.helger.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.ext.ICommonsList;
-import com.helger.commons.collection.multimap.IMultiMapListBased;
-import com.helger.commons.collection.multimap.MultiHashMapArrayListBased;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.commons.datetime.PDTFromString;
+import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SMap;
 import com.helger.commons.url.URLHelper;
-import com.helger.datetime.format.PDTFromString;
-import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCEdit;
@@ -141,8 +141,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   private final static String FIELD_TECHNICAL_INFORMATION = "technicalinformation";
   private final static String FIELD_EXTENSION = "extension";
 
-  private static final String ATTR_PROCESS = "$process";
-  private static final String ATTR_ENDPOINT = "$endpoint";
+  private static final String REQUEST_ATTR_PROCESS = "$process";
+  private static final String REQUEST_ATTR_ENDPOINT = "$endpoint";
 
   private static final String ACTION_DELETE_DOCUMENT_TYPE = "del.doctype";
   private static final String ACTION_DELETE_PROCESS = "del.process";
@@ -161,8 +161,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                       @Nonnull final BootstrapForm aForm,
                                       @Nonnull final ISMPServiceInformation aSelectedObject)
       {
-        final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
-        final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+        final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
+        final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
 
         aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
                                            aSelectedObject.getServiceGroup ()
@@ -192,8 +192,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
       {
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-        final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
-        final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+        final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
+        final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
 
         if (aSelectedProcess.deleteEndpoint (aSelectedEndpoint.getTransportProfile ()).isChanged ())
         {
@@ -329,8 +329,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
         final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfile);
         if (aEndpoint != null)
         {
-          aWPEC.getRequestScope ().setAttribute (ATTR_PROCESS, aProcess);
-          aWPEC.getRequestScope ().setAttribute (ATTR_ENDPOINT, aEndpoint);
+          aWPEC.getRequestScope ().attrs ().putIn (REQUEST_ATTR_PROCESS, aProcess);
+          aWPEC.getRequestScope ().attrs ().putIn (REQUEST_ATTR_ENDPOINT, aEndpoint);
           return true;
         }
       }
@@ -367,8 +367,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                       @Nonnull final ISMPServiceInformation aSelectedObject)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
-    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
+    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
 
     final BootstrapButtonToolbar aToolbar = createNewViewToolbar (aWPEC);
     if (bCanGoBack)
@@ -396,8 +396,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
-    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
+    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
     final LocalDateTime aNowLDT = PDTFactory.getCurrentLocalDateTime ();
 
     aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of endpoint"));
@@ -435,10 +435,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                                                    CMenuSecure.MENU_TRANSPORT_PROFILES,
                                                                                    aSelectedEndpoint.getTransportProfile ())).addChild (aSelectedEndpoint.getTransportProfile ())));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
-                                                 .setCtrl (StringHelper.hasText (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),
-                                                                                                                                                       HC_Target.BLANK)
-                                                                                                                            : new HCEM ().addChild ("none")));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference").setCtrl (StringHelper
+                                                                                                       .hasText (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (), HC_Target.BLANK) : new HCEM ().addChild ("none")));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires business level signature")
                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedEndpoint.isRequireBusinessLevelSignature (),
@@ -500,8 +498,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   {
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
-    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
+    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
@@ -527,7 +525,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                              : aWPEC.getAttributeAsString (FIELD_TRANSPORT_PROFILE);
     final ISMPTransportProfile aTransportProfile = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfileID);
     final String sEndpointReference = aWPEC.getAttributeAsString (FIELD_ENDPOINT_REFERENCE);
-    final boolean bRequireBusinessLevelSignature = aWPEC.getAttributeAsBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
+    final boolean bRequireBusinessLevelSignature = aWPEC.params ()
+                                                        .getAsBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aWPEC.getAttributeAsString (FIELD_MINIMUM_AUTHENTICATION_LEVEL);
     final String sNotBefore = aWPEC.getAttributeAsString (FIELD_NOT_BEFORE);
     final LocalDate aNotBeforeDate = PDTFromString.getLocalDateFromString (sNotBefore, aDisplayLocale);
@@ -696,8 +695,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   {
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().getCastedAttribute (ATTR_PROCESS);
-    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().getCastedAttribute (ATTR_ENDPOINT);
+    final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
+    final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit endpoint" : "Create new endpoint"));
@@ -863,7 +862,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     if (bTreeView)
     {
       // Create sorted list of service groups
-      final IMultiMapListBased <ISMPServiceGroup, ISMPServiceInformation> aMap = new MultiHashMapArrayListBased<> ();
+      final IMultiMapListBased <ISMPServiceGroup, ISMPServiceInformation> aMap = new MultiHashMapArrayListBased <> ();
       aServiceInfoMgr.getAllSMPServiceInformation ().forEach (x -> aMap.putSingle (x.getServiceGroup (), x));
 
       final HCUL aULSG = new HCUL ();
@@ -926,9 +925,9 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                 aDiv.addChild (" ")
                     .addChild (new HCA (aWPEC.getSelfHref ()
                                              .addAll (_createParamMap (aServiceInfo, aProcess, (ISMPEndpoint) null))
-                                             .add (CPageParam.PARAM_ACTION,
-                                                   ACTION_DELETE_PROCESS)).setTitle ("Delete process")
-                                                                          .addChild (EDefaultIcon.DELETE.getAsNode ()));
+                                             .add (CPageParam.PARAM_ACTION, ACTION_DELETE_PROCESS))
+                                                                                                   .setTitle ("Delete process")
+                                                                                                   .addChild (EDefaultIcon.DELETE.getAsNode ()));
               }
               else
                 aLI.addChild (aEPTable);
@@ -954,9 +953,9 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                            .addAll (_createParamMap (aServiceInfo,
                                                                      (ISMPProcess) null,
                                                                      (ISMPEndpoint) null))
-                                           .add (CPageParam.PARAM_ACTION,
-                                                 ACTION_DELETE_DOCUMENT_TYPE)).setTitle ("Delete document type")
-                                                                              .addChild (EDefaultIcon.DELETE.getAsNode ()));
+                                           .add (CPageParam.PARAM_ACTION, ACTION_DELETE_DOCUMENT_TYPE))
+                                                                                                       .setTitle ("Delete document type")
+                                                                                                       .addChild (EDefaultIcon.DELETE.getAsNode ()));
             }
             else
               aLI.addChild (aULP);

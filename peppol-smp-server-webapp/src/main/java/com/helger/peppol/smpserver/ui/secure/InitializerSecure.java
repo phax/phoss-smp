@@ -83,8 +83,6 @@ public final class InitializerSecure implements IApplicationInitializer <LayoutE
                                                                              .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
 
     // If the SMP settings change, the PD client must be re-created
-    SMPMetaManager.getSettingsMgr ()
-                  .getCallbacks ()
-                  .addCallback (x -> PDClientProvider.getInstance ().resetPDClient ());
+    SMPMetaManager.getSettingsMgr ().callbacks ().add (x -> PDClientProvider.getInstance ().resetPDClient ());
   }
 }

@@ -169,7 +169,7 @@ public class SMPSettings implements ISMPSettings
 
   @Nonnull
   @ReturnsMutableCopy
-  public ISettings getAsSettings ()
+  public SettingsWithDefault getAsSettings ()
   {
     return m_aSettings;
   }

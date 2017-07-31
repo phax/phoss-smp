@@ -43,7 +43,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
-import com.helger.photon.core.app.CApplication;
+import com.helger.photon.basic.app.CApplicationID;
 import com.helger.servlet.mock.MockHttpServletResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
 
@@ -74,7 +74,7 @@ public final class ServiceGroupInterface
   @Produces (MediaType.TEXT_XML)
   public Document getServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
@@ -112,7 +112,7 @@ public final class ServiceGroupInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
@@ -160,7 +160,7 @@ public final class ServiceGroupInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);

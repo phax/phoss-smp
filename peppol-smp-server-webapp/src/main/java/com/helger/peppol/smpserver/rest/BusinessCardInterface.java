@@ -46,7 +46,7 @@ import com.helger.pd.businesscard.v2.PD2BusinessCardType;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
-import com.helger.photon.core.app.CApplication;
+import com.helger.photon.basic.app.CApplicationID;
 import com.helger.servlet.mock.MockHttpServletResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
 
@@ -87,7 +87,7 @@ public final class BusinessCardInterface
       throw new WebApplicationException (404);
     }
 
-    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
@@ -113,7 +113,7 @@ public final class BusinessCardInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
       PD1BusinessCardType aV1 = new PD1BusinessCardMarshaller ().read (aServiceGroupDoc);
@@ -154,7 +154,7 @@ public final class BusinessCardInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);

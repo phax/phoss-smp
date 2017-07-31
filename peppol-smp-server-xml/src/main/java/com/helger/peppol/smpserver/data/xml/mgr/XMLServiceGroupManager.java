@@ -27,7 +27,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -60,7 +60,7 @@ public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPSe
 
   @Nonnull
   @ReturnsMutableObject ("by design")
-  public CallbackList <ISMPServiceGroupCallback> getServiceGroupCallbacks ()
+  public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {
     return m_aCBs;
   }

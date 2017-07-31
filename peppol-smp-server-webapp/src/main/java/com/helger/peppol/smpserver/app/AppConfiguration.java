@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.io.resource.IReadableResource;
-import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
+import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.settings.ISettings;
 import com.helger.settings.exchange.configfile.ConfigFile;
 import com.helger.settings.exchange.configfile.ConfigFileBuilder;

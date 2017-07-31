@@ -37,9 +37,9 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
-import com.helger.http.CHTTPHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -76,7 +76,7 @@ public final class ServiceGroupInterfaceTest
   private static Builder _addCredentials (@Nonnull final Builder aBuilder)
   {
     // Use default credentials for XML backend
-    return aBuilder.header (CHTTPHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
+    return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
   private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
@@ -90,9 +90,7 @@ public final class ServiceGroupInterfaceTest
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
       s_aLogger.info ("HTTP Response: " + sResponse);
-    assertTrue (aResponseMsg.getStatus () +
-                " is not in " +
-                Arrays.toString (aStatusCodes),
+    assertTrue (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes),
                 ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));
     return aResponseMsg.getStatus ();
   }

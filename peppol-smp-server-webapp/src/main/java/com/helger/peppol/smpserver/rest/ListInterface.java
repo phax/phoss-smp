@@ -32,7 +32,7 @@ import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupReferenceListType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
-import com.helger.photon.core.app.CApplication;
+import com.helger.photon.basic.app.CApplicationID;
 import com.helger.servlet.mock.MockHttpServletResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
 
@@ -62,7 +62,7 @@ public final class ListInterface
   @Produces (MediaType.TEXT_XML)
   public Document getServiceGroupReferenceList (@PathParam ("UserId") final String sUserID) throws Throwable
   {
-    WebScopeManager.onRequestBegin (CApplication.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
+    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
     try
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);

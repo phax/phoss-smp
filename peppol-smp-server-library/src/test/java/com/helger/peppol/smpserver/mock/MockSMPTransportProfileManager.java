@@ -40,7 +40,7 @@
  */
 package com.helger.peppol.smpserver.mock;
 
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;

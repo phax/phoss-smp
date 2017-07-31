@@ -186,8 +186,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
         final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocTypeID);
         if (aDocTypeID != null)
         {
-          aWPEC.getRequestScope ().setAttribute (ATTR_SERVICE_GROUP, aServiceGroup);
-          aWPEC.getRequestScope ().setAttribute (ATTR_DOCTYPE_ID, aDocTypeID);
+          aWPEC.getRequestScope ().attrs ().putIn (ATTR_SERVICE_GROUP, aServiceGroup);
+          aWPEC.getRequestScope ().attrs ().putIn (ATTR_DOCTYPE_ID, aDocTypeID);
           return true;
         }
       }
@@ -215,11 +215,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       // Edit object
       aToolbar.addButtonEdit (aDisplayLocale,
                               createEditURL (aWPEC,
-                                             aSelectedObject).addAll (new SMap ().add (FIELD_SERVICE_GROUP_ID,
-                                                                                       aSelectedObject.getServiceGroupID ())
-                                                                                 .add (FIELD_DOCTYPE_ID,
-                                                                                       aSelectedObject.getDocumentTypeIdentifier ()
-                                                                                                      .getURIEncoded ())));
+                                             aSelectedObject).addAll (new SMap ().add (FIELD_SERVICE_GROUP_ID, aSelectedObject.getServiceGroupID ()).add (FIELD_DOCTYPE_ID, aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ())));
     }
 
     // Callback

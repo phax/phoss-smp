@@ -45,7 +45,7 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.ClassPathResource;
-import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
+import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.settings.ISettings;
 import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
 

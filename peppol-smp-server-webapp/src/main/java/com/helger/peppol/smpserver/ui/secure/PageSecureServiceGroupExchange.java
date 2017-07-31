@@ -22,15 +22,15 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.CommonsHashSet;
-import com.helger.commons.collection.ext.CommonsLinkedHashMap;
-import com.helger.commons.collection.ext.CommonsLinkedHashSet;
-import com.helger.commons.collection.ext.ICommonsIterable;
-import com.helger.commons.collection.ext.ICommonsList;
-import com.helger.commons.collection.ext.ICommonsOrderedMap;
-import com.helger.commons.collection.ext.ICommonsOrderedSet;
-import com.helger.commons.collection.ext.ICommonsSet;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashSet;
+import com.helger.commons.collection.impl.CommonsLinkedHashMap;
+import com.helger.commons.collection.impl.CommonsLinkedHashSet;
+import com.helger.commons.collection.impl.ICommonsIterable;
+import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsOrderedMap;
+import com.helger.commons.collection.impl.ICommonsOrderedSet;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.error.level.EErrorLevel;
 import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.log.InMemoryLogger;
@@ -460,8 +460,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       bSelectImportTab = true;
 
       // Start import
-      final IFileItem aImportFile = aWPEC.getFileItem (FIELD_IMPORT_FILE);
-      final boolean bOverwriteExisting = aWPEC.getCheckBoxAttr (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
+      final IFileItem aImportFile = aWPEC.params ().getAsFileItem (FIELD_IMPORT_FILE);
+      final boolean bOverwriteExisting = aWPEC.params ().isCheckBoxChecked (FIELD_OVERWRITE_EXISTING,
+                                                                            DEFAULT_OVERWRITE_EXISTING);
       final String sDefaultOwnerID = aWPEC.getAttributeAsString (FIELD_DEFAULT_OWNER);
       final ISMPUser aDefaultOwner = aUserMgr.getUserOfID (sDefaultOwnerID);
 

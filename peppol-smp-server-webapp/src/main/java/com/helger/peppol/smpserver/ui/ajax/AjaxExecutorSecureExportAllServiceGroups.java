@@ -18,7 +18,7 @@ package com.helger.peppol.smpserver.ui.ajax;
 
 import javax.annotation.Nonnull;
 
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.mime.CMimeType;
 import com.helger.datetime.util.PDTIOHelper;

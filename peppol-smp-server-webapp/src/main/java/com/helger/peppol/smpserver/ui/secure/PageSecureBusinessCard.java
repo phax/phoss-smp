@@ -26,10 +26,12 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
-import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.CompareHelper;
 import com.helger.commons.compare.ESortOrder;
+import com.helger.commons.datetime.PDTFromString;
+import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.error.IError;
 import com.helger.commons.error.list.IErrorList;
@@ -43,8 +45,6 @@ import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.URLValidator;
-import com.helger.datetime.format.PDTFromString;
-import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.ext.HCExtHelper;
@@ -351,7 +351,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
                                          : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
-    final ICommonsList <SMPBusinessCardEntity> aSMPEntities = new CommonsArrayList<> ();
+    final ICommonsList <SMPBusinessCardEntity> aSMPEntities = new CommonsArrayList <> ();
 
     // validations
     if (StringHelper.hasNoText (sServiceGroupID))
@@ -376,7 +376,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       for (final String sEntityRowID : aEntities.keySet ())
       {
         final Map <String, String> aEntityRow = aEntities.getValueMap (sEntityRowID);
-        final int nErrors = aFormErrors.getSize ();
+        final int nErrors = aFormErrors.size ();
 
         // Entity name
         final String sFieldName = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityRowID, SUFFIX_NAME);
@@ -396,13 +396,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         final String sGeoInfo = aEntityRow.get (SUFFIX_GEO_INFO);
 
         // Entity Identifiers
-        final ICommonsList <SMPBusinessCardIdentifier> aSMPIdentifiers = new CommonsArrayList<> ();
+        final ICommonsList <SMPBusinessCardIdentifier> aSMPIdentifiers = new CommonsArrayList <> ();
         final IRequestParamMap aIdentifiers = aEntities.getMap (sEntityRowID, PREFIX_IDENTIFIER);
         if (aIdentifiers != null)
           for (final String sIdentifierRowID : aIdentifiers.keySet ())
           {
             final Map <String, String> aIdentifierRow = aIdentifiers.getValueMap (sIdentifierRowID);
-            final int nErrors2 = aFormErrors.getSize ();
+            final int nErrors2 = aFormErrors.size ();
 
             // Scheme
             final String sFieldScheme = RequestParamMap.getFieldName (PREFIX_ENTITY,
@@ -424,7 +424,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
             if (StringHelper.hasNoText (sValue))
               aFormErrors.addFieldError (sFieldValue, "The Value of the Identifier must be provided!");
 
-            if (aFormErrors.getSize () == nErrors2)
+            if (aFormErrors.size () == nErrors2)
             {
               final boolean bIsNewIdentifier = sIdentifierRowID.startsWith (TMP_ID_PREFIX);
               aSMPIdentifiers.add (bIsNewIdentifier ? new SMPBusinessCardIdentifier (sScheme, sValue)
@@ -446,7 +446,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                        sEntityRowID,
                                                                        SUFFIX_WEBSITE_URIS);
         final String sWebsiteURIs = aEntityRow.get (SUFFIX_WEBSITE_URIS);
-        final ICommonsList <String> aWebsiteURIs = new CommonsArrayList<> ();
+        final ICommonsList <String> aWebsiteURIs = new CommonsArrayList <> ();
         for (final String sWebsiteURI : RegExHelper.getSplitToArray (sWebsiteURIs, "\\n"))
         {
           final String sRealWebsiteURI = sWebsiteURI.trim ();
@@ -458,13 +458,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         }
 
         // Entity Contacts
-        final ICommonsList <SMPBusinessCardContact> aSMPContacts = new CommonsArrayList<> ();
+        final ICommonsList <SMPBusinessCardContact> aSMPContacts = new CommonsArrayList <> ();
         final IRequestParamMap aContacts = aEntities.getMap (sEntityRowID, PREFIX_CONTACT);
         if (aContacts != null)
           for (final String sContactRowID : aContacts.keySet ())
           {
             final Map <String, String> aContactRow = aContacts.getValueMap (sContactRowID);
-            final int nErrors2 = aFormErrors.getSize ();
+            final int nErrors2 = aFormErrors.size ();
 
             final String sType = aContactRow.get (SUFFIX_TYPE);
             final String sName = aContactRow.get (SUFFIX_NAME);
@@ -485,7 +485,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                       StringHelper.hasText (sPhoneNumber) ||
                                       StringHelper.hasText (sEmail);
 
-            if (aFormErrors.getSize () == nErrors2 && bIsAnySet)
+            if (aFormErrors.size () == nErrors2 && bIsAnySet)
             {
               final boolean bIsNewContact = sContactRowID.startsWith (TMP_ID_PREFIX);
               aSMPContacts.add (bIsNewContact ? new SMPBusinessCardContact (sType, sName, sPhoneNumber, sEmail)
@@ -522,7 +522,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         if (aRegDate == null && StringHelper.hasText (sRegDate))
           aFormErrors.addFieldError (sFieldRegDate, "The entered registration date is invalid!");
 
-        if (aFormErrors.getSize () == nErrors)
+        if (aFormErrors.size () == nErrors)
         {
           // Add to list
           final boolean bIsNewEntity = sEntityRowID.startsWith (TMP_ID_PREFIX);
@@ -745,9 +745,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aTable.addHeaderRow ().addCells ("Scheme", "Value", "");
       aTable.setBodyID (sBodyID);
 
-      final IRequestParamMap aIdentifiers = aLEC.getRequestParamMap ().getMap (PREFIX_ENTITY,
-                                                                               sEntityID,
-                                                                               PREFIX_IDENTIFIER);
+      final IRequestParamMap aIdentifiers = aLEC.getRequestParamMap ()
+                                                .getMap (PREFIX_ENTITY, sEntityID, PREFIX_IDENTIFIER);
       if (aIdentifiers != null)
       {
         // Re-show of form
@@ -924,10 +923,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                      @Nonnull final ISMPBusinessCard aCurObject)
   {
     final String sDisplayName = aCurObject.getServiceGroupID ();
-    final HCNodeList ret = new HCNodeList ().addChildren (new HCA (createEditURL (aWPEC, aCurObject))
-                                                                                                     .setTitle ("Edit " +
-                                                                                                                sDisplayName)
-                                                                                                     .addChild (EDefaultIcon.EDIT.getAsNode ()),
+    final HCNodeList ret = new HCNodeList ().addChildren (new HCA (createEditURL (aWPEC,
+                                                                                  aCurObject)).setTitle ("Edit " +
+                                                                                                         sDisplayName)
+                                                                                              .addChild (EDefaultIcon.EDIT.getAsNode ()),
                                                           new HCTextNode (" "),
                                                           new HCA (createCopyURL (aWPEC,
                                                                                   aCurObject)).setTitle ("Create a copy of " +
@@ -952,9 +951,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       ret.addChildren (new HCTextNode (" "),
                        new HCA (aWPEC.getSelfHref ()
                                      .add (CPageParam.PARAM_ACTION, ACTION_PUBLISH_TO_INDEXER)
-                                     .add (CPageParam.PARAM_OBJECT,
-                                           aCurObject.getID ())).setTitle ("Update Business Card in PEPPOL Directory")
-                                                                .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
+                                     .add (CPageParam.PARAM_OBJECT, aCurObject.getID ()))
+                                                                                         .setTitle ("Update Business Card in PEPPOL Directory")
+                                                                                         .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
     }
     return ret;
   }

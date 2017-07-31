@@ -44,8 +44,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -63,7 +63,7 @@ import com.helger.xml.microdom.util.MicroHelper;
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationMicroTypeConverter implements IMicroTypeConverter
+public final class SMPServiceInformationMicroTypeConverter implements IMicroTypeConverter <SMPServiceInformation>
 {
   private static final String ATTR_SERVICE_GROUP_ID = "servicegroupid";
   private static final String ELEMENT_DOCUMENT_TYPE_IDENTIFIER = "doctypeidentifier";
@@ -71,11 +71,10 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   private static final String ELEMENT_EXTENSION = "extension";
 
   @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final Object aObject,
+  public IMicroElement convertToMicroElement (@Nonnull final SMPServiceInformation aValue,
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final ISMPServiceInformation aValue = (ISMPServiceInformation) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_SERVICE_GROUP_ID, aValue.getServiceGroupID ());
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),
@@ -89,8 +88,8 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   }
 
   @Nonnull
-  public static ISMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement,
-                                                        @Nonnull final ISMPServiceGroupProvider aSGProvider)
+  public static SMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement,
+                                                       @Nonnull final ISMPServiceGroupProvider aSGProvider)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);
@@ -100,7 +99,7 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
 
     final SimpleDocumentTypeIdentifier aDocTypeIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_DOCUMENT_TYPE_IDENTIFIER),
                                                                                                 SimpleDocumentTypeIdentifier.class);
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     for (final IMicroElement aProcess : aElement.getAllChildElements (ELEMENT_PROCESS))
       aProcesses.add (MicroTypeConverter.convertToNative (aProcess, SMPProcess.class));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
@@ -109,7 +108,7 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   }
 
   @Nonnull
-  public ISMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement)
+  public SMPServiceInformation convertToNative (@Nonnull final IMicroElement aElement)
   {
     return convertToNative (aElement, SMPMetaManager.getServiceGroupMgr ());
   }

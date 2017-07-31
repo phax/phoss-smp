@@ -24,7 +24,7 @@ import javax.ws.rs.core.HttpHeaders;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.http.basicauth.HTTPBasicAuth;
+import com.helger.http.basicauth.HttpBasicAuth;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 
 /**
@@ -49,6 +49,6 @@ final class RestRequestHelper
                                           "' for user authentication");
 
     final String sAuthHeader = CollectionHelper.getFirstElement (aHeaders);
-    return HTTPBasicAuth.getBasicAuthClientCredentials (sAuthHeader);
+    return HttpBasicAuth.getBasicAuthClientCredentials (sAuthHeader);
   }
 }

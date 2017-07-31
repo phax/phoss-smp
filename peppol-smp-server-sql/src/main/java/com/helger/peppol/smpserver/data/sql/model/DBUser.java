@@ -52,7 +52,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.helger.commons.collection.ext.CommonsHashSet;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.smpserver.domain.user.ISMPUserEditable;
 

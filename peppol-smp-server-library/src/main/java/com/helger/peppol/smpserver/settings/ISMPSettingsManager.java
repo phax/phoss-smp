@@ -58,8 +58,8 @@ public interface ISMPSettingsManager
    * @return A non-<code>null</code> mutable list of callbacks.
    */
   @Nonnull
-  @ReturnsMutableObject ("by design")
-  CallbackList <ISMPSettingsCallback> getCallbacks ();
+  @ReturnsMutableObject
+  CallbackList <ISMPSettingsCallback> callbacks ();
 
   /**
    * @return The contained settings. Never <code>null</code>.

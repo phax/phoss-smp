@@ -60,18 +60,17 @@ import com.helger.xml.microdom.util.MicroHelper;
  *
  * @author Philip Helger
  */
-public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConverter
+public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConverter <SMPServiceGroup>
 {
   private static final String ATTR_OWNER_ID = "ownerid";
   private static final String ELEMENT_PARTICIPANT_ID = "participant";
   private static final String ELEMENT_EXTENSION = "extension";
 
   @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final Object aObject,
+  public IMicroElement convertToMicroElement (@Nonnull final SMPServiceGroup aValue,
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final ISMPServiceGroup aValue = (ISMPServiceGroup) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_OWNER_ID, aValue.getOwnerID ());
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticpantIdentifier (),
@@ -83,8 +82,8 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   }
 
   @Nonnull
-  public static ISMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement,
-                                                  @Nonnull final ISMPUserProvider aUserProvider)
+  public static SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement,
+                                                 @Nonnull final ISMPUserProvider aUserProvider)
   {
     final String sOwnerID = aElement.getAttributeValue (ATTR_OWNER_ID);
     final ISMPUser aOwner = aUserProvider.getUserOfID (sOwnerID);
@@ -104,7 +103,7 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   }
 
   @Nonnull
-  public ISMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement)
+  public SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement)
   {
     return convertToNative (aElement, SMPMetaManager.getUserMgr ());
   }

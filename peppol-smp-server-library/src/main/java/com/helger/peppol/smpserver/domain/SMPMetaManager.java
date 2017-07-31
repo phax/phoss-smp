@@ -49,8 +49,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
-import com.helger.commons.scope.IScope;
-import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.peppol.identifier.factory.BDXRIdentifierFactory;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
@@ -73,6 +71,8 @@ import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.peppol.url.PeppolURLProvider;
+import com.helger.scope.IScope;
+import com.helger.scope.singleton.AbstractGlobalSingleton;
 
 /**
  * The central SMP meta manager containing all the singleton manager instances.
@@ -141,7 +141,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     if (m_aBusinessCardMgr != null)
     {
       // If service group is deleted, also delete respective business card
-      m_aServiceGroupMgr.getServiceGroupCallbacks ().addCallback (new ISMPServiceGroupCallback ()
+      m_aServiceGroupMgr.serviceGroupCallbacks ().add (new ISMPServiceGroupCallback ()
       {
         public void onSMPServiceGroupDeleted (@Nonnull final String sServiceGroupID)
         {

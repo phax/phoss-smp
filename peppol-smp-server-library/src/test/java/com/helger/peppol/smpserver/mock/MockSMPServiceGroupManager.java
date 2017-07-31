@@ -44,7 +44,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -62,7 +62,7 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
 
   @Nonnull
   @ReturnsMutableObject ("by design")
-  public CallbackList <ISMPServiceGroupCallback> getServiceGroupCallbacks ()
+  public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {
     return m_aCBs;
   }

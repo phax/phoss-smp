@@ -24,7 +24,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.state.EContinue;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.ui.SMPLoginManager;
-import com.helger.photon.core.app.CApplication;
+import com.helger.photon.basic.app.CApplicationID;
 import com.helger.photon.core.servlet.AbstractUnifiedResponseFilter;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.util.SecurityHelper;
@@ -46,7 +46,7 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
   @Nonempty
   protected String getApplicationID ()
   {
-    return CApplication.APP_ID_SECURE;
+    return CApplicationID.APP_ID_SECURE;
   }
 
   @Override

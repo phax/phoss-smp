@@ -58,7 +58,7 @@ import com.helger.xml.microdom.util.MicroHelper;
  *
  * @author Philip Helger
  */
-public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter
+public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter <SMPEndpoint>
 {
   private static final String ATTR_TRANSPORT_PROFILE = "transportprofile";
   private static final String ATTR_ENDPOINT_REFERENCE = "endpointref";
@@ -73,11 +73,10 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter
   private static final String ELEMENT_EXTENSION = "extension";
 
   @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final Object aObject,
+  public IMicroElement convertToMicroElement (@Nonnull final SMPEndpoint aValue,
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final ISMPEndpoint aValue = (ISMPEndpoint) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_TRANSPORT_PROFILE, aValue.getTransportProfile ());
     if (StringHelper.hasText (aValue.getEndpointReference ()))
@@ -101,7 +100,7 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter
   }
 
   @Nonnull
-  public ISMPEndpoint convertToNative (@Nonnull final IMicroElement aElement)
+  public SMPEndpoint convertToNative (@Nonnull final IMicroElement aElement)
   {
     final String sTransportProfile = aElement.getAttributeValue (ATTR_TRANSPORT_PROFILE);
     final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);

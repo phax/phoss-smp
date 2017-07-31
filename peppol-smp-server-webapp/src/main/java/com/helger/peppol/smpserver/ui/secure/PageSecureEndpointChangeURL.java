@@ -20,14 +20,14 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
+import com.helger.collection.multimap.MultiHashMapArrayListBased;
+import com.helger.collection.multimap.MultiHashMapHashSetBased;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.ext.CommonsTreeSet;
-import com.helger.commons.collection.ext.ICommonsList;
-import com.helger.commons.collection.ext.ICommonsSet;
-import com.helger.commons.collection.ext.ICommonsSortedSet;
-import com.helger.commons.collection.multimap.MultiHashMapArrayListBased;
-import com.helger.commons.collection.multimap.MultiHashMapHashSetBased;
+import com.helger.commons.collection.impl.CommonsTreeSet;
+import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
+import com.helger.commons.collection.impl.ICommonsSortedSet;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;

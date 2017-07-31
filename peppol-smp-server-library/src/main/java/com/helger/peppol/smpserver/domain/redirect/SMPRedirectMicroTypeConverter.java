@@ -60,7 +60,7 @@ import com.helger.xml.microdom.util.MicroHelper;
  *
  * @author Philip Helger
  */
-public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
+public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter <SMPRedirect>
 {
   private static final String ATTR_SERVICE_GROUPD_ID = "servicegroupid";
   private static final String ELEMENT_DOCUMENT_TYPE_IDENTIFIER = "doctypeidentifier";
@@ -69,11 +69,10 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
   private static final String ELEMENT_EXTENSION = "extension";
 
   @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final Object aObject,
+  public IMicroElement convertToMicroElement (@Nonnull final SMPRedirect aValue,
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final ISMPRedirect aValue = (ISMPRedirect) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_SERVICE_GROUPD_ID, aValue.getServiceGroupID ());
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),
@@ -87,8 +86,8 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
   }
 
   @Nonnull
-  public static ISMPRedirect convertToNative (@Nonnull final IMicroElement aElement,
-                                              @Nonnull final ISMPServiceGroupProvider aSGProvider)
+  public static SMPRedirect convertToNative (@Nonnull final IMicroElement aElement,
+                                             @Nonnull final ISMPServiceGroupProvider aSGProvider)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUPD_ID);
@@ -106,7 +105,7 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter
   }
 
   @Nonnull
-  public ISMPRedirect convertToNative (@Nonnull final IMicroElement aElement)
+  public SMPRedirect convertToNative (@Nonnull final IMicroElement aElement)
   {
     return convertToNative (aElement, SMPMetaManager.getServiceGroupMgr ());
   }

@@ -76,13 +76,13 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.random.RandomHelper;
-import com.helger.commons.scope.singleton.AbstractGlobalSingleton;
 import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
+import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKey;

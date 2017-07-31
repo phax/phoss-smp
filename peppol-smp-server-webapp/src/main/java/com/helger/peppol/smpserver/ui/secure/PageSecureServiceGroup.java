@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;

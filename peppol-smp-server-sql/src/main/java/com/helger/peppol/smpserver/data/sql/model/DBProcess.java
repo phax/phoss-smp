@@ -60,7 +60,7 @@ import javax.persistence.Transient;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.collection.ext.CommonsHashSet;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.peppol.smp.ExtensionType;
 import com.helger.peppol.smp.SMPExtensionConverter;

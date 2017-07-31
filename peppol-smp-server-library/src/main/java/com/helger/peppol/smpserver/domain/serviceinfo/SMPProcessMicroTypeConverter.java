@@ -44,8 +44,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.ext.CommonsArrayList;
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
@@ -58,18 +58,17 @@ import com.helger.xml.microdom.util.MicroHelper;
  *
  * @author Philip Helger
  */
-public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter
+public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter <SMPProcess>
 {
   private static final String ELEMENT_PROCESS_IDENTIFIER = "processidentifier";
   private static final String ELEMENT_ENDPOINT = "endpoint";
   private static final String ELEMENT_EXTENSION = "extension";
 
   @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final Object aObject,
+  public IMicroElement convertToMicroElement (@Nonnull final SMPProcess aValue,
                                               @Nullable final String sNamespaceURI,
                                               @Nonnull @Nonempty final String sTagName)
   {
-    final ISMPProcess aValue = (ISMPProcess) aObject;
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getProcessIdentifier (),
                                                                     sNamespaceURI,
@@ -82,7 +81,7 @@ public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter
   }
 
   @Nonnull
-  public ISMPProcess convertToNative (@Nonnull final IMicroElement aElement)
+  public SMPProcess convertToNative (@Nonnull final IMicroElement aElement)
   {
     final SimpleProcessIdentifier aProcessIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PROCESS_IDENTIFIER),
                                                                                            SimpleProcessIdentifier.class);

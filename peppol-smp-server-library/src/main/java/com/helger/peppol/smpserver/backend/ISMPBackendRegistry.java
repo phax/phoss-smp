@@ -43,7 +43,7 @@ package com.helger.peppol.smpserver.backend;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.factory.IFactory;
+import com.helger.commons.functional.ISupplier;
 import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 
 /**
@@ -66,5 +66,5 @@ public interface ISMPBackendRegistry
    * @throws IllegalArgumentException
    *         If another backend with the same ID is already registered.
    */
-  void registerSMPBackend (@Nonnull @Nonempty String sID, @Nonnull IFactory <? extends ISMPManagerProvider> aFactory);
+  void registerSMPBackend (@Nonnull @Nonempty String sID, @Nonnull ISupplier <? extends ISMPManagerProvider> aFactory);
 }

@@ -50,11 +50,11 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.ext.CommonsLinkedHashMap;
-import com.helger.commons.collection.ext.ICommonsMap;
-import com.helger.commons.collection.ext.ICommonsSet;
+import com.helger.commons.collection.impl.CommonsLinkedHashMap;
+import com.helger.commons.collection.impl.ICommonsMap;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
-import com.helger.commons.factory.IFactory;
+import com.helger.commons.functional.ISupplier;
 import com.helger.commons.lang.ServiceLoaderHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
@@ -80,7 +80,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   private static boolean s_bDefaultInstantiated = false;
 
   private final SimpleReadWriteLock m_aRWLock = new SimpleReadWriteLock ();
-  private final ICommonsMap <String, IFactory <? extends ISMPManagerProvider>> m_aMap = new CommonsLinkedHashMap <> ();
+  private final ICommonsMap <String, ISupplier <? extends ISMPManagerProvider>> m_aMap = new CommonsLinkedHashMap <> ();
 
   private SMPBackendRegistry ()
   {
@@ -104,7 +104,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   }
 
   public void registerSMPBackend (@Nonnull @Nonempty final String sID,
-                                  @Nonnull final IFactory <? extends ISMPManagerProvider> aFactory)
+                                  @Nonnull final ISupplier <? extends ISMPManagerProvider> aFactory)
   {
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (aFactory, "Factory");
@@ -131,7 +131,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     if (StringHelper.hasNoText (sBackendID))
       return null;
 
-    final IFactory <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLocked ( () -> m_aMap.get (sBackendID));
+    final ISupplier <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLocked ( () -> m_aMap.get (sBackendID));
     return aFactory == null ? null : aFactory.get ();
   }
 

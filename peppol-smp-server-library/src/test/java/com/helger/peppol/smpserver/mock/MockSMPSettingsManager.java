@@ -55,7 +55,7 @@ import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 final class MockSMPSettingsManager implements ISMPSettingsManager
 {
   @UnsupportedOperation
-  public CallbackList <ISMPSettingsCallback> getCallbacks ()
+  public CallbackList <ISMPSettingsCallback> callbacks ()
   {
     throw new UnsupportedOperationException ();
   }
