@@ -79,7 +79,7 @@ import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 
 public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager implements ISMPServiceGroupManager
 {
-  private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList<> ();
+  private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
   public SQLServiceGroupManager ()
   {}
@@ -144,7 +144,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
 
@@ -212,7 +212,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return EChange.UNCHANGED;
     }
 
@@ -265,7 +265,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return EChange.UNCHANGED;
     }
 
@@ -295,7 +295,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                                       DBServiceGroup.class)
                                                                         .getResultList ();
 
-      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList<> ();
+      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
         final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
@@ -313,7 +313,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
     return ret.get ();
@@ -333,7 +333,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                         .setParameter ("user", sOwnerID)
                                                                         .getResultList ();
 
-      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList<> ();
+      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
         final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,
@@ -345,7 +345,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
     return ret.get ();
@@ -366,7 +366,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -399,7 +399,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
     return ret.get ();
@@ -418,7 +418,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     JPAExecutionResult <Boolean> ret;
     ret = doSelect ( () -> {
       // Disable caching here
-      final ICommonsMap <String, Object> aProps = new CommonsHashMap<> ();
+      final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
       final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
                                                                        new DBServiceGroupID (aParticipantIdentifier),
@@ -427,7 +427,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return false;
     }
     return ret.get ().booleanValue ();
@@ -446,7 +446,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return 0;
     }
     return ret.get ().intValue ();

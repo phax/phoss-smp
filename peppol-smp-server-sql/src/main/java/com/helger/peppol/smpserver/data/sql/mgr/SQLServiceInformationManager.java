@@ -87,8 +87,8 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
  *
  * @author Philip Helger
  */
-public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledManager
-                                                implements ISMPServiceInformationManager
+public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledManager implements
+                                                ISMPServiceInformationManager
 {
   public SQLServiceInformationManager ()
   {}
@@ -99,7 +99,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   {
     // For all DB processes
     // Create a copy to avoid concurrent modification
-    for (final DBProcess aDBProcess : new CommonsArrayList<> (aDBMetadata.getProcesses ()))
+    for (final DBProcess aDBProcess : new CommonsArrayList <> (aDBMetadata.getProcesses ()))
     {
       boolean bProcessFound = false;
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
@@ -263,7 +263,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
     }
   }
 
@@ -309,7 +309,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -333,7 +333,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -374,7 +374,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -384,10 +384,10 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   private static SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
   {
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
+    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
     {
-      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
+      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
       for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
       {
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBEndpoint.getId ().getTransportProfile (),
@@ -425,11 +425,11 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                      .getResultList ());
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
 
-    final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
+    final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
     for (final DBServiceMetadata aDBMetadata : ret.get ())
       aServiceInformations.add (_convert (aDBMetadata));
     return aServiceInformations;
@@ -445,7 +445,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -455,7 +455,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList<> ();
+    final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
       JPAExecutionResult <List <DBServiceMetadata>> ret;
@@ -470,7 +470,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                        .getResultList ());
       if (ret.hasThrowable ())
       {
-        getExceptionHandler ().onException (ret.getThrowable ());
+        exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
         return null;
       }
 
@@ -484,7 +484,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   @ReturnsMutableCopy
   public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList<> ();
+    final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
       for (final ISMPServiceInformation aServiceInformation : getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
@@ -503,7 +503,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     JPAExecutionResult <DBServiceMetadata> ret;
     ret = doInTransaction ( () -> {
       // Disable caching here
-      final ICommonsMap <String, Object> aProps = new CommonsHashMap<> ();
+      final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
       final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceGroup.getParticpantIdentifier (),
                                                                          aDocTypeID);
@@ -511,7 +511,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
     return ret.get ();

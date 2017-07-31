@@ -111,7 +111,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   @Nonnull
   public static ICommonsList <SMPBusinessCardIdentifier> getJsonAsBCI (@Nullable final String sJson)
   {
-    final ICommonsList <SMPBusinessCardIdentifier> ret = new CommonsArrayList<> ();
+    final ICommonsList <SMPBusinessCardIdentifier> ret = new CommonsArrayList <> ();
     final IJson aJson = sJson == null ? null : JsonReader.readFromString (sJson);
     if (aJson != null && aJson.isArray ())
       for (final IJson aItem : aJson.getAsArray ())
@@ -134,7 +134,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   @Nonnull
   public static ICommonsList <String> getJsonAsString (@Nullable final String sJson)
   {
-    final ICommonsList <String> ret = new CommonsArrayList<> ();
+    final ICommonsList <String> ret = new CommonsArrayList <> ();
     final IJson aJson = sJson == null ? null : JsonReader.readFromString (sJson);
     if (aJson != null && aJson.isArray ())
       for (final IJson aItem : aJson.getAsArray ())
@@ -162,7 +162,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   @Nonnull
   public static ICommonsList <SMPBusinessCardContact> getJsonAsBCC (@Nullable final String sJson)
   {
-    final ICommonsList <SMPBusinessCardContact> ret = new CommonsArrayList<> ();
+    final ICommonsList <SMPBusinessCardContact> ret = new CommonsArrayList <> ();
     final IJson aJson = sJson == null ? null : JsonReader.readFromString (sJson);
     if (aJson != null && aJson.isArray ())
       for (final IJson aItem : aJson.getAsArray ())
@@ -223,7 +223,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
 
@@ -255,7 +255,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return EChange.UNCHANGED;
     }
 
@@ -270,7 +270,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                     @Nonnull final List <DBBusinessCardEntity> aDBEntities)
   {
     final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aID);
-    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList<> ();
+    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
     for (final DBBusinessCardEntity aDBEntity : aDBEntities)
     {
       final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aDBEntity.getId ());
@@ -297,17 +297,17 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                                      .getResultList ());
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
 
     /// Group by ID
-    final IMultiMapListBased <IParticipantIdentifier, DBBusinessCardEntity> aGrouped = new MultiHashMapArrayListBased<> ();
+    final IMultiMapListBased <IParticipantIdentifier, DBBusinessCardEntity> aGrouped = new MultiHashMapArrayListBased <> ();
     for (final DBBusinessCardEntity aDBItem : ret.get ())
       aGrouped.putSingle (aDBItem.getAsBusinessIdentifier (), aDBItem);
 
     // Convert
-    final ICommonsList <ISMPBusinessCard> aRedirects = new CommonsArrayList<> ();
+    final ICommonsList <ISMPBusinessCard> aRedirects = new CommonsArrayList <> ();
     for (final Map.Entry <IParticipantIdentifier, ICommonsList <DBBusinessCardEntity>> aEntry : aGrouped.entrySet ())
       aRedirects.add (_convert (aEntry.getKey (), aEntry.getValue ()));
     return aRedirects;
@@ -328,7 +328,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                                      .getResultList ());
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
 
@@ -361,7 +361,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return 0;
     }
 

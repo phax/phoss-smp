@@ -133,7 +133,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
     return new SMPRedirect (aServiceGroup, aDocumentTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, sExtension);
@@ -160,7 +160,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -184,7 +184,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -211,11 +211,11 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                                                      .getResultList ());
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
 
-    final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList<> ();
+    final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList <> ();
     for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
       aRedirects.add (_convert (aDBRedirect));
     return aRedirects;
@@ -225,7 +225,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList<> ();
+    final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
       JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
@@ -240,7 +240,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                                                        .getResultList ());
       if (ret.hasThrowable ())
       {
-        getExceptionHandler ().onException (ret.getThrowable ());
+        exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
         return null;
       }
 
@@ -260,7 +260,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -278,7 +278,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     JPAExecutionResult <DBServiceMetadataRedirection> ret;
     ret = doInTransaction ( () -> {
       // Disable caching here
-      final ICommonsMap <String, Object> aProps = new CommonsHashMap<> ();
+      final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
       final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
                                                                                                aDocTypeID);
@@ -286,7 +286,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
     final DBServiceMetadataRedirection aDBRedirect = ret.get ();

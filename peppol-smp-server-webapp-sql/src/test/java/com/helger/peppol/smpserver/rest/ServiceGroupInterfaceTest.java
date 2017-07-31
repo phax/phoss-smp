@@ -40,6 +40,7 @@ import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.db.jpa.JPAEnabledManager;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -49,9 +50,7 @@ import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smpclient.SMPClient;
 import com.helger.peppol.smpclient.exception.SMPClientException;
 import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
-import com.helger.peppol.smpserver.data.sql.mgr.SQLServiceGroupManager;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.mock.MockSMPClient;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
 
@@ -182,8 +181,7 @@ public final class ServiceGroupInterfaceTest
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
-    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    ((SQLServiceGroupManager) aSGMgr).setExceptionHandler (x -> {});
+    JPAEnabledManager.exceptionCallbacks ().removeAll ();
     final SMPClient aSMPClient = new MockSMPClient ();
 
     // GET

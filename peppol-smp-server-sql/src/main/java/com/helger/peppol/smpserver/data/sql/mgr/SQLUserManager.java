@@ -122,7 +122,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
     });
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -136,10 +136,10 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
     ret = doSelect ( () -> getEntityManager ().createQuery ("SELECT p FROM DBUser p", DBUser.class).getResultList ());
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
-    return new CommonsArrayList<> (ret.get ());
+    return new CommonsArrayList <> (ret.get ());
   }
 
   @Nullable
@@ -152,7 +152,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
     ret = doSelect ( () -> getEntityManager ().find (DBUser.class, sID));
     if (ret.hasThrowable ())
     {
-      getExceptionHandler ().onException (ret.getThrowable ());
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
       return null;
     }
     return ret.get ();
