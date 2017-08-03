@@ -102,7 +102,7 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setRESTWritableAPIDisabled (final boolean bRESTWritableAPIDisabled)
   {
-    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_REST_WRITABLE_API_DISABLED, bRESTWritableAPIDisabled);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_REST_WRITABLE_API_DISABLED, bRESTWritableAPIDisabled);
   }
 
   public boolean isPEPPOLDirectoryIntegrationEnabled ()
@@ -114,8 +114,8 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setPEPPOLDirectoryIntegrationEnabled (final boolean bPEPPOLDirectoryIntegrationEnabled)
   {
-    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
-                                 bPEPPOLDirectoryIntegrationEnabled);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
+                              bPEPPOLDirectoryIntegrationEnabled);
   }
 
   public boolean isPEPPOLDirectoryIntegrationAutoUpdate ()
@@ -127,8 +127,8 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setPEPPOLDirectoryIntegrationAutoUpdate (final boolean bPEPPOLDirectoryIntegrationAutoUpdate)
   {
-    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                 bPEPPOLDirectoryIntegrationAutoUpdate);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                              bPEPPOLDirectoryIntegrationAutoUpdate);
   }
 
   @Nonnull
@@ -141,7 +141,7 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setPEPPOLDirectoryHostName (@Nullable final String sPEPPOLDirectoryHostName)
   {
-    return m_aSettings.setValue (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, sPEPPOLDirectoryHostName);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, sPEPPOLDirectoryHostName);
   }
 
   public boolean isWriteToSML ()
@@ -152,7 +152,7 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setWriteToSML (final boolean bWriteToSML)
   {
-    return m_aSettings.setValue (SMPServerConfiguration.KEY_SML_ACTIVE, bWriteToSML);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_ACTIVE, bWriteToSML);
   }
 
   @Nullable
@@ -164,7 +164,7 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setSMLURL (@Nullable final String sSMLURL)
   {
-    return m_aSettings.setValue (SMPServerConfiguration.KEY_SML_URL, sSMLURL);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_URL, sSMLURL);
   }
 
   @Nonnull
@@ -178,7 +178,7 @@ public class SMPSettings implements ISMPSettings
   {
     ValueEnforcer.notNull (aSettings, "settings");
     m_aSettings.clear ();
-    m_aSettings.setValues (aSettings);
+    m_aSettings.putAllIn (aSettings);
   }
 
   @Override
