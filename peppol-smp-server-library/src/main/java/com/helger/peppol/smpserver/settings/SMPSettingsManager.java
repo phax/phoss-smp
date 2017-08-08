@@ -47,8 +47,8 @@ import javax.annotation.concurrent.ThreadSafe;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
-import com.helger.photon.basic.app.dao.impl.AbstractSimpleDAO;
-import com.helger.photon.basic.app.dao.impl.DAOException;
+import com.helger.dao.DAOException;
+import com.helger.photon.basic.app.dao.AbstractPhotonSimpleDAO;
 import com.helger.settings.ISettings;
 import com.helger.settings.Settings;
 import com.helger.settings.exchange.xml.SettingsMicroDocumentConverter;
@@ -64,7 +64,7 @@ import com.helger.xml.microdom.MicroDocument;
  * @author Philip Helger
  */
 @ThreadSafe
-public class SMPSettingsManager extends AbstractSimpleDAO implements ISMPSettingsManager
+public class SMPSettingsManager extends AbstractPhotonSimpleDAO implements ISMPSettingsManager
 {
   private final SMPSettings m_aSettings = new SMPSettings ();
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();

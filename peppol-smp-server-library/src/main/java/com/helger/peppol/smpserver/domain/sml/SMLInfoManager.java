@@ -48,15 +48,15 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
+import com.helger.dao.DAOException;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
-import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
-import com.helger.photon.basic.app.dao.impl.DAOException;
+import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.basic.audit.AuditHelper;
 
-public final class SMLInfoManager extends AbstractMapBasedWALDAO <ISMLInfo, SMLInfo> implements ISMLInfoManager
+public final class SMLInfoManager extends AbstractPhotonMapBasedWALDAO <ISMLInfo, SMLInfo> implements ISMLInfoManager
 {
   public SMLInfoManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {

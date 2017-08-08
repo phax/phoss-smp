@@ -29,6 +29,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
+import com.helger.dao.DAOException;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -38,8 +39,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
-import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
-import com.helger.photon.basic.app.dao.impl.DAOException;
+import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.basic.audit.AuditHelper;
 
 /**
@@ -48,7 +48,7 @@ import com.helger.photon.basic.audit.AuditHelper;
  * @author Philip Helger
  */
 public final class XMLServiceInformationManager extends
-                                                AbstractMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
+                                                AbstractPhotonMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
                                                 implements
                                                 ISMPServiceInformationManager
 {

@@ -30,6 +30,7 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
+import com.helger.dao.DAOException;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
@@ -42,16 +43,16 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
-import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
-import com.helger.photon.basic.app.dao.impl.DAOException;
+import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.basic.audit.AuditHelper;
 
-public final class XMLServiceGroupManager extends AbstractMapBasedWALDAO <ISMPServiceGroup, SMPServiceGroup>
-                                          implements ISMPServiceGroupManager
+public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <ISMPServiceGroup, SMPServiceGroup>
+                                          implements
+                                          ISMPServiceGroupManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceGroupManager.class);
 
-  private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList<> ();
+  private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
   public XMLServiceGroupManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {

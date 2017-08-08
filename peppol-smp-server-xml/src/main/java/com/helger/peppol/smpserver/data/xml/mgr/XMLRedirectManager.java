@@ -32,13 +32,13 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
+import com.helger.dao.DAOException;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
-import com.helger.photon.basic.app.dao.impl.DAOException;
+import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.basic.audit.AuditHelper;
 
 /**
@@ -46,8 +46,8 @@ import com.helger.photon.basic.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedirect, SMPRedirect>
-                                      implements ISMPRedirectManager
+public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements
+                                      ISMPRedirectManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceInformationManager.class);
 
@@ -227,7 +227,7 @@ public final class XMLRedirectManager extends AbstractMapBasedWALDAO <ISMPRedire
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {
-    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList<> ();
+    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (StringHelper.hasText (sServiceGroupID))
       findAll (x -> x.getServiceGroupID ().equals (sServiceGroupID), ret::add);
     return ret;

@@ -33,13 +33,13 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
+import com.helger.dao.DAOException;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.photon.basic.app.dao.impl.AbstractMapBasedWALDAO;
-import com.helger.photon.basic.app.dao.impl.DAOException;
+import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.basic.audit.AuditHelper;
 
 /**
@@ -47,8 +47,9 @@ import com.helger.photon.basic.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class XMLBusinessCardManager extends AbstractMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard>
-                                          implements ISMPBusinessCardManager
+public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard>
+                                          implements
+                                          ISMPBusinessCardManager
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLBusinessCardManager.class);
 

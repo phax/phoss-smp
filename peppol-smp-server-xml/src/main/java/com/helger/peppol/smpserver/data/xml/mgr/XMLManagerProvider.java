@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.dao.DAOException;
 import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
@@ -32,7 +33,6 @@ import com.helger.peppol.smpserver.domain.transportprofile.SMPTransportProfileMa
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.smpserver.settings.SMPSettingsManager;
-import com.helger.photon.basic.app.dao.impl.DAOException;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.
