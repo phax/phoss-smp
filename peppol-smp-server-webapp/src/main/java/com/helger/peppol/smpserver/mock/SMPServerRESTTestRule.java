@@ -68,10 +68,15 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
   @Override
   public void after ()
   {
-    m_aTarget = null;
-    m_aServer.shutdownNow ();
-
-    super.after ();
+    try
+    {
+      m_aTarget = null;
+      m_aServer.shutdownNow ();
+    }
+    finally
+    {
+      super.after ();
+    }
   }
 
   @Nonnull
