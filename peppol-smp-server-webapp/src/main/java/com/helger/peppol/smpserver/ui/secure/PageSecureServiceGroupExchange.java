@@ -463,7 +463,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       final IFileItem aImportFile = aWPEC.params ().getAsFileItem (FIELD_IMPORT_FILE);
       final boolean bOverwriteExisting = aWPEC.params ().isCheckBoxChecked (FIELD_OVERWRITE_EXISTING,
                                                                             DEFAULT_OVERWRITE_EXISTING);
-      final String sDefaultOwnerID = aWPEC.getAttributeAsString (FIELD_DEFAULT_OWNER);
+      final String sDefaultOwnerID = aWPEC.params ().getAsString (FIELD_DEFAULT_OWNER);
       final ISMPUser aDefaultOwner = aUserMgr.getUserOfID (sDefaultOwnerID);
 
       if (aImportFile == null || aImportFile.getSize () == 0)

@@ -122,10 +122,10 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final boolean bPEPPOLDirectoryIntegrationAutoUpdate = aWPEC.params ()
                                                                .isCheckBoxChecked (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                                                                    SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE);
-    final String sPEPPOLDirectoryHostName = aWPEC.getAttributeAsString (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME);
+    final String sPEPPOLDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME);
     final boolean bSMLActive = aWPEC.params ().isCheckBoxChecked (FIELD_SML_ACTIVE,
                                                                   SMPServerConfiguration.DEFAULT_SML_ACTIVE);
-    final String sSMLURL = aWPEC.getAttributeAsString (FIELD_SML_URL);
+    final String sSMLURL = aWPEC.params ().getAsString (FIELD_SML_URL);
 
     if (StringHelper.hasNoText (sPEPPOLDirectoryHostName))
       aFormErrors.addFieldError (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME, "PEPPOL Directory hostname may not be empty.");

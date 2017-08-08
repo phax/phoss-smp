@@ -243,8 +243,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                           final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
                           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-                          final String sProcessIDScheme = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_SCHEME);
-                          final String sProcessIDValue = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
+                          final String sProcessIDScheme = aWPEC.params ().getAsString (FIELD_PROCESS_ID_SCHEME);
+                          final String sProcessIDValue = aWPEC.params ().getAsString (FIELD_PROCESS_ID_VALUE);
                           final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (sProcessIDScheme,
                                                                                                             sProcessIDValue);
                           final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);
@@ -296,12 +296,12 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-    final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
+    final String sServiceGroupID = aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
 
-    final String sDocTypeIDScheme = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_SCHEME);
-    final String sDocTypeIDValue = aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_VALUE);
+    final String sDocTypeIDScheme = aWPEC.params ().getAsString (FIELD_DOCTYPE_ID_SCHEME);
+    final String sDocTypeIDValue = aWPEC.params ().getAsString (FIELD_DOCTYPE_ID_VALUE);
     final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (sDocTypeIDScheme,
                                                                                                 sDocTypeIDValue);
     return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
@@ -318,14 +318,14 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
         eFormAction == EWebPageFormAction.DELETE)
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final String sProcessIDScheme = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_SCHEME);
-      final String sProcessIDValue = aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
+      final String sProcessIDScheme = aWPEC.params ().getAsString (FIELD_PROCESS_ID_SCHEME);
+      final String sProcessIDValue = aWPEC.params ().getAsString (FIELD_PROCESS_ID_VALUE);
       final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (sProcessIDScheme,
                                                                                         sProcessIDValue);
       final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
-        final String sTransportProfile = aWPEC.getAttributeAsString (FIELD_TRANSPORT_PROFILE);
+        final String sTransportProfile = aWPEC.params ().getAsString (FIELD_TRANSPORT_PROFILE);
         final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfile);
         if (aEndpoint != null)
         {
@@ -507,36 +507,36 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
-                                         : aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP_ID);
+                                         : aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
 
     final String sDocTypeIDScheme = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getScheme ()
-                                          : aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_SCHEME);
+                                          : aWPEC.params ().getAsString (FIELD_DOCTYPE_ID_SCHEME);
     final String sDocTypeIDValue = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getValue ()
-                                         : aWPEC.getAttributeAsString (FIELD_DOCTYPE_ID_VALUE);
+                                         : aWPEC.params ().getAsString (FIELD_DOCTYPE_ID_VALUE);
     IDocumentTypeIdentifier aDocTypeID = null;
     final String sProcessIDScheme = bEdit ? aSelectedProcess.getProcessIdentifier ().getScheme ()
-                                          : aWPEC.getAttributeAsString (FIELD_PROCESS_ID_SCHEME);
+                                          : aWPEC.params ().getAsString (FIELD_PROCESS_ID_SCHEME);
     final String sProcessIDValue = bEdit ? aSelectedProcess.getProcessIdentifier ().getValue ()
-                                         : aWPEC.getAttributeAsString (FIELD_PROCESS_ID_VALUE);
+                                         : aWPEC.params ().getAsString (FIELD_PROCESS_ID_VALUE);
     IProcessIdentifier aProcessID = null;
 
     final String sTransportProfileID = bEdit ? aSelectedEndpoint.getTransportProfile ()
-                                             : aWPEC.getAttributeAsString (FIELD_TRANSPORT_PROFILE);
+                                             : aWPEC.params ().getAsString (FIELD_TRANSPORT_PROFILE);
     final ISMPTransportProfile aTransportProfile = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfileID);
-    final String sEndpointReference = aWPEC.getAttributeAsString (FIELD_ENDPOINT_REFERENCE);
+    final String sEndpointReference = aWPEC.params ().getAsString (FIELD_ENDPOINT_REFERENCE);
     final boolean bRequireBusinessLevelSignature = aWPEC.params ()
                                                         .getAsBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
-    final String sMinimumAuthenticationLevel = aWPEC.getAttributeAsString (FIELD_MINIMUM_AUTHENTICATION_LEVEL);
-    final String sNotBefore = aWPEC.getAttributeAsString (FIELD_NOT_BEFORE);
+    final String sMinimumAuthenticationLevel = aWPEC.params ().getAsString (FIELD_MINIMUM_AUTHENTICATION_LEVEL);
+    final String sNotBefore = aWPEC.params ().getAsString (FIELD_NOT_BEFORE);
     final LocalDate aNotBeforeDate = PDTFromString.getLocalDateFromString (sNotBefore, aDisplayLocale);
-    final String sNotAfter = aWPEC.getAttributeAsString (FIELD_NOT_AFTER);
+    final String sNotAfter = aWPEC.params ().getAsString (FIELD_NOT_AFTER);
     final LocalDate aNotAfterDate = PDTFromString.getLocalDateFromString (sNotAfter, aDisplayLocale);
-    final String sCertificate = aWPEC.getAttributeAsString (FIELD_CERTIFICATE);
-    final String sServiceDescription = aWPEC.getAttributeAsString (FIELD_SERVICE_DESCRIPTION);
-    final String sTechnicalContact = aWPEC.getAttributeAsString (FIELD_TECHNICAL_CONTACT);
-    final String sTechnicalInformation = aWPEC.getAttributeAsString (FIELD_TECHNICAL_INFORMATION);
-    final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
+    final String sCertificate = aWPEC.params ().getAsString (FIELD_CERTIFICATE);
+    final String sServiceDescription = aWPEC.params ().getAsString (FIELD_SERVICE_DESCRIPTION);
+    final String sTechnicalContact = aWPEC.params ().getAsString (FIELD_TECHNICAL_CONTACT);
+    final String sTechnicalInformation = aWPEC.params ().getAsString (FIELD_TECHNICAL_INFORMATION);
+    final String sExtension = aWPEC.params ().getAsString (FIELD_EXTENSION);
 
     // validations
     if (StringHelper.hasNoText (sServiceGroupID))

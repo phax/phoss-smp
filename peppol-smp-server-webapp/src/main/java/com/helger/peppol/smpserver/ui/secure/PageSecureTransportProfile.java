@@ -179,8 +179,8 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
 
     // Never edit ID
-    final String sID = bEdit ? aSelectedObject.getID () : aWPEC.getAttributeAsString (FIELD_ID);
-    final String sName = aWPEC.getAttributeAsString (FIELD_NAME);
+    final String sID = bEdit ? aSelectedObject.getID () : aWPEC.params ().getAsString (FIELD_ID);
+    final String sName = aWPEC.params ().getAsString (FIELD_NAME);
 
     // validations
     if (StringHelper.hasNoText (sID))

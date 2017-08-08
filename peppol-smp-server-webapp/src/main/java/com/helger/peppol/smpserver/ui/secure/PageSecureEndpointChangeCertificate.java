@@ -179,11 +179,11 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       bShowList = false;
       final FormErrorList aFormErrors = new FormErrorList ();
 
-      final String sOldCert = aWPEC.getAttributeAsString (FIELD_OLD_CERTIFICATE);
+      final String sOldCert = aWPEC.params ().getAsString (FIELD_OLD_CERTIFICATE);
 
       if (aWPEC.hasSubAction (CPageParam.ACTION_SAVE))
       {
-        final String sNewCert = aWPEC.getAttributeAsString (FIELD_NEW_CERTIFICATE);
+        final String sNewCert = aWPEC.params ().getAsString (FIELD_NEW_CERTIFICATE);
 
         if (StringHelper.hasNoText (sOldCert))
           aFormErrors.addFieldInfo (FIELD_OLD_CERTIFICATE, "An old certificate must be provided");

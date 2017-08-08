@@ -38,7 +38,7 @@ public final class AjaxExecutorSecureCreateBusinessCardIdentifierInput extends A
   @Nonnull
   protected AjaxHtmlResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
   {
-    final String sEntityID = aLEC.getAttributeAsString (PARAM_ENTITY_ID);
+    final String sEntityID = aLEC.params ().getAsString (PARAM_ENTITY_ID);
 
     final IHCNode aNode = PageSecureBusinessCard.createIdentifierInputForm (aLEC,
                                                                              sEntityID,

@@ -139,12 +139,12 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       bShowList = false;
       final FormErrorList aFormErrors = new FormErrorList ();
 
-      final String sOldURL = aWPEC.getAttributeAsString (FIELD_OLD_URL);
+      final String sOldURL = aWPEC.params ().getAsString (FIELD_OLD_URL);
 
       if (aWPEC.hasSubAction (CPageParam.ACTION_SAVE))
       {
         // Find selected service group (if any)
-        final String sServiceGroupID = aWPEC.getAttributeAsString (FIELD_SERVICE_GROUP);
+        final String sServiceGroupID = aWPEC.params ().getAsString (FIELD_SERVICE_GROUP);
         ISMPServiceGroup aServiceGroup = null;
         if (StringHelper.hasText (sServiceGroupID))
         {
@@ -153,7 +153,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
             aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
         }
 
-        final String sNewURL = aWPEC.getAttributeAsString (FIELD_NEW_URL);
+        final String sNewURL = aWPEC.params ().getAsString (FIELD_NEW_URL);
 
         if (StringHelper.hasNoText (sOldURL))
           aFormErrors.addFieldInfo (FIELD_OLD_URL, "An old URL must be provided");

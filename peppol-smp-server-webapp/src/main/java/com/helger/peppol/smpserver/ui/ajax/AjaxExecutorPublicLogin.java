@@ -52,8 +52,8 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutorJson
   @Nonnull
   protected AjaxJsonResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
   {
-    final String sLoginName = aLEC.getAttributeAsString (CLogin.REQUEST_ATTR_USERID);
-    final String sPassword = aLEC.getAttributeAsString (CLogin.REQUEST_ATTR_PASSWORD);
+    final String sLoginName = aLEC.params ().getAsString (CLogin.REQUEST_ATTR_USERID);
+    final String sPassword = aLEC.params ().getAsString (CLogin.REQUEST_ATTR_PASSWORD);
 
     // Main login
     final ELoginResult eLoginResult = LoggedInUserManager.getInstance ().loginUser (sLoginName,

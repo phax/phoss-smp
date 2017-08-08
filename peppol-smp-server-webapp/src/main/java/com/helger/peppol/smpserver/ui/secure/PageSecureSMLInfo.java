@@ -206,9 +206,9 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
     final boolean bEdit = eFormAction.isEdit ();
     final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
 
-    final String sDisplayName = aWPEC.getAttributeAsString (FIELD_DISPLAY_NAME);
-    final String sDNSZone = aWPEC.getAttributeAsString (FIELD_DNS_ZONE);
-    final String sManagementAddressURL = aWPEC.getAttributeAsString (FIELD_MANAGEMENT_ADDRESS_URL);
+    final String sDisplayName = aWPEC.params ().getAsString (FIELD_DISPLAY_NAME);
+    final String sDNSZone = aWPEC.params ().getAsString (FIELD_DNS_ZONE);
+    final String sManagementAddressURL = aWPEC.params ().getAsString (FIELD_MANAGEMENT_ADDRESS_URL);
     final boolean bClientCertificateRequired = aWPEC.params ().isCheckBoxChecked (FIELD_CLIENT_CERTIFICATE_REQUIRED,
                                                                                   true);
 

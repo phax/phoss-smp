@@ -415,12 +415,12 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-    final String sParticipantIDScheme = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID_SCHEME);
-    final String sParticipantIDValue = aWPEC.getAttributeAsString (FIELD_PARTICIPANT_ID_VALUE);
+    final String sParticipantIDScheme = aWPEC.params ().getAsString (FIELD_PARTICIPANT_ID_SCHEME);
+    final String sParticipantIDValue = aWPEC.params ().getAsString (FIELD_PARTICIPANT_ID_VALUE);
     IParticipantIdentifier aParticipantID = null;
-    final String sOwningUserID = aWPEC.getAttributeAsString (FIELD_OWNING_USER_ID);
+    final String sOwningUserID = aWPEC.params ().getAsString (FIELD_OWNING_USER_ID);
     final ISMPUser aOwningUser = SMPMetaManager.getUserMgr ().getUserOfID (sOwningUserID);
-    final String sExtension = aWPEC.getAttributeAsString (FIELD_EXTENSION);
+    final String sExtension = aWPEC.params ().getAsString (FIELD_EXTENSION);
 
     // validations
     if (aIdentifierFactory.isParticipantIdentifierSchemeMandatory () && StringHelper.hasNoText (sParticipantIDScheme))

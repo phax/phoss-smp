@@ -182,8 +182,8 @@ public class PageSecureUser extends AbstractSMPWebPageForm <ISMPUserEditable>
   {
     final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
     final boolean bEdit = eFormAction.isEdit ();
-    final String sUserName = bEdit ? aSelectedObject.getUserName () : aWPEC.getAttributeAsString (FIELD_USERNAME);
-    final String sPassword = aWPEC.getAttributeAsString (FIELD_PASSWORD);
+    final String sUserName = bEdit ? aSelectedObject.getUserName () : aWPEC.params ().getAsString (FIELD_USERNAME);
+    final String sPassword = aWPEC.params ().getAsString (FIELD_PASSWORD);
 
     if (StringHelper.hasNoText (sUserName))
       aFormErrors.addFieldError (FIELD_USERNAME, "The user name may not be empty!");
