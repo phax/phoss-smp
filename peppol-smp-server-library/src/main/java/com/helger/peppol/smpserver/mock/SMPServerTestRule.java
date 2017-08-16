@@ -44,10 +44,6 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-import org.slf4j.LoggerFactory;
-
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.commons.url.SMap;
@@ -77,34 +73,6 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
                                          sSMPServerPropertiesPath);
       SMPServerConfiguration.reloadConfiguration ();
     }
-  }
-
-  // Change to "apply" when something fails :)
-  public Statement _apply (final Statement base, final Description description)
-  {
-    return new Statement ()
-    {
-      @Override
-      public void evaluate () throws Throwable
-      {
-        try
-        {
-          before ();
-          try
-          {
-            base.evaluate ();
-          }
-          finally
-          {
-            after ();
-          }
-        }
-        catch (final Throwable t)
-        {
-          LoggerFactory.getLogger ("root").error ("Test execution error: " + description, t);
-        }
-      }
-    };
   }
 
   @Override
