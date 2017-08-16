@@ -79,8 +79,8 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
     }
   }
 
-  @Override
-  public Statement apply (final Statement base, final Description description)
+  // Change to "apply" when something fails :)
+  public Statement _apply (final Statement base, final Description description)
   {
     return new Statement ()
     {
@@ -101,7 +101,7 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
         }
         catch (final Throwable t)
         {
-          LoggerFactory.getLogger ("root").error ("Test execution error", t);
+          LoggerFactory.getLogger ("root").error ("Test execution error: " + description, t);
         }
       }
     };
