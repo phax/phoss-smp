@@ -16,9 +16,6 @@
  */
 package com.helger.peppol.smpserver.mock;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.client.Client;
@@ -28,11 +25,15 @@ import javax.ws.rs.client.WebTarget;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.logging.LoggingFeature.Verbosity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.servlet.StaticServerInfo;
 
 public class SMPServerRESTTestRule extends SMPServerTestRule
 {
+  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServerRESTTestRule.class);
+
   private HttpServer m_aServer;
   private WebTarget m_aTarget;
 
@@ -57,12 +58,13 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
 
     // Enable the feature to activate logging of HTTP requests
     if (false)
-      aClient.register (new LoggingFeature (Logger.getLogger ("SMPServerRESTTestRule"),
-                                            Level.INFO,
+      aClient.register (new LoggingFeature (java.util.logging.Logger.getLogger ("SMPServerRESTTestRule"),
+                                            java.util.logging.Level.INFO,
                                             Verbosity.PAYLOAD_ANY,
                                             null));
 
     m_aTarget = aClient.target (MockWebServer.BASE_URI_HTTP);
+    s_aLogger.info ("Finished before");
   }
 
   @Override
@@ -70,11 +72,15 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
   {
     try
     {
+      s_aLogger.info ("Shutting down server");
       m_aTarget = null;
-      m_aServer.shutdownNow ();
+      if (m_aServer != null)
+        m_aServer.shutdownNow ();
+      s_aLogger.info ("Finished shutting down server");
     }
     finally
     {
+      s_aLogger.info ("super.after");
       super.after ();
     }
   }
