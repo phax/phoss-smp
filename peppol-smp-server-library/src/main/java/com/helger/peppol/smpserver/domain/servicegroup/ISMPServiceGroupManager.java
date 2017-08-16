@@ -65,7 +65,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return A non-<code>null</code> mutable list of callbacks.
    */
   @Nonnull
-  @ReturnsMutableObject ("by design")
+  @ReturnsMutableObject
   CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ();
 
   /**

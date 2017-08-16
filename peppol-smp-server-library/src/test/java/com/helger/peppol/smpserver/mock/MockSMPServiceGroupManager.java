@@ -58,10 +58,10 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
  */
 final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
 {
-  private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList<> ();
+  private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
   @Nonnull
-  @ReturnsMutableObject ("by design")
+  @ReturnsMutableObject
   public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {
     return m_aCBs;
