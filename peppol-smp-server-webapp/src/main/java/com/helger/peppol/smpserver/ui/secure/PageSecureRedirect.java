@@ -22,12 +22,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.attr.StringMap;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
-import com.helger.commons.url.SMap;
 import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCEdit;
@@ -214,8 +214,12 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     {
       // Edit object
       aToolbar.addButtonEdit (aDisplayLocale,
-                              createEditURL (aWPEC,
-                                             aSelectedObject).addAll (new SMap ().add (FIELD_SERVICE_GROUP_ID, aSelectedObject.getServiceGroupID ()).add (FIELD_DOCTYPE_ID, aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ())));
+                              createEditURL (aWPEC, aSelectedObject)
+                                                                    .add (FIELD_SERVICE_GROUP_ID,
+                                                                          aSelectedObject.getServiceGroupID ())
+                                                                    .add (FIELD_DOCTYPE_ID,
+                                                                          aSelectedObject.getDocumentTypeIdentifier ()
+                                                                                         .getURIEncoded ()));
     }
 
     // Callback
@@ -406,8 +410,9 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPRedirect aCurObject : aRedirectMgr.getAllSMPRedirects ())
     {
-      final SMap aParams = new SMap ().add (FIELD_SERVICE_GROUP_ID, aCurObject.getServiceGroupID ())
-                                      .add (FIELD_DOCTYPE_ID, aCurObject.getDocumentTypeIdentifier ().getURIEncoded ());
+      final StringMap aParams = new StringMap ();
+      aParams.putIn (FIELD_SERVICE_GROUP_ID, aCurObject.getServiceGroupID ());
+      aParams.putIn (FIELD_DOCTYPE_ID, aCurObject.getDocumentTypeIdentifier ().getURIEncoded ());
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject, aParams);
       final String sDisplayName = aCurObject.getServiceGroupID ();
 

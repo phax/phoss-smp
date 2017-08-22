@@ -27,13 +27,13 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
+import com.helger.commons.collection.attr.StringMap;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
-import com.helger.commons.url.SMap;
 import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -265,7 +265,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                         public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
                                                      @Nonnull final ISMPServiceGroup aSelectedObject)
                         {
-                          final SMap aTargetParams = new SMap ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
+                          final StringMap aTargetParams = new StringMap ();
+                          aTargetParams.putIn (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
                           final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
                           try
                           {
@@ -380,9 +381,10 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
                                                    .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme" +
-                                                                 (sDefaultScheme == null ? "" : " (default: " +
-                                                                                                sDefaultScheme +
-                                                                                                ")") +
+                                                                 (sDefaultScheme == null ? ""
+                                                                                         : " (default: " +
+                                                                                           sDefaultScheme +
+                                                                                           ")") +
                                                                  ", the right part is the identifier value (e.g. 9915:test)")
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PARTICIPANT_ID_SCHEME,
                                                                                                FIELD_PARTICIPANT_ID_VALUE)));

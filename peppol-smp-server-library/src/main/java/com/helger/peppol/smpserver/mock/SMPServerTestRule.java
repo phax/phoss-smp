@@ -41,12 +41,12 @@
 package com.helger.peppol.smpserver.mock;
 
 import java.util.Locale;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
-import com.helger.commons.url.SMap;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
@@ -88,7 +88,7 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
                                                               "Admin",
                                                               "Description",
                                                               Locale.US,
-                                                              new SMap (),
+                                                              (Map <String, String>) null,
                                                               false);
   }
 

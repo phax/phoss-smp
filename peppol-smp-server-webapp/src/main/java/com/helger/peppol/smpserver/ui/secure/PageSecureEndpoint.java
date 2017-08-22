@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 import com.helger.collection.multimap.IMultiMapListBased;
 import com.helger.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.attr.StringMap;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFactory;
@@ -37,7 +38,6 @@ import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
-import com.helger.commons.url.SMap;
 import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
@@ -340,21 +340,21 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   }
 
   @Nonnull
-  private static SMap _createParamMap (@Nonnull final ISMPServiceInformation aServiceInfo,
-                                       @Nullable final ISMPProcess aProcess,
-                                       @Nullable final ISMPEndpoint aEndpoint)
+  private static StringMap _createParamMap (@Nonnull final ISMPServiceInformation aServiceInfo,
+                                            @Nullable final ISMPProcess aProcess,
+                                            @Nullable final ISMPEndpoint aEndpoint)
   {
-    final SMap ret = new SMap ().add (FIELD_SERVICE_GROUP_ID,
-                                      aServiceInfo.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ())
-                                .add (FIELD_DOCTYPE_ID_SCHEME, aServiceInfo.getDocumentTypeIdentifier ().getScheme ())
-                                .add (FIELD_DOCTYPE_ID_VALUE, aServiceInfo.getDocumentTypeIdentifier ().getValue ());
+    final StringMap ret = new StringMap ();
+    ret.putIn (FIELD_SERVICE_GROUP_ID, aServiceInfo.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ());
+    ret.putIn (FIELD_DOCTYPE_ID_SCHEME, aServiceInfo.getDocumentTypeIdentifier ().getScheme ());
+    ret.putIn (FIELD_DOCTYPE_ID_VALUE, aServiceInfo.getDocumentTypeIdentifier ().getValue ());
     if (aProcess != null)
     {
-      ret.add (FIELD_PROCESS_ID_SCHEME, aProcess.getProcessIdentifier ().getScheme ())
-         .add (FIELD_PROCESS_ID_VALUE, aProcess.getProcessIdentifier ().getValue ());
+      ret.putIn (FIELD_PROCESS_ID_SCHEME, aProcess.getProcessIdentifier ().getScheme ());
+      ret.putIn (FIELD_PROCESS_ID_VALUE, aProcess.getProcessIdentifier ().getValue ());
       if (aEndpoint != null)
       {
-        ret.add (FIELD_TRANSPORT_PROFILE, aEndpoint.getTransportProfile ());
+        ret.putIn (FIELD_TRANSPORT_PROFILE, aEndpoint.getTransportProfile ());
       }
     }
     return ret;
@@ -893,7 +893,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                                      .getSortedInline (ISMPEndpoint.comparator ());
               for (final ISMPEndpoint aEndpoint : aEndpoints)
               {
-                final SMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
+                final StringMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
 
                 final HCRow aBodyRow = aEPTable.addBodyRow ();
                 aBodyRow.addCell (new HCA (createViewURL (aWPEC,
@@ -979,7 +979,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
         for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
           for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
           {
-            final SMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
+            final StringMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
 
             final HCRow aRow = aTable.addBodyRow ();
             aRow.addCell (new HCA (createViewURL (aWPEC,
