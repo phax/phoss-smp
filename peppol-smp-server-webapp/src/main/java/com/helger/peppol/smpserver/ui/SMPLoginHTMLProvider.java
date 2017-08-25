@@ -27,12 +27,12 @@ import com.helger.html.hc.html.sections.HCH2;
 import com.helger.html.hc.html.textlevel.HCSmall;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
-import com.helger.photon.basic.auth.credentials.ICredentialValidationResult;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
 import com.helger.photon.bootstrap3.pageheader.BootstrapPageHeader;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginHTMLProvider;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
+import com.helger.security.authentication.credentials.ICredentialValidationResult;
 
 /**
  * The login screen HTML provider.
