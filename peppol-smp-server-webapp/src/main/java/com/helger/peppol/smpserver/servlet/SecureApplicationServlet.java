@@ -16,10 +16,9 @@
  */
 package com.helger.peppol.smpserver.servlet;
 
-import javax.annotation.Nonnull;
-
 import com.helger.peppol.smpserver.ui.AppLayoutHTMLProvider;
 import com.helger.photon.core.app.html.IHTMLProvider;
+import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
@@ -30,10 +29,15 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  */
 public class SecureApplicationServlet extends AbstractSecureApplicationServlet
 {
-  @Override
-  @Nonnull
-  protected IHTMLProvider createHTMLProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope)
+  public SecureApplicationServlet ()
   {
-    return new AppLayoutHTMLProvider ();
+    super (new AbstractApplicationXServletHandler ()
+    {
+      @Override
+      protected IHTMLProvider createHTMLProvider (final IRequestWebScopeWithoutResponse aRequestScope)
+      {
+        return new AppLayoutHTMLProvider ();
+      }
+    });
   }
 }
