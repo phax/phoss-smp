@@ -33,8 +33,7 @@ import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.photon.basic.app.CApplicationID;
-import com.helger.servlet.mock.MockHttpServletResponse;
-import com.helger.web.scope.mgr.WebScopeManager;
+import com.helger.web.scope.mgr.WebScoped;
 
 /**
  * This class implements a REST frontend for getting the list of service groups
@@ -62,8 +61,7 @@ public final class ListInterface
   @Produces (MediaType.TEXT_XML)
   public Document getServiceGroupReferenceList (@PathParam ("UserId") final String sUserID) throws Throwable
   {
-    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
-    try
+    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       switch (SMPServerConfiguration.getRESTType ())
@@ -78,10 +76,6 @@ public final class ListInterface
         default:
           throw new UnsupportedOperationException ("Unsupported REST type specified!");
       }
-    }
-    finally
-    {
-      WebScopeManager.onRequestEnd ();
     }
   }
 }

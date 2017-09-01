@@ -47,8 +47,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.basic.app.CApplicationID;
-import com.helger.servlet.mock.MockHttpServletResponse;
-import com.helger.web.scope.mgr.WebScopeManager;
+import com.helger.web.scope.mgr.WebScoped;
 
 /**
  * This class implements the "Business Card" REST interface to be used with the
@@ -87,17 +86,12 @@ public final class BusinessCardInterface
       throw new WebApplicationException (404);
     }
 
-    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
-    try
+    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       // getBusinessCard throws an exception if non is found
       final PD1BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
       return m_aBDOF.createBusinessCard (ret);
-    }
-    finally
-    {
-      WebScopeManager.onRequestEnd ();
     }
   }
 
@@ -113,8 +107,7 @@ public final class BusinessCardInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
-    try
+    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
     {
       PD1BusinessCardType aV1 = new PD1BusinessCardMarshaller ().read (aServiceGroupDoc);
       if (aV1 == null)
@@ -138,10 +131,6 @@ public final class BusinessCardInterface
         return Response.status (Status.BAD_REQUEST).build ();
       return Response.ok ().build ();
     }
-    finally
-    {
-      WebScopeManager.onRequestEnd ();
-    }
   }
 
   @DELETE
@@ -154,8 +143,7 @@ public final class BusinessCardInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    WebScopeManager.onRequestBegin (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest, new MockHttpServletResponse ());
-    try
+    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID,
@@ -163,10 +151,6 @@ public final class BusinessCardInterface
       if (eSuccess.isFailure ())
         return Response.status (Status.BAD_REQUEST).build ();
       return Response.ok ().build ();
-    }
-    finally
-    {
-      WebScopeManager.onRequestEnd ();
     }
   }
 }
