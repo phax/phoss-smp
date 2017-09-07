@@ -183,6 +183,6 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
   @Nonnegative
   public int getSMPBusinessCardCount ()
   {
-    return getCount ();
+    return size ();
   }
 }

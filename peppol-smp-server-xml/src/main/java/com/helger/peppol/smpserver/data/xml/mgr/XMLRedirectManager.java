@@ -236,7 +236,7 @@ public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMP
   @Nonnegative
   public int getSMPRedirectCount ()
   {
-    return getCount ();
+    return size ();
   }
 
   @Nullable

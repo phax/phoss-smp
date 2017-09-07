@@ -296,6 +296,6 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
   @Nonnegative
   public int getSMPServiceGroupCount ()
   {
-    return getCount ();
+    return size ();
   }
 }

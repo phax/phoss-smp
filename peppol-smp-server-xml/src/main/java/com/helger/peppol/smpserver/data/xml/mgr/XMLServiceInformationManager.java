@@ -268,7 +268,7 @@ public final class XMLServiceInformationManager extends
   @Nonnegative
   public int getSMPServiceInformationCount ()
   {
-    return getCount ();
+    return size ();
   }
 
   @Nonnull
