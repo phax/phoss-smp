@@ -32,11 +32,14 @@ import com.helger.peppol.smpserver.app.AppSecurity;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.peppol.smpserver.ui.pub.InitializerPublic;
 import com.helger.peppol.smpserver.ui.secure.InitializerSecure;
 import com.helger.photon.basic.app.CApplicationID;
+import com.helger.photon.basic.app.locale.ILocaleManager;
 import com.helger.photon.basic.app.request.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.basic.app.request.RequestParameterManager;
+import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
@@ -128,5 +131,18 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     ret.put (CApplicationID.APP_ID_PUBLIC, new InitializerPublic ());
     ret.put (CApplicationID.APP_ID_SECURE, new InitializerSecure ());
     return ret;
+  }
+
+  @Override
+  public void initLocales (@Nonnull final ILocaleManager aLocaleMgr)
+  {
+    aLocaleMgr.registerLocale (CApp.DEFAULT_LOCALE);
+    aLocaleMgr.setDefaultLocale (CApp.DEFAULT_LOCALE);
+  }
+
+  @Override
+  public void initAjax (@Nonnull final IAjaxInvoker aAjaxInvoker)
+  {
+    CAjax.init (aAjaxInvoker);
   }
 }

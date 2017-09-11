@@ -39,7 +39,7 @@
     </init-param>
     <init-param>
       <param-name>jersey.config.servlet.filter.staticContentRegex</param-name>
-      <param-value>/(stream|public|secure|publicajax|secureajax|publicaction|secureaction|resbundle)/.*|/favicon.ico|/logout</param-value>
+      <param-value>/(stream|public|secure|ajax|resbundle)/.*|/favicon.ico|/logout</param-value>
     </init-param>
   </filter>
   <filter-mapping>
@@ -56,14 +56,6 @@
   <filter-mapping>
     <filter-name>SecureLoginFilter</filter-name>
     <url-pattern>/secure/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>SecureLoginFilter</filter-name>
-    <url-pattern>/secureajax/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>SecureLoginFilter</filter-name>
-    <url-pattern>/secureaction/*</url-pattern>
   </filter-mapping>
   
   <servlet>

@@ -78,7 +78,7 @@ import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorSecureCreateBusinessCardContactInput;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorSecureCreateBusinessCardIdentifierInput;
-import com.helger.peppol.smpserver.ui.ajax.CAjaxSecure;
+import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
@@ -769,9 +769,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (AjaxHtmlResponse.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT.getInvocationURL (aRequestScope)
-                                                                                                            .add (AjaxExecutorSecureCreateBusinessCardIdentifierInput.PARAM_ENTITY_ID,
-                                                                                                                  sEntityID))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT.getInvocationURL (aRequestScope)
+                                                                                                      .add (AjaxExecutorSecureCreateBusinessCardIdentifierInput.PARAM_ENTITY_ID,
+                                                                                                            sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());
@@ -829,9 +829,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (AjaxHtmlResponse.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT.getInvocationURL (aRequestScope)
-                                                                                                         .add (AjaxExecutorSecureCreateBusinessCardContactInput.PARAM_ENTITY_ID,
-                                                                                                               sEntityID))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT.getInvocationURL (aRequestScope)
+                                                                                                   .add (AjaxExecutorSecureCreateBusinessCardContactInput.PARAM_ENTITY_ID,
+                                                                                                         sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());
@@ -909,7 +909,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                .add (JQuery.idRef (aEntityContainer).append (aJSAppendData.ref (AjaxHtmlResponse.PROPERTY_HTML)));
 
       final JSPackage aOnAdd = new JSPackage ();
-      aOnAdd.add (new JQueryAjaxBuilder ().url (CAjaxSecure.FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT.getInvocationURL (aRequestScope))
+      aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT.getInvocationURL (aRequestScope))
                                           .data (new JSAssocArray ())
                                           .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                           .build ());

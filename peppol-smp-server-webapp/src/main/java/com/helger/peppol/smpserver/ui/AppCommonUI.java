@@ -59,7 +59,7 @@ import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdenti
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorPublicLogin;
-import com.helger.peppol.smpserver.ui.ajax.CAjaxPublic;
+import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.ext.BootstrapSystemMessage;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
@@ -104,11 +104,11 @@ public final class AppCommonUI
       final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
       aDataTables.setAutoWidth (false)
                  .setLengthMenu (LENGTH_MENU)
-                 .setAjaxBuilder (new JQueryAjaxBuilder ().url (CAjaxPublic.DATATABLES.getInvocationURL (aRequestScope))
+                 .setAjaxBuilder (new JQueryAjaxBuilder ().url (CAjax.DATATABLES.getInvocationURL (aRequestScope))
                                                           .data (new JSAssocArray ().add (AjaxExecutorDataTables.OBJECT_ID,
                                                                                           aTable.getID ())))
                  .setServerFilterType (EDataTablesFilterType.ALL_TERMS_PER_ROW)
-                 .setTextLoadingURL (CAjaxPublic.DATATABLES_I18N.getInvocationURL (aRequestScope),
+                 .setTextLoadingURL (CAjax.DATATABLES_I18N.getInvocationURL (aRequestScope),
                                      AjaxExecutorDataTablesI18N.LANGUAGE_ID)
                  .addPlugin (new DataTablesPluginSearchHighlight ());
     });
@@ -184,7 +184,7 @@ public final class AppCommonUI
                 ._if (aJSData.ref (AjaxExecutorPublicLogin.JSON_LOGGEDIN),
                       JSHtml.windowLocationReload (),
                       JQuery.idRef (sIDErrorField).empty ().append (aJSData.ref (AjaxExecutorPublicLogin.JSON_HTML)));
-      aOnClick.add (new JQueryAjaxBuilder ().url (CAjaxPublic.LOGIN.getInvocationURI (aRequestScope))
+      aOnClick.add (new JQueryAjaxBuilder ().url (CAjax.LOGIN.getInvocationURI (aRequestScope))
                                             .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID,
                                                                             JQuery.idRef (sIDUserName).val ())
                                                                       .add (CLogin.REQUEST_ATTR_PASSWORD,

@@ -59,7 +59,7 @@ import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
-import com.helger.peppol.smpserver.ui.ajax.CAjaxSecure;
+import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
@@ -557,7 +557,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       final BootstrapButtonToolbar aToolbar = aExport.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
       aToolbar.addChild (new BootstrapButton ().addChild ("Export all Service Groups")
                                                .setIcon (EDefaultIcon.SAVE_ALL)
-                                               .setOnClick (CAjaxSecure.FUNCTION_EXPORT_ALL_SERVICE_GROUPS.getInvocationURL (aRequestScope))
+                                               .setOnClick (CAjax.FUNCTION_EXPORT_ALL_SERVICE_GROUPS.getInvocationURL (aRequestScope))
                                                .setDisabled (aAllServiceGroups.isEmpty ()));
       aTabBox.addTab ("export", "Export", aExport, !bSelectImportTab);
     }

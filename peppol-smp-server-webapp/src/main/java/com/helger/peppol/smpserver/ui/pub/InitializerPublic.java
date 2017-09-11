@@ -18,11 +18,7 @@ package com.helger.peppol.smpserver.ui.pub;
 
 import javax.annotation.Nonnull;
 
-import com.helger.peppol.smpserver.app.CApp;
-import com.helger.peppol.smpserver.ui.ajax.CAjaxPublic;
-import com.helger.photon.basic.app.locale.ILocaleManager;
 import com.helger.photon.basic.app.menu.IMenuTree;
-import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.app.layout.CLayout;
@@ -35,12 +31,6 @@ import com.helger.photon.core.app.layout.ILayoutManager;
  */
 public final class InitializerPublic implements IApplicationInitializer <LayoutExecutionContext>
 {
-  public void initLocales (@Nonnull final ILocaleManager aLocaleMgr)
-  {
-    aLocaleMgr.registerLocale (CApp.DEFAULT_LOCALE);
-    aLocaleMgr.setDefaultLocale (CApp.DEFAULT_LOCALE);
-  }
-
   public void initLayout (@Nonnull final ILayoutManager <LayoutExecutionContext> aLayoutMgr)
   {
     // Register all layout area handler (order is important for SEO!)
@@ -51,12 +41,4 @@ public final class InitializerPublic implements IApplicationInitializer <LayoutE
   {
     MenuPublic.init (aMenuTree);
   }
-
-  public void initAjax (@Nonnull final IAjaxInvoker aAjaxInvoker)
-  {
-    CAjaxPublic.init (aAjaxInvoker);
-  }
-
-  public void initRest ()
-  {}
 }

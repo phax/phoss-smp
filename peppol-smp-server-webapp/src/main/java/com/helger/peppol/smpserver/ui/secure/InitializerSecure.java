@@ -23,15 +23,11 @@ import com.helger.commons.io.resource.IReadableResource;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppConfiguration;
-import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.app.PDClientProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.ui.ajax.CAjaxSecure;
-import com.helger.photon.basic.app.locale.ILocaleManager;
 import com.helger.photon.basic.app.menu.IMenuTree;
 import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFile;
 import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFileManager;
-import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.init.IApplicationInitializer;
 import com.helger.photon.core.app.layout.CLayout;
@@ -45,12 +41,6 @@ import com.helger.photon.uictrls.prism.EPrismLanguage;
  */
 public final class InitializerSecure implements IApplicationInitializer <LayoutExecutionContext>
 {
-  public void initLocales (@Nonnull final ILocaleManager aLocaleMgr)
-  {
-    aLocaleMgr.registerLocale (CApp.DEFAULT_LOCALE);
-    aLocaleMgr.setDefaultLocale (CApp.DEFAULT_LOCALE);
-  }
-
   public void initLayout (@Nonnull final ILayoutManager <LayoutExecutionContext> aLayoutMgr)
   {
     aLayoutMgr.registerAreaContentProvider (CLayout.LAYOUT_AREAID_VIEWPORT, new SMPRendererSecure ());
@@ -59,11 +49,6 @@ public final class InitializerSecure implements IApplicationInitializer <LayoutE
   public void initMenu (@Nonnull final IMenuTree aMenuTree)
   {
     MenuSecure.init (aMenuTree);
-  }
-
-  public void initAjax (@Nonnull final IAjaxInvoker aAjaxInvoker)
-  {
-    CAjaxSecure.init (aAjaxInvoker);
   }
 
   public void initRest ()
