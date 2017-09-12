@@ -32,7 +32,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
-import com.helger.photon.core.ajax.AjaxResponse;
+import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
@@ -49,7 +49,7 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
 {
   @Override
   protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
-                                    @Nonnull final AjaxResponse aAjaxResponse) throws Exception
+                                    @Nonnull final PhotonUnifiedResponse aAjaxResponse) throws Exception
   {
     final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();

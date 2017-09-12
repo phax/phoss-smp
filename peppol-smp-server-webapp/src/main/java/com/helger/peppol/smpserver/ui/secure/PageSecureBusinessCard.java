@@ -99,7 +99,7 @@ import com.helger.photon.bootstrap3.table.BootstrapTable;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap3.uictrls.datetimepicker.BootstrapDateTimePicker;
-import com.helger.photon.core.ajax.AjaxResponse;
+import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
@@ -767,7 +767,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
         final JSVar aJSAppendData = aJSAppend.param ("data");
         aJSAppend.body ()
-                 .add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (AjaxResponse.HtmlHelper.PROPERTY_HTML)));
+                 .add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
         aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT.getInvocationURL (aRequestScope)
@@ -828,7 +828,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
         final JSVar aJSAppendData = aJSAppend.param ("data");
         aJSAppend.body ()
-                 .add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (AjaxResponse.HtmlHelper.PROPERTY_HTML)));
+                 .add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
         aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT.getInvocationURL (aRequestScope)
@@ -908,7 +908,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
       final JSVar aJSAppendData = aJSAppend.param ("data");
       aJSAppend.body ().add (JQuery.idRef (aEntityContainer)
-                                   .append (aJSAppendData.ref (AjaxResponse.HtmlHelper.PROPERTY_HTML)));
+                                   .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
       final JSPackage aOnAdd = new JSPackage ();
       aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT.getInvocationURL (aRequestScope))

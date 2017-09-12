@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import com.helger.html.hc.IHCNode;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCard;
-import com.helger.photon.core.ajax.AjaxResponse;
+import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 
@@ -36,7 +36,7 @@ public final class AjaxExecutorSecureCreateBusinessCardIdentifierInput extends A
 
   @Override
   protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
-                                    @Nonnull final AjaxResponse aAjaxResponse) throws Exception
+                                    @Nonnull final PhotonUnifiedResponse aAjaxResponse) throws Exception
   {
     final String sEntityID = aLEC.params ().getAsString (PARAM_ENTITY_ID);
 
