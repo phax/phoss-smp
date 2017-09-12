@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import com.helger.html.hc.IHCNode;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCard;
-import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
+import com.helger.photon.core.ajax.AjaxResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 
@@ -30,18 +30,18 @@ import com.helger.photon.core.form.FormErrorList;
  *
  * @author Philip Helger
  */
-public final class AjaxExecutorSecureCreateBusinessCardEntityInput extends AbstractSMPAjaxExecutorHtml
+public final class AjaxExecutorSecureCreateBusinessCardEntityInput extends AbstractSMPAjaxExecutor
 {
   @Override
-  @Nonnull
-  protected AjaxHtmlResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
+  protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
+                                    @Nonnull final AjaxResponse aAjaxResponse) throws Exception
   {
     final IHCNode aNode = PageSecureBusinessCard.createEntityInputForm (aLEC,
-                                                                         (SMPBusinessCardEntity) null,
-                                                                         (String) null,
-                                                                         new FormErrorList ());
+                                                                        (SMPBusinessCardEntity) null,
+                                                                        (String) null,
+                                                                        new FormErrorList ());
 
     // Build the HTML response
-    return AjaxHtmlResponse.createSuccess (aLEC.getRequestScope (), aNode);
+    aAjaxResponse.html (aNode);
   }
 }

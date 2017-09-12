@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import com.helger.html.hc.IHCNode;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
 import com.helger.peppol.smpserver.ui.secure.PageSecureBusinessCard;
-import com.helger.photon.core.ajax.response.AjaxHtmlResponse;
+import com.helger.photon.core.ajax.AjaxResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 
@@ -30,23 +30,23 @@ import com.helger.photon.core.form.FormErrorList;
  *
  * @author Philip Helger
  */
-public final class AjaxExecutorSecureCreateBusinessCardContactInput extends AbstractSMPAjaxExecutorHtml
+public final class AjaxExecutorSecureCreateBusinessCardContactInput extends AbstractSMPAjaxExecutor
 {
   public static final String PARAM_ENTITY_ID = "entityid";
 
   @Override
-  @Nonnull
-  protected AjaxHtmlResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
+  protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
+                                    @Nonnull final AjaxResponse aAjaxResponse) throws Exception
   {
     final String sEntityID = aLEC.params ().getAsString (PARAM_ENTITY_ID);
 
     final IHCNode aNode = PageSecureBusinessCard.createContactInputForm (aLEC,
-                                                                          sEntityID,
-                                                                          (SMPBusinessCardContact) null,
-                                                                          (String) null,
-                                                                          new FormErrorList ());
+                                                                         sEntityID,
+                                                                         (SMPBusinessCardContact) null,
+                                                                         (String) null,
+                                                                         new FormErrorList ());
 
     // Build the HTML response
-    return AjaxHtmlResponse.createSuccess (aLEC.getRequestScope (), aNode);
+    aAjaxResponse.html (aNode);
   }
 }

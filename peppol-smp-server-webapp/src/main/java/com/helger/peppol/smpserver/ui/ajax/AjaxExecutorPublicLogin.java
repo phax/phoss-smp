@@ -30,7 +30,7 @@ import com.helger.json.JsonObject;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.core.EPhotonCoreText;
-import com.helger.photon.core.ajax.response.AjaxJsonResponse;
+import com.helger.photon.core.ajax.AjaxResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.login.CLogin;
 import com.helger.photon.security.login.ELoginResult;
@@ -41,7 +41,7 @@ import com.helger.photon.security.login.LoggedInUserManager;
  *
  * @author Philip Helger
  */
-public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutorJson
+public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor
 {
   public static final String JSON_LOGGEDIN = "loggedin";
   public static final String JSON_HTML = "html";
@@ -49,8 +49,8 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutorJson
   private static final Logger s_aLogger = LoggerFactory.getLogger (AjaxExecutorPublicLogin.class);
 
   @Override
-  @Nonnull
-  protected AjaxJsonResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
+  protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
+                                    @Nonnull final AjaxResponse aAjaxResponse) throws Exception
   {
     final String sLoginName = aLEC.params ().getAsString (CLogin.REQUEST_ATTR_USERID);
     final String sPassword = aLEC.params ().getAsString (CLogin.REQUEST_ATTR_PASSWORD);
@@ -60,7 +60,10 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutorJson
                                                                                     sPassword,
                                                                                     CApp.REQUIRED_ROLE_IDS_VIEW);
     if (eLoginResult.isSuccess ())
-      return AjaxJsonResponse.createSuccess (new JsonObject ().add (JSON_LOGGEDIN, true));
+    {
+      aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, true));
+      return;
+    }
 
     // Get the rendered content of the menu area
     if (GlobalDebug.isDebugMode ())
@@ -72,8 +75,7 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutorJson
                                                              eLoginResult.getDisplayText (aDisplayLocale));
 
     // Set as result property
-    return AjaxJsonResponse.createSuccess (new JsonObject ().add (JSON_LOGGEDIN, false)
-                                                            .add (JSON_HTML,
-                                                                  HCRenderer.getAsHTMLStringWithoutNamespaces (aRoot)));
+    aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, false)
+                                         .add (JSON_HTML, HCRenderer.getAsHTMLStringWithoutNamespaces (aRoot)));
   }
 }

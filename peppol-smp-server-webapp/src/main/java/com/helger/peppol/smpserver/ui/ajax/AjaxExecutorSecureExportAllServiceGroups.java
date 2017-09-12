@@ -19,8 +19,6 @@ package com.helger.peppol.smpserver.ui.ajax;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
-import com.helger.commons.mime.CMimeType;
 import com.helger.datetime.util.PDTIOHelper;
 import com.helger.peppol.smpserver.app.CSMPExchange;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -34,13 +32,12 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
-import com.helger.photon.core.ajax.response.AjaxBinaryResponse;
+import com.helger.photon.core.ajax.AjaxResponse;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroDocument;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
-import com.helger.xml.microdom.serialize.MicroWriter;
 
 /**
  * Export all service groups incl. service information and business cards (if
@@ -51,8 +48,8 @@ import com.helger.xml.microdom.serialize.MicroWriter;
 public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPAjaxExecutor
 {
   @Override
-  @Nonnull
-  protected AjaxBinaryResponse mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC) throws Exception
+  protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
+                                    @Nonnull final AjaxResponse aAjaxResponse) throws Exception
   {
     final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -101,10 +98,7 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
     }
 
     // Build the XML response
-    final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ();
-    MicroWriter.writeToStream (aDoc, aBAOS);
-
-    final String sFilename = "smp-data-" + PDTIOHelper.getCurrentLocalDateTimeForFilename () + ".xml";
-    return new AjaxBinaryResponse (aBAOS.toByteArray (), CMimeType.APPLICATION_XML, sFilename);
+    aAjaxResponse.xml (aDoc);
+    aAjaxResponse.attachment ("smp-data-" + PDTIOHelper.getCurrentLocalDateTimeForFilename () + ".xml");
   }
 }
