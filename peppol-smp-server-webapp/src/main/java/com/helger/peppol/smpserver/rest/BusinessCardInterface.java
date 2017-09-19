@@ -46,7 +46,6 @@ import com.helger.pd.businesscard.v2.PD2BusinessCardType;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
-import com.helger.photon.basic.app.CApplicationID;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
@@ -86,7 +85,7 @@ public final class BusinessCardInterface
       throw new WebApplicationException (404);
     }
 
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       // getBusinessCard throws an exception if non is found
@@ -107,7 +106,7 @@ public final class BusinessCardInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       PD1BusinessCardType aV1 = new PD1BusinessCardMarshaller ().read (aServiceGroupDoc);
       if (aV1 == null)
@@ -143,7 +142,7 @@ public final class BusinessCardInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID,

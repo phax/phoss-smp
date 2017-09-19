@@ -50,7 +50,6 @@ import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
-import com.helger.photon.basic.app.CApplicationID;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xml.serialize.write.EXMLIncorrectCharacterHandling;
 import com.helger.xml.serialize.write.EXMLSerializeIndent;
@@ -84,7 +83,7 @@ public final class ServiceMetadataInterface
   public byte [] getServiceRegistration (@PathParam ("ServiceGroupId") final String sServiceGroupID,
                                          @PathParam ("DocumentTypeId") final String sDocumentTypeID) throws Throwable
   {
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
 
@@ -172,7 +171,7 @@ public final class ServiceMetadataInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       ESuccess eSuccess = ESuccess.FAILURE;
@@ -218,7 +217,7 @@ public final class ServiceMetadataInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       ESuccess eSuccess;

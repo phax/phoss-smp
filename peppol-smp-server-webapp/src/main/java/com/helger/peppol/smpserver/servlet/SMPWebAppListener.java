@@ -23,26 +23,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.helger.commons.collection.impl.CommonsHashMap;
-import com.helger.commons.collection.impl.ICommonsMap;
+import com.helger.commons.io.resource.ClassPathResource;
+import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.regex.RegExHelper;
+import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.app.AppSecurity;
 import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.PDClientProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.ajax.CAjax;
-import com.helger.peppol.smpserver.ui.pub.InitializerPublic;
-import com.helger.peppol.smpserver.ui.secure.InitializerSecure;
-import com.helger.photon.basic.app.CApplicationID;
+import com.helger.peppol.smpserver.ui.pub.MenuPublic;
+import com.helger.peppol.smpserver.ui.secure.MenuSecure;
+import com.helger.photon.basic.app.appid.CApplicationID;
+import com.helger.photon.basic.app.appid.PhotonGlobalState;
 import com.helger.photon.basic.app.locale.ILocaleManager;
+import com.helger.photon.basic.app.menu.MenuTree;
 import com.helger.photon.basic.app.request.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.basic.app.request.RequestParameterManager;
+import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFile;
+import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFileManager;
+import com.helger.photon.bootstrap3.servlet.WebAppListenerBootstrap;
 import com.helger.photon.core.ajax.IAjaxInvoker;
-import com.helger.photon.core.app.context.LayoutExecutionContext;
-import com.helger.photon.core.app.init.IApplicationInitializer;
-import com.helger.photon.core.servlet.AbstractWebAppListenerMultiApp;
+import com.helger.photon.uictrls.prism.EPrismLanguage;
 import com.helger.servlet.ServletContextPathHolder;
 
 /**
@@ -51,7 +56,7 @@ import com.helger.servlet.ServletContextPathHolder;
  *
  * @author Philip Helger
  */
-public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExecutionContext>
+public class SMPWebAppListener extends WebAppListenerBootstrap
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPWebAppListener.class);
 
@@ -86,7 +91,7 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
   }
 
   @Override
-  protected void initGlobals ()
+  protected void initGlobalSettings ()
   {
     // Internal stuff:
 
@@ -94,23 +99,12 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
     SLF4JBridgeHandler.removeHandlersForRootLogger ();
     SLF4JBridgeHandler.install ();
 
-    super.initGlobals ();
-
     if (SMPServerConfiguration.isForceRoot ())
     {
       // Enforce an empty context path according to the specs!
       ServletContextPathHolder.setCustomContextPath ("");
     }
     RequestParameterManager.getInstance ().setParameterHandler (new RequestParameterHandlerURLPathNamed ());
-
-    // UI stuff
-    AppCommonUI.init ();
-
-    // Set all security related stuff
-    AppSecurity.init ();
-
-    // Determine backend
-    SMPMetaManager.initBackendFromConfiguration ();
 
     // Check SMP ID
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
@@ -124,16 +118,6 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
   }
 
   @Override
-  @Nonnull
-  protected ICommonsMap <String, IApplicationInitializer <LayoutExecutionContext>> getAllInitializers ()
-  {
-    final ICommonsMap <String, IApplicationInitializer <LayoutExecutionContext>> ret = new CommonsHashMap <> ();
-    ret.put (CApplicationID.APP_ID_PUBLIC, new InitializerPublic ());
-    ret.put (CApplicationID.APP_ID_SECURE, new InitializerSecure ());
-    return ret;
-  }
-
-  @Override
   public void initLocales (@Nonnull final ILocaleManager aLocaleMgr)
   {
     aLocaleMgr.registerLocale (CApp.DEFAULT_LOCALE);
@@ -141,8 +125,62 @@ public class SMPWebAppListener extends AbstractWebAppListenerMultiApp <LayoutExe
   }
 
   @Override
+  protected void initMenu ()
+  {
+    // Create all menu items
+    {
+      final MenuTree aMenuTree = new MenuTree ();
+      MenuPublic.init (aMenuTree);
+      PhotonGlobalState.getInstance ().state (CApplicationID.APP_ID_PUBLIC).setMenuTree (aMenuTree);
+    }
+    {
+      final MenuTree aMenuTree = new MenuTree ();
+      MenuSecure.init (aMenuTree);
+      PhotonGlobalState.getInstance ().state (CApplicationID.APP_ID_SECURE).setMenuTree (aMenuTree);
+    }
+  }
+
+  @Override
   public void initAjax (@Nonnull final IAjaxInvoker aAjaxInvoker)
   {
     CAjax.init (aAjaxInvoker);
+  }
+
+  @Override
+  protected void initUI ()
+  {
+    // UI stuff
+    AppCommonUI.init ();
+  }
+
+  @Override
+  protected void initSecurity ()
+  {
+    // Set all security related stuff
+    AppSecurity.init ();
+  }
+
+  @Override
+  protected void initManagers ()
+  {
+    final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
+    aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
+                                                                                                .setSyntaxHighlightLanguage (EPrismLanguage.MARKUP));
+    aCFM.registerConfigurationFile (new ConfigurationFile (AppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
+                                                                                                   .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+    final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
+    if (aConfigRes != null)
+      aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
+                                                                        .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+    final IReadableResource aPDClientConfig = PDClientConfiguration.getConfigFile ().getReadResource ();
+    if (aPDClientConfig != null)
+      aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription ("PEPPOL Directory client configuration")
+                                                                             .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+
+    // If the SMP settings change, the PD client must be re-created
+    SMPMetaManager.getSettingsMgr ().callbacks ().add (x -> PDClientProvider.getInstance ().resetPDClient ());
+
+    // Determine backend
+    SMPMetaManager.initBackendFromConfiguration ();
   }
 }

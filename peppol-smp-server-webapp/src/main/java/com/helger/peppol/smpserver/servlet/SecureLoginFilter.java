@@ -20,11 +20,9 @@ import javax.annotation.Nonnull;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.state.EContinue;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.ui.SMPLoginManager;
-import com.helger.photon.basic.app.CApplicationID;
 import com.helger.photon.core.servlet.AbstractUnifiedResponseFilter;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.util.SecurityHelper;
@@ -40,14 +38,6 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
 {
   private SMPLoginManager m_aLogin;
-
-  @Override
-  @Nonnull
-  @Nonempty
-  protected String getApplicationID ()
-  {
-    return CApplicationID.APP_ID_SECURE;
-  }
 
   @Override
   public void init () throws ServletException

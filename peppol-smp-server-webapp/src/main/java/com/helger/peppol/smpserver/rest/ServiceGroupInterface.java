@@ -43,7 +43,6 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
-import com.helger.photon.basic.app.CApplicationID;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
@@ -73,7 +72,7 @@ public final class ServiceGroupInterface
   @Produces (MediaType.TEXT_XML)
   public Document getServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       switch (SMPServerConfiguration.getRESTType ())
@@ -106,7 +105,7 @@ public final class ServiceGroupInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       ESuccess eSuccess = ESuccess.FAILURE;
@@ -149,7 +148,7 @@ public final class ServiceGroupInterface
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       ESuccess eSuccess;

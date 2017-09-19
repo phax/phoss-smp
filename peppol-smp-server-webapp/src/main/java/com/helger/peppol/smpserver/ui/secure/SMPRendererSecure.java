@@ -24,7 +24,6 @@ import com.helger.commons.url.ISimpleURL;
 import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
-import com.helger.html.hc.html.metadata.HCHead;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
@@ -53,7 +52,6 @@ import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.layout.CLayout;
-import com.helger.photon.core.app.layout.ILayoutAreaContentProvider;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.core.url.LinkHelper;
@@ -67,8 +65,11 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  *
  * @author Philip Helger
  */
-public final class SMPRendererSecure implements ILayoutAreaContentProvider <LayoutExecutionContext>
+public final class SMPRendererSecure
 {
+  private SMPRendererSecure ()
+  {}
+
   @Nonnull
   private static IHCNode _getNavbar (@Nonnull final ILayoutExecutionContext aLEC)
   {
@@ -137,7 +138,7 @@ public final class SMPRendererSecure implements ILayoutAreaContentProvider <Layo
   }
 
   @Nonnull
-  public IHCNode getContent (@Nonnull final LayoutExecutionContext aLEC, @Nonnull final HCHead aHead)
+  public static IHCNode getContent (@Nonnull final LayoutExecutionContext aLEC)
   {
     final HCNodeList ret = new HCNodeList ();
 

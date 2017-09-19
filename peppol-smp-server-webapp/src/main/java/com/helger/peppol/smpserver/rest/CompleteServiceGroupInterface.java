@@ -31,7 +31,6 @@ import com.helger.peppol.smp.marshal.SMPMarshallerCompleteServiceGroupType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
-import com.helger.photon.basic.app.CApplicationID;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
@@ -59,7 +58,7 @@ public final class CompleteServiceGroupInterface
   @Produces (MediaType.TEXT_XML)
   public Document getCompleteServiceGroup (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
-    try (final WebScoped aWebScoped = new WebScoped (CApplicationID.APP_ID_PUBLIC, m_aHttpRequest))
+    try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       switch (SMPServerConfiguration.getRESTType ())
