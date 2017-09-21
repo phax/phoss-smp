@@ -44,6 +44,8 @@ Short explanation
   * `phoss-smp-latest` - the tag to be run
 
 Upon successful completion opening http://localhost:8888 in your browser should show you the start page of phoss SMP.
+
+Default credentials are in the Wiki at https://github.com/phax/peppol-smp-server/wiki/Running#default-login
  
 ## Stopping
 
