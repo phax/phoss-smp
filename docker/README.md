@@ -20,7 +20,7 @@ It exposes port 8080 where Tomcat is running.
 To change the version build you can specify the version on the commandline:
 
 ```
-docker build --build-arg VERSION=5.0.2 -t phoss-smp-5.0.2 .
+docker build --build-arg VERSION=5.0.3 -t phoss-smp-5.0.3 .
 ```
 
 Note: since the file system layout changed between 5.0.0 and 5.0.1, the current version is only applicable to versions &ge; 5.0.1
@@ -46,6 +46,8 @@ Short explanation
 Upon successful completion opening http://localhost:8888 in your browser should show you the start page of phoss SMP.
 
 Default credentials are in the Wiki at https://github.com/phax/peppol-smp-server/wiki/Running#default-login
+
+The data directory inside the Docker image, where the data is stored is usually `/home/git/conf`.
  
 ## Stopping
 
