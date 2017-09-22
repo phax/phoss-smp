@@ -96,13 +96,10 @@ public final class SMPRendererPublic
 
   static
   {
-    PhotonGlobalState.getInstance ()
-                     .state (CApplicationID.APP_ID_PUBLIC)
-                     .getMenuTree ()
-                     .iterateAllMenuObjects (aCurrentObject -> {
-                       if (aCurrentObject.attrs ().containsKey (CMenuPublic.FLAG_FOOTER))
-                         s_aFooterObjects.add (aCurrentObject);
-                     });
+    PhotonGlobalState.state (CApplicationID.APP_ID_PUBLIC).getMenuTree ().iterateAllMenuObjects (aCurrentObject -> {
+      if (aCurrentObject.attrs ().containsKey (CMenuPublic.FLAG_FOOTER))
+        s_aFooterObjects.add (aCurrentObject);
+    });
   }
 
   private SMPRendererPublic ()
