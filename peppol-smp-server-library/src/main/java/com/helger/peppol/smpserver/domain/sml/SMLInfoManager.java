@@ -69,7 +69,7 @@ public final class SMLInfoManager extends AbstractPhotonMapBasedWALDAO <ISMLInfo
   {
     // Add the default transport profiles
     for (final ESML e : ESML.values ())
-      internalCreateItem (SMLInfo.create (e));
+      internalCreateItem (new SMLInfo (e));
     return EChange.CHANGED;
   }
 
