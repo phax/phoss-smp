@@ -43,11 +43,11 @@ import com.helger.photon.basic.app.locale.ILocaleManager;
 import com.helger.photon.basic.app.menu.MenuTree;
 import com.helger.photon.basic.app.request.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.basic.app.request.RequestParameterManager;
-import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFile;
-import com.helger.photon.bootstrap3.pages.sysinfo.ConfigurationFileManager;
+import com.helger.photon.basic.configfile.ConfigurationFile;
+import com.helger.photon.basic.configfile.ConfigurationFileManager;
+import com.helger.photon.basic.configfile.EConfigurationFileSyntax;
 import com.helger.photon.bootstrap3.servlet.WebAppListenerBootstrap;
 import com.helger.photon.core.ajax.IAjaxInvoker;
-import com.helger.photon.uictrls.prism.EPrismLanguage;
 import com.helger.servlet.ServletContextPathHolder;
 
 /**
@@ -165,17 +165,17 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   {
     final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
     aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
-                                                                                                .setSyntaxHighlightLanguage (EPrismLanguage.MARKUP));
+                                                                                                .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
     aCFM.registerConfigurationFile (new ConfigurationFile (AppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
-                                                                                                   .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+                                                                                                   .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
     final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
     if (aConfigRes != null)
       aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
-                                                                        .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+                                                                        .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
     final IReadableResource aPDClientConfig = PDClientConfiguration.getConfigFile ().getReadResource ();
     if (aPDClientConfig != null)
       aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription ("PEPPOL Directory client configuration")
-                                                                             .setSyntaxHighlightLanguage (EPrismLanguage.APACHECONF));
+                                                                             .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
 
     // If the SMP settings change, the PD client must be re-created
     SMPMetaManager.getSettingsMgr ().callbacks ().add (x -> PDClientProvider.getInstance ().resetPDClient ());
