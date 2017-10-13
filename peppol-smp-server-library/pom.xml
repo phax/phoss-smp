@@ -158,6 +158,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Automatic-Module-Name>com.helger.peppol.smpserver</Automatic-Module-Name>
             <Export-Package>com.helger.peppol.smpserver.*</Export-Package>
             <Import-Package>!javax.annotation.*,*</Import-Package>
             <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)",
