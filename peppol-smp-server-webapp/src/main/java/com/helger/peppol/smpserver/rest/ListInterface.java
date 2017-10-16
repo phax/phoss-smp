@@ -28,8 +28,10 @@ import javax.ws.rs.core.UriInfo;
 
 import org.w3c.dom.Document;
 
+import com.helger.peppol.bdxr.marshal.BDXRMarshallerServiceGroupReferenceListType;
 import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupReferenceListType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.web.scope.mgr.WebScoped;
@@ -67,11 +69,18 @@ public final class ListInterface
       {
         case PEPPOL:
         {
+          // Unspecified extension
           final com.helger.peppol.smp.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
                                                                                                                                          RestRequestHelper.getAuth (m_aHttpHeaders));
           return new SMPMarshallerServiceGroupReferenceListType ().getAsDocument (ret);
         }
-        // BDXR does not support list service group!
+        case BDXR:
+        {
+          // Unspecified extension
+          final com.helger.peppol.bdxr.ServiceGroupReferenceListType ret = new BDXRServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
+                                                                                                                                           RestRequestHelper.getAuth (m_aHttpHeaders));
+          return new BDXRMarshallerServiceGroupReferenceListType ().getAsDocument (ret);
+        }
         default:
           throw new UnsupportedOperationException ("Unsupported REST type specified!");
       }

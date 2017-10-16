@@ -60,9 +60,12 @@ import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.bdxr.BDXRExtensionConverter;
+import com.helger.peppol.bdxr.CompleteServiceGroupType;
 import com.helger.peppol.bdxr.EndpointType;
 import com.helger.peppol.bdxr.ProcessListType;
 import com.helger.peppol.bdxr.ProcessType;
+import com.helger.peppol.bdxr.ServiceGroupReferenceListType;
+import com.helger.peppol.bdxr.ServiceGroupReferenceType;
 import com.helger.peppol.bdxr.ServiceGroupType;
 import com.helger.peppol.bdxr.ServiceInformationType;
 import com.helger.peppol.bdxr.ServiceMetadataReferenceCollectionType;
@@ -85,6 +88,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 
 /**
  * This class implements all the service methods, that must be provided by the
@@ -109,6 +113,132 @@ public final class BDXRServerAPI
   }
 
   @Nonnull
+  public CompleteServiceGroupType getCompleteServiceGroup (final String sServiceGroupID) throws Throwable
+  {
+    s_aLogger.info (LOG_PREFIX + "GET /complete/" + sServiceGroupID);
+    s_aStatsCounterInvocation.increment ("getCompleteServiceGroup");
+
+    try
+    {
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      if (aServiceGroupID == null)
+      {
+        // Invalid identifier
+        throw new SMPNotFoundException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
+                                        m_aAPIProvider.getCurrentURI ());
+      }
+
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+
+      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+      if (aServiceGroup == null)
+      {
+        // No such service group
+        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
+                                        m_aAPIProvider.getCurrentURI ());
+      }
+
+      /*
+       * Then add the service metadata references
+       */
+      final ServiceMetadataReferenceCollectionType aRefCollection = new ServiceMetadataReferenceCollectionType ();
+      final List <ServiceMetadataReferenceType> aMetadataReferences = aRefCollection.getServiceMetadataReference ();
+
+      for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
+      {
+        // Ignore all service information without endpoints
+        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                                           aDocTypeID);
+        if (aServiceInfo == null)
+          continue;
+
+        final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
+        aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
+        aMetadataReferences.add (aMetadataReference);
+      }
+
+      final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR ();
+      aSG.setServiceMetadataReferenceCollection (aRefCollection);
+
+      final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
+      aCompleteServiceGroup.setServiceGroup (aSG);
+
+      for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
+      {
+        aCompleteServiceGroup.addServiceMetadata (aServiceInfo.getAsJAXBObjectBDXR ());
+      }
+
+      s_aLogger.info (LOG_PREFIX + "Finished getCompleteServiceGroup(" + sServiceGroupID + ")");
+      s_aStatsCounterSuccess.increment ("getCompleteServiceGroup");
+      return aCompleteServiceGroup;
+    }
+    catch (final Throwable t)
+    {
+      s_aLogger.warn (LOG_PREFIX +
+                      "Error in getCompleteServiceGroup(" +
+                      sServiceGroupID +
+                      ") - " +
+                      ClassHelper.getClassLocalName (t) +
+                      " - " +
+                      t.getMessage ());
+      throw t;
+    }
+  }
+
+  @Nonnull
+  public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sUserID,
+                                                                     @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
+  {
+    s_aLogger.info (LOG_PREFIX + "GET /list/" + sUserID);
+    s_aStatsCounterInvocation.increment ("getServiceGroupReferenceList");
+
+    try
+    {
+      if (!aCredentials.getUserName ().equals (sUserID))
+      {
+        throw new SMPUnauthorizedException ("URL user name '" +
+                                            sUserID +
+                                            "' does not match HTTP Basic Auth user name '" +
+                                            aCredentials.getUserName () +
+                                            "'");
+      }
+
+      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
+      final ICommonsList <ISMPServiceGroup> aServiceGroups = SMPMetaManager.getServiceGroupMgr ()
+                                                                           .getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
+
+      final ServiceGroupReferenceListType aRefList = new ServiceGroupReferenceListType ();
+      final List <ServiceGroupReferenceType> aReferenceTypes = aRefList.getServiceGroupReference ();
+      for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
+      {
+        final String sHref = m_aAPIProvider.getServiceGroupHref (aServiceGroup.getParticpantIdentifier ());
+
+        final ServiceGroupReferenceType aServGroupRefType = new ServiceGroupReferenceType ();
+        aServGroupRefType.setHref (sHref);
+        aReferenceTypes.add (aServGroupRefType);
+      }
+
+      s_aLogger.info (LOG_PREFIX + "Finished getServiceGroupReferenceList(" + sUserID + ")");
+      s_aStatsCounterSuccess.increment ("getServiceGroupReferenceList");
+      return aRefList;
+    }
+    catch (final Throwable t)
+    {
+      s_aLogger.warn (LOG_PREFIX +
+                      "Error in getServiceGroupReferenceList(" +
+                      sUserID +
+                      ") - " +
+                      ClassHelper.getClassLocalName (t) +
+                      " - " +
+                      t.getMessage ());
+      throw t;
+    }
+  }
+
+  @Nonnull
   public ServiceGroupType getServiceGroup (final String sServiceGroupID) throws Throwable
   {
     s_aLogger.info (LOG_PREFIX + "GET /" + sServiceGroupID);
@@ -121,9 +251,7 @@ public final class BDXRServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPNotFoundException ("Failed to parse serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -135,9 +263,7 @@ public final class BDXRServerAPI
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -191,9 +317,7 @@ public final class BDXRServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPNotFoundException ("Failed to parse serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -288,9 +412,7 @@ public final class BDXRServerAPI
       final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       if (aServiceGroupID == null)
       {
-        throw new SMPNotFoundException ("Failed to parse serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -298,18 +420,14 @@ public final class BDXRServerAPI
                                                            .getSMPServiceGroupOfID (aServiceGroupID);
       if (aServiceGroup == null)
       {
-        throw new SMPNotFoundException ("No such serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("No such serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocumentTypeID);
       if (aDocTypeID == null)
       {
-        throw new SMPNotFoundException ("Failed to parse documentTypeID '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("Failed to parse documentTypeID '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -336,11 +454,7 @@ public final class BDXRServerAPI
         else
         {
           // Neither nor is present
-          throw new SMPNotFoundException ("service(" +
-                                          sServiceGroupID +
-                                          "," +
-                                          sDocumentTypeID +
-                                          ")",
+          throw new SMPNotFoundException ("service(" + sServiceGroupID + "," + sDocumentTypeID + ")",
                                           m_aAPIProvider.getCurrentURI ());
         }
       }
@@ -457,10 +571,10 @@ public final class BDXRServerAPI
       {
         // Handle service information
         final ProcessListType aJAXBProcesses = aServiceMetadata.getServiceInformation ().getProcessList ();
-        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList<> ();
+        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
         for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
         {
-          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList<> ();
+          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
           for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
           {
             final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),

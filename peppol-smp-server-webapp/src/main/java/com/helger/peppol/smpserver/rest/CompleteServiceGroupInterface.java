@@ -27,8 +27,10 @@ import javax.ws.rs.core.UriInfo;
 
 import org.w3c.dom.Document;
 
+import com.helger.peppol.bdxr.marshal.BDXRMarshallerCompleteServiceGroupType;
 import com.helger.peppol.smp.marshal.SMPMarshallerCompleteServiceGroupType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.web.scope.mgr.WebScoped;
@@ -65,10 +67,16 @@ public final class CompleteServiceGroupInterface
       {
         case PEPPOL:
         {
+          // Unspecified extension
           final com.helger.peppol.smp.CompleteServiceGroupType ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
           return new SMPMarshallerCompleteServiceGroupType ().getAsDocument (ret);
         }
-        // BDXR does not support complete service group!
+        case BDXR:
+        {
+          // Unspecified extension
+          final com.helger.peppol.bdxr.CompleteServiceGroupType ret = new BDXRServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
+          return new BDXRMarshallerCompleteServiceGroupType ().getAsDocument (ret);
+        }
         default:
           throw new UnsupportedOperationException ("Unsupported REST type specified!");
       }
