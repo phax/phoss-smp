@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
+import com.helger.security.keystore.EKeyStoreType;
 import com.helger.settings.exchange.configfile.ConfigFile;
 import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 
@@ -81,10 +82,12 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 public final class SMPServerConfiguration
 {
   public static final String KEY_SMP_BACKEND = "smp.backend";
+  public static final String KEY_SMP_KEYSTORE_TYPE = "smp.keystore.type";
   public static final String KEY_SMP_KEYSTORE_PATH = "smp.keystore.path";
   public static final String KEY_SMP_KEYSTORE_PASSWORD = "smp.keystore.password";
   public static final String KEY_SMP_KEYSTORE_KEY_ALIAS = "smp.keystore.key.alias";
   public static final String KEY_SMP_KEYSTORE_KEY_PASSWORD = "smp.keystore.key.password";
+  public static final String KEY_SMP_TRUSTSTORE_TYPE = "smp.truststore.type";
   public static final String KEY_SMP_TRUSTSTORE_PATH = "smp.truststore.path";
   public static final String KEY_SMP_TRUSTSTORE_PASSWORD = "smp.truststore.password";
   public static final String KEY_SMP_FORCE_ROOT = "smp.forceroot";
@@ -191,6 +194,17 @@ public final class SMPServerConfiguration
   }
 
   /**
+   * @return The type to the keystore. This is usually JKS. Property
+   *         <code>smp.keystore.type</code>.
+   */
+  @Nonnull
+  public static EKeyStoreType getKeyStoreType ()
+  {
+    final String sType = getConfigFile ().getAsString (KEY_SMP_KEYSTORE_TYPE);
+    return EKeyStoreType.getFromIDCaseInsensitiveOrDefault (sType, EKeyStoreType.JKS);
+  }
+
+  /**
    * @return The path to the keystore. May be a classpath or an absolute file
    *         path. Property <code>smp.keystore.path</code>.
    */
@@ -229,6 +243,17 @@ public final class SMPServerConfiguration
   public static char [] getKeyStoreKeyPassword ()
   {
     return getConfigFile ().getAsCharArray (KEY_SMP_KEYSTORE_KEY_PASSWORD);
+  }
+
+  /**
+   * @return The type to the truststore. This is usually JKS. Property
+   *         <code>smp.truststore.type</code>.
+   */
+  @Nonnull
+  public static EKeyStoreType getTrustStoreType ()
+  {
+    final String sType = getConfigFile ().getAsString (KEY_SMP_TRUSTSTORE_TYPE);
+    return EKeyStoreType.getFromIDCaseInsensitiveOrDefault (sType, EKeyStoreType.JKS);
   }
 
   /**

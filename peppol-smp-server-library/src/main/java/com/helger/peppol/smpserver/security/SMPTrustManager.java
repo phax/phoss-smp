@@ -81,7 +81,8 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
     m_aTrustStore = null;
 
     // Load the trust store
-    final LoadedKeyStore aTrustStoreLoading = KeyStoreHelper.loadKeyStore (SMPServerConfiguration.getTrustStorePath (),
+    final LoadedKeyStore aTrustStoreLoading = KeyStoreHelper.loadKeyStore (SMPServerConfiguration.getTrustStoreType (),
+                                                                           SMPServerConfiguration.getTrustStorePath (),
                                                                            SMPServerConfiguration.getTrustStorePassword ());
     if (aTrustStoreLoading.isFailure ())
     {

@@ -54,6 +54,7 @@ import com.helger.photon.bootstrap3.table.BootstrapTable;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.security.keystore.EKeyStoreType;
 import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
@@ -226,9 +227,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     {
       final HCNodeList aTab = new HCNodeList ();
 
+      final EKeyStoreType eKeyStoreType = PDClientConfiguration.getKeyStoreType ();
       final String sKeyStorePath = PDClientConfiguration.getKeyStorePath ();
 
-      final LoadedKeyStore aKeyStoreLR = KeyStoreHelper.loadKeyStore (sKeyStorePath,
+      final LoadedKeyStore aKeyStoreLR = KeyStoreHelper.loadKeyStore (eKeyStoreType,
+                                                                      sKeyStorePath,
                                                                       PDClientConfiguration.getKeyStorePassword ());
       if (aKeyStoreLR.isFailure ())
       {

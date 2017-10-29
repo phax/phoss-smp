@@ -135,7 +135,8 @@ public class PageSecureTasks extends AbstractSMPWebPage
         aOL.addItem (_createError ("An empty PEPPOL Directory hostname is provided"),
                      new HCDiv ().addChild ("A connection to the PEPPOL Directory server cannot be establised!"));
 
-      final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (PDClientConfiguration.getKeyStorePath (),
+      final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (PDClientConfiguration.getKeyStoreType (),
+                                                                          PDClientConfiguration.getKeyStorePath (),
                                                                           PDClientConfiguration.getKeyStorePassword ());
       if (aLoadedKeyStore.isFailure ())
         aOL.addItem (_createError ("The PEPPOL Directory client certificate configuration is invalid."),

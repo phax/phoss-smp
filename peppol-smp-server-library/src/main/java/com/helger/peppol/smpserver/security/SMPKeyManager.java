@@ -114,7 +114,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     m_aKeyEntry = null;
 
     // Load the key store and get the signing key
-    final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (SMPServerConfiguration.getKeyStorePath (),
+    final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (SMPServerConfiguration.getKeyStoreType (),
+                                                                        SMPServerConfiguration.getKeyStorePath (),
                                                                         SMPServerConfiguration.getKeyStorePassword ());
     if (aLoadedKeyStore.isFailure ())
     {
@@ -212,11 +213,10 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     return aSSLCtx;
   }
 
-  public void signXML (@Nonnull final Element aElementToSign,
-                       final boolean bBDXR) throws NoSuchAlgorithmException,
-                                            InvalidAlgorithmParameterException,
-                                            MarshalException,
-                                            XMLSignatureException
+  public void signXML (@Nonnull final Element aElementToSign, final boolean bBDXR) throws NoSuchAlgorithmException,
+                                                                                   InvalidAlgorithmParameterException,
+                                                                                   MarshalException,
+                                                                                   XMLSignatureException
   {
     // Create a DOM XMLSignatureFactory that will be used to
     // generate the enveloped signature.
