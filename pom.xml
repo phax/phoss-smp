@@ -69,7 +69,7 @@
   <properties>
     <!-- Must correspond to jaxws-tools.version in jaxws-maven-plugin POM -->
     <jaxws.version>2.2.10</jaxws.version>
-    <log4j.version>2.9.1</log4j.version>
+    <log4j.version>2.10.0</log4j.version>
     <jersey.version>2.26</jersey.version>
     <eclipselink.version>2.7.0</eclipselink.version>
   </properties>
@@ -100,7 +100,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-schedule-parent-pom</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
