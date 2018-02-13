@@ -56,6 +56,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   private static final String FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smppdiau";
   private static final String FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smppdh";
   private static final String FIELD_SML_ACTIVE = "smla";
+  private static final String FIELD_SML_NEEDED = "smln";
   private static final String FIELD_SML_URL = "smlu";
 
   public PageSecureSMPSettings (@Nonnull @Nonempty final String sID)
@@ -88,7 +89,10 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory hostname")
                                                   .setCtrl (HCA.createLinkedWebsite (aObject.getPEPPOLDirectoryHostName ())));
     aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
-                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isWriteToSML (),
+                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLActive (),
+                                                                                        aDisplayLocale)));
+    aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection needed?")
+                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLNeeded (),
                                                                                         aDisplayLocale)));
 
     {
@@ -125,6 +129,8 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final String sPEPPOLDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME);
     final boolean bSMLActive = aWPEC.params ().isCheckBoxChecked (FIELD_SML_ACTIVE,
                                                                   SMPServerConfiguration.DEFAULT_SML_ACTIVE);
+    final boolean bSMLNeeded = aWPEC.params ().isCheckBoxChecked (FIELD_SML_NEEDED,
+                                                                  SMPServerConfiguration.DEFAULT_SML_NEEDED);
     final String sSMLURL = aWPEC.params ().getAsString (FIELD_SML_URL);
 
     if (StringHelper.hasNoText (sPEPPOLDirectoryHostName))
@@ -166,6 +172,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                        bPEPPOLDirectoryIntegrationAutoUpdate,
                                                        sPEPPOLDirectoryHostName,
                                                        bSMLActive,
+                                                       bSMLNeeded,
                                                        sSMLURL);
       aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP settings were successfully saved."));
     }
@@ -200,9 +207,14 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SML_ACTIVE,
-                                                                                                           aObject.isWriteToSML ())))
+                                                                                                           aObject.isSMLActive ())))
                                                  .setHelpText ("If this checkbox is checked, service group changes are propagated to the SML.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SML_ACTIVE)));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection needed?")
+                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SML_NEEDED,
+                                                                                                           aObject.isSMLNeeded ())))
+                                                 .setHelpText ("If this checkbox is checked, warnings are emitted if the SML connection is not enabled.")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SML_NEEDED)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML management URL")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_SML_URL,
                                                                                          aObject.getSMLURL ())))

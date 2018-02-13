@@ -114,15 +114,26 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME, sPEPPOLDirectoryHostName);
   }
 
-  public boolean isWriteToSML ()
+  public boolean isSMLActive ()
   {
     return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_ACTIVE, SMPServerConfiguration.DEFAULT_SML_ACTIVE);
   }
 
   @Nonnull
-  public EChange setWriteToSML (final boolean bWriteToSML)
+  public EChange setSMLActive (final boolean bSMLActive)
   {
-    return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_ACTIVE, bWriteToSML);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_ACTIVE, bSMLActive);
+  }
+
+  public boolean isSMLNeeded ()
+  {
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_NEEDED, SMPServerConfiguration.DEFAULT_SML_NEEDED);
+  }
+
+  @Nonnull
+  public EChange setSMLNeeded (final boolean bSMLNeeded)
+  {
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_NEEDED, bSMLNeeded);
   }
 
   @Nullable

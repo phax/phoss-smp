@@ -124,9 +124,13 @@ public class PageSecureTasks extends AbstractSMPWebPage
 
     // Check SML configuration
     {
-      if (!SMPMetaManager.getSettings ().isWriteToSML ())
-        aOL.addItem (_createWarning ("The connection to the SML is not active."),
-                     new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+      if (!SMPMetaManager.getSettings ().isSMLActive ())
+      {
+        // Warn only if SML is needed
+        if (SMPMetaManager.getSettings ().isSMLNeeded ())
+          aOL.addItem (_createWarning ("The connection to the SML is not active."),
+                       new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+      }
     }
 
     if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())

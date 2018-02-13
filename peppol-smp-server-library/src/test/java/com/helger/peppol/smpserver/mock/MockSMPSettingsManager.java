@@ -35,7 +35,8 @@ final class MockSMPSettingsManager implements ISMPSettingsManager
                                  final boolean bPEPPOLDirectoryIntegrationEnabled,
                                  final boolean bPEPPOLDirectoryIntegrationAutoUpdate,
                                  final String sPEPPOLDirectoryHostName,
-                                 final boolean bWriteToSML,
+                                 final boolean bSMLActive,
+                                 final boolean bSMLNeeded,
                                  final String sSMLURL)
   {
     throw new UnsupportedOperationException ();

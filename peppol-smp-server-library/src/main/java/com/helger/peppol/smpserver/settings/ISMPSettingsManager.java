@@ -50,8 +50,10 @@ public interface ISMPSettingsManager
    * @param sPEPPOLDirectoryHostName
    *        The hostname of the PEPPOL Directory server to use. Must be fully
    *        qualified including the protocol.
-   * @param bWriteToSML
+   * @param bSMLActive
    *        <code>true</code> to enable write access to the SML
+   * @param bSMLNeeded
+   *        <code>true</code> to warn if SML is disabled
    * @param sSMLURL
    *        The hostname of the SMP to use. Must be fully qualified including
    *        the protocol.
@@ -62,6 +64,7 @@ public interface ISMPSettingsManager
                           boolean bPEPPOLDirectoryIntegrationEnabled,
                           boolean bPEPPOLDirectoryIntegrationAutoUpdate,
                           @Nullable String sPEPPOLDirectoryHostName,
-                          boolean bWriteToSML,
+                          boolean bSMLActive,
+                          boolean bSMLNeeded,
                           @Nullable String sSMLURL);
 }

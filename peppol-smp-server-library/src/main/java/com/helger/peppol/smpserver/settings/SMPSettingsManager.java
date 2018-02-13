@@ -83,7 +83,8 @@ public class SMPSettingsManager extends AbstractPhotonSimpleDAO implements ISMPS
                                  final boolean bPEPPOLDirectoryIntegrationEnabled,
                                  final boolean bPEPPOLDirectoryIntegrationAutoUpdate,
                                  @Nullable final String sPEPPOLDirectoryHostName,
-                                 final boolean bWriteToSML,
+                                 final boolean bSMLActive,
+                                 final boolean bSMLNeeded,
                                  @Nullable final String sSMLURL)
   {
     EChange eChange = EChange.UNCHANGED;
@@ -94,7 +95,8 @@ public class SMPSettingsManager extends AbstractPhotonSimpleDAO implements ISMPS
       eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationEnabled (bPEPPOLDirectoryIntegrationEnabled));
       eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationAutoUpdate (bPEPPOLDirectoryIntegrationAutoUpdate));
       eChange = eChange.or (m_aSettings.setPEPPOLDirectoryHostName (sPEPPOLDirectoryHostName));
-      eChange = eChange.or (m_aSettings.setWriteToSML (bWriteToSML));
+      eChange = eChange.or (m_aSettings.setSMLActive (bSMLActive));
+      eChange = eChange.or (m_aSettings.setSMLNeeded (bSMLNeeded));
       eChange = eChange.or (m_aSettings.setSMLURL (sSMLURL));
       if (eChange.isChanged ())
         markAsChanged ();

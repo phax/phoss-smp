@@ -39,13 +39,18 @@ public final class MenuSecure
   public static void init (@Nonnull final IMenuTree aMenuTree)
   {
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID);
-    final IMenuObjectFilter aFilterPEPPOLDirectory = aValue -> SMPMetaManager.getSettings ()
-                                                                             .isPEPPOLDirectoryIntegrationEnabled () &&
-                                                               SMPMetaManager.hasBusinessCardMgr ();
-    final IMenuObjectFilter aFilterSMLConnectionActive = aValue -> SMPMetaManager.getSettings ().isWriteToSML ();
+    final IMenuObjectFilter aFilterPEPPOLDirectory = x -> SMPMetaManager.getSettings ()
+                                                                        .isPEPPOLDirectoryIntegrationEnabled () &&
+                                                          SMPMetaManager.hasBusinessCardMgr ();
+    final IMenuObjectFilter aFilterSMLConnectionActive = x -> SMPMetaManager.getSettings ().isSMLActive ();
+    final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> SMPMetaManager.getSettings ().isSMLActive () ||
+                                                                      SMPMetaManager.getSettings ().isSMLNeeded ();
 
     if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
+    {
+      // E.g. SQL version requires separate menu item
       aMenuTree.createRootItem (new PageSecureUser (CMenuSecure.MENU_USERS));
+    }
 
     {
       final IMenuItemPage aServiceGroups = aMenuTree.createRootItem (new PageSecureServiceGroup (CMenuSecure.MENU_SERVICE_GROUPS));
@@ -72,10 +77,12 @@ public final class MenuSecure
                                                                                                                  aMenuTree));
       {
         final IMenuItemPage aAdminSML = aMenuTree.createItem (aAdmin,
-                                                              new BasePageShowChildren<> (CMenuSecure.MENU_SML,
-                                                                                          "SML",
-                                                                                          aMenuTree));
-        aMenuTree.createItem (aAdminSML, new PageSecureSMLInfo (CMenuSecure.MENU_SML_INFO));
+                                                              new BasePageShowChildren <> (CMenuSecure.MENU_SML,
+                                                                                           "SML",
+                                                                                           aMenuTree))
+                                                 .setDisplayFilter (aFilterSMLConnectionActiveOrNeeded);
+        aMenuTree.createItem (aAdminSML, new PageSecureSMLInfo (CMenuSecure.MENU_SML_INFO))
+                 .setDisplayFilter (aFilterSMLConnectionActiveOrNeeded);
         aMenuTree.createItem (aAdminSML, new PageSecureSMLRegistration (CMenuSecure.MENU_SML_REGISTRATION))
                  .setDisplayFilter (aFilterSMLConnectionActive);
       }

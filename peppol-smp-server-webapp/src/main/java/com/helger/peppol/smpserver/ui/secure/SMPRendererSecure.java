@@ -117,10 +117,14 @@ public final class SMPRendererSecure
     ret.addChild (BootstrapMenuItemRenderer.createSideBarMenu (aLEC));
 
     // Information on SML usage
-    if (aSettings.isWriteToSML ())
+    if (aSettings.isSMLActive ())
       ret.addChild (new BootstrapInfoBox ().addChild ("SML connection active!"));
     else
-      ret.addChild (new BootstrapWarnBox ().addChild ("SML connection NOT active!"));
+    {
+      // Warn only if SML is needed
+      if (SMPMetaManager.getSettings ().isSMLNeeded ())
+        ret.addChild (new BootstrapWarnBox ().addChild ("SML connection NOT active!"));
+    }
 
     if (SMPServerConfiguration.getRESTType ().isPEPPOL ())
     {

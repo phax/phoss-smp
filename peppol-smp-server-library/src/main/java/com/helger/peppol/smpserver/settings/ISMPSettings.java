@@ -61,12 +61,32 @@ public interface ISMPSettings extends ITypedObject <String>
    * @return <code>true</code> if the SML connection is active,
    *         <code>false</code> if not.
    */
-  boolean isWriteToSML ();
+  @Deprecated
+  default boolean isWriteToSML ()
+  {
+    return isSMLActive ();
+  }
+
+  /**
+   * @return <code>true</code> if the SML connection is active,
+   *         <code>false</code> if not.
+   * @since 5.0.4 - renamed
+   */
+  boolean isSMLActive ();
+
+  /**
+   * @return <code>true</code> if the SML is needed and warnings should be
+   *         emitted if it is disabled, <code>false</code> if not. Default is
+   *         <code>true</code>.
+   * @see #isSMLActive()
+   * @since 5.0.4
+   */
+  boolean isSMLNeeded ();
 
   /**
    * @return The SML URL to use (the manage participant endpoint - e.g.
    *         <code>https://edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier</code>).
-   *         Only relevant when {@link #isWriteToSML()} is <code>true</code>.
+   *         Only relevant when {@link #isSMLActive()} is <code>true</code>.
    */
   @Nullable
   String getSMLURL ();
