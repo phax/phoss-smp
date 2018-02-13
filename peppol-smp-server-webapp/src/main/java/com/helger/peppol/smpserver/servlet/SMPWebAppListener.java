@@ -129,6 +129,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected void initMenu ()
   {
+    // Determine backend
+    // Required before menu!
+    SMPMetaManager.initBackendFromConfiguration ();
+
     // Create all menu items
     {
       final MenuTree aMenuTree = new MenuTree ();
@@ -209,8 +213,5 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
         }
       }
     });
-
-    // Determine backend
-    SMPMetaManager.initBackendFromConfiguration ();
   }
 }
