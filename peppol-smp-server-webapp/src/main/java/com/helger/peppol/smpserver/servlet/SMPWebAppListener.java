@@ -189,7 +189,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Callback on BusinessCard manager - if something happens, notify PD server
     SMPMetaManager.getBusinessCardMgr ().bcCallbacks ().add (new ISMPBusinessCardCallback ()
     {
-      public void onCreateOrUpdateSMPBusinessCard (final ISMPBusinessCard aBusinessCard)
+      public void onCreateOrUpdateSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
       {
         if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
         {
@@ -201,7 +201,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
         }
       }
 
-      public void onDeleteSMPBusinessCard (final ISMPBusinessCard aBusinessCard)
+      public void onDeleteSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
       {
         if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
         {
