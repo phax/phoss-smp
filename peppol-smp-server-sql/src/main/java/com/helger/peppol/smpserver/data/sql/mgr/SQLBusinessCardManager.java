@@ -23,6 +23,8 @@ import com.helger.collection.multimap.IMultiMapListBased;
 import com.helger.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
@@ -40,6 +42,7 @@ import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBBusinessCardEntity;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
@@ -60,11 +63,19 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                                                          .setWriteNewlineAtEnd (false);
 
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
+  private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
   public SQLBusinessCardManager (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     ValueEnforcer.notNull (aServiceGroupMgr, "ServiceGroupMgr");
     m_aServiceGroupMgr = aServiceGroupMgr;
+  }
+
+  @Nonnull
+  @ReturnsMutableObject
+  public CallbackList <ISMPBusinessCardCallback> bcCallbacks ()
+  {
+    return m_aCBs;
   }
 
   @Nonnull
@@ -197,10 +208,15 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       return null;
     }
 
+    final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aServiceGroup, aEntities);
+
+    // Invoke generic callbacks
+    m_aCBs.forEach (x -> x.onCreateOrUpdateSMPBusinessCard (aNewBusinessCard));
+
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("Finished createOrUpdateSMPBusinessCard");
 
-    return new SMPBusinessCard (aServiceGroup, aEntities);
+    return aNewBusinessCard;
   }
 
   @Nonnull
@@ -229,10 +245,18 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       return EChange.UNCHANGED;
     }
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Finished deleteSMPBusinessCard. Change=" + ret.get ().isChanged ());
+    final EChange eChange = ret.get ();
 
-    return ret.get ();
+    if (eChange.isChanged ())
+    {
+      // Invoke generic callbacks
+      m_aCBs.forEach (x -> x.onDeleteSMPBusinessCard (aSMPBusinessCard));
+    }
+
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("Finished deleteSMPBusinessCard. Change=" + eChange.isChanged ());
+
+    return eChange;
   }
 
   @Nonnull

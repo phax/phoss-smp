@@ -30,11 +30,14 @@ import com.helger.commons.annotation.ELockType;
 import com.helger.commons.annotation.IsLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.dao.DAOException;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
@@ -53,9 +56,18 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
 {
   private static final Logger s_aLogger = LoggerFactory.getLogger (XMLBusinessCardManager.class);
 
+  private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
+
   public XMLBusinessCardManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPBusinessCard.class, sFilename);
+  }
+
+  @Nonnull
+  @ReturnsMutableObject
+  public CallbackList <ISMPBusinessCardCallback> bcCallbacks ()
+  {
+    return m_aCBs;
   }
 
   @Nonnull
@@ -123,6 +135,10 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
       _createSMPBusinessCard (aNewBusinessCard);
       s_aLogger.info ("createOrUpdateSMPBusinessCard create successful");
     }
+
+    // Invoke generic callbacks
+    m_aCBs.forEach (x -> x.onCreateOrUpdateSMPBusinessCard (aNewBusinessCard));
+
     return aNewBusinessCard;
   }
 
@@ -148,6 +164,10 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
     {
       m_aRWLock.writeLock ().unlock ();
     }
+
+    // Invoke generic callbacks
+    m_aCBs.forEach (x -> x.onDeleteSMPBusinessCard (aSMPBusinessCard));
+
     AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
                                       aSMPBusinessCard.getID (),
                                       aSMPBusinessCard.getServiceGroupID (),

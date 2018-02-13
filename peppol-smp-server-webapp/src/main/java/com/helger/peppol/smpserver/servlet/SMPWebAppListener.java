@@ -33,6 +33,8 @@ import com.helger.peppol.smpserver.app.AppSecurity;
 import com.helger.peppol.smpserver.app.CApp;
 import com.helger.peppol.smpserver.app.PDClientProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.peppol.smpserver.ui.pub.MenuPublic;
@@ -179,6 +181,34 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     // If the SMP settings change, the PD client must be re-created
     SMPMetaManager.getSettingsMgr ().callbacks ().add (x -> PDClientProvider.getInstance ().resetPDClient ());
+
+    // Callback on BusinessCard manager - if something happens, notify PD server
+    SMPMetaManager.getBusinessCardMgr ().bcCallbacks ().add (new ISMPBusinessCardCallback ()
+    {
+      public void onCreateOrUpdateSMPBusinessCard (final ISMPBusinessCard aBusinessCard)
+      {
+        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+        {
+          // Notify PD server
+          PDClientProvider.getInstance ()
+                          .getPDClient ()
+                          .addServiceGroupToIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ())
+                          .isSuccess ();
+        }
+      }
+
+      public void onDeleteSMPBusinessCard (final ISMPBusinessCard aBusinessCard)
+      {
+        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+        {
+          // Notify PD server
+          PDClientProvider.getInstance ()
+                          .getPDClient ()
+                          .addServiceGroupToIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ())
+                          .isSuccess ();
+        }
+      }
+    });
 
     // Determine backend
     SMPMetaManager.initBackendFromConfiguration ();

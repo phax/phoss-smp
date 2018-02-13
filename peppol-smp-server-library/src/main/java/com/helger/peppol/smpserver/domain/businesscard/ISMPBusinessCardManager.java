@@ -17,6 +17,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -32,6 +34,14 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
  */
 public interface ISMPBusinessCardManager
 {
+  /**
+   * @return The callbacks for the business card manager. Never
+   *         <code>null</code>.
+   */
+  @Nonnull
+  @ReturnsMutableObject
+  CallbackList <ISMPBusinessCardCallback> bcCallbacks ();
+
   /**
    * Create or update a business card for a service group.
    *

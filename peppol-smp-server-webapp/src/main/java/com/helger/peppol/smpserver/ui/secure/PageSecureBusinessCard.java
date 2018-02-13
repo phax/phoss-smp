@@ -39,7 +39,6 @@ import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.locale.country.CountryCache;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.state.ESuccess;
-import com.helger.commons.state.ETriState;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
@@ -164,20 +163,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
         if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
         {
-          boolean bNotifiedServer = false;
-          if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
-          {
-            // Notify PD server
-            bNotifiedServer = PDClientProvider.getInstance ()
-                                              .getPDClient ()
-                                              .deleteServiceGroupFromIndex (aSelectedObject.getServiceGroup ()
-                                                                                           .getParticpantIdentifier ())
-                                              .isSuccess ();
-          }
-
           aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!" +
-                                                                              (bNotifiedServer ? " The PEPPOL Directory server was notified about this deletion."
-                                                                                               : "")));
+                                                                              (SMPMetaManager.getSettings ()
+                                                                                             .isPEPPOLDirectoryIntegrationAutoUpdate () ? " PEPPOL Directory server should have been updated."
+                                                                                                                                        : "")));
         }
         else
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
@@ -546,22 +535,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aSMPEntities.sort ( (o1, o2) -> o1.getName ().compareToIgnoreCase (o2.getName ()));
       aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities);
 
-      ETriState eNotifiedServer = ETriState.UNDEFINED;
-      if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
-      {
-        // Notify PD server
-        eNotifiedServer = ETriState.valueOf (PDClientProvider.getInstance ()
-                                                             .getPDClient ()
-                                                             .addServiceGroupToIndex (aServiceGroup.getParticpantIdentifier ())
-                                                             .isSuccess ());
-      }
-
       aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
                                                                           aServiceGroup.getID () +
                                                                           "' was successfully saved." +
-                                                                          (eNotifiedServer.isTrue () ? " The PEPPOL Directory server was notified about this modification."
-                                                                                                     : eNotifiedServer.isFalse () ? " An error occurred when notifying the PEPPOL Directory server about the change."
-                                                                                                                                  : "")));
+                                                                          (SMPMetaManager.getSettings ()
+                                                                                         .isPEPPOLDirectoryIntegrationAutoUpdate () ? " PEPPOL Directory server should have been updated."
+                                                                                                                                    : "")));
     }
   }
 
@@ -766,8 +745,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
         final JSVar aJSAppendData = aJSAppend.param ("data");
-        aJSAppend.body ()
-                 .add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
+        aJSAppend.body ().add (JQuery.idRef (sBodyID)
+                                     .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
         aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT.getInvocationURL (aRequestScope)
@@ -827,8 +806,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
         final JSVar aJSAppendData = aJSAppend.param ("data");
-        aJSAppend.body ()
-                 .add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
+        aJSAppend.body ().add (JQuery.idRef (sBodyID)
+                                     .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
         aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT.getInvocationURL (aRequestScope)
