@@ -127,11 +127,23 @@ public final class AppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * This method has only effect, if participants are shown on the start page.
+   *
    * @return <code>true</code> if the start page should show a dynamic table
    * @since 5.0.2
    */
   public static boolean isStartPageDynamicTable ()
   {
     return s_aConfigFile.getAsBoolean ("webapp.startpage.dynamictable", false);
+  }
+
+  /**
+   * @return <code>true</code> to show no participants on the start page.
+   *         Default is <code>false</code>.
+   * @since 5.0.4
+   */
+  public static boolean isStartPageParticipantsNone ()
+  {
+    return s_aConfigFile.getAsBoolean ("webapp.startpage.participants.none", false);
   }
 }

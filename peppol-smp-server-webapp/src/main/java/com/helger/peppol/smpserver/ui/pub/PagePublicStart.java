@@ -70,62 +70,71 @@ public final class PagePublicStart extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups ();
 
-    // Use dynamic or static table?
-    final boolean bUseDataTables = AppConfiguration.isStartPageDynamicTable ();
-
-    AbstractHCTable <?> aFinalTable;
-    if (bUseDataTables)
+    if (AppConfiguration.isStartPageParticipantsNone ())
     {
-      // Dynamic
-      final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                          new DTCol ("Extension?").setDataSort (1, 0),
-                                          new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-      aFinalTable = aTable;
+      // New in v5.0.4
+      aNodeList.addChild (new BootstrapInfoBox ().addChild ("This SMP has disabled the list of participants."));
     }
     else
     {
-      // Static
-      final BootstrapTable aTable = new BootstrapTable ();
-      aTable.setBordered (true);
-      aTable.setCondensed (false);
-      aTable.setStriped (true);
-      aTable.addHeaderRow ()
-            .addCell ("Participant ID")
-            .addCell ("Extension?")
-            .addCell (EPhotonCoreText.ACTIONS.getDisplayText (aDisplayLocale));
-      aFinalTable = aTable;
+      final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+      final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups ();
 
-      // Sort manually
-      aServiceGroups.sort (Comparator.comparing (x -> x.getParticpantIdentifier ().getURIEncoded ()));
-    }
+      // Use dynamic or static table?
+      final boolean bUseDataTables = AppConfiguration.isStartPageDynamicTable ();
 
-    for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
-    {
-      final String sDisplayName = aServiceGroup.getParticpantIdentifier ().getURIEncoded ();
-
-      final HCRow aRow = aFinalTable.addBodyRow ();
-      aRow.addCell (sDisplayName);
-      aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
-      aRow.addCell (new HCA (LinkHelper.getURLWithServerAndContext (aServiceGroup.getParticpantIdentifier ()
-                                                                                 .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
-                                                                                                                      sDisplayName)
-                                                                                                           .setTargetBlank ()
-                                                                                                           .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
-    }
-    if (aFinalTable.hasBodyRows ())
-    {
-      aNodeList.addChild (aFinalTable);
-
+      AbstractHCTable <?> aFinalTable;
       if (bUseDataTables)
       {
-        final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
-        aNodeList.addChild (aDataTables);
+        // Dynamic
+        final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
+                                            new DTCol ("Extension?").setDataSort (1, 0),
+                                            new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
+        aFinalTable = aTable;
       }
+      else
+      {
+        // Static
+        final BootstrapTable aTable = new BootstrapTable ();
+        aTable.setBordered (true);
+        aTable.setCondensed (false);
+        aTable.setStriped (true);
+        aTable.addHeaderRow ()
+              .addCell ("Participant ID")
+              .addCell ("Extension?")
+              .addCell (EPhotonCoreText.ACTIONS.getDisplayText (aDisplayLocale));
+        aFinalTable = aTable;
+
+        // Sort manually
+        aServiceGroups.sort (Comparator.comparing (x -> x.getParticpantIdentifier ().getURIEncoded ()));
+      }
+
+      for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
+      {
+        final String sDisplayName = aServiceGroup.getParticpantIdentifier ().getURIEncoded ();
+
+        final HCRow aRow = aFinalTable.addBodyRow ();
+        aRow.addCell (sDisplayName);
+        aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
+        aRow.addCell (new HCA (LinkHelper.getURLWithServerAndContext (aServiceGroup.getParticpantIdentifier ()
+                                                                                   .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
+                                                                                                                        sDisplayName)
+                                                                                                             .setTargetBlank ()
+                                                                                                             .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+      }
+      if (aFinalTable.hasBodyRows ())
+      {
+        aNodeList.addChild (aFinalTable);
+
+        if (bUseDataTables)
+        {
+          final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
+          aNodeList.addChild (aDataTables);
+        }
+      }
+      else
+        aNodeList.addChild (new BootstrapInfoBox ().addChild ("This SMP does not manage any participant yet."));
     }
-    else
-      aNodeList.addChild (new BootstrapInfoBox ().addChild ("This SMP does not manage any participant yet."));
   }
 }
