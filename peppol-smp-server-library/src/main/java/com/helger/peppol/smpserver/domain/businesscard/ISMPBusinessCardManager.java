@@ -37,6 +37,7 @@ public interface ISMPBusinessCardManager
   /**
    * @return The callbacks for the business card manager. Never
    *         <code>null</code>.
+   * @since 5.0.4
    */
   @Nonnull
   @ReturnsMutableObject

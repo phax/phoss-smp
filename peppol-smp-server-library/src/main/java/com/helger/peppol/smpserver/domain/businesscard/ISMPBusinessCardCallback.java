@@ -21,6 +21,7 @@ import com.helger.commons.callback.ICallback;
  * </p>
  *
  * @author Philip Helger
+ * @since 5.0.4
  */
 public interface ISMPBusinessCardCallback extends ICallback
 {
