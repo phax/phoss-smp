@@ -49,6 +49,8 @@ Default credentials are in the Wiki at https://github.com/phax/peppol-smp-server
 
 The data directory inside the Docker image, where the data is stored is usually `/home/git/conf`.
  
+To check the log file use `docker logs phoss-smp`. There is no catalina.out file - only a catalina.out.yyyy-mm-dd.
+ 
 ## Stopping
 
 When you don't need the image anymore stop and remove it like this:
