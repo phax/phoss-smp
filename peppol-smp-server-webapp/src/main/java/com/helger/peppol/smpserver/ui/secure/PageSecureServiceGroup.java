@@ -517,12 +517,17 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    // Disable button if no SML URL is configured
-    // Disable button if no service group is present
-    aToolbar.addAndReturnButton ("Check DNS state",
-                                 aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
-                                 EDefaultIcon.MAGNIFIER)
-            .setDisabled (_getSMLHostName () == null || aAllServiceGroups.isEmpty ());
+    if (SMPMetaManager.getSettings ().isSMLNeeded ())
+    {
+      // Disable button if no SML URL is configured
+      // Disable button if no service group is present
+      aToolbar.addAndReturnButton ("Check DNS state",
+                                   aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
+                                   EDefaultIcon.MAGNIFIER)
+              .setDisabled (_getSMLHostName () == null ||
+                            aAllServiceGroups.isEmpty () ||
+                            !SMPMetaManager.getSettings ().isSMLActive ());
+    }
     aNodeList.addChild (aToolbar);
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
