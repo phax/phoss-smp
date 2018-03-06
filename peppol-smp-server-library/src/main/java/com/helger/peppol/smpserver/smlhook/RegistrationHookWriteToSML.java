@@ -56,7 +56,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   {}
 
   @Nonnull
-  private ManageParticipantIdentifierServiceCaller _createSMLCaller ()
+  private static ManageParticipantIdentifierServiceCaller _createSMLCaller ()
   {
     // SML endpoint (incl. the service name)
     final String sSMLURL = SMPMetaManager.getSettings ().getSMLURL ();
@@ -105,6 +105,12 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     final ManageParticipantIdentifierServiceCaller ret = new ManageParticipantIdentifierServiceCaller (aSMLEndpointURL);
     ret.setSSLSocketFactory (aSocketFactory);
     ret.setHostnameVerifier (aHostnameVerifier);
+    final Integer aConnectionTimeoutMS = SMPServerConfiguration.getSMLConnectionTimeoutMS ();
+    if (aConnectionTimeoutMS != null)
+      ret.setConnectionTimeoutMS (aConnectionTimeoutMS.intValue ());
+    final Integer aRequestTimeoutMS = SMPServerConfiguration.getSMLRequestTimeoutMS ();
+    if (aRequestTimeoutMS != null)
+      ret.setRequestTimeoutMS (aRequestTimeoutMS.intValue ());
     return ret;
   }
 

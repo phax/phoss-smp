@@ -74,6 +74,8 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_SMPID = "sml.smpid";
   public static final String KEY_SML_SMP_IP = "sml.smp.ip";
   public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";
+  public static final String KEY_SML_CONNECTION_TIMEOUT_MS = "sml.connection.timeout.ms";
+  public static final String KEY_SML_REQUEST_TIMEOUT_MS = "sml.request.timeout.ms";
 
   public static final boolean DEFAULT_SMP_FORCEROOT = false;
   public static final ESMPIdentifierType DEFAULT_SMP_IDENTIFIER_TYPE = ESMPIdentifierType.PEPPOL;
@@ -330,5 +332,29 @@ public final class SMPServerConfiguration
     if (StringHelper.hasText (ret) && !ret.startsWith ("http://"))
       ret = "http://" + ret;
     return ret;
+  }
+
+  /**
+   * @return The connection timeout in milliseconds used for connecting to the
+   *         SML server. May be <code>null</code> in which case the system
+   *         default timeout should be used.
+   * @since 5.0.4
+   */
+  @Nullable
+  public static Integer getSMLConnectionTimeoutMS ()
+  {
+    return getConfigFile ().getAsIntObj (KEY_SML_CONNECTION_TIMEOUT_MS);
+  }
+
+  /**
+   * @return The request timeout in milliseconds used for connecting to the SML
+   *         server. May be <code>null</code> in which case the system default
+   *         timeout should be used.
+   * @since 5.0.4
+   */
+  @Nullable
+  public static Integer getSMLRequestTimeoutMS ()
+  {
+    return getConfigFile ().getAsIntObj (KEY_SML_REQUEST_TIMEOUT_MS);
   }
 }
