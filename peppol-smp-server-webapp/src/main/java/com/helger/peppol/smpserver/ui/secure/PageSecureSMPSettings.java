@@ -145,7 +145,10 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                  "SML connection cannot be activated, because the configured keystore is invalid!");
 
     if (StringHelper.hasNoText (sSMLURL))
-      aFormErrors.addFieldError (FIELD_SML_URL, "SML management URL may not be empty.");
+    {
+      if (bSMLActive)
+        aFormErrors.addFieldError (FIELD_SML_URL, "SML management URL may not be empty if SML is active.");
+    }
     else
     {
       final URL aURL = URLHelper.getAsURL (sSMLURL);

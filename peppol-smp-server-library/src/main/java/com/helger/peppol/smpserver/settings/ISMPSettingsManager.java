@@ -56,7 +56,7 @@ public interface ISMPSettingsManager
    *        <code>true</code> to warn if SML is disabled
    * @param sSMLURL
    *        The hostname of the SMP to use. Must be fully qualified including
-   *        the protocol.
+   *        the protocol. May be <code>null</code> if not active.
    * @return {@link EChange}
    */
   @Nonnull

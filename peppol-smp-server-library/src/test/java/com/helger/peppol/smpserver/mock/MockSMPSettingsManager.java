@@ -10,6 +10,8 @@
  */
 package com.helger.peppol.smpserver.mock;
 
+import javax.annotation.Nullable;
+
 import com.helger.commons.annotation.UnsupportedOperation;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
@@ -34,10 +36,10 @@ final class MockSMPSettingsManager implements ISMPSettingsManager
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
                                  final boolean bPEPPOLDirectoryIntegrationEnabled,
                                  final boolean bPEPPOLDirectoryIntegrationAutoUpdate,
-                                 final String sPEPPOLDirectoryHostName,
+                                 @Nullable final String sPEPPOLDirectoryHostName,
                                  final boolean bSMLActive,
                                  final boolean bSMLNeeded,
-                                 final String sSMLURL)
+                                 @Nullable final String sSMLURL)
   {
     throw new UnsupportedOperationException ();
   }
