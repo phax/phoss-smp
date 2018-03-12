@@ -70,15 +70,21 @@ public class PageSecureTasks extends AbstractSMPWebPage
   }
 
   @Nonnull
-  private static IHCNode _createError (@Nonnull final String sMsg)
+  private static IHCNode _createInfo (@Nonnull final String sMsg)
   {
-    return new BootstrapLabel (EBootstrapLabelType.DANGER).addChild (sMsg);
+    return new BootstrapLabel (EBootstrapLabelType.INFO).addChild ("Information: " + sMsg);
   }
 
   @Nonnull
   private static IHCNode _createWarning (@Nonnull final String sMsg)
   {
-    return new BootstrapLabel (EBootstrapLabelType.WARNING).addChild (sMsg);
+    return new BootstrapLabel (EBootstrapLabelType.WARNING).addChild ("Warning: " + sMsg);
+  }
+
+  @Nonnull
+  private static IHCNode _createError (@Nonnull final String sMsg)
+  {
+    return new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("Error: " + sMsg);
   }
 
   @Override
@@ -164,7 +170,8 @@ public class PageSecureTasks extends AbstractSMPWebPage
           final ICommonsList <ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
           if (aServiceInfos.isEmpty ())
           {
-            aULPerSG.addItem (_createWarning ("No endpoint is configured for this service group."));
+            // This is merely a warning or an error
+            aULPerSG.addItem (_createInfo ("No endpoint is configured for this service group."));
           }
           else
           {
