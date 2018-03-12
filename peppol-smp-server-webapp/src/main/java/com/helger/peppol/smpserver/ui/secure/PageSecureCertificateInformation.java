@@ -26,12 +26,15 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.lang.ClassHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.impl.HCNodeList;
@@ -67,8 +70,58 @@ import com.helger.security.keystore.LoadedKeyStore;
  */
 public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 {
-  private static final String SMP_ISSUER_PILOT = "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK";
-  private static final String SMP_ISSUER_PRODUCTION = "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK";
+  private static enum EPredefinedCert
+  {
+    PEPPOL_PILOT_V2 ("PEPPOL pilot v2",
+                     "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK",
+                     3),
+    PEPPOL_PRODUCTION_V2 ("PEPPOL production v2",
+                          "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK",
+                          3),
+    PEPPOL_PILOT_V3 ("PEPPOL pilot v3",
+                     "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
+                     2),
+    PEPPOL_PRODUCTION_V3 ("PEPPOL production v3",
+                          "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
+                          2);
+
+    private final String m_sName;
+    private final String m_sIssuer;
+    private final int m_nCerts;
+
+    private EPredefinedCert (@Nonnull @Nonempty final String sName,
+                             @Nonnull @Nonempty final String sIssuer,
+                             @Nonnegative final int nCerts)
+    {
+      m_sName = sName;
+      m_sIssuer = sIssuer;
+      m_nCerts = nCerts;
+    }
+
+    @Nonnull
+    @Nonempty
+    public String getName ()
+    {
+      return m_sName;
+    }
+
+    @Nonnegative
+    public int getCertificateTreeLength ()
+    {
+      return m_nCerts;
+    }
+
+    @Nullable
+    public static EPredefinedCert getFromIssuerOrNull (@Nullable final String sIssuer)
+    {
+      if (StringHelper.hasText (sIssuer))
+        for (final EPredefinedCert e : values ())
+          if (e.m_sIssuer.equals (sIssuer))
+            return e;
+      return null;
+    }
+  }
+
   private static final String ACTION_RELOAD_KEYSTORE = "reloadkeystore";
   private static final String ACTION_RELOAD_TRUSTSTORE = "reloadtruststore";
 
@@ -138,20 +191,23 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                                    SMPServerConfiguration.getKeyStoreKeyAlias () +
                                                                                    "' was successfully loaded.")));
 
-        if (aChain.length != 3)
-          aTab.addChild (new BootstrapWarnBox ().addChild ("The private key should be a chain of 3 certificates but it has " +
-                                                           aChain.length +
-                                                           " certificates. Please ensure that the respective root certificates are contained!"));
-
         if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
         {
           final X509Certificate aHead = (X509Certificate) aChain[0];
           final String sIssuer = aHead.getIssuerX500Principal ().getName ();
-          if (SMP_ISSUER_PILOT.equals (sIssuer))
-            aTab.addChild (new BootstrapWarnBox ().addChild ("You are currently using a PEPPOL pilot certificate!"));
-          else
-            if (SMP_ISSUER_PRODUCTION.equals (sIssuer))
-              aTab.addChild (new BootstrapSuccessBox ().addChild ("You are currently using a PEPPOL production certificate!"));
+          final EPredefinedCert eCert = EPredefinedCert.getFromIssuerOrNull (sIssuer);
+          if (eCert != null)
+          {
+            aTab.addChild (new BootstrapInfoBox ().addChild ("You are currently using a " +
+                                                             eCert.getName () +
+                                                             " certificate!"));
+            if (aChain.length != eCert.getCertificateTreeLength ())
+              aTab.addChild (new BootstrapErrorBox ().addChild ("The private key should be a chain of " +
+                                                                eCert.getCertificateTreeLength () +
+                                                                " certificates but it has " +
+                                                                aChain.length +
+                                                                " certificates. Please ensure that the respective root certificates are contained!"));
+          }
           // else: we don't care
         }
 
@@ -266,20 +322,23 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                                      sKeyStoreAlias +
                                                                                      "' was successfully loaded.")));
 
-          if (aChain.length != 3)
-            aTab.addChild (new BootstrapWarnBox ().addChild ("The private key should be a chain of 3 certificates but it has " +
-                                                             aChain.length +
-                                                             " certificates. Please ensure that the respective root certificates are contained!"));
-
           if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
           {
             final X509Certificate aHead = (X509Certificate) aChain[0];
             final String sIssuer = aHead.getIssuerX500Principal ().getName ();
-            if (SMP_ISSUER_PILOT.equals (sIssuer))
-              aTab.addChild (new BootstrapWarnBox ().addChild ("You are currently using a PEPPOL pilot certificate!"));
-            else
-              if (SMP_ISSUER_PRODUCTION.equals (sIssuer))
-                aTab.addChild (new BootstrapSuccessBox ().addChild ("You are currently using a PEPPOL production certificate!"));
+            final EPredefinedCert eCert = EPredefinedCert.getFromIssuerOrNull (sIssuer);
+            if (eCert != null)
+            {
+              aTab.addChild (new BootstrapInfoBox ().addChild ("You are currently using a " +
+                                                               eCert.getName () +
+                                                               " certificate!"));
+              if (aChain.length != eCert.getCertificateTreeLength ())
+                aTab.addChild (new BootstrapErrorBox ().addChild ("The private key should be a chain of " +
+                                                                  eCert.getCertificateTreeLength () +
+                                                                  " certificates but it has " +
+                                                                  aChain.length +
+                                                                  " certificates. Please ensure that the respective root certificates are contained!"));
+            }
             // else: we don't care
           }
 
