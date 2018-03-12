@@ -18,6 +18,9 @@
 # Use an official Tomcat runtime as a base image
 FROM tomcat:8.5
 
+# Special encoded slash handling for SMP
+ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"
+
 # Install vim
 RUN apt-get update \
   && apt-get install -y vim \
@@ -30,16 +33,16 @@ RUN rm -r $CATALINA_HOME/webapps/ROOT \
 
 # Set arguments and labels after initial cleanup was performed :)
 # Minimum version for this layout is 5.0.1
-ARG VERSION=5.0.3
+ARG VERSION
 # Set to environment to be persistent
-ENV SMP_VERSION=$VERSION
+ENV VERSION=${VERSION:-5.0.3}
 LABEL vendor="Philip Helger"
-LABEL version=$SMP_VERSION
+LABEL version=$VERSION
  
 # Download, unzip and copy result to Tomcat webapps dir
 WORKDIR /home/git
-RUN echo Downloading phoss SMP $SMP_VERSION \
-  && wget -nv https://github.com/phax/peppol-smp-server/releases/download/peppol-smp-server-parent-pom-$SMP_VERSION/peppol-smp-server-webapp-xml-$SMP_VERSION.war -O smp.zip \ 
+RUN echo Downloading phoss SMP $VERSION \
+  && wget -nv https://github.com/phax/peppol-smp-server/releases/download/peppol-smp-server-parent-pom-$VERSION/peppol-smp-server-webapp-xml-$VERSION.war -O smp.zip \ 
   && unzip smp.zip -d smp/ \
   && cp -r smp/ $CATALINA_HOME/webapps/ROOT \
   && rm smp.zip
