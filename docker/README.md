@@ -78,12 +78,17 @@ docker build --build-arg VERSION=5.0.3 -t phoss-smp-5.0.3 .
 
 Note: since the file system layout changed between 5.0.0 and 5.0.1, the current version is only applicable to versions &ge; 5.0.1
 
-## Running
+## Running pre-build image from Docker Hub
 
 Running a pre-build image (XML backend only):
 ```
-docker run -d --name phoss-smp -p 8888:8080 phelger/smp:latest
+docker run -d --name phoss-smp-release-binary-xml-5.0.3 -p 8888:8080 phelger/smp:5.0.3
+docker stop phoss-smp-release-binary-xml-5.0.3
+docker rm phoss-smp-release-binary-xml-5.0.3
 ```
+
+It exposes port 8888 where Tomcat is running successfully.
+Open `http://localhost:8888` in your browser.
 
 ## Docker cheatsheet
 
