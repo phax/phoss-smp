@@ -7,34 +7,64 @@ Prebuild images are available from https://hub.docker.com/r/phelger/smp/
 
 **Note:** The SMP comes pretty unconfigured
 
-Note: the default `Dockerfile` builds the latest release with the XML backend.
+Note: the `Dockerfile-release-binary-xml` builds the latest release with the XML backend.
 
-Note: the `Dockerfile-sql` builds the latest release with the SQL backend
+Note: the `Dockerfile-release-binary-sql` builds the latest release with the SQL backend
 
-Note: the `Dockerfile-build-fully` build the latest snapshot from GitHub with XML backend
+Note: the `Dockerfile-release-from-source-xml` build the latest release from GitHub with XML backend
 
-## Building
+Note: the `Dockerfile-snapshot-from-source-xml` build the latest snapshot from GitHub with XML backend
+
+## Release Binary, XML Backend
+
+To build, run and stop the SMP image with XML backend use the following command:
+```
+docker build -t phoss-smp-release-binary-xml -f Dockerfile-release-binary-xml .
+docker run -d --name phoss-smp-release-binary-xml -p 8888:8080 phoss-smp-release-binary-xml
+docker stop phoss-smp-release-binary-xml
+```
+
+It exposes port 8888 where Tomcat is running successfully.
+Open `http://localhost:8888` in your browser.
+
+## Release Binary, SQL backend
 
 To build the SMP image with XML backend use the following command:
 ```
-docker build -t phoss-smp-latest .
-docker run -d --name phoss-smp-latest phoss-smp-latest
+docker build -t phoss-smp-release-binary-sql -f Dockerfile-release-binary-sql .
+docker run -d --name phoss-smp-release-binary-sql -p 8888:8080 phoss-smp-release-binary-sql
+docker stop phoss-smp-release-binary-sql
 ```
 
-It exposes port 8080 where Tomcat is running.
+It exposes port 8888 where Tomcat is running successfully.
+Open `http://localhost:8888` in your browser.
 
-## SQL backend
+## Release from source, XML Backend
 
-To build the SMP image with XML backend use the following command:
 ```
-docker build -t phoss-smp-latest-sql -f Dockerfile-sql .
-docker run -d --name phoss-smp-latest-sql phoss-smp-latest-sql
+docker build -t phoss-smp-release-from-source-xml -f Dockerfile-release-from-source-xml .
+docker run -d --name phoss-smp-release-from-source-xml -p 8888:8080 phoss-smp-release-from-source-xml
+docker stop phoss-smp-release-from-source-xml
 ```
 
-It exposes port 8080 where Tomcat is running.
+It exposes port 8888 where Tomcat is running successfully.
+Open `http://localhost:8888` in your browser.
 
-### Version change
-To change the version build you can specify the version on the commandline:
+## Latest version from source, XML Backend
+
+```
+docker build -t phoss-smp-snapshot-from-source-xml -f Dockerfile-snapshot-from-source-xml .
+docker run -d --name phoss-smp-snapshot-from-source-xml -p 8888:8080 phoss-smp-snapshot-from-source-xml
+docker stop phoss-smp-snapshot-from-source-xml
+```
+
+It exposes port 8888 where Tomcat is running successfully.
+Open `http://localhost:8888` in your browser.
+
+# Misc Docker related stuff
+
+## Version change
+To change the version build of release versions you can specify the version on the commandline:
 
 ```
 docker build --build-arg VERSION=5.0.3 -t phoss-smp-5.0.3 .
@@ -42,32 +72,20 @@ docker build --build-arg VERSION=5.0.3 -t phoss-smp-5.0.3 .
 
 Note: since the file system layout changed between 5.0.0 and 5.0.1, the current version is only applicable to versions &ge; 5.0.1
 
-### Latest snapshot from source
-
-```
-docker build -t phoss-smp-snapshot -f Dockerfile-build-fully .
-docker run -d --name phoss-smp-snapshot -p 8888:8080 phoss-smp-snapshot
-```
-
-Open `http://localhost:8888` in your browser.
-
 ## Running
 
-Running a pre-build image:
+Running a pre-build image (XML backend only):
 ```
 docker run -d --name phoss-smp -p 8888:8080 phelger/smp:latest
 ```
 
-Once the image is build you can run it with the following command.
-```
-docker run -d --name phoss-smp -p 8888:8080 phoss-smp
-```
+## Docker cheatsheet
 
-Short explanation
+Short explanation on docker running
   * `-d` - run in daemon mode
   * `--name phoss-smp` - internal nice name for `docker ps` etc.
   * `-p 8888:8080` - proxy container port 8080 to host port 8888
-  * `phoss-smp-latest` - the tag to be run
+  * `phoss-smp` - the tag to be run
 
 Upon successful completion opening http://localhost:8888 in your browser should show you the start page of phoss SMP.
 
@@ -77,14 +95,6 @@ The data directory inside the Docker image, where the data is stored is usually 
  
 To check the log file use `docker logs phoss-smp`. There is no catalina.out file - only a catalina.out.yyyy-mm-dd.
  
-## Stopping
-
-When you don't need the image anymore stop and remove it like this:
-```
-docker stop phoss-smp
-docker rm phoss-smp
-```
-
 ## Pushing changes
 
 Once a new version is available the image needs to be build and pushed to Docker hub:

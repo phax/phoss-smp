@@ -16,5 +16,11 @@
 @REM
 
 @echo off
-docker stop phoss-smp
-docker rm phoss-smp
+set XVER=5.0.3
+docker build --build-arg VERSION=%XVER% -t phoss-smp-%XVER% .
+docker tag phoss-smp-%XVER% phelger/smp:%XVER%
+docker tag phoss-smp-%XVER% phelger/smp:latest
+docker login
+docker push phelger/smp:%XVER%
+docker push phelger/smp:latest
+docker logout

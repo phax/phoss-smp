@@ -1,0 +1,28 @@
+# Use an official Tomcat runtime as a base image
+FROM tomcat:8.5
+
+# Special encoded slash handling for SMP
+ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"
+
+# Install vim, Java 8 JDK, Maven and Git
+RUN apt-get update \
+  && apt-get install -y vim openjdk-8-jdk-headless git maven \
+  && rm -rf /var/lib/apt/lists/*
+
+# Remove predefined Tomcat webapps
+RUN rm -r $CATALINA_HOME/webapps/ROOT \
+  && rm -r $CATALINA_HOME/webapps/docs \
+  && rm -r $CATALINA_HOME/webapps/examples
+
+LABEL vendor="Philip Helger"
+LABEL version="HEAD"
+ 
+# Checkout from git and build
+WORKDIR /home/git
+RUN echo Building phoss SMP $VERSION \
+  && git clone https://github.com/phax/peppol-smp-server.git . \
+  && git checkout -b work \
+  && mvn clean install -DskipTests
+
+# Copy result to Tomcat webapps dir
+RUN cp -r peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-*/ $CATALINA_HOME/webapps/ROOT
