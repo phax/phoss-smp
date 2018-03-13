@@ -122,14 +122,15 @@ docker push phelger/smp:latest
 docker logout
 ```
 
-## Adding SMP configuration
+## SMP file storage
+
+### Referencing configuration files
 
 My suggestion is to create a child dockerfile like `Example-Dockerfile-with-configuration`.
 It sets the system properties to the SMP configuration files in the virtual path `/config`.
 See https://docs.docker.com/storage/volumes/ for the Docker configuration on volumes and mount points.
 
 The main change is the `-v` parameter that mounts a local directory into the running image. `/host-directory/config` in the example down below must be changed to an existing directory containing the files `smp-server.properties`, `webapp.properties` and `pd-client.properties` (as named in the example dockerfile).
-
 
 ```
 docker build -t phoss-smp-with-config -f Example-Dockerfile-with-configuration .
@@ -138,8 +139,16 @@ docker stop phoss-smp-with-config
 docker rm phoss-smp-with-config
 ```
 
-On my Windows machine I use the following command to run it 
+Note: if you change `/config` as the image directory to something else, please ensure to change the paths in the `example-config-dir/` properties files as well. 
+
+### Persistent data storage for XML backend 
+
+To persistently save all the data stored by the SMP add another volume that mounts the docker directory `/home/git/conf` to a local directory as in `-v /host-directory/data:/home/git/conf`.
+
+### All setup together
+
+On my Windows machine I use the following command to run the whole SMP on port 8888 with the correct configuration and the persistent storage like this: 
 
 ```
-docker run -d --name phoss-smp-with-config -p 8888:8080 -v c:\dev\git\peppol-smp-server\docker\example-config-dir:/config phoss-smp-with-config
+docker run -d --name phoss-smp-with-config -p 8888:8080 -v c:\dev\git\peppol-smp-server\docker\example-config-dir:/config -v C:\dev\git\peppol-smp-server\docker\persistent\:/home/git/conf phoss-smp-with-config
 ```
