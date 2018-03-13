@@ -7,11 +7,28 @@ Prebuild images are available from https://hub.docker.com/r/phelger/smp/
 
 **Note:** The SMP comes pretty unconfigured
 
+Note: the default `Dockerfile` builds the latest release with the XML backend.
+
+Note: the `Dockerfile-sql` builds the latest release with the SQL backend
+
+Note: the `Dockerfile-build-fully` build the latest snapshot from GitHub with XML backend
+
 ## Building
 
-To build the SMP image use the following command:
+To build the SMP image with XML backend use the following command:
 ```
 docker build -t phoss-smp-latest .
+docker run -d --name phoss-smp-latest phoss-smp-latest
+```
+
+It exposes port 8080 where Tomcat is running.
+
+## SQL backend
+
+To build the SMP image with XML backend use the following command:
+```
+docker build -t phoss-smp-latest-sql -f Dockerfile-sql .
+docker run -d --name phoss-smp-latest-sql phoss-smp-latest-sql
 ```
 
 It exposes port 8080 where Tomcat is running.
@@ -24,6 +41,15 @@ docker build --build-arg VERSION=5.0.3 -t phoss-smp-5.0.3 .
 ```
 
 Note: since the file system layout changed between 5.0.0 and 5.0.1, the current version is only applicable to versions &ge; 5.0.1
+
+### Latest snapshot from source
+
+```
+docker build -t phoss-smp-snapshot -f Dockerfile-build-fully .
+docker run -d --name phoss-smp-snapshot -p 8888:8080 phoss-smp-snapshot
+```
+
+Open `http://localhost:8888` in your browser.
 
 ## Running
 
