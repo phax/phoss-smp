@@ -18,10 +18,12 @@ Note: the `Dockerfile-snapshot-from-source-xml` build the latest snapshot from G
 ## Release Binary, XML Backend
 
 To build, run and stop the SMP image with XML backend use the following command:
+
 ```
 docker build -t phoss-smp-release-binary-xml -f Dockerfile-release-binary-xml .
 docker run -d --name phoss-smp-release-binary-xml -p 8888:8080 phoss-smp-release-binary-xml
 docker stop phoss-smp-release-binary-xml
+docker rm phoss-smp-release-binary-xml
 ```
 
 It exposes port 8888 where Tomcat is running successfully.
@@ -30,10 +32,12 @@ Open `http://localhost:8888` in your browser.
 ## Release Binary, SQL backend
 
 To build the SMP image with XML backend use the following command:
+
 ```
 docker build -t phoss-smp-release-binary-sql -f Dockerfile-release-binary-sql .
 docker run -d --name phoss-smp-release-binary-sql -p 8888:8080 phoss-smp-release-binary-sql
 docker stop phoss-smp-release-binary-sql
+docker rm phoss-smp-release-binary-sql
 ```
 
 It exposes port 8888 where Tomcat is running successfully.
@@ -45,6 +49,7 @@ Open `http://localhost:8888` in your browser.
 docker build -t phoss-smp-release-from-source-xml -f Dockerfile-release-from-source-xml .
 docker run -d --name phoss-smp-release-from-source-xml -p 8888:8080 phoss-smp-release-from-source-xml
 docker stop phoss-smp-release-from-source-xml
+docker rm phoss-smp-release-from-source-xml
 ```
 
 It exposes port 8888 where Tomcat is running successfully.
@@ -56,6 +61,7 @@ Open `http://localhost:8888` in your browser.
 docker build -t phoss-smp-snapshot-from-source-xml -f Dockerfile-snapshot-from-source-xml .
 docker run -d --name phoss-smp-snapshot-from-source-xml -p 8888:8080 phoss-smp-snapshot-from-source-xml
 docker stop phoss-smp-snapshot-from-source-xml
+docker rm phoss-smp-snapshot-from-source-xml
 ```
 
 It exposes port 8888 where Tomcat is running successfully.
@@ -64,7 +70,7 @@ Open `http://localhost:8888` in your browser.
 # Misc Docker related stuff
 
 ## Version change
-To change the version build of release versions you can specify the version on the commandline:
+To change the version build of release versions you can specify the version on the commandline when building:
 
 ```
 docker build --build-arg VERSION=5.0.3 -t phoss-smp-5.0.3 .
@@ -94,6 +100,8 @@ Default credentials are in the Wiki at https://github.com/phax/peppol-smp-server
 The data directory inside the Docker image, where the data is stored is usually `/home/git/conf`.
  
 To check the log file use `docker logs phoss-smp`. There is no catalina.out file - only a catalina.out.yyyy-mm-dd.
+
+To open a shell in the docker image use `docker exec -it phoss-smp-snapshot-from-source-xml bash` where `phoss-smp-snapshot-from-source-xml` is the name of the machine.
  
 ## Pushing changes
 
