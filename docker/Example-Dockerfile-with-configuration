@@ -1,0 +1,5 @@
+# Use an official Tomcat runtime as a base image
+FROM phoss-smp-snapshot-from-source-xml
+
+# Special encoded slash handling for SMP
+ENV CATALINA_OPTS="$CATALINA_OPTS -Dsmp.server.properties.path=/config/smp-server.properties -Dsmp.webapp.properties.path=/config/webapp.properties -Dpd.client.properties.path=/config/pd-client.properties"

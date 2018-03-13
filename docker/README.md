@@ -81,6 +81,7 @@ Note: since the file system layout changed between 5.0.0 and 5.0.1, the current 
 ## Running pre-build image from Docker Hub
 
 Running a pre-build image (XML backend only):
+
 ```
 docker run -d --name phoss-smp-release-binary-xml-5.0.3 -p 8888:8080 phelger/smp:5.0.3
 docker stop phoss-smp-release-binary-xml-5.0.3
@@ -111,6 +112,7 @@ To open a shell in the docker image use `docker exec -it phoss-smp-snapshot-from
 ## Pushing changes
 
 Once a new version is available the image needs to be build and pushed to Docker hub:
+
 ```
 docker login
 docker tag phoss-smp-x.y.z phelger/smp:x.y.z
@@ -118,4 +120,26 @@ docker push phelger/smp:x.y.z
 docker tag phoss-smp-x.y.z phelger/smp:latest
 docker push phelger/smp:latest
 docker logout
+```
+
+## Adding SMP configuration
+
+My suggestion is to create a child dockerfile like `Example-Dockerfile-with-configuration`.
+It sets the system properties to the SMP configuration files in the virtual path `/config`.
+See https://docs.docker.com/storage/volumes/ for the Docker configuration on volumes and mount points.
+
+The main change is the `-v` parameter that mounts a local directory into the running image. `/host-directory/config` in the example down below must be changed to an existing directory containing the files `smp-server.properties`, `webapp.properties` and `pd-client.properties` (as named in the example dockerfile).
+
+
+```
+docker build -t phoss-smp-with-config -f Example-Dockerfile-with-configuration .
+docker run -d --name phoss-smp-with-config -p 8888:8080 -v /host-directory/config:/config phoss-smp-with-config
+docker stop phoss-smp-with-config
+docker rm phoss-smp-with-config
+```
+
+On my Windows machine I use the following command to run it 
+
+```
+docker run -d --name phoss-smp-with-config -p 8888:8080 -v c:\dev\git\peppol-smp-server\docker\example-config-dir:/config phoss-smp-with-config
 ```
