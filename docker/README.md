@@ -115,9 +115,9 @@ Once a new version is available the image needs to be build and pushed to Docker
 
 ```
 docker login
-docker tag phoss-smp-x.y.z phelger/smp:x.y.z
+docker tag phoss-smp-release-binary-xml-x.y.z phelger/smp:x.y.z
 docker push phelger/smp:x.y.z
-docker tag phoss-smp-x.y.z phelger/smp:latest
+docker tag phoss-smp-release-binary-xml-x.y.z phelger/smp:latest
 docker push phelger/smp:latest
 docker logout
 ```
