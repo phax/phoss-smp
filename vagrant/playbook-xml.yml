@@ -119,7 +119,7 @@
 
   - name: Clone the phoss SMP Server in {{ sources_dir }}/peppol-smp-server
 #   git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-4.1.2
-    git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-5.0.3
+    git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-5.0.4
     register: smp_result
 
   - name: Build SMP Server from {{ sources_dir }}/peppol-smp-server 
@@ -131,7 +131,7 @@
 
   - name: Deploy SMP Server to tomcat
 #    copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp/target/peppol-smp-server-webapp-4.1.2.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
-    copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-5.0.3.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
+    copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-5.0.4.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
 
   - name: Copy SMP Keystore to tomcat
     copy: src="{{smp_keystore}}" dest="{{smp_keystore_path}}" mode=0600 backup=yes

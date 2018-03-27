@@ -16,10 +16,10 @@
 @REM
 
 @echo off
-set XVER=5.0.3
-docker build --build-arg VERSION=%XVER% -t phoss-smp-%XVER% .
-docker tag phoss-smp-%XVER% phelger/smp:%XVER%
-docker tag phoss-smp-%XVER% phelger/smp:latest
+set XVER=5.0.4
+docker build --build-arg VERSION=%XVER% -t phoss-smp-release-binary-xml-%XVER% -f Dockerfile-release-binary-xml .
+docker tag phoss-smp-release-binary-xml-%XVER% phelger/smp:%XVER%
+docker tag phoss-smp-release-binary-xml-%XVER% phelger/smp:latest
 docker login
 docker push phelger/smp:%XVER%
 docker push phelger/smp:latest
