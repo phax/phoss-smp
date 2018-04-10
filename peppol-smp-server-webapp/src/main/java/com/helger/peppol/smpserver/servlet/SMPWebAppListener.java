@@ -193,7 +193,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
         {
-          // Notify PD server
+          // Notify PD server: add
           PDClientProvider.getInstance ()
                           .getPDClient ()
                           .addServiceGroupToIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ())
@@ -205,10 +205,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
         {
-          // Notify PD server
+          // Notify PD server: delete
           PDClientProvider.getInstance ()
                           .getPDClient ()
-                          .addServiceGroupToIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ())
+                          .deleteServiceGroupFromIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ())
                           .isSuccess ();
         }
       }
