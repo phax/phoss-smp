@@ -70,7 +70,7 @@
     <!-- Must correspond to jaxws-tools.version in jaxws-maven-plugin POM -->
     <jaxws.version>2.2.10</jaxws.version>
     <log4j.version>2.11.0</log4j.version>
-    <jersey.version>2.26</jersey.version>
+    <jersey.version>2.27</jersey.version>
     <eclipselink.version>2.7.1</eclipselink.version>
   </properties>
   
@@ -100,7 +100,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css-parent-pom</artifactId>
-        <version>6.1.0</version>
+        <version>6.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -261,7 +261,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>6.1.0</version><!--$NO-MVN-MAN-VER$-->
+          <version>6.1.1</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>
