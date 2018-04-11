@@ -55,11 +55,11 @@ import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
+import com.helger.peppol.identifier.generic.doctype.IBusdoxDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -415,7 +415,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
       aCtrl.addChild (new HCDiv ().addChild (AppCommonUI.getDocumentTypeID (aDocumentTypeID)));
       try
       {
-        final IPeppolDocumentTypeIdentifierParts aParts = PeppolIdentifierHelper.getDocumentTypeIdentifierParts (aDocumentTypeID);
+        final IBusdoxDocumentTypeIdentifierParts aParts = PeppolIdentifierHelper.getDocumentTypeIdentifierParts (aDocumentTypeID);
         aCtrl.addChild (AppCommonUI.getDocumentTypeIDDetails (aParts));
       }
       catch (final IllegalArgumentException ex)

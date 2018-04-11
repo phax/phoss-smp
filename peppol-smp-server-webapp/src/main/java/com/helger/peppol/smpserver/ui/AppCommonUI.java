@@ -53,6 +53,7 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.html.jscode.html.JSHtml;
+import com.helger.peppol.identifier.generic.doctype.IBusdoxDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
@@ -297,25 +298,32 @@ public final class AppCommonUI
   }
 
   @Nonnull
-  public static HCUL getDocumentTypeIDDetails (@Nonnull final IPeppolDocumentTypeIdentifierParts aParts)
+  public static HCUL getDocumentTypeIDDetails (@Nonnull final IBusdoxDocumentTypeIdentifierParts aParts)
   {
     final HCUL aUL = new HCUL ();
     aUL.addItem ().addChild ("Root namespace: ").addChild (new HCCode ().addChild (aParts.getRootNS ()));
     aUL.addItem ().addChild ("Local name: ").addChild (new HCCode ().addChild (aParts.getLocalName ()));
-    aUL.addItem ().addChild ("Transaction ID: ").addChild (new HCCode ().addChild (aParts.getTransactionID ()));
-    final HCNodeList aExtensions = new HCNodeList ();
-    final List <String> aExtensionIDs = aParts.getExtensionIDs ();
-    for (final String sExtension : aExtensionIDs)
+    if (aParts instanceof IPeppolDocumentTypeIdentifierParts)
     {
-      if (aExtensions.hasChildren ())
-        aExtensions.addChild (", ");
-      aExtensions.addChild (new HCCode ().addChild (sExtension));
+      final IPeppolDocumentTypeIdentifierParts aPParts = (IPeppolDocumentTypeIdentifierParts) aParts;
+      aUL.addItem ().addChild ("Transaction ID: ").addChild (new HCCode ().addChild (aPParts.getTransactionID ()));
+      final HCUL aExtensions = new HCUL ();
+      final List <String> aExtensionIDs = aPParts.getExtensionIDs ();
+      for (final String sExtension : aExtensionIDs)
+        aExtensions.addItem (new HCCode ().addChild (sExtension));
+      aUL.addItem ().addChild ("Extension IDs:").addChild (aExtensions);
+      aUL.addItem ()
+         .addChild ("Customization ID (transaction + extensions): ")
+         .addChild (new HCCode ().addChild (aPParts.getAsUBLCustomizationID ()));
+      aUL.addItem ().addChild ("Version: ").addChild (new HCCode ().addChild (aPParts.getVersion ()));
     }
-    aUL.addItem ().addChild ("Extension IDs (" + aExtensionIDs.size () + "): ").addChild (aExtensions);
-    aUL.addItem ()
-       .addChild ("Customization ID (transaction + extensions): ")
-       .addChild (new HCCode ().addChild (aParts.getAsUBLCustomizationID ()));
-    aUL.addItem ().addChild ("Version: ").addChild (new HCCode ().addChild (aParts.getVersion ()));
+    else
+      if (aParts.getSubTypeIdentifier () != null)
+      {
+        aUL.addItem ()
+           .addChild ("Sub type identifier: ")
+           .addChild (new HCCode ().addChild (aParts.getSubTypeIdentifier ()));
+      }
     return aUL;
   }
 
