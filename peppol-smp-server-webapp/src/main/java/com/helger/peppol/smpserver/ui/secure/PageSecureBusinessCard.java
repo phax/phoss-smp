@@ -854,15 +854,27 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
+    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
 
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Business Card" : "Create new Business Card"));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                 .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                       aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                               : null),
-                                                                                     aDisplayLocale).setReadOnly (bEdit))
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
+    if (bEdit)
+    {
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
+                                                   .setCtrl (aSelectedObject.getServiceGroupID ())
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
+    }
+    else
+    {
+      // Show only service groups that don't have a BC already
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
+                                                   .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                         aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                 : null),
+                                                                                       aDisplayLocale,
+                                                                                       x -> aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (x) == null))
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
+    }
 
     final HCDiv aEntityContainer = aForm.addAndReturnChild (new HCDiv ().setID ("entitycontainer"));
 
