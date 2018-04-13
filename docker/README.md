@@ -17,6 +17,8 @@ Note: the `Dockerfile-snapshot-from-source-xml` build the latest snapshot from G
 
 ## Release Binary, XML Backend
 
+Use an existing binary release, with the XML backend.
+
 To build, run and stop the SMP image with XML backend use the following command:
 
 ```
@@ -31,7 +33,9 @@ Open `http://localhost:8888` in your browser.
 
 ## Release Binary, SQL backend
 
-To build the SMP image with XML backend use the following command:
+Use an existing binary release, with the SQL backend.
+
+To build the SMP image with SQL backend use the following command:
 
 ```
 docker build -t phoss-smp-release-binary-sql -f Dockerfile-release-binary-sql .
@@ -45,6 +49,8 @@ Open `http://localhost:8888` in your browser.
 
 ## Release from source, XML Backend
 
+Build the SMP from source with the XML backend using the tag of the last release.
+
 ```
 docker build -t phoss-smp-release-from-source-xml -f Dockerfile-release-from-source-xml .
 docker run -d --name phoss-smp-release-from-source-xml -p 8888:8080 phoss-smp-release-from-source-xml
@@ -56,6 +62,8 @@ It exposes port 8888 where Tomcat is running successfully.
 Open `http://localhost:8888` in your browser.
 
 ## Latest version from source, XML Backend
+
+Build the SMP from source with the XML backend using the HEAD version of the master branch (SNAPSHOT version).
 
 ```
 docker build -t phoss-smp-snapshot-from-source-xml -f Dockerfile-snapshot-from-source-xml .
