@@ -70,6 +70,7 @@ import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.button.BootstrapButton;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.button.EBootstrapButtonSize;
+import com.helger.photon.bootstrap3.button.EBootstrapButtonType;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
@@ -109,6 +110,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
   private static final String ACTION_CHECK_DNS = "checkdns";
   private static final String ACTION_REGISTER_TO_SML = "register-to-sml";
+  private static final String ACTION_UNREGISTER_FROM_SML = "unregister-from-sml";
 
   public PageSecureServiceGroup (@Nonnull @Nonempty final String sID)
   {
@@ -231,6 +233,16 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             {
                               aRow.addCell (new IPV4Addr (aInetAddress).getAsString ());
                               aRow.addCell (aNice == null ? null : aNice.getCanonicalHostName ());
+                              aRow.addCell (new BootstrapButton (EBootstrapButtonType.DANGER,
+                                                                 EBootstrapButtonSize.MINI).addChild ("Unregister from SML")
+                                                                                           .setOnClick (aWPEC.getSelfHref ()
+                                                                                                             .add (CPageParam.PARAM_ACTION,
+                                                                                                                   ACTION_UNREGISTER_FROM_SML)
+                                                                                                             .add (CPageParam.PARAM_OBJECT,
+                                                                                                                   aServiceGroup.getID ()))
+                                                                                           .setDisabled (bOffLine ||
+                                                                                                         !SMPMetaManager.getSettings ()
+                                                                                                                        .isSMLActive ()));
                             }
                             else
                             {
@@ -283,6 +295,39 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                               aSelectedObject.getParticpantIdentifier ()
                                                                                                              .getURIEncoded () +
                                                                                               "' at the configured SML! Technical details: " +
+                                                                                              (ex.getCause () != null ? ex.getCause ()
+                                                                                                                          .getMessage ()
+                                                                                                                      : ex.getMessage ())),
+                                                           aTargetParams);
+                          }
+                          // Never reached
+                          return false;
+                        }
+                      });
+    addCustomHandler (ACTION_UNREGISTER_FROM_SML,
+                      new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (true)
+                      {
+                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                     @Nonnull final ISMPServiceGroup aSelectedObject)
+                        {
+                          final StringMap aTargetParams = new StringMap ();
+                          aTargetParams.putIn (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
+                          final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+                          try
+                          {
+                            aHook.deleteServiceGroup (aSelectedObject.getParticpantIdentifier ());
+                            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Service group '" +
+                                                                                                aSelectedObject.getParticpantIdentifier ()
+                                                                                                               .getURIEncoded () +
+                                                                                                "' was successfully unregistered from the configured SML!"),
+                                                           aTargetParams);
+                          }
+                          catch (final RegistrationHookException ex)
+                          {
+                            aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error unregistering the Service group '" +
+                                                                                              aSelectedObject.getParticpantIdentifier ()
+                                                                                                             .getURIEncoded () +
+                                                                                              "' from the configured SML! Technical details: " +
                                                                                               (ex.getCause () != null ? ex.getCause ()
                                                                                                                           .getMessage ()
                                                                                                                       : ex.getMessage ())),
