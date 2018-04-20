@@ -28,6 +28,7 @@ import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.equals.EqualsHelper;
+import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
@@ -75,6 +76,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                        (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                        ")");
 
+    final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+    final MutableBoolean aCreatedServiceGroup = new MutableBoolean (false);
+
     JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
@@ -91,26 +95,30 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       if (aDBUser == null)
         throw new IllegalStateException ("User '" + sOwnerID + "' does not exist!");
 
-      // It's a new service group - throws exception in case of an error
-      final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
-      aHook.createServiceGroup (aParticipantIdentifier);
+      {
+        // It's a new service group - Create in SML and remember that
+        // Throws exception in case of an error
+        aHook.createServiceGroup (aParticipantIdentifier);
+        aCreatedServiceGroup.set (true);
+      }
 
-      try
-      {
-        // Did not exist. Create it.
-        final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantIdentifier);
-        final DBOwnership aOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
-        aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID, sExtension, aOwnership, null);
-        aEM.persist (aDBServiceGroup);
-        aEM.persist (aOwnership);
-      }
-      catch (final RuntimeException ex)
-      {
-        // An error occurred - remove from SML again
-        aHook.undoCreateServiceGroup (aParticipantIdentifier);
-        throw ex;
-      }
+      // Did not exist. Create it.
+      final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantIdentifier);
+      final DBOwnership aOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
+      aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID, sExtension, aOwnership, null);
+      aEM.persist (aDBServiceGroup);
+      aEM.persist (aOwnership);
     });
+
+    if (ret.isFailure ())
+    {
+      // Error writing to the DB
+      if (aCreatedServiceGroup.booleanValue ())
+      {
+        // Undo creation in SML again
+        aHook.undoCreateServiceGroup (aParticipantIdentifier);
+      }
+    }
 
     if (ret.hasThrowable ())
     {
@@ -180,6 +188,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       aEM.merge (aDBServiceGroup);
       return eChange;
     });
+
     if (ret.hasThrowable ())
     {
       exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
@@ -204,6 +213,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     if (s_aLogger.isDebugEnabled ())
       s_aLogger.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
+    final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+    final MutableBoolean aDeletedServiceGroup = new MutableBoolean (false);
+
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
       // Check if the service group is existing
@@ -216,23 +228,27 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
         return EChange.UNCHANGED;
       }
 
-      // Delete in SML - throws exception in case of error
-      final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
-      aHook.deleteServiceGroup (aParticipantID);
-
-      try
       {
-        aEM.remove (aDBServiceGroup);
-      }
-      catch (final RuntimeException ex)
-      {
-        // An error occurred - remove from SML again
-        aHook.undoDeleteServiceGroup (aParticipantID);
-        throw ex;
+        // Delete in SML - and remember that
+        // throws exception in case of error
+        aHook.deleteServiceGroup (aParticipantID);
+        aDeletedServiceGroup.set (true);
       }
 
+      aEM.remove (aDBServiceGroup);
       return EChange.CHANGED;
     });
+
+    if (ret.isFailure ())
+    {
+      // Error writing to the DB
+      if (aDeletedServiceGroup.booleanValue ())
+      {
+        // Undo deletion in SML!
+        aHook.undoDeleteServiceGroup (aParticipantID);
+      }
+    }
+
     if (ret.hasThrowable ())
     {
       exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
