@@ -52,7 +52,7 @@ public final class SQLManagerProvider implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new IllegalStateException (ex.getMessage (), ex);
     }
   }
 
@@ -66,7 +66,7 @@ public final class SQLManagerProvider implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new IllegalStateException (ex.getMessage (), ex);
     }
   }
 
@@ -80,7 +80,7 @@ public final class SQLManagerProvider implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new IllegalStateException (ex.getMessage (), ex);
     }
   }
 
