@@ -23,6 +23,7 @@ import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.db.jpa.AbstractGlobalEntityManagerFactory;
+import com.helger.db.jpa.JPAEnabledManager;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.scope.IScope;
 import com.helger.settings.exchange.configfile.ConfigFile;
@@ -41,7 +42,7 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
     // Standard configuration file
     final ConfigFile aConfigFile = SMPServerConfiguration.getConfigFile ();
 
-    final ICommonsMap <String, Object> ret = new CommonsHashMap<> ();
+    final ICommonsMap <String, Object> ret = new CommonsHashMap <> ();
     // Read all properties from the standard configuration file
     // Connection pooling
     ret.put (PersistenceUnitProperties.CONNECTION_POOL_MAX,
@@ -79,6 +80,13 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
            "peppol-smp",
            _createPropertiesMap ());
 
+    // Set execution time stuff
+    JPAEnabledManager.setDefaultExecutionWarnTimeEnabled (SMPServerConfiguration.getConfigFile ()
+                                                                                .getAsBoolean (SMPJPAConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
+                                                                                               JPAEnabledManager.DEFAULT_EXECUTION_WARN_ENABLED));
+    JPAEnabledManager.setDefaultExecutionWarnTime (SMPServerConfiguration.getConfigFile ()
+                                                                         .getAsInt (SMPJPAConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
+                                                                                    JPAEnabledManager.DEFAULT_EXECUTION_WARN_TIME_MS));
   }
 
   @Nonnull

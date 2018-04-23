@@ -16,6 +16,7 @@ import javax.annotation.concurrent.Immutable;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 import com.helger.commons.annotation.PresentForCodeCoverage;
+import com.helger.commons.annotation.Since;
 
 /**
  * Default JPA configuration file properties
@@ -32,6 +33,10 @@ public final class SMPJPAConfiguration
   public static final String CONFIG_TARGET_DATABASE = "target-database";
   public static final String CONFIG_JDBC_READ_CONNECTIONS_MAX = "jdbc.read-connections.max";
   public static final String CONFIG_DDL_GENERATION_MODE = PersistenceUnitProperties.DDL_GENERATION_MODE;
+  @Since ("5.0.6")
+  public static final String CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE = "jdbc.execution-time-warning.enabled";
+  @Since ("5.0.6")
+  public static final String CONFIG_JDBC_EXECUTION_TIME_WARNING_MS = "jdbc.execution-time-warning.ms";
 
   @PresentForCodeCoverage
   private static final SMPJPAConfiguration s_aInstance = new SMPJPAConfiguration ();
