@@ -17,10 +17,13 @@
     limitations under the License.
 
 -->
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
-  xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-  id="SMP_WebApp" version="2.5">
-  <display-name>ph-peppol-smp-server</display-name>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" 
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         id="SMP_WebApp" 
+         version="2.5">
+  <display-name>phoss SMP server (SQL backend)</display-name>
 
   <listener>
     <listener-class>com.helger.peppol.smpserver.servlet.SMPWebAppListener</listener-class>
