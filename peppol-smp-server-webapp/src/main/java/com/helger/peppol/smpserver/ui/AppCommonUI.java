@@ -23,7 +23,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -53,7 +52,6 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.html.jscode.html.JSHtml;
-import com.helger.peppol.identifier.generic.doctype.IBusdoxDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
@@ -298,32 +296,13 @@ public final class AppCommonUI
   }
 
   @Nonnull
-  public static HCUL getDocumentTypeIDDetails (@Nonnull final IBusdoxDocumentTypeIdentifierParts aParts)
+  public static HCUL getDocumentTypeIDDetails (@Nonnull final IPeppolDocumentTypeIdentifierParts aParts)
   {
     final HCUL aUL = new HCUL ();
     aUL.addItem ().addChild ("Root namespace: ").addChild (new HCCode ().addChild (aParts.getRootNS ()));
     aUL.addItem ().addChild ("Local name: ").addChild (new HCCode ().addChild (aParts.getLocalName ()));
-    if (aParts instanceof IPeppolDocumentTypeIdentifierParts)
-    {
-      final IPeppolDocumentTypeIdentifierParts aPParts = (IPeppolDocumentTypeIdentifierParts) aParts;
-      aUL.addItem ().addChild ("Transaction ID: ").addChild (new HCCode ().addChild (aPParts.getTransactionID ()));
-      final HCUL aExtensions = new HCUL ();
-      final List <String> aExtensionIDs = aPParts.getExtensionIDs ();
-      for (final String sExtension : aExtensionIDs)
-        aExtensions.addItem (new HCCode ().addChild (sExtension));
-      aUL.addItem ().addChild ("Extension IDs:").addChild (aExtensions);
-      aUL.addItem ()
-         .addChild ("Customization ID (transaction + extensions): ")
-         .addChild (new HCCode ().addChild (aPParts.getAsUBLCustomizationID ()));
-      aUL.addItem ().addChild ("Version: ").addChild (new HCCode ().addChild (aPParts.getVersion ()));
-    }
-    else
-      if (aParts.getSubTypeIdentifier () != null)
-      {
-        aUL.addItem ()
-           .addChild ("Sub type identifier: ")
-           .addChild (new HCCode ().addChild (aParts.getSubTypeIdentifier ()));
-      }
+    aUL.addItem ().addChild ("Customization ID: ").addChild (new HCCode ().addChild (aParts.getCustomizationID ()));
+    aUL.addItem ().addChild ("Version: ").addChild (new HCCode ().addChild (aParts.getVersion ()));
     return aUL;
   }
 
