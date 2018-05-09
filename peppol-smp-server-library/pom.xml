@@ -78,11 +78,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-jaxws</artifactId>
-      <type>pom</type>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <optional>true</optional>
