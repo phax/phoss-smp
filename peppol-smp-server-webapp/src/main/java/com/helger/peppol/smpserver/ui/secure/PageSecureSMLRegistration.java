@@ -113,8 +113,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     return true;
   }
 
-  private void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final FormErrorList aFormErrors)
+  private static void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                         @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
@@ -235,7 +235,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     }
   }
 
-  private void _updateSMPatSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
+  private static void _updateSMPatSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                       @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
@@ -356,8 +357,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     }
   }
 
-  private void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final FormErrorList aFormErrors)
+  private static void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                         @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
