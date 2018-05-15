@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.SSLSocketFactory;
-import javax.xml.ws.WebServiceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,10 +60,12 @@ import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.nav.BootstrapTabBox;
+import com.helger.photon.bootstrap3.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.sun.xml.ws.client.ClientTransportException;
 
 public class PageSecureSMLRegistration extends AbstractSMPWebPage
 {
@@ -111,6 +112,15 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       return false;
     }
     return true;
+  }
+
+  @Nonnull
+  private static ManageServiceMetadataServiceCaller _create (@Nonnull final ISMLInfo aSML,
+                                                             @Nonnull final SSLSocketFactory aSocketFactory)
+  {
+    final ManageServiceMetadataServiceCaller ret = new ManageServiceMetadataServiceCaller (aSML);
+    ret.setSSLSocketFactory (aSocketFactory);
+    return ret;
   }
 
   private static void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC,
@@ -186,8 +196,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       try
       {
         final SSLSocketFactory aSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
-        final ManageServiceMetadataServiceCaller aCaller = new ManageServiceMetadataServiceCaller (aSMLInfo);
-        aCaller.setSSLSocketFactory (aSocketFactory);
+        final ManageServiceMetadataServiceCaller aCaller = _create (aSMLInfo, aSocketFactory);
         aCaller.create (sSMPID, sPhysicalAddress, sLogicalAddress);
 
         final String sMsg = "Successfully registered SMP '" +
@@ -211,7 +220,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                    | BadRequestFault
                    | InternalErrorFault
                    | UnauthorizedFault
-                   | WebServiceException ex)
+                   | ClientTransportException ex)
       {
         final String sMsg = "Error registering SMP '" +
                             sSMPID +
@@ -233,6 +242,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                            ex.getMessage ());
       }
     }
+    else
+      aNodeList.addChild (BootstrapWebPageUIHandler.INSTANCE.createIncorrectInputBox (aWPEC));
   }
 
   private static void _updateSMPatSML (@Nonnull final WebPageExecutionContext aWPEC,
@@ -308,8 +319,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       try
       {
         final SSLSocketFactory aSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
-        final ManageServiceMetadataServiceCaller aCaller = new ManageServiceMetadataServiceCaller (aSMLInfo);
-        aCaller.setSSLSocketFactory (aSocketFactory);
+        final ManageServiceMetadataServiceCaller aCaller = _create (aSMLInfo, aSocketFactory);
         aCaller.update (sSMPID, sPhysicalAddress, sLogicalAddress);
 
         final String sMsg = "Successfully updated SMP '" +
@@ -333,7 +343,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                    | BadRequestFault
                    | InternalErrorFault
                    | UnauthorizedFault
-                   | NotFoundFault ex)
+                   | NotFoundFault
+                   | ClientTransportException ex)
       {
         final String sMsg = "Error updating SMP '" +
                             sSMPID +
@@ -355,6 +366,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                            ex.getMessage ());
       }
     }
+    else
+      aNodeList.addChild (BootstrapWebPageUIHandler.INSTANCE.createIncorrectInputBox (aWPEC));
   }
 
   private static void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC,
@@ -373,8 +386,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       try
       {
         final SSLSocketFactory aSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
-        final ManageServiceMetadataServiceCaller aCaller = new ManageServiceMetadataServiceCaller (aSMLInfo);
-        aCaller.setSSLSocketFactory (aSocketFactory);
+        final ManageServiceMetadataServiceCaller aCaller = _create (aSMLInfo, aSocketFactory);
         aCaller.delete (sSMPID);
 
         final String sMsg = "Successfully deleted SMP '" +
@@ -390,7 +402,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                    | BadRequestFault
                    | InternalErrorFault
                    | UnauthorizedFault
-                   | NotFoundFault ex)
+                   | NotFoundFault
+                   | ClientTransportException ex)
       {
         final String sMsg = "Error deleting SMP '" +
                             sSMPID +
@@ -406,6 +419,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                            ex.getMessage ());
       }
     }
+    else
+      aNodeList.addChild (BootstrapWebPageUIHandler.INSTANCE.createIncorrectInputBox (aWPEC));
   }
 
   @Override
