@@ -22,7 +22,16 @@ import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileM
  */
 final class MockSMPTransportProfileManager implements ISMPTransportProfileManager
 {
-  public EChange updateSMPTransportProfile (final String sSMPTransportProfileID, final String sName)
+  public ISMPTransportProfile createSMPTransportProfile (final String sID,
+                                                         final String sName,
+                                                         final boolean bIsDeprecated)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public EChange updateSMPTransportProfile (final String sSMPTransportProfileID,
+                                            final String sName,
+                                            final boolean bIsDeprecated)
   {
     throw new UnsupportedOperationException ();
   }
@@ -38,11 +47,6 @@ final class MockSMPTransportProfileManager implements ISMPTransportProfileManage
   }
 
   public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
-  {
-    throw new UnsupportedOperationException ();
-  }
-
-  public ISMPTransportProfile createSMPTransportProfile (final String sID, final String sName)
   {
     throw new UnsupportedOperationException ();
   }

@@ -35,11 +35,16 @@ public interface ISMPTransportProfileManager
    * @param sName
    *        The display name of the transport profile. May neither be
    *        <code>null</code> nor empty.
+   * @param bIsDeprecated
+   *        <code>true</code> if the profile is deprecated, <code>false</code>
+   *        if not
    * @return <code>null</code> if another transport profile with the same ID
    *         already exists.
    */
   @Nullable
-  ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty String sID, @Nonnull @Nonempty String sName);
+  ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty String sID,
+                                                  @Nonnull @Nonempty String sName,
+                                                  boolean bIsDeprecated);
 
   /**
    * Update an existing transport profile.
@@ -50,10 +55,15 @@ public interface ISMPTransportProfileManager
    * @param sName
    *        The new name of the transport profile. May neither be
    *        <code>null</code> nor empty.
+   * @param bIsDeprecated
+   *        <code>true</code> if the profile is deprecated, <code>false</code>
+   *        if not
    * @return {@link EChange#CHANGED} if something was changed.
    */
   @Nonnull
-  EChange updateSMPTransportProfile (@Nullable String sSMPTransportProfileID, @Nonnull @Nonempty String sName);
+  EChange updateSMPTransportProfile (@Nullable String sSMPTransportProfileID,
+                                     @Nonnull @Nonempty String sName,
+                                     boolean bIsDeprecated);
 
   /**
    * Delete an existing transport profile.

@@ -45,14 +45,17 @@ import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap3.form.BootstrapCheckBox;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
 import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
+import com.helger.photon.core.form.RequestFieldBoolean;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
@@ -63,6 +66,8 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
 {
   private static final String FIELD_ID = "id";
   private static final String FIELD_NAME = "name";
+  private static final String FIELD_DEPRECATED = "deprecated";
+  private static final boolean DEFAULT_DEPRECATED = false;
 
   public PageSecureTransportProfile (@Nonnull @Nonempty final String sID)
   {
@@ -128,6 +133,7 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
                                      @Nonnull final ISMPTransportProfile aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
     aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of transport profile '" +
                                                             aSelectedObject.getID () +
@@ -136,6 +142,9 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("ID").setCtrl (aSelectedObject.getID ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aSelectedObject.getName ()));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Deprecated?")
+                                                 .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedObject.isDeprecated (),
+                                                                                       aDisplayLocale)));
 
     aNodeList.addChild (aForm);
   }
@@ -167,6 +176,13 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
                                                                                                                  : null)))
                                                  .setHelpText ("The name of the transport profile")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_NAME)));
+
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Deprecated?")
+                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_DEPRECATED,
+                                                                                                           aSelectedObject != null ? aSelectedObject.isDeprecated ()
+                                                                                                                                   : DEFAULT_DEPRECATED)))
+                                                 .setHelpText ("Is the transport profile deprecated?")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_DEPRECATED)));
   }
 
   @Override
@@ -181,6 +197,7 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
     // Never edit ID
     final String sID = bEdit ? aSelectedObject.getID () : aWPEC.params ().getAsString (FIELD_ID);
     final String sName = aWPEC.params ().getAsString (FIELD_NAME);
+    final boolean bIsDeprecated = aWPEC.params ().getAsBoolean (FIELD_DEPRECATED, DEFAULT_DEPRECATED);
 
     // validations
     if (StringHelper.hasNoText (sID))
@@ -200,14 +217,14 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
     {
       if (bEdit)
       {
-        aTransportProfileMgr.updateSMPTransportProfile (sID, sName);
+        aTransportProfileMgr.updateSMPTransportProfile (sID, sName, bIsDeprecated);
         aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The transport profile '" +
                                                                             sID +
                                                                             "' was successfully edited."));
       }
       else
       {
-        aTransportProfileMgr.createSMPTransportProfile (sID, sName);
+        aTransportProfileMgr.createSMPTransportProfile (sID, sName, bIsDeprecated);
         aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new transport profile '" +
                                                                             sID +
                                                                             "' was successfully created."));
@@ -230,6 +247,7 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
 
     final HCTable aTable = new HCTable (new DTCol ("ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Name"),
+                                        new DTCol ("Deprecated?"),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPTransportProfile aCurObject : aTransportProfileMgr.getAllSMPTransportProfiles ())
     {
@@ -238,16 +256,16 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (aCurObject.getID ()));
       aRow.addCell (aCurObject.getName ());
+      aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.isDeprecated (), aDisplayLocale));
 
       aRow.addCell (createEditLink (aWPEC, aCurObject, "Edit " + aCurObject.getID ()),
                     new HCTextNode (" "),
                     createCopyLink (aWPEC, aCurObject, "Copy " + aCurObject.getID ()),
                     new HCTextNode (" "),
-                    isActionAllowed (aWPEC, EWebPageFormAction.DELETE, aCurObject)
-                                                                                   ? createDeleteLink (aWPEC,
-                                                                                                       aCurObject,
-                                                                                                       "Delete " + aCurObject.getID ())
-                                                                                   : createEmptyAction ());
+                    isActionAllowed (aWPEC,
+                                     EWebPageFormAction.DELETE,
+                                     aCurObject) ? createDeleteLink (aWPEC, aCurObject, "Delete " + aCurObject.getID ())
+                                                 : createEmptyAction ());
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);

@@ -48,13 +48,14 @@ public final class SMPTransportProfileManager extends
 
   @Nullable
   public ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty final String sID,
-                                                         @Nonnull @Nonempty final String sName)
+                                                         @Nonnull @Nonempty final String sName,
+                                                         final boolean bIsDeprecated)
   {
     // Double ID needs to be taken care of
     if (containsWithID (sID))
       return null;
 
-    final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID, sName);
+    final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID, sName, bIsDeprecated);
 
     m_aRWLock.writeLocked ( () -> {
       internalCreateItem (aSMPTransportProfile);
@@ -65,7 +66,8 @@ public final class SMPTransportProfileManager extends
 
   @Nonnull
   public EChange updateSMPTransportProfile (@Nullable final String sSMPTransportProfileID,
-                                            @Nonnull @Nonempty final String sName)
+                                            @Nonnull @Nonempty final String sName,
+                                            final boolean bIsDeprecated)
   {
     final SMPTransportProfile aSMPTransportProfile = getOfID (sSMPTransportProfileID);
     if (aSMPTransportProfile == null)
@@ -79,6 +81,7 @@ public final class SMPTransportProfileManager extends
     {
       EChange eChange = EChange.UNCHANGED;
       eChange = eChange.or (aSMPTransportProfile.setName (sName));
+      eChange = eChange.or (aSMPTransportProfile.setDeprecated (bIsDeprecated));
       if (eChange.isUnchanged ())
         return EChange.UNCHANGED;
 
