@@ -11,6 +11,7 @@
 package com.helger.peppol.smpserver;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
@@ -24,6 +25,7 @@ import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
  *
  * @author Philip Helger
  */
+@Immutable
 public final class CSMPServer extends AbstractGlobalSingleton
 {
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
@@ -46,7 +48,8 @@ public final class CSMPServer extends AbstractGlobalSingleton
   {}
 
   /**
-   * @return The version number of the SMP server. Never <code>null</code>.
+   * @return The version number of the SMP server read from the internal
+   *         properties file. Never <code>null</code>.
    */
   @Nonnull
   public static String getVersionNumber ()
