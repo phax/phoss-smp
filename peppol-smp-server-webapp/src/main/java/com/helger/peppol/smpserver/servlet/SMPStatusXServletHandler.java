@@ -8,7 +8,6 @@ import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +36,6 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
   private static final Logger s_aLogger = LoggerFactory.getLogger (SMPStatusXServletHandler.class);
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-  @Nullable
-  private static String _toString (@Nullable final Object o)
-  {
-    return o == null ? null : o.toString ();
-  }
-
   @Nonnull
   @ReturnsMutableCopy
   public static IJsonObject getDefaultStatusData ()
@@ -67,10 +60,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("smp.sml.enabled", aSettings.isSMLActive ());
     aStatusData.add ("smp.sml.needed", aSettings.isSMLNeeded ());
     aStatusData.add ("smp.sml.url", aSettings.getSMLURL ());
-    aStatusData.addIfNotNull ("smp.sml.connection-timeout-ms",
-                              _toString (SMPServerConfiguration.getSMLConnectionTimeoutMS ()));
-    aStatusData.addIfNotNull ("smp.sml.request-timeout-ms",
-                              _toString (SMPServerConfiguration.getSMLRequestTimeoutMS ()));
+    aStatusData.addIfNotNull ("smp.sml.connection-timeout-ms", SMPServerConfiguration.getSMLConnectionTimeoutMS ());
+    aStatusData.addIfNotNull ("smp.sml.request-timeout-ms", SMPServerConfiguration.getSMLRequestTimeoutMS ());
 
     // Directory information
     aStatusData.add ("smp.pd.enabled", aSettings.isPEPPOLDirectoryIntegrationEnabled ());
