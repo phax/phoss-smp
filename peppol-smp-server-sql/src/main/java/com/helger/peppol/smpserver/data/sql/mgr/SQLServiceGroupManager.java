@@ -150,6 +150,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aParticipantIdentifier = aIdentifierFactory.parseParticipantIdentifier (sSMPServiceGroupID);
+    if (aParticipantIdentifier == null)
+      throw new IllegalStateException ("Failed to parse participant identifier '" + sSMPServiceGroupID + "'");
 
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {

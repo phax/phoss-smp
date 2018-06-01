@@ -264,6 +264,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                     @Nonnull final List <DBBusinessCardEntity> aDBEntities)
   {
     final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aID);
+    if (aServiceGroup == null)
+      throw new IllegalStateException ("Failed to resolve service group " + aID);
+
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
     for (final DBBusinessCardEntity aDBEntity : aDBEntities)
     {

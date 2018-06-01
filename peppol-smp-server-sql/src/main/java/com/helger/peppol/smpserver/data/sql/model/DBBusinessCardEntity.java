@@ -106,7 +106,10 @@ public class DBBusinessCardEntity implements Serializable
   public IParticipantIdentifier getAsBusinessIdentifier ()
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    return aIdentifierFactory.parseParticipantIdentifier (m_sParticipantID);
+    final IParticipantIdentifier ret = aIdentifierFactory.parseParticipantIdentifier (m_sParticipantID);
+    if (ret == null)
+      throw new IllegalStateException ("Failed to parse participant identifier '" + m_sParticipantID + "'");
+    return ret;
   }
 
   @Column (name = "name", nullable = false)
