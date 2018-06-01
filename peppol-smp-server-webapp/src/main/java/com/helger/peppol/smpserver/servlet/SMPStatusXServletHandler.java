@@ -109,7 +109,15 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
       s_aLogger.debug ("Status information requested");
 
     // Build data to provide
-    final IJsonObject aStatusData = getDefaultStatusData ();
+    IJsonObject aStatusData;
+    if (SMPServerConfiguration.isStatusEnabled ())
+      aStatusData = getDefaultStatusData ();
+    else
+    {
+      // Status is disabled in the configuration
+      aStatusData = new JsonObject ();
+      aStatusData.add ("status.enabled", false);
+    }
 
     // Put JSON on response
     aUnifiedResponse.disableCaching ();
