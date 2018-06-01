@@ -42,7 +42,7 @@
     </init-param>
     <init-param>
       <param-name>jersey.config.servlet.filter.staticContentRegex</param-name>
-      <param-value>/(stream|public|secure|ajax|resbundle)/.*|/favicon.ico|/logout</param-value>
+      <param-value>/(stream|public|secure|ajax|resbundle|smp-status)/.*|/favicon.ico|/logout</param-value>
     </init-param>
     <init-param>
       <param-name>jersey.config.server.tracing.type</param-name>
@@ -59,6 +59,17 @@
     <filter-name>RestFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  
+  <!-- Misc stuff -->
+  
+  <servlet>
+    <servlet-name>SMPStatusServlet</servlet-name>
+    <servlet-class>com.helger.peppol.smpserver.servlet.SMPStatusServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SMPStatusServlet</servlet-name>
+    <url-pattern>/smp-status/*</url-pattern>
+  </servlet-mapping>
   
   <!-- UI stuff -->
 
