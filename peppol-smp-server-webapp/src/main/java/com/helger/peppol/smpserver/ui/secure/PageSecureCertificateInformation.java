@@ -181,52 +181,55 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         // Successfully loaded private key
         final SMPKeyManager aKeyMgr = SMPKeyManager.getInstance ();
         final PrivateKeyEntry aKeyEntry = aKeyMgr.getPrivateKeyEntry ();
-        final Certificate [] aChain = aKeyEntry.getCertificateChain ();
-
-        // Key store path and password are fine
-        aTab.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" +
-                                                                                   SMPServerConfiguration.getKeyStorePath () +
-                                                                                   "' and was successfully loaded."))
-                                                 .addChild (new HCDiv ().addChild ("The private key with the alias '" +
-                                                                                   SMPServerConfiguration.getKeyStoreKeyAlias () +
-                                                                                   "' was successfully loaded.")));
-
-        if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
+        if (aKeyEntry != null)
         {
-          final X509Certificate aHead = (X509Certificate) aChain[0];
-          final String sIssuer = aHead.getIssuerX500Principal ().getName ();
-          final EPredefinedCert eCert = EPredefinedCert.getFromIssuerOrNull (sIssuer);
-          if (eCert != null)
-          {
-            aTab.addChild (new BootstrapInfoBox ().addChild ("You are currently using a " +
-                                                             eCert.getName () +
-                                                             " certificate!"));
-            if (aChain.length != eCert.getCertificateTreeLength ())
-              aTab.addChild (new BootstrapErrorBox ().addChild ("The private key should be a chain of " +
-                                                                eCert.getCertificateTreeLength () +
-                                                                " certificates but it has " +
-                                                                aChain.length +
-                                                                " certificates. Please ensure that the respective root certificates are contained!"));
-          }
-          // else: we don't care
-        }
+          final Certificate [] aChain = aKeyEntry.getCertificateChain ();
 
-        final HCOL aUL = new HCOL ();
-        for (final Certificate aCert : aChain)
-        {
-          if (aCert instanceof X509Certificate)
+          // Key store path and password are fine
+          aTab.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" +
+                                                                                     SMPServerConfiguration.getKeyStorePath () +
+                                                                                     "' and was successfully loaded."))
+                                                   .addChild (new HCDiv ().addChild ("The private key with the alias '" +
+                                                                                     SMPServerConfiguration.getKeyStoreKeyAlias () +
+                                                                                     "' was successfully loaded.")));
+
+          if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
           {
-            final X509Certificate aX509Cert = (X509Certificate) aCert;
-            final BootstrapTable aCertDetails = AppCommonUI.createCertificateDetailsTable (aX509Cert,
-                                                                                           aNowLDT,
-                                                                                           aDisplayLocale);
-            aUL.addItem (aCertDetails.getAsResponsiveTable ());
+            final X509Certificate aHead = (X509Certificate) aChain[0];
+            final String sIssuer = aHead.getIssuerX500Principal ().getName ();
+            final EPredefinedCert eCert = EPredefinedCert.getFromIssuerOrNull (sIssuer);
+            if (eCert != null)
+            {
+              aTab.addChild (new BootstrapInfoBox ().addChild ("You are currently using a " +
+                                                               eCert.getName () +
+                                                               " certificate!"));
+              if (aChain.length != eCert.getCertificateTreeLength ())
+                aTab.addChild (new BootstrapErrorBox ().addChild ("The private key should be a chain of " +
+                                                                  eCert.getCertificateTreeLength () +
+                                                                  " certificates but it has " +
+                                                                  aChain.length +
+                                                                  " certificates. Please ensure that the respective root certificates are contained!"));
+            }
+            // else: we don't care
           }
-          else
-            aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
-                         ClassHelper.getClassName (aCert));
+
+          final HCOL aUL = new HCOL ();
+          for (final Certificate aCert : aChain)
+          {
+            if (aCert instanceof X509Certificate)
+            {
+              final X509Certificate aX509Cert = (X509Certificate) aCert;
+              final BootstrapTable aCertDetails = AppCommonUI.createCertificateDetailsTable (aX509Cert,
+                                                                                             aNowLDT,
+                                                                                             aDisplayLocale);
+              aUL.addItem (aCertDetails.getAsResponsiveTable ());
+            }
+            else
+              aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
+                           ClassHelper.getClassName (aCert));
+          }
+          aTab.addChild (aUL);
         }
-        aTab.addChild (aUL);
       }
       aTabBox.addTab ("keystore", "Keystore", aTab);
     }
