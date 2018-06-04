@@ -16,7 +16,7 @@
 @REM
 
 @echo off
-set XVER=5.0.5
+set XVER=5.0.6
 docker build --build-arg VERSION=%XVER% -t phoss-smp-release-binary-xml-%XVER% -f Dockerfile-release-binary-xml .
 docker tag phoss-smp-release-binary-xml-%XVER% phelger/smp:%XVER%
 docker tag phoss-smp-release-binary-xml-%XVER% phelger/smp:latest

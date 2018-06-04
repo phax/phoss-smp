@@ -6,7 +6,7 @@ It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/cefdi
 
 [![Gitter](https://badges.gitter.im/phax/peppol-smp-server.svg)](https://gitter.im/phax/peppol-smp-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Latest version: **[5.0.5](https://github.com/phax/peppol-smp-server/releases/tag/peppol-smp-server-parent-pom-5.0.5)** (2018-04-16).
+Latest version: **[5.0.6](https://github.com/phax/peppol-smp-server/releases/tag/peppol-smp-server-parent-pom-5.0.6)** (2018-06-04).
 If you are on an old 4.x version see the special [Upgrade guide to v5.0.0](https://github.com/phax/peppol-smp-server/wiki/Upgrade-Guide-V5)
 
 Please read the **[Wiki](https://github.com/phax/peppol-smp-server/wiki)** for a detailed description, configuration reference and setup hints. It contains an introduction with screenshots, configuration, building and running instructions as well as [News and noteworthy](https://github.com/phax/peppol-smp-server/wiki/News-and-noteworthy).
