@@ -38,9 +38,12 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.helger.commons.state.ESuccess;
+import com.helger.pd.businesscard.generic.PDBusinessCard;
 import com.helger.pd.businesscard.v1.ObjectFactory;
+import com.helger.pd.businesscard.v1.PD1APIHelper;
 import com.helger.pd.businesscard.v1.PD1BusinessCardMarshaller;
 import com.helger.pd.businesscard.v1.PD1BusinessCardType;
+import com.helger.pd.businesscard.v2.PD2APIHelper;
 import com.helger.pd.businesscard.v2.PD2BusinessCardMarshaller;
 import com.helger.pd.businesscard.v2.PD2BusinessCardType;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -108,23 +111,29 @@ public final class BusinessCardInterface
 
     try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
-      PD1BusinessCardType aV1 = new PD1BusinessCardMarshaller ().read (aServiceGroupDoc);
-      if (aV1 == null)
+      PDBusinessCard aBC = null;
+      final PD1BusinessCardType aV1 = new PD1BusinessCardMarshaller ().read (aServiceGroupDoc);
+      if (aV1 != null)
+      {
+        // Convert to wider format
+        aBC = PD1APIHelper.createBusinessCard (aV1);
+      }
+      else
       {
         final PD2BusinessCardType aV2 = new PD2BusinessCardMarshaller ().read (aServiceGroupDoc);
         if (aV2 != null)
         {
           // Convert to wider format
-          aV1 = PD2BusinessCardMarshaller.getAsV1 (aV2);
+          aBC = PD2APIHelper.createBusinessCard (aV2);
         }
       }
 
-      if (aV1 == null)
+      if (aBC == null)
         return Response.status (Response.Status.BAD_REQUEST).build ();
 
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
-                                                                                              aV1,
+                                                                                              aBC,
                                                                                               RestRequestHelper.getAuth (m_aHttpHeaders));
       if (eSuccess.isFailure ())
         return Response.status (Status.BAD_REQUEST).build ();

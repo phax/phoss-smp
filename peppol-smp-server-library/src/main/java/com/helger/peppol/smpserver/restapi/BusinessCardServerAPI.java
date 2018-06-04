@@ -24,8 +24,9 @@ import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.pd.businesscard.generic.PDBusinessCard;
+import com.helger.pd.businesscard.generic.PDBusinessEntity;
 import com.helger.pd.businesscard.v1.PD1BusinessCardType;
-import com.helger.pd.businesscard.v1.PD1BusinessEntityType;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -73,9 +74,7 @@ public final class BusinessCardServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPNotFoundException ("Failed to parse serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -84,9 +83,7 @@ public final class BusinessCardServerAPI
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -100,9 +97,7 @@ public final class BusinessCardServerAPI
       if (aBusinessCard == null)
       {
         // No such business card
-        throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -125,7 +120,7 @@ public final class BusinessCardServerAPI
 
   @Nonnull
   public ESuccess createBusinessCard (@Nonnull final String sServiceGroupID,
-                                      @Nonnull final PD1BusinessCardType aBusinessCard,
+                                      @Nonnull final PDBusinessCard aBusinessCard,
                                       @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
     s_aLogger.info (LOG_PREFIX + "PUT /businesscard/" + sServiceGroupID + " ==> " + aBusinessCard);
@@ -139,9 +134,7 @@ public final class BusinessCardServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPNotFoundException ("Failed to parse serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -164,9 +157,7 @@ public final class BusinessCardServerAPI
       if (aServiceGroup == null)
       {
         // No such service group (on this server)
-        throw new SMPNotFoundException ("Unknown serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -182,9 +173,9 @@ public final class BusinessCardServerAPI
                                         m_aAPIProvider.getCurrentURI ());
       }
 
-      final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList<> ();
-      for (final PD1BusinessEntityType aEntity : aBusinessCard.getBusinessEntity ())
-        aEntities.add (SMPBusinessCardEntity.createFromJAXBObject (aEntity));
+      final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
+      for (final PDBusinessEntity aEntity : aBusinessCard.businessEntities ())
+        aEntities.add (SMPBusinessCardEntity.createFromGenericObject (aEntity));
       aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aEntities);
 
       s_aLogger.info (LOG_PREFIX + "Finished createBusinessCard(" + sServiceGroupID + "," + aBusinessCard + ")");
@@ -250,9 +241,7 @@ public final class BusinessCardServerAPI
       if (aBusinessCard == null)
       {
         // No such business card
-        throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" +
-                                        sServiceGroupID +
-                                        "'",
+        throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 

@@ -29,9 +29,10 @@ import com.helger.commons.id.IHasID;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.pd.businesscard.generic.PDBusinessEntity;
+import com.helger.pd.businesscard.generic.PDContact;
+import com.helger.pd.businesscard.generic.PDIdentifier;
 import com.helger.pd.businesscard.v1.PD1BusinessEntityType;
-import com.helger.pd.businesscard.v1.PD1ContactType;
-import com.helger.pd.businesscard.v1.PD1IdentifierType;
 
 /**
  * This class represents a single Business Card entity - a part of a Business
@@ -49,9 +50,9 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   private String m_sName;
   private String m_sCountryCode;
   private String m_sGeographicalInformation;
-  private final ICommonsList <SMPBusinessCardIdentifier> m_aIdentifiers = new CommonsArrayList<> ();
-  private final ICommonsList <String> m_aWebsiteURIs = new CommonsArrayList<> ();
-  private final ICommonsList <SMPBusinessCardContact> m_aContacts = new CommonsArrayList<> ();
+  private final ICommonsList <SMPBusinessCardIdentifier> m_aIdentifiers = new CommonsArrayList <> ();
+  private final ICommonsList <String> m_aWebsiteURIs = new CommonsArrayList <> ();
+  private final ICommonsList <SMPBusinessCardContact> m_aContacts = new CommonsArrayList <> ();
   private String m_sAdditionalInformation;
   private LocalDate m_aRegistrationDate;
 
@@ -347,19 +348,19 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   }
 
   @Nonnull
-  public static SMPBusinessCardEntity createFromJAXBObject (final PD1BusinessEntityType aEntity)
+  public static SMPBusinessCardEntity createFromGenericObject (final PDBusinessEntity aEntity)
   {
     final SMPBusinessCardEntity ret = new SMPBusinessCardEntity ();
     ret.setName (aEntity.getName ());
     ret.setCountryCode (aEntity.getCountryCode ());
-    ret.setGeographicalInformation (aEntity.getGeographicalInformation ());
-    for (final PD1IdentifierType aItem : aEntity.getIdentifier ())
-      ret.addIdentifier (SMPBusinessCardIdentifier.createFromJAXBObject (aItem));
-    for (final String sItem : aEntity.getWebsiteURI ())
+    ret.setGeographicalInformation (aEntity.getGeoInfo ());
+    for (final PDIdentifier aItem : aEntity.identifiers ())
+      ret.addIdentifier (SMPBusinessCardIdentifier.createFromGenericObject (aItem));
+    for (final String sItem : aEntity.websiteURIs ())
       ret.addWebsiteURI (sItem);
-    for (final PD1ContactType aItem : aEntity.getContact ())
-      ret.addContact (SMPBusinessCardContact.createFromJAXBObject (aItem));
-    ret.setAdditionalInformation (aEntity.getAdditionalInformation ());
+    for (final PDContact aItem : aEntity.contacts ())
+      ret.addContact (SMPBusinessCardContact.createFromGenericObject (aItem));
+    ret.setAdditionalInformation (aEntity.getAdditionalInfo ());
     ret.setRegistrationDate (aEntity.getRegistrationDate ());
     return ret;
   }

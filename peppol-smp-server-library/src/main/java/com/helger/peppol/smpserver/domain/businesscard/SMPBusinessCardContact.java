@@ -24,6 +24,7 @@ import com.helger.commons.id.IHasID;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.pd.businesscard.generic.PDContact;
 import com.helger.pd.businesscard.v1.PD1ContactType;
 
 /**
@@ -182,7 +183,7 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
   }
 
   @Nonnull
-  public static SMPBusinessCardContact createFromJAXBObject (@Nonnull final PD1ContactType aEntity)
+  public static SMPBusinessCardContact createFromGenericObject (@Nonnull final PDContact aEntity)
   {
     return new SMPBusinessCardContact (aEntity.getType (),
                                        aEntity.getName (),
