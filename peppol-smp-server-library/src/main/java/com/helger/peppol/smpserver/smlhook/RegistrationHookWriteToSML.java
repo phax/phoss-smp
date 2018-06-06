@@ -10,7 +10,6 @@
  */
 package com.helger.peppol.smpserver.smlhook;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 
@@ -26,6 +25,7 @@ import com.helger.commons.exception.InitializationException;
 import com.helger.commons.ws.HostnameVerifierVerifyAll;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.SMLExceptionHelper;
 import com.helger.peppol.smlclient.participant.NotFoundFault;
@@ -59,16 +59,10 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   private static ManageParticipantIdentifierServiceCaller _createSMLCaller ()
   {
     // SML endpoint (incl. the service name)
-    final String sSMLURL = SMPMetaManager.getSettings ().getSMLURL ();
-    URL aSMLEndpointURL;
-    try
-    {
-      aSMLEndpointURL = new URL (sSMLURL);
-    }
-    catch (final MalformedURLException ex)
-    {
-      throw new IllegalStateException ("Failed to init SML endpoint URL from '" + sSMLURL + "'", ex);
-    }
+    final ISMLInfo aSMLInfo = SMPMetaManager.getSettings ().getSMLInfo ();
+    if (aSMLInfo == null)
+      throw new IllegalStateException ("Failed to get SML manage participant endpoint URL");
+    final URL aSMLEndpointURL = aSMLInfo.getManageParticipantIdentifierEndpointAddress ();
 
     // SSL socket factory
     SSLSocketFactory aSocketFactory;

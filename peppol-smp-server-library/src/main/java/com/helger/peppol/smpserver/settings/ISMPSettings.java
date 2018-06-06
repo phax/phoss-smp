@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.type.ITypedObject;
+import com.helger.peppol.sml.ISMLInfo;
 
 /**
  * Runtime settings for this SMP server instance.
@@ -85,16 +86,47 @@ public interface ISMPSettings extends ITypedObject <String>
 
   /**
    * @return The SML URL to use (the manage participant endpoint - e.g.
-   *         <code>https://edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier</code>).
+   *         <code>https://acc.edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier</code>).
    *         Only relevant when {@link #isSMLActive()} is <code>true</code>.
    */
   @Nullable
-  String getSMLURL ();
+  @Deprecated
+  default String getSMLURL ()
+  {
+    final ISMLInfo aSMLInfo = getSMLInfo ();
+    return aSMLInfo == null ? null : aSMLInfo.getManageParticipantIdentifierEndpointAddress ().toExternalForm ();
+  }
+
+  /**
+   * @return The SML information object to be used. May be <code>null</code>.
+   *         Only relevant when {@link #isSMLActive()} is <code>true</code>.
+   * @since 5.0.7
+   */
+  @Nullable
+  ISMLInfo getSMLInfo ();
+
+  /**
+   * @return The ID of SML information object to be used. May be
+   *         <code>null</code>. Only relevant when {@link #isSMLActive()} is
+   *         <code>true</code>.
+   * @since 5.0.7
+   */
+  @Nullable
+  default String getSMLInfoID ()
+  {
+    final ISMLInfo aSMLInfo = getSMLInfo ();
+    return aSMLInfo == null ? null : aSMLInfo.getID ();
+  }
 
   /**
    * @return The DNS zone in which the SML operates. May be <code>null</code> if
    *         the SML URL is <code>null</code>.
+   * @since 5.0.7
    */
   @Nullable
-  String getSMLDNSZone ();
+  default String getSMLDNSZone ()
+  {
+    final ISMLInfo aSMLInfo = getSMLInfo ();
+    return aSMLInfo == null ? null : aSMLInfo.getDNSZone ();
+  }
 }

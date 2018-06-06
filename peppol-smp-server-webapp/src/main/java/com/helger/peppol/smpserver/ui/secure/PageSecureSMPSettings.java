@@ -16,27 +16,25 @@
  */
 package com.helger.peppol.smpserver.ui.secure;
 
-import java.net.URL;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.URLHelper;
 import com.helger.commons.url.URLValidator;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.textlevel.HCA;
-import com.helger.html.hc.html.textlevel.HCCode;
+import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
-import com.helger.peppol.sml.CSMLDefault;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageSimpleForm;
+import com.helger.peppol.smpserver.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.form.BootstrapCheckBox;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
@@ -57,7 +55,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   private static final String FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smppdh";
   private static final String FIELD_SML_ACTIVE = "smla";
   private static final String FIELD_SML_NEEDED = "smln";
-  private static final String FIELD_SML_URL = "smlu";
+  private static final String FIELD_SML_INFO = "smlinfo";
 
   public PageSecureSMPSettings (@Nonnull @Nonempty final String sID)
   {
@@ -96,18 +94,10 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                                         aDisplayLocale)));
 
     {
-      final String sSMLURL = aObject.getSMLURL ();
-      final ISMLInfo aAssignedSML = SMPMetaManager.getSMLInfoMgr ()
-                                                  .getAllSMLInfos ()
-                                                  .findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ()
-                                                                    .toExternalForm ()
-                                                                    .equals (sSMLURL));
-      aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML management URL")
-                                                    .setCtrl (HCA.createLinkedWebsite (sSMLURL))
-                                                    .setHelpText (aAssignedSML == null ? null
-                                                                                       : "This belongs to the defined SML '" +
-                                                                                         aAssignedSML.getDisplayName () +
-                                                                                         "'"));
+      final ISMLInfo aSMLInfo = aObject.getSMLInfo ();
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML to be used")
+                                                    .setCtrl (aSMLInfo == null ? new HCEM ().addChild ("none")
+                                                                               : new HCTextNode (HCSMLSelect.getDisplayName (aSMLInfo))));
     }
   }
 
@@ -131,7 +121,8 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                   SMPServerConfiguration.DEFAULT_SML_ACTIVE);
     final boolean bSMLNeeded = aWPEC.params ().isCheckBoxChecked (FIELD_SML_NEEDED,
                                                                   SMPServerConfiguration.DEFAULT_SML_NEEDED);
-    final String sSMLURL = aWPEC.params ().getAsString (FIELD_SML_URL);
+    final String sSMLInfoID = aWPEC.params ().getAsString (FIELD_SML_INFO);
+    final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLInfoID);
 
     if (StringHelper.hasNoText (sPEPPOLDirectoryHostName))
       aFormErrors.addFieldError (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME, "PEPPOL Directory hostname may not be empty.");
@@ -144,28 +135,10 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       aFormErrors.addFieldError (FIELD_SML_ACTIVE,
                                  "SML connection cannot be activated, because the configured keystore is invalid!");
 
-    if (StringHelper.hasNoText (sSMLURL))
+    if (aSMLInfo == null)
     {
       if (bSMLActive)
-        aFormErrors.addFieldError (FIELD_SML_URL, "SML management URL may not be empty if SML is active.");
-    }
-    else
-    {
-      final URL aURL = URLHelper.getAsURL (sSMLURL);
-      if (aURL == null)
-        aFormErrors.addFieldError (FIELD_SML_URL, "SML management URL must be a valid URL.");
-      else
-      {
-        if (SMPMetaManager.getSMLInfoMgr ()
-                          .getAllSMLInfos ()
-                          .containsNone (x -> x.getManageParticipantIdentifierEndpointAddress ()
-                                               .toExternalForm ()
-                                               .equals (sSMLURL)))
-        {
-          aFormErrors.addFieldError (FIELD_SML_URL,
-                                     "The SML management URL does not belong to any of the configured SMLs.");
-        }
-      }
+        aFormErrors.addFieldError (FIELD_SML_INFO, "An SML configuration must be selected if SML is active.");
     }
 
     if (aFormErrors.isEmpty ())
@@ -176,7 +149,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                        sPEPPOLDirectoryHostName,
                                                        bSMLActive,
                                                        bSMLNeeded,
-                                                       sSMLURL);
+                                                       aSMLInfo);
       aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP settings were successfully saved."));
     }
   }
@@ -188,6 +161,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                 @Nonnull final EWebPageSimpleFormAction eSimpleFormAction,
                                 @Nonnull final FormErrorList aFormErrors)
   {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_REST_WRITABLE_API_DISABLED,
                                                                                                            aObject.isRESTWritableAPIDisabled ())))
@@ -218,13 +192,12 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                                                            aObject.isSMLNeeded ())))
                                                  .setHelpText ("If this checkbox is checked, warnings are emitted if the SML connection is not enabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SML_NEEDED)));
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML management URL")
-                                                 .setCtrl (new HCEdit (new RequestField (FIELD_SML_URL,
-                                                                                         aObject.getSMLURL ())))
-                                                 .setHelpText (new HCTextNode ("The SML manage participant endpoint. This URL is only used if the SML connection (see above) is enabled. The URL must end with "),
-                                                               new HCCode ().addChild ("/" +
-                                                                                       CSMLDefault.MANAGEMENT_SERVICE_PARTICIPANTIDENTIFIER),
-                                                               new HCTextNode ("."))
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SML_URL)));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML configuration")
+                                                 .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_INFO,
+                                                                                              aObject.getSMLInfoID ()),
+                                                                            aDisplayLocale,
+                                                                            null))
+                                                 .setHelpText (new HCTextNode ("Select the SML to operate on. The list of available configurations can be customized."))
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SML_INFO)));
   }
 }

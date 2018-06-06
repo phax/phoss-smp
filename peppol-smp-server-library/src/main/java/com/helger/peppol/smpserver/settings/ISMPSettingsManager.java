@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
+import com.helger.peppol.sml.ISMLInfo;
 
 /**
  * Base interface for the SMP settings manager
@@ -54,9 +55,8 @@ public interface ISMPSettingsManager
    *        <code>true</code> to enable write access to the SML
    * @param bSMLNeeded
    *        <code>true</code> to warn if SML is disabled
-   * @param sSMLURL
-   *        The hostname of the SMP to use. Must be fully qualified including
-   *        the protocol. May be <code>null</code> if not active.
+   * @param aSMLInfo
+   *        The SMLInfo object to use. May be <code>null</code> if not active.
    * @return {@link EChange}
    */
   @Nonnull
@@ -66,5 +66,5 @@ public interface ISMPSettingsManager
                           @Nullable String sPEPPOLDirectoryHostName,
                           boolean bSMLActive,
                           boolean bSMLNeeded,
-                          @Nullable String sSMLURL);
+                          @Nullable ISMLInfo aSMLInfo);
 }

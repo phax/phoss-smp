@@ -62,16 +62,16 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 
-public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
+public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo>
 {
   private static final String FIELD_DISPLAY_NAME = "displayname";
   private static final String FIELD_DNS_ZONE = "dnszone";
   private static final String FIELD_MANAGEMENT_ADDRESS_URL = "mgmtaddrurl";
   private static final String FIELD_CLIENT_CERTIFICATE_REQUIRED = "clientcert";
 
-  public PageSecureSMLInfo (@Nonnull @Nonempty final String sID)
+  public PageSecureSMLConfiguration (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "SML information");
+    super (sID, "SML configuration");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMLInfo, WebPageExecutionContext> ()
     {
       @Override
@@ -79,7 +79,7 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
                                       @Nonnull final BootstrapForm aForm,
                                       @Nonnull final ISMLInfo aSelectedObject)
       {
-        aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the SML information '" +
+        aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the SML configuration '" +
                                                                                      aSelectedObject.getDisplayName () +
                                                                                      "'?")));
       }
@@ -90,11 +90,11 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
       {
         final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
         if (aSMLInfoMgr.removeSMLInfo (aSelectedObject.getID ()).isChanged ())
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SML information '" +
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SML configuration '" +
                                                                               aSelectedObject.getDisplayName () +
                                                                               "' was successfully deleted!"));
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("The SML information '" +
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("The SML configuration '" +
                                                                             aSelectedObject.getDisplayName () +
                                                                             "' could not be deleted!"));
       }
@@ -113,6 +113,12 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
                                      @Nonnull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMLInfo aSelectedObject)
   {
+    if (eFormAction.isDelete ())
+    {
+      // Cannot delete the selected object!
+      if (aSelectedObject == SMPMetaManager.getSettings ().getSMLInfo ())
+        return false;
+    }
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
   }
 
@@ -123,7 +129,7 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
-    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of SML information '" +
+    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of SML configuration '" +
                                                             aSelectedObject.getDisplayName () +
                                                             "'"));
 
@@ -156,16 +162,16 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
   {
     final boolean bEdit = eFormAction.isEdit ();
 
-    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit SML information '" +
+    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit SML configuration '" +
                                                                 aSelectedObject.getDisplayName () +
                                                                 "'"
-                                                              : "Create new SML information"));
+                                                              : "Create new SML configuration"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Name")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_DISPLAY_NAME,
                                                                                          aSelectedObject != null ? aSelectedObject.getDisplayName ()
                                                                                                                  : null)))
-                                                 .setHelpText ("The name of the SML information. This is for informational purposes only and has no effect on the functionality.")
+                                                 .setHelpText ("The name of the SML configuration. This is for informational purposes only and has no effect on the functionality.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DISPLAY_NAME)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("DNS Zone")
@@ -214,7 +220,7 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
 
     // validations
     if (StringHelper.hasNoText (sDisplayName))
-      aFormErrors.addFieldError (FIELD_DISPLAY_NAME, "The SML information name must not be empty!");
+      aFormErrors.addFieldError (FIELD_DISPLAY_NAME, "The SML configuration name must not be empty!");
 
     if (StringHelper.hasNoText (sDNSZone))
       aFormErrors.addFieldError (FIELD_DNS_ZONE, "The DNS Zone must not be empty!");
@@ -244,14 +250,14 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
                                    sDNSZoneLC,
                                    sManagementAddressURL,
                                    bClientCertificateRequired);
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SML information '" +
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SML configuration '" +
                                                                             sDisplayName +
                                                                             "' was successfully edited."));
       }
       else
       {
         aSMLInfoMgr.createSMLInfo (sDisplayName, sDNSZoneLC, sManagementAddressURL, bClientCertificateRequired);
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new SML information '" +
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new SML configuration '" +
                                                                             sDisplayName +
                                                                             "' was successfully created."));
       }
@@ -265,10 +271,10 @@ public class PageSecureSMLInfo extends AbstractSMPWebPageForm <ISMLInfo>
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
 
-    aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page lets you create custom SML informations that can be used for registration."));
+    aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page lets you create custom SML configurations that can be used for registration."));
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-    aToolbar.addButton ("Create new SML information", createCreateURL (aWPEC), EDefaultIcon.NEW);
+    aToolbar.addButton ("Create new SML configuration", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aNodeList.addChild (aToolbar);
 
     final HCTable aTable = new HCTable (new DTCol ("Name").setInitialSorting (ESortOrder.ASCENDING),

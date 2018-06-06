@@ -37,6 +37,7 @@ import com.helger.commons.mime.MimeType;
 import com.helger.commons.system.SystemProperties;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.CSMPServer;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppConfiguration;
@@ -58,6 +59,7 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
   {
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final LocalDateTime aNow = PDTFactory.getCurrentLocalDateTime ();
+    final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
 
     final IJsonObject aStatusData = new JsonObject ();
     aStatusData.add ("status.datetime", PDTWebDateHelper.getAsStringXSD (PDTFactory.getCurrentZonedDateTimeUTC ()));
@@ -75,7 +77,11 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     // SML information
     aStatusData.add ("smp.sml.enabled", aSettings.isSMLActive ());
     aStatusData.add ("smp.sml.needed", aSettings.isSMLNeeded ());
-    aStatusData.add ("smp.sml.url", aSettings.getSMLURL ());
+    if (aSMLInfo != null)
+    {
+      aStatusData.add ("smp.sml.url", aSMLInfo.getManagementServiceURL ());
+      aStatusData.add ("smp.sml.dnszone", aSMLInfo.getDNSZone ());
+    }
     aStatusData.addIfNotNull ("smp.sml.connection-timeout-ms", SMPServerConfiguration.getSMLConnectionTimeoutMS ());
     aStatusData.addIfNotNull ("smp.sml.request-timeout-ms", SMPServerConfiguration.getSMLRequestTimeoutMS ());
 

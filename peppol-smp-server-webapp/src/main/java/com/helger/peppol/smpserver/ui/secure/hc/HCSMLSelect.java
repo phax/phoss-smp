@@ -22,6 +22,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.name.IHasDisplayName;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -30,6 +31,13 @@ import com.helger.photon.uicore.html.select.HCExtSelect;
 
 public class HCSMLSelect extends HCExtSelect
 {
+  @Nonnull
+  @Nonempty
+  public static String getDisplayName (@Nonnull final ISMLInfo aObj)
+  {
+    return "[" + aObj.getDisplayName () + "] " + aObj.getManagementServiceURL () + " (" + aObj.getDNSZone () + ")";
+  }
+
   public HCSMLSelect (@Nonnull final RequestField aRF,
                       @Nonnull final Locale aDisplayLocale,
                       @Nullable final Predicate <? super ISMLInfo> aFilter)
@@ -38,15 +46,7 @@ public class HCSMLSelect extends HCExtSelect
     SMPMetaManager.getSMLInfoMgr ()
                   .getAllSMLInfos ()
                   .getSortedInline (IHasDisplayName.getComparatorCollating (aDisplayLocale))
-                  .findAll (aFilter,
-                            x -> addOption (x.getID (),
-                                            "[" +
-                                                        x.getDisplayName () +
-                                                        "] " +
-                                                        x.getManagementServiceURL () +
-                                                        " (" +
-                                                        x.getDNSZone () +
-                                                        ")"));
+                  .findAll (aFilter, x -> addOption (x.getID (), getDisplayName (x)));
     addOptionPleaseSelect (aDisplayLocale);
   }
 }

@@ -10,9 +10,6 @@
  */
 package com.helger.peppol.smpserver.settings;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -21,9 +18,12 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.settings.ISettings;
 import com.helger.settings.SettingsWithDefault;
 
@@ -37,6 +37,8 @@ import com.helger.settings.SettingsWithDefault;
 @NotThreadSafe
 public class SMPSettings implements ISMPSettings
 {
+  private static final String KEY_SML_INFO_ID = "smlinfo.id";
+
   private static final ObjectType OT = new ObjectType ("smp-settings");
 
   private SettingsWithDefault m_aSettings;
@@ -140,31 +142,16 @@ public class SMPSettings implements ISMPSettings
   }
 
   @Nullable
-  public String getSMLURL ()
+  public ISMLInfo getSMLInfo ()
   {
-    return m_aSettings.getAsString (SMPServerConfiguration.KEY_SML_URL);
+    final String sID = m_aSettings.getAsString (KEY_SML_INFO_ID);
+    return SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sID);
   }
 
   @Nonnull
-  public EChange setSMLURL (@Nullable final String sSMLURL)
+  public EChange setSMLInfo (@Nullable final String sSMLInfoID)
   {
-    return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_URL, sSMLURL);
-  }
-
-  @Nullable
-  public String getSMLDNSZone ()
-  {
-    try
-    {
-      String ret = new URL (getSMLURL ()).getHost ();
-      if (!ret.endsWith ("."))
-        ret += '.';
-      return ret;
-    }
-    catch (final MalformedURLException ex)
-    {
-      return null;
-    }
+    return m_aSettings.putIn (KEY_SML_INFO_ID, sSMLInfoID);
   }
 
   @Nonnull
@@ -175,10 +162,27 @@ public class SMPSettings implements ISMPSettings
   }
 
   @Nonnull
-  public EChange setFromSettings (@Nonnull final ISettings aSettings)
+  EChange initFromSettings (@Nonnull final ISettings aSettings)
   {
     ValueEnforcer.notNull (aSettings, "settings");
-    return m_aSettings.setAll (aSettings);
+    final EChange ret = m_aSettings.setAll (aSettings);
+    // Soft migration 5.0.7
+    if (!m_aSettings.containsKey (KEY_SML_INFO_ID))
+    {
+      // Get old String (includes "/manageparticipantidentifier")
+      final String sOldSMLURL = m_aSettings.getAsString ("sml.url");
+      if (StringHelper.hasText (sOldSMLURL))
+      {
+        // Check if any SML item matches
+        final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ()
+                                                .findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ()
+                                                                  .toExternalForm ()
+                                                                  .equals (sOldSMLURL));
+        if (aSMLInfo != null)
+          m_aSettings.put (KEY_SML_INFO_ID, aSMLInfo.getID ());
+      }
+    }
+    return ret;
   }
 
   @Override

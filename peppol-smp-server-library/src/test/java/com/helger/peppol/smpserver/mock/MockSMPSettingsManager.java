@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.UnsupportedOperation;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.settings.ISMPSettingsCallback;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
@@ -39,7 +40,7 @@ final class MockSMPSettingsManager implements ISMPSettingsManager
                                  @Nullable final String sPEPPOLDirectoryHostName,
                                  final boolean bSMLActive,
                                  final boolean bSMLNeeded,
-                                 @Nullable final String sSMLURL)
+                                 @Nullable final ISMLInfo aSMLInfo)
   {
     throw new UnsupportedOperationException ();
   }

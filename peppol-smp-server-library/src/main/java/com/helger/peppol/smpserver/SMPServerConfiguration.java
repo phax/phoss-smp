@@ -71,7 +71,6 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
   public static final String KEY_SML_ACTIVE = "sml.active";
   public static final String KEY_SML_NEEDED = "sml.needed";
-  public static final String KEY_SML_URL = "sml.url";
   public static final String KEY_SML_SMPID = "sml.smpid";
   public static final String KEY_SML_SMP_IP = "sml.smp.ip";
   public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";

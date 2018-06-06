@@ -433,12 +433,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final FormErrorList aFormErrors = new FormErrorList ();
     final boolean bShowInput = true;
-    final String sDefaultSMLURL = SMPMetaManager.getSettings ().getSMLURL ();
-    final ISMLInfo aDefaultSML = sDefaultSMLURL == null ? null
-                                                        : SMPMetaManager.getSMLInfoMgr ()
-                                                                        .findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ()
-                                                                                          .toExternalForm ()
-                                                                                          .equals (sDefaultSMLURL));
+    final ISMLInfo aDefaultSML = SMPMetaManager.getSettings ().getSMLInfo ();
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
 
     if (aDefaultSML != null)

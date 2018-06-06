@@ -81,7 +81,7 @@ public final class MenuSecure
                                                                                            "SML",
                                                                                            aMenuTree))
                                                  .setDisplayFilter (aFilterSMLConnectionActiveOrNeeded);
-        aMenuTree.createItem (aAdminSML, new PageSecureSMLInfo (CMenuSecure.MENU_SML_INFO))
+        aMenuTree.createItem (aAdminSML, new PageSecureSMLConfiguration (CMenuSecure.MENU_SML_INFO))
                  .setDisplayFilter (aFilterSMLConnectionActiveOrNeeded);
         aMenuTree.createItem (aAdminSML, new PageSecureSMLRegistration (CMenuSecure.MENU_SML_REGISTRATION))
                  .setDisplayFilter (aFilterSMLConnectionActive);
