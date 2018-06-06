@@ -38,10 +38,15 @@ public class HCSMLSelect extends HCExtSelect
     SMPMetaManager.getSMLInfoMgr ()
                   .getAllSMLInfos ()
                   .getSortedInline (IHasDisplayName.getComparatorCollating (aDisplayLocale))
-                  .findAll (aFilter, x -> addOption (x.getID (), "[" +
-                                                                 x.getDisplayName () +
-                                                                 "] " +
-                                                                 x.getManagementServiceURL ()));
+                  .findAll (aFilter,
+                            x -> addOption (x.getID (),
+                                            "[" +
+                                                        x.getDisplayName () +
+                                                        "] " +
+                                                        x.getManagementServiceURL () +
+                                                        " (" +
+                                                        x.getDNSZone () +
+                                                        ")"));
     addOptionPleaseSelect (aDisplayLocale);
   }
 }
