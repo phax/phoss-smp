@@ -17,8 +17,6 @@
 package com.helger.peppol.smpserver.ui.secure;
 
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Locale;
 
@@ -193,7 +191,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             aNodeList.addChild (new BootstrapWarnBox ().addChild ("It seems like you are offline! So please interpret the results on this page with care!"));
                           }
 
-                          final String sSMLZoneName = _getSMLHostName ();
+                          final String sSMLZoneName = SMPMetaManager.getSettings ().getSMLDNSZone ();
                           final IPeppolURLProvider aURLProvider = SMPMetaManager.getPeppolURLProvider ();
 
                           final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
@@ -534,22 +532,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     }
   }
 
-  @Nullable
-  private static String _getSMLHostName ()
-  {
-    try
-    {
-      String ret = new URL (SMPMetaManager.getSettings ().getSMLURL ()).getHost ();
-      if (!ret.endsWith ("."))
-        ret += '.';
-      return ret;
-    }
-    catch (final MalformedURLException ex)
-    {
-      return null;
-    }
-  }
-
   @Override
   protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
   {
@@ -571,7 +553,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aToolbar.addAndReturnButton ("Check DNS state",
                                    aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                    EDefaultIcon.MAGNIFIER)
-              .setDisabled (_getSMLHostName () == null ||
+              .setDisabled (SMPMetaManager.getSettings ().getSMLDNSZone () == null ||
                             aAllServiceGroups.isEmpty () ||
                             !SMPMetaManager.getSettings ().isSMLActive ());
     }

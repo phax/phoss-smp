@@ -10,6 +10,9 @@
  */
 package com.helger.peppol.smpserver.settings;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -148,6 +151,22 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_URL, sSMLURL);
   }
 
+  @Nullable
+  public String getSMLDNSZone ()
+  {
+    try
+    {
+      String ret = new URL (getSMLURL ()).getHost ();
+      if (!ret.endsWith ("."))
+        ret += '.';
+      return ret;
+    }
+    catch (final MalformedURLException ex)
+    {
+      return null;
+    }
+  }
+
   @Nonnull
   @ReturnsMutableCopy
   public SettingsWithDefault getAsSettings ()
@@ -155,11 +174,11 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings;
   }
 
-  public void setFromSettings (@Nonnull final ISettings aSettings)
+  @Nonnull
+  public EChange setFromSettings (@Nonnull final ISettings aSettings)
   {
     ValueEnforcer.notNull (aSettings, "settings");
-    m_aSettings.clear ();
-    m_aSettings.putAllIn (aSettings);
+    return m_aSettings.setAll (aSettings);
   }
 
   @Override

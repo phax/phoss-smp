@@ -90,4 +90,11 @@ public interface ISMPSettings extends ITypedObject <String>
    */
   @Nullable
   String getSMLURL ();
+
+  /**
+   * @return The DNS zone in which the SML operates. May be <code>null</code> if
+   *         the SML URL is <code>null</code>.
+   */
+  @Nullable
+  String getSMLDNSZone ();
 }
