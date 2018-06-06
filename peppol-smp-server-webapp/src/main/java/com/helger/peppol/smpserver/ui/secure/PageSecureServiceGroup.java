@@ -199,7 +199,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                           final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
                                                               new DTCol ("DNS name"),
                                                               new DTCol ("IP address").setDataSort (2, 0),
-                                                              new DTCol ("Nice name")).setID (getID () + "checkdns");
+                                                              new DTCol ("Nice name"),
+                                                              new DTCol ("Action")).setID (getID () + "_checkdns");
                           for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
                           {
                             final String sDNSName = aURLProvider.getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
@@ -247,6 +248,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             else
                             {
                               aRow.addCell (new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("is not registered in SML"));
+                              aRow.addCell ();
                               aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).addChild ("Register in SML")
                                                                                            .setOnClick (aWPEC.getSelfHref ()
                                                                                                              .add (CPageParam.PARAM_ACTION,
