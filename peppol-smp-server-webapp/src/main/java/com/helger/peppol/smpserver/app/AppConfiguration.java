@@ -103,6 +103,17 @@ public final class AppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> if global JAX WS debugging should be enabled,
+   *         <code>false</code> if not. Default is <code>false</code>.
+   * @since 5.0.7
+   */
+  @Nullable
+  public static boolean isGlobalDebugJaxWS ()
+  {
+    return s_aConfigFile.getAsBoolean ("global.debugjaxws", false);
+  }
+
+  /**
    * @return The path where the application stores its data. Should be an
    *         absolute path.
    */

@@ -51,6 +51,7 @@ import com.helger.photon.basic.configfile.EConfigurationFileSyntax;
 import com.helger.photon.bootstrap3.servlet.WebAppListenerBootstrap;
 import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.servlet.ServletContextPathHolder;
+import com.helger.wsclient.WSHelper;
 
 /**
  * Special SMP web app listener. This is the entry point for application
@@ -95,7 +96,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected void initGlobalSettings ()
   {
-    // Internal stuff:
+    // Enable JaxWS debugging?
+    if (AppConfiguration.isGlobalDebugJaxWS ())
+      WSHelper.setMetroDebugSystemProperties (true);
 
     // JUL to SLF4J
     SLF4JBridgeHandler.removeHandlersForRootLogger ();
