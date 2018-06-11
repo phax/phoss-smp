@@ -46,6 +46,7 @@ import com.helger.pd.businesscard.v1.PD1BusinessCardType;
 import com.helger.pd.businesscard.v2.PD2APIHelper;
 import com.helger.pd.businesscard.v2.PD2BusinessCardMarshaller;
 import com.helger.pd.businesscard.v2.PD2BusinessCardType;
+import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
@@ -84,7 +85,9 @@ public final class BusinessCardInterface
     // Is the PEPPOL Directory integration enabled?
     if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
-      s_aLogger.warn ("The PEPPOL Directory integration is disabled. getBusinessCard will not be executed.");
+      s_aLogger.warn ("The " +
+                      AppConfiguration.getDirectoryName () +
+                      " integration is disabled. getBusinessCard will not be executed.");
       throw new WebApplicationException (404);
     }
 

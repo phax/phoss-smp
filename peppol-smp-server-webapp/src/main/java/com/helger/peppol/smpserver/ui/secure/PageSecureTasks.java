@@ -37,6 +37,7 @@ import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -141,15 +142,16 @@ public class PageSecureTasks extends AbstractSMPWebPage
 
     if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
+      final String sDirectoryName = AppConfiguration.getDirectoryName ();
       if (StringHelper.hasNoText (SMPMetaManager.getSettings ().getPEPPOLDirectoryHostName ()))
-        aOL.addItem (_createError ("An empty PEPPOL Directory hostname is provided"),
-                     new HCDiv ().addChild ("A connection to the PEPPOL Directory server cannot be establised!"));
+        aOL.addItem (_createError ("An empty " + sDirectoryName + " hostname is provided"),
+                     new HCDiv ().addChild ("A connection to the " + sDirectoryName + " server cannot be establised!"));
 
       final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (PDClientConfiguration.getKeyStoreType (),
                                                                           PDClientConfiguration.getKeyStorePath (),
                                                                           PDClientConfiguration.getKeyStorePassword ());
       if (aLoadedKeyStore.isFailure ())
-        aOL.addItem (_createError ("The PEPPOL Directory client certificate configuration is invalid."),
+        aOL.addItem (_createError ("The " + sDirectoryName + " client certificate configuration is invalid."),
                      new HCDiv ().addChild (PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore)));
     }
 

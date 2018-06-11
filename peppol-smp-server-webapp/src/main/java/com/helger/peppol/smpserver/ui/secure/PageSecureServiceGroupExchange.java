@@ -40,6 +40,7 @@ import com.helger.html.hc.html.forms.HCEditFile;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.app.CSMPExchange;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
@@ -586,7 +587,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Overwrite existing elements")
                                                    .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_OVERWRITE_EXISTING,
                                                                                                              DEFAULT_OVERWRITE_EXISTING)))
-                                                   .setHelpText ("If this box is checked, all existing endpoints etc. of a service group are deleted and new endpoints are created! If the PEPPOL directory integration is enabled, existing business cards contained in the import are also overwritten!")
+                                                   .setHelpText ("If this box is checked, all existing endpoints etc. of a service group are deleted and new endpoints are created! If the " +
+                                                                 AppConfiguration.getDirectoryName () +
+                                                                 " integration is enabled, existing business cards contained in the import are also overwritten!")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_OVERWRITE_EXISTING)));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owner of the new service groups")
                                                    .setCtrl (new HCSMPUserSelect (new RequestField (FIELD_DEFAULT_OWNER),

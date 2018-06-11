@@ -30,6 +30,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
@@ -73,18 +74,19 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final String sDirectoryName = AppConfiguration.getDirectoryName ();
 
     final BootstrapViewForm aTable = aNodeList.addAndReturnChild (new BootstrapViewForm ());
     aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                   .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isRESTWritableAPIDisabled (),
                                                                                         aDisplayLocale)));
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory integration enabled?")
+    aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration enabled?")
                                                   .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationEnabled (),
                                                                                         aDisplayLocale)));
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory integration automatic update?")
+    aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration automatic update?")
                                                   .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationAutoUpdate (),
                                                                                         aDisplayLocale)));
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory hostname")
+    aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " hostname")
                                                   .setCtrl (HCA.createLinkedWebsite (aObject.getPEPPOLDirectoryHostName ())));
     aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
                                                   .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLActive (),
@@ -123,13 +125,14 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                   SMPServerConfiguration.DEFAULT_SML_NEEDED);
     final String sSMLInfoID = aWPEC.params ().getAsString (FIELD_SML_INFO);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLInfoID);
+    final String sDirectoryName = AppConfiguration.getDirectoryName ();
 
     if (StringHelper.hasNoText (sPEPPOLDirectoryHostName))
-      aFormErrors.addFieldError (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME, "PEPPOL Directory hostname may not be empty.");
+      aFormErrors.addFieldError (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME, sDirectoryName + " hostname may not be empty.");
     else
       if (!URLValidator.isValid (sPEPPOLDirectoryHostName))
         aFormErrors.addFieldError (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME,
-                                   "PEPPOL Directory hostname must be a valid URL.");
+                                   sDirectoryName + " hostname must be a valid URL.");
 
     if (bSMLActive && !SMPKeyManager.isCertificateValid ())
       aFormErrors.addFieldError (FIELD_SML_ACTIVE,
@@ -161,26 +164,37 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                 @Nonnull final EWebPageSimpleFormAction eSimpleFormAction,
                                 @Nonnull final FormErrorList aFormErrors)
   {
+    final String sDirectoryName = AppConfiguration.getDirectoryName ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_REST_WRITABLE_API_DISABLED,
                                                                                                            aObject.isRESTWritableAPIDisabled ())))
                                                  .setHelpText ("If this checkbox is checked, all non-standard writing REST APIs are disabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_REST_WRITABLE_API_DISABLED)));
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory integration enabled?")
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration enabled?")
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
                                                                                                            aObject.isPEPPOLDirectoryIntegrationEnabled ())))
-                                                 .setHelpText ("If this checkbox is checked, the PEPPOL Directory integration is enabled.")
+                                                 .setHelpText ("If this checkbox is checked, the " +
+                                                               sDirectoryName +
+                                                               " integration is enabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED)));
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory integration automatic update?")
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration automatic update?")
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                                                                                            aObject.isPEPPOLDirectoryIntegrationAutoUpdate ())))
-                                                 .setHelpText ("If the PEPPOL Directory integration is enabled and this checkbox is checked, all business card creations, modifications and deletions are automatically pushed to the PEPPOL Directory server.")
+                                                 .setHelpText ("If the " +
+                                                               sDirectoryName +
+                                                               " integration is enabled and this checkbox is checked, all business card creations, modifications and deletions are automatically pushed to the " +
+                                                               sDirectoryName +
+                                                               " server.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED)));
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("PEPPOL Directory hostname")
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " hostname")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME,
                                                                                          aObject.getPEPPOLDirectoryHostName ())))
-                                                 .setHelpText ("The PEPPOL Directory host where the business cards should be published to. This URL is only used if the PEPPOL Directory integration (see above) is enabled.")
+                                                 .setHelpText ("The " +
+                                                               sDirectoryName +
+                                                               " host where the business cards should be published to. This URL is only used if the " +
+                                                               sDirectoryName +
+                                                               " integration (see above) is enabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SML_ACTIVE,

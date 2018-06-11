@@ -157,4 +157,15 @@ public final class AppConfiguration extends AbstractGlobalSingleton
   {
     return s_aConfigFile.getAsBoolean ("webapp.startpage.participants.none", false);
   }
+
+  /**
+   * @return Name of the Directory. Usually "PEPPOL Directory" but maybe "TOOP
+   *         Directory" as well.
+   * @since 5.0.7
+   */
+  @Nonnull
+  public static String getDirectoryName ()
+  {
+    return s_aConfigFile.getAsString ("webapp.directory.name", "PEPPOL Directory");
+  }
 }

@@ -183,7 +183,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                                                         .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
     final IReadableResource aPDClientConfig = PDClientConfiguration.getConfigFile ().getReadResource ();
     if (aPDClientConfig != null)
-      aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription ("PEPPOL Directory client configuration")
+      aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription (AppConfiguration.getDirectoryName () +
+                                                                                              " client configuration")
                                                                              .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
 
     // If the SMP settings change, the PD client must be re-created

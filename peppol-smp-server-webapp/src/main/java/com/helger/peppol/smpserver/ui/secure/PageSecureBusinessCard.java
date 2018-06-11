@@ -64,6 +64,7 @@ import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.app.PDClientProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
@@ -165,8 +166,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         {
           aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!" +
                                                                               (SMPMetaManager.getSettings ()
-                                                                                             .isPEPPOLDirectoryIntegrationAutoUpdate () ? " PEPPOL Directory server should have been updated."
-                                                                                                                                        : "")));
+                                                                                             .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + AppConfiguration.getDirectoryName () + " server should have been updated." : "")));
         }
         else
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
@@ -178,19 +178,28 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                         public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
                                                      @Nonnull final ISMPBusinessCard aSelectedObject)
                         {
+                          final String sDirectoryName = AppConfiguration.getDirectoryName ();
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ()
                                                                                        .getParticpantIdentifier ();
                           final ESuccess eSuccess = PDClientProvider.getInstance ()
                                                                     .getPDClient ()
                                                                     .addServiceGroupToIndex (aParticipantID);
                           if (eSuccess.isSuccess ())
-                            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("Successfully notified the PEPPOL Directory to index '" +
+                          {
+                            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("Successfully notified the " +
+                                                                                                sDirectoryName +
+                                                                                                " to index '" +
                                                                                                 aParticipantID.getURIEncoded () +
                                                                                                 "'"));
+                          }
                           else
-                            aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error notifying the PEPPOL Directory to index '" +
+                          {
+                            aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error notifying the " +
+                                                                                              sDirectoryName +
+                                                                                              " to index '" +
                                                                                               aParticipantID.getURIEncoded () +
                                                                                               "'"));
+                          }
                           return true;
                         }
                       });
@@ -205,7 +214,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
     if (!aSettingsMgr.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("PEPPOL Directory integration is disabled hence no Business Cards can be created."));
+      aNodeList.addChild (new BootstrapWarnBox ().addChild (AppConfiguration.getDirectoryName () +
+                                                            " integration is disabled hence no Business Cards can be created."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Change settings")
                                                 .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SMP_SETTINGS))
                                                 .setIcon (EDefaultIcon.YES));
@@ -539,8 +549,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                           aServiceGroup.getID () +
                                                                           "' was successfully saved." +
                                                                           (SMPMetaManager.getSettings ()
-                                                                                         .isPEPPOLDirectoryIntegrationAutoUpdate () ? " PEPPOL Directory server should have been updated."
-                                                                                                                                    : "")));
+                                                                                         .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + AppConfiguration.getDirectoryName () + " server should have been updated." : "")));
     }
   }
 
@@ -945,7 +954,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                        new HCA (aWPEC.getSelfHref ()
                                      .add (CPageParam.PARAM_ACTION, ACTION_PUBLISH_TO_INDEXER)
                                      .add (CPageParam.PARAM_OBJECT, aCurObject.getID ()))
-                                                                                         .setTitle ("Update Business Card in PEPPOL Directory")
+                                                                                         .setTitle ("Update Business Card in " +
+                                                                                                    AppConfiguration.getDirectoryName ())
                                                                                          .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
     }
     return ret;

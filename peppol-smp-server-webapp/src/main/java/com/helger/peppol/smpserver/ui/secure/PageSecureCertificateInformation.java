@@ -40,6 +40,7 @@ import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
@@ -363,7 +364,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           aTab.addChild (aUL);
         }
       }
-      aTabBox.addTab ("pdkeystore", "PEPPOL Directory Keystore", aTab);
+      aTabBox.addTab ("pdkeystore", AppConfiguration.getDirectoryName () + " Keystore", aTab);
     }
   }
 }
