@@ -171,6 +171,7 @@ public final class SMPServerConfiguration
   /**
    * @return The type to the keystore. This is usually JKS. Property
    *         <code>smp.keystore.type</code>.
+   * @since 5.0.4
    */
   @Nonnull
   public static EKeyStoreType getKeyStoreType ()
