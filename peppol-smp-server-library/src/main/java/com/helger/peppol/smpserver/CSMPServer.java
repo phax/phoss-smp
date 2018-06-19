@@ -16,7 +16,6 @@ import javax.annotation.concurrent.Immutable;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.ClassPathResource;
-import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.settings.ISettings;
 import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
 
@@ -26,7 +25,7 @@ import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
  * @author Philip Helger
  */
 @Immutable
-public final class CSMPServer extends AbstractGlobalSingleton
+public final class CSMPServer
 {
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
 
