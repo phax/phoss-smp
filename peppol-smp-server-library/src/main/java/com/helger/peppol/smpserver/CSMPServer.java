@@ -13,7 +13,6 @@ package com.helger.peppol.smpserver;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.settings.ISettings;
@@ -29,20 +28,18 @@ public final class CSMPServer
 {
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
 
-  private static final String s_sVersionNumber;
+  private static final String VERSION_NUMBER;
 
   static
   {
     // Read version number
     final SettingsPersistenceProperties aSPP = new SettingsPersistenceProperties ();
     final ISettings aVersionProps = aSPP.readSettings (new ClassPathResource (SMP_SERVER_VERSION_FILENAME));
-    s_sVersionNumber = aVersionProps.getAsString ("smp.version");
-    if (s_sVersionNumber == null)
+    VERSION_NUMBER = aVersionProps.getAsString ("smp.version");
+    if (VERSION_NUMBER == null)
       throw new InitializationException ("Error determining SMP version number!");
   }
 
-  @Deprecated
-  @UsedViaReflection
   private CSMPServer ()
   {}
 
@@ -53,6 +50,6 @@ public final class CSMPServer
   @Nonnull
   public static String getVersionNumber ()
   {
-    return s_sVersionNumber;
+    return VERSION_NUMBER;
   }
 }
