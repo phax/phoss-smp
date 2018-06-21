@@ -22,7 +22,6 @@ import com.helger.dao.DAOException;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
-import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
 import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.basic.audit.AuditHelper;
 
@@ -116,7 +115,7 @@ public final class SMLInfoManager extends AbstractPhotonMapBasedWALDAO <ISMLInfo
       final SMLInfo aSMLInfo = internalDeleteItem (sSMLInfoID);
       if (aSMLInfo == null)
       {
-        AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", sSMLInfoID);
+        AuditHelper.onAuditDeleteFailure (SMLInfo.OT, "no-such-id", sSMLInfoID);
         return EChange.UNCHANGED;
       }
     }
@@ -124,7 +123,7 @@ public final class SMLInfoManager extends AbstractPhotonMapBasedWALDAO <ISMLInfo
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT, sSMLInfoID);
+    AuditHelper.onAuditDeleteSuccess (SMLInfo.OT, sSMLInfoID);
     return EChange.CHANGED;
   }
 
