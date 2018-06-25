@@ -93,8 +93,6 @@ import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
-import com.helger.photon.uictrls.prism.EPrismLanguage;
-import com.helger.photon.uictrls.prism.HCPrismJS;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
@@ -387,7 +385,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                  .setCtrl (AppCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
     if (aSelectedObject.hasExtension ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (new HCPrismJS (EPrismLanguage.JAVASCRIPT).addChild (aSelectedObject.getExtensionAsString ())));
+                                                   .setCtrl (AppCommonUI.getExtensionDisplay (aSelectedObject)));
 
     aNodeList.addChild (aForm);
   }

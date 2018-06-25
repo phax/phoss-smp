@@ -481,10 +481,13 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical contact")
                                                  .setCtrl (HCA_MailTo.createLinkedEmail (aSelectedEndpoint.getTechnicalContactUrl ())));
 
-    if (StringHelper.hasText (aSelectedEndpoint.getTechnicalInformationUrl ()))
+    if (aSelectedEndpoint.hasTechnicalInformationUrl ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical information")
                                                    .setCtrl (HCA.createLinkedWebsite (aSelectedEndpoint.getTechnicalInformationUrl (),
                                                                                       HC_Target.BLANK)));
+    if (aSelectedEndpoint.hasExtension ())
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
+                                                   .setCtrl (AppCommonUI.getExtensionDisplay (aSelectedEndpoint)));
 
     aNodeList.addChild (aForm);
 
@@ -836,6 +839,13 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                                "This could for example be a web site containing links to XML " +
                                                                "Schemas, WSDLs, Schematrons and other relevant resources.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_TECHNICAL_INFORMATION)));
+
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
+                                                 .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_EXTENSION,
+                                                                                                     aSelectedObject != null ? aSelectedObject.getFirstExtensionXML ()
+                                                                                                                             : null)))
+                                                 .setHelpText ("Optional extension to the endpoint. If present it must be valid XML content!")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }
 
   @Override

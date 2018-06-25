@@ -178,6 +178,11 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
   @Nullable
   String getTechnicalInformationUrl ();
 
+  default boolean hasTechnicalInformationUrl ()
+  {
+    return StringHelper.hasText (getTechnicalInformationUrl ());
+  }
+
   /**
    * @return This service information object as a PEPPOL SMP JAXB object for the
    *         REST interface. Never <code>null</code>.

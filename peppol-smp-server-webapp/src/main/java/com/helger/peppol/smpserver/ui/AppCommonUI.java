@@ -29,8 +29,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
+import org.w3c.dom.Element;
+
 import com.helger.commons.CGlobal;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.id.factory.GlobalIDFactory;
@@ -57,6 +60,7 @@ import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
+import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
@@ -79,7 +83,10 @@ import com.helger.photon.uictrls.datatables.EDataTablesFilterType;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
 import com.helger.photon.uictrls.datatables.plugins.DataTablesPluginSearchHighlight;
+import com.helger.photon.uictrls.prism.EPrismLanguage;
+import com.helger.photon.uictrls.prism.HCPrismJS;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xml.serialize.write.XMLWriter;
 
 /**
  * Common UI helper methods
@@ -311,5 +318,23 @@ public final class AppCommonUI
   {
     final IUser aOwner = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwnerID);
     return aOwner == null ? sOwnerID : aOwner.getLoginName () + " (" + aOwner.getDisplayName () + ")";
+  }
+
+  @Nullable
+  public static IHCNode getExtensionDisplay (@Nonnull final ISMPHasExtension aHasExtension)
+  {
+    final ICommonsList <com.helger.peppol.bdxr.ExtensionType> aExtensions = aHasExtension.getAllExtensions ();
+    if (aExtensions.isEmpty ())
+      return null;
+
+    final HCNodeList aNL = new HCNodeList ();
+    for (final com.helger.peppol.bdxr.ExtensionType aExtension : aExtensions)
+    {
+      // Use only the XML element of the first extension
+      final Element aAny = (Element) aExtension.getAny ();
+      final String sXML = XMLWriter.getNodeAsString (aAny);
+      aNL.addChild (new HCPrismJS (EPrismLanguage.MARKUP).addChild (sXML));
+    }
+    return aNL;
   }
 }

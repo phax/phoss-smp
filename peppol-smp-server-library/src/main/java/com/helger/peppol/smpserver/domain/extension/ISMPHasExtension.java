@@ -10,8 +10,11 @@
  */
 package com.helger.peppol.smpserver.domain.extension;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.string.StringHelper;
 
 /**
@@ -22,6 +25,10 @@ import com.helger.commons.string.StringHelper;
  */
 public interface ISMPHasExtension
 {
+  @Nonnull
+  @ReturnsMutableCopy
+  ICommonsList <com.helger.peppol.bdxr.ExtensionType> getAllExtensions ();
+
   /**
    * @return The string representation of the extension element. May be
    *         <code>null</code>. If an extension is present it must be
