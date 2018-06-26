@@ -42,6 +42,7 @@ import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCEditPassword;
 import com.helger.html.hc.html.grouping.HCDiv;
+import com.helger.html.hc.html.grouping.HCHR;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.textlevel.HCCode;
@@ -330,6 +331,12 @@ public final class AppCommonUI
     final HCNodeList aNL = new HCNodeList ();
     for (final com.helger.peppol.bdxr.ExtensionType aExtension : aExtensions)
     {
+      if (aNL.hasChildren ())
+      {
+        // add a separator line
+        aNL.addChild (new HCHR ());
+      }
+
       // Use only the XML element of the first extension
       final Element aAny = (Element) aExtension.getAny ();
       final String sXML = XMLWriter.getNodeAsString (aAny);
