@@ -842,8 +842,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                  .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_EXTENSION,
-                                                                                                     aSelectedObject != null ? aSelectedObject.getFirstExtensionXML ()
-                                                                                                                             : null)))
+                                                                                                     aSelectedEndpoint != null ? aSelectedEndpoint.getFirstExtensionXML ()
+                                                                                                                               : null)))
                                                  .setHelpText ("Optional extension to the endpoint. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }
