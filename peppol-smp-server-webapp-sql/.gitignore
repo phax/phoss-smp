@@ -16,3 +16,6 @@ hs_err_pid*
 /conf/
 
 db-*.sql
+/.settings/ 
+/.project 
+/.classpath 
