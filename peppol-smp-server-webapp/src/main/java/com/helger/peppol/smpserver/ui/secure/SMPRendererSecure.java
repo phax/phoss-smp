@@ -87,7 +87,6 @@ public final class SMPRendererSecure
                        new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH +
                                                                                         "/"))
                                              .addChild ("Goto public view")
-                                             .addClass (CBootstrapCSS.NAVBAR_BTN)
                                              .addStyle (CCSSProperties.MARGIN_LEFT.newValue ("8px"))
                                              .addStyle (CCSSProperties.MARGIN_RIGHT.newValue ("8px")));
 

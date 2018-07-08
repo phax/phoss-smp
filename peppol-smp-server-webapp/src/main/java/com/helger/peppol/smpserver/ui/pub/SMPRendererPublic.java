@@ -106,7 +106,7 @@ public final class SMPRendererPublic
   {}
 
   private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC,
-                                             @Nonnull final BootstrapNavbar aNavbar)
+                                             @Nonnull final BootstrapNavbar aNavBar)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
@@ -114,7 +114,7 @@ public final class SMPRendererPublic
     {
       final Locale aDisplayLocale = aLEC.getDisplayLocale ();
       final BootstrapNav aNav = new BootstrapNav ();
-      aNavbar.addButton (EBootstrapNavbarPosition.COLLAPSIBLE_DEFAULT,
+      aNavBar.addButton (EBootstrapNavbarPosition.COLLAPSIBLE_DEFAULT,
                          new BootstrapButton ().addChild ("Goto manager")
                                                .setOnClick (LinkHelper.getURLWithContext (AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH +
                                                                                           "/")));
@@ -125,7 +125,7 @@ public final class SMPRendererPublic
       aNav.addButton (new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (aRequestScope,
                                                                                        LogoutServlet.SERVLET_DEFAULT_PATH))
                                             .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
-      aNavbar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_RIGHT, aNav);
+      aNavBar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_RIGHT, aNav);
     }
     else
     {
@@ -138,7 +138,7 @@ public final class SMPRendererPublic
         aDiv.addChild (AppCommonUI.createViewLoginForm (aLEC, null, false).addClass (CBootstrapCSS.NAVBAR_FORM));
         aDropDown.addItem (aDiv);
       }
-      aNavbar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_LEFT, aNav);
+      aNavBar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_LEFT, aNav);
     }
   }
 
@@ -166,13 +166,13 @@ public final class SMPRendererPublic
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final ISimpleURL aLinkToStartPage = aLEC.getLinkToMenuItem (aLEC.getMenuTree ().getDefaultMenuItemID ());
 
-    final BootstrapNavbar aNavbar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
-    aNavbar.getContainer ().setFluid (true);
-    aNavbar.addBrand (createLogo (aLEC), aLinkToStartPage);
-    aNavbar.addBrand (new HCSpan ().addChild (CApp.getApplicationTitle ()), aLinkToStartPage);
+    final BootstrapNavbar aNavBar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
+    aNavBar.getContainer ().setFluid (true);
+    aNavBar.addBrand (createLogo (aLEC), aLinkToStartPage);
+    aNavBar.addBrand (new HCSpan ().addChild (CApp.getApplicationTitle ()), aLinkToStartPage);
 
-    _addNavbarLoginLogout (aLEC, aNavbar);
-    return aNavbar;
+    _addNavbarLoginLogout (aLEC, aNavBar);
+    return aNavBar;
   }
 
   @Nonnull
