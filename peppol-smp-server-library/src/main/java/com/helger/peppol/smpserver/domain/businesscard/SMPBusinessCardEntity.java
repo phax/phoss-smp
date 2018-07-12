@@ -173,8 +173,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   public void setIdentifiers (@Nonnull final List <SMPBusinessCardIdentifier> aIdentifiers)
   {
     ValueEnforcer.notNull (aIdentifiers, "Identifiers");
-    m_aIdentifiers.clear ();
-    m_aIdentifiers.addAll (aIdentifiers);
+    m_aIdentifiers.setAll (aIdentifiers);
   }
 
   @Nonnull
@@ -198,8 +197,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   public void setWebsiteURIs (@Nonnull final List <String> aWebsiteURIs)
   {
     ValueEnforcer.notNull (aWebsiteURIs, "WebsiteURIs");
-    m_aWebsiteURIs.clear ();
-    m_aWebsiteURIs.addAll (aWebsiteURIs);
+    m_aWebsiteURIs.setAll (aWebsiteURIs);
   }
 
   @Nonnull
@@ -223,8 +221,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   public void setContacts (@Nonnull final List <SMPBusinessCardContact> aContacts)
   {
     ValueEnforcer.notNull (aContacts, "Contacts");
-    m_aContacts.clear ();
-    m_aContacts.addAll (aContacts);
+    m_aContacts.setAll (aContacts);
   }
 
   /**
