@@ -259,13 +259,18 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     return eChange;
   }
 
-  @Nonnull
+  @Nullable
   private SMPBusinessCard _convert (@Nonnull final IParticipantIdentifier aID,
                                     @Nonnull final List <DBBusinessCardEntity> aDBEntities)
   {
     final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aID);
     if (aServiceGroup == null)
-      throw new IllegalStateException ("Failed to resolve service group " + aID);
+    {
+      // Can happen if there is an inconsistency between BCE and SG tables
+      if (s_aLogger.isWarnEnabled ())
+        s_aLogger.warn ("Failed to resolve service group " + aID);
+      return null;
+    }
 
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
     for (final DBBusinessCardEntity aDBEntity : aDBEntities)
@@ -304,10 +309,14 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       aGrouped.putSingle (aDBItem.getAsBusinessIdentifier (), aDBItem);
 
     // Convert
-    final ICommonsList <ISMPBusinessCard> aRedirects = new CommonsArrayList <> ();
+    final ICommonsList <ISMPBusinessCard> aBCs = new CommonsArrayList <> ();
     for (final Map.Entry <IParticipantIdentifier, ICommonsList <DBBusinessCardEntity>> aEntry : aGrouped.entrySet ())
-      aRedirects.add (_convert (aEntry.getKey (), aEntry.getValue ()));
-    return aRedirects;
+    {
+      final ISMPBusinessCard aBC = _convert (aEntry.getKey (), aEntry.getValue ());
+      if (aBC != null)
+        aBCs.add (aBC);
+    }
+    return aBCs;
   }
 
   @Nullable
