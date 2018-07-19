@@ -62,7 +62,7 @@ import com.helger.photon.security.CSecurity;
  */
 public final class ServiceGroupInterfaceTest
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceGroupInterfaceTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (ServiceGroupInterfaceTest.class);
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_LOGIN,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
@@ -89,7 +89,7 @@ public final class ServiceGroupInterfaceTest
     // Read response
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
-      s_aLogger.info ("HTTP Response: " + sResponse);
+      LOGGER.info ("HTTP Response: " + sResponse);
     assertTrue (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes),
                 ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));
     return aResponseMsg.getStatus ();

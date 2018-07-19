@@ -49,7 +49,7 @@ import com.helger.photon.basic.audit.AuditHelper;
 public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements
                                       ISMPRedirectManager
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceInformationManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (XMLServiceInformationManager.class);
 
   public XMLRedirectManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
@@ -116,8 +116,8 @@ public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMP
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("createOrUpdateSMPRedirect (" +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("createOrUpdateSMPRedirect (" +
                        aServiceGroup +
                        ", " +
                        aDocumentTypeIdentifier +
@@ -141,8 +141,8 @@ public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMP
                                       sSubjectUniqueIdentifier,
                                       sExtension);
       _updateSMPRedirect (aNewRedirect);
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("createOrUpdateSMPRedirect - success - updated");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("createOrUpdateSMPRedirect - success - updated");
     }
     else
     {
@@ -153,8 +153,8 @@ public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMP
                                       sSubjectUniqueIdentifier,
                                       sExtension);
       _createSMPRedirect (aNewRedirect);
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("createOrUpdateSMPRedirect - success - created");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("createOrUpdateSMPRedirect - success - created");
     }
     return aNewRedirect;
   }
@@ -162,13 +162,13 @@ public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMP
   @Nonnull
   public EChange deleteSMPRedirect (@Nullable final ISMPRedirect aSMPRedirect)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPRedirect (" + aSMPRedirect + ")");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPRedirect (" + aSMPRedirect + ")");
 
     if (aSMPRedirect == null)
     {
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("deleteSMPRedirect - failure");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("deleteSMPRedirect - failure");
       return EChange.UNCHANGED;
     }
 
@@ -179,8 +179,8 @@ public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMP
       if (aRealRedirect == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
-        if (s_aLogger.isDebugEnabled ())
-          s_aLogger.debug ("deleteSMPRedirect - failure");
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("deleteSMPRedirect - failure");
         return EChange.UNCHANGED;
       }
     }
@@ -192,8 +192,8 @@ public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMP
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
                                       aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded ());
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPRedirect - success");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPRedirect - success");
     return EChange.CHANGED;
   }
 

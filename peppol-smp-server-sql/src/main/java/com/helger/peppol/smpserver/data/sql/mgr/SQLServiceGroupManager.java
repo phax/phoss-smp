@@ -67,8 +67,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                 @Nonnull final IParticipantIdentifier aParticipantIdentifier,
                                                 @Nullable final String sExtension)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("createSMPServiceGroup (" +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("createSMPServiceGroup (" +
                        sOwnerID +
                        ", " +
                        aParticipantIdentifier.getURIEncoded () +
@@ -126,8 +126,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       return null;
     }
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("createSMPServiceGroup succeeded");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("createSMPServiceGroup succeeded");
 
     final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
     m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aServiceGroup));
@@ -139,8 +139,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                         @Nonnull @Nonempty final String sNewOwnerID,
                                         @Nullable final String sExtension)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("updateSMPServiceGroup (" +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("updateSMPServiceGroup (" +
                        sSMPServiceGroupID +
                        ", " +
                        sNewOwnerID +
@@ -198,7 +198,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     }
 
     final EChange eChange = ret.get ();
-    s_aLogger.info ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
+    LOGGER.info ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
 
     if (eChange.isChanged ())
       m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (sSMPServiceGroupID));
@@ -212,8 +212,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     if (aParticipantID == null)
       return EChange.UNCHANGED;
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
     final MutableBoolean aDeletedServiceGroup = new MutableBoolean (false);
@@ -226,7 +226,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
       if (aDBServiceGroup == null)
       {
-        s_aLogger.warn ("No such service group to delete: " + aParticipantID.getURIEncoded ());
+        LOGGER.warn ("No such service group to delete: " + aParticipantID.getURIEncoded ());
         return EChange.UNCHANGED;
       }
 
@@ -258,8 +258,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     }
 
     final EChange eChange = ret.get ();
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
 
     if (eChange.isChanged ())
     {
@@ -274,8 +274,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("getAllSMPServiceGroups()");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getAllSMPServiceGroups()");
 
     JPAExecutionResult <ICommonsList <ISMPServiceGroup>> ret;
     ret = doSelect ( () -> {
@@ -311,8 +311,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
 
     JPAExecutionResult <ICommonsList <ISMPServiceGroup>> ret;
     ret = doSelect ( () -> {
@@ -342,8 +342,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @Nonnegative
   public int getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("getSMPServiceGroupCountOfOwner(" + sOwnerID + ")");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getSMPServiceGroupCountOfOwner(" + sOwnerID + ")");
 
     JPAExecutionResult <Long> ret;
     ret = doSelect ( () -> {
@@ -363,8 +363,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @Nullable
   public SMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("getSMPServiceGroupOfID(" +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getSMPServiceGroupOfID(" +
                        (aParticipantIdentifier == null ? "null" : aParticipantIdentifier.getURIEncoded ()) +
                        ")");
 
@@ -395,8 +395,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("containsSMPServiceGroupWithID(" +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("containsSMPServiceGroupWithID(" +
                        (aParticipantIdentifier == null ? "null" : aParticipantIdentifier.getURIEncoded ()) +
                        ")");
 
@@ -424,8 +424,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   @Nonnegative
   public int getSMPServiceGroupCount ()
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("getSMPServiceGroupCount()");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getSMPServiceGroupCount()");
 
     JPAExecutionResult <Long> ret;
     ret = doSelect ( () -> {

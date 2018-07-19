@@ -46,7 +46,7 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor
   public static final String JSON_LOGGEDIN = "loggedin";
   public static final String JSON_HTML = "html";
 
-  private static final Logger s_aLogger = LoggerFactory.getLogger (AjaxExecutorPublicLogin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (AjaxExecutorPublicLogin.class);
 
   @Override
   protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
@@ -67,7 +67,7 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor
 
     // Get the rendered content of the menu area
     if (GlobalDebug.isDebugMode ())
-      s_aLogger.warn ("Login of '" + sLoginName + "' failed because " + eLoginResult);
+      LOGGER.warn ("Login of '" + sLoginName + "' failed because " + eLoginResult);
 
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IHCNode aRoot = new BootstrapErrorBox ().addChild (EPhotonCoreText.LOGIN_ERROR_MSG.getDisplayText (aDisplayLocale) +

@@ -54,7 +54,7 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
                                           implements
                                           ISMPBusinessCardManager
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLBusinessCardManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (XMLBusinessCardManager.class);
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
@@ -115,7 +115,7 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aEntities, "Entities");
 
-    s_aLogger.info ("createOrUpdateSMPBusinessCard (" +
+    LOGGER.info ("createOrUpdateSMPBusinessCard (" +
                     aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
                     ", " +
                     CollectionHelper.getSize (aEntities) +
@@ -127,13 +127,13 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
     {
       // Reuse old ID
       _updateSMPBusinessCard (aNewBusinessCard);
-      s_aLogger.info ("createOrUpdateSMPBusinessCard update successful");
+      LOGGER.info ("createOrUpdateSMPBusinessCard update successful");
     }
     else
     {
       // Create new ID
       _createSMPBusinessCard (aNewBusinessCard);
-      s_aLogger.info ("createOrUpdateSMPBusinessCard create successful");
+      LOGGER.info ("createOrUpdateSMPBusinessCard create successful");
     }
 
     // Invoke generic callbacks
@@ -148,7 +148,7 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
     if (aSMPBusinessCard == null)
       return EChange.UNCHANGED;
 
-    s_aLogger.info ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
+    LOGGER.info ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
     m_aRWLock.writeLock ().lock ();
     try
@@ -172,7 +172,7 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
                                       aSMPBusinessCard.getID (),
                                       aSMPBusinessCard.getServiceGroupID (),
                                       Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
-    s_aLogger.info ("deleteSMPBusinessCard successful");
+    LOGGER.info ("deleteSMPBusinessCard successful");
 
     return EChange.CHANGED;
   }

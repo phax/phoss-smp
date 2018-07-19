@@ -38,7 +38,7 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public final class SMPInternalErrorHandler extends AbstractErrorCallback
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPInternalErrorHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPInternalErrorHandler.class);
 
   @Nonnull
   public static InternalErrorBuilder createInternalErrorBuilder ()
@@ -99,7 +99,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
       InternalErrorSettings.setSMTPReceiverAddresses (new EmailAddress (sReceiverAddress, sReceiverName));
       InternalErrorSettings.setSMTPSettings (aSMTPSettings);
       InternalErrorSettings.setFallbackLocale (CApp.DEFAULT_LOCALE);
-      s_aLogger.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);
+      LOGGER.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);
     }
   }
 }

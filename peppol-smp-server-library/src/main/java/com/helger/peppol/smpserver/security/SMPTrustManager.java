@@ -35,7 +35,7 @@ import com.helger.security.keystore.LoadedKeyStore;
  */
 public final class SMPTrustManager extends AbstractGlobalSingleton
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPTrustManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPTrustManager.class);
 
   private static final AtomicBoolean s_aCertificateValid = new AtomicBoolean (false);
   private static EKeyStoreLoadError s_eInitError;
@@ -62,7 +62,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
     }
     m_aTrustStore = aTrustStoreLoading.getKeyStore ();
 
-    s_aLogger.info ("SMPTrustManager successfully initialized with truststore '" +
+    LOGGER.info ("SMPTrustManager successfully initialized with truststore '" +
                     SMPServerConfiguration.getTrustStorePath () +
                     "'");
     s_aCertificateValid.set (true);

@@ -68,7 +68,7 @@ import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
  */
 public final class BDXRServerAPI
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (BDXRServerAPI.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (BDXRServerAPI.class);
   private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterInvocation = StatisticsManager.getKeyedCounterHandler (BDXRServerAPI.class.getName () +
                                                                                                                                    "$call");
   private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (BDXRServerAPI.class.getName () +
@@ -85,7 +85,7 @@ public final class BDXRServerAPI
   @Nonnull
   public CompleteServiceGroupType getCompleteServiceGroup (final String sServiceGroupID) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "GET /complete/" + sServiceGroupID);
+    LOGGER.info (LOG_PREFIX + "GET /complete/" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("getCompleteServiceGroup");
 
     try
@@ -140,13 +140,13 @@ public final class BDXRServerAPI
         aCompleteServiceGroup.addServiceMetadata (aServiceInfo.getAsJAXBObjectBDXR ());
       }
 
-      s_aLogger.info (LOG_PREFIX + "Finished getCompleteServiceGroup(" + sServiceGroupID + ")");
+      LOGGER.info (LOG_PREFIX + "Finished getCompleteServiceGroup(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("getCompleteServiceGroup");
       return aCompleteServiceGroup;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in getCompleteServiceGroup(" +
                       sServiceGroupID +
                       ") - " +
@@ -161,7 +161,7 @@ public final class BDXRServerAPI
   public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sUserID,
                                                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "GET /list/" + sUserID);
+    LOGGER.info (LOG_PREFIX + "GET /list/" + sUserID);
     s_aStatsCounterInvocation.increment ("getServiceGroupReferenceList");
 
     try
@@ -191,13 +191,13 @@ public final class BDXRServerAPI
         aReferenceTypes.add (aServGroupRefType);
       }
 
-      s_aLogger.info (LOG_PREFIX + "Finished getServiceGroupReferenceList(" + sUserID + ")");
+      LOGGER.info (LOG_PREFIX + "Finished getServiceGroupReferenceList(" + sUserID + ")");
       s_aStatsCounterSuccess.increment ("getServiceGroupReferenceList");
       return aRefList;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in getServiceGroupReferenceList(" +
                       sUserID +
                       ") - " +
@@ -211,7 +211,7 @@ public final class BDXRServerAPI
   @Nonnull
   public ServiceGroupType getServiceGroup (final String sServiceGroupID) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "GET /" + sServiceGroupID);
+    LOGGER.info (LOG_PREFIX + "GET /" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("getServiceGroup");
 
     try
@@ -255,13 +255,13 @@ public final class BDXRServerAPI
       }
       aSG.setServiceMetadataReferenceCollection (aCollectionType);
 
-      s_aLogger.info (LOG_PREFIX + "Finished getServiceGroup(" + sServiceGroupID + ")");
+      LOGGER.info (LOG_PREFIX + "Finished getServiceGroup(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("getServiceGroup");
       return aSG;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in getServiceGroup(" +
                       sServiceGroupID +
                       ") - " +
@@ -277,7 +277,7 @@ public final class BDXRServerAPI
                                     @Nonnull final ServiceGroupType aServiceGroup,
                                     @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "PUT /" + sServiceGroupID + " ==> " + aServiceGroup);
+    LOGGER.info (LOG_PREFIX + "PUT /" + sServiceGroupID + " ==> " + aServiceGroup);
     s_aStatsCounterInvocation.increment ("saveServiceGroup");
 
     try
@@ -307,13 +307,13 @@ public final class BDXRServerAPI
       else
         aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aServiceGroupID, sExtension);
 
-      s_aLogger.info (LOG_PREFIX + "Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ")");
+      LOGGER.info (LOG_PREFIX + "Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ")");
       s_aStatsCounterSuccess.increment ("saveServiceGroup");
       return ESuccess.SUCCESS;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in saveServiceGroup(" +
                       sServiceGroupID +
                       "," +
@@ -330,7 +330,7 @@ public final class BDXRServerAPI
   public ESuccess deleteServiceGroup (@Nonnull final String sServiceGroupID,
                                       @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "DELETE /" + sServiceGroupID);
+    LOGGER.info (LOG_PREFIX + "DELETE /" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("deleteServiceGroup");
 
     try
@@ -340,7 +340,7 @@ public final class BDXRServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -352,13 +352,13 @@ public final class BDXRServerAPI
 
       aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
 
-      s_aLogger.info (LOG_PREFIX + "Finished deleteServiceGroup(" + sServiceGroupID + ")");
+      LOGGER.info (LOG_PREFIX + "Finished deleteServiceGroup(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("deleteServiceGroup");
       return ESuccess.SUCCESS;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in deleteServiceGroup(" +
                       sServiceGroupID +
                       ") - " +
@@ -373,7 +373,7 @@ public final class BDXRServerAPI
   public SignedServiceMetadataType getServiceRegistration (@Nonnull final String sServiceGroupID,
                                                            @Nonnull final String sDocumentTypeID) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "GET /" + sServiceGroupID + "/services/" + sDocumentTypeID);
+    LOGGER.info (LOG_PREFIX + "GET /" + sServiceGroupID + "/services/" + sDocumentTypeID);
     s_aStatsCounterInvocation.increment ("getServiceRegistration");
 
     try
@@ -431,13 +431,13 @@ public final class BDXRServerAPI
 
       // Signature must be added by the rest service
 
-      s_aLogger.info (LOG_PREFIX + "Finished getServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
+      LOGGER.info (LOG_PREFIX + "Finished getServiceRegistration(" + sServiceGroupID + "," + sDocumentTypeID + ")");
       s_aStatsCounterSuccess.increment ("getServiceRegistration");
       return aSignedServiceMetadata;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in getServiceRegistration(" +
                       sServiceGroupID +
                       "," +
@@ -456,7 +456,7 @@ public final class BDXRServerAPI
                                            @Nonnull final ServiceMetadataType aServiceMetadata,
                                            @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX +
+    LOGGER.info (LOG_PREFIX +
                     "PUT /" +
                     sServiceGroupID +
                     "/services/" +
@@ -472,7 +472,7 @@ public final class BDXRServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -480,7 +480,7 @@ public final class BDXRServerAPI
       if (aDocTypeID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse document type identifier '" + sDocumentTypeID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse document type identifier '" + sDocumentTypeID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -492,7 +492,7 @@ public final class BDXRServerAPI
         // metadata (body) must equal path
         if (!aServiceInformation.getParticipantIdentifier ().hasSameContent (aServiceGroupID))
         {
-          s_aLogger.info (LOG_PREFIX +
+          LOGGER.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +
                           aServiceInformation.getParticipantIdentifier ().getURIEncoded () +
                           " param:" +
@@ -502,7 +502,7 @@ public final class BDXRServerAPI
 
         if (!aServiceInformation.getDocumentIdentifier ().hasSameContent (aDocTypeID))
         {
-          s_aLogger.info (LOG_PREFIX +
+          LOGGER.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +
                           aServiceInformation.getDocumentIdentifier ().getURIEncoded () +
                           " param:" +
@@ -522,7 +522,7 @@ public final class BDXRServerAPI
       if (aServiceGroup == null)
       {
         // Service group not found
-        s_aLogger.info (LOG_PREFIX + "ServiceGroup not found: " + sServiceGroupID);
+        LOGGER.info (LOG_PREFIX + "ServiceGroup not found: " + sServiceGroupID);
         return ESuccess.FAILURE;
       }
 
@@ -575,7 +575,7 @@ public final class BDXRServerAPI
                                                                                                                                        .getExtension ())));
       }
 
-      s_aLogger.info (LOG_PREFIX +
+      LOGGER.info (LOG_PREFIX +
                       "Finished saveServiceRegistration(" +
                       sServiceGroupID +
                       "," +
@@ -589,7 +589,7 @@ public final class BDXRServerAPI
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in saveServiceRegistration(" +
                       sServiceGroupID +
                       "," +
@@ -609,7 +609,7 @@ public final class BDXRServerAPI
                                              @Nonnull final String sDocumentTypeID,
                                              @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID);
+    LOGGER.info (LOG_PREFIX + "DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID);
     s_aStatsCounterInvocation.increment ("deleteServiceRegistration");
 
     try
@@ -619,7 +619,7 @@ public final class BDXRServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -627,7 +627,7 @@ public final class BDXRServerAPI
       if (aDocTypeID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse document type identifier '" + sDocumentTypeID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse document type identifier '" + sDocumentTypeID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -639,7 +639,7 @@ public final class BDXRServerAPI
       final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
       if (aServiceGroup == null)
       {
-        s_aLogger.info (LOG_PREFIX + "Service group '" + sServiceGroupID + "' not on this SMP");
+        LOGGER.info (LOG_PREFIX + "Service group '" + sServiceGroupID + "' not on this SMP");
         return ESuccess.FAILURE;
       }
 
@@ -652,7 +652,7 @@ public final class BDXRServerAPI
         final EChange eChange = aServiceInfoMgr.deleteSMPServiceInformation (aServiceInfo);
         if (eChange.isChanged ())
         {
-          s_aLogger.info (LOG_PREFIX +
+          LOGGER.info (LOG_PREFIX +
                           "Finished deleteServiceRegistration(" +
                           sServiceGroupID +
                           "," +
@@ -673,7 +673,7 @@ public final class BDXRServerAPI
           final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
           if (eChange.isChanged ())
           {
-            s_aLogger.info (LOG_PREFIX +
+            LOGGER.info (LOG_PREFIX +
                             "Finished deleteServiceRegistration(" +
                             sServiceGroupID +
                             "," +
@@ -685,7 +685,7 @@ public final class BDXRServerAPI
         }
       }
 
-      s_aLogger.info (LOG_PREFIX +
+      LOGGER.info (LOG_PREFIX +
                       "Service group '" +
                       sServiceGroupID +
                       "' has no document type '" +
@@ -695,7 +695,7 @@ public final class BDXRServerAPI
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in deleteServiceRegistration(" +
                       sServiceGroupID +
                       "," +

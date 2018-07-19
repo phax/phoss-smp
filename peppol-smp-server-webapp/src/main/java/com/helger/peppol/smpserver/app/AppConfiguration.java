@@ -48,7 +48,7 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
  */
 public final class AppConfiguration extends AbstractGlobalSingleton
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (AppConfiguration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (AppConfiguration.class);
 
   private static final ConfigFile s_aConfigFile;
 
@@ -62,7 +62,7 @@ public final class AppConfiguration extends AbstractGlobalSingleton
     s_aConfigFile = aCFB.build ();
     if (!s_aConfigFile.isRead ())
       throw new IllegalStateException ("Failed to read PEPPOL SMP UI properties from " + aCFB.getAllPaths ());
-    s_aLogger.info ("Read PEPPOL SMP UI properties from " + s_aConfigFile.getReadResource ().getPath ());
+    LOGGER.info ("Read PEPPOL SMP UI properties from " + s_aConfigFile.getReadResource ().getPath ());
   }
 
   @Deprecated

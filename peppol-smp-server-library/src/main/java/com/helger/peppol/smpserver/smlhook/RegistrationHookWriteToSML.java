@@ -45,7 +45,7 @@ import com.helger.peppol.smpserver.security.SMPKeyManager;
 @NotThreadSafe
 public class RegistrationHookWriteToSML implements IRegistrationHook
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (RegistrationHookWriteToSML.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (RegistrationHookWriteToSML.class);
   // SMP ID is static and cannot change
   private static final String s_sSMPID = SMPServerConfiguration.getSMLSMPID ();
 
@@ -111,24 +111,24 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   public void createServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    s_aLogger.info ("Trying to CREATE business " + sParticipantID + " for " + s_sSMPID + " in SML");
+    LOGGER.info ("Trying to CREATE business " + sParticipantID + " for " + s_sSMPID + " in SML");
 
     try
     {
       // Explicit constructor call is needed here!
       _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      s_aLogger.info ("Succeeded in CREATE business " + sParticipantID + " in SML");
+      LOGGER.info ("Succeeded in CREATE business " + sParticipantID + " in SML");
     }
     catch (final UnauthorizedFault ex)
     {
       final String sMsg = "Seems like this SMP is not registered to the SML, or you're providing invalid credentials!";
-      s_aLogger.error (sMsg + " " + SMLExceptionHelper.getFaultMessage (ex));
+      LOGGER.error (sMsg + " " + SMLExceptionHelper.getFaultMessage (ex));
       throw new RegistrationHookException (sMsg, ex);
     }
     catch (final Throwable t)
     {
       final String sMsg = "Could not create business " + sParticipantID + " in SML";
-      s_aLogger.error (sMsg, t);
+      LOGGER.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
   }
@@ -136,7 +136,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    s_aLogger.warn ("CREATE failed in SMP backend, so deleting again business " +
+    LOGGER.warn ("CREATE failed in SMP backend, so deleting again business " +
                     sParticipantID +
                     " for " +
                     s_sSMPID +
@@ -147,12 +147,12 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
       // Undo create
       // Explicit constructor call is needed here!
       _createSMLCaller ().delete (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      s_aLogger.warn ("Succeeded in deleting again business " + sParticipantID + " from SML.");
+      LOGGER.warn ("Succeeded in deleting again business " + sParticipantID + " from SML.");
     }
     catch (final Throwable t)
     {
       final String sMsg = "Unable to rollback create business " + sParticipantID + " in SML";
-      s_aLogger.error (sMsg, t);
+      LOGGER.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
   }
@@ -160,27 +160,27 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    s_aLogger.info ("Trying to DELETE business " + sParticipantID + " for " + s_sSMPID + " from SML");
+    LOGGER.info ("Trying to DELETE business " + sParticipantID + " for " + s_sSMPID + " from SML");
 
     try
     {
       // Use the version with the SMP ID to be on the safe side
       // Explicit constructor call is needed here!
       _createSMLCaller ().delete (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      s_aLogger.info ("Succeeded in deleting business " + sParticipantID + " from SML");
+      LOGGER.info ("Succeeded in deleting business " + sParticipantID + " from SML");
     }
     catch (final NotFoundFault ex)
     {
       final String sMsg = "The business " +
                           sParticipantID +
                           " was not present in the SML and hence could not be deleted.";
-      s_aLogger.error (sMsg, ex);
+      LOGGER.error (sMsg, ex);
       throw new RegistrationHookException (sMsg, ex);
     }
     catch (final Throwable t)
     {
       final String sMsg = "Could not delete business " + sParticipantID + " from SML.";
-      s_aLogger.error (sMsg, t);
+      LOGGER.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
   }
@@ -188,7 +188,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    s_aLogger.warn ("DELETE failed in SMP backend, so creating again business " +
+    LOGGER.warn ("DELETE failed in SMP backend, so creating again business " +
                     sParticipantID +
                     " for " +
                     s_sSMPID +
@@ -199,12 +199,12 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
       // Undo delete
       // Explicit constructor call is needed here!
       _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      s_aLogger.warn ("Succeeded in creating again business " + sParticipantID + " in SML.");
+      LOGGER.warn ("Succeeded in creating again business " + sParticipantID + " in SML.");
     }
     catch (final Throwable t)
     {
       final String sMsg = "Unable to rollback delete business " + sParticipantID + " in SML";
-      s_aLogger.error (sMsg, t);
+      LOGGER.error (sMsg, t);
       throw new RegistrationHookException (sMsg, t);
     }
   }

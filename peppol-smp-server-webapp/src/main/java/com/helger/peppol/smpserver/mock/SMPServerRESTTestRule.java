@@ -32,7 +32,7 @@ import com.helger.servlet.StaticServerInfo;
 
 public class SMPServerRESTTestRule extends SMPServerTestRule
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServerRESTTestRule.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerRESTTestRule.class);
 
   private HttpServer m_aServer;
   private WebTarget m_aTarget;
@@ -64,7 +64,7 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
                                             null));
 
     m_aTarget = aClient.target (MockWebServer.BASE_URI_HTTP);
-    s_aLogger.info ("Finished before");
+    LOGGER.info ("Finished before");
   }
 
   @Override
@@ -72,15 +72,15 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
   {
     try
     {
-      s_aLogger.info ("Shutting down server");
+      LOGGER.info ("Shutting down server");
       m_aTarget = null;
       if (m_aServer != null)
         m_aServer.shutdownNow ();
-      s_aLogger.info ("Finished shutting down server");
+      LOGGER.info ("Finished shutting down server");
     }
     finally
     {
-      s_aLogger.info ("super.after");
+      LOGGER.info ("super.after");
       super.after ();
     }
   }

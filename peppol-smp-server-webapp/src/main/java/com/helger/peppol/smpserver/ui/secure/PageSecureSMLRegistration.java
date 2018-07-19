@@ -69,7 +69,7 @@ import com.sun.xml.ws.client.ClientTransportException;
 
 public class PageSecureSMLRegistration extends AbstractSMPWebPage
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (PageSecureSMLRegistration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureSMLRegistration.class);
 
   private static final String FIELD_SML_ID = "sml";
   private static final String FIELD_PHYSICAL_ADDRESS = "physicaladdr";
@@ -208,7 +208,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' to the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        s_aLogger.info (sMsg);
+        LOGGER.info (sMsg);
         aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-create",
                                            sSMPID,
@@ -231,7 +231,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' to the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        s_aLogger.error (sMsg, ex);
+        LOGGER.error (sMsg, ex);
         aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg + _getTechnicalDetails (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-create",
                                            sSMPID,
@@ -331,7 +331,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' at the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        s_aLogger.info (sMsg);
+        LOGGER.info (sMsg);
         aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-update",
                                            sSMPID,
@@ -355,7 +355,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' to the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        s_aLogger.error (sMsg, ex);
+        LOGGER.error (sMsg, ex);
         aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg + _getTechnicalDetails (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-update",
                                            sSMPID,
@@ -394,7 +394,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' from the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        s_aLogger.info (sMsg);
+        LOGGER.info (sMsg);
         aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, aSMLInfo.getManagementServiceURL ());
       }
@@ -410,7 +410,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' from the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        s_aLogger.error (sMsg, ex);
+        LOGGER.error (sMsg, ex);
         aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg + _getTechnicalDetails (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-delete",
                                            sSMPID,
@@ -485,7 +485,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       }
       catch (final UnknownHostException ex)
       {
-        s_aLogger.error ("Error determining localhost address", ex);
+        LOGGER.error ("Error determining localhost address", ex);
       }
 
       final BootstrapTabBox aTabBox = new BootstrapTabBox ();

@@ -46,7 +46,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     static final SMPBackendRegistry s_aInstance = new SMPBackendRegistry ();
   }
 
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPBackendRegistry.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPBackendRegistry.class);
   private static boolean s_bDefaultInstantiated = false;
 
   private final SimpleReadWriteLock m_aRWLock = new SimpleReadWriteLock ();
@@ -128,13 +128,13 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
       // register all SPI implementations
       for (final ISMPBackendRegistrarSPI aSPI : ServiceLoaderHelper.getAllSPIImplementations (ISMPBackendRegistrarSPI.class))
       {
-        if (s_aLogger.isDebugEnabled ())
-          s_aLogger.debug ("Calling registerSMPBackend on " + aSPI.getClass ().getName ());
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("Calling registerSMPBackend on " + aSPI.getClass ().getName ());
         aSPI.registerSMPBackend (this);
       }
 
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug (m_aMap.size () + " SMP backends registered");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug (m_aMap.size () + " SMP backends registered");
     });
   }
 

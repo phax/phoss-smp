@@ -61,7 +61,7 @@ import com.helger.wsclient.WSHelper;
  */
 public class SMPWebAppListener extends WebAppListenerBootstrap
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPWebAppListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppListener.class);
 
   @Override
   protected String getInitParameterDebug (@Nonnull final ServletContext aSC)
@@ -119,7 +119,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                           "' is not valid when used as a DNS name. It must match the regular expression '" +
                                           CApp.PATTERN_SMP_ID +
                                           "'!");
-    s_aLogger.info ("This SMP has the ID '" + sSMPID + "'");
+    LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
   }
 
   @Override

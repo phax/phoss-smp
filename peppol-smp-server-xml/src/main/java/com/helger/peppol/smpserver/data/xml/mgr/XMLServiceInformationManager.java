@@ -52,7 +52,7 @@ public final class XMLServiceInformationManager extends
                                                 implements
                                                 ISMPServiceInformationManager
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceInformationManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (XMLServiceInformationManager.class);
 
   public XMLServiceInformationManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
@@ -85,8 +85,8 @@ public final class XMLServiceInformationManager extends
     final SMPServiceInformation aSMPServiceInformation = (SMPServiceInformation) aSMPServiceInformationObj;
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("mergeSMPServiceInformation (" + aSMPServiceInformationObj + ")");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("mergeSMPServiceInformation (" + aSMPServiceInformationObj + ")");
 
     // Check for an update
     boolean bChangedExisting = false;
@@ -114,8 +114,8 @@ public final class XMLServiceInformationManager extends
                                         aOldInformation.getAllProcesses (),
                                         aOldInformation.getExtensionAsString ());
 
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("mergeSMPServiceInformation - success - updated");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("mergeSMPServiceInformation - success - updated");
     }
     else
     {
@@ -156,21 +156,21 @@ public final class XMLServiceInformationManager extends
                                         aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aSMPServiceInformation.getAllProcesses (),
                                         aSMPServiceInformation.getExtensionAsString ());
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("mergeSMPServiceInformation - success - created");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("mergeSMPServiceInformation - success - created");
     }
   }
 
   @Nonnull
   public EChange deleteSMPServiceInformation (@Nullable final ISMPServiceInformation aSMPServiceInformation)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPServiceInformation (" + aSMPServiceInformation + ")");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPServiceInformation (" + aSMPServiceInformation + ")");
 
     if (aSMPServiceInformation == null)
     {
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("deleteSMPServiceInformation - failure");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("deleteSMPServiceInformation - failure");
       return EChange.UNCHANGED;
     }
 
@@ -181,8 +181,8 @@ public final class XMLServiceInformationManager extends
       if (aRealServiceInformation == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
-        if (s_aLogger.isDebugEnabled ())
-          s_aLogger.debug ("deleteSMPServiceInformation - failure");
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("deleteSMPServiceInformation - failure");
         return EChange.UNCHANGED;
       }
     }
@@ -192,8 +192,8 @@ public final class XMLServiceInformationManager extends
     }
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPServiceInformation - success");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPServiceInformation - success");
 
     return EChange.CHANGED;
   }
@@ -211,13 +211,13 @@ public final class XMLServiceInformationManager extends
   public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
                                    @Nullable final ISMPProcess aProcess)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPProcess (" + aSMPServiceInformation + ", " + aProcess + ")");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPProcess (" + aSMPServiceInformation + ", " + aProcess + ")");
 
     if (aSMPServiceInformation == null || aProcess == null)
     {
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("deleteSMPProcess - failure");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("deleteSMPProcess - failure");
       return EChange.UNCHANGED;
     }
 
@@ -226,8 +226,8 @@ public final class XMLServiceInformationManager extends
     if (aRealServiceInformation == null)
     {
       AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("deleteSMPProcess - failure");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("deleteSMPProcess - failure");
       return EChange.UNCHANGED;
     }
 
@@ -241,8 +241,8 @@ public final class XMLServiceInformationManager extends
                                           "no-such-process",
                                           aSMPServiceInformation.getID (),
                                           aProcess.getProcessIdentifier ().getURIEncoded ());
-        if (s_aLogger.isDebugEnabled ())
-          s_aLogger.debug ("deleteSMPProcess - failure");
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("deleteSMPProcess - failure");
         return EChange.UNCHANGED;
       }
     }
@@ -253,8 +253,8 @@ public final class XMLServiceInformationManager extends
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
                                       aSMPServiceInformation.getID (),
                                       aProcess.getProcessIdentifier ().getURIEncoded ());
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPProcess - success");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPProcess - success");
     return EChange.CHANGED;
   }
 
@@ -312,7 +312,7 @@ public final class XMLServiceInformationManager extends
     if (ret.isEmpty ())
       return null;
     if (ret.size () > 1)
-      s_aLogger.warn ("Found more than one entry for service group '" +
+      LOGGER.warn ("Found more than one entry for service group '" +
                       aServiceGroup.getID () +
                       "' and document type '" +
                       aDocumentTypeIdentifier.getValue () +

@@ -50,7 +50,7 @@ import com.helger.xservlet.handler.simple.IXServletSimpleHandler;
 
 public class SMPStatusXServletHandler implements IXServletSimpleHandler
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPStatusXServletHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPStatusXServletHandler.class);
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   @Nonnull
@@ -118,8 +118,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
   public void handleRequest (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                              @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Status information requested");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Status information requested");
 
     // Build data to provide
     IJsonObject aStatusData;

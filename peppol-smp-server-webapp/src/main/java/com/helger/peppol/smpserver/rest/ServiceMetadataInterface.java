@@ -67,7 +67,7 @@ import com.helger.xml.transform.XMLTransformerFactory;
 @Path ("/{ServiceGroupId}/services/{DocumentTypeId}")
 public final class ServiceMetadataInterface
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceMetadataInterface.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (ServiceMetadataInterface.class);
 
   @Context
   private HttpServletRequest m_aHttpRequest;
@@ -167,7 +167,7 @@ public final class ServiceMetadataInterface
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      s_aLogger.warn ("The writable REST API is disabled. saveServiceRegistration will not be executed.");
+      LOGGER.warn ("The writable REST API is disabled. saveServiceRegistration will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
@@ -213,7 +213,7 @@ public final class ServiceMetadataInterface
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      s_aLogger.warn ("The writable REST API is disabled. deleteServiceRegistration will not be executed.");
+      LOGGER.warn ("The writable REST API is disabled. deleteServiceRegistration will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 

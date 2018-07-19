@@ -66,7 +66,7 @@ import com.helger.security.keystore.LoadedKeyStore;
  */
 public final class SMPKeyManager extends AbstractGlobalSingleton
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPKeyManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPKeyManager.class);
 
   private static final AtomicBoolean s_aCertificateValid = new AtomicBoolean (false);
   private static EKeyStoreLoadError s_eInitError;
@@ -106,7 +106,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     }
 
     m_aKeyEntry = aLoadedKey.getKeyEntry ();
-    s_aLogger.info ("SMPKeyManager successfully initialized with keystore '" +
+    LOGGER.info ("SMPKeyManager successfully initialized with keystore '" +
                     SMPServerConfiguration.getKeyStorePath () +
                     "' and alias '" +
                     SMPServerConfiguration.getKeyStoreKeyAlias () +

@@ -51,7 +51,7 @@ import com.helger.scope.singleton.AbstractGlobalSingleton;
  */
 public final class SMPMetaManager extends AbstractGlobalSingleton
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPMetaManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPMetaManager.class);
 
   private static ISMPManagerProvider s_aManagerProvider = null;
 
@@ -82,13 +82,13 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       throw new IllegalStateException ("A manager provider is already set. You cannot set this twice! Call it with null before setting a new one");
 
     if (isGlobalSingletonInstantiated (SMPMetaManager.class))
-      s_aLogger.warn ("Setting the manager provider after singleton instantiation may not have the desired effect.");
+      LOGGER.warn ("Setting the manager provider after singleton instantiation may not have the desired effect.");
 
     s_aManagerProvider = aManagerProvider;
     if (aManagerProvider == null)
-      s_aLogger.info ("Using no backend manager provider");
+      LOGGER.info ("Using no backend manager provider");
     else
-      s_aLogger.info ("Using " + aManagerProvider + " as the backend manager provider");
+      LOGGER.info ("Using " + aManagerProvider + " as the backend manager provider");
   }
 
   /**
@@ -203,7 +203,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
       _initCallbacks ();
 
-      s_aLogger.info (ClassHelper.getClassLocalName (this) + " was initialized");
+      LOGGER.info (ClassHelper.getClassLocalName (this) + " was initialized");
     }
     catch (final Exception ex)
     {

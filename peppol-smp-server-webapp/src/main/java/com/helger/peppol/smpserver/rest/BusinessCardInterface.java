@@ -62,7 +62,7 @@ import com.helger.web.scope.mgr.WebScoped;
 @Path ("/businesscard/{ServiceGroupId}")
 public final class BusinessCardInterface
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (BusinessCardInterface.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (BusinessCardInterface.class);
 
   @Context
   private HttpServletRequest m_aHttpRequest;
@@ -85,7 +85,7 @@ public final class BusinessCardInterface
     // Is the PEPPOL Directory integration enabled?
     if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
-      s_aLogger.warn ("The " +
+      LOGGER.warn ("The " +
                       AppConfiguration.getDirectoryName () +
                       " integration is disabled. getBusinessCard will not be executed.");
       throw new WebApplicationException (404);
@@ -108,7 +108,7 @@ public final class BusinessCardInterface
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      s_aLogger.warn ("The writable REST API is disabled. saveBusinessCard will not be executed.");
+      LOGGER.warn ("The writable REST API is disabled. saveBusinessCard will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
@@ -150,7 +150,7 @@ public final class BusinessCardInterface
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      s_aLogger.warn ("The writable REST API is disabled. deleteBusinessCard will not be executed.");
+      LOGGER.warn ("The writable REST API is disabled. deleteBusinessCard will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 

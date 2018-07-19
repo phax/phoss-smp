@@ -144,8 +144,8 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
       if (!aDBUser.getPassword ().equals (aCredentials.getPassword ()))
         throw new SMPUnauthorizedException ("Illegal password for user '" + sUserName + "'");
 
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("Verified credentials of user '" + sUserName + "' successfully");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Verified credentials of user '" + sUserName + "' successfully");
       return aDBUser;
     });
     return ret.getOrThrow ();
@@ -174,8 +174,8 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
                                           aServiceGroupID.getURIEncoded ());
     }
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Verified service group ID " +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Verified service group ID " +
                        aServiceGroupID.getURIEncoded () +
                        " is owned by user '" +
                        aCredentials.getUserName () +

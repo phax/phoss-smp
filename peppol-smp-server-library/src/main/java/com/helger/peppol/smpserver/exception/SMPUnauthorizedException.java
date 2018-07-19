@@ -21,13 +21,13 @@ import org.slf4j.LoggerFactory;
  */
 public class SMPUnauthorizedException extends SMPServerException
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPUnauthorizedException.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPUnauthorizedException.class);
 
   public SMPUnauthorizedException (final String sMsg)
   {
     super (sMsg);
 
     // Always log!
-    s_aLogger.warn (sMsg);
+    LOGGER.warn (sMsg);
   }
 }

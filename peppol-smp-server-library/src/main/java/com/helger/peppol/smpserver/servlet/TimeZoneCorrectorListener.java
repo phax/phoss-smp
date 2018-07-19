@@ -35,17 +35,17 @@ public final class TimeZoneCorrectorListener implements ServletContextListener
 {
   public static final String DEFAULT_TIMEZONE = "UTC";
 
-  private static final Logger s_aLogger = LoggerFactory.getLogger (TimeZoneCorrectorListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (TimeZoneCorrectorListener.class);
 
   public void contextInitialized (@Nonnull final ServletContextEvent aServletContextEvent)
   {
-    s_aLogger.info ("SMP server started");
+    LOGGER.info ("SMP server started");
 
     // Check if the timezone is supported
     if (!ArrayHelper.contains (TimeZone.getAvailableIDs (), DEFAULT_TIMEZONE))
     {
       final String sErrorMsg = "The default time zone '" + DEFAULT_TIMEZONE + "' is not supported!";
-      s_aLogger.error (sErrorMsg);
+      LOGGER.error (sErrorMsg);
       throw new InitializationException (sErrorMsg);
     }
 
@@ -53,13 +53,13 @@ public final class TimeZoneCorrectorListener implements ServletContextListener
     if (PDTConfig.setDefaultDateTimeZoneID (DEFAULT_TIMEZONE).isFailure ())
     {
       final String sErrorMsg = "Failed to set default time zone to '" + DEFAULT_TIMEZONE + "'!";
-      s_aLogger.error (sErrorMsg);
+      LOGGER.error (sErrorMsg);
       throw new InitializationException (sErrorMsg);
     }
   }
 
   public void contextDestroyed (@Nonnull final ServletContextEvent aServletContextEvent)
   {
-    s_aLogger.info ("SMP server stopped");
+    LOGGER.info ("SMP server stopped");
   }
 }

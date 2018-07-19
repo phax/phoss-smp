@@ -166,8 +166,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aEntities, "Entities");
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("createOrUpdateSMPBusinessCard (" +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
                        aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
                        ", " +
                        aEntities.size () +
@@ -183,8 +183,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                               .setParameter ("id", aServiceGroup.getParticpantIdentifier ().getURIEncoded ())
                               .executeUpdate ();
 
-      if (s_aLogger.isDebugEnabled () && nDeleted > 0)
-        s_aLogger.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
+      if (LOGGER.isDebugEnabled () && nDeleted > 0)
+        LOGGER.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
 
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
@@ -213,8 +213,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onCreateOrUpdateSMPBusinessCard (aNewBusinessCard));
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Finished createOrUpdateSMPBusinessCard");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Finished createOrUpdateSMPBusinessCard");
 
     return aNewBusinessCard;
   }
@@ -225,8 +225,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     if (aSMPBusinessCard == null)
       return EChange.UNCHANGED;
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
@@ -253,8 +253,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       m_aCBs.forEach (x -> x.onDeleteSMPBusinessCard (aSMPBusinessCard));
     }
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Finished deleteSMPBusinessCard. Change=" + eChange.isChanged ());
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Finished deleteSMPBusinessCard. Change=" + eChange.isChanged ());
 
     return eChange;
   }
@@ -267,8 +267,8 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     if (aServiceGroup == null)
     {
       // Can happen if there is an inconsistency between BCE and SG tables
-      if (s_aLogger.isWarnEnabled ())
-        s_aLogger.warn ("Failed to resolve service group " + aID);
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn ("Failed to resolve service group " + aID);
       return null;
     }
 

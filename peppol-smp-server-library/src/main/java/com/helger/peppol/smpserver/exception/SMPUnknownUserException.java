@@ -22,15 +22,15 @@ import org.slf4j.LoggerFactory;
  */
 public class SMPUnknownUserException extends SMPServerException
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPUnknownUserException.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPUnknownUserException.class);
 
   private final String m_sUserName;
 
   public SMPUnknownUserException (@Nullable final String sUserName)
   {
     super ("Unknown user '" + sUserName + "'");
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug (getMessage ());
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug (getMessage ());
     m_sUserName = sUserName;
   }
 

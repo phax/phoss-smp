@@ -104,7 +104,7 @@ public final class SMPServerConfiguration
   /** The default secondary properties file to load */
   public static final String PATH_SMP_SERVER_PROPERTIES = "smp-server.properties";
 
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServerConfiguration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerConfiguration.class);
   private static final SimpleReadWriteLock s_aRWLock = new SimpleReadWriteLock ();
   @GuardedBy ("s_aRWLock")
   private static ConfigFile s_aConfigFile;
@@ -135,11 +135,11 @@ public final class SMPServerConfiguration
       s_aConfigFile = aCFB.build ();
       if (s_aConfigFile.isRead ())
       {
-        s_aLogger.info ("Read PEPPOL SMP server properties from " + s_aConfigFile.getReadResource ().getPath ());
+        LOGGER.info ("Read PEPPOL SMP server properties from " + s_aConfigFile.getReadResource ().getPath ());
         return ESuccess.SUCCESS;
       }
 
-      s_aLogger.warn ("Failed to read PEPPOL SMP server properties from " + aCFB.getAllPaths ());
+      LOGGER.warn ("Failed to read PEPPOL SMP server properties from " + aCFB.getAllPaths ());
       return ESuccess.FAILURE;
     });
   }

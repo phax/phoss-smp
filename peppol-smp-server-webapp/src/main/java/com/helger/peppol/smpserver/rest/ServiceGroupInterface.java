@@ -54,7 +54,7 @@ import com.helger.web.scope.mgr.WebScoped;
 @Path ("/{ServiceGroupId}")
 public final class ServiceGroupInterface
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (ServiceGroupInterface.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (ServiceGroupInterface.class);
 
   @Context
   private HttpServletRequest m_aHttpRequest;
@@ -101,7 +101,7 @@ public final class ServiceGroupInterface
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      s_aLogger.warn ("The writable REST API is disabled. saveServiceGroup will not be executed.");
+      LOGGER.warn ("The writable REST API is disabled. saveServiceGroup will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 
@@ -144,7 +144,7 @@ public final class ServiceGroupInterface
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      s_aLogger.warn ("The writable REST API is disabled. deleteServiceGroup will not be executed.");
+      LOGGER.warn ("The writable REST API is disabled. deleteServiceGroup will not be executed.");
       return Response.status (Response.Status.NOT_FOUND).build ();
     }
 

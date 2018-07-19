@@ -67,7 +67,7 @@ import com.helger.peppol.utils.W3CEndpointReferenceHelper;
  */
 public final class SMPServerAPI
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (SMPServerAPI.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerAPI.class);
   private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterInvocation = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
                                                                                                                                    "$call");
   private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
@@ -84,7 +84,7 @@ public final class SMPServerAPI
   @Nonnull
   public CompleteServiceGroupType getCompleteServiceGroup (final String sServiceGroupID) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "GET /complete/" + sServiceGroupID);
+    LOGGER.info (LOG_PREFIX + "GET /complete/" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("getCompleteServiceGroup");
 
     try
@@ -143,13 +143,13 @@ public final class SMPServerAPI
         aCompleteServiceGroup.addServiceMetadata (aServiceInfo.getAsJAXBObjectPeppol ());
       }
 
-      s_aLogger.info (LOG_PREFIX + "Finished getCompleteServiceGroup(" + sServiceGroupID + ")");
+      LOGGER.info (LOG_PREFIX + "Finished getCompleteServiceGroup(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("getCompleteServiceGroup");
       return aCompleteServiceGroup;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in getCompleteServiceGroup(" +
                       sServiceGroupID +
                       ") - " +
@@ -164,7 +164,7 @@ public final class SMPServerAPI
   public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sUserID,
                                                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "GET /list/" + sUserID);
+    LOGGER.info (LOG_PREFIX + "GET /list/" + sUserID);
     s_aStatsCounterInvocation.increment ("getServiceGroupReferenceList");
 
     try
@@ -194,13 +194,13 @@ public final class SMPServerAPI
         aReferenceTypes.add (aServGroupRefType);
       }
 
-      s_aLogger.info (LOG_PREFIX + "Finished getServiceGroupReferenceList(" + sUserID + ")");
+      LOGGER.info (LOG_PREFIX + "Finished getServiceGroupReferenceList(" + sUserID + ")");
       s_aStatsCounterSuccess.increment ("getServiceGroupReferenceList");
       return aRefList;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in getServiceGroupReferenceList(" +
                       sUserID +
                       ") - " +
@@ -214,7 +214,7 @@ public final class SMPServerAPI
   @Nonnull
   public ServiceGroupType getServiceGroup (final String sServiceGroupID) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "GET /" + sServiceGroupID);
+    LOGGER.info (LOG_PREFIX + "GET /" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("getServiceGroup");
 
     try
@@ -262,13 +262,13 @@ public final class SMPServerAPI
       }
       aSG.setServiceMetadataReferenceCollection (aCollectionType);
 
-      s_aLogger.info (LOG_PREFIX + "Finished getServiceGroup(" + sServiceGroupID + ")");
+      LOGGER.info (LOG_PREFIX + "Finished getServiceGroup(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("getServiceGroup");
       return aSG;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in getServiceGroup(" +
                       sServiceGroupID +
                       ") - " +
@@ -284,7 +284,7 @@ public final class SMPServerAPI
                                     @Nonnull final ServiceGroupType aServiceGroup,
                                     @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "PUT /" + sServiceGroupID + " ==> " + aServiceGroup);
+    LOGGER.info (LOG_PREFIX + "PUT /" + sServiceGroupID + " ==> " + aServiceGroup);
     s_aStatsCounterInvocation.increment ("saveServiceGroup");
 
     try
@@ -320,13 +320,13 @@ public final class SMPServerAPI
       else
         aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aServiceGroupID, sExtension);
 
-      s_aLogger.info (LOG_PREFIX + "Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ")");
+      LOGGER.info (LOG_PREFIX + "Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ")");
       s_aStatsCounterSuccess.increment ("saveServiceGroup");
       return ESuccess.SUCCESS;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in saveServiceGroup(" +
                       sServiceGroupID +
                       "," +
@@ -343,7 +343,7 @@ public final class SMPServerAPI
   public ESuccess deleteServiceGroup (@Nonnull final String sServiceGroupID,
                                       @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "DELETE /" + sServiceGroupID);
+    LOGGER.info (LOG_PREFIX + "DELETE /" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("deleteServiceGroup");
 
     try
@@ -353,7 +353,7 @@ public final class SMPServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -365,13 +365,13 @@ public final class SMPServerAPI
 
       aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
 
-      s_aLogger.info (LOG_PREFIX + "Finished deleteServiceGroup(" + sServiceGroupID + ")");
+      LOGGER.info (LOG_PREFIX + "Finished deleteServiceGroup(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("deleteServiceGroup");
       return ESuccess.SUCCESS;
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in deleteServiceGroup(" +
                       sServiceGroupID +
                       ") - " +
@@ -386,7 +386,7 @@ public final class SMPServerAPI
   public SignedServiceMetadataType getServiceRegistration (@Nonnull final String sServiceGroupID,
                                                            @Nonnull final String sDocumentTypeID) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "GET /" + sServiceGroupID + "/services/" + sDocumentTypeID);
+    LOGGER.info (LOG_PREFIX + "GET /" + sServiceGroupID + "/services/" + sDocumentTypeID);
     s_aStatsCounterInvocation.increment ("getServiceRegistration");
 
     try
@@ -454,7 +454,7 @@ public final class SMPServerAPI
 
       // Signature must be added by the rest service
 
-      s_aLogger.info (LOG_PREFIX +
+      LOGGER.info (LOG_PREFIX +
                       "Finished getServiceRegistration(" +
                       sServiceGroupID +
                       "," +
@@ -466,7 +466,7 @@ public final class SMPServerAPI
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in getServiceRegistration(" +
                       sServiceGroupID +
                       "," +
@@ -485,7 +485,7 @@ public final class SMPServerAPI
                                            @Nonnull final ServiceMetadataType aServiceMetadata,
                                            @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX +
+    LOGGER.info (LOG_PREFIX +
                     "PUT /" +
                     sServiceGroupID +
                     "/services/" +
@@ -501,7 +501,7 @@ public final class SMPServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -509,7 +509,7 @@ public final class SMPServerAPI
       if (aDocTypeID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse document type identifier '" + sDocumentTypeID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse document type identifier '" + sDocumentTypeID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -521,7 +521,7 @@ public final class SMPServerAPI
         // metadata (body) must equal path
         if (aServiceInformation.getParticipantIdentifier () == null)
         {
-          s_aLogger.info (LOG_PREFIX +
+          LOGGER.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:!NO PARTICIPANT ID! param:" +
                           aServiceGroupID);
           return ESuccess.FAILURE;
@@ -529,7 +529,7 @@ public final class SMPServerAPI
         if (!aServiceInformation.getParticipantIdentifier ().hasSameContent (aServiceGroupID))
         {
           // Participant ID in URL mist match the one in XML structure
-          s_aLogger.info (LOG_PREFIX +
+          LOGGER.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +
                           aServiceInformation.getParticipantIdentifier ().getURIEncoded () +
                           " param:" +
@@ -539,7 +539,7 @@ public final class SMPServerAPI
 
         if (aServiceInformation.getDocumentIdentifier () == null)
         {
-          s_aLogger.info (LOG_PREFIX +
+          LOGGER.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:!NO DOCUMENT TYPE ID! param:" +
                           aDocTypeID);
           return ESuccess.FAILURE;
@@ -547,7 +547,7 @@ public final class SMPServerAPI
         if (!aServiceInformation.getDocumentIdentifier ().hasSameContent (aDocTypeID))
         {
           // Document type ID in URL must match the one in XML structure
-          s_aLogger.info (LOG_PREFIX +
+          LOGGER.info (LOG_PREFIX +
                           "Save service metadata was called with bad parameters. serviceInfo:" +
                           aServiceInformation.getDocumentIdentifier ().getURIEncoded () +
                           " param:" +
@@ -566,7 +566,7 @@ public final class SMPServerAPI
       if (aServiceGroup == null)
       {
         // Service group not found
-        s_aLogger.info (LOG_PREFIX + "ServiceGroup not found: " + sServiceGroupID);
+        LOGGER.info (LOG_PREFIX + "ServiceGroup not found: " + sServiceGroupID);
         return ESuccess.FAILURE;
       }
 
@@ -619,7 +619,7 @@ public final class SMPServerAPI
                                                                                sExtensionXML));
       }
 
-      s_aLogger.info (LOG_PREFIX +
+      LOGGER.info (LOG_PREFIX +
                       "Finished saveServiceRegistration(" +
                       sServiceGroupID +
                       "," +
@@ -633,7 +633,7 @@ public final class SMPServerAPI
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in saveServiceRegistration(" +
                       sServiceGroupID +
                       "," +
@@ -653,7 +653,7 @@ public final class SMPServerAPI
                                              @Nonnull final String sDocumentTypeID,
                                              @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    s_aLogger.info (LOG_PREFIX + "DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID);
+    LOGGER.info (LOG_PREFIX + "DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID);
     s_aStatsCounterInvocation.increment ("deleteServiceRegistration");
 
     try
@@ -663,7 +663,7 @@ public final class SMPServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -671,7 +671,7 @@ public final class SMPServerAPI
       if (aDocTypeID == null)
       {
         // Invalid identifier
-        s_aLogger.info (LOG_PREFIX + "Failed to parse document type identifier '" + sDocumentTypeID + "'");
+        LOGGER.info (LOG_PREFIX + "Failed to parse document type identifier '" + sDocumentTypeID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -683,7 +683,7 @@ public final class SMPServerAPI
       final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
       if (aServiceGroup == null)
       {
-        s_aLogger.info (LOG_PREFIX + "Service group '" + sServiceGroupID + "' not on this SMP");
+        LOGGER.info (LOG_PREFIX + "Service group '" + sServiceGroupID + "' not on this SMP");
         return ESuccess.FAILURE;
       }
 
@@ -696,7 +696,7 @@ public final class SMPServerAPI
         final EChange eChange = aServiceInfoMgr.deleteSMPServiceInformation (aServiceInfo);
         if (eChange.isChanged ())
         {
-          s_aLogger.info (LOG_PREFIX +
+          LOGGER.info (LOG_PREFIX +
                           "Finished deleteServiceRegistration(" +
                           sServiceGroupID +
                           "," +
@@ -717,7 +717,7 @@ public final class SMPServerAPI
           final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
           if (eChange.isChanged ())
           {
-            s_aLogger.info (LOG_PREFIX +
+            LOGGER.info (LOG_PREFIX +
                             "Finished deleteServiceRegistration(" +
                             sServiceGroupID +
                             "," +
@@ -729,7 +729,7 @@ public final class SMPServerAPI
         }
       }
 
-      s_aLogger.info (LOG_PREFIX +
+      LOGGER.info (LOG_PREFIX +
                       "Service group '" +
                       sServiceGroupID +
                       "' has no document type '" +
@@ -739,7 +739,7 @@ public final class SMPServerAPI
     }
     catch (final Throwable t)
     {
-      s_aLogger.warn (LOG_PREFIX +
+      LOGGER.warn (LOG_PREFIX +
                       "Error in deleteServiceRegistration(" +
                       sServiceGroupID +
                       "," +

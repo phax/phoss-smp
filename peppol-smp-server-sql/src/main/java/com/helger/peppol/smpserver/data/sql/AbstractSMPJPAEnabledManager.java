@@ -17,7 +17,7 @@ import com.helger.db.jpa.JPAEnabledManager;
 
 public abstract class AbstractSMPJPAEnabledManager extends JPAEnabledManager
 {
-  protected static final Logger s_aLogger = LoggerFactory.getLogger (AbstractSMPJPAEnabledManager.class);
+  protected static final Logger LOGGER = LoggerFactory.getLogger (AbstractSMPJPAEnabledManager.class);
 
   public AbstractSMPJPAEnabledManager ()
   {

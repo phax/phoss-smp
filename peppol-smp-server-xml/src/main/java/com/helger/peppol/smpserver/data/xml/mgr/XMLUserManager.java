@@ -48,7 +48,7 @@ import com.helger.photon.security.user.UserManager;
  */
 public final class XMLUserManager implements ISMPUserManager
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLUserManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (XMLUserManager.class);
 
   public XMLUserManager ()
   {}
@@ -104,12 +104,12 @@ public final class XMLUserManager implements ISMPUserManager
     final IUser aUser = aUserMgr.getUserOfLoginName (aCredentials.getUserName ());
     if (aUser == null)
     {
-      s_aLogger.info ("Invalid login name provided: '" + aCredentials.getUserName () + "'");
+      LOGGER.info ("Invalid login name provided: '" + aCredentials.getUserName () + "'");
       throw new SMPUnknownUserException (aCredentials.getUserName ());
     }
     if (!aUserMgr.areUserIDAndPasswordValid (aUser.getID (), aCredentials.getPassword ()))
     {
-      s_aLogger.info ("Invalid password provided for '" + aCredentials.getUserName () + "'");
+      LOGGER.info ("Invalid password provided for '" + aCredentials.getUserName () + "'");
       throw new SMPUnauthorizedException ("Username and/or password are invalid!");
     }
     return new XMLDataUser (aUser);
@@ -144,8 +144,8 @@ public final class XMLUserManager implements ISMPUserManager
                                           aServiceGroupID.getURIEncoded ());
     }
 
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("Verified service group " +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Verified service group " +
                        aServiceGroup.getID () +
                        " is owned by user '" +
                        aCurrentUser.getUserName () +

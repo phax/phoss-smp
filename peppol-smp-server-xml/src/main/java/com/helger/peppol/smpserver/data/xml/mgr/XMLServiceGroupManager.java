@@ -50,7 +50,7 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
                                           implements
                                           ISMPServiceGroupManager
 {
-  private static final Logger s_aLogger = LoggerFactory.getLogger (XMLServiceGroupManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (XMLServiceGroupManager.class);
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
@@ -71,8 +71,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
                                                 @Nonnull final IParticipantIdentifier aParticipantIdentifier,
                                                 @Nullable final String sExtension)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("createSMPServiceGroup (" +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("createSMPServiceGroup (" +
                        sOwnerID +
                        ", " +
                        aParticipantIdentifier.getURIEncoded () +
@@ -95,8 +95,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
     {
       // An error occurred - remove from SML again
       aHook.undoCreateServiceGroup (aParticipantIdentifier);
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("createSMPServiceGroup - failure");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("createSMPServiceGroup - failure");
       throw ex;
     }
     finally
@@ -109,8 +109,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
                                       sOwnerID,
                                       aParticipantIdentifier.getURIEncoded (),
                                       sExtension);
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("createSMPServiceGroup - success");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("createSMPServiceGroup - success");
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aSMPServiceGroup));
 
@@ -122,8 +122,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
                                         @Nonnull @Nonempty final String sNewOwnerID,
                                         @Nullable final String sExtension)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("updateSMPServiceGroup (" +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("updateSMPServiceGroup (" +
                        sSMPServiceGroupID +
                        ", " +
                        sNewOwnerID +
@@ -135,8 +135,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
     if (aSMPServiceGroup == null)
     {
       AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, sSMPServiceGroupID, "no-such-id");
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("updateSMPServiceGroup - failure");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("updateSMPServiceGroup - failure");
       return EChange.UNCHANGED;
     }
 
@@ -148,8 +148,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
       eChange = eChange.or (aSMPServiceGroup.setExtensionAsString (sExtension));
       if (eChange.isUnchanged ())
       {
-        if (s_aLogger.isDebugEnabled ())
-          s_aLogger.debug ("updateSMPServiceGroup - unchanged");
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("updateSMPServiceGroup - unchanged");
         return EChange.UNCHANGED;
       }
       internalUpdateItem (aSMPServiceGroup);
@@ -160,8 +160,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
     }
 
     AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sSMPServiceGroupID, sNewOwnerID, sExtension);
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("updateSMPServiceGroup - success");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("updateSMPServiceGroup - success");
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (sSMPServiceGroupID));
 
@@ -171,8 +171,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
   @Nonnull
   public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPServiceGroup (" +
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPServiceGroup (" +
                        (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) +
                        ")");
 
@@ -182,8 +182,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
     if (aSMPServiceGroup == null)
     {
       AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
-      if (s_aLogger.isDebugEnabled ())
-        s_aLogger.debug ("deleteSMPServiceGroup - failure");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("deleteSMPServiceGroup - failure");
       return EChange.UNCHANGED;
     }
 
@@ -202,8 +202,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
       if (internalDeleteItem (aSMPServiceGroup.getID ()) == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aSMPServiceGroup.getID ());
-        if (s_aLogger.isDebugEnabled ())
-          s_aLogger.debug ("deleteSMPServiceGroup - failure");
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("deleteSMPServiceGroup - failure");
         return EChange.UNCHANGED;
       }
 
@@ -247,8 +247,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
     }
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID ());
-    if (s_aLogger.isDebugEnabled ())
-      s_aLogger.debug ("deleteSMPServiceGroup - success");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPServiceGroup - success");
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (sServiceGroupID));
 
