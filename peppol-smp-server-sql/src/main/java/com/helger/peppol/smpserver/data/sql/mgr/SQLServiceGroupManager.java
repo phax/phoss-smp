@@ -69,12 +69,12 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup (" +
-                       sOwnerID +
-                       ", " +
-                       aParticipantIdentifier.getURIEncoded () +
-                       ", " +
-                       (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
-                       ")");
+                    sOwnerID +
+                    ", " +
+                    aParticipantIdentifier.getURIEncoded () +
+                    ", " +
+                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ")");
 
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
     final MutableBoolean aCreatedServiceGroup = new MutableBoolean (false);
@@ -120,9 +120,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       }
     }
 
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
 
@@ -141,12 +141,12 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup (" +
-                       sSMPServiceGroupID +
-                       ", " +
-                       sNewOwnerID +
-                       ", " +
-                       (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
-                       ")");
+                    sSMPServiceGroupID +
+                    ", " +
+                    sNewOwnerID +
+                    ", " +
+                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ")");
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aParticipantIdentifier = aIdentifierFactory.parseParticipantIdentifier (sSMPServiceGroupID);
@@ -191,9 +191,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       return eChange;
     });
 
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
 
@@ -251,9 +251,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       }
     }
 
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
 
@@ -299,9 +299,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       }
       return aList;
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return ret.get ();
@@ -331,9 +331,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       }
       return aList;
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return ret.get ();
@@ -352,9 +352,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                    .setParameter ("user", sOwnerID));
       return Long.valueOf (nCount);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -365,8 +365,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupOfID(" +
-                       (aParticipantIdentifier == null ? "null" : aParticipantIdentifier.getURIEncoded ()) +
-                       ")");
+                    (aParticipantIdentifier == null ? "null" : aParticipantIdentifier.getURIEncoded ()) +
+                    ")");
 
     if (aParticipantIdentifier == null)
       return null;
@@ -385,9 +385,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                  aDBServiceGroup.getExtension ());
       return aServiceGroup;
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return ret.get ();
@@ -397,8 +397,8 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("containsSMPServiceGroupWithID(" +
-                       (aParticipantIdentifier == null ? "null" : aParticipantIdentifier.getURIEncoded ()) +
-                       ")");
+                    (aParticipantIdentifier == null ? "null" : aParticipantIdentifier.getURIEncoded ()) +
+                    ")");
 
     if (aParticipantIdentifier == null)
       return false;
@@ -413,9 +413,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
                                                                        aProps);
       return Boolean.valueOf (aDBServiceGroup != null);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return false;
     }
     return ret.get ().booleanValue ();
@@ -432,9 +432,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceGroup p"));
       return Long.valueOf (nCount);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
     return ret.get ().intValue ();

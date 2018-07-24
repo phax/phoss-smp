@@ -90,9 +90,9 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
       final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p) FROM DBUser p"));
       return Long.valueOf (nCount);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -104,9 +104,9 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   {
     JPAExecutionResult <Collection <DBUser>> ret;
     ret = doSelect ( () -> getEntityManager ().createQuery ("SELECT p FROM DBUser p", DBUser.class).getResultList ());
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return new CommonsArrayList <> (ret.get ());
@@ -120,9 +120,9 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
     JPAExecutionResult <DBUser> ret;
     ret = doSelect ( () -> getEntityManager ().find (DBUser.class, sID));
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return ret.get ();
@@ -148,18 +148,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
         LOGGER.debug ("Verified credentials of user '" + sUserName + "' successfully");
       return aDBUser;
     });
-    try
-    {
-      return ret.getOrThrow ();
-    }
-    catch (final Exception ex)
-    {
-      throw ex;
-    }
-    catch (final Throwable t)
-    {
-      throw new Exception (t);
-    }
+    return ret.getOrThrow ();
   }
 
   @Nonnull

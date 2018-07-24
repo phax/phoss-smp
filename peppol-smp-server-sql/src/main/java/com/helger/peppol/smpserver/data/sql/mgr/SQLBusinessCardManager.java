@@ -84,8 +84,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     final JsonArray ret = new JsonArray ();
     if (aIDs != null)
       for (final SMPBusinessCardIdentifier aID : aIDs)
-        ret.add (new JsonObject ().add ("id", aID.getID ()).add ("scheme", aID.getScheme ()).add ("value",
-                                                                                                  aID.getValue ()));
+        ret.add (new JsonObject ().add ("id", aID.getID ())
+                                  .add ("scheme", aID.getScheme ())
+                                  .add ("value", aID.getValue ()));
     return ret;
   }
 
@@ -168,11 +169,11 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
-                       aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                       ", " +
-                       aEntities.size () +
-                       " entities" +
-                       ")");
+                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                    ", " +
+                    aEntities.size () +
+                    " entities" +
+                    ")");
 
     JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
@@ -202,9 +203,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
         aEM.persist (aDBBCE);
       }
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
 
@@ -239,9 +240,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
 
       return EChange.valueOf (nCount > 0);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
 
@@ -297,9 +298,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p",
                                                                    DBBusinessCardEntity.class)
                                                      .getResultList ());
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
 
@@ -332,9 +333,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                                                     aServiceGroup.getParticpantIdentifier ()
                                                                                  .getURIEncoded ())
                                                      .getResultList ());
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
 
@@ -365,9 +366,9 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
       final EntityManager em = getEntityManager ();
       return getSelectCountResultObj (em.createQuery ("SELECT COUNT(DISTINCT p.participantId) FROM DBBusinessCardEntity p"));
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
 

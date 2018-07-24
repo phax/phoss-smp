@@ -231,9 +231,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       }
       return aDBMetadata;
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
     }
   }
 
@@ -277,9 +277,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       aEM.remove (aDBMetadata);
       return EChange.CHANGED;
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -301,9 +301,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                           .executeUpdate ();
       return EChange.valueOf (nCnt > 0);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -342,9 +342,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                           .executeUpdate ();
       return EChange.valueOf (nCnt > 0);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -393,9 +393,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p",
                                                                    DBServiceMetadata.class)
                                                      .getResultList ());
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
 
@@ -413,9 +413,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadata p"));
       return Long.valueOf (nCount);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -438,9 +438,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                                       aServiceGroup.getParticpantIdentifier ()
                                                                                    .getValue ())
                                                        .getResultList ());
-      if (ret.hasThrowable ())
+      if (ret.hasException ())
       {
-        exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+        exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
         return null;
       }
 
@@ -479,9 +479,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                                          aDocTypeID);
       return getEntityManager ().find (DBServiceMetadata.class, aDBMetadataID, aProps);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return ret.get ();

@@ -101,9 +101,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
         aEM.merge (aDBRedirect);
       }
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return new SMPRedirect (aServiceGroup, aDocumentTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, sExtension);
@@ -128,9 +128,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       aEM.remove (aDBRedirect);
       return EChange.CHANGED;
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -152,9 +152,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                                           .executeUpdate ();
       return EChange.valueOf (nCnt > 0);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -179,9 +179,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p",
                                                                    DBServiceMetadataRedirection.class)
                                                      .getResultList ());
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
 
@@ -208,9 +208,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                                                                       aServiceGroup.getParticpantIdentifier ()
                                                                                    .getValue ())
                                                        .getResultList ());
-      if (ret.hasThrowable ())
+      if (ret.hasException ())
       {
-        exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+        exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
         return null;
       }
 
@@ -228,9 +228,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadataRedirection p"));
       return Long.valueOf (nCount);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -254,9 +254,9 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                                                                                                aDocTypeID);
       return getEntityManager ().find (DBServiceMetadataRedirection.class, aDBRedirectID, aProps);
     });
-    if (ret.hasThrowable ())
+    if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getThrowable ()));
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     final DBServiceMetadataRedirection aDBRedirect = ret.get ();
