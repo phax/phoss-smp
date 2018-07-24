@@ -59,13 +59,13 @@ public interface ISMPUserManager extends ISMPUserProvider
    * @param aCredentials
    *        The credentials to be validated. May not be <code>null</code>.
    * @return The matching non-<code>null</code> {@link ISMPUser}.
-   * @throws Throwable
+   * @throws Exception
    *         If no user matching the passed user name is present or if the
    *         password in the credentials does not match the stored password
    *         (hash).
    */
   @Nonnull
-  ISMPUser validateUserCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Throwable;
+  ISMPUser validateUserCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Exception;
 
   /**
    * Verify that the passed service group is owned by the user specified in the

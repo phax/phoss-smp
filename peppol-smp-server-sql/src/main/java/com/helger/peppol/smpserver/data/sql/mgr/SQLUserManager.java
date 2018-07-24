@@ -129,7 +129,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   }
 
   @Nonnull
-  public DBUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
+  public DBUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws Exception
   {
     JPAExecutionResult <DBUser> ret;
     ret = doSelect ( () -> {
@@ -148,7 +148,18 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
         LOGGER.debug ("Verified credentials of user '" + sUserName + "' successfully");
       return aDBUser;
     });
-    return ret.getOrThrow ();
+    try
+    {
+      return ret.getOrThrow ();
+    }
+    catch (final Exception ex)
+    {
+      throw ex;
+    }
+    catch (final Throwable t)
+    {
+      throw new Exception (t);
+    }
   }
 
   @Nonnull
@@ -176,10 +187,10 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Verified service group ID " +
-                       aServiceGroupID.getURIEncoded () +
-                       " is owned by user '" +
-                       aCredentials.getUserName () +
-                       "'");
+                    aServiceGroupID.getURIEncoded () +
+                    " is owned by user '" +
+                    aCredentials.getUserName () +
+                    "'");
     return aOwnership;
   }
 }

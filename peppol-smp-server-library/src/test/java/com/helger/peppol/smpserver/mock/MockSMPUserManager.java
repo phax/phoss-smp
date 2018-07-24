@@ -31,7 +31,7 @@ final class MockSMPUserManager implements ISMPUserManager
     throw new UnsupportedOperationException ();
   }
 
-  public ISMPUser validateUserCredentials (final BasicAuthClientCredentials aCredentials) throws Throwable
+  public ISMPUser validateUserCredentials (final BasicAuthClientCredentials aCredentials) throws Exception
   {
     throw new UnsupportedOperationException ();
   }
