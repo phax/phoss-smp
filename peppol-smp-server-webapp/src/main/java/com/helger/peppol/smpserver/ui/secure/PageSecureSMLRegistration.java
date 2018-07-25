@@ -216,11 +216,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                            sLogicalAddress,
                                            aSMLInfo.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException
-                   | BadRequestFault
-                   | InternalErrorFault
-                   | UnauthorizedFault
-                   | ClientTransportException ex)
+      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault
+          | ClientTransportException ex)
       {
         final String sMsg = "Error registering SMP '" +
                             sSMPID +
@@ -339,12 +336,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                            sLogicalAddress,
                                            aSMLInfo.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException
-                   | BadRequestFault
-                   | InternalErrorFault
-                   | UnauthorizedFault
-                   | NotFoundFault
-                   | ClientTransportException ex)
+      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault | NotFoundFault
+          | ClientTransportException ex)
       {
         final String sMsg = "Error updating SMP '" +
                             sSMPID +
@@ -398,12 +391,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, aSMLInfo.getManagementServiceURL ());
       }
-      catch (final GeneralSecurityException
-                   | BadRequestFault
-                   | InternalErrorFault
-                   | UnauthorizedFault
-                   | NotFoundFault
-                   | ClientTransportException ex)
+      catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | UnauthorizedFault | NotFoundFault
+          | ClientTransportException ex)
       {
         final String sMsg = "Error deleting SMP '" +
                             sSMPID +
@@ -498,7 +487,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         aForm.addChild (new BootstrapInfoBox ().addChild ("Register this SMP to the SML. This must only be done once per SMP!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
-                                                                                                  aDefaultSML),
+                                                                                                  aDefaultSML != null ? aDefaultSML.getID ()
+                                                                                                                      : null),
                                                                                 aDisplayLocale,
                                                                                 aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
@@ -531,7 +521,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         aForm.addChild (new BootstrapInfoBox ().addChild ("Update this SMP at the SML. This must only be done when either the IP address or the host name of the SMP changed!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
-                                                                                                  aDefaultSML),
+                                                                                                  aDefaultSML == null ? null
+                                                                                                                      : aDefaultSML.getID ()),
                                                                                 aDisplayLocale,
                                                                                 aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
@@ -564,7 +555,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         aForm.addChild (new BootstrapInfoBox ().addChild ("Delete this SMP from the SML."));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
-                                                                                                  aDefaultSML),
+                                                                                                  aDefaultSML == null ? null
+                                                                                                                      : aDefaultSML.getID ()),
                                                                                 aDisplayLocale,
                                                                                 aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
