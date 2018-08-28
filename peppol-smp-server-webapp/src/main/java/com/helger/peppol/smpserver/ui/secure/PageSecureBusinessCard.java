@@ -17,9 +17,7 @@
 package com.helger.peppol.smpserver.ui.secure;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,6 +26,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.compare.CompareHelper;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFromString;
@@ -374,7 +373,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     if (aEntities != null)
       for (final String sEntityRowID : aEntities.keySet ())
       {
-        final Map <String, String> aEntityRow = aEntities.getValueMap (sEntityRowID);
+        final ICommonsMap <String, String> aEntityRow = aEntities.getValueMap (sEntityRowID);
         final int nErrors = aFormErrors.size ();
 
         // Entity name
@@ -400,7 +399,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         if (aIdentifiers != null)
           for (final String sIdentifierRowID : aIdentifiers.keySet ())
           {
-            final Map <String, String> aIdentifierRow = aIdentifiers.getValueMap (sIdentifierRowID);
+            final ICommonsMap <String, String> aIdentifierRow = aIdentifiers.getValueMap (sIdentifierRowID);
             final int nErrors2 = aFormErrors.size ();
 
             // Scheme
@@ -433,7 +432,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
             }
           }
 
-        Collections.sort (aSMPIdentifiers, (o1, o2) -> {
+        aSMPIdentifiers.sort ( (o1, o2) -> {
           int ret = o1.getScheme ().compareToIgnoreCase (o2.getScheme ());
           if (ret == 0)
             ret = o1.getValue ().compareToIgnoreCase (o2.getValue ());
@@ -462,7 +461,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         if (aContacts != null)
           for (final String sContactRowID : aContacts.keySet ())
           {
-            final Map <String, String> aContactRow = aContacts.getValueMap (sContactRowID);
+            final ICommonsMap <String, String> aContactRow = aContacts.getValueMap (sContactRowID);
             final int nErrors2 = aFormErrors.size ();
 
             final String sType = aContactRow.get (SUFFIX_TYPE);
@@ -496,7 +495,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
             }
           }
 
-        Collections.sort (aSMPContacts, (o1, o2) -> {
+        aSMPContacts.sort ( (o1, o2) -> {
           int ret = CompareHelper.compareIgnoreCase (o1.getType (), o2.getType ());
           if (ret == 0)
           {
@@ -754,8 +753,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
         final JSVar aJSAppendData = aJSAppend.param ("data");
-        aJSAppend.body ().add (JQuery.idRef (sBodyID)
-                                     .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
+        aJSAppend.body ()
+                 .add (JQuery.idRef (sBodyID)
+                             .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
         aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT.getInvocationURL (aRequestScope)
@@ -815,8 +815,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
         final JSVar aJSAppendData = aJSAppend.param ("data");
-        aJSAppend.body ().add (JQuery.idRef (sBodyID)
-                                     .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
+        aJSAppend.body ()
+                 .add (JQuery.idRef (sBodyID)
+                             .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
         aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT.getInvocationURL (aRequestScope)
@@ -907,8 +908,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     {
       final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
       final JSVar aJSAppendData = aJSAppend.param ("data");
-      aJSAppend.body ().add (JQuery.idRef (aEntityContainer)
-                                   .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
+      aJSAppend.body ()
+               .add (JQuery.idRef (aEntityContainer)
+                           .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
       final JSPackage aOnAdd = new JSPackage ();
       aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT.getInvocationURL (aRequestScope))
