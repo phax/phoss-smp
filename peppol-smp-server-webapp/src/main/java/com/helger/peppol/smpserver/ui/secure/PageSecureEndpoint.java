@@ -124,22 +124,22 @@ import com.helger.xml.microdom.serialize.MicroReader;
  */
 public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServiceInformation>
 {
-  private final static String FIELD_SERVICE_GROUP_ID = "sgid";
-  private final static String FIELD_DOCTYPE_ID_SCHEME = "doctypeidscheme";
-  private final static String FIELD_DOCTYPE_ID_VALUE = "doctypeidvalue";
-  private final static String FIELD_PROCESS_ID_SCHEME = "processidscheme";
-  private final static String FIELD_PROCESS_ID_VALUE = "processidvalue";
-  private final static String FIELD_TRANSPORT_PROFILE = "transportprofile";
-  private final static String FIELD_ENDPOINT_REFERENCE = "endpointreference";
-  private final static String FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE = "requiresbusinesslevelsignature";
-  private final static String FIELD_MINIMUM_AUTHENTICATION_LEVEL = "minimumauthenticationlevel";
-  private final static String FIELD_NOT_BEFORE = "notbefore";
-  private final static String FIELD_NOT_AFTER = "notafter";
-  private final static String FIELD_CERTIFICATE = "certificate";
-  private final static String FIELD_SERVICE_DESCRIPTION = "servicedescription";
-  private final static String FIELD_TECHNICAL_CONTACT = "technicalcontact";
-  private final static String FIELD_TECHNICAL_INFORMATION = "technicalinformation";
-  private final static String FIELD_EXTENSION = "extension";
+  private static final String FIELD_SERVICE_GROUP_ID = "sgid";
+  private static final String FIELD_DOCTYPE_ID_SCHEME = "doctypeidscheme";
+  private static final String FIELD_DOCTYPE_ID_VALUE = "doctypeidvalue";
+  private static final String FIELD_PROCESS_ID_SCHEME = "processidscheme";
+  private static final String FIELD_PROCESS_ID_VALUE = "processidvalue";
+  private static final String FIELD_TRANSPORT_PROFILE = "transportprofile";
+  private static final String FIELD_ENDPOINT_REFERENCE = "endpointreference";
+  private static final String FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE = "requiresbusinesslevelsignature";
+  private static final String FIELD_MINIMUM_AUTHENTICATION_LEVEL = "minimumauthenticationlevel";
+  private static final String FIELD_NOT_BEFORE = "notbefore";
+  private static final String FIELD_NOT_AFTER = "notafter";
+  private static final String FIELD_CERTIFICATE = "certificate";
+  private static final String FIELD_SERVICE_DESCRIPTION = "servicedescription";
+  private static final String FIELD_TECHNICAL_CONTACT = "technicalcontact";
+  private static final String FIELD_TECHNICAL_INFORMATION = "technicalinformation";
+  private static final String FIELD_EXTENSION = "extension";
 
   private static final String REQUEST_ATTR_PROCESS = "$process";
   private static final String REQUEST_ATTR_ENDPOINT = "$endpoint";
@@ -435,8 +435,10 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                                                    CMenuSecure.MENU_TRANSPORT_PROFILES,
                                                                                    aSelectedEndpoint.getTransportProfile ())).addChild (aSelectedEndpoint.getTransportProfile ())));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference").setCtrl (StringHelper
-                                                                                                       .hasText (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (), HC_Target.BLANK) : new HCEM ().addChild ("none")));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
+                                                 .setCtrl (StringHelper.hasText (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),
+                                                                                                                                                       HC_Target.BLANK)
+                                                                                                                            : new HCEM ().addChild ("none")));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires business level signature")
                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedEndpoint.isRequireBusinessLevelSignature (),

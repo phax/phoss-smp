@@ -83,7 +83,7 @@ public final class XMLUserManager implements ISMPUserManager
   @ReturnsMutableCopy
   public ICommonsList <ISMPUser> getAllUsers ()
   {
-    final ICommonsList <ISMPUser> ret = new CommonsArrayList<> ();
+    final ICommonsList <ISMPUser> ret = new CommonsArrayList <> ();
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ().getAllActiveUsers ())
       ret.add (new XMLDataUser (aUser));
     return ret;
@@ -97,8 +97,7 @@ public final class XMLUserManager implements ISMPUserManager
   }
 
   @Nonnull
-  public XMLDataUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnauthorizedException,
-                                                                                                      SMPUnknownUserException
+  public XMLDataUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials)
   {
     final UserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final IUser aUser = aUserMgr.getUserOfLoginName (aCredentials.getUserName ());
@@ -123,8 +122,7 @@ public final class XMLUserManager implements ISMPUserManager
 
   @Nonnull
   public ISMPServiceGroup verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                           @Nonnull final ISMPUser aCurrentUser) throws SMPNotFoundException,
-                                                                                 SMPUnauthorizedException
+                                           @Nonnull final ISMPUser aCurrentUser)
   {
     // Resolve service group
     final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
@@ -146,10 +144,10 @@ public final class XMLUserManager implements ISMPUserManager
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Verified service group " +
-                       aServiceGroup.getID () +
-                       " is owned by user '" +
-                       aCurrentUser.getUserName () +
-                       "'");
+                    aServiceGroup.getID () +
+                    " is owned by user '" +
+                    aCurrentUser.getUserName () +
+                    "'");
 
     return aServiceGroup;
   }

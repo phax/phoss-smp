@@ -301,7 +301,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
    * @see ISMPManagerProvider
    * @see #setManagerProvider(ISMPManagerProvider)
    */
-  public static void initBackendFromConfiguration () throws InitializationException
+  public static void initBackendFromConfiguration ()
   {
     // Determine backend
     final SMPBackendRegistry aBackendRegistry = SMPBackendRegistry.getInstance ();

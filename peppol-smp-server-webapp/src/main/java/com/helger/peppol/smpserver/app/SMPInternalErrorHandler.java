@@ -44,6 +44,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
   public static InternalErrorBuilder createInternalErrorBuilder ()
   {
     final InternalErrorBuilder ret = new InternalErrorBuilder ();
+    ret.setDisplayLocale (CApp.DEFAULT_LOCALE);
     return ret;
   }
 

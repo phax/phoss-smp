@@ -153,7 +153,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
 
   @Nonnull
   public DBOwnership verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                      @Nonnull final ISMPUser aCredentials) throws SMPUnauthorizedException
+                                      @Nonnull final ISMPUser aCredentials)
   {
     // Resolve service group
     // to throw a 404 if a service group does not exist

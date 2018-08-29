@@ -87,36 +87,31 @@ public final class SQLManagerProvider implements ISMPManagerProvider
   @Nonnull
   public ISMPUserManager createUserMgr ()
   {
-    final SQLUserManager ret = new SQLUserManager ();
-    return ret;
+    return new SQLUserManager ();
   }
 
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    final SQLServiceGroupManager ret = new SQLServiceGroupManager ();
-    return ret;
+    return new SQLServiceGroupManager ();
   }
 
   @Nonnull
   public ISMPRedirectManager createRedirectMgr ()
   {
-    final SQLRedirectManager ret = new SQLRedirectManager ();
-    return ret;
+    return new SQLRedirectManager ();
   }
 
   @Nonnull
   public ISMPServiceInformationManager createServiceInformationMgr ()
   {
-    final SQLServiceInformationManager ret = new SQLServiceInformationManager ();
-    return ret;
+    return new SQLServiceInformationManager ();
   }
 
   @Nullable
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    final SQLBusinessCardManager ret = new SQLBusinessCardManager (aServiceGroupMgr);
-    return ret;
+    return new SQLBusinessCardManager (aServiceGroupMgr);
   }
 
   @Override

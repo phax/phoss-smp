@@ -71,7 +71,7 @@ import com.helger.security.keystore.LoadedKeyStore;
  */
 public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 {
-  private static enum EPredefinedCert
+  private enum EPredefinedCert
   {
     PEPPOL_PILOT_V2 ("PEPPOL pilot v2",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK",
@@ -159,12 +159,14 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
       aToolbar.addChild (new BootstrapButton ().addChild ("Reload keystore")
                                                .setIcon (EDefaultIcon.REFRESH)
-                                               .setOnClick (aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION,
-                                                                                      ACTION_RELOAD_KEYSTORE)));
+                                               .setOnClick (aWPEC.getSelfHref ()
+                                                                 .add (CPageParam.PARAM_ACTION,
+                                                                       ACTION_RELOAD_KEYSTORE)));
       aToolbar.addChild (new BootstrapButton ().addChild ("Reload truststore")
                                                .setIcon (EDefaultIcon.REFRESH)
-                                               .setOnClick (aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION,
-                                                                                      ACTION_RELOAD_TRUSTSTORE)));
+                                               .setOnClick (aWPEC.getSelfHref ()
+                                                                 .add (CPageParam.PARAM_ACTION,
+                                                                       ACTION_RELOAD_TRUSTSTORE)));
       aNodeList.addChild (aToolbar);
     }
 

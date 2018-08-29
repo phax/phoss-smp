@@ -10,6 +10,8 @@
  */
 package com.helger.peppol.smpserver.backend;
 
+import java.util.function.Supplier;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -113,7 +115,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   @ReturnsMutableCopy
   public ICommonsSet <String> getAllBackendIDs ()
   {
-    return m_aRWLock.readLocked ( () -> m_aMap.copyOfKeySet ());
+    return m_aRWLock.readLocked ((Supplier <ICommonsSet <String>>) m_aMap::copyOfKeySet);
   }
 
   /**

@@ -247,6 +247,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                      @Nonnull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMPBusinessCard aSelectedObject)
   {
+    // TODO add rules
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
   }
 
@@ -927,28 +928,33 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                      @Nonnull final ISMPBusinessCard aCurObject)
   {
     final String sDisplayName = aCurObject.getServiceGroupID ();
-    final HCNodeList ret = new HCNodeList ().addChildren (new HCA (createEditURL (aWPEC,
-                                                                                  aCurObject)).setTitle ("Edit " +
-                                                                                                         sDisplayName)
-                                                                                              .addChild (EDefaultIcon.EDIT.getAsNode ()),
-                                                          new HCTextNode (" "),
-                                                          new HCA (createCopyURL (aWPEC,
-                                                                                  aCurObject)).setTitle ("Create a copy of " +
-                                                                                                         sDisplayName)
-                                                                                              .addChild (EDefaultIcon.COPY.getAsNode ()),
-                                                          new HCTextNode (" "),
-                                                          new HCA (createDeleteURL (aWPEC,
-                                                                                    aCurObject)).setTitle ("Delete " +
-                                                                                                           sDisplayName)
-                                                                                                .addChild (EDefaultIcon.DELETE.getAsNode ()),
-                                                          new HCTextNode (" "),
-                                                          new HCA (LinkHelper.getURLWithServerAndContext ("businesscard/" +
-                                                                                                          aCurObject.getServiceGroup ()
-                                                                                                                    .getParticpantIdentifier ()
-                                                                                                                    .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
-                                                                                                                                                         sDisplayName)
-                                                                                                                                              .setTargetBlank ()
-                                                                                                                                              .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+    final HCNodeList ret = new HCNodeList ();
+    if (isActionAllowed (aWPEC, EWebPageFormAction.EDIT, aCurObject))
+      ret.addChild (new HCA (createEditURL (aWPEC, aCurObject)).setTitle ("Edit " + sDisplayName)
+                                                               .addChild (EDefaultIcon.EDIT.getAsNode ()));
+    else
+      ret.addChild (createEmptyAction ());
+    ret.addChild (new HCTextNode (" "));
+    if (isActionAllowed (aWPEC, EWebPageFormAction.EDIT, aCurObject))
+      ret.addChild (new HCA (createCopyURL (aWPEC, aCurObject)).setTitle ("Create a copy of " + sDisplayName)
+                                                               .addChild (EDefaultIcon.COPY.getAsNode ()));
+    else
+      ret.addChild (createEmptyAction ());
+    ret.addChild (new HCTextNode (" "));
+    if (isActionAllowed (aWPEC, EWebPageFormAction.DELETE, aCurObject))
+      ret.addChild (new HCA (createDeleteURL (aWPEC, aCurObject)).setTitle ("Delete " + sDisplayName)
+                                                                 .addChild (EDefaultIcon.DELETE.getAsNode ()));
+    else
+      ret.addChild (createEmptyAction ());
+    ret.addChild (new HCTextNode (" "));
+    ret.addChild (new HCA (LinkHelper.getURLWithServerAndContext ("businesscard/" +
+                                                                  aCurObject.getServiceGroup ()
+                                                                            .getParticpantIdentifier ()
+                                                                            .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
+                                                                                                                 sDisplayName)
+                                                                                                      .setTargetBlank ()
+                                                                                                      .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+
     if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate () || GlobalDebug.isDebugMode ())
     {
       // When auto update is enabled, there is no need for a manual update

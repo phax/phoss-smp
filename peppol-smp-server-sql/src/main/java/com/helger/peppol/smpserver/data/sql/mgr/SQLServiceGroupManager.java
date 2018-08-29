@@ -378,12 +378,9 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       if (aDBServiceGroup == null)
         return null;
 
-      final SMPServiceGroup aServiceGroup = new SMPServiceGroup (aDBServiceGroup.getOwnership ()
-                                                                                .getId ()
-                                                                                .getUsername (),
-                                                                 aDBServiceGroup.getId ().getAsBusinessIdentifier (),
-                                                                 aDBServiceGroup.getExtension ());
-      return aServiceGroup;
+      return new SMPServiceGroup (aDBServiceGroup.getOwnership ().getId ().getUsername (),
+                                  aDBServiceGroup.getId ().getAsBusinessIdentifier (),
+                                  aDBServiceGroup.getExtension ());
     });
     if (ret.hasException ())
     {
