@@ -182,11 +182,10 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           aImportServiceGroups.put (aServiceGroup, aSGInfo);
           if (bIsServiceGroupContained)
             aDeleteServiceGroups.add (aServiceGroup);
-          aLogger.log (EErrorLevel.SUCCESS,
-                       "Will " +
-                                            (bIsServiceGroupContained ? "overwrite" : "import") +
-                                            " service group " +
-                                            sServiceGroupID);
+          aLogger.success ("Will " +
+                           (bIsServiceGroupContained ? "overwrite" : "import") +
+                           " service group " +
+                           sServiceGroupID);
 
           // read all contained service information
           {
@@ -295,11 +294,10 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             aImportBusinessCards.add (aBusinessCard);
             if (bIsBusinessCardContained)
               aDeleteBusinessCards.add (aBusinessCard);
-            aLogger.log (EErrorLevel.SUCCESS,
-                         "Will " +
-                                              (bIsBusinessCardContained ? "overwrite" : "import") +
-                                              " business card for " +
-                                              sBusinessCardID);
+            aLogger.success ("Will " +
+                             (bIsBusinessCardContained ? "overwrite" : "import") +
+                             " business card for " +
+                             sBusinessCardID);
           }
           else
           {
@@ -340,7 +338,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           final IParticipantIdentifier aPI = aDeleteServiceGroup.getParticpantIdentifier ();
           if (aServiceGroupMgr.deleteSMPServiceGroup (aPI).isChanged ())
           {
-            aLogger.log (EErrorLevel.SUCCESS, "Successfully deleted service group " + aDeleteServiceGroup.getID ());
+            aLogger.success ("Successfully deleted service group " + aDeleteServiceGroup.getID ());
             aDeletedServiceGroups.add (aPI);
           }
           else
@@ -358,7 +356,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                                                                        aImportServiceGroup.getParticpantIdentifier (),
                                                                        aImportServiceGroup.getExtensionAsString ());
             if (aNewServiceGroup != null)
-              aLogger.log (EErrorLevel.SUCCESS, "Successfully created service group " + aImportServiceGroup.getID ());
+              aLogger.success ("Successfully created service group " + aImportServiceGroup.getID ());
           }
           catch (final Exception ex)
           {
@@ -372,8 +370,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
               try
               {
                 aServiceInfoMgr.mergeSMPServiceInformation (aImportServiceInfo);
-                aLogger.log (EErrorLevel.SUCCESS,
-                             "Successfully created service information for " + aImportServiceGroup.getID ());
+                aLogger.success ("Successfully created service information for " + aImportServiceGroup.getID ());
               }
               catch (final Exception ex)
               {
@@ -384,12 +381,12 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             for (final ISMPRedirect aImportRedirect : aEntry.getValue ().getRedirects ())
               try
               {
-                aRedirectMgr.createOrUpdateSMPRedirect (aNewServiceGroup,
-                                                        aImportRedirect.getDocumentTypeIdentifier (),
-                                                        aImportRedirect.getTargetHref (),
-                                                        aImportRedirect.getSubjectUniqueIdentifier (),
-                                                        aImportRedirect.getExtensionAsString ());
-                aLogger.log (EErrorLevel.SUCCESS, "Successfully created redirect for " + aImportServiceGroup.getID ());
+                if (aRedirectMgr.createOrUpdateSMPRedirect (aNewServiceGroup,
+                                                            aImportRedirect.getDocumentTypeIdentifier (),
+                                                            aImportRedirect.getTargetHref (),
+                                                            aImportRedirect.getSubjectUniqueIdentifier (),
+                                                            aImportRedirect.getExtensionAsString ()) != null)
+                  aLogger.success ("Successfully created redirect for " + aImportServiceGroup.getID ());
               }
               catch (final Exception ex)
               {
@@ -404,7 +401,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           try
           {
             if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard).isChanged ())
-              aLogger.log (EErrorLevel.SUCCESS, "Successfully deleted business card " + aDeleteBusinessCard.getID ());
+              aLogger.success ("Successfully deleted business card " + aDeleteBusinessCard.getID ());
             else
             {
               // If the service group to which the business card belongs was
@@ -430,7 +427,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           {
             aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getServiceGroup (),
                                                             aImportBusinessCard.getAllEntities ());
-            aLogger.log (EErrorLevel.SUCCESS, "Successfully created business card " + aImportBusinessCard.getID ());
+            aLogger.success ("Successfully created business card " + aImportBusinessCard.getID ());
           }
           catch (final Exception ex)
           {

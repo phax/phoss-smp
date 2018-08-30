@@ -171,7 +171,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                             aDBRedirect.getExtension ());
   }
 
-  @Nullable
+  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
@@ -182,7 +182,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     if (ret.hasException ())
     {
       exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
-      return null;
+      return new CommonsArrayList <> ();
     }
 
     final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList <> ();
@@ -191,7 +191,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     return aRedirects;
   }
 
-  @Nullable
+  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
@@ -211,7 +211,7 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
       if (ret.hasException ())
       {
         exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
-        return null;
+        return new CommonsArrayList <> ();
       }
 
       for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())

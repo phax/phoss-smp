@@ -270,7 +270,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     return eChange;
   }
 
-  @Nullable
+  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
@@ -302,12 +302,12 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     if (ret.hasException ())
     {
       exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
-      return null;
+      return new CommonsArrayList <> ();
     }
     return ret.get ();
   }
 
-  @Nullable
+  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
@@ -324,17 +324,16 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
-        final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID,
-                                                                   aDBServiceGroup.getId ().getAsBusinessIdentifier (),
-                                                                   aDBServiceGroup.getExtension ());
-        aList.add (aServiceGroup);
+        aList.add (new SMPServiceGroup (sOwnerID,
+                                        aDBServiceGroup.getId ().getAsBusinessIdentifier (),
+                                        aDBServiceGroup.getExtension ()));
       }
       return aList;
     });
     if (ret.hasException ())
     {
       exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
-      return null;
+      return new CommonsArrayList <> ();
     }
     return ret.get ();
   }

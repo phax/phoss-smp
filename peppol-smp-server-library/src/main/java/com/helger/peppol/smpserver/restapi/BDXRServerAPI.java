@@ -536,12 +536,24 @@ public final class BDXRServerAPI
       {
         // Handle redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-        aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
-                                                aDocTypeID,
-                                                aServiceMetadata.getRedirect ().getHref (),
-                                                aServiceMetadata.getRedirect ().getCertificateUID (),
-                                                BDXRExtensionConverter.convertToString (aServiceMetadata.getRedirect ()
-                                                                                                        .getExtension ()));
+        if (aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
+                                                    aDocTypeID,
+                                                    aServiceMetadata.getRedirect ().getHref (),
+                                                    aServiceMetadata.getRedirect ().getCertificateUID (),
+                                                    BDXRExtensionConverter.convertToString (aServiceMetadata.getRedirect ()
+                                                                                                            .getExtension ())) == null)
+        {
+          LOGGER.error (LOG_PREFIX +
+                        "Finished saveServiceRegistration(" +
+                        sServiceGroupID +
+                        "," +
+                        sDocumentTypeID +
+                        "," +
+                        aServiceMetadata +
+                        ") - Redirect - failure");
+          s_aStatsCounterError.increment ("saveServiceRegistration");
+          return ESuccess.FAILURE;
+        }
       }
       else
       {

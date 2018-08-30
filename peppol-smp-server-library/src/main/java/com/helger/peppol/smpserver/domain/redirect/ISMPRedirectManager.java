@@ -45,9 +45,10 @@ public interface ISMPRedirectManager
    * @param sExtension
    *        Optional extension element. May be <code>null</code>. If present it
    *        must be well-formed XML content.
-   * @return The new or updated {@link ISMPRedirect}. Never <code>null</code>.
+   * @return The new or updated {@link ISMPRedirect}. <code>null</code> if
+   *         persistence failed.
    */
-  @Nonnull
+  @Nullable
   ISMPRedirect createOrUpdateSMPRedirect (@Nonnull ISMPServiceGroup aServiceGroup,
                                           @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                           @Nonnull @Nonempty String sTargetHref,
