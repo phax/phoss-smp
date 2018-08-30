@@ -357,12 +357,13 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
                                                                        aImportServiceGroup.getParticpantIdentifier (),
                                                                        aImportServiceGroup.getExtensionAsString ());
-            aLogger.log (EErrorLevel.SUCCESS, "Successfully created service group " + aImportServiceGroup.getID ());
+            if (aNewServiceGroup != null)
+              aLogger.log (EErrorLevel.SUCCESS, "Successfully created service group " + aImportServiceGroup.getID ());
           }
-          catch (final Throwable t)
+          catch (final Exception ex)
           {
             // E.g. if SML connection failed
-            aLogger.error ("Error creating the new service group " + aImportServiceGroup.getID (), t);
+            aLogger.error ("Error creating the new service group " + aImportServiceGroup.getID (), ex);
           }
           if (aNewServiceGroup != null)
           {
@@ -374,9 +375,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                 aLogger.log (EErrorLevel.SUCCESS,
                              "Successfully created service information for " + aImportServiceGroup.getID ());
               }
-              catch (final Throwable t)
+              catch (final Exception ex)
               {
-                aLogger.error ("Error creating the new service information for " + aImportServiceGroup.getID (), t);
+                aLogger.error ("Error creating the new service information for " + aImportServiceGroup.getID (), ex);
               }
 
             // 3b. create all redirects
@@ -390,9 +391,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                                                         aImportRedirect.getExtensionAsString ());
                 aLogger.log (EErrorLevel.SUCCESS, "Successfully created redirect for " + aImportServiceGroup.getID ());
               }
-              catch (final Throwable t)
+              catch (final Exception ex)
               {
-                aLogger.error ("Error creating the new redirect for " + aImportServiceGroup.getID (), t);
+                aLogger.error ("Error creating the new redirect for " + aImportServiceGroup.getID (), ex);
               }
           }
         }
@@ -413,13 +414,13 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                 aLogger.error ("Failed to delete business card " + aDeleteBusinessCard.getID ());
             }
           }
-          catch (final Throwable t)
+          catch (final Exception ex)
           {
             aLogger.error ("Failed to delete business card " +
                            aDeleteBusinessCard.getID () +
                            "; Technical details: " +
-                           t.getMessage (),
-                           t);
+                           ex.getMessage (),
+                           ex);
           }
 
         // 5. create all new business cards
@@ -431,9 +432,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                                                             aImportBusinessCard.getAllEntities ());
             aLogger.log (EErrorLevel.SUCCESS, "Successfully created business card " + aImportBusinessCard.getID ());
           }
-          catch (final Throwable t)
+          catch (final Exception ex)
           {
-            aLogger.error ("Failed to create business card " + aImportBusinessCard.getID (), t);
+            aLogger.error ("Failed to create business card " + aImportBusinessCard.getID (), ex);
           }
       }
   }
@@ -462,8 +463,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
       // Start import
       final IFileItem aImportFile = aWPEC.params ().getAsFileItem (FIELD_IMPORT_FILE);
-      final boolean bOverwriteExisting = aWPEC.params ().isCheckBoxChecked (FIELD_OVERWRITE_EXISTING,
-                                                                            DEFAULT_OVERWRITE_EXISTING);
+      final boolean bOverwriteExisting = aWPEC.params ()
+                                              .isCheckBoxChecked (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
       final String sDefaultOwnerID = aWPEC.params ().getAsString (FIELD_DEFAULT_OWNER);
       final ISMPUser aDefaultOwner = aUserMgr.getUserOfID (sDefaultOwnerID);
 

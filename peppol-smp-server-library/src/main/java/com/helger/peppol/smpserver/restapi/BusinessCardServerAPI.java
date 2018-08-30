@@ -52,6 +52,8 @@ public final class BusinessCardServerAPI
                                                                                                                                    "$call");
   private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
                                                                                                                                 "$success");
+  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterError = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
+                                                                                                                              "$error");
   private static final String LOG_PREFIX = "[BusinessCard REST API] ";
 
   private final ISMPServerAPIDataProvider m_aAPIProvider;
@@ -108,12 +110,12 @@ public final class BusinessCardServerAPI
     catch (final Throwable t)
     {
       LOGGER.warn (LOG_PREFIX +
-                      "Error in getBusinessCard(" +
-                      sServiceGroupID +
-                      ") - " +
-                      ClassHelper.getClassLocalName (t) +
-                      " - " +
-                      t.getMessage ());
+                   "Error in getBusinessCard(" +
+                   sServiceGroupID +
+                   ") - " +
+                   ClassHelper.getClassLocalName (t) +
+                   " - " +
+                   t.getMessage ());
       throw t;
     }
   }
@@ -176,23 +178,33 @@ public final class BusinessCardServerAPI
       final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
       for (final PDBusinessEntity aEntity : aBusinessCard.businessEntities ())
         aEntities.add (SMPBusinessCardEntity.createFromGenericObject (aEntity));
-      aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aEntities);
+      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aEntities) == null)
+      {
+        LOGGER.info (LOG_PREFIX +
+                     "Finished createBusinessCard(" +
+                     sServiceGroupID +
+                     "," +
+                     aBusinessCard +
+                     ") - failure");
+        s_aStatsCounterError.increment ("createBusinessCard");
+        return ESuccess.FAILURE;
+      }
 
-      LOGGER.info (LOG_PREFIX + "Finished createBusinessCard(" + sServiceGroupID + "," + aBusinessCard + ")");
+      LOGGER.info (LOG_PREFIX + "Finished createBusinessCard(" + sServiceGroupID + "," + aBusinessCard + ") - success");
       s_aStatsCounterSuccess.increment ("createBusinessCard");
       return ESuccess.SUCCESS;
     }
     catch (final Throwable t)
     {
       LOGGER.warn (LOG_PREFIX +
-                      "Error in createBusinessCard(" +
-                      sServiceGroupID +
-                      "," +
-                      aBusinessCard +
-                      ") - " +
-                      ClassHelper.getClassLocalName (t) +
-                      " - " +
-                      t.getMessage ());
+                   "Error in createBusinessCard(" +
+                   sServiceGroupID +
+                   "," +
+                   aBusinessCard +
+                   ") - " +
+                   ClassHelper.getClassLocalName (t) +
+                   " - " +
+                   t.getMessage ());
       throw t;
     }
   }
@@ -247,9 +259,9 @@ public final class BusinessCardServerAPI
 
       if (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard).isUnchanged ())
         LOGGER.error ("Internal error deleting SMP business card " +
-                         aBusinessCard.toString () +
-                         " from " +
-                         sServiceGroupID);
+                      aBusinessCard.toString () +
+                      " from " +
+                      sServiceGroupID);
 
       LOGGER.info (LOG_PREFIX + "Finished deleteBusinessCard(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("deleteBusinessCard");
@@ -258,12 +270,12 @@ public final class BusinessCardServerAPI
     catch (final Throwable t)
     {
       LOGGER.warn (LOG_PREFIX +
-                      "Error in deleteBusinessCard(" +
-                      sServiceGroupID +
-                      ") - " +
-                      ClassHelper.getClassLocalName (t) +
-                      " - " +
-                      t.getMessage ());
+                   "Error in deleteBusinessCard(" +
+                   sServiceGroupID +
+                   ") - " +
+                   ClassHelper.getClassLocalName (t) +
+                   " - " +
+                   t.getMessage ());
       throw t;
     }
   }

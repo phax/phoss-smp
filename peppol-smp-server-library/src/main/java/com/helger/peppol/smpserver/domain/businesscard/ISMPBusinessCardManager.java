@@ -50,10 +50,10 @@ public interface ISMPBusinessCardManager
    *        Service group the redirect belongs to. May not be <code>null</code>.
    * @param aEntities
    *        The entities for this business card. May not be <code>null</code>.
-   * @return The new or updated {@link ISMPBusinessCard}. Never
-   *         <code>null</code>.
+   * @return The new or updated {@link ISMPBusinessCard}. <code>null</code> if
+   *         persistence failed.
    */
-  @Nonnull
+  @Nullable
   ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull ISMPServiceGroup aServiceGroup,
                                                   @Nonnull Collection <SMPBusinessCardEntity> aEntities);
 

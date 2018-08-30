@@ -17,6 +17,7 @@
 package com.helger.peppol.smpserver.domain.redirect;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -69,6 +70,7 @@ public final class ISMPRedirectManagerFuncTest
 
       final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
+      assertNotNull (aSG);
       try
       {
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
@@ -97,6 +99,7 @@ public final class ISMPRedirectManagerFuncTest
 
         // Add second one
         final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
+        assertNotNull (aSG2);
         try
         {
           aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", "<extredirect2 />");

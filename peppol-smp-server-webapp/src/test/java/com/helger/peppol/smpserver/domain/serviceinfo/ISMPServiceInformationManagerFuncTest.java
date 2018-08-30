@@ -16,6 +16,7 @@
  */
 package com.helger.peppol.smpserver.domain.serviceinfo;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDateTime;
@@ -74,6 +75,7 @@ public final class ISMPServiceInformationManagerFuncTest
     {
       aServiceGroupMgr.deleteSMPServiceGroup (aPI1);
       final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (sUserID, aPI1, null);
+      assertNotNull (aSG);
       try
       {
         final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
@@ -90,11 +92,11 @@ public final class ISMPServiceInformationManagerFuncTest
                                                  "ti",
                                                  "<extep />");
 
-        final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList<> (aEP), "<extproc/>");
+        final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP), "<extproc/>");
 
         final SMPServiceInformation aServiceInformation = new SMPServiceInformation (aSG,
                                                                                      aDocTypeID,
-                                                                                     new CommonsArrayList<> (aProcess),
+                                                                                     new CommonsArrayList <> (aProcess),
                                                                                      "<extsi/>");
         aServiceInfoMgr.mergeSMPServiceInformation (aServiceInformation);
       }

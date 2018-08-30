@@ -17,6 +17,7 @@
 package com.helger.peppol.smpserver.domain.businesscard;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -89,13 +90,14 @@ public final class ISMPBusinessCardManagerFuncTest
 
       final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
+      assertNotNull (aSG);
       ISMPBusinessCard aBusinessCard = null;
       try
       {
         final int nBCCount = aBusinessCardMgr.getSMPBusinessCardCount ();
 
         // Create new one
-        aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG, new CommonsArrayList<> (aEntity1));
+        aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG, new CommonsArrayList <> (aEntity1));
         assertSame (aSG, aBusinessCard.getServiceGroup ());
         assertEquals (aPI1.getScheme (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getScheme ());
         assertEquals (aPI1.getValue (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getValue ());
@@ -107,7 +109,7 @@ public final class ISMPBusinessCardManagerFuncTest
 
         // Update existing
         aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG,
-                                                                        new CommonsArrayList<> (aEntity1, aEntity2));
+                                                                        new CommonsArrayList <> (aEntity1, aEntity2));
         assertSame (aSG, aBusinessCard.getServiceGroup ());
         assertEquals (aPI1.getScheme (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getScheme ());
         assertEquals (aPI1.getValue (), aBusinessCard.getServiceGroup ().getParticpantIdentifier ().getValue ());
@@ -120,10 +122,11 @@ public final class ISMPBusinessCardManagerFuncTest
 
         // Add second one
         final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
+        assertNotNull (aSG2);
         ISMPBusinessCard aBusinessCard2 = null;
         try
         {
-          aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG2, new CommonsArrayList<> (aEntity3));
+          aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG2, new CommonsArrayList <> (aEntity3));
           assertSame (aSG2, aBusinessCard2.getServiceGroup ());
           assertEquals (1, aBusinessCard2.getEntityCount ());
           assertEquals (nBCCount + 2, aBusinessCardMgr.getSMPBusinessCardCount ());

@@ -511,21 +511,27 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       else
       {
         // Create the service group both locally and on the SML (if active)!
+        ISMPServiceGroup aSG = null;
+        Exception aCaughtEx = null;
         try
         {
-          aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension);
+          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension);
         }
-        catch (final Throwable t)
+        catch (final Exception ex)
         {
+          aCaughtEx = ex;
+        }
+        if (aSG == null)
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the new SMP ServiceGroup for participant '" +
                                                                             aParticipantID.getURIEncoded () +
-                                                                            "'. Technical details: " +
-                                                                            t.getMessage ()));
-        }
-
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
-                                                                            aParticipantID.getURIEncoded () +
-                                                                            "' was successfully created."));
+                                                                            "'." +
+                                                                            (aCaughtEx != null ? " Technical details: " +
+                                                                                                 aCaughtEx.getMessage ()
+                                                                                               : "")));
+        else
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
+                                                                              aParticipantID.getURIEncoded () +
+                                                                              "' was successfully created."));
       }
     }
   }

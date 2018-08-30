@@ -72,6 +72,8 @@ public final class SMPServerAPI
                                                                                                                                    "$call");
   private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
                                                                                                                                 "$success");
+  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterError = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
+                                                                                                                              "$error");
   private static final String LOG_PREFIX = "[SMP REST API] ";
 
   private final ISMPServerAPIDataProvider m_aAPIProvider;
@@ -308,9 +310,19 @@ public final class SMPServerAPI
       if (aServiceGroupMgr.containsSMPServiceGroupWithID (aServiceGroupID))
         aServiceGroupMgr.updateSMPServiceGroup (sServiceGroupID, aSMPUser.getID (), sExtension);
       else
-        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aServiceGroupID, sExtension);
+        if (aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aServiceGroupID, sExtension) == null)
+        {
+          LOGGER.error (LOG_PREFIX +
+                        "Finished saveServiceGroup(" +
+                        sServiceGroupID +
+                        "," +
+                        aServiceGroup +
+                        ") - failure");
+          s_aStatsCounterError.increment ("saveServiceGroup");
+          return ESuccess.FAILURE;
+        }
 
-      LOGGER.info (LOG_PREFIX + "Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ")");
+      LOGGER.info (LOG_PREFIX + "Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ") - success");
       s_aStatsCounterSuccess.increment ("saveServiceGroup");
       return ESuccess.SUCCESS;
     }

@@ -290,7 +290,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     return new SMPBusinessCard (aServiceGroup, aEntities);
   }
 
-  @Nullable
+  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
@@ -301,7 +301,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     if (ret.hasException ())
     {
       exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
-      return null;
+      return new CommonsArrayList <> ();
     }
 
     /// Group by ID

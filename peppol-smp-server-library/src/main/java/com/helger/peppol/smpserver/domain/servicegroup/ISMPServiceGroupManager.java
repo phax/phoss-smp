@@ -50,11 +50,12 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @param sExtension
    *        The optional extension element that must be either a well-formed XML
    *        string (for PEPPOL SMP) or a valid JSON string (for BDXR SMP).
-   * @return The created service group object. Never <code>null</code>.
+   * @return The created service group object. May be <code>null</code> to
+   *         indicate the persistent storage failed.
    * @see com.helger.peppol.smp.SMPExtensionConverter
    * @see com.helger.peppol.bdxr.BDXRExtensionConverter
    */
-  @Nonnull
+  @Nullable
   ISMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty String sOwnerID,
                                           @Nonnull IParticipantIdentifier aParticipantIdentifier,
                                           @Nullable String sExtension);

@@ -75,6 +75,7 @@ public final class XMLServiceInformationManagerTest
     aServiceGroupMgr.deleteSMPServiceGroup (aPI);
 
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
+    assertNotNull (aSG);
     try
     {
       final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
