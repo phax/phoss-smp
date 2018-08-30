@@ -611,10 +611,23 @@ public final class SMPServerAPI
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
         final String sExtensionXML = SMPExtensionConverter.convertToString (aServiceMetadata.getServiceInformation ()
                                                                                             .getExtension ());
-        aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
-                                                                               aDocTypeID,
-                                                                               aProcesses,
-                                                                               sExtensionXML));
+        if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
+                                                                                   aDocTypeID,
+                                                                                   aProcesses,
+                                                                                   sExtensionXML))
+                           .isFailure ())
+        {
+          LOGGER.error (LOG_PREFIX +
+                        "Finished saveServiceRegistration(" +
+                        sServiceGroupID +
+                        "," +
+                        sDocumentTypeID +
+                        "," +
+                        aServiceMetadata +
+                        ") - ServiceInformation - failure");
+          s_aStatsCounterError.increment ("saveServiceRegistration");
+          return ESuccess.FAILURE;
+        }
       }
 
       LOGGER.info (LOG_PREFIX +
@@ -625,7 +638,8 @@ public final class SMPServerAPI
                    "," +
                    aServiceMetadata +
                    ") - " +
-                   (aServiceMetadata.getRedirect () != null ? "Redirect" : "ServiceInformation"));
+                   (aServiceMetadata.getRedirect () != null ? "Redirect" : "ServiceInformation") +
+                   " - success");
       s_aStatsCounterSuccess.increment ("saveServiceRegistration");
       return ESuccess.SUCCESS;
     }

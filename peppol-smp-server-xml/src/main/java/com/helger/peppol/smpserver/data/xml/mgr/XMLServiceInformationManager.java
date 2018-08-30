@@ -29,6 +29,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.dao.DAOException;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
@@ -80,7 +81,8 @@ public final class XMLServiceInformationManager extends
     return null;
   }
 
-  public void mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aSMPServiceInformationObj)
+  @Nonnull
+  public ESuccess mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aSMPServiceInformationObj)
   {
     final SMPServiceInformation aSMPServiceInformation = (SMPServiceInformation) aSMPServiceInformationObj;
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
@@ -159,6 +161,7 @@ public final class XMLServiceInformationManager extends
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - created");
     }
+    return ESuccess.FAILURE;
   }
 
   @Nonnull
@@ -313,10 +316,10 @@ public final class XMLServiceInformationManager extends
       return null;
     if (ret.size () > 1)
       LOGGER.warn ("Found more than one entry for service group '" +
-                      aServiceGroup.getID () +
-                      "' and document type '" +
-                      aDocumentTypeIdentifier.getValue () +
-                      "'. This seems to be a bug! Using the first one.");
+                   aServiceGroup.getID () +
+                   "' and document type '" +
+                   aDocumentTypeIdentifier.getValue () +
+                   "'. This seems to be a bug! Using the first one.");
     return ret.getFirst ();
   }
 }

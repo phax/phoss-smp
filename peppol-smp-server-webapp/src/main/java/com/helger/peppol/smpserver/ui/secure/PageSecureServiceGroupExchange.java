@@ -369,8 +369,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             for (final ISMPServiceInformation aImportServiceInfo : aEntry.getValue ().getServiceInfo ())
               try
               {
-                aServiceInfoMgr.mergeSMPServiceInformation (aImportServiceInfo);
-                aLogger.success ("Successfully created service information for " + aImportServiceGroup.getID ());
+                if (aServiceInfoMgr.mergeSMPServiceInformation (aImportServiceInfo).isSuccess ())
+                  aLogger.success ("Successfully created service information for " + aImportServiceGroup.getID ());
               }
               catch (final Exception ex)
               {

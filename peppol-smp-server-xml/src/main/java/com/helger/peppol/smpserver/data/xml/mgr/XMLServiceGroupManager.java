@@ -73,12 +73,12 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup (" +
-                       sOwnerID +
-                       ", " +
-                       aParticipantIdentifier.getURIEncoded () +
-                       ", " +
-                       (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
-                       ")");
+                    sOwnerID +
+                    ", " +
+                    aParticipantIdentifier.getURIEncoded () +
+                    ", " +
+                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ")");
 
     final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
 
@@ -124,12 +124,12 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup (" +
-                       sSMPServiceGroupID +
-                       ", " +
-                       sNewOwnerID +
-                       ", " +
-                       (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
-                       ")");
+                    sSMPServiceGroupID +
+                    ", " +
+                    sNewOwnerID +
+                    ", " +
+                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ")");
 
     final SMPServiceGroup aSMPServiceGroup = getOfID (sSMPServiceGroupID);
     if (aSMPServiceGroup == null)
@@ -173,8 +173,8 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup (" +
-                       (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) +
-                       ")");
+                    (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) +
+                    ")");
 
     final String sServiceGroupID = aParticipantID == null ? null
                                                           : SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
@@ -226,16 +226,22 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
       // Restore redirects (if any)
       if (aOldRedirects != null)
         for (final ISMPRedirect aOldRedirect : aOldRedirects)
+        {
+          // ignore return value - we cannot do anything anyway
           aRedirectMgr.createOrUpdateSMPRedirect (aSMPServiceGroup,
                                                   aOldRedirect.getDocumentTypeIdentifier (),
                                                   aOldRedirect.getTargetHref (),
                                                   aOldRedirect.getSubjectUniqueIdentifier (),
                                                   aOldRedirect.getExtensionAsString ());
+        }
 
       // Restore service information (if any)
       if (aOldServiceInformation != null)
         for (final ISMPServiceInformation aOldServiceInfo : aOldServiceInformation)
+        {
+          // ignore return value - we cannot do anything anyway
           aServiceInfoMgr.mergeSMPServiceInformation (aOldServiceInfo);
+        }
 
       // An error occurred - restore in SML again
       aHook.undoDeleteServiceGroup (aSMPServiceGroup.getParticpantIdentifier ());

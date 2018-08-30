@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -38,8 +39,10 @@ public interface ISMPServiceInformationManager
    * @param aServiceInformation
    *        The service information object to handle. May not be
    *        <code>null</code>.
+   * @return {@link ESuccess}
    */
-  void mergeSMPServiceInformation (@Nonnull ISMPServiceInformation aServiceInformation);
+  @Nonnull
+  ESuccess mergeSMPServiceInformation (@Nonnull ISMPServiceInformation aServiceInformation);
 
   /**
    * Find the service information matching the passed quadruple of parameters.
@@ -97,7 +100,7 @@ public interface ISMPServiceInformationManager
 
   /**
    * Delete a single process with all endpoints from this service information.
-   * 
+   *
    * @param aSMPServiceInformation
    *        The service information object where the process should be deleted.
    *        May be <code>null</code>.

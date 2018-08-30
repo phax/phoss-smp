@@ -98,7 +98,7 @@ public final class ISMPServiceInformationManagerFuncTest
                                                                                      aDocTypeID,
                                                                                      new CommonsArrayList <> (aProcess),
                                                                                      "<extsi/>");
-        aServiceInfoMgr.mergeSMPServiceInformation (aServiceInformation);
+        assertTrue (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInformation).isSuccess ());
       }
       finally
       {

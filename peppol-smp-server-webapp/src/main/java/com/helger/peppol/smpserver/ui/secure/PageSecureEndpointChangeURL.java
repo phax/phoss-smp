@@ -39,6 +39,7 @@ import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCUL;
+import com.helger.html.hc.html.sections.HCH3;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -54,6 +55,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
+import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
@@ -175,6 +177,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         {
           // Modify all endpoints
           int nChangedEndpoints = 0;
+          int nSaveErrors = 0;
           final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
           for (final ISMPServiceInformation aSI : aAllSIs)
           {
@@ -195,7 +198,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
                 }
             if (bChanged)
             {
-              aServiceInfoMgr.mergeSMPServiceInformation (aSI);
+              if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
+                nSaveErrors++;
               aChangedServiceGroup.add (aSI.getServiceGroupID ());
             }
           }
@@ -205,12 +209,20 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
             final HCUL aUL = new HCUL ();
             for (final String sChangedServiceGroupID : aChangedServiceGroup)
               aUL.addItem (sChangedServiceGroupID);
-            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChildren (new HCDiv ().addChild ("The old URL '" +
-                                                                                                          sOldURL +
-                                                                                                          "' was changed in " +
-                                                                                                          nChangedEndpoints +
-                                                                                                          " endpoints. Effected service groups are:"),
-                                                                                   aUL));
+
+            final HCNodeList aNodes = new HCNodeList ().addChildren (new HCDiv ().addChild ("The old URL '" +
+                                                                                            sOldURL +
+                                                                                            "' was changed in " +
+                                                                                            nChangedEndpoints +
+                                                                                            " endpoints. Effected service groups are:"),
+                                                                     aUL);
+            if (nSaveErrors == 0)
+              aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild (aNodes));
+            else
+            {
+              aNodes.addChildAt (0, new HCH3 ().addChild ("Some changes could NOT be saved! Please check the logs!"));
+              aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild (aNodes));
+            }
           }
           else
             aWPEC.postRedirectGetInternal (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old URL '" +

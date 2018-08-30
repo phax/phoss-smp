@@ -586,11 +586,24 @@ public final class BDXRServerAPI
         }
 
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-        aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
-                                                                               aDocTypeID,
-                                                                               aProcesses,
-                                                                               BDXRExtensionConverter.convertToString (aServiceMetadata.getServiceInformation ()
-                                                                                                                                       .getExtension ())));
+        if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
+                                                                                   aDocTypeID,
+                                                                                   aProcesses,
+                                                                                   BDXRExtensionConverter.convertToString (aServiceMetadata.getServiceInformation ()
+                                                                                                                                           .getExtension ())))
+                           .isFailure ())
+        {
+          LOGGER.error (LOG_PREFIX +
+                        "Finished saveServiceRegistration(" +
+                        sServiceGroupID +
+                        "," +
+                        sDocumentTypeID +
+                        "," +
+                        aServiceMetadata +
+                        ") - ServiceInformation - failure");
+          s_aStatsCounterError.increment ("saveServiceRegistration");
+          return ESuccess.FAILURE;
+        }
       }
 
       LOGGER.info (LOG_PREFIX +
@@ -601,7 +614,8 @@ public final class BDXRServerAPI
                    "," +
                    aServiceMetadata +
                    ") - " +
-                   (aServiceMetadata.getRedirect () != null ? "Redirect" : "ServiceInformation"));
+                   (aServiceMetadata.getRedirect () != null ? "Redirect" : "ServiceInformation") +
+                   " - success");
       s_aStatsCounterSuccess.increment ("saveServiceRegistration");
       return ESuccess.SUCCESS;
     }

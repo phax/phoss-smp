@@ -18,6 +18,7 @@ package com.helger.peppol.smpserver.data.xml.mgr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +27,7 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
@@ -98,11 +100,12 @@ public final class XMLServiceInformationManagerTest
                                                  "tc",
                                                  "ti",
                                                  "<extep />");
-        final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "<extproc />");
-        aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
-                                                                                      aDocTypeID,
-                                                                                      CollectionHelper.newList (aProcess),
-                                                                                      "<extsi />"));
+        final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP), "<extproc />");
+        assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
+                                                                                                  aDocTypeID,
+                                                                                                  new CommonsArrayList <> (aProcess),
+                                                                                                  "<extsi />"))
+                                          .isSuccess ());
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -133,7 +136,7 @@ public final class XMLServiceInformationManagerTest
                                                "tc",
                                                "ti",
                                                "<extep />"));
-        aServiceInformationMgr.mergeSMPServiceInformation (aSI);
+        assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (aSI).isSuccess ());
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -172,7 +175,7 @@ public final class XMLServiceInformationManagerTest
                                                "tc",
                                                "ti",
                                                "<extep />"));
-        aServiceInformationMgr.mergeSMPServiceInformation (aSI);
+        assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (aSI).isSuccess ());
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
@@ -203,9 +206,9 @@ public final class XMLServiceInformationManagerTest
                                                  "ti",
                                                  "<extep />");
         aSI.addProcess (new SMPProcess (PeppolIdentifierFactory.INSTANCE.createProcessIdentifierWithDefaultScheme ("testproc2"),
-                                        CollectionHelper.newList (aEP),
+                                        new CommonsArrayList <> (aEP),
                                         "<extproc />"));
-        aServiceInformationMgr.mergeSMPServiceInformation (aSI);
+        assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (aSI).isSuccess ());
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (2,

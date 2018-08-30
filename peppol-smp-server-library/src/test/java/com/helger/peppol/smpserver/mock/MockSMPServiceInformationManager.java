@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -30,8 +31,11 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
  */
 final class MockSMPServiceInformationManager implements ISMPServiceInformationManager
 {
-  public void mergeSMPServiceInformation (final ISMPServiceInformation aServiceInformation)
-  {}
+  @Nonnull
+  public ESuccess mergeSMPServiceInformation (final ISMPServiceInformation aServiceInformation)
+  {
+    return ESuccess.SUCCESS;
+  }
 
   public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (final ISMPServiceGroup aServiceGroup,
                                                                                        final IDocumentTypeIdentifier aDocumentTypeIdentifier)

@@ -27,6 +27,7 @@ import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
@@ -197,7 +198,8 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     aDBMetadata.setExtension (aServiceInfo.getExtensionAsString ());
   }
 
-  public void mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aServiceInformation)
+  @Nonnull
+  public ESuccess mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aServiceInformation)
   {
     ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
 
@@ -234,7 +236,9 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     if (ret.hasException ())
     {
       exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
+      return ESuccess.FAILURE;
     }
+    return ESuccess.SUCCESS;
   }
 
   @Nullable
