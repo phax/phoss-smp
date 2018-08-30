@@ -161,7 +161,7 @@ public final class XMLServiceInformationManager extends
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - created");
     }
-    return ESuccess.FAILURE;
+    return ESuccess.SUCCESS;
   }
 
   @Nonnull
