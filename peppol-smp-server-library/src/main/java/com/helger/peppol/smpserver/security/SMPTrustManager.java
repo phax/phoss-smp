@@ -43,11 +43,22 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
 
   private KeyStore m_aTrustStore;
 
+  private static void _setCertValid (final boolean bValid)
+  {
+    s_aCertificateValid.set (bValid);
+  }
+
+  private static void _loadError (@Nullable final EKeyStoreLoadError eInitError, @Nullable final String sInitError)
+  {
+    s_eInitError = eInitError;
+    s_sInitError = sInitError;
+  }
+
   private void _loadCertificates () throws InitializationException
   {
     // Reset every time
-    s_aCertificateValid.set (false);
-    s_sInitError = null;
+    _setCertValid (false);
+    _loadError (null, null);
     m_aTrustStore = null;
 
     // Load the trust store
@@ -56,16 +67,15 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
                                                                            SMPServerConfiguration.getTrustStorePassword ());
     if (aTrustStoreLoading.isFailure ())
     {
-      s_eInitError = aTrustStoreLoading.getError ();
-      s_sInitError = PeppolKeyStoreHelper.getLoadError (aTrustStoreLoading);
+      _loadError (aTrustStoreLoading.getError (), PeppolKeyStoreHelper.getLoadError (aTrustStoreLoading));
       throw new InitializationException (s_sInitError);
     }
     m_aTrustStore = aTrustStoreLoading.getKeyStore ();
 
     LOGGER.info ("SMPTrustManager successfully initialized with truststore '" +
-                    SMPServerConfiguration.getTrustStorePath () +
-                    "'");
-    s_aCertificateValid.set (true);
+                 SMPServerConfiguration.getTrustStorePath () +
+                 "'");
+    _setCertValid (true);
   }
 
   @Deprecated

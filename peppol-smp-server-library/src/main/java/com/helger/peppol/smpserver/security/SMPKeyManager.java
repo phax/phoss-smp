@@ -75,11 +75,22 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   private KeyStore m_aKeyStore;
   private KeyStore.PrivateKeyEntry m_aKeyEntry;
 
+  private static void _setCertValid (final boolean bValid)
+  {
+    s_aCertificateValid.set (bValid);
+  }
+
+  private static void _loadError (@Nullable final EKeyStoreLoadError eInitError, @Nullable final String sInitError)
+  {
+    s_eInitError = eInitError;
+    s_sInitError = sInitError;
+  }
+
   private void _loadCertificates () throws InitializationException
   {
     // Reset every time
-    s_aCertificateValid.set (false);
-    s_sInitError = null;
+    _setCertValid (false);
+    _loadError (null, null);
     m_aKeyStore = null;
     m_aKeyEntry = null;
 
@@ -89,8 +100,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                         SMPServerConfiguration.getKeyStorePassword ());
     if (aLoadedKeyStore.isFailure ())
     {
-      s_eInitError = aLoadedKeyStore.getError ();
-      s_sInitError = PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore);
+      _loadError (aLoadedKeyStore.getError (), PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore));
       throw new InitializationException (s_sInitError);
     }
     m_aKeyStore = aLoadedKeyStore.getKeyStore ();
@@ -101,17 +111,17 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                                            SMPServerConfiguration.getKeyStoreKeyPassword ());
     if (aLoadedKey.isFailure ())
     {
-      s_sInitError = PeppolKeyStoreHelper.getLoadError (aLoadedKey);
+      _loadError (aLoadedKey.getError (), PeppolKeyStoreHelper.getLoadError (aLoadedKey));
       throw new InitializationException (s_sInitError);
     }
 
     m_aKeyEntry = aLoadedKey.getKeyEntry ();
     LOGGER.info ("SMPKeyManager successfully initialized with keystore '" +
-                    SMPServerConfiguration.getKeyStorePath () +
-                    "' and alias '" +
-                    SMPServerConfiguration.getKeyStoreKeyAlias () +
-                    "'");
-    s_aCertificateValid.set (true);
+                 SMPServerConfiguration.getKeyStorePath () +
+                 "' and alias '" +
+                 SMPServerConfiguration.getKeyStoreKeyAlias () +
+                 "'");
+    _setCertValid (true);
   }
 
   @Deprecated
