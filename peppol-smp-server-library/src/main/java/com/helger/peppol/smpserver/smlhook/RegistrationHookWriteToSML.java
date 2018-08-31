@@ -46,8 +46,9 @@ import com.helger.peppol.smpserver.security.SMPKeyManager;
 public class RegistrationHookWriteToSML implements IRegistrationHook
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (RegistrationHookWriteToSML.class);
+
   // SMP ID is static and cannot change
-  private static final String s_sSMPID = SMPServerConfiguration.getSMLSMPID ();
+  private static final String SMP_ID = SMPServerConfiguration.getSMLSMPID ();
 
   static
   {}
@@ -111,12 +112,12 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   public void createServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    LOGGER.info ("Trying to CREATE business " + sParticipantID + " for " + s_sSMPID + " in SML");
+    LOGGER.info ("Trying to CREATE business " + sParticipantID + " for " + SMP_ID + " in SML");
 
     try
     {
       // Explicit constructor call is needed here!
-      _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
+      _createSMLCaller ().create (SMP_ID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       LOGGER.info ("Succeeded in CREATE business " + sParticipantID + " in SML");
     }
     catch (final UnauthorizedFault ex)
@@ -137,16 +138,16 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     LOGGER.warn ("CREATE failed in SMP backend, so deleting again business " +
-                    sParticipantID +
-                    " for " +
-                    s_sSMPID +
-                    " from SML.");
+                 sParticipantID +
+                 " for " +
+                 SMP_ID +
+                 " from SML.");
 
     try
     {
       // Undo create
       // Explicit constructor call is needed here!
-      _createSMLCaller ().delete (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
+      _createSMLCaller ().delete (SMP_ID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       LOGGER.warn ("Succeeded in deleting again business " + sParticipantID + " from SML.");
     }
     catch (final Throwable t)
@@ -160,13 +161,13 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    LOGGER.info ("Trying to DELETE business " + sParticipantID + " for " + s_sSMPID + " from SML");
+    LOGGER.info ("Trying to DELETE business " + sParticipantID + " for " + SMP_ID + " from SML");
 
     try
     {
       // Use the version with the SMP ID to be on the safe side
       // Explicit constructor call is needed here!
-      _createSMLCaller ().delete (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
+      _createSMLCaller ().delete (SMP_ID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       LOGGER.info ("Succeeded in deleting business " + sParticipantID + " from SML");
     }
     catch (final NotFoundFault ex)
@@ -189,16 +190,16 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     LOGGER.warn ("DELETE failed in SMP backend, so creating again business " +
-                    sParticipantID +
-                    " for " +
-                    s_sSMPID +
-                    " in SML.");
+                 sParticipantID +
+                 " for " +
+                 SMP_ID +
+                 " in SML.");
 
     try
     {
       // Undo delete
       // Explicit constructor call is needed here!
-      _createSMLCaller ().create (s_sSMPID, new SimpleParticipantIdentifier (aBusinessIdentifier));
+      _createSMLCaller ().create (SMP_ID, new SimpleParticipantIdentifier (aBusinessIdentifier));
       LOGGER.warn ("Succeeded in creating again business " + sParticipantID + " in SML.");
     }
     catch (final Throwable t)
