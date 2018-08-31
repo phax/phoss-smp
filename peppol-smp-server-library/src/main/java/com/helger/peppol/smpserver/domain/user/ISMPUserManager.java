@@ -16,6 +16,8 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
@@ -35,11 +37,14 @@ public interface ISMPUserManager extends ISMPUserProvider
    */
   boolean isSpecialUserManagementNeeded ();
 
-  void createUser (@Nonnull String sUserName, @Nonnull String sPassword);
+  @Nonnull
+  ESuccess createUser (@Nonnull String sUserName, @Nonnull String sPassword);
 
-  void updateUser (@Nonnull String sUserName, @Nonnull String sPassword);
+  @Nonnull
+  ESuccess updateUser (@Nonnull String sUserName, @Nonnull String sPassword);
 
-  void deleteUser (@Nullable String sUserName);
+  @Nonnull
+  EChange deleteUser (@Nullable String sUserName);
 
   /**
    * @return The number of contained user. Always &ge; 0.

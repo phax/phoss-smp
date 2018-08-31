@@ -40,6 +40,7 @@ import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserEditable;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
+import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
@@ -91,10 +92,14 @@ public class PageSecureUser extends AbstractSMPWebPageForm <ISMPUserEditable>
                                     @Nonnull final ISMPUserEditable aSelectedObject)
       {
         final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
-        aUserManager.deleteUser (aSelectedObject.getID ());
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The user '" +
+        if (aUserManager.deleteUser (aSelectedObject.getID ()).isChanged ())
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The user '" +
+                                                                              aSelectedObject.getUserName () +
+                                                                              "' was successfully deleted."));
+        else
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete user '" +
                                                                             aSelectedObject.getUserName () +
-                                                                            "' was successfully deleted."));
+                                                                            "'."));
       }
     });
   }
@@ -198,17 +203,25 @@ public class PageSecureUser extends AbstractSMPWebPageForm <ISMPUserEditable>
     {
       if (bEdit)
       {
-        aUserManager.updateUser (sUserName, sPassword);
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("User '" +
+        if (aUserManager.updateUser (sUserName, sPassword).isSuccess ())
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("User '" +
+                                                                              sUserName +
+                                                                              "' was successfully edited."));
+        else
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to edit user '" +
                                                                             sUserName +
-                                                                            "' was successfully edited."));
+                                                                            "'."));
       }
       else
       {
-        aUserManager.createUser (sUserName, sPassword);
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("User '" +
+        if (aUserManager.createUser (sUserName, sPassword).isSuccess ())
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("User '" +
+                                                                              sUserName +
+                                                                              "' was successfully created."));
+        else
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to create user '" +
                                                                             sUserName +
-                                                                            "' was successfully created."));
+                                                                            "'."));
       }
     }
   }
@@ -241,10 +254,7 @@ public class PageSecureUser extends AbstractSMPWebPageForm <ISMPUserEditable>
                     new HCTextNode (" "),
                     isActionAllowed (aWPEC,
                                      EWebPageFormAction.DELETE,
-                                     (ISMPUserEditable) aCurObject) ? createDeleteLink (aWPEC, aCurObject, "Delete '" +
-                                                                                                           aCurObject.getUserName () +
-                                                                                                           "'")
-                                                                    : createEmptyAction ());
+                                     (ISMPUserEditable) aCurObject) ? createDeleteLink (aWPEC, aCurObject, "Delete '" + aCurObject.getUserName () + "'") : createEmptyAction ());
     }
 
     final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);

@@ -543,13 +543,16 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     {
       // Store in a consistent manner
       aSMPEntities.sort ( (o1, o2) -> o1.getName ().compareToIgnoreCase (o2.getName ()));
-      aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities);
-
-      aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
+      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities) != null)
+        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
+                                                                            aServiceGroup.getID () +
+                                                                            "' was successfully saved." +
+                                                                            (SMPMetaManager.getSettings ()
+                                                                                           .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + AppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+      else
+        aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the Business Card for Service Group '" +
                                                                           aServiceGroup.getID () +
-                                                                          "' was successfully saved." +
-                                                                          (SMPMetaManager.getSettings ()
-                                                                                         .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + AppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+                                                                          "'"));
     }
   }
 

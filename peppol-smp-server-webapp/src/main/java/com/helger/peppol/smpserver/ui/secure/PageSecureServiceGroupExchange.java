@@ -425,9 +425,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         for (final ISMPBusinessCard aImportBusinessCard : aImportBusinessCards)
           try
           {
-            aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getServiceGroup (),
-                                                            aImportBusinessCard.getAllEntities ());
-            aLogger.success ("Successfully created business card " + aImportBusinessCard.getID ());
+            if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getServiceGroup (),
+                                                                aImportBusinessCard.getAllEntities ()) != null)
+              aLogger.success ("Successfully created business card " + aImportBusinessCard.getID ());
           }
           catch (final Exception ex)
           {

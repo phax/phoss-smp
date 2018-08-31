@@ -180,12 +180,12 @@ public final class BusinessCardServerAPI
         aEntities.add (SMPBusinessCardEntity.createFromGenericObject (aEntity));
       if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aEntities) == null)
       {
-        LOGGER.info (LOG_PREFIX +
-                     "Finished createBusinessCard(" +
-                     sServiceGroupID +
-                     "," +
-                     aBusinessCard +
-                     ") - failure");
+        LOGGER.error (LOG_PREFIX +
+                      "Finished createBusinessCard(" +
+                      sServiceGroupID +
+                      "," +
+                      aBusinessCard +
+                      ") - failure");
         s_aStatsCounterError.increment ("createBusinessCard");
         return ESuccess.FAILURE;
       }

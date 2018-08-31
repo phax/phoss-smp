@@ -20,6 +20,8 @@ import javax.persistence.EntityManager;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
@@ -51,17 +53,27 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
     return true;
   }
 
-  public void createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
+  @Nonnull
+  public ESuccess createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
-    doInTransaction ( () -> {
+    JPAExecutionResult <?> ret;
+    ret = doInTransaction ( () -> {
       final DBUser aDBUser = new DBUser (sUserName, sPassword);
       getEntityManager ().persist (aDBUser);
     });
+    if (ret.hasException ())
+    {
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
+      return ESuccess.FAILURE;
+    }
+    return ESuccess.SUCCESS;
   }
 
-  public void updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
+  @Nonnull
+  public ESuccess updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
-    doInTransaction ( () -> {
+    JPAExecutionResult <?> ret;
+    ret = doInTransaction ( () -> {
       final DBUser aDBUser = getEntityManager ().find (DBUser.class, sUserName);
       if (aDBUser != null)
       {
@@ -69,17 +81,37 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
         getEntityManager ().merge (aDBUser);
       }
     });
+    if (ret.hasException ())
+    {
+      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
+      return ESuccess.FAILURE;
+    }
+    return ESuccess.SUCCESS;
   }
 
-  public void deleteUser (@Nullable final String sUserName)
+  @Nonnull
+  public EChange deleteUser (@Nullable final String sUserName)
   {
+    EChange eChange = EChange.CHANGED;
     if (StringHelper.hasText (sUserName))
-      doInTransaction ( () -> {
+    {
+      JPAExecutionResult <EChange> ret;
+      ret = doInTransaction ( () -> {
         final EntityManager aEM = getEntityManager ();
         final DBUser aDBUser = aEM.find (DBUser.class, sUserName);
-        if (aDBUser != null)
-          aEM.remove (aDBUser);
+        if (aDBUser == null)
+          return EChange.UNCHANGED;
+        aEM.remove (aDBUser);
+        return EChange.CHANGED;
       });
+      if (ret.hasException ())
+      {
+        exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
+        return EChange.UNCHANGED;
+      }
+      eChange = ret.get ();
+    }
+    return eChange;
   }
 
   @Nonnegative
@@ -98,7 +130,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
     return ret.get ().intValue ();
   }
 
-  @Nullable
+  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPUser> getAllUsers ()
   {
@@ -107,7 +139,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
     if (ret.hasException ())
     {
       exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
-      return null;
+      return new CommonsArrayList <> ();
     }
     return new CommonsArrayList <> (ret.get ());
   }

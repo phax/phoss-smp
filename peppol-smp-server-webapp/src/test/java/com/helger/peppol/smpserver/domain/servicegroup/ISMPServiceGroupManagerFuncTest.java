@@ -63,7 +63,7 @@ public final class ISMPServiceGroupManagerFuncTest
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     try
     {
-      aUserMgr.createUser (sOwner1ID, "any");
+      assertTrue (aUserMgr.createUser (sOwner1ID, "any").isSuccess ());
     }
     catch (final PersistenceException ex)
     {
@@ -72,7 +72,7 @@ public final class ISMPServiceGroupManagerFuncTest
       return;
     }
 
-    aUserMgr.createUser (sOwner2ID, "any");
+    assertTrue (aUserMgr.createUser (sOwner2ID, "any").isSuccess ());
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     assertNotNull (aSGMgr);
     try
@@ -183,6 +183,7 @@ public final class ISMPServiceGroupManagerFuncTest
     }
     finally
     {
+      // Don't care about the result
       aSGMgr.deleteSMPServiceGroup (aPI1);
       aSGMgr.deleteSMPServiceGroup (aPI2);
       aUserMgr.deleteUser (sOwner1ID);

@@ -62,7 +62,7 @@ public final class ISMPServiceInformationManagerFuncTest
     final String sUserID = "junitserviceinfo";
     try
     {
-      aUserMgr.createUser (sUserID, "bla");
+      assertTrue (aUserMgr.createUser (sUserID, "bla").isSuccess ());
     }
     catch (final PersistenceException ex)
     {
@@ -102,11 +102,13 @@ public final class ISMPServiceInformationManagerFuncTest
       }
       finally
       {
+        // Don't care about the result
         aServiceGroupMgr.deleteSMPServiceGroup (aPI1);
       }
     }
     finally
     {
+      // Don't care about the result
       aUserMgr.deleteUser (sUserID);
     }
   }

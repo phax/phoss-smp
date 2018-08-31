@@ -10,7 +10,14 @@
  */
 package com.helger.peppol.smpserver.mock;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
@@ -25,43 +32,58 @@ import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
  */
 final class MockSMPUserManager implements ISMPUserManager
 {
-  public Object verifyOwnership (final IParticipantIdentifier aServiceGroupID,
-                                 final ISMPUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
-  {
-    throw new UnsupportedOperationException ();
-  }
-
-  public ISMPUser validateUserCredentials (final BasicAuthClientCredentials aCredentials) throws Exception
-  {
-    throw new UnsupportedOperationException ();
-  }
-
-  public void updateUser (final String sUserName, final String sPassword)
-  {}
-
   public boolean isSpecialUserManagementNeeded ()
   {
     return false;
   }
 
-  public ISMPUser getUserOfID (final String sUserID)
+  @Nonnull
+  public ESuccess createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
     throw new UnsupportedOperationException ();
   }
 
+  @Nonnull
+  public ESuccess updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Nonnull
+  public EChange deleteUser (@Nullable final String sUserName)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Nullable
+  public ISMPUser getUserOfID (@Nullable final String sUserID)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Nonnegative
   public int getUserCount ()
   {
     return 0;
   }
 
+  @Nonnull
+  @ReturnsMutableCopy
   public ICommonsList <ISMPUser> getAllUsers ()
   {
     throw new UnsupportedOperationException ();
   }
 
-  public void deleteUser (final String sUserName)
-  {}
+  @Nonnull
+  public ISMPUser validateUserCredentials (final BasicAuthClientCredentials aCredentials) throws Exception
+  {
+    throw new UnsupportedOperationException ();
+  }
 
-  public void createUser (final String sUserName, final String sPassword)
-  {}
+  @Nullable
+  public Object verifyOwnership (final IParticipantIdentifier aServiceGroupID,
+                                 final ISMPUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
+  {
+    throw new UnsupportedOperationException ();
+  }
 }

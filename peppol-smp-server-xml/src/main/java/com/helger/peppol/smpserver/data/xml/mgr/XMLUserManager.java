@@ -27,6 +27,8 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.data.xml.domain.XMLDataUser;
@@ -58,19 +60,25 @@ public final class XMLUserManager implements ISMPUserManager
     return false;
   }
 
-  public void createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
+  @Nonnull
+  public ESuccess createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
     // not needed
+    return ESuccess.FAILURE;
   }
 
-  public void updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
+  @Nonnull
+  public ESuccess updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
     // not needed
+    return ESuccess.FAILURE;
   }
 
-  public void deleteUser (@Nonnull final String sUserName)
+  @Nonnull
+  public EChange deleteUser (@Nullable final String sUserName)
   {
     // not needed
+    return EChange.UNCHANGED;
   }
 
   @Nonnegative
