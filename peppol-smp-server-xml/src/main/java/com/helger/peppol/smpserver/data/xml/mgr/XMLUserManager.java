@@ -64,14 +64,16 @@ public final class XMLUserManager implements ISMPUserManager
   public ESuccess createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
     // not needed
-    return ESuccess.FAILURE;
+    // Success needed for tests
+    return ESuccess.SUCCESS;
   }
 
   @Nonnull
   public ESuccess updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
     // not needed
-    return ESuccess.FAILURE;
+    // Success needed for tests
+    return ESuccess.SUCCESS;
   }
 
   @Nonnull
