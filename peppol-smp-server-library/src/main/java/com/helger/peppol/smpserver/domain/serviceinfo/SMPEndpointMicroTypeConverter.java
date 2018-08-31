@@ -75,7 +75,8 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     final String sTransportProfile = aElement.getAttributeValue (ATTR_TRANSPORT_PROFILE);
     final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);
     final String sRequireBusinessLevelSignature = aElement.getAttributeValue (ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE);
-    final boolean bRequireBusinessLevelSignature = StringParser.parseBool (sRequireBusinessLevelSignature, false);
+    final boolean bRequireBusinessLevelSignature = StringParser.parseBool (sRequireBusinessLevelSignature,
+                                                                           SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aElement.getAttributeValue (ATTR_MINIMUM_AUTHENTICATION_LEVEL);
     final LocalDateTime aServiceActivationDate = aElement.getAttributeValueWithConversion (ATTR_SERVICE_ACTIVATION_DATE,
                                                                                            LocalDateTime.class);

@@ -33,7 +33,6 @@ import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.html.AbstractSWECHTMLProvider;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xservlet.forcedredirect.ForcedRedirectException;
 
 /**
  * Main class for creating HTML output
@@ -50,8 +49,7 @@ public class AppLayoutHTMLProvider extends AbstractSWECHTMLProvider
   }
 
   @Override
-  protected void fillBody (@Nonnull final ISimpleWebExecutionContext aSWEC,
-                           @Nonnull final HCHtml aHtml) throws ForcedRedirectException
+  protected void fillBody (@Nonnull final ISimpleWebExecutionContext aSWEC, @Nonnull final HCHtml aHtml)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
     final Locale aDisplayLocale = aSWEC.getDisplayLocale ();

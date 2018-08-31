@@ -80,7 +80,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
 
   @Deprecated
   @UsedViaReflection
-  public SMPTrustManager () throws InitializationException
+  public SMPTrustManager ()
   {
     _loadCertificates ();
   }

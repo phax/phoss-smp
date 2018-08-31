@@ -243,15 +243,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Override
-  protected boolean isActionAllowed (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final EWebPageFormAction eFormAction,
-                                     @Nullable final ISMPBusinessCard aSelectedObject)
-  {
-    // TODO add rules
-    return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
-  }
-
-  @Override
   protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                      @Nonnull final ISMPBusinessCard aSelectedObject)
   {

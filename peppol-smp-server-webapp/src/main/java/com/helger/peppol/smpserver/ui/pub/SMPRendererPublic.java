@@ -31,7 +31,6 @@ import com.helger.html.css.DefaultCSSClassProvider;
 import com.helger.html.css.ICSSClassProvider;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCA_MailTo;
-import com.helger.html.hc.html.IHCElement;
 import com.helger.html.hc.html.embedded.HCImg;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCP;
@@ -194,8 +193,7 @@ public final class SMPRendererPublic
         return super.isMenuItemValidToBeDisplayed (aMenuObj);
       }
     };
-    final IHCElement <?> aMenu = BootstrapMenuItemRenderer.createSideBarMenu (aLEC, aCallback);
-    return aMenu;
+    return BootstrapMenuItemRenderer.createSideBarMenu (aLEC, aCallback);
   }
 
   @SuppressWarnings ("unchecked")

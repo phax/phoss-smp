@@ -790,7 +790,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires Business Level Signature")
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
                                                                                                            aSelectedEndpoint != null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
-                                                                                                                                     : false)))
+                                                                                                                                     : SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE)))
                                                  .setHelpText ("Check the box if the recipient requires business-level signatures for\r\n" +
                                                                "the message, meaning a signature applied to the business message\r\n" +
                                                                "before the message is put on the transport. This is independent of\r\n" +

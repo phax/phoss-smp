@@ -39,8 +39,17 @@ final class RestRequestHelper
   private RestRequestHelper ()
   {}
 
+  /**
+   * Get the basic auth from the header
+   *
+   * @param aHttpHeaders
+   *        Headers to extract from. May not be <code>null</code>.
+   * @return The extracted basic auth. Never <code>null</code>.
+   * @throws SMPUnauthorizedException
+   *         If no BasicAuth HTTP header is present
+   */
   @Nonnull
-  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders aHttpHeaders) throws SMPUnauthorizedException
+  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders aHttpHeaders)
   {
     final List <String> aHeaders = aHttpHeaders.getRequestHeader (HttpHeaders.AUTHORIZATION);
     if (CollectionHelper.isEmpty (aHeaders))

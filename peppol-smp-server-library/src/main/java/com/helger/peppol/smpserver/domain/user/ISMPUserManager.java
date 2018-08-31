@@ -88,6 +88,5 @@ public interface ISMPUserManager extends ISMPUserProvider
    *         the credentials
    */
   @Nullable
-  Object verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                          @Nonnull final ISMPUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException;
+  Object verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID, @Nonnull final ISMPUser aCurrentUser);
 }

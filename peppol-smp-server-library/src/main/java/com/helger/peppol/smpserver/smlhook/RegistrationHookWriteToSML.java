@@ -109,104 +109,118 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     return ret;
   }
 
-  public void createServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
+  public void createServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier)
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    LOGGER.info ("Trying to CREATE business " + sParticipantID + " for " + SMP_ID + " in SML");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Trying to CREATE business " + sParticipantID + " for " + SMP_ID + " in SML");
 
     try
     {
       // Explicit constructor call is needed here!
       _createSMLCaller ().create (SMP_ID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      LOGGER.info ("Succeeded in CREATE business " + sParticipantID + " in SML");
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info ("Succeeded in CREATE business " + sParticipantID + " in SML");
     }
     catch (final UnauthorizedFault ex)
     {
       final String sMsg = "Seems like this SMP is not registered to the SML, or you're providing invalid credentials!";
-      LOGGER.error (sMsg + " " + SMLExceptionHelper.getFaultMessage (ex));
+      if (LOGGER.isErrorEnabled ())
+        LOGGER.error (sMsg + " " + SMLExceptionHelper.getFaultMessage (ex));
       throw new RegistrationHookException (sMsg, ex);
     }
-    catch (final Throwable t)
+    catch (final Exception ex)
     {
       final String sMsg = "Could not create business " + sParticipantID + " in SML";
-      LOGGER.error (sMsg, t);
-      throw new RegistrationHookException (sMsg, t);
+      if (LOGGER.isErrorEnabled ())
+        LOGGER.error (sMsg, ex);
+      throw new RegistrationHookException (sMsg, ex);
     }
   }
 
-  public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
+  public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier)
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    LOGGER.warn ("CREATE failed in SMP backend, so deleting again business " +
-                 sParticipantID +
-                 " for " +
-                 SMP_ID +
-                 " from SML.");
+    if (LOGGER.isWarnEnabled ())
+      LOGGER.warn ("CREATE failed in SMP backend, so deleting again business " +
+                   sParticipantID +
+                   " for " +
+                   SMP_ID +
+                   " from SML.");
 
     try
     {
       // Undo create
       // Explicit constructor call is needed here!
       _createSMLCaller ().delete (SMP_ID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      LOGGER.warn ("Succeeded in deleting again business " + sParticipantID + " from SML.");
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn ("Succeeded in deleting again business " + sParticipantID + " from SML.");
     }
-    catch (final Throwable t)
+    catch (final Exception ex)
     {
       final String sMsg = "Unable to rollback create business " + sParticipantID + " in SML";
-      LOGGER.error (sMsg, t);
-      throw new RegistrationHookException (sMsg, t);
+      if (LOGGER.isErrorEnabled ())
+        LOGGER.error (sMsg, ex);
+      throw new RegistrationHookException (sMsg, ex);
     }
   }
 
-  public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
+  public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier)
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    LOGGER.info ("Trying to DELETE business " + sParticipantID + " for " + SMP_ID + " from SML");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Trying to DELETE business " + sParticipantID + " for " + SMP_ID + " from SML");
 
     try
     {
       // Use the version with the SMP ID to be on the safe side
       // Explicit constructor call is needed here!
       _createSMLCaller ().delete (SMP_ID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      LOGGER.info ("Succeeded in deleting business " + sParticipantID + " from SML");
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info ("Succeeded in deleting business " + sParticipantID + " from SML");
     }
     catch (final NotFoundFault ex)
     {
       final String sMsg = "The business " +
                           sParticipantID +
                           " was not present in the SML and hence could not be deleted.";
-      LOGGER.error (sMsg, ex);
+      if (LOGGER.isErrorEnabled ())
+        LOGGER.error (sMsg, ex);
       throw new RegistrationHookException (sMsg, ex);
     }
-    catch (final Throwable t)
+    catch (final Exception ex)
     {
       final String sMsg = "Could not delete business " + sParticipantID + " from SML.";
-      LOGGER.error (sMsg, t);
-      throw new RegistrationHookException (sMsg, t);
+      if (LOGGER.isErrorEnabled ())
+        LOGGER.error (sMsg, ex);
+      throw new RegistrationHookException (sMsg, ex);
     }
   }
 
-  public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
+  public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier)
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
-    LOGGER.warn ("DELETE failed in SMP backend, so creating again business " +
-                 sParticipantID +
-                 " for " +
-                 SMP_ID +
-                 " in SML.");
+    if (LOGGER.isWarnEnabled ())
+      LOGGER.warn ("DELETE failed in SMP backend, so creating again business " +
+                   sParticipantID +
+                   " for " +
+                   SMP_ID +
+                   " in SML.");
 
     try
     {
       // Undo delete
       // Explicit constructor call is needed here!
       _createSMLCaller ().create (SMP_ID, new SimpleParticipantIdentifier (aBusinessIdentifier));
-      LOGGER.warn ("Succeeded in creating again business " + sParticipantID + " in SML.");
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn ("Succeeded in creating again business " + sParticipantID + " in SML.");
     }
-    catch (final Throwable t)
+    catch (final Exception ex)
     {
       final String sMsg = "Unable to rollback delete business " + sParticipantID + " in SML";
-      LOGGER.error (sMsg, t);
-      throw new RegistrationHookException (sMsg, t);
+      if (LOGGER.isErrorEnabled ())
+        LOGGER.error (sMsg, ex);
+      throw new RegistrationHookException (sMsg, ex);
     }
   }
 }

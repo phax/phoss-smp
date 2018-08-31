@@ -34,6 +34,8 @@ import com.helger.security.certificate.CertificateHelper;
 @NotThreadSafe
 public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
 {
+  public static final boolean DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE = false;
+
   private String m_sTransportProfile;
   private String m_sEndpointReference;
   private boolean m_bRequireBusinessLevelSignature;

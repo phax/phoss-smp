@@ -28,6 +28,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.dao.DAOException;
@@ -98,7 +99,7 @@ public final class XMLServiceInformationManager extends
     {
       // If a service information is present, it must be the provided object!
       // This is not true for the REST API
-      if (aOldInformation == aSMPServiceInformation)
+      if (EqualsHelper.identityEqual (aOldInformation, aSMPServiceInformation))
         bChangedExisting = true;
     }
 
@@ -127,7 +128,10 @@ public final class XMLServiceInformationManager extends
       try
       {
         if (aOldInformation != null)
-          bRemovedOld = internalDeleteItem (aOldInformation.getID ()) == aOldInformation;
+        {
+          // Delete only if present
+          bRemovedOld = EqualsHelper.identityEqual (internalDeleteItem (aOldInformation.getID ()), aOldInformation);
+        }
 
         internalCreateItem (aSMPServiceInformation);
       }
