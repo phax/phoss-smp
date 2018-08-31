@@ -10,6 +10,10 @@
  */
 package com.helger.peppol.smpserver.mock;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -22,6 +26,7 @@ import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileM
  */
 final class MockSMPTransportProfileManager implements ISMPTransportProfileManager
 {
+  @Nullable
   public ISMPTransportProfile createSMPTransportProfile (final String sID,
                                                          final String sName,
                                                          final boolean bIsDeprecated)
@@ -29,6 +34,7 @@ final class MockSMPTransportProfileManager implements ISMPTransportProfileManage
     throw new UnsupportedOperationException ();
   }
 
+  @Nonnull
   public EChange updateSMPTransportProfile (final String sSMPTransportProfileID,
                                             final String sName,
                                             final boolean bIsDeprecated)
@@ -36,16 +42,20 @@ final class MockSMPTransportProfileManager implements ISMPTransportProfileManage
     throw new UnsupportedOperationException ();
   }
 
+  @Nonnull
   public EChange removeSMPTransportProfile (final String sSMPTransportProfileID)
   {
     throw new UnsupportedOperationException ();
   }
 
+  @Nullable
   public ISMPTransportProfile getSMPTransportProfileOfID (final String sID)
   {
     return null;
   }
 
+  @Nonnull
+  @ReturnsMutableCopy
   public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
   {
     throw new UnsupportedOperationException ();

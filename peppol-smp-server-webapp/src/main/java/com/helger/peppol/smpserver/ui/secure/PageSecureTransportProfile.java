@@ -41,6 +41,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
+import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
@@ -89,10 +90,14 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
                                     @Nonnull final ISMPTransportProfile aSelectedObject)
       {
         final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
-        aTransportProfileMgr.removeSMPTransportProfile (aSelectedObject.getID ());
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The transport profile '" +
+        if (aTransportProfileMgr.removeSMPTransportProfile (aSelectedObject.getID ()).isChanged ())
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The transport profile '" +
+                                                                              aSelectedObject.getID () +
+                                                                              "' was successfully deleted!"));
+        else
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete transport profile '" +
                                                                             aSelectedObject.getID () +
-                                                                            "' was successfully deleted!"));
+                                                                            "'!"));
       }
     });
   }
@@ -217,17 +222,25 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
     {
       if (bEdit)
       {
-        aTransportProfileMgr.updateSMPTransportProfile (sID, sName, bIsDeprecated);
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The transport profile '" +
+        if (aTransportProfileMgr.updateSMPTransportProfile (sID, sName, bIsDeprecated).isChanged ())
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The transport profile '" +
+                                                                              sID +
+                                                                              "' was successfully edited."));
+        else
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to edit transport profile '" +
                                                                             sID +
-                                                                            "' was successfully edited."));
+                                                                            "'."));
       }
       else
       {
-        aTransportProfileMgr.createSMPTransportProfile (sID, sName, bIsDeprecated);
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new transport profile '" +
+        if (aTransportProfileMgr.createSMPTransportProfile (sID, sName, bIsDeprecated) != null)
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new transport profile '" +
+                                                                              sID +
+                                                                              "' was successfully created."));
+        else
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to create transport profile '" +
                                                                             sID +
-                                                                            "' was successfully created."));
+                                                                            "'."));
       }
     }
   }
