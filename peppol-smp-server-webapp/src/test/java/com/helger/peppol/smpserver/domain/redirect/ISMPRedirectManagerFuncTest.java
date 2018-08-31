@@ -54,7 +54,8 @@ public final class ISMPRedirectManagerFuncTest
     final String sUserID = "junitredir";
     try
     {
-      assertTrue (aUserMgr.createUser (sUserID, "dummy").isSuccess ());
+      // May fail
+      aUserMgr.createUser (sUserID, "dummy");
     }
     catch (final PersistenceException ex)
     {

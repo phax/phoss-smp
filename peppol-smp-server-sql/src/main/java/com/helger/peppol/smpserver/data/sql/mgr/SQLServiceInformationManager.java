@@ -389,7 +389,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                       aDBMetadata.getExtension ());
   }
 
-  @Nullable
+  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
@@ -400,7 +400,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     if (ret.hasException ())
     {
       exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
-      return null;
+      return new CommonsArrayList <> ();
     }
 
     final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
@@ -425,7 +425,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     return ret.get ().intValue ();
   }
 
-  @Nullable
+  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
@@ -445,7 +445,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       if (ret.hasException ())
       {
         exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
-        return null;
+        return new CommonsArrayList <> ();
       }
 
       for (final DBServiceMetadata aDBMetadata : ret.get ())

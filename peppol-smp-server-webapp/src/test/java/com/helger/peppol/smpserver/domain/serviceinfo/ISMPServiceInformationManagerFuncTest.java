@@ -62,7 +62,8 @@ public final class ISMPServiceInformationManagerFuncTest
     final String sUserID = "junitserviceinfo";
     try
     {
-      assertTrue (aUserMgr.createUser (sUserID, "bla").isSuccess ());
+      // May fail
+      aUserMgr.createUser (sUserID, "bla");
     }
     catch (final PersistenceException ex)
     {

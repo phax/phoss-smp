@@ -57,7 +57,8 @@ public final class ISMPBusinessCardManagerFuncTest
     final String sUserID = "junitredir";
     try
     {
-      assertTrue (aUserMgr.createUser (sUserID, "dummy").isSuccess ());
+      // May fail
+      aUserMgr.createUser (sUserID, "dummy");
     }
     catch (final PersistenceException ex)
     {

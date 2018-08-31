@@ -63,7 +63,8 @@ public final class ISMPServiceGroupManagerFuncTest
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     try
     {
-      assertTrue (aUserMgr.createUser (sOwner1ID, "any").isSuccess ());
+      // May fail
+      aUserMgr.createUser (sOwner1ID, "any");
     }
     catch (final PersistenceException ex)
     {
