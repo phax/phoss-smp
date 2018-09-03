@@ -127,7 +127,10 @@ public final class XMLUserManager implements ISMPUserManager
   @Nonnull
   public XMLDataUser createPreAuthenticatedUser (@Nonnull @Nonempty final String sUserName)
   {
-    return new XMLDataUser (PhotonSecurityManager.getUserMgr ().getUserOfLoginName (sUserName));
+    final IUser aUser = PhotonSecurityManager.getUserMgr ().getUserOfLoginName (sUserName);
+    if (aUser == null)
+      throw new IllegalArgumentException ("Failed to resolve user of login name '" + sUserName + "'");
+    return new XMLDataUser (aUser);
   }
 
   @Nonnull
@@ -138,9 +141,7 @@ public final class XMLUserManager implements ISMPUserManager
     final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
                                                          .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
-    {
       throw new SMPNotFoundException ("Service group " + aServiceGroupID.getURIEncoded () + " does not exist");
-    }
 
     // Resolve user
     final String sOwnerID = aServiceGroup.getOwnerID ();

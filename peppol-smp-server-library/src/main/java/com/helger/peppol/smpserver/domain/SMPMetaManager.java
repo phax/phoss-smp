@@ -127,6 +127,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     }
   }
 
+  @SuppressWarnings ("null")
   @Override
   protected void onAfterInstantiation (@Nonnull final IScope aScope)
   {
@@ -148,7 +149,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
           m_aIdentifierFactory = BDXRIdentifierFactory.INSTANCE;
           break;
         default:
-          throw new IllegalStateException ("Failed to determine iddentifier types!");
+          throw new IllegalStateException ("Unsupporeted identifier type " + eIdentifierType + "!");
       }
 
       // Initialize first because the service group manager initializes the

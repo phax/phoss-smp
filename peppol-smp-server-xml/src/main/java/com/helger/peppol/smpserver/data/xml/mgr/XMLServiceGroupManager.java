@@ -134,7 +134,7 @@ public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <
     final SMPServiceGroup aSMPServiceGroup = getOfID (sSMPServiceGroupID);
     if (aSMPServiceGroup == null)
     {
-      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, sSMPServiceGroupID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "no-such-id", sSMPServiceGroupID);
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("updateSMPServiceGroup - failure");
       return EChange.UNCHANGED;

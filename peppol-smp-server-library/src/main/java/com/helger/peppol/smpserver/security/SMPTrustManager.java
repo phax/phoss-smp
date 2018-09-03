@@ -54,7 +54,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
     s_sInitError = sInitError;
   }
 
-  private void _loadCertificates () throws InitializationException
+  private void _loadCertificates ()
   {
     // Reset every time
     _setCertValid (false);
