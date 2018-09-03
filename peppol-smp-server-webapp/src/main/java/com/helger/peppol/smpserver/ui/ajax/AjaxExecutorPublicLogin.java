@@ -56,9 +56,10 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor
     final String sPassword = aLEC.params ().getAsString (CLogin.REQUEST_ATTR_PASSWORD);
 
     // Main login
-    final ELoginResult eLoginResult = LoggedInUserManager.getInstance ().loginUser (sLoginName,
-                                                                                    sPassword,
-                                                                                    CApp.REQUIRED_ROLE_IDS_VIEW);
+    final ELoginResult eLoginResult = LoggedInUserManager.getInstance ()
+                                                         .loginUser (sLoginName,
+                                                                     sPassword,
+                                                                     CApp.REQUIRED_ROLE_IDS_VIEW);
     if (eLoginResult.isSuccess ())
     {
       aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, true));
@@ -67,7 +68,8 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor
 
     // Get the rendered content of the menu area
     if (GlobalDebug.isDebugMode ())
-      LOGGER.warn ("Login of '" + sLoginName + "' failed because " + eLoginResult);
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn ("Login of '" + sLoginName + "' failed because " + eLoginResult);
 
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IHCNode aRoot = new BootstrapErrorBox ().addChild (EPhotonCoreText.LOGIN_ERROR_MSG.getDisplayText (aDisplayLocale) +

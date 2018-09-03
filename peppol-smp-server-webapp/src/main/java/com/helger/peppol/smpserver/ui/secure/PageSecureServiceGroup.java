@@ -141,13 +141,13 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
           aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier ());
         }
-        catch (final Throwable t)
+        catch (final Exception ex)
         {
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error deleting the SMP ServiceGroup for participant '" +
                                                                             aSelectedObject.getParticpantIdentifier ()
                                                                                            .getURIEncoded () +
                                                                             "'. Technical details: " +
-                                                                            t.getMessage ()));
+                                                                            ex.getMessage ()));
         }
         aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
                                                                             aSelectedObject.getParticpantIdentifier ()

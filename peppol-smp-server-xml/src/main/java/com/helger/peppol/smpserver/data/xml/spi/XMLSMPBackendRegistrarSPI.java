@@ -33,6 +33,6 @@ public final class XMLSMPBackendRegistrarSPI implements ISMPBackendRegistrarSPI
 {
   public void registerSMPBackend (@Nonnull final ISMPBackendRegistry aRegistry)
   {
-    aRegistry.registerSMPBackend ("xml", () -> new XMLManagerProvider ());
+    aRegistry.registerSMPBackend ("xml", XMLManagerProvider::new);
   }
 }

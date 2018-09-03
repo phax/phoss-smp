@@ -100,7 +100,9 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
       InternalErrorSettings.setSMTPReceiverAddresses (new EmailAddress (sReceiverAddress, sReceiverName));
       InternalErrorSettings.setSMTPSettings (aSMTPSettings);
       InternalErrorSettings.setFallbackLocale (CApp.DEFAULT_LOCALE);
-      LOGGER.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);
+
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);
     }
   }
 }

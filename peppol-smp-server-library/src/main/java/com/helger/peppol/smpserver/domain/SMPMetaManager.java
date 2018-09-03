@@ -85,10 +85,13 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       LOGGER.warn ("Setting the manager provider after singleton instantiation may not have the desired effect.");
 
     s_aManagerProvider = aManagerProvider;
-    if (aManagerProvider == null)
-      LOGGER.info ("Using no backend manager provider");
-    else
-      LOGGER.info ("Using " + aManagerProvider + " as the backend manager provider");
+    if (LOGGER.isInfoEnabled ())
+    {
+      if (aManagerProvider == null)
+        LOGGER.info ("Using no backend manager provider");
+      else
+        LOGGER.info ("Using " + aManagerProvider + " as the backend manager provider");
+    }
   }
 
   /**
@@ -113,6 +116,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       // If service group is deleted, also delete respective business card
       m_aServiceGroupMgr.serviceGroupCallbacks ().add (new ISMPServiceGroupCallback ()
       {
+        @Override
         public void onSMPServiceGroupDeleted (@Nonnull final String sServiceGroupID)
         {
           final ISMPBusinessCard aBusinessCard = m_aBusinessCardMgr.getSMPBusinessCardOfID (sServiceGroupID);

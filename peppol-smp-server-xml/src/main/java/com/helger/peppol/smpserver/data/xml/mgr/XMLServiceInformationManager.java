@@ -296,7 +296,7 @@ public final class XMLServiceInformationManager extends
     if (aServiceGroup != null)
     {
       findAllMapped (aSI -> aSI.getServiceGroupID ().equals (aServiceGroup.getID ()),
-                     aSI -> aSI.getDocumentTypeIdentifier (),
+                     ISMPServiceInformation::getDocumentTypeIdentifier,
                      ret::add);
     }
     return ret;

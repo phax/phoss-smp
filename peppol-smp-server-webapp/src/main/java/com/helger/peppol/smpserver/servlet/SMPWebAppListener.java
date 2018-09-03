@@ -119,7 +119,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                           "' is not valid when used as a DNS name. It must match the regular expression '" +
                                           CApp.PATTERN_SMP_ID +
                                           "'!");
-    LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
   }
 
   @Override

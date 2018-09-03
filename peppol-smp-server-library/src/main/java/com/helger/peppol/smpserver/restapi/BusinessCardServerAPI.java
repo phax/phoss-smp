@@ -66,7 +66,8 @@ public final class BusinessCardServerAPI
   @Nonnull
   public PD1BusinessCardType getBusinessCard (final String sServiceGroupID) throws Throwable
   {
-    LOGGER.info (LOG_PREFIX + "GET /businesscard/" + sServiceGroupID);
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (LOG_PREFIX + "GET /businesscard/" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("getBusinessCard");
 
     try
@@ -103,20 +104,22 @@ public final class BusinessCardServerAPI
                                         m_aAPIProvider.getCurrentURI ());
       }
 
-      LOGGER.info (LOG_PREFIX + "Finished getBusinessCard(" + sServiceGroupID + ")");
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info (LOG_PREFIX + "Finished getBusinessCard(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("getBusinessCard");
       return aBusinessCard.getAsJAXBObject ();
     }
-    catch (final Throwable t)
+    catch (final Exception ex)
     {
-      LOGGER.warn (LOG_PREFIX +
-                   "Error in getBusinessCard(" +
-                   sServiceGroupID +
-                   ") - " +
-                   ClassHelper.getClassLocalName (t) +
-                   " - " +
-                   t.getMessage ());
-      throw t;
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn (LOG_PREFIX +
+                     "Error in getBusinessCard(" +
+                     sServiceGroupID +
+                     ") - " +
+                     ClassHelper.getClassLocalName (ex) +
+                     " - " +
+                     ex.getMessage ());
+      throw ex;
     }
   }
 
@@ -125,7 +128,8 @@ public final class BusinessCardServerAPI
                                       @Nonnull final PDBusinessCard aBusinessCard,
                                       @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    LOGGER.info (LOG_PREFIX + "PUT /businesscard/" + sServiceGroupID + " ==> " + aBusinessCard);
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (LOG_PREFIX + "PUT /businesscard/" + sServiceGroupID + " ==> " + aBusinessCard);
     s_aStatsCounterInvocation.increment ("createBusinessCard");
 
     try
@@ -180,32 +184,40 @@ public final class BusinessCardServerAPI
         aEntities.add (SMPBusinessCardEntity.createFromGenericObject (aEntity));
       if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aEntities) == null)
       {
-        LOGGER.error (LOG_PREFIX +
-                      "Finished createBusinessCard(" +
-                      sServiceGroupID +
-                      "," +
-                      aBusinessCard +
-                      ") - failure");
+        if (LOGGER.isErrorEnabled ())
+          LOGGER.error (LOG_PREFIX +
+                        "Finished createBusinessCard(" +
+                        sServiceGroupID +
+                        "," +
+                        aBusinessCard +
+                        ") - failure");
         s_aStatsCounterError.increment ("createBusinessCard");
         return ESuccess.FAILURE;
       }
 
-      LOGGER.info (LOG_PREFIX + "Finished createBusinessCard(" + sServiceGroupID + "," + aBusinessCard + ") - success");
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info (LOG_PREFIX +
+                     "Finished createBusinessCard(" +
+                     sServiceGroupID +
+                     "," +
+                     aBusinessCard +
+                     ") - success");
       s_aStatsCounterSuccess.increment ("createBusinessCard");
       return ESuccess.SUCCESS;
     }
-    catch (final Throwable t)
+    catch (final Exception ex)
     {
-      LOGGER.warn (LOG_PREFIX +
-                   "Error in createBusinessCard(" +
-                   sServiceGroupID +
-                   "," +
-                   aBusinessCard +
-                   ") - " +
-                   ClassHelper.getClassLocalName (t) +
-                   " - " +
-                   t.getMessage ());
-      throw t;
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn (LOG_PREFIX +
+                     "Error in createBusinessCard(" +
+                     sServiceGroupID +
+                     "," +
+                     aBusinessCard +
+                     ") - " +
+                     ClassHelper.getClassLocalName (ex) +
+                     " - " +
+                     ex.getMessage ());
+      throw ex;
     }
   }
 
@@ -225,7 +237,8 @@ public final class BusinessCardServerAPI
   public ESuccess deleteBusinessCard (@Nonnull final String sServiceGroupID,
                                       @Nonnull final BasicAuthClientCredentials aCredentials) throws Throwable
   {
-    LOGGER.info (LOG_PREFIX + "DELETE /businesscard/" + sServiceGroupID);
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (LOG_PREFIX + "DELETE /businesscard/" + sServiceGroupID);
     s_aStatsCounterInvocation.increment ("deleteBusinessCard");
 
     try
@@ -235,7 +248,8 @@ public final class BusinessCardServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        LOGGER.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
+        if (LOGGER.isInfoEnabled ())
+          LOGGER.info (LOG_PREFIX + "Failed to parse participant identifier '" + sServiceGroupID + "'");
         return ESuccess.FAILURE;
       }
 
@@ -258,25 +272,28 @@ public final class BusinessCardServerAPI
       }
 
       if (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard).isUnchanged ())
-        LOGGER.error ("Internal error deleting SMP business card " +
-                      aBusinessCard.toString () +
-                      " from " +
-                      sServiceGroupID);
+        if (LOGGER.isErrorEnabled ())
+          LOGGER.error ("Internal error deleting SMP business card " +
+                        aBusinessCard.toString () +
+                        " from " +
+                        sServiceGroupID);
 
-      LOGGER.info (LOG_PREFIX + "Finished deleteBusinessCard(" + sServiceGroupID + ")");
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info (LOG_PREFIX + "Finished deleteBusinessCard(" + sServiceGroupID + ")");
       s_aStatsCounterSuccess.increment ("deleteBusinessCard");
       return ESuccess.SUCCESS;
     }
-    catch (final Throwable t)
+    catch (final Exception ex)
     {
-      LOGGER.warn (LOG_PREFIX +
-                   "Error in deleteBusinessCard(" +
-                   sServiceGroupID +
-                   ") - " +
-                   ClassHelper.getClassLocalName (t) +
-                   " - " +
-                   t.getMessage ());
-      throw t;
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn (LOG_PREFIX +
+                     "Error in deleteBusinessCard(" +
+                     sServiceGroupID +
+                     ") - " +
+                     ClassHelper.getClassLocalName (ex) +
+                     " - " +
+                     ex.getMessage ());
+      throw ex;
     }
   }
 
@@ -296,5 +313,14 @@ public final class BusinessCardServerAPI
   public static IStatisticsHandlerKeyedCounter getSuccessCounter ()
   {
     return s_aStatsCounterSuccess;
+  }
+
+  /**
+   * @return The statistics data with the error invocation counter.
+   */
+  @Nonnull
+  public static IStatisticsHandlerKeyedCounter getErrorCounter ()
+  {
+    return s_aStatsCounterError;
   }
 }

@@ -319,12 +319,13 @@ public final class BDXRServerAPI
       else
         if (aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aServiceGroupID, sExtension) == null)
         {
-          LOGGER.error (LOG_PREFIX +
-                        "Finished saveServiceGroup(" +
-                        sServiceGroupID +
-                        "," +
-                        aServiceGroup +
-                        ") - failure");
+          if (LOGGER.isErrorEnabled ())
+            LOGGER.error (LOG_PREFIX +
+                          "Finished saveServiceGroup(" +
+                          sServiceGroupID +
+                          "," +
+                          aServiceGroup +
+                          ") - failure");
           s_aStatsCounterError.increment ("saveServiceGroup");
           return ESuccess.FAILURE;
         }
@@ -574,14 +575,15 @@ public final class BDXRServerAPI
                                                     BDXRExtensionConverter.convertToString (aServiceMetadata.getRedirect ()
                                                                                                             .getExtension ())) == null)
         {
-          LOGGER.error (LOG_PREFIX +
-                        "Finished saveServiceRegistration(" +
-                        sServiceGroupID +
-                        "," +
-                        sDocumentTypeID +
-                        "," +
-                        aServiceMetadata +
-                        ") - Redirect - failure");
+          if (LOGGER.isErrorEnabled ())
+            LOGGER.error (LOG_PREFIX +
+                          "Finished saveServiceRegistration(" +
+                          sServiceGroupID +
+                          "," +
+                          sDocumentTypeID +
+                          "," +
+                          aServiceMetadata +
+                          ") - Redirect - failure");
           s_aStatsCounterError.increment ("saveServiceRegistration");
           return ESuccess.FAILURE;
         }
@@ -624,14 +626,15 @@ public final class BDXRServerAPI
                                                                                                                                            .getExtension ())))
                            .isFailure ())
         {
-          LOGGER.error (LOG_PREFIX +
-                        "Finished saveServiceRegistration(" +
-                        sServiceGroupID +
-                        "," +
-                        sDocumentTypeID +
-                        "," +
-                        aServiceMetadata +
-                        ") - ServiceInformation - failure");
+          if (LOGGER.isErrorEnabled ())
+            LOGGER.error (LOG_PREFIX +
+                          "Finished saveServiceRegistration(" +
+                          sServiceGroupID +
+                          "," +
+                          sDocumentTypeID +
+                          "," +
+                          aServiceMetadata +
+                          ") - ServiceInformation - failure");
           s_aStatsCounterError.increment ("saveServiceRegistration");
           return ESuccess.FAILURE;
         }
@@ -797,5 +800,14 @@ public final class BDXRServerAPI
   public static IStatisticsHandlerKeyedCounter getSuccessCounter ()
   {
     return s_aStatsCounterSuccess;
+  }
+
+  /**
+   * @return The statistics data with the error invocation counter.
+   */
+  @Nonnull
+  public static IStatisticsHandlerKeyedCounter getErrorCounter ()
+  {
+    return s_aStatsCounterError;
   }
 }
