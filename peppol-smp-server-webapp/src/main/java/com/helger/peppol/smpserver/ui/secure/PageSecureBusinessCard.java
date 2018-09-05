@@ -32,8 +32,6 @@ import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.debug.GlobalDebug;
-import com.helger.commons.error.IError;
-import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.locale.country.CountryCache;
 import com.helger.commons.regex.RegExHelper;
@@ -75,8 +73,8 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
+import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
-import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
@@ -86,7 +84,6 @@ import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.button.EBootstrapButtonSize;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap3.form.BootstrapHelpBlock;
 import com.helger.photon.bootstrap3.form.BootstrapViewForm;
 import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageActionHandler;
 import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
@@ -591,19 +588,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
   }
 
-  @Nullable
-  public static IHCNode createStandaloneError (@Nullable final IErrorList aFormErrors,
-                                               @Nonnull final Locale aDisplayLocale)
-  {
-    if (aFormErrors == null || aFormErrors.isEmpty ())
-      return null;
-
-    final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.HAS_ERROR);
-    for (final IError aError : aFormErrors)
-      aDiv.addChild (new BootstrapHelpBlock ().addChild (aError.getErrorText (aDisplayLocale)));
-    return aDiv;
-  }
-
   @Nonnull
   private static HCRow _createIdentifierInputForm (@Nonnull final ILayoutExecutionContext aLEC,
                                                    @Nonnull final String sEntityID,
@@ -628,7 +612,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     aRow.addCell (new HCEdit (new RequestField (sFieldScheme,
                                                 aExistingIdentifier == null ? null : aExistingIdentifier.getScheme ()))
                                                                                                                        .setPlaceholder ("Identifier scheme"),
-                  createStandaloneError (aFormErrors.getListOfField (sFieldScheme), aDisplayLocale));
+                  AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldScheme), aDisplayLocale));
 
     // Identifier Value
     final String sFieldValue = RequestParamMap.getFieldName (PREFIX_ENTITY,
@@ -639,7 +623,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     aRow.addCell (new HCEdit (new RequestField (sFieldValue,
                                                 aExistingIdentifier == null ? null : aExistingIdentifier.getValue ()))
                                                                                                                       .setPlaceholder ("Identifier value"),
-                  createStandaloneError (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
+                  AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
                                                                  .setOnClick (JQuery.idRef (aRow).remove ()));
@@ -672,7 +656,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aRow.addCell (new HCEdit (new RequestField (sFieldType,
                                                   aExistingContact == null ? null : aExistingContact.getType ()))
                                                                                                                  .setPlaceholder ("Contact type"),
-                    createStandaloneError (aFormErrors.getListOfField (sFieldType), aDisplayLocale));
+                    AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldType), aDisplayLocale));
     }
 
     // Name
@@ -685,7 +669,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aRow.addCell (new HCEdit (new RequestField (sFieldName,
                                                   aExistingContact == null ? null : aExistingContact.getName ()))
                                                                                                                  .setPlaceholder ("Contact name"),
-                    createStandaloneError (aFormErrors.getListOfField (sFieldName), aDisplayLocale));
+                    AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldName), aDisplayLocale));
     }
 
     // Phone number
@@ -698,7 +682,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aRow.addCell (new HCEdit (new RequestField (sFieldPhone,
                                                   aExistingContact == null ? null : aExistingContact.getPhoneNumber ()))
                                                                                                                         .setPlaceholder ("Contact phone number"),
-                    createStandaloneError (aFormErrors.getListOfField (sFieldPhone), aDisplayLocale));
+                    AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldPhone), aDisplayLocale));
     }
 
     // Email address
@@ -711,7 +695,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aRow.addCell (new HCEdit (new RequestField (sFieldEmail,
                                                   aExistingContact == null ? null : aExistingContact.getEmail ()))
                                                                                                                   .setPlaceholder ("Contact email address"),
-                    createStandaloneError (aFormErrors.getListOfField (sFieldEmail), aDisplayLocale));
+                    AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldEmail), aDisplayLocale));
     }
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)

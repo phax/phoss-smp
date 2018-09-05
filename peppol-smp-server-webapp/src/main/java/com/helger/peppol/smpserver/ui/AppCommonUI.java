@@ -36,6 +36,8 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
+import com.helger.commons.error.IError;
+import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.IHCNode;
@@ -64,10 +66,12 @@ import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.peppol.smpserver.ui.ajax.CAjax;
+import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap3.ext.BootstrapSystemMessage;
 import com.helger.photon.bootstrap3.form.BootstrapForm;
 import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap3.form.BootstrapHelpBlock;
 import com.helger.photon.bootstrap3.form.EBootstrapFormType;
 import com.helger.photon.bootstrap3.label.BootstrapLabel;
 import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
@@ -343,5 +347,18 @@ public final class AppCommonUI
       aNL.addChild (new HCPrismJS (EPrismLanguage.MARKUP).addChild (sXML));
     }
     return aNL;
+  }
+
+  @Nullable
+  public static IHCNode createStandaloneError (@Nullable final IErrorList aFormErrors,
+                                               @Nonnull final Locale aDisplayLocale)
+  {
+    if (aFormErrors == null || aFormErrors.isEmpty ())
+      return null;
+
+    final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.HAS_ERROR);
+    for (final IError aError : aFormErrors)
+      aDiv.addChild (new BootstrapHelpBlock ().addChild (aError.getErrorText (aDisplayLocale)));
+    return aDiv;
   }
 }
