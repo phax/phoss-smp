@@ -75,9 +75,6 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
-import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorSecureCreateBusinessCardContactInput;
-import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorSecureCreateBusinessCardIdentifierInput;
-import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
@@ -99,6 +96,7 @@ import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap3.uictrls.datetimepicker.BootstrapDateTimePicker;
 import com.helger.photon.core.PhotonUnifiedResponse;
+import com.helger.photon.core.ajax.decl.AjaxFunctionDeclaration;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
@@ -140,6 +138,52 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   private static final String SUFFIX_REG_DATE = "regdate";
   private static final String TMP_ID_PREFIX = "tmp";
   private static final String ACTION_PUBLISH_TO_INDEXER = "publishtoindexer";
+
+  private static final String PARAM_ENTITY_ID = "entityid";
+
+  private static AjaxFunctionDeclaration s_aAjaxCreateEntity;
+  private static AjaxFunctionDeclaration s_aAjaxCreateContact;
+  private static AjaxFunctionDeclaration s_aAjaxCreateIdentifier;
+
+  static
+  {
+    s_aAjaxCreateEntity = addAjax ( (aRequestScope, aAjaxResponse) -> {
+      final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
+      final IHCNode aNode = _createEntityInputForm (aLEC,
+                                                    (SMPBusinessCardEntity) null,
+                                                    (String) null,
+                                                    new FormErrorList ());
+
+      // Build the HTML response
+      aAjaxResponse.html (aNode);
+    });
+    s_aAjaxCreateContact = addAjax ( (aRequestScope, aAjaxResponse) -> {
+      final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
+      final String sEntityID = aRequestScope.params ().getAsString (PARAM_ENTITY_ID);
+
+      final IHCNode aNode = _createContactInputForm (aLEC,
+                                                     sEntityID,
+                                                     (SMPBusinessCardContact) null,
+                                                     (String) null,
+                                                     new FormErrorList ());
+
+      // Build the HTML response
+      aAjaxResponse.html (aNode);
+    });
+    s_aAjaxCreateIdentifier = addAjax ( (aRequestScope, aAjaxResponse) -> {
+      final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
+      final String sEntityID = aRequestScope.params ().getAsString (PARAM_ENTITY_ID);
+
+      final IHCNode aNode = _createIdentifierInputForm (aLEC,
+                                                        sEntityID,
+                                                        (SMPBusinessCardIdentifier) null,
+                                                        (String) null,
+                                                        new FormErrorList ());
+
+      // Build the HTML response
+      aAjaxResponse.html (aNode);
+    });
+  }
 
   public PageSecureBusinessCard (@Nonnull @Nonempty final String sID)
   {
@@ -561,11 +605,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Nonnull
-  public static HCRow createIdentifierInputForm (@Nonnull final ILayoutExecutionContext aLEC,
-                                                 @Nonnull final String sEntityID,
-                                                 @Nullable final SMPBusinessCardIdentifier aExistingIdentifier,
-                                                 @Nullable final String sExistingID,
-                                                 @Nonnull final FormErrorList aFormErrors)
+  private static HCRow _createIdentifierInputForm (@Nonnull final ILayoutExecutionContext aLEC,
+                                                   @Nonnull final String sEntityID,
+                                                   @Nullable final SMPBusinessCardIdentifier aExistingIdentifier,
+                                                   @Nullable final String sExistingID,
+                                                   @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sIdentifierID = aExistingIdentifier != null ? aExistingIdentifier.getID ()
@@ -604,11 +648,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Nonnull
-  public static HCRow createContactInputForm (@Nonnull final ILayoutExecutionContext aLEC,
-                                              @Nonnull final String sEntityID,
-                                              @Nullable final SMPBusinessCardContact aExistingContact,
-                                              @Nullable final String sExistingID,
-                                              @Nonnull final FormErrorList aFormErrors)
+  private static HCRow _createContactInputForm (@Nonnull final ILayoutExecutionContext aLEC,
+                                                @Nonnull final String sEntityID,
+                                                @Nullable final SMPBusinessCardContact aExistingContact,
+                                                @Nullable final String sExistingID,
+                                                @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sContactID = aExistingContact != null ? aExistingContact.getID ()
@@ -677,10 +721,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Nonnull
-  public static IHCNode createEntityInputForm (@Nonnull final LayoutExecutionContext aLEC,
-                                               @Nullable final SMPBusinessCardEntity aExistingEntity,
-                                               @Nullable final String sExistingID,
-                                               @Nonnull final FormErrorList aFormErrors)
+  private static IHCNode _createEntityInputForm (@Nonnull final LayoutExecutionContext aLEC,
+                                                 @Nullable final SMPBusinessCardEntity aExistingEntity,
+                                                 @Nullable final String sExistingID,
+                                                 @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -733,7 +777,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         // Re-show of form
         for (final String sIdentifierRowID : aIdentifiers.keySet ())
-          aTable.addBodyRow (createIdentifierInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
+          aTable.addBodyRow (_createIdentifierInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
       }
       else
       {
@@ -741,7 +785,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         {
           // add all existing stored entities
           for (final SMPBusinessCardIdentifier aIdentifier : aExistingEntity.getIdentifiers ())
-            aTable.addBodyRow (createIdentifierInputForm (aLEC, sEntityID, aIdentifier, (String) null, aFormErrors));
+            aTable.addBodyRow (_createIdentifierInputForm (aLEC, sEntityID, aIdentifier, (String) null, aFormErrors));
         }
       }
 
@@ -753,9 +797,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                              .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT.getInvocationURL (aRequestScope)
-                                                                                                      .add (AjaxExecutorSecureCreateBusinessCardIdentifierInput.PARAM_ENTITY_ID,
-                                                                                                            sEntityID))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (s_aAjaxCreateIdentifier.getInvocationURL (aRequestScope)
+                                                                         .add (PARAM_ENTITY_ID, sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());
@@ -795,7 +838,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         // Re-show of form
         for (final String sIdentifierRowID : aContacts.keySet ())
-          aTable.addBodyRow (createContactInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
+          aTable.addBodyRow (_createContactInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
       }
       else
       {
@@ -803,7 +846,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         {
           // add all existing stored entities
           for (final SMPBusinessCardContact aContact : aExistingEntity.getContacts ())
-            aTable.addBodyRow (createContactInputForm (aLEC, sEntityID, aContact, (String) null, aFormErrors));
+            aTable.addBodyRow (_createContactInputForm (aLEC, sEntityID, aContact, (String) null, aFormErrors));
         }
       }
 
@@ -815,9 +858,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                              .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT.getInvocationURL (aRequestScope)
-                                                                                                   .add (AjaxExecutorSecureCreateBusinessCardContactInput.PARAM_ENTITY_ID,
-                                                                                                         sEntityID))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (s_aAjaxCreateContact.getInvocationURL (aRequestScope)
+                                                                      .add (PARAM_ENTITY_ID, sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());
@@ -888,7 +930,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     {
       // Re-show of form
       for (final String sEntityRowID : aEntities.keySet ())
-        aEntityContainer.addChild (createEntityInputForm (aWPEC, null, sEntityRowID, aFormErrors));
+        aEntityContainer.addChild (_createEntityInputForm (aWPEC, null, sEntityRowID, aFormErrors));
     }
     else
     {
@@ -896,7 +938,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         // add all existing stored entities
         for (final SMPBusinessCardEntity aEntity : aSelectedObject.getAllEntities ())
-          aEntityContainer.addChild (createEntityInputForm (aWPEC, aEntity, (String) null, aFormErrors));
+          aEntityContainer.addChild (_createEntityInputForm (aWPEC, aEntity, (String) null, aFormErrors));
       }
     }
 
@@ -908,7 +950,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                            .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
       final JSPackage aOnAdd = new JSPackage ();
-      aOnAdd.add (new JQueryAjaxBuilder ().url (CAjax.FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT.getInvocationURL (aRequestScope))
+      aOnAdd.add (new JQueryAjaxBuilder ().url (s_aAjaxCreateEntity.getInvocationURL (aRequestScope))
                                           .data (new JSAssocArray ())
                                           .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                           .build ());

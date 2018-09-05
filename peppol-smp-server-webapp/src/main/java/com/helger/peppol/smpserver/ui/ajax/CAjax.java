@@ -48,18 +48,6 @@ public final class CAjax
                                                                               .build ();
   private static final IPredicate <? super IRequestWebScopeWithoutResponse> FILTER_LOGIN = x -> LoggedInUserManager.getInstance ()
                                                                                                                    .isUserLoggedInInCurrentSession ();
-  public static final IAjaxFunctionDeclaration FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT = AjaxFunctionDeclaration.builder ("createBusinessCardEntityInput")
-                                                                                                                   .withExecutor (AjaxExecutorSecureCreateBusinessCardEntityInput.class)
-                                                                                                                   .withFilter (FILTER_LOGIN)
-                                                                                                                   .build ();
-  public static final IAjaxFunctionDeclaration FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT = AjaxFunctionDeclaration.builder ("createBusinessCardIdentifierInput")
-                                                                                                                       .withExecutor (AjaxExecutorSecureCreateBusinessCardIdentifierInput.class)
-                                                                                                                       .withFilter (FILTER_LOGIN)
-                                                                                                                       .build ();
-  public static final IAjaxFunctionDeclaration FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT = AjaxFunctionDeclaration.builder ("createBusinessCardContactInput")
-                                                                                                                    .withExecutor (AjaxExecutorSecureCreateBusinessCardContactInput.class)
-                                                                                                                    .withFilter (FILTER_LOGIN)
-                                                                                                                    .build ();
   public static final IAjaxFunctionDeclaration FUNCTION_EXPORT_ALL_SERVICE_GROUPS = AjaxFunctionDeclaration.builder ("exportAllServiceGroups")
                                                                                                            .withExecutor (AjaxExecutorSecureExportAllServiceGroups.class)
                                                                                                            .withFilter (FILTER_LOGIN)
@@ -73,9 +61,6 @@ public final class CAjax
     aAjaxInvoker.registerFunction (DATATABLES);
     aAjaxInvoker.registerFunction (DATATABLES_I18N);
     aAjaxInvoker.registerFunction (LOGIN);
-    aAjaxInvoker.registerFunction (FUNCTION_CREATE_BUSINESS_CARD_ENTITY_INPUT);
-    aAjaxInvoker.registerFunction (FUNCTION_CREATE_BUSINESS_CARD_IDENTIFIER_INPUT);
-    aAjaxInvoker.registerFunction (FUNCTION_CREATE_BUSINESS_CARD_CONTACT_INPUT);
     aAjaxInvoker.registerFunction (FUNCTION_EXPORT_ALL_SERVICE_GROUPS);
   }
 }
