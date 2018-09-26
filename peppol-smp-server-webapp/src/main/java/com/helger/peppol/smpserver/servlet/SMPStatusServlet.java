@@ -24,6 +24,7 @@ import com.helger.xservlet.AbstractXServlet;
  * Source: https://github.com/phax/peppol-smp-server/issues/73
  *
  * @author Philip Helger
+ * @since 5.0.6
  */
 public class SMPStatusServlet extends AbstractXServlet
 {

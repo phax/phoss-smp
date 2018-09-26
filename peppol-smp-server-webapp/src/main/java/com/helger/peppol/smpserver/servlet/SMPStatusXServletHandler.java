@@ -48,6 +48,13 @@ import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.handler.simple.IXServletSimpleHandler;
 
+/**
+ * Create SMP status as JSON object. See
+ * https://github.com/phax/peppol-smp-server/wiki/Status-API for details.
+ *
+ * @author Philip Helger
+ * @since 5.0.6
+ */
 public class SMPStatusXServletHandler implements IXServletSimpleHandler
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPStatusXServletHandler.class);
