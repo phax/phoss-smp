@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>1.10.5</version>
+    <version>1.10.6</version>
   </parent>
   <artifactId>peppol-smp-server-parent-pom</artifactId>
   <version>5.0.7-SNAPSHOT</version>
@@ -79,7 +79,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>9.1.5</version>
+        <version>9.1.6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
