@@ -81,10 +81,10 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                           3),
     PEPPOL_PILOT_V3 ("PEPPOL pilot v3",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
-                     2),
+                     3),
     PEPPOL_PRODUCTION_V3 ("PEPPOL production v3",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
-                          2);
+                          3);
 
     private final String m_sName;
     private final String m_sIssuer;
@@ -211,7 +211,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                   eCert.getCertificateTreeLength () +
                                                                   " certificates but it has " +
                                                                   aChain.length +
-                                                                  " certificates. Please ensure that the respective root certificates are contained!"));
+                                                                  " certificates. Please ensure that the respective root certificates are contained correctly!"));
             }
             // else: we don't care
           }
