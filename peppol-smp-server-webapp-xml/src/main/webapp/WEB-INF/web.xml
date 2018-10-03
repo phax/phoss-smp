@@ -42,7 +42,7 @@
     </init-param>
     <init-param>
       <param-name>jersey.config.servlet.filter.staticContentRegex</param-name>
-      <param-value>/(stream|public|secure|ajax|resbundle|smp-status)/.*|/favicon.ico|/logout</param-value>
+      <param-value>/(stream|public|secure|ajax|resbundle|smp-status|error)/.*|/favicon.ico|/logout</param-value>
     </init-param>
     <init-param>
       <param-name>jersey.config.server.tracing.type</param-name>
