@@ -938,6 +938,12 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                 final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
                 final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);
                 final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
+                final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aServiceInfo.getServiceGroup ()
+                                                                                                  .getParticpantIdentifier ()
+                                                                                                  .getURIPercentEncoded () +
+                                                                                      "/services/" +
+                                                                                      aServiceInfo.getDocumentTypeIdentifier ()
+                                                                                                  .getURIPercentEncoded ());
                 aBodyRow.addCell (new HCTextNode (" "),
                                   new HCA (aEditURL).setTitle ("Edit endpoint")
                                                     .addChild (EDefaultIcon.EDIT.getAsNode ()),
@@ -946,7 +952,11 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                     .addChild (EDefaultIcon.COPY.getAsNode ()),
                                   new HCTextNode (" "),
                                   new HCA (aDeleteURL).setTitle ("Delete endpoint")
-                                                      .addChild (EDefaultIcon.DELETE.getAsNode ()));
+                                                      .addChild (EDefaultIcon.DELETE.getAsNode ()),
+                                  new HCTextNode (" "),
+                                  new HCA (aPreviewURL).setTitle ("Perform SMP query on endpoint")
+                                                       .setTargetBlank ()
+                                                       .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
               }
 
               // Show process + endpoints
@@ -1027,20 +1037,21 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
             final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
             final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);
             final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
+            final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aServiceInfo.getServiceGroup ()
+                                                                                              .getParticpantIdentifier ()
+                                                                                              .getURIPercentEncoded () +
+                                                                                  "/services/" +
+                                                                                  aServiceInfo.getDocumentTypeIdentifier ()
+                                                                                              .getURIPercentEncoded ());
             aRow.addCell (new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
                           new HCTextNode (" "),
                           new HCA (aCopyURL).setTitle ("Copy endpoint").addChild (EDefaultIcon.COPY.getAsNode ()),
                           new HCTextNode (" "),
                           new HCA (aDeleteURL).setTitle ("Delete endpoint").addChild (EDefaultIcon.DELETE.getAsNode ()),
                           new HCTextNode (" "),
-                          new HCA (LinkHelper.getURLWithServerAndContext (aServiceInfo.getServiceGroup ()
-                                                                                      .getParticpantIdentifier ()
-                                                                                      .getURIPercentEncoded () +
-                                                                          "/services/" +
-                                                                          aServiceInfo.getDocumentTypeIdentifier ()
-                                                                                      .getURIPercentEncoded ())).setTitle ("Perform SMP query on endpoint ")
-                                                                                                                .setTargetBlank ()
-                                                                                                                .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                          new HCA (aPreviewURL).setTitle ("Perform SMP query on endpoint")
+                                               .setTargetBlank ()
+                                               .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
           }
 
       final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
