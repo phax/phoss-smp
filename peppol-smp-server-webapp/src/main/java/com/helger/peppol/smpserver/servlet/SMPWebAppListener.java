@@ -23,9 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.regex.RegExHelper;
+import com.helger.network.proxy.ProxySelectorProxySettingsManager;
+import com.helger.network.proxy.settings.IProxySettings;
+import com.helger.network.proxy.settings.ProxySettingsManager;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.AppConfiguration;
@@ -218,5 +222,20 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
         }
       }
     });
+
+    // Register global proxy servers
+    ProxySelectorProxySettingsManager.setAsDefault (true);
+    final IProxySettings aProxyHttp = SMPServerConfiguration.getAsHttpProxySettings ();
+    if (aProxyHttp != null)
+      ProxySettingsManager.registerProvider ( (sProtocol,
+                                               sHost,
+                                               nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
+                                                                                   : null);
+    final IProxySettings aProxyHttps = SMPServerConfiguration.getAsHttpsProxySettings ();
+    if (aProxyHttps != null)
+      ProxySettingsManager.registerProvider ( (sProtocol,
+                                               sHost,
+                                               nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps)
+                                                                                    : null);
   }
 }
