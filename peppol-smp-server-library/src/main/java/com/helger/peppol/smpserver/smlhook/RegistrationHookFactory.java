@@ -24,8 +24,8 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 @Immutable
 public final class RegistrationHookFactory
 {
-  private static RegistrationHookDoNothing s_aDoNothing = new RegistrationHookDoNothing ();
-  private static RegistrationHookWriteToSML s_aWriteToSML = new RegistrationHookWriteToSML ();
+  private static final RegistrationHookDoNothing s_aDoNothing = new RegistrationHookDoNothing ();
+  private static final RegistrationHookWriteToSML s_aWriteToSML = new RegistrationHookWriteToSML ();
 
   private RegistrationHookFactory ()
   {}
