@@ -69,6 +69,7 @@ import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier;
+import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardName;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
@@ -307,7 +308,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
       final BootstrapViewForm aForm2 = aPanel.getBody ().addAndReturnChild (new BootstrapViewForm ());
 
-      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aEntity.getName ()));
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Name")
+                                                    .setCtrl (aEntity.names ().getFirst ().getName ()));
       aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code")
                                                     .setCtrl (CountryCache.getInstance ()
                                                                           .getCountry (aEntity.getCountryCode ())
@@ -320,26 +322,26 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Geographical information")
                                                       .setCtrl (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ())));
       }
-      if (aEntity.hasIdentifiers ())
+      if (aEntity.identifiers ().isNotEmpty ())
       {
         final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star ());
         aTable.addHeaderRow ().addCells ("Scheme", "Value");
-        for (final SMPBusinessCardIdentifier aIdentifier : aEntity.getIdentifiers ())
+        for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
           aTable.addBodyRow ().addCells (aIdentifier.getScheme (), aIdentifier.getValue ());
         aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aTable));
       }
-      if (aEntity.hasWebsiteURIs ())
+      if (aEntity.websiteURIs ().isNotEmpty ())
       {
         final HCNodeList aNL = new HCNodeList ();
-        for (final String sWebsiteURI : aEntity.getAllWebsiteURIs ())
+        for (final String sWebsiteURI : aEntity.websiteURIs ())
           aNL.addChild (new HCDiv ().addChild (HCA.createLinkedWebsite (sWebsiteURI)));
         aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs").setCtrl (aNL));
       }
-      if (aEntity.hasContacts ())
+      if (aEntity.contacts ().isNotEmpty ())
       {
         final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star (), HCCol.star (), HCCol.star ());
         aTable.addHeaderRow ().addCells ("Type", "Name", "Phone number", "Email address");
-        for (final SMPBusinessCardContact aContact : aEntity.getContacts ())
+        for (final SMPBusinessCardContact aContact : aEntity.contacts ())
         {
           final HCRow aBodyRow = aTable.addBodyRow ();
           aBodyRow.addCells (aContact.getType (), aContact.getName (), aContact.getPhoneNumber ());
@@ -559,12 +561,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
           final boolean bIsNewEntity = sEntityRowID.startsWith (TMP_ID_PREFIX);
           final SMPBusinessCardEntity aEntity = bIsNewEntity ? new SMPBusinessCardEntity ()
                                                              : new SMPBusinessCardEntity (sEntityRowID);
-          aEntity.setName (sEntityName);
+          aEntity.names ().add (new SMPBusinessCardName (sEntityName, null));
           aEntity.setCountryCode (sCountryCode);
           aEntity.setGeographicalInformation (sGeoInfo);
-          aEntity.setIdentifiers (aSMPIdentifiers);
-          aEntity.setWebsiteURIs (aWebsiteURIs);
-          aEntity.setContacts (aSMPContacts);
+          aEntity.identifiers ().setAll (aSMPIdentifiers);
+          aEntity.websiteURIs ().setAll (aWebsiteURIs);
+          aEntity.contacts ().setAll (aSMPContacts);
           aEntity.setAdditionalInformation (sAdditionalInfo);
           aEntity.setRegistrationDate (aRegDate);
           aSMPEntities.add (aEntity);
@@ -574,7 +576,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     if (aFormErrors.isEmpty ())
     {
       // Store in a consistent manner
-      aSMPEntities.sort ( (o1, o2) -> o1.getName ().compareToIgnoreCase (o2.getName ()));
+      aSMPEntities.sort ( (o1, o2) -> o1.names ()
+                                        .getFirst ()
+                                        .getName ()
+                                        .compareToIgnoreCase (o2.names ().getFirst ().getName ()));
       if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities) != null)
         aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
                                                                             aServiceGroup.getID () +
@@ -727,7 +732,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Name")
                                                  .setCtrl (new HCEdit (new RequestField (sFieldName,
                                                                                          aExistingEntity == null ? null
-                                                                                                                 : aExistingEntity.getName ())))
+                                                                                                                 : aExistingEntity.names ()
+                                                                                                                                  .getFirst ()
+                                                                                                                                  .getName ())))
                                                  .setErrorList (aFormErrors.getListOfField (sFieldName)));
 
     final String sFieldCountryCode = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_COUNTRY_CODE);
@@ -768,7 +775,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         if (aExistingEntity != null)
         {
           // add all existing stored entities
-          for (final SMPBusinessCardIdentifier aIdentifier : aExistingEntity.getIdentifiers ())
+          for (final SMPBusinessCardIdentifier aIdentifier : aExistingEntity.identifiers ())
             aTable.addBodyRow (_createIdentifierInputForm (aLEC, sEntityID, aIdentifier, (String) null, aFormErrors));
         }
       }
@@ -801,7 +808,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                  .setCtrl (new HCTextAreaAutosize (new RequestField (sFieldWebsiteURIs,
                                                                                                      aExistingEntity == null ? null
                                                                                                                              : StringHelper.getImploded ('\n',
-                                                                                                                                                         aExistingEntity.getAllWebsiteURIs ()))))
+                                                                                                                                                         aExistingEntity.websiteURIs ()))))
                                                  .setHelpText ("Put each Website URI in a separate line")
                                                  .setErrorList (aFormErrors.getListOfField (sFieldWebsiteURIs)));
 
@@ -829,7 +836,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         if (aExistingEntity != null)
         {
           // add all existing stored entities
-          for (final SMPBusinessCardContact aContact : aExistingEntity.getContacts ())
+          for (final SMPBusinessCardContact aContact : aExistingEntity.contacts ())
             aTable.addBodyRow (_createContactInputForm (aLEC, sEntityID, aContact, (String) null, aFormErrors));
         }
       }
@@ -1026,14 +1033,14 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         {
           final HCRow aRow = aTable.addBodyRow ();
           aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-          aRow.addCell (aEntity.getName ());
+          aRow.addCell (aEntity.names ().getFirst ().getName ());
           aRow.addCell (CountryCache.getInstance ()
                                     .getCountry (aEntity.getCountryCode ())
                                     .getDisplayCountry (aDisplayLocale));
           aRow.addCell (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ()));
           {
             final HCNodeList aIdentifiers = new HCNodeList ();
-            for (final SMPBusinessCardIdentifier aIdentifier : aEntity.getIdentifiers ())
+            for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
               aIdentifiers.addChild (new HCDiv ().addChild (aIdentifier.getScheme ())
                                                  .addChild (" - ")
                                                  .addChild (aIdentifier.getValue ()));

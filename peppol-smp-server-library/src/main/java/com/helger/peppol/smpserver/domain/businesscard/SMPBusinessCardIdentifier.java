@@ -23,8 +23,8 @@ import com.helger.commons.id.IHasID;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.pd.businesscard.generic.PDIdentifier;
-import com.helger.pd.businesscard.v1.PD1APIHelper;
-import com.helger.pd.businesscard.v1.PD1IdentifierType;
+import com.helger.pd.businesscard.v3.PD3APIHelper;
+import com.helger.pd.businesscard.v3.PD3IdentifierType;
 
 /**
  * A single business card identifier.
@@ -87,9 +87,9 @@ public class SMPBusinessCardIdentifier implements IHasID <String>, Serializable
   }
 
   @Nonnull
-  public PD1IdentifierType getAsJAXBObject ()
+  public PD3IdentifierType getAsJAXBObject ()
   {
-    return PD1APIHelper.createIdentifier (m_sScheme, m_sValue);
+    return PD3APIHelper.createIdentifier (m_sScheme, m_sValue);
   }
 
   public boolean isEqualContent (@Nullable final SMPBusinessCardIdentifier rhs)

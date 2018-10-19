@@ -48,6 +48,7 @@ import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier;
+import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardName;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 
@@ -189,15 +190,16 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
 
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
+        // Single name only
         final DBBusinessCardEntity aDBBCE = new DBBusinessCardEntity (aEntity.getID (),
                                                                       aServiceGroup.getParticpantIdentifier ()
                                                                                    .getURIEncoded (),
-                                                                      aEntity.getName (),
+                                                                      aEntity.names ().getFirst ().getName (),
                                                                       aEntity.getCountryCode (),
                                                                       aEntity.getGeographicalInformation (),
-                                                                      getBCIAsJson (aEntity.getIdentifiers ()).getAsJsonString (JWS),
-                                                                      getStringAsJson (aEntity.getAllWebsiteURIs ()).getAsJsonString (JWS),
-                                                                      getBCCAsJson (aEntity.getContacts ()).getAsJsonString (JWS),
+                                                                      getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
+                                                                      getStringAsJson (aEntity.websiteURIs ()).getAsJsonString (JWS),
+                                                                      getBCCAsJson (aEntity.contacts ()).getAsJsonString (JWS),
                                                                       aEntity.getAdditionalInformation (),
                                                                       aEntity.getRegistrationDate ());
         aEM.persist (aDBBCE);
@@ -277,12 +279,13 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     for (final DBBusinessCardEntity aDBEntity : aDBEntities)
     {
       final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aDBEntity.getId ());
-      aEntity.setName (aDBEntity.getName ());
+      // Single name only
+      aEntity.names ().add (new SMPBusinessCardName (aDBEntity.getName (), null));
       aEntity.setCountryCode (aDBEntity.getCountryCode ());
       aEntity.setGeographicalInformation (aDBEntity.getGeographicalInformation ());
-      aEntity.setIdentifiers (getJsonAsBCI (aDBEntity.getIdentifiers ()));
-      aEntity.setWebsiteURIs (getJsonAsString (aDBEntity.getWebsiteURIs ()));
-      aEntity.setContacts (getJsonAsBCC (aDBEntity.getContacts ()));
+      aEntity.identifiers ().setAll (getJsonAsBCI (aDBEntity.getIdentifiers ()));
+      aEntity.websiteURIs ().setAll (getJsonAsString (aDBEntity.getWebsiteURIs ()));
+      aEntity.contacts ().setAll (getJsonAsBCC (aDBEntity.getContacts ()));
       aEntity.setAdditionalInformation (aDBEntity.getAdditionalInformation ());
       aEntity.setRegistrationDate (aDBEntity.getRegistrationDate ());
       aEntities.add (aEntity);

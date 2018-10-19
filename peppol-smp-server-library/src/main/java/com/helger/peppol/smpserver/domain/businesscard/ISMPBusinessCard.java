@@ -12,7 +12,6 @@ package com.helger.peppol.smpserver.domain.businesscard;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.List;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -20,8 +19,9 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.id.IHasID;
-import com.helger.pd.businesscard.v1.PD1BusinessCardType;
+import com.helger.pd.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -56,7 +56,7 @@ public interface ISMPBusinessCard extends IHasID <String>, Serializable
    */
   @Nonnull
   @ReturnsMutableCopy
-  List <SMPBusinessCardEntity> getAllEntities ();
+  ICommonsList <SMPBusinessCardEntity> getAllEntities ();
 
   /**
    * @return The number of contained entities. Always &ge; 0.
@@ -69,7 +69,7 @@ public interface ISMPBusinessCard extends IHasID <String>, Serializable
    *         <code>null</code>.
    */
   @Nonnull
-  PD1BusinessCardType getAsJAXBObject ();
+  PD3BusinessCardType getAsJAXBObject ();
 
   @Nonnull
   static Comparator <ISMPBusinessCard> comparator ()

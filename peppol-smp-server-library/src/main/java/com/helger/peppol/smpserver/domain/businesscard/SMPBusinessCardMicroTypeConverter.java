@@ -24,7 +24,9 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupProvider;
 import com.helger.xml.microdom.IMicroElement;
+import com.helger.xml.microdom.IMicroQName;
 import com.helger.xml.microdom.MicroElement;
+import com.helger.xml.microdom.MicroQName;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
 
@@ -39,22 +41,24 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConverter <SMPBusinessCard>
 {
-  private static final String ATTR_SERVICE_GROUP_ID = "servicegroupid";
+  private static final IMicroQName ATTR_SERVICE_GROUP_ID = new MicroQName ("servicegroupid");
   private static final String ELEMENT_ENTITY = "entity";
-  private static final String ATTR_ID = "id";
-  private static final String ATTR_NAME = "name";
-  private static final String ATTR_COUNTRY_CODE = "country";
+  private static final IMicroQName ATTR_ID = new MicroQName ("id");
+  private static final String ELEMENT_NAME = "name";
+  private static final IMicroQName ATTR_NAME = new MicroQName ("name");
+  private static final IMicroQName ATTR_LANGUAGE_CODE = new MicroQName ("language");
+  private static final IMicroQName ATTR_COUNTRY_CODE = new MicroQName ("country");
   private static final String ELEMENT_GEOGRAPHICAL_INFORMATION = "geoinfo";
   private static final String ELEMENT_IDENTIFIER = "identifier";
-  private static final String ATTR_SCHEME = "scheme";
-  private static final String ATTR_VALUE = "value";
+  private static final IMicroQName ATTR_SCHEME = new MicroQName ("scheme");
+  private static final IMicroQName ATTR_VALUE = new MicroQName ("value");
   private static final String ELEMENT_WEBSITE_URI = "website";
   private static final String ELEMENT_CONTACT = "contact";
-  private static final String ATTR_TYPE = "type";
-  private static final String ATTR_PHONE = "phone";
-  private static final String ATTR_EMAIL = "email";
+  private static final IMicroQName ATTR_TYPE = new MicroQName ("type");
+  private static final IMicroQName ATTR_PHONE = new MicroQName ("phone");
+  private static final IMicroQName ATTR_EMAIL = new MicroQName ("email");
   private static final String ELEMENT_ADDITIONAL_INFORMATION = "additional";
-  private static final String ATTR_REGISTRATION_DATE = "regdate";
+  private static final IMicroQName ATTR_REGISTRATION_DATE = new MicroQName ("regdate");
 
   @Nonnull
   public static IMicroElement convertToMicroElement (@Nonnull final ISMPBusinessCard aValue,
@@ -69,25 +73,30 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       final IMicroElement eEntity = aElement.appendElement (sNamespaceURI, ELEMENT_ENTITY);
       if (!bManualExport)
         eEntity.setAttribute (ATTR_ID, aEntity.getID ());
-      eEntity.setAttribute (ATTR_NAME, aEntity.getName ());
+      for (final SMPBusinessCardName aItem : aEntity.names ())
+      {
+        final IMicroElement eName = eEntity.appendElement (sNamespaceURI, ELEMENT_NAME);
+        eName.setAttribute (ATTR_NAME, aItem.getName ());
+        eName.setAttribute (ATTR_LANGUAGE_CODE, aItem.getLanguageCode ());
+      }
       eEntity.setAttribute (ATTR_COUNTRY_CODE, aEntity.getCountryCode ());
       if (aEntity.hasGeographicalInformation ())
       {
         eEntity.appendElement (sNamespaceURI, ELEMENT_GEOGRAPHICAL_INFORMATION)
                .appendText (aEntity.getGeographicalInformation ());
       }
-      for (final SMPBusinessCardIdentifier aIdentifier : aEntity.getIdentifiers ())
+      for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
       {
         eEntity.appendElement (sNamespaceURI, ELEMENT_IDENTIFIER)
                .setAttribute (ATTR_ID, aIdentifier.getID ())
                .setAttribute (ATTR_SCHEME, aIdentifier.getScheme ())
                .setAttribute (ATTR_VALUE, aIdentifier.getValue ());
       }
-      for (final String sWebsiteURI : aEntity.getAllWebsiteURIs ())
+      for (final String sWebsiteURI : aEntity.websiteURIs ())
       {
         eEntity.appendElement (sNamespaceURI, ELEMENT_WEBSITE_URI).appendText (sWebsiteURI);
       }
-      for (final SMPBusinessCardContact aContact : aEntity.getContacts ())
+      for (final SMPBusinessCardContact aContact : aEntity.contacts ())
       {
         eEntity.appendElement (sNamespaceURI, ELEMENT_CONTACT)
                .setAttribute (ATTR_ID, aContact.getID ())
@@ -136,27 +145,44 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       }
 
       final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (sEntityID);
-      aEntity.setName (eEntity.getAttributeValue (ATTR_NAME));
+      final String sOldName = eEntity.getAttributeValue (ATTR_NAME);
+      if (sOldName != null)
+      {
+        // No language code
+        aEntity.names ().add (new SMPBusinessCardName (sOldName, (String) null));
+      }
+      else
+      {
+        // Multiple names with different languages
+        for (final IMicroElement eName : eEntity.getAllChildElements (ELEMENT_NAME))
+        {
+          final String sName = eName.getAttributeValue (ATTR_NAME);
+          final String sLanguageCode = eName.getAttributeValue (ATTR_LANGUAGE_CODE);
+          aEntity.names ().add (new SMPBusinessCardName (sName, sLanguageCode));
+        }
+      }
       aEntity.setCountryCode (eEntity.getAttributeValue (ATTR_COUNTRY_CODE));
       aEntity.setGeographicalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
                                                                                   ELEMENT_GEOGRAPHICAL_INFORMATION));
       for (final IMicroElement eIdentifier : eEntity.getAllChildElements (ELEMENT_IDENTIFIER))
       {
-        aEntity.addIdentifier (new SMPBusinessCardIdentifier (eIdentifier.getAttributeValue (ATTR_ID),
-                                                              eIdentifier.getAttributeValue (ATTR_SCHEME),
-                                                              eIdentifier.getAttributeValue (ATTR_VALUE)));
+        aEntity.identifiers ()
+               .add (new SMPBusinessCardIdentifier (eIdentifier.getAttributeValue (ATTR_ID),
+                                                    eIdentifier.getAttributeValue (ATTR_SCHEME),
+                                                    eIdentifier.getAttributeValue (ATTR_VALUE)));
       }
       for (final IMicroElement eWebsite : eEntity.getAllChildElements (ELEMENT_WEBSITE_URI))
       {
-        aEntity.addWebsiteURI (eWebsite.getTextContentTrimmed ());
+        aEntity.websiteURIs ().add (eWebsite.getTextContentTrimmed ());
       }
       for (final IMicroElement eContact : eEntity.getAllChildElements (ELEMENT_CONTACT))
       {
-        aEntity.addContact (new SMPBusinessCardContact (eContact.getAttributeValue (ATTR_ID),
-                                                        eContact.getAttributeValue (ATTR_TYPE),
-                                                        eContact.getAttributeValue (ATTR_NAME),
-                                                        eContact.getAttributeValue (ATTR_PHONE),
-                                                        eContact.getAttributeValue (ATTR_EMAIL)));
+        aEntity.contacts ()
+               .add (new SMPBusinessCardContact (eContact.getAttributeValue (ATTR_ID),
+                                                 eContact.getAttributeValue (ATTR_TYPE),
+                                                 eContact.getAttributeValue (ATTR_NAME),
+                                                 eContact.getAttributeValue (ATTR_PHONE),
+                                                 eContact.getAttributeValue (ATTR_EMAIL)));
       }
       aEntity.setAdditionalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
                                                                                 ELEMENT_ADDITIONAL_INFORMATION));

@@ -68,19 +68,19 @@ public final class ISMPBusinessCardManagerFuncTest
     }
 
     final SMPBusinessCardEntity aEntity1 = new SMPBusinessCardEntity ();
-    aEntity1.setName ("Test entity");
+    aEntity1.names ().add (new SMPBusinessCardName ("Test entity", null));
     aEntity1.setCountryCode ("AT");
     final SMPBusinessCardEntity aEntity2 = new SMPBusinessCardEntity ();
-    aEntity2.setName ("Test entity2");
+    aEntity2.names ().add (new SMPBusinessCardName ("Test entity2", null));
     aEntity2.setCountryCode ("AT");
     aEntity2.setGeographicalInformation ("Address here");
-    aEntity2.addIdentifier (new SMPBusinessCardIdentifier ("gln", "1234567890123"));
-    aEntity2.addWebsiteURI ("https://www.peppol-directory.org/fake");
-    aEntity2.addContact (new SMPBusinessCardContact ("support", "Unit test support", null, "support@peppol.eu"));
+    aEntity2.identifiers ().add (new SMPBusinessCardIdentifier ("gln", "1234567890123"));
+    aEntity2.websiteURIs ().add ("https://www.peppol-directory.org/fake");
+    aEntity2.contacts ().add (new SMPBusinessCardContact ("support", "Unit test support", null, "support@peppol.eu"));
     aEntity2.setAdditionalInformation ("Bla foo fasel");
     aEntity2.setRegistrationDate (PDTFactory.getCurrentLocalDate ());
     final SMPBusinessCardEntity aEntity3 = new SMPBusinessCardEntity ();
-    aEntity3.setName ("Test entity3");
+    aEntity3.names ().add (new SMPBusinessCardName ("Test entity3", null));
     aEntity3.setCountryCode ("AT");
     aEntity3.setAdditionalInformation ("Entity 3");
 

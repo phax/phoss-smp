@@ -26,7 +26,7 @@ import com.helger.commons.statistics.StatisticsManager;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.pd.businesscard.generic.PDBusinessCard;
 import com.helger.pd.businesscard.generic.PDBusinessEntity;
-import com.helger.pd.businesscard.v1.PD1BusinessCardType;
+import com.helger.pd.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -64,7 +64,7 @@ public final class BusinessCardServerAPI
   }
 
   @Nonnull
-  public PD1BusinessCardType getBusinessCard (final String sServiceGroupID) throws Throwable
+  public PD3BusinessCardType getBusinessCard (final String sServiceGroupID) throws Throwable
   {
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (LOG_PREFIX + "GET /businesscard/" + sServiceGroupID);

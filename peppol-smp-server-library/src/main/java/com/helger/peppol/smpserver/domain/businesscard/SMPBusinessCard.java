@@ -23,8 +23,8 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.pd.businesscard.v1.PD1APIHelper;
-import com.helger.pd.businesscard.v1.PD1BusinessCardType;
+import com.helger.pd.businesscard.v3.PD3APIHelper;
+import com.helger.pd.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -52,7 +52,7 @@ public class SMPBusinessCard implements ISMPBusinessCard
 
     m_aServiceGroup = aServiceGroup;
     m_sID = m_aServiceGroup.getID ();
-    m_aEntities = new CommonsArrayList<> (aEntities);
+    m_aEntities = new CommonsArrayList <> (aEntities);
   }
 
   @Nonnull
@@ -104,10 +104,10 @@ public class SMPBusinessCard implements ISMPBusinessCard
   }
 
   @Nonnull
-  public PD1BusinessCardType getAsJAXBObject ()
+  public PD3BusinessCardType getAsJAXBObject ()
   {
-    final PD1BusinessCardType ret = new PD1BusinessCardType ();
-    ret.setParticipantIdentifier (PD1APIHelper.createIdentifier (m_aServiceGroup.getParticpantIdentifier ()
+    final PD3BusinessCardType ret = new PD3BusinessCardType ();
+    ret.setParticipantIdentifier (PD3APIHelper.createIdentifier (m_aServiceGroup.getParticpantIdentifier ()
                                                                                 .getScheme (),
                                                                  m_aServiceGroup.getParticpantIdentifier ()
                                                                                 .getValue ()));

@@ -39,13 +39,16 @@ import org.w3c.dom.Document;
 
 import com.helger.commons.state.ESuccess;
 import com.helger.pd.businesscard.generic.PDBusinessCard;
-import com.helger.pd.businesscard.v1.ObjectFactory;
 import com.helger.pd.businesscard.v1.PD1APIHelper;
 import com.helger.pd.businesscard.v1.PD1BusinessCardMarshaller;
 import com.helger.pd.businesscard.v1.PD1BusinessCardType;
 import com.helger.pd.businesscard.v2.PD2APIHelper;
 import com.helger.pd.businesscard.v2.PD2BusinessCardMarshaller;
 import com.helger.pd.businesscard.v2.PD2BusinessCardType;
+import com.helger.pd.businesscard.v3.ObjectFactory;
+import com.helger.pd.businesscard.v3.PD3APIHelper;
+import com.helger.pd.businesscard.v3.PD3BusinessCardMarshaller;
+import com.helger.pd.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppol.smpserver.app.AppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
@@ -80,14 +83,14 @@ public final class BusinessCardInterface
 
   @GET
   @Produces (MediaType.TEXT_XML)
-  public JAXBElement <PD1BusinessCardType> getBusinessCard (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
+  public JAXBElement <PD3BusinessCardType> getBusinessCard (@PathParam ("ServiceGroupId") final String sServiceGroupID) throws Throwable
   {
     // Is the PEPPOL Directory integration enabled?
     if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
       LOGGER.warn ("The " +
-                      AppConfiguration.getDirectoryName () +
-                      " integration is disabled. getBusinessCard will not be executed.");
+                   AppConfiguration.getDirectoryName () +
+                   " integration is disabled. getBusinessCard will not be executed.");
       throw new WebApplicationException (404);
     }
 
@@ -95,7 +98,7 @@ public final class BusinessCardInterface
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
       // getBusinessCard throws an exception if non is found
-      final PD1BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
+      final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
       return m_aBDOF.createBusinessCard (ret);
     }
   }
@@ -128,6 +131,15 @@ public final class BusinessCardInterface
         {
           // Convert to wider format
           aBC = PD2APIHelper.createBusinessCard (aV2);
+        }
+        else
+        {
+          final PD3BusinessCardType aV3 = new PD3BusinessCardMarshaller ().read (aServiceGroupDoc);
+          if (aV3 != null)
+          {
+            // Convert to wider format
+            aBC = PD3APIHelper.createBusinessCard (aV3);
+          }
         }
       }
 
