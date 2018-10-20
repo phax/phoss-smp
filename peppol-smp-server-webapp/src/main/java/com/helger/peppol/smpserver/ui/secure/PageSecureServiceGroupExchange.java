@@ -159,85 +159,58 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         }
         return ret;
       });
-      if (aServiceGroup == null)
+      final String sServiceGroupID = aServiceGroup.getID ();
+      final boolean bIsServiceGroupContained = aAllServiceGroups.containsAny (x -> x.getID ().equals (sServiceGroupID));
+      if (!bIsServiceGroupContained || bOverwriteExisting)
       {
-        aLogger.error ("Failed to read service group at index " + nSGIndex);
+        if (aImportServiceGroups.containsKey (aServiceGroup))
+        {
+          aLogger.error ("The service group " +
+                         sServiceGroupID +
+                         " (index " +
+                         nSGIndex +
+                         ") is already contained in the file. Will overwrite the previous definition.");
+        }
+
+        // Remember to create/overwrite the service group
+        final SGImportData aSGInfo = new SGImportData ();
+        aImportServiceGroups.put (aServiceGroup, aSGInfo);
+        if (bIsServiceGroupContained)
+          aDeleteServiceGroups.add (aServiceGroup);
+        aLogger.success ("Will " +
+                         (bIsServiceGroupContained ? "overwrite" : "import") +
+                         " service group " +
+                         sServiceGroupID);
+
+        // read all contained service information
+        {
+          int nSICount = 0;
+          for (final IMicroElement eServiceInfo : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_SERVICEINFO))
+          {
+            final ISMPServiceInformation aServiceInfo = SMPServiceInformationMicroTypeConverter.convertToNative (eServiceInfo,
+                                                                                                                 x -> aServiceGroup);
+            aSGInfo.addServiceInfo (aServiceInfo);
+            ++nSICount;
+          }
+          aLogger.info ("Read " + nSICount + " service information of service group " + sServiceGroupID);
+        }
+
+        // read all contained redirects
+        {
+          int nRDCount = 0;
+          for (final IMicroElement eRedirect : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_REDIRECT))
+          {
+            final ISMPRedirect aRedirect = SMPRedirectMicroTypeConverter.convertToNative (eRedirect,
+                                                                                          x -> aServiceGroup);
+            aSGInfo.addRedirect (aRedirect);
+            ++nRDCount;
+          }
+          aLogger.info ("Read " + nRDCount + " redirects of service group " + sServiceGroupID);
+        }
       }
       else
       {
-        final String sServiceGroupID = aServiceGroup.getID ();
-        final boolean bIsServiceGroupContained = aAllServiceGroups.containsAny (x -> x.getID ()
-                                                                                      .equals (sServiceGroupID));
-        if (!bIsServiceGroupContained || bOverwriteExisting)
-        {
-          if (aImportServiceGroups.containsKey (aServiceGroup))
-          {
-            aLogger.error ("The service group " +
-                           sServiceGroupID +
-                           " is already contained in the file. Will overwrite the previous definition.");
-          }
-
-          // Remember to create/overwrite the service group
-          final SGImportData aSGInfo = new SGImportData ();
-          aImportServiceGroups.put (aServiceGroup, aSGInfo);
-          if (bIsServiceGroupContained)
-            aDeleteServiceGroups.add (aServiceGroup);
-          aLogger.success ("Will " +
-                           (bIsServiceGroupContained ? "overwrite" : "import") +
-                           " service group " +
-                           sServiceGroupID);
-
-          // read all contained service information
-          {
-            int nSIIndex = 0;
-            int nSIFound = 0;
-            for (final IMicroElement eServiceInfo : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_SERVICEINFO))
-            {
-              final ISMPServiceInformation aServiceInfo = SMPServiceInformationMicroTypeConverter.convertToNative (eServiceInfo,
-                                                                                                                   x -> aServiceGroup);
-              if (aServiceInfo == null)
-              {
-                aLogger.error ("Failed to read service group " +
-                               sServiceGroupID +
-                               " service information at index " +
-                               nSIIndex);
-              }
-              else
-              {
-                aSGInfo.addServiceInfo (aServiceInfo);
-                ++nSIFound;
-              }
-              ++nSIIndex;
-            }
-            aLogger.info ("Read " + nSIFound + " service information of service group " + sServiceGroupID);
-          }
-
-          // read all contained redirects
-          {
-            int nRDIndex = 0;
-            int nRDFound = 0;
-            for (final IMicroElement eRedirect : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_REDIRECT))
-            {
-              final ISMPRedirect aRedirect = SMPRedirectMicroTypeConverter.convertToNative (eRedirect,
-                                                                                            x -> aServiceGroup);
-              if (aRedirect == null)
-              {
-                aLogger.error ("Failed to read service group " + sServiceGroupID + " redirect at index " + nRDIndex);
-              }
-              else
-              {
-                aSGInfo.addRedirect (aRedirect);
-                ++nRDFound;
-              }
-              ++nRDIndex;
-            }
-            aLogger.info ("Read " + nRDFound + " redirects of service group " + sServiceGroupID);
-          }
-        }
-        else
-        {
-          aLogger.warn ("Ignoring already contained service group " + sServiceGroupID);
-        }
+        aLogger.warn ("Ignoring already contained service group " + sServiceGroupID);
       }
       ++nSGIndex;
     }

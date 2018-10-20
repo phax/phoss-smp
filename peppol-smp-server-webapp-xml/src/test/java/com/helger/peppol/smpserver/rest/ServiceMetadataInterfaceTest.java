@@ -436,11 +436,9 @@ public final class ServiceMetadataInterfaceTest
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
-    final ServiceMetadataType aSM = new ServiceMetadataType ();
     final RedirectType aRedir = new RedirectType ();
     aRedir.setHref ("http://other-smp.domain.xyz");
     aRedir.setCertificateUID ("APP_0000000000000");
-    aSM.setRedirect (aRedir);
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPRedirectManager aSRMgr = SMPMetaManager.getRedirectMgr ();

@@ -104,7 +104,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
       // Did not exist. Create it.
       final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantIdentifier);
-      final DBOwnership aOwnership = new DBOwnership (aDBOwnershipID, aDBUser, aDBServiceGroup);
+      final DBOwnership aOwnership = new DBOwnership (aDBOwnershipID, aDBUser, (DBServiceGroup) null);
       aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID, sExtension, aOwnership, null);
       aEM.persist (aDBServiceGroup);
       aEM.persist (aOwnership);

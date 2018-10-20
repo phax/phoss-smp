@@ -404,8 +404,8 @@ public final class ServiceMetadataInterfaceTest
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
         _testResponseJerseyClient (aResponseMsg, 200);
-        assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                     aDT));
+        assertNotNull (SMPMetaManager.getRedirectMgr ()
+                                     .getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
         // PUT 2 ServiceInformation
         aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
@@ -413,8 +413,8 @@ public final class ServiceMetadataInterfaceTest
                                                .path (sDT)
                                                .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
         _testResponseJerseyClient (aResponseMsg, 200);
-        assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                     aDT));
+        assertNotNull (SMPMetaManager.getRedirectMgr ()
+                                     .getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
         // DELETE 1 Redirect
         aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
@@ -456,11 +456,9 @@ public final class ServiceMetadataInterfaceTest
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
-    final ServiceMetadataType aSM = new ServiceMetadataType ();
     final RedirectType aRedir = new RedirectType ();
     aRedir.setHref ("http://other-smp.domain.xyz");
     aRedir.setCertificateUID ("APP_0000000000000");
-    aSM.setRedirect (aRedir);
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPRedirectManager aSRMgr = SMPMetaManager.getRedirectMgr ();
