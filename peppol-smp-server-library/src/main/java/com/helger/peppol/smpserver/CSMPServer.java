@@ -29,6 +29,7 @@ public final class CSMPServer
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
 
   private static final String VERSION_NUMBER;
+  private static final String TIMESTAMP;
 
   static
   {
@@ -38,6 +39,9 @@ public final class CSMPServer
     VERSION_NUMBER = aVersionProps.getAsString ("smp.version");
     if (VERSION_NUMBER == null)
       throw new InitializationException ("Error determining SMP version number!");
+    TIMESTAMP = aVersionProps.getAsString ("timestamp");
+    if (TIMESTAMP == null)
+      throw new InitializationException ("Error determining SMP build timestamp!");
   }
 
   private CSMPServer ()
@@ -51,5 +55,15 @@ public final class CSMPServer
   public static String getVersionNumber ()
   {
     return VERSION_NUMBER;
+  }
+
+  /**
+   * @return The build timestamp of the SMP server read from the internal
+   *         properties file. Never <code>null</code>.
+   */
+  @Nonnull
+  public static String getBuildTimestamp ()
+  {
+    return TIMESTAMP;
   }
 }

@@ -71,6 +71,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     final IJsonObject aStatusData = new JsonObject ();
     aStatusData.add ("status.datetime", PDTWebDateHelper.getAsStringXSD (PDTFactory.getCurrentZonedDateTimeUTC ()));
     aStatusData.add ("version.smp", CSMPServer.getVersionNumber ());
+    // Since 5.0.7
+    aStatusData.add ("build.timestamp", CSMPServer.getBuildTimestamp ());
     aStatusData.add ("version.java", SystemProperties.getJavaVersion ());
     aStatusData.add ("global.debug", GlobalDebug.isDebugMode ());
     aStatusData.add ("global.production", GlobalDebug.isProductionMode ());
