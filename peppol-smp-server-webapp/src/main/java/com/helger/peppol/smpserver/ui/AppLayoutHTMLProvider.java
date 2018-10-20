@@ -31,8 +31,10 @@ import com.helger.photon.basic.app.appid.RequestSettings;
 import com.helger.photon.basic.app.menu.IMenuItemPage;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
+import com.helger.photon.core.app.error.InternalErrorBuilder;
 import com.helger.photon.core.app.html.AbstractSWECHTMLProvider;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xservlet.forcedredirect.ForcedRedirectException;
 
 /**
  * Main class for creating HTML output
@@ -63,7 +65,22 @@ public class AppLayoutHTMLProvider extends AbstractSWECHTMLProvider
                                                               " - ",
                                                               aMenuItem.getDisplayText (aDisplayLocale)));
 
-    final IHCNode aNode = m_aFactory.apply (aLEC);
-    aBody.addChild (aNode);
+    try
+    {
+      final IHCNode aNode = m_aFactory.apply (aLEC);
+      aBody.addChild (aNode);
+    }
+    catch (final ForcedRedirectException ex)
+    {
+      throw ex;
+    }
+    catch (final RuntimeException ex)
+    {
+      new InternalErrorBuilder ().setDisplayLocale (aDisplayLocale)
+                                 .setRequestScope (aRequestScope)
+                                 .setThrowable (ex)
+                                 .setUIErrorHandlerFor (aBody)
+                                 .handle ();
+    }
   }
 }

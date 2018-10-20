@@ -103,6 +103,7 @@ import com.helger.photon.core.form.RequestFieldDate;
 import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.html.select.HCCountrySelect;
+import com.helger.photon.uicore.html.select.HCCountrySelect.EWithDeprecated;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.js.JSJQueryHelper;
 import com.helger.photon.uicore.page.EWebPageFormAction;
@@ -742,7 +743,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                  .setCtrl (new HCCountrySelect (new RequestField (sFieldCountryCode,
                                                                                                   aExistingEntity == null ? null
                                                                                                                           : aExistingEntity.getCountryCode ()),
-                                                                                aDisplayLocale))
+                                                                                aDisplayLocale,
+                                                                                HCCountrySelect.getAllCountries (EWithDeprecated.DEFAULT),
+                                                                                (aLocale,
+                                                                                 aContentLocale) -> aLocale.getDisplayCountry (aContentLocale) +
+                                                                                                    " (" +
+                                                                                                    aLocale.getCountry () +
+                                                                                                    ")"))
                                                  .setErrorList (aFormErrors.getListOfField (sFieldCountryCode)));
 
     final String sFieldGeoInfo = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_GEO_INFO);

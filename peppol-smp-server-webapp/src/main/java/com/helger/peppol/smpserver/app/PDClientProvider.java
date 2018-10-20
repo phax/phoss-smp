@@ -80,6 +80,7 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
         {
           // Create a new one
           m_aPDClient = new PDClient (SMPMetaManager.getSettings ().getPEPPOLDirectoryHostName ());
+          // Note: by default a logging exception handler is installed
         }
         return m_aPDClient;
       });

@@ -205,8 +205,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
           // Notify PD server: add
           PDClientProvider.getInstance ()
                           .getPDClient ()
-                          .addServiceGroupToIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ())
-                          .isSuccess ();
+                          .addServiceGroupToIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ());
         }
       }
 
@@ -217,8 +216,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
           // Notify PD server: delete
           PDClientProvider.getInstance ()
                           .getPDClient ()
-                          .deleteServiceGroupFromIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ())
-                          .isSuccess ();
+                          .deleteServiceGroupFromIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ());
         }
       }
     });

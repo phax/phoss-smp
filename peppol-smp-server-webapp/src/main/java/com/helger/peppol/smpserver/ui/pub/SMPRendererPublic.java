@@ -70,6 +70,7 @@ import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
+import com.helger.photon.core.app.error.InternalErrorBuilder;
 import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.photon.core.servlet.LogoutServlet;
@@ -80,6 +81,7 @@ import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.page.IWebPage;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xservlet.forcedredirect.ForcedRedirectException;
 import com.helger.xservlet.forcedredirect.ForcedRedirectManager;
 
 /**
@@ -251,7 +253,22 @@ public final class SMPRendererPublic
     final String sHeaderText = aDisplayPage.getHeaderText (aWPEC);
     aPageContainer.addChild (BootstrapWebPageUIHandler.INSTANCE.createPageHeader (sHeaderText));
     // Main fill content
-    aDisplayPage.getContent (aWPEC);
+    try
+    {
+      aDisplayPage.getContent (aWPEC);
+    }
+    catch (final ForcedRedirectException ex)
+    {
+      throw ex;
+    }
+    catch (final RuntimeException ex)
+    {
+      new InternalErrorBuilder ().setDisplayLocale (aWPEC.getDisplayLocale ())
+                                 .setRequestScope (aRequestScope)
+                                 .setThrowable (ex)
+                                 .setUIErrorHandlerFor (aWPEC.getNodeList ())
+                                 .handle ();
+    }
     // Add result
     aPageContainer.addChild (aWPEC.getNodeList ());
     return aPageContainer;
@@ -297,24 +314,39 @@ public final class SMPRendererPublic
     }
 
     // Content
-    if (true)
+    try
     {
-      // Show no menu
-      aOuterContainer.addChild (getPageContent (aLEC));
+      if (true)
+      {
+        // Show no menu
+        aOuterContainer.addChild (getPageContent (aLEC));
+      }
+      else
+      {
+        final BootstrapRow aRow = aOuterContainer.addAndReturnChild (new BootstrapRow ());
+        final HCDiv aCol1 = aRow.createColumn (12, 4, 4, 3);
+        final HCDiv aCol2 = aRow.createColumn (12, 8, 8, 9);
+
+        // left
+        // We need a wrapper span for easy AJAX content replacement
+        aCol1.addChild (new HCSpan ().setID (CLayout.LAYOUT_AREAID_MENU).addChild (getMenuContent (aLEC)));
+        aCol1.addChild (new HCDiv ().setID (CLayout.LAYOUT_AREAID_SPECIAL));
+
+        // content
+        aCol2.addChild (getPageContent (aLEC));
+      }
     }
-    else
+    catch (final ForcedRedirectException ex)
     {
-      final BootstrapRow aRow = aOuterContainer.addAndReturnChild (new BootstrapRow ());
-      final HCDiv aCol1 = aRow.createColumn (12, 4, 4, 3);
-      final HCDiv aCol2 = aRow.createColumn (12, 8, 8, 9);
-
-      // left
-      // We need a wrapper span for easy AJAX content replacement
-      aCol1.addChild (new HCSpan ().setID (CLayout.LAYOUT_AREAID_MENU).addChild (getMenuContent (aLEC)));
-      aCol1.addChild (new HCDiv ().setID (CLayout.LAYOUT_AREAID_SPECIAL));
-
-      // content
-      aCol2.addChild (getPageContent (aLEC));
+      throw ex;
+    }
+    catch (final RuntimeException ex)
+    {
+      new InternalErrorBuilder ().setDisplayLocale (aDisplayLocale)
+                                 .setRequestScope (aLEC.getRequestScope ())
+                                 .setThrowable (ex)
+                                 .setUIErrorHandlerFor (aOuterContainer)
+                                 .handle ();
     }
 
     // Footer
