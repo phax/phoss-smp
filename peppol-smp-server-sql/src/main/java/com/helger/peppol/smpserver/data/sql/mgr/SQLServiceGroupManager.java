@@ -205,8 +205,10 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     }
 
     final EChange eChange = ret.get ();
-    LOGGER.info ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
 
+    // Callback only if something changed
     if (eChange.isChanged ())
       m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (sSMPServiceGroupID));
 
