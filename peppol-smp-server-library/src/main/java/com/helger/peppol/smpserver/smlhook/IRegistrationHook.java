@@ -29,7 +29,7 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void createServiceGroup (@Nonnull IParticipantIdentifier aPI);
+  void createServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
    * Delete a participant in the SML because the internal adding in the SMP
@@ -40,7 +40,7 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void undoCreateServiceGroup (@Nonnull IParticipantIdentifier aPI);
+  void undoCreateServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
    * Delete a participant in the SML.
@@ -50,7 +50,7 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void deleteServiceGroup (@Nonnull IParticipantIdentifier aPI);
+  void deleteServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
    * Create a participant in the SML because the deletion.
@@ -60,5 +60,5 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void undoDeleteServiceGroup (@Nonnull IParticipantIdentifier aPI);
+  void undoDeleteServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
 }

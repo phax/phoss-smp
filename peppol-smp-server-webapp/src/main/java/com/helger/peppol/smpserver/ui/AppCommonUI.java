@@ -48,6 +48,7 @@ import com.helger.html.hc.html.grouping.HCHR;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.textlevel.HCCode;
+import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCWBR;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
@@ -258,7 +259,7 @@ public final class AppCommonUI
   @Nonnull
   private static IHCNode _getWBRList (@Nonnull final String s)
   {
-    final HCDiv ret = new HCDiv ();
+    final HCSpan ret = new HCSpan ();
     String sRest = s;
     final int nChars = 30;
     while (sRest.length () > nChars)

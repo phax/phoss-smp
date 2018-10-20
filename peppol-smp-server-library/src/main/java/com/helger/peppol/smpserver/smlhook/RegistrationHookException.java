@@ -10,6 +10,7 @@
  */
 package com.helger.peppol.smpserver.smlhook;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.string.StringHelper;
@@ -20,8 +21,9 @@ import com.helger.peppol.smlclient.SMLExceptionHelper;
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public final class RegistrationHookException extends RuntimeException
+public final class RegistrationHookException extends Exception
 {
+  @Nonnull
   private static String _getRealMessage (@Nullable final String sMsg, @Nullable final Throwable aCause)
   {
     final String ret = StringHelper.getNotNull (sMsg);

@@ -109,7 +109,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     return ret;
   }
 
-  public void createServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier)
+  public void createServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     if (LOGGER.isInfoEnabled ())
@@ -138,7 +138,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     }
   }
 
-  public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier)
+  public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     if (LOGGER.isWarnEnabled ())
@@ -165,7 +165,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     }
   }
 
-  public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier)
+  public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     if (LOGGER.isInfoEnabled ())
@@ -197,7 +197,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     }
   }
 
-  public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier)
+  public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     if (LOGGER.isWarnEnabled ())
