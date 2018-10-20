@@ -207,7 +207,6 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
 
@@ -244,7 +243,6 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
 
@@ -303,7 +301,6 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                                      .getResultList ());
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return new CommonsArrayList <> ();
     }
 
@@ -338,7 +335,6 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
                                                      .getResultList ());
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
 
@@ -371,7 +367,6 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
 

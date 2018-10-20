@@ -235,7 +235,6 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return ESuccess.FAILURE;
     }
     return ESuccess.SUCCESS;
@@ -283,7 +282,6 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -307,7 +305,6 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -348,7 +345,6 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -399,7 +395,6 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                      .getResultList ());
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return new CommonsArrayList <> ();
     }
 
@@ -419,7 +414,6 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -444,7 +438,6 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                        .getResultList ());
       if (ret.hasException ())
       {
-        exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
         return new CommonsArrayList <> ();
       }
 
@@ -485,7 +478,6 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return ret.get ();

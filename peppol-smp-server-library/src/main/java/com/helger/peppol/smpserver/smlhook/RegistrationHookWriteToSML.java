@@ -192,7 +192,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     {
       final String sMsg = "Could not delete business " + sParticipantID + " from SML.";
       if (LOGGER.isErrorEnabled ())
-        LOGGER.error (sMsg, ex);
+        LOGGER.error (sMsg + " Technical details: " + ex.getClass ().getName () + " - " + ex.getMessage ());
       throw new RegistrationHookException (sMsg, ex);
     }
   }

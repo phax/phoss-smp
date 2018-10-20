@@ -95,6 +95,7 @@ import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
+import com.helger.xservlet.forcedredirect.ForcedRedirectException;
 
 @WorkInProgress
 public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPServiceGroup>
@@ -153,6 +154,10 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                              .getURIEncoded () +
                                                                               "' could not be deleted! Please check the logs."));
           }
+        }
+        catch (final ForcedRedirectException ex)
+        {
+          throw ex;
         }
         catch (final Exception ex)
         {

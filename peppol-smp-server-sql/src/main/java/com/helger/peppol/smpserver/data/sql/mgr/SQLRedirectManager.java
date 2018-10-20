@@ -103,7 +103,6 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return new SMPRedirect (aServiceGroup, aDocumentTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, sExtension);
@@ -130,7 +129,6 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -154,7 +152,6 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
     return ret.get ();
@@ -181,7 +178,6 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                                                      .getResultList ());
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return new CommonsArrayList <> ();
     }
 
@@ -210,7 +206,6 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
                                                        .getResultList ());
       if (ret.hasException ())
       {
-        exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
         return new CommonsArrayList <> ();
       }
 
@@ -230,7 +225,6 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -256,7 +250,6 @@ public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager imple
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     final DBServiceMetadataRedirection aDBRedirect = ret.get ();

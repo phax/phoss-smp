@@ -130,7 +130,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
 
@@ -200,7 +199,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
 
@@ -269,7 +267,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return EChange.UNCHANGED;
     }
 
@@ -317,7 +314,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return new CommonsArrayList <> ();
     }
     return ret.get ();
@@ -348,7 +344,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return new CommonsArrayList <> ();
     }
     return ret.get ();
@@ -369,7 +364,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
     return ret.get ().intValue ();
@@ -399,7 +393,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return null;
     }
     return ret.get ();
@@ -427,7 +420,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return false;
     }
     return ret.get ().booleanValue ();
@@ -446,7 +438,6 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     });
     if (ret.hasException ())
     {
-      exceptionCallbacks ().forEach (x -> x.onException (ret.getException ()));
       return 0;
     }
     return ret.get ().intValue ();
