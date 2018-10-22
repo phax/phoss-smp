@@ -718,10 +718,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
-    final String sEntityID = aExistingEntity != null ? aExistingEntity.getID ()
-                                                     : StringHelper.hasText (sExistingID) ? sExistingID
-                                                                                          : TMP_ID_PREFIX +
-                                                                                            Integer.toString (GlobalIDFactory.getNewIntID ());
+    final String sEntityID = StringHelper.hasText (sExistingID) ? sExistingID
+                                                                : TMP_ID_PREFIX +
+                                                                  Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final BootstrapPanel aPanel = new BootstrapPanel ().setID (sEntityID);
     aPanel.getOrCreateHeader ().addChild ("Business Entity");
