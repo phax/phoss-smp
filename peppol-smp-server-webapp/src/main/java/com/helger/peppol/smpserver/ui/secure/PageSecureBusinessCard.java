@@ -602,10 +602,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                    @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
-    final String sIdentifierID = aExistingIdentifier != null ? aExistingIdentifier.getID ()
-                                                             : StringHelper.hasText (sExistingID) ? sExistingID
-                                                                                                  : TMP_ID_PREFIX +
-                                                                                                    Integer.toString (GlobalIDFactory.getNewIntID ());
+    final String sIdentifierID = StringHelper.hasText (sExistingID) ? sExistingID
+                                                                    : TMP_ID_PREFIX +
+                                                                      Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final HCRow aRow = new HCRow ();
 
@@ -645,10 +644,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                 @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
-    final String sContactID = aExistingContact != null ? aExistingContact.getID ()
-                                                       : StringHelper.hasText (sExistingID) ? sExistingID
-                                                                                            : TMP_ID_PREFIX +
-                                                                                              Integer.toString (GlobalIDFactory.getNewIntID ());
+    final String sContactID = StringHelper.hasText (sExistingID) ? sExistingID
+                                                                 : TMP_ID_PREFIX +
+                                                                   Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final HCRow aRow = new HCRow ();
 
