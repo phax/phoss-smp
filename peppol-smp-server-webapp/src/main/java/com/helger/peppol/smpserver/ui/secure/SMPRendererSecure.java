@@ -36,7 +36,6 @@ import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
 import com.helger.photon.bootstrap3.CBootstrapCSS;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbs;
@@ -128,7 +127,7 @@ public final class SMPRendererSecure
     if (SMPServerConfiguration.getRESTType ().isPEPPOL ())
     {
       if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
-        ret.addChild (new BootstrapSuccessBox ().addChild ("Directory support is enabled!"));
+        ret.addChild (new BootstrapInfoBox ().addChild ("Directory support is enabled!"));
       else
         ret.addChild (new BootstrapWarnBox ().addChild ("Directory support is disabled!"));
     }

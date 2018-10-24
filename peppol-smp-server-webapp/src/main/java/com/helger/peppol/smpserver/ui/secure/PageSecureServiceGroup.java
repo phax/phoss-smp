@@ -38,6 +38,7 @@ import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
@@ -60,6 +61,7 @@ import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.AppCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
 import com.helger.peppol.url.IPeppolURLProvider;
+import com.helger.peppol.url.PeppolDNSResolutionException;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
@@ -213,8 +215,16 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                               new DTCol ("Action")).setID (getID () + "_checkdns");
                           for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
                           {
-                            final String sDNSName = aURLProvider.getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
-                                                                                          sSMLZoneName);
+                            String sDNSName = null;
+                            try
+                            {
+                              sDNSName = aURLProvider.getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
+                                                                               sSMLZoneName);
+                            }
+                            catch (final PeppolDNSResolutionException ex1)
+                            {
+                              // Ignore
+                            }
 
                             InetAddress aInetAddress = null;
                             try
@@ -238,8 +248,11 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
                             final HCRow aRow = aTable.addBodyRow ();
                             aRow.addCell (aServiceGroup.getParticpantIdentifier ().getURIEncoded ());
-                            aRow.addCell (new HCA (new SimpleURL ("http://" + sDNSName)).setTargetBlank ()
-                                                                                        .addChild (sDNSName));
+                            if (sDNSName != null)
+                              aRow.addCell (new HCA (new SimpleURL ("http://" + sDNSName)).setTargetBlank ()
+                                                                                          .addChild (sDNSName));
+                            else
+                              aRow.addCell (new HCEM ().addChild ("DNS resolve failed"));
                             if (aInetAddress != null)
                             {
                               aRow.addCell (new IPV4Addr (aInetAddress).getAsString ());
