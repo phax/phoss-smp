@@ -135,7 +135,8 @@ public final class SMPRendererSecure
       if (SMPMetaManager.getSettings ().isSMLNeeded ())
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.MINUS.getAsNode ())
-                                   .addChild (" SML connection is NOT active."));
+                                   .addChild (" SML connection is NOT active. ")
+                                   .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
         aBox.setType (EBootstrapAlertType.WARNING);
       }
     }
@@ -145,12 +146,13 @@ public final class SMPRendererSecure
       if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ())
-                                   .addChild (" Directory support is enabled!"));
+                                   .addChild (" Directory support is enabled."));
       }
       else
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.MINUS.getAsNode ())
-                                   .addChild (" Directory support is disabled!"));
+                                   .addChild (" Directory support is disabled. ")
+                                   .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
         if (aBox.getType () == EBootstrapAlertType.SUCCESS)
           aBox.setType (EBootstrapAlertType.INFO);
       }
