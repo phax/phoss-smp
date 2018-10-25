@@ -24,6 +24,7 @@ import com.helger.commons.url.ISimpleURL;
 import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
+import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
@@ -34,9 +35,8 @@ import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
 import com.helger.photon.bootstrap3.CBootstrapCSS;
-import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap3.alert.EBootstrapAlertType;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbs;
 import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbsProvider;
@@ -57,6 +57,7 @@ import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.util.SecurityHelper;
+import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
@@ -114,27 +115,55 @@ public final class SMPRendererSecure
 
     ret.addChild (BootstrapMenuItemRenderer.createSideBarMenu (aLEC));
 
+    final BootstrapSuccessBox aBox = new BootstrapSuccessBox ();
+
     // Information on SML usage
     if (aSettings.isSMLActive ())
-      ret.addChild (new BootstrapInfoBox ().addChild ("SML connection active!"));
+    {
+      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ()).addChild (" SML connection is active."));
+      if (SMPMetaManager.getSettings ().getSMLInfo () == null)
+      {
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
+                                   .addChild (" No SML is selected. ")
+                                   .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
+        aBox.setType (EBootstrapAlertType.DANGER);
+      }
+    }
     else
     {
       // Warn only if SML is needed
       if (SMPMetaManager.getSettings ().isSMLNeeded ())
-        ret.addChild (new BootstrapWarnBox ().addChild ("SML connection NOT active!"));
+      {
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.MINUS.getAsNode ())
+                                   .addChild (" SML connection is NOT active."));
+        aBox.setType (EBootstrapAlertType.WARNING);
+      }
     }
 
     if (SMPServerConfiguration.getRESTType ().isPEPPOL ())
     {
       if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
-        ret.addChild (new BootstrapInfoBox ().addChild ("Directory support is enabled!"));
+      {
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ())
+                                   .addChild (" Directory support is enabled!"));
+      }
       else
-        ret.addChild (new BootstrapWarnBox ().addChild ("Directory support is disabled!"));
+      {
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.MINUS.getAsNode ())
+                                   .addChild (" Directory support is disabled!"));
+        if (aBox.getType () == EBootstrapAlertType.SUCCESS)
+          aBox.setType (EBootstrapAlertType.INFO);
+      }
     }
 
     // Information on certificate
     if (!SMPKeyManager.isCertificateValid ())
-      ret.addChild (new BootstrapErrorBox ().addChild ("Certificate configuration is invalid. REST queries will not work!"));
+    {
+      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
+                                 .addChild (" Certificate configuration is invalid. REST queries will not work!"));
+      aBox.setType (EBootstrapAlertType.DANGER);
+    }
+    ret.addChild (aBox);
 
     return ret;
   }
