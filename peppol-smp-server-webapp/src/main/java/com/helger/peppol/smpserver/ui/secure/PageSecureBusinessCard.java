@@ -106,6 +106,7 @@ import com.helger.photon.uicore.html.select.HCCountrySelect;
 import com.helger.photon.uicore.html.select.HCCountrySelect.EWithDeprecated;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.js.JSJQueryHelper;
+import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
@@ -217,8 +218,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     addCustomHandler (ACTION_PUBLISH_TO_INDEXER,
                       new AbstractBootstrapWebPageActionHandler <ISMPBusinessCard, WebPageExecutionContext> (true)
                       {
-                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                     @Nonnull final ISMPBusinessCard aSelectedObject)
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nonnull final ISMPBusinessCard aSelectedObject)
                         {
                           final String sDirectoryName = AppConfiguration.getDirectoryName ();
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ()
@@ -242,7 +244,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                               aParticipantID.getURIEncoded () +
                                                                                               "'"));
                           }
-                          return true;
+                          return EShowList.SHOW_LIST;
                         }
                       });
   }
@@ -890,6 +892,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPBusinessCard aSelectedObject,
                                 @Nonnull final BootstrapForm aForm,
+                                final boolean bFormSubmitted,
                                 @Nonnull final EWebPageFormAction eFormAction,
                                 @Nonnull final FormErrorList aFormErrors)
   {

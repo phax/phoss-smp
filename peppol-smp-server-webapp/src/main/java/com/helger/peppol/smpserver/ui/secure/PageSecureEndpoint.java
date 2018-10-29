@@ -105,6 +105,7 @@ import com.helger.photon.core.form.SessionBackedRequestField;
 import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
+import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uicore.page.handler.IWebPageActionHandler;
@@ -214,21 +215,26 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                           return true;
                         }
 
-                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                     @Nonnull final ISMPServiceInformation aSelectedObject)
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nonnull final ISMPServiceInformation aSelectedObject)
                         {
                           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
                           if (aServiceInfoMgr.deleteSMPServiceInformation (aSelectedObject).isChanged ())
+                          {
                             aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected document type '" +
                                                                                                 aSelectedObject.getDocumentTypeIdentifier ()
                                                                                                                .getURIEncoded () +
                                                                                                 "' was successfully deleted!"));
+                          }
                           else
+                          {
                             aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error deleting the selected document type '" +
                                                                                               aSelectedObject.getDocumentTypeIdentifier ()
                                                                                                              .getURIEncoded () +
                                                                                               "'!"));
-                          return false;
+                          }
+                          return EShowList.DONT_SHOW_LIST;
                         }
                       });
     addCustomHandler (ACTION_DELETE_PROCESS,
@@ -239,8 +245,9 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                           return true;
                         }
 
-                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                     @Nonnull final ISMPServiceInformation aSelectedObject)
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nonnull final ISMPServiceInformation aSelectedObject)
                         {
                           final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
                           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -267,7 +274,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                                                                 aSelectedObject.getDocumentTypeIdentifier ()
                                                                                                                .getURIEncoded () +
                                                                                                 "'!"));
-                          return true;
+                          return EShowList.SHOW_LIST;
                         }
                       });
   }
@@ -716,6 +723,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPServiceInformation aSelectedObject,
                                 @Nonnull final BootstrapForm aForm,
+                                final boolean bFormSubmitted,
                                 @Nonnull final EWebPageFormAction eFormAction,
                                 @Nonnull final FormErrorList aFormErrors)
   {

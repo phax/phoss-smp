@@ -88,6 +88,7 @@ import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
+import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
@@ -174,8 +175,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     addCustomHandler (ACTION_CHECK_DNS,
                       new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (false)
                       {
-                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                     @Nullable final ISMPServiceGroup aSelectedObject)
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nullable final ISMPServiceGroup aSelectedObject)
                         {
                           final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
                           final HCNodeList aNodeList = aWPEC.getNodeList ();
@@ -293,14 +295,15 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             aNodeList.addChild (aToolbar);
                           }
 
-                          return false;
+                          return EShowList.DONT_SHOW_LIST;
                         }
                       });
     addCustomHandler (ACTION_REGISTER_TO_SML,
                       new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (true)
                       {
-                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                     @Nonnull final ISMPServiceGroup aSelectedObject)
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nonnull final ISMPServiceGroup aSelectedObject)
                         {
                           final StringMap aTargetParams = new StringMap ();
                           aTargetParams.putIn (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
@@ -326,14 +329,15 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                            aTargetParams);
                           }
                           // Never reached
-                          return false;
+                          return EShowList.DONT_SHOW_LIST;
                         }
                       });
     addCustomHandler (ACTION_UNREGISTER_FROM_SML,
                       new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (true)
                       {
-                        public boolean handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                     @Nonnull final ISMPServiceGroup aSelectedObject)
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nonnull final ISMPServiceGroup aSelectedObject)
                         {
                           final StringMap aTargetParams = new StringMap ();
                           aTargetParams.putIn (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
@@ -359,7 +363,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                            aTargetParams);
                           }
                           // Never reached
-                          return false;
+                          return EShowList.DONT_SHOW_LIST;
                         }
                       });
   }
@@ -421,6 +425,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPServiceGroup aSelectedObject,
                                 @Nonnull final BootstrapForm aForm,
+                                final boolean bFormSubmitted,
                                 @Nonnull final EWebPageFormAction eFormAction,
                                 @Nonnull final FormErrorList aFormErrors)
   {

@@ -157,6 +157,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMLInfo aSelectedObject,
                                 @Nonnull final BootstrapForm aForm,
+                                final boolean bFormSubmitted,
                                 @Nonnull final EWebPageFormAction eFormAction,
                                 @Nonnull final FormErrorList aFormErrors)
   {
@@ -215,8 +216,8 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     final String sDisplayName = aWPEC.params ().getAsString (FIELD_DISPLAY_NAME);
     final String sDNSZone = aWPEC.params ().getAsString (FIELD_DNS_ZONE);
     final String sManagementAddressURL = aWPEC.params ().getAsString (FIELD_MANAGEMENT_ADDRESS_URL);
-    final boolean bClientCertificateRequired = aWPEC.params ().isCheckBoxChecked (FIELD_CLIENT_CERTIFICATE_REQUIRED,
-                                                                                  true);
+    final boolean bClientCertificateRequired = aWPEC.params ()
+                                                    .isCheckBoxChecked (FIELD_CLIENT_CERTIFICATE_REQUIRED, true);
 
     // validations
     if (StringHelper.hasNoText (sDisplayName))
