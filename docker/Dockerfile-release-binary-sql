@@ -35,7 +35,7 @@ RUN rm -r $CATALINA_HOME/webapps/ROOT \
 # Minimum version for this layout is 5.0.1
 ARG VERSION
 # Set to environment to be persistent
-ENV VERSION=${VERSION:-5.0.6}
+ENV VERSION=${VERSION:-5.0.7}
 LABEL vendor="Philip Helger"
 LABEL version=$VERSION
  
