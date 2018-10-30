@@ -21,7 +21,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>peppol-smp-server-parent-pom</artifactId>
-    <version>5.1.0-SNAPSHOT</version>
+    <version>5.0.8-SNAPSHOT</version>
   </parent>
   <artifactId>peppol-smp-server-webapp-sql</artifactId>
   <packaging>war</packaging>
