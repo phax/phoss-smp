@@ -40,12 +40,12 @@ import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.app.AppConfiguration;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
-import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
@@ -222,7 +222,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             if (aCert instanceof X509Certificate)
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final BootstrapTable aCertDetails = AppCommonUI.createCertificateDetailsTable (aX509Cert,
+              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert,
                                                                                              aNowLDT,
                                                                                              aDisplayLocale);
               aUL.addItem (aCertDetails.getAsResponsiveTable ());
@@ -264,7 +264,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             if (aCert instanceof X509Certificate)
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final BootstrapTable aCertDetails = AppCommonUI.createCertificateDetailsTable (aX509Cert,
+              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert,
                                                                                              aNowLDT,
                                                                                              aDisplayLocale);
               aUL.addItem (aCertDetails.getAsResponsiveTable ());
@@ -354,7 +354,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             if (aCert instanceof X509Certificate)
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final BootstrapTable aCertDetails = AppCommonUI.createCertificateDetailsTable (aX509Cert,
+              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert,
                                                                                              aNowLDT,
                                                                                              aDisplayLocale);
               aUL.addItem (aCertDetails.getAsResponsiveTable ());
@@ -366,7 +366,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           aTab.addChild (aUL);
         }
       }
-      aTabBox.addTab ("pdkeystore", AppConfiguration.getDirectoryName () + " Keystore", aTab);
+      aTabBox.addTab ("pdkeystore", SMPWebAppConfiguration.getDirectoryName () + " Keystore", aTab);
     }
   }
 }

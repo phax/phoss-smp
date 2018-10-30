@@ -18,7 +18,7 @@ package com.helger.peppol.smpserver.ui;
 
 import javax.annotation.Nonnull;
 
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginManager;
 import com.helger.photon.core.app.html.IHTMLProvider;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
@@ -32,8 +32,8 @@ public final class SMPLoginManager extends BootstrapLoginManager
 {
   public SMPLoginManager ()
   {
-    super (CApp.getApplicationTitle () + " Administration - Login");
-    setRequiredRoleIDs (CApp.REQUIRED_ROLE_IDS_CONFIG);
+    super (CSMP.getApplicationTitle () + " Administration - Login");
+    setRequiredRoleIDs (CSMP.REQUIRED_ROLE_IDS_CONFIG);
   }
 
   @Override

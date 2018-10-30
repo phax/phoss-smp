@@ -46,9 +46,9 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
  *
  * @author Philip Helger
  */
-public final class AppConfiguration extends AbstractGlobalSingleton
+public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (AppConfiguration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppConfiguration.class);
 
   private static final ConfigFile s_aConfigFile;
 
@@ -67,7 +67,7 @@ public final class AppConfiguration extends AbstractGlobalSingleton
 
   @Deprecated
   @UsedViaReflection
-  private AppConfiguration ()
+  private SMPWebAppConfiguration ()
   {}
 
   @Nonnull

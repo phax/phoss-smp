@@ -27,7 +27,7 @@ import com.helger.commons.debug.GlobalDebug;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.render.HCRenderer;
 import com.helger.json.JsonObject;
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.PhotonUnifiedResponse;
@@ -59,7 +59,7 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor
     final ELoginResult eLoginResult = LoggedInUserManager.getInstance ()
                                                          .loginUser (sLoginName,
                                                                      sPassword,
-                                                                     CApp.REQUIRED_ROLE_IDS_VIEW);
+                                                                     CSMP.REQUIRED_ROLE_IDS_VIEW);
     if (eLoginResult.isSuccess ())
     {
       aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, true));

@@ -49,7 +49,7 @@ import com.helger.pd.businesscard.v3.ObjectFactory;
 import com.helger.pd.businesscard.v3.PD3APIHelper;
 import com.helger.pd.businesscard.v3.PD3BusinessCardMarshaller;
 import com.helger.pd.businesscard.v3.PD3BusinessCardType;
-import com.helger.peppol.smpserver.app.AppConfiguration;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
@@ -89,7 +89,7 @@ public final class BusinessCardInterface
     if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
       LOGGER.warn ("The " +
-                   AppConfiguration.getDirectoryName () +
+                   SMPWebAppConfiguration.getDirectoryName () +
                    " integration is disabled. getBusinessCard will not be executed.");
       throw new WebApplicationException (404);
     }

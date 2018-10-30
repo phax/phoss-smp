@@ -26,7 +26,7 @@ import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.metadata.HCHead;
 import com.helger.html.hc.html.root.HCHtml;
 import com.helger.html.hc.html.sections.HCBody;
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.photon.basic.app.appid.RequestSettings;
 import com.helger.photon.basic.app.menu.IMenuItemPage;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
@@ -41,11 +41,11 @@ import com.helger.xservlet.forcedredirect.ForcedRedirectException;
  *
  * @author Philip Helger
  */
-public class AppLayoutHTMLProvider extends AbstractSWECHTMLProvider
+public class SMPLayoutHTMLProvider extends AbstractSWECHTMLProvider
 {
   private final IFunction <LayoutExecutionContext, IHCNode> m_aFactory;
 
-  public AppLayoutHTMLProvider (@Nonnull final IFunction <LayoutExecutionContext, IHCNode> aFactory)
+  public SMPLayoutHTMLProvider (@Nonnull final IFunction <LayoutExecutionContext, IHCNode> aFactory)
   {
     m_aFactory = aFactory;
   }
@@ -61,7 +61,7 @@ public class AppLayoutHTMLProvider extends AbstractSWECHTMLProvider
     final HCBody aBody = aHtml.body ();
 
     // Add menu item in page title
-    aHead.setPageTitle (StringHelper.getConcatenatedOnDemand (CApp.getApplicationTitle (),
+    aHead.setPageTitle (StringHelper.getConcatenatedOnDemand (CSMP.getApplicationTitle (),
                                                               " - ",
                                                               aMenuItem.getDisplayText (aDisplayLocale)));
 

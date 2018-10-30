@@ -30,7 +30,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.app.AppConfiguration;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
@@ -74,7 +74,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final String sDirectoryName = AppConfiguration.getDirectoryName ();
+    final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 
     final BootstrapViewForm aTable = aNodeList.addAndReturnChild (new BootstrapViewForm ());
     aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
@@ -125,7 +125,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                   SMPServerConfiguration.DEFAULT_SML_NEEDED);
     final String sSMLInfoID = aWPEC.params ().getAsString (FIELD_SML_INFO);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLInfoID);
-    final String sDirectoryName = AppConfiguration.getDirectoryName ();
+    final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 
     if (StringHelper.hasNoText (sPEPPOLDirectoryHostName))
       aFormErrors.addFieldError (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME, sDirectoryName + " hostname may not be empty.");
@@ -164,7 +164,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                 @Nonnull final EWebPageSimpleFormAction eSimpleFormAction,
                                 @Nonnull final FormErrorList aFormErrors)
   {
-    final String sDirectoryName = AppConfiguration.getDirectoryName ();
+    final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                  .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_REST_WRITABLE_API_DISABLED,

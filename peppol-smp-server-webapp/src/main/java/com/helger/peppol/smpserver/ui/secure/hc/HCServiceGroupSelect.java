@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 
@@ -51,7 +51,7 @@ public class HCServiceGroupSelect extends HCExtSelect
                                                               .getSortedInline (ISMPServiceGroup.comparator ()))
       if (aFilter == null || aFilter.test (aServiceGroup))
       {
-        final String sOwnerName = AppCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
+        final String sOwnerName = SMPCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
         addOption (aServiceGroup.getID (),
                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () + " [" + sOwnerName + "]");
       }

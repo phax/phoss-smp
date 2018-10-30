@@ -25,7 +25,7 @@ import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.sections.HCH2;
 import com.helger.html.hc.html.textlevel.HCSmall;
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
 import com.helger.photon.bootstrap3.base.BootstrapContainer;
 import com.helger.photon.bootstrap3.grid.BootstrapRow;
@@ -68,6 +68,6 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
 
     // Add the version number in the login screen
     aContentCol.addChild (new HCDiv ().addStyle (CCSSProperties.MARGIN_TOP.newValue (ECSSUnit.em (1)))
-                                      .addChild (new HCSmall ().addChild (CApp.getApplicationTitleAndVersion ())));
+                                      .addChild (new HCSmall ().addChild (CSMP.getApplicationTitleAndVersion ())));
   }
 }

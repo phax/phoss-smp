@@ -61,7 +61,7 @@ import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.smpserver.app.AppConfiguration;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.app.PDClientProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
@@ -74,7 +74,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
-import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
@@ -209,7 +209,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         {
           aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!" +
                                                                               (SMPMetaManager.getSettings ()
-                                                                                             .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + AppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+                                                                                             .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
         }
         else
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
@@ -222,7 +222,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                         public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
                                                        @Nonnull final ISMPBusinessCard aSelectedObject)
                         {
-                          final String sDirectoryName = AppConfiguration.getDirectoryName ();
+                          final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getServiceGroup ()
                                                                                        .getParticpantIdentifier ();
                           final ESuccess eSuccess = PDClientProvider.getInstance ()
@@ -258,7 +258,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
     if (!aSettingsMgr.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild (AppConfiguration.getDirectoryName () +
+      aNodeList.addChild (new BootstrapWarnBox ().addChild (SMPWebAppConfiguration.getDirectoryName () +
                                                             " integration is disabled hence no Business Cards can be created."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Change settings")
                                                 .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SMP_SETTINGS))
@@ -588,7 +588,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                             aServiceGroup.getID () +
                                                                             "' was successfully saved." +
                                                                             (SMPMetaManager.getSettings ()
-                                                                                           .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + AppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+                                                                                           .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
       else
         aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the Business Card for Service Group '" +
                                                                           aServiceGroup.getID () +
@@ -619,7 +619,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     aRow.addCell (new HCEdit (new RequestField (sFieldScheme,
                                                 aExistingIdentifier == null ? null : aExistingIdentifier.getScheme ()))
                                                                                                                        .setPlaceholder ("Identifier scheme"),
-                  AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldScheme), aDisplayLocale));
+                  SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldScheme), aDisplayLocale));
 
     // Identifier Value
     final String sFieldValue = RequestParamMap.getFieldName (PREFIX_ENTITY,
@@ -630,7 +630,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     aRow.addCell (new HCEdit (new RequestField (sFieldValue,
                                                 aExistingIdentifier == null ? null : aExistingIdentifier.getValue ()))
                                                                                                                       .setPlaceholder ("Identifier value"),
-                  AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
+                  SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
                                                                  .setOnClick (JQuery.idRef (aRow).remove ()));
@@ -662,7 +662,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aRow.addCell (new HCEdit (new RequestField (sFieldType,
                                                   aExistingContact == null ? null : aExistingContact.getType ()))
                                                                                                                  .setPlaceholder ("Contact type"),
-                    AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldType), aDisplayLocale));
+                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldType), aDisplayLocale));
     }
 
     // Name
@@ -675,7 +675,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aRow.addCell (new HCEdit (new RequestField (sFieldName,
                                                   aExistingContact == null ? null : aExistingContact.getName ()))
                                                                                                                  .setPlaceholder ("Contact name"),
-                    AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldName), aDisplayLocale));
+                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldName), aDisplayLocale));
     }
 
     // Phone number
@@ -688,7 +688,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aRow.addCell (new HCEdit (new RequestField (sFieldPhone,
                                                   aExistingContact == null ? null : aExistingContact.getPhoneNumber ()))
                                                                                                                         .setPlaceholder ("Contact phone number"),
-                    AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldPhone), aDisplayLocale));
+                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldPhone), aDisplayLocale));
     }
 
     // Email address
@@ -701,7 +701,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aRow.addCell (new HCEdit (new RequestField (sFieldEmail,
                                                   aExistingContact == null ? null : aExistingContact.getEmail ()))
                                                                                                                   .setPlaceholder ("Contact email address"),
-                    AppCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldEmail), aDisplayLocale));
+                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldEmail), aDisplayLocale));
     }
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
@@ -997,7 +997,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                      .add (CPageParam.PARAM_ACTION, ACTION_PUBLISH_TO_INDEXER)
                                      .add (CPageParam.PARAM_OBJECT, aCurObject.getID ()))
                                                                                          .setTitle ("Update Business Card in " +
-                                                                                                    AppConfiguration.getDirectoryName ())
+                                                                                                    SMPWebAppConfiguration.getDirectoryName ())
                                                                                          .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
     }
     return ret;

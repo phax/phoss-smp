@@ -32,14 +32,14 @@ import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettingsManager;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.app.AppConfiguration;
-import com.helger.peppol.smpserver.app.AppSecurity;
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
+import com.helger.peppol.smpserver.app.SMPSecurity;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.peppol.smpserver.app.PDClientProvider;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardCallback;
-import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.peppol.smpserver.ui.pub.MenuPublic;
 import com.helger.peppol.smpserver.ui.secure.MenuSecure;
@@ -70,25 +70,25 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected String getInitParameterDebug (@Nonnull final ServletContext aSC)
   {
-    return AppConfiguration.getGlobalDebug ();
+    return SMPWebAppConfiguration.getGlobalDebug ();
   }
 
   @Override
   protected String getInitParameterProduction (@Nonnull final ServletContext aSC)
   {
-    return AppConfiguration.getGlobalProduction ();
+    return SMPWebAppConfiguration.getGlobalProduction ();
   }
 
   @Override
   protected String getDataPath (@Nonnull final ServletContext aSC)
   {
-    return AppConfiguration.getDataPath ();
+    return SMPWebAppConfiguration.getDataPath ();
   }
 
   @Override
   protected boolean shouldCheckFileAccess (@Nonnull final ServletContext aSC)
   {
-    return AppConfiguration.isCheckFileAccess ();
+    return SMPWebAppConfiguration.isCheckFileAccess ();
   }
 
   @Override
@@ -101,7 +101,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   protected void initGlobalSettings ()
   {
     // Enable JaxWS debugging?
-    if (AppConfiguration.isGlobalDebugJaxWS ())
+    if (SMPWebAppConfiguration.isGlobalDebugJaxWS ())
       WSHelper.setMetroDebugSystemProperties (true);
 
     // JUL to SLF4J
@@ -117,11 +117,11 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     // Check SMP ID
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
-    if (!RegExHelper.stringMatchesPattern (CApp.PATTERN_SMP_ID, sSMPID))
+    if (!RegExHelper.stringMatchesPattern (CSMP.PATTERN_SMP_ID, sSMPID))
       throw new IllegalArgumentException ("The provided SMP ID '" +
                                           sSMPID +
                                           "' is not valid when used as a DNS name. It must match the regular expression '" +
-                                          CApp.PATTERN_SMP_ID +
+                                          CSMP.PATTERN_SMP_ID +
                                           "'!");
     if (LOGGER.isInfoEnabled ())
       LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
@@ -130,8 +130,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   public void initLocales (@Nonnull final ILocaleManager aLocaleMgr)
   {
-    aLocaleMgr.registerLocale (CApp.DEFAULT_LOCALE);
-    aLocaleMgr.setDefaultLocale (CApp.DEFAULT_LOCALE);
+    aLocaleMgr.registerLocale (CSMP.DEFAULT_LOCALE);
+    aLocaleMgr.setDefaultLocale (CSMP.DEFAULT_LOCALE);
   }
 
   @Override
@@ -164,14 +164,14 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   protected void initUI ()
   {
     // UI stuff
-    AppCommonUI.init ();
+    SMPCommonUI.init ();
   }
 
   @Override
   protected void initSecurity ()
   {
     // Set all security related stuff
-    AppSecurity.init ();
+    SMPSecurity.init ();
   }
 
   @Override
@@ -180,7 +180,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
     aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
                                                                                                 .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
-    aCFM.registerConfigurationFile (new ConfigurationFile (AppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
+    aCFM.registerConfigurationFile (new ConfigurationFile (SMPWebAppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
                                                                                                    .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
     final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
     if (aConfigRes != null)
@@ -188,7 +188,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                                                         .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
     final IReadableResource aPDClientConfig = PDClientConfiguration.getConfigFile ().getReadResource ();
     if (aPDClientConfig != null)
-      aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription (AppConfiguration.getDirectoryName () +
+      aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription (SMPWebAppConfiguration.getDirectoryName () +
                                                                                               " client configuration")
                                                                              .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
 

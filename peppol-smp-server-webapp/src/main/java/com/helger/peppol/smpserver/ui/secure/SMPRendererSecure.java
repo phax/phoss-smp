@@ -29,7 +29,7 @@ import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
@@ -81,7 +81,7 @@ public final class SMPRendererSecure
     final BootstrapNavbar aNavBar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
     aNavBar.getContainer ().setFluid (true);
     aNavBar.addBrand (SMPRendererPublic.createLogo (aLEC), aLinkToStartPage);
-    aNavBar.addBrand (new HCSpan ().addChild (CApp.getApplicationSuffix () + " Administration"), aLinkToStartPage);
+    aNavBar.addBrand (new HCSpan ().addChild (CSMP.getApplicationSuffix () + " Administration"), aLinkToStartPage);
     aNavBar.addText (EBootstrapNavbarPosition.COLLAPSIBLE_LEFT, " [" + SMPServerConfiguration.getSMLSMPID () + "]");
     aNavBar.addButton (EBootstrapNavbarPosition.COLLAPSIBLE_LEFT,
                        new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH +

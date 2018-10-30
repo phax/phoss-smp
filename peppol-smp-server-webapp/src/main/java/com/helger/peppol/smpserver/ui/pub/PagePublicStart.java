@@ -30,7 +30,7 @@ import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.peppol.smpserver.app.AppConfiguration;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -71,7 +71,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
-    if (AppConfiguration.isStartPageParticipantsNone ())
+    if (SMPWebAppConfiguration.isStartPageParticipantsNone ())
     {
       // New in v5.0.4
       aNodeList.addChild (new BootstrapInfoBox ().addChild ("This SMP has disabled the list of participants."));
@@ -82,7 +82,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
       final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups ();
 
       // Use dynamic or static table?
-      final boolean bUseDataTables = AppConfiguration.isStartPageDynamicTable ();
+      final boolean bUseDataTables = SMPWebAppConfiguration.isStartPageDynamicTable ();
 
       AbstractHCTable <?> aFinalTable;
       if (bUseDataTables)

@@ -21,7 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import com.helger.commons.state.EContinue;
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.peppol.smpserver.ui.SMPLoginManager;
 import com.helger.photon.core.servlet.AbstractUnifiedResponseFilter;
 import com.helger.photon.security.login.LoggedInUserManager;
@@ -60,7 +60,7 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
 
     // Check if the currently logged in user has the required roles
     final String sCurrentUserID = LoggedInUserManager.getInstance ().getCurrentUserID ();
-    if (!SecurityHelper.hasUserAllRoles (sCurrentUserID, CApp.REQUIRED_ROLE_IDS_CONFIG))
+    if (!SecurityHelper.hasUserAllRoles (sCurrentUserID, CSMP.REQUIRED_ROLE_IDS_CONFIG))
     {
       aUnifiedResponse.setStatus (HttpServletResponse.SC_FORBIDDEN);
       return EContinue.BREAK;

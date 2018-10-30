@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import com.helger.commons.functional.IPredicate;
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.photon.core.ajax.decl.AjaxFunctionDeclaration;
 import com.helger.photon.core.ajax.decl.IAjaxFunctionDeclaration;
@@ -41,7 +41,7 @@ public final class CAjax
                                                                                    .withExecutor (AjaxExecutorDataTables.class)
                                                                                    .build ();
   public static final IAjaxFunctionDeclaration DATATABLES_I18N = AjaxFunctionDeclaration.builder ("datatables-i18n")
-                                                                                        .withExecutor (new AjaxExecutorDataTablesI18N (CApp.DEFAULT_LOCALE))
+                                                                                        .withExecutor (new AjaxExecutorDataTablesI18N (CSMP.DEFAULT_LOCALE))
                                                                                         .build ();
   public static final IAjaxFunctionDeclaration LOGIN = AjaxFunctionDeclaration.builder ("login")
                                                                               .withExecutor (AjaxExecutorPublicLogin.class)

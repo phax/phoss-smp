@@ -44,7 +44,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
   public static InternalErrorBuilder createInternalErrorBuilder ()
   {
     final InternalErrorBuilder ret = new InternalErrorBuilder ();
-    ret.setDisplayLocale (CApp.DEFAULT_LOCALE);
+    ret.setDisplayLocale (CSMP.DEFAULT_LOCALE);
     return ret;
   }
 
@@ -99,7 +99,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
       InternalErrorSettings.setSMTPSenderAddress (new EmailAddress (sSenderAddress, sSenderName));
       InternalErrorSettings.setSMTPReceiverAddresses (new EmailAddress (sReceiverAddress, sReceiverName));
       InternalErrorSettings.setSMTPSettings (aSMTPSettings);
-      InternalErrorSettings.setFallbackLocale (CApp.DEFAULT_LOCALE);
+      InternalErrorSettings.setFallbackLocale (CSMP.DEFAULT_LOCALE);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);

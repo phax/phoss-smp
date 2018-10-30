@@ -48,7 +48,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
-import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
@@ -248,7 +248,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                  .setCtrl (aSelectedObject.getSubjectUniqueIdentifier ()));
     if (aSelectedObject.hasExtension ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (AppCommonUI.getExtensionDisplay (aSelectedObject)));
+                                                   .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
 
     aNodeList.addChild (aForm);
   }
@@ -421,7 +421,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-      aRow.addCell (AppCommonUI.getDocumentTypeID (aCurObject.getDocumentTypeIdentifier ()));
+      aRow.addCell (SMPCommonUI.getDocumentTypeID (aCurObject.getDocumentTypeIdentifier ()));
       aRow.addCell (aCurObject.getTargetHref ());
 
       final ISimpleURL aEditURL = createEditURL (aWPEC, aCurObject).addAll (aParams);

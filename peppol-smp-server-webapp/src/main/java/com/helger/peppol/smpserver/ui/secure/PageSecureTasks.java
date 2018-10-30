@@ -37,7 +37,7 @@ import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppol.smpserver.app.AppConfiguration;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -142,7 +142,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
 
     if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
-      final String sDirectoryName = AppConfiguration.getDirectoryName ();
+      final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
       if (StringHelper.hasNoText (SMPMetaManager.getSettings ().getPEPPOLDirectoryHostName ()))
         aOL.addItem (_createError ("An empty " + sDirectoryName + " hostname is provided"),
                      new HCDiv ().addChild ("A connection to the " + sDirectoryName + " server cannot be establised!"));

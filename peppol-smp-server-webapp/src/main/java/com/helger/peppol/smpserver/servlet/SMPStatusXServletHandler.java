@@ -40,7 +40,7 @@ import com.helger.json.JsonObject;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.CSMPServer;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.app.AppConfiguration;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
@@ -77,7 +77,7 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("global.debug", GlobalDebug.isDebugMode ());
     aStatusData.add ("global.production", GlobalDebug.isProductionMode ());
     aStatusData.add ("smp.backend", SMPServerConfiguration.getBackend ());
-    aStatusData.add ("smp.mode", AppConfiguration.isTestVersion () ? "test" : "production");
+    aStatusData.add ("smp.mode", SMPWebAppConfiguration.isTestVersion () ? "test" : "production");
     aStatusData.add ("smp.resttype", SMPServerConfiguration.getRESTType ().getID ());
     aStatusData.add ("smp.identifiertype", SMPServerConfiguration.getIdentifierType ().getID ());
     aStatusData.add ("smp.id", SMPServerConfiguration.getSMLSMPID ());

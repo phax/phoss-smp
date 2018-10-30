@@ -16,7 +16,7 @@
  */
 package com.helger.peppol.smpserver.servlet;
 
-import com.helger.peppol.smpserver.ui.AppLayoutHTMLProvider;
+import com.helger.peppol.smpserver.ui.SMPLayoutHTMLProvider;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
 import com.helger.photon.core.app.html.IHTMLProvider;
 import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
@@ -37,7 +37,7 @@ public class PublicApplicationServlet extends AbstractPublicApplicationServlet
       @Override
       protected IHTMLProvider createHTMLProvider (final IRequestWebScopeWithoutResponse aRequestScope)
       {
-        return new AppLayoutHTMLProvider (SMPRendererPublic::getContent);
+        return new SMPLayoutHTMLProvider (SMPRendererPublic::getContent);
       }
     });
   }

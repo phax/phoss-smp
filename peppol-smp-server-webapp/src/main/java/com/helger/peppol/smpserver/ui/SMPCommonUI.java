@@ -101,14 +101,14 @@ import com.helger.xml.serialize.write.XMLWriter;
  * @author Philip Helger
  */
 @Immutable
-public final class AppCommonUI
+public final class SMPCommonUI
 {
   private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25)
                                                                                      .addItem (50)
                                                                                      .addItem (100)
                                                                                      .addItemAll ();
 
-  private AppCommonUI ()
+  private SMPCommonUI ()
   {}
 
   public static void init ()

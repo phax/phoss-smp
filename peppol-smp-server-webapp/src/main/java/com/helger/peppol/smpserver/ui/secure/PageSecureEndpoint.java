@@ -75,7 +75,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
-import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPTransportProfileSelect;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
@@ -421,11 +421,11 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     {
       final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
       final HCNodeList aCtrl = new HCNodeList ();
-      aCtrl.addChild (new HCDiv ().addChild (AppCommonUI.getDocumentTypeID (aDocumentTypeID)));
+      aCtrl.addChild (new HCDiv ().addChild (SMPCommonUI.getDocumentTypeID (aDocumentTypeID)));
       try
       {
         final IPeppolDocumentTypeIdentifierParts aParts = PeppolIdentifierHelper.getDocumentTypeIdentifierParts (aDocumentTypeID);
-        aCtrl.addChild (AppCommonUI.getDocumentTypeIDDetails (aParts));
+        aCtrl.addChild (SMPCommonUI.getDocumentTypeIDDetails (aParts));
       }
       catch (final IllegalArgumentException ex)
       {
@@ -437,7 +437,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     }
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Process ID")
-                                                 .setCtrl (AppCommonUI.getProcessID (aSelectedProcess.getProcessIdentifier ())));
+                                                 .setCtrl (SMPCommonUI.getProcessID (aSelectedProcess.getProcessIdentifier ())));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Transport profile")
                                                  .setCtrl (new HCA (createViewURL (aWPEC,
@@ -481,7 +481,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     }
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate")
                                                  .setCtrl (aEndpointCert == null ? new HCStrong ().addChild ("!!!FAILED TO INTERPRETE!!!")
-                                                                                 : AppCommonUI.createCertificateDetailsTable (aEndpointCert,
+                                                                                 : SMPCommonUI.createCertificateDetailsTable (aEndpointCert,
                                                                                                                               aNowLDT,
                                                                                                                               aDisplayLocale)
                                                                                               .getAsResponsiveTable ()));
@@ -498,7 +498,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                                                       HC_Target.BLANK)));
     if (aSelectedEndpoint.hasExtension ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (AppCommonUI.getExtensionDisplay (aSelectedEndpoint)));
+                                                   .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedEndpoint)));
 
     aNodeList.addChild (aForm);
 
@@ -969,7 +969,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
 
               // Show process + endpoints
               final HCLI aLI = aULP.addItem ();
-              final HCDiv aDiv = new HCDiv ().addChild (AppCommonUI.getProcessID (aProcess.getProcessIdentifier ()));
+              final HCDiv aDiv = new HCDiv ().addChild (SMPCommonUI.getProcessID (aProcess.getProcessIdentifier ()));
               aLI.addChild (aDiv);
               if (aEndpoints.isEmpty ())
               {
@@ -986,7 +986,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
 
             // Show document types + children
             final HCLI aLI = aULDT.addItem ();
-            final HCDiv aDiv = new HCDiv ().addChild (AppCommonUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()))
+            final HCDiv aDiv = new HCDiv ().addChild (SMPCommonUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()))
                                            .addChild (" ")
                                            .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aServiceInfo.getServiceGroup ()
                                                                                                                   .getParticpantIdentifier ()
@@ -1036,8 +1036,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
             aRow.addCell (new HCA (createViewURL (aWPEC,
                                                   aServiceInfo,
                                                   aParams)).addChild (aServiceInfo.getServiceGroupID ()));
-            aRow.addCell (AppCommonUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()));
-            aRow.addCell (AppCommonUI.getProcessID (aProcess.getProcessIdentifier ()));
+            aRow.addCell (SMPCommonUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()));
+            aRow.addCell (SMPCommonUI.getProcessID (aProcess.getProcessIdentifier ()));
             aRow.addCell (new HCA (createViewURL (aWPEC,
                                                   CMenuSecure.MENU_TRANSPORT_PROFILES,
                                                   aEndpoint.getTransportProfile ())).addChild (aEndpoint.getTransportProfile ()));

@@ -40,8 +40,8 @@ import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.app.CApp;
-import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.app.CSMP;
+import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.photon.basic.app.appid.CApplicationID;
 import com.helger.photon.basic.app.appid.PhotonGlobalState;
 import com.helger.photon.basic.app.menu.IMenuItemExternal;
@@ -137,7 +137,7 @@ public final class SMPRendererPublic
         // 300px would lead to a messy layout - so 250px is fine
         final HCDiv aDiv = new HCDiv ().addStyle (CCSSProperties.PADDING.newValue ("10px"))
                                        .addStyle (CCSSProperties.WIDTH.newValue ("250px"));
-        aDiv.addChild (AppCommonUI.createViewLoginForm (aLEC, null, false).addClass (CBootstrapCSS.NAVBAR_FORM));
+        aDiv.addChild (SMPCommonUI.createViewLoginForm (aLEC, null, false).addClass (CBootstrapCSS.NAVBAR_FORM));
         aDropDown.addItem (aDiv);
       }
       aNavBar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_LEFT, aNav);
@@ -171,7 +171,7 @@ public final class SMPRendererPublic
     final BootstrapNavbar aNavBar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
     aNavBar.getContainer ().setFluid (true);
     aNavBar.addBrand (createLogo (aLEC), aLinkToStartPage);
-    aNavBar.addBrand (new HCSpan ().addChild (CApp.getApplicationTitle ()), aLinkToStartPage);
+    aNavBar.addBrand (new HCSpan ().addChild (CSMP.getApplicationTitle ()), aLinkToStartPage);
 
     _addNavbarLoginLogout (aLEC, aNavBar);
     return aNavBar;
@@ -279,7 +279,7 @@ public final class SMPRendererPublic
   public static BootstrapContainer createDefaultFooter ()
   {
     final BootstrapContainer aDiv = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
-    aDiv.addChild (new HCP ().addChild (CApp.getApplicationTitleAndVersion () +
+    aDiv.addChild (new HCP ().addChild (CSMP.getApplicationTitleAndVersion () +
                                         " with " +
                                         SMPServerConfiguration.getRESTType ().getDisplayName () +
                                         " API"));
@@ -290,7 +290,7 @@ public final class SMPRendererPublic
                                                                                                     .addChild ("@philiphelger"))
                              .addChild (" - ")
                              .addChild (new HCA (new SimpleURL ("https://github.com/phax/peppol-smp-server")).setTargetBlank ()
-                                                                                                             .addChild (CApp.APPLICATION_TITLE +
+                                                                                                             .addChild (CSMP.APPLICATION_TITLE +
                                                                                                                         " on GitHub")));
     return aDiv;
   }

@@ -58,7 +58,7 @@ import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookException;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
-import com.helger.peppol.smpserver.ui.AppCommonUI;
+import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
 import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.peppol.url.PeppolDNSResolutionException;
@@ -413,10 +413,10 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                  .setCtrl (aSelectedObject.getParticpantIdentifier ()
                                                                           .getURIEncoded ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
-                                                 .setCtrl (AppCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
+                                                 .setCtrl (SMPCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
     if (aSelectedObject.hasExtension ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (AppCommonUI.getExtensionDisplay (aSelectedObject)));
+                                                   .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
 
     aNodeList.addChild (aForm);
   }
@@ -629,7 +629,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-      aRow.addCell (AppCommonUI.getOwnerName (aCurObject.getOwnerID ()));
+      aRow.addCell (SMPCommonUI.getOwnerName (aCurObject.getOwnerID ()));
       aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.hasExtension (), aDisplayLocale));
       aRow.addCell (Integer.toString (aSIs.size ()));
       aRow.addCell (Integer.toString (nProcesses));

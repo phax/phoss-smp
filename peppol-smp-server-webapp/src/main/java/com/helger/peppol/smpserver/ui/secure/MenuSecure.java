@@ -19,7 +19,7 @@ package com.helger.peppol.smpserver.ui.secure;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.basic.app.menu.IMenuItemPage;
 import com.helger.photon.basic.app.menu.IMenuObjectFilter;
@@ -38,7 +38,7 @@ public final class MenuSecure
 
   public static void init (@Nonnull final IMenuTree aMenuTree)
   {
-    final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID);
+    final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID);
     final IMenuObjectFilter aFilterPEPPOLDirectory = x -> SMPMetaManager.getSettings ()
                                                                         .isPEPPOLDirectoryIntegrationEnabled () &&
                                                           SMPMetaManager.hasBusinessCardMgr ();
@@ -90,7 +90,7 @@ public final class MenuSecure
       aMenuTree.createItem (aAdmin, new PageSecureTransportProfile (CMenuSecure.MENU_TRANSPORT_PROFILES));
       aMenuTree.createItem (aAdmin,
                             new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
-      BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CApp.DEFAULT_LOCALE);
+      BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CSMP.DEFAULT_LOCALE);
     }
 
     // Default menu item

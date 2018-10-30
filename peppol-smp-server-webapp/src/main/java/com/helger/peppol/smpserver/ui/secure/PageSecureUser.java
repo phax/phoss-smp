@@ -34,7 +34,7 @@ import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
-import com.helger.peppol.smpserver.app.CApp;
+import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserEditable;
@@ -114,7 +114,7 @@ public class PageSecureUser extends AbstractSMPWebPageForm <ISMPUserEditable>
     {
       final BootstrapWarnBox aWarnBox = new BootstrapWarnBox ().addChild (new HCDiv ().addChild ("No special user management is needed. The integrated user management must be used."));
       aNodeList.addChild (aWarnBox);
-      if (SecurityHelper.isCurrentUserAssignedToUserGroup (CApp.USERGROUP_ADMINISTRATORS_ID))
+      if (SecurityHelper.isCurrentUserAssignedToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID))
       {
         aNodeList.addChild (new BootstrapButton ().addChild ("Open user management")
                                                   .setOnClick (aWPEC.getLinkToMenuItem (BootstrapPagesMenuConfigurator.MENU_ADMIN_SECURITY_USER))

@@ -37,7 +37,7 @@ import com.helger.photon.security.CSecurity;
  * @author Philip Helger
  */
 @Immutable
-public final class CApp
+public final class CSMP
 {
   public static final Locale DEFAULT_LOCALE = LocaleCache.getInstance ().getLocale ("en", "US");
 
@@ -80,19 +80,19 @@ public final class CApp
   public static final String USER_ADMINISTRATOR_FIRSTNAME = null;
   public static final String USER_ADMINISTRATOR_LASTNAME = CSecurity.USER_ADMINISTRATOR_NAME;
   public static final String USER_ADMINISTRATOR_DESCRIPTION = null;
-  public static final Locale USER_ADMINISTRATOR_LOCALE = CApp.DEFAULT_LOCALE;
+  public static final Locale USER_ADMINISTRATOR_LOCALE = CSMP.DEFAULT_LOCALE;
   public static final ICommonsMap <String, String> USER_ADMINISTRATOR_CUSTOMATTRS = null;
 
   /** A regular expression pattern to validate the SMP ID. */
   public static final String PATTERN_SMP_ID = "[a-zA-Z0-9\\-\\.]+";
 
-  private CApp ()
+  private CSMP ()
   {}
 
   @Nonnull
   public static String getApplicationSuffix ()
   {
-    return AppConfiguration.isTestVersion () ? " [Test version]" : "";
+    return SMPWebAppConfiguration.isTestVersion () ? " [Test version]" : "";
   }
 
   @Nonnull
