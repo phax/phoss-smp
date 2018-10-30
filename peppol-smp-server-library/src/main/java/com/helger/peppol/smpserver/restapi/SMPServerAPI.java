@@ -302,13 +302,19 @@ public final class SMPServerAPI
                                         m_aAPIProvider.getCurrentURI ());
       }
 
-      if (!aServiceGroupID.hasSameContent (aServiceGroup.getParticipantIdentifier ()))
+      // Parse the content of the payload with the same identifier factory to
+      // ensure same case sensitivity
+      final IParticipantIdentifier aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceGroup.getParticipantIdentifier ()
+                                                                                                                         .getScheme (),
+                                                                                                            aServiceGroup.getParticipantIdentifier ()
+                                                                                                                         .getValue ());
+      if (!aServiceGroupID.hasSameContent (aPayloadServiceGroupID))
       {
         // Business identifiers must be equal
         throw new SMPNotFoundException ("ServiceGroup Inconsistency. The URL points to " +
                                         aServiceGroupID.getURIEncoded () +
                                         " whereas the ServiceGroup contains " +
-                                        aServiceGroup.getParticipantIdentifier (),
+                                        aPayloadServiceGroupID.getURIEncoded (),
                                         m_aAPIProvider.getCurrentURI ());
       }
 
