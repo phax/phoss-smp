@@ -49,11 +49,11 @@ import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
-import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
-import com.helger.photon.bootstrap3.label.BootstrapLabel;
-import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
+import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
+import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap4.badge.BootstrapBadge;
+import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.uicore.css.CUICoreCSS;
@@ -73,19 +73,19 @@ public class PageSecureTasks extends AbstractSMPWebPage
   @Nonnull
   private static IHCNode _createInfo (@Nonnull final String sMsg)
   {
-    return new BootstrapLabel (EBootstrapLabelType.INFO).addChild ("Information: " + sMsg);
+    return new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("Information: " + sMsg);
   }
 
   @Nonnull
   private static IHCNode _createWarning (@Nonnull final String sMsg)
   {
-    return new BootstrapLabel (EBootstrapLabelType.WARNING).addChild ("Warning: " + sMsg);
+    return new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Warning: " + sMsg);
   }
 
   @Nonnull
   private static IHCNode _createError (@Nonnull final String sMsg)
   {
-    return new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("Error: " + sMsg);
+    return new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("Error: " + sMsg);
   }
 
   @Override
@@ -103,8 +103,9 @@ public class PageSecureTasks extends AbstractSMPWebPage
     final HCOL aOL = new HCOL ();
 
     // Check for default password
-    if (PhotonSecurityManager.getUserMgr ().areUserIDAndPasswordValid (CSecurity.USER_ADMINISTRATOR_ID,
-                                                                       CSecurity.USER_ADMINISTRATOR_PASSWORD))
+    if (PhotonSecurityManager.getUserMgr ()
+                             .areUserIDAndPasswordValid (CSecurity.USER_ADMINISTRATOR_ID,
+                                                         CSecurity.USER_ADMINISTRATOR_PASSWORD))
     {
       aOL.addItem (_createError ("Please change the password of the default user " +
                                  CSecurity.USER_ADMINISTRATOR_EMAIL +

@@ -47,14 +47,14 @@ import com.helger.peppol.smpserver.security.SMPTrustManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
-import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
-import com.helger.photon.bootstrap3.button.BootstrapButton;
-import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap3.nav.BootstrapTabBox;
-import com.helger.photon.bootstrap3.table.BootstrapTable;
+import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
+import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap4.button.BootstrapButton;
+import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
+import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
@@ -225,7 +225,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert,
                                                                                              aNowLDT,
                                                                                              aDisplayLocale);
-              aUL.addItem (aCertDetails.getAsResponsiveTable ());
+              aUL.addItem (aCertDetails.setResponsive (true));
             }
             else
               aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
@@ -267,7 +267,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert,
                                                                                              aNowLDT,
                                                                                              aDisplayLocale);
-              aUL.addItem (aCertDetails.getAsResponsiveTable ());
+              aUL.addItem (aCertDetails.setResponsive (true));
             }
             else
               aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
@@ -357,7 +357,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert,
                                                                                              aNowLDT,
                                                                                              aDisplayLocale);
-              aUL.addItem (aCertDetails.getAsResponsiveTable ());
+              aUL.addItem (aCertDetails.setResponsive (true));
             }
             else
               aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +

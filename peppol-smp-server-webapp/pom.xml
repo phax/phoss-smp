@@ -81,7 +81,7 @@
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-oton-bootstrap3-stub</artifactId>
+      <artifactId>ph-oton-bootstrap4-stub</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>

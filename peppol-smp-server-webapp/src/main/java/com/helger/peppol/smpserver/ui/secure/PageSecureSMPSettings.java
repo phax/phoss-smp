@@ -23,6 +23,7 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLValidator;
+import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCEM;
@@ -36,11 +37,10 @@ import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageSimpleForm;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMLSelect;
-import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap3.form.BootstrapCheckBox;
-import com.helger.photon.bootstrap3.form.BootstrapForm;
-import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap3.form.BootstrapViewForm;
+import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.form.BootstrapForm;
+import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.form.BootstrapViewForm;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
@@ -119,10 +119,10 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                .isCheckBoxChecked (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                                                                    SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE);
     final String sPEPPOLDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME);
-    final boolean bSMLActive = aWPEC.params ().isCheckBoxChecked (FIELD_SML_ACTIVE,
-                                                                  SMPServerConfiguration.DEFAULT_SML_ACTIVE);
-    final boolean bSMLNeeded = aWPEC.params ().isCheckBoxChecked (FIELD_SML_NEEDED,
-                                                                  SMPServerConfiguration.DEFAULT_SML_NEEDED);
+    final boolean bSMLActive = aWPEC.params ()
+                                    .isCheckBoxChecked (FIELD_SML_ACTIVE, SMPServerConfiguration.DEFAULT_SML_ACTIVE);
+    final boolean bSMLNeeded = aWPEC.params ()
+                                    .isCheckBoxChecked (FIELD_SML_NEEDED, SMPServerConfiguration.DEFAULT_SML_NEEDED);
     final String sSMLInfoID = aWPEC.params ().getAsString (FIELD_SML_INFO);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLInfoID);
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
@@ -146,13 +146,14 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
 
     if (aFormErrors.isEmpty ())
     {
-      SMPMetaManager.getSettingsMgr ().updateSettings (bRESTWritableAPIDisabled,
-                                                       bPEPPOLDirectoryIntegrationEnabled,
-                                                       bPEPPOLDirectoryIntegrationAutoUpdate,
-                                                       sPEPPOLDirectoryHostName,
-                                                       bSMLActive,
-                                                       bSMLNeeded,
-                                                       aSMLInfo);
+      SMPMetaManager.getSettingsMgr ()
+                    .updateSettings (bRESTWritableAPIDisabled,
+                                     bPEPPOLDirectoryIntegrationEnabled,
+                                     bPEPPOLDirectoryIntegrationAutoUpdate,
+                                     sPEPPOLDirectoryHostName,
+                                     bSMLActive,
+                                     bSMLNeeded,
+                                     aSMLInfo);
       aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP settings were successfully saved."));
     }
   }
@@ -167,20 +168,20 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
-                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_REST_WRITABLE_API_DISABLED,
-                                                                                                           aObject.isRESTWritableAPIDisabled ())))
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_REST_WRITABLE_API_DISABLED,
+                                                                                                    aObject.isRESTWritableAPIDisabled ())))
                                                  .setHelpText ("If this checkbox is checked, all non-standard writing REST APIs are disabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_REST_WRITABLE_API_DISABLED)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration enabled?")
-                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
-                                                                                                           aObject.isPEPPOLDirectoryIntegrationEnabled ())))
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
+                                                                                                    aObject.isPEPPOLDirectoryIntegrationEnabled ())))
                                                  .setHelpText ("If this checkbox is checked, the " +
                                                                sDirectoryName +
                                                                " integration is enabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration automatic update?")
-                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                                                                                           aObject.isPEPPOLDirectoryIntegrationAutoUpdate ())))
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                                                                                    aObject.isPEPPOLDirectoryIntegrationAutoUpdate ())))
                                                  .setHelpText ("If the " +
                                                                sDirectoryName +
                                                                " integration is enabled and this checkbox is checked, all business card creations, modifications and deletions are automatically pushed to the " +
@@ -197,13 +198,13 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                " integration (see above) is enabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
-                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SML_ACTIVE,
-                                                                                                           aObject.isSMLActive ())))
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SML_ACTIVE,
+                                                                                                    aObject.isSMLActive ())))
                                                  .setHelpText ("If this checkbox is checked, service group changes are propagated to the SML.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SML_ACTIVE)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection needed?")
-                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_SML_NEEDED,
-                                                                                                           aObject.isSMLNeeded ())))
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SML_NEEDED,
+                                                                                                    aObject.isSMLNeeded ())))
                                                  .setHelpText ("If this checkbox is checked, warnings are emitted if the SML connection is not enabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SML_NEEDED)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML configuration")

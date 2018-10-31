@@ -36,12 +36,13 @@ import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.log.InMemoryLogger;
 import com.helger.commons.log.LogMessage;
 import com.helger.commons.string.StringHelper;
+import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEditFile;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.app.CSMPExchange;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
@@ -62,18 +63,17 @@ import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
-import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
-import com.helger.photon.bootstrap3.button.BootstrapButton;
-import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap3.button.BootstrapSubmitButton;
-import com.helger.photon.bootstrap3.form.BootstrapCheckBox;
-import com.helger.photon.bootstrap3.form.BootstrapForm;
-import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap3.label.BootstrapLabel;
-import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
-import com.helger.photon.bootstrap3.nav.BootstrapTabBox;
-import com.helger.photon.bootstrap3.panel.BootstrapPanel;
+import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
+import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap4.badge.BootstrapBadge;
+import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
+import com.helger.photon.bootstrap4.button.BootstrapButton;
+import com.helger.photon.bootstrap4.button.BootstrapSubmitButton;
+import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap4.card.BootstrapCard;
+import com.helger.photon.bootstrap4.form.BootstrapForm;
+import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
@@ -470,17 +470,17 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             for (final LogMessage aLogMsg : aLogger)
             {
               final IErrorLevel aErrorLevel = aLogMsg.getErrorLevel ();
-              EBootstrapLabelType eLabelType;
+              EBootstrapBadgeType eBadgeType;
               if (aErrorLevel.isGE (EErrorLevel.ERROR))
-                eLabelType = EBootstrapLabelType.DANGER;
+                eBadgeType = EBootstrapBadgeType.DANGER;
               else
                 if (aErrorLevel.isGE (EErrorLevel.WARN))
-                  eLabelType = EBootstrapLabelType.WARNING;
+                  eBadgeType = EBootstrapBadgeType.WARNING;
                 else
                   if (aErrorLevel.isGE (EErrorLevel.INFO))
-                    eLabelType = EBootstrapLabelType.INFO;
+                    eBadgeType = EBootstrapBadgeType.INFO;
                   else
-                    eLabelType = EBootstrapLabelType.SUCCESS;
+                    eBadgeType = EBootstrapBadgeType.SUCCESS;
 
               String sMsg = aLogMsg.getMessage ().toString ();
               if (aLogMsg.getThrowable () != null)
@@ -488,7 +488,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                         aLogMsg.getThrowable ().getClass ().getName () +
                         " - " +
                         aLogMsg.getThrowable ().getMessage ();
-              aImportResultUL.addItem (new BootstrapLabel (eLabelType).addChild (sMsg));
+              aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild (sMsg));
             }
           }
           else
@@ -540,9 +540,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
       if (aImportResultUL.hasChildren ())
       {
-        final BootstrapPanel aPanel = new BootstrapPanel ();
-        aPanel.getOrCreateHeader ().addChild ("Import results");
-        aPanel.getBody ().addChild (aImportResultUL);
+        final BootstrapCard aPanel = new BootstrapCard ();
+        aPanel.createAndAddHeader ().addChild ("Import results");
+        aPanel.createAndAddBody ().addChild (aImportResultUL);
         aImport.addChild (aPanel);
       }
 
@@ -556,8 +556,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                                                    .setCtrl (new HCEditFile (FIELD_IMPORT_FILE))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_IMPORT_FILE)));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Overwrite existing elements")
-                                                   .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_OVERWRITE_EXISTING,
-                                                                                                             DEFAULT_OVERWRITE_EXISTING)))
+                                                   .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_OVERWRITE_EXISTING,
+                                                                                                      DEFAULT_OVERWRITE_EXISTING)))
                                                    .setHelpText ("If this box is checked, all existing endpoints etc. of a service group are deleted and new endpoints are created! If the " +
                                                                  SMPWebAppConfiguration.getDirectoryName () +
                                                                  " integration is enabled, existing business cards contained in the import are also overwritten!")

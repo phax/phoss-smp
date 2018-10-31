@@ -27,6 +27,7 @@ import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.URLHelper;
+import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
@@ -40,18 +41,17 @@ import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
-import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
-import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap3.form.BootstrapCheckBox;
-import com.helger.photon.bootstrap3.form.BootstrapForm;
-import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap3.form.BootstrapViewForm;
-import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
-import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
+import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
+import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap4.form.BootstrapForm;
+import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.form.BootstrapViewForm;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
@@ -196,9 +196,9 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_MANAGEMENT_ADDRESS_URL)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Client Certificate required?")
-                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_CLIENT_CERTIFICATE_REQUIRED,
-                                                                                                           aSelectedObject != null ? aSelectedObject.isClientCertificateRequired ()
-                                                                                                                                   : true)))
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_CLIENT_CERTIFICATE_REQUIRED,
+                                                                                                    aSelectedObject != null ? aSelectedObject.isClientCertificateRequired ()
+                                                                                                                            : true)))
                                                  .setHelpText ("Check this if this SML requires a client certificate for access. Both PEPPOL production SML and SMK require a client certificate. Only a locally running SML software may not require a client certificate.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CLIENT_CERTIFICATE_REQUIRED)));
 

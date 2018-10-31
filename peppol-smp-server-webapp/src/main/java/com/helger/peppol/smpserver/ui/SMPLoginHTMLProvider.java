@@ -19,18 +19,15 @@ package com.helger.peppol.smpserver.ui;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.css.ECSSUnit;
-import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
-import com.helger.html.hc.html.sections.HCH2;
 import com.helger.html.hc.html.textlevel.HCSmall;
+import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.app.CSMP;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
-import com.helger.photon.bootstrap3.base.BootstrapContainer;
-import com.helger.photon.bootstrap3.grid.BootstrapRow;
-import com.helger.photon.bootstrap3.pageheader.BootstrapPageHeader;
-import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginHTMLProvider;
+import com.helger.photon.bootstrap4.CBootstrapCSS;
+import com.helger.photon.bootstrap4.uictrls.ext.BootstrapLoginHTMLProvider;
+import com.helger.photon.bootstrap4.utils.BootstrapPageHeader;
 import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
 
@@ -50,24 +47,21 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
 
   @Override
   @Nonnull
-  protected IHCNode createPageHeader (@Nullable final IHCNode aPageTitle)
+  protected IHCNode createPageHeader (@Nonnull final ISimpleWebExecutionContext aSWEC,
+                                      @Nullable final IHCNode aPageTitle)
   {
-    return new BootstrapPageHeader ().addChild (new HCH2 ().addChild ("Administration - Login"));
+    final HCNodeList ret = new HCNodeList ();
+    ret.addChild (new HCDiv ().addClass (CBootstrapCSS.MB_3).addChild (SMPRendererPublic.createLogoBig (aSWEC)));
+    ret.addChild (new BootstrapPageHeader ().addChild ("Administration - Login"));
+    return ret;
   }
 
   @Override
-  protected void onAfterContainer (@Nonnull final ISimpleWebExecutionContext aSWEC,
-                                   @Nonnull final BootstrapContainer aContainer,
-                                   @Nonnull final BootstrapRow aRow,
-                                   @Nonnull final HCDiv aContentCol)
+  @Nullable
+  protected IHCNode createFormFooter (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
-    // Add the logo on top
-    aContentCol.addChildAt (0,
-                            new HCDiv ().addStyle (CCSSProperties.MARGIN_TOP.newValue (ECSSUnit.em (1)))
-                                        .addChild (SMPRendererPublic.createLogoBig (aSWEC)));
-
-    // Add the version number in the login screen
-    aContentCol.addChild (new HCDiv ().addStyle (CCSSProperties.MARGIN_TOP.newValue (ECSSUnit.em (1)))
-                                      .addChild (new HCSmall ().addChild (CSMP.getApplicationTitleAndVersion ())));
+    final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.D_FLEX).addClass (CBootstrapCSS.MT_3);
+    aDiv.addChild (new HCSmall ().addChild (CSMP.getApplicationTitleAndVersion ()));
+    return aDiv;
   }
 }

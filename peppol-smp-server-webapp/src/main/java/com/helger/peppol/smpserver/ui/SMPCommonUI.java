@@ -40,7 +40,6 @@ import com.helger.commons.error.IError;
 import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.id.factory.GlobalIDFactory;
-import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCEditPassword;
@@ -68,17 +67,16 @@ import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.peppol.smpserver.domain.extension.ISMPHasExtension;
 import com.helger.peppol.smpserver.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.peppol.smpserver.ui.ajax.CAjax;
-import com.helger.photon.bootstrap3.CBootstrapCSS;
-import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap3.ext.BootstrapSystemMessage;
-import com.helger.photon.bootstrap3.form.BootstrapForm;
-import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap3.form.BootstrapHelpBlock;
-import com.helger.photon.bootstrap3.form.EBootstrapFormType;
-import com.helger.photon.bootstrap3.label.BootstrapLabel;
-import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
-import com.helger.photon.bootstrap3.table.BootstrapTable;
-import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap4.CBootstrapCSS;
+import com.helger.photon.bootstrap4.badge.BootstrapBadge;
+import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
+import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap4.ext.BootstrapSystemMessage;
+import com.helger.photon.bootstrap4.form.BootstrapForm;
+import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.form.DefaultBootstrapFormGroupRenderer;
+import com.helger.photon.bootstrap4.table.BootstrapTable;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.form.RequestField;
@@ -158,8 +156,7 @@ public final class SMPCommonUI
 
   @Nonnull
   public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC,
-                                                   @Nullable final String sPreselectedUserName,
-                                                   final boolean bFullUI)
+                                                   @Nullable final String sPreselectedUserName)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -170,10 +167,7 @@ public final class SMPCommonUI
     final String sIDPassword = GlobalIDFactory.getNewStringID ();
     final String sIDErrorField = GlobalIDFactory.getNewStringID ();
 
-    final BootstrapForm aForm = new BootstrapForm (aLEC).setAction (aLEC.getSelfHref ())
-                                                        .setFormType (bFullUI ? EBootstrapFormType.HORIZONTAL
-                                                                              : EBootstrapFormType.DEFAULT);
-    aForm.setLeft (3);
+    final BootstrapForm aForm = new BootstrapForm (aLEC).setAction (aLEC.getSelfHref ());
 
     // User name field
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel (EPhotonCoreText.EMAIL_ADDRESS.getDisplayText (aDisplayLocale))
@@ -185,7 +179,7 @@ public final class SMPCommonUI
                                                  .setCtrl (new HCEditPassword (CLogin.REQUEST_ATTR_PASSWORD).setID (sIDPassword)));
 
     // Placeholder for error message
-    aForm.addChild (new HCDiv ().setID (sIDErrorField).addStyle (CCSSProperties.MARGIN.newValue ("4px 0")));
+    aForm.addChild (new HCDiv ().setID (sIDErrorField).addClass (CBootstrapCSS.MX_2));
 
     // Login button
     final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aLEC));
@@ -228,12 +222,12 @@ public final class SMPCommonUI
     aCertDetails.addBodyRow ()
                 .addCell ("Valid from:")
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotBefore, aDisplayLocale) + " "),
-                          aNowLDT.isBefore (aNotBefore) ? new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("!!!NOT YET VALID!!!")
+                          aNowLDT.isBefore (aNotBefore) ? new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NOT YET VALID!!!")
                                                         : null);
     aCertDetails.addBodyRow ()
                 .addCell ("Valid to:")
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotAfter, aDisplayLocale) + " "),
-                          aNowLDT.isAfter (aNotAfter) ? new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("!!!NO LONGER VALID!!!")
+                          aNowLDT.isAfter (aNotAfter) ? new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NO LONGER VALID!!!")
                                                       : new HCDiv ().addChild ("Valid for: " +
                                                                                _getPeriod (aNowLDT, aNotAfter)));
 
@@ -287,7 +281,7 @@ public final class SMPCommonUI
 
     if (ePredefined != null)
       return new HCNodeList ().addChild (ePredefined.getCommonName () + " ")
-                              .addChild (new BootstrapLabel (EBootstrapLabelType.INFO).addChild ("predefined"));
+                              .addChild (new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("predefined"));
 
     return _getWBRList (aDocTypeID.getURIEncoded ());
   }
@@ -305,7 +299,7 @@ public final class SMPCommonUI
 
     if (ePredefined != null)
       return new HCNodeList ().addChild (ePredefined.getValue () + " ")
-                              .addChild (new BootstrapLabel (EBootstrapLabelType.INFO).addChild ("predefined"));
+                              .addChild (new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("predefined"));
 
     return _getWBRList (aDocTypeID.getURIEncoded ());
   }
@@ -359,9 +353,9 @@ public final class SMPCommonUI
     if (aFormErrors == null || aFormErrors.isEmpty ())
       return null;
 
-    final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.HAS_ERROR);
+    final HCNodeList ret = new HCNodeList ();
     for (final IError aError : aFormErrors)
-      aDiv.addChild (new BootstrapHelpBlock ().addChild (aError.getErrorText (aDisplayLocale)));
-    return aDiv;
+      ret.addChild (DefaultBootstrapFormGroupRenderer.createDefaultErrorNode (aError, aDisplayLocale));
+    return ret;
   }
 }

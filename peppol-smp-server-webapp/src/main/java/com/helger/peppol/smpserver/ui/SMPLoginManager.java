@@ -19,7 +19,7 @@ package com.helger.peppol.smpserver.ui;
 import javax.annotation.Nonnull;
 
 import com.helger.peppol.smpserver.app.CSMP;
-import com.helger.photon.bootstrap3.uictrls.ext.BootstrapLoginManager;
+import com.helger.photon.bootstrap4.uictrls.ext.BootstrapLoginManager;
 import com.helger.photon.core.app.html.IHTMLProvider;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
 

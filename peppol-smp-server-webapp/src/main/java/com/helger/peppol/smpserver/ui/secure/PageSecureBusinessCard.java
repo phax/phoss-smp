@@ -61,8 +61,8 @@ import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.app.PDClientProvider;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
@@ -76,23 +76,25 @@ import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
-import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
-import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
-import com.helger.photon.bootstrap3.button.BootstrapButton;
-import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap3.button.EBootstrapButtonSize;
-import com.helger.photon.bootstrap3.form.BootstrapForm;
-import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap3.form.BootstrapViewForm;
-import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageActionHandler;
-import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
-import com.helger.photon.bootstrap3.panel.BootstrapPanel;
-import com.helger.photon.bootstrap3.table.BootstrapTable;
-import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
-import com.helger.photon.bootstrap3.uictrls.datetimepicker.BootstrapDateTimePicker;
+import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
+import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap4.button.BootstrapButton;
+import com.helger.photon.bootstrap4.button.EBootstrapButtonSize;
+import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap4.card.BootstrapCard;
+import com.helger.photon.bootstrap4.card.BootstrapCardBody;
+import com.helger.photon.bootstrap4.form.BootstrapForm;
+import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.form.BootstrapViewForm;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap4.table.BootstrapTable;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap4.uictrls.datetimepicker.BootstrapDateTimePicker;
+import com.helger.photon.bootstrap4.uictrls.datetimepicker.EBootstrap4DateTimePickerMode;
 import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.ajax.decl.AjaxFunctionDeclaration;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
@@ -306,10 +308,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     for (final SMPBusinessCardEntity aEntity : aSelectedObject.getAllEntities ())
     {
       ++nIndex;
-      final BootstrapPanel aPanel = aForm.addAndReturnChild (new BootstrapPanel ());
-      aPanel.getOrCreateHeader ().addChild ("Business Entity " + nIndex);
+      final BootstrapCard aPanel = aForm.addAndReturnChild (new BootstrapCard ());
+      aPanel.createAndAddHeader ().addChild ("Business Entity " + nIndex);
 
-      final BootstrapViewForm aForm2 = aPanel.getBody ().addAndReturnChild (new BootstrapViewForm ());
+      final BootstrapViewForm aForm2 = aPanel.createAndAddBody ().addAndReturnChild (new BootstrapViewForm ());
 
       aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Name")
                                                     .setCtrl (aEntity.names ().getFirst ().getName ()));
@@ -632,8 +634,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                                                       .setPlaceholder ("Identifier value"),
                   SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
 
-    aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
-                                                                 .setOnClick (JQuery.idRef (aRow).remove ()));
+    aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).setIcon (EDefaultIcon.DELETE)
+                                                                  .setOnClick (JQuery.idRef (aRow).remove ()));
 
     return aRow;
   }
@@ -704,8 +706,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                     SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldEmail), aDisplayLocale));
     }
 
-    aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).setIcon (EDefaultIcon.DELETE)
-                                                                 .setOnClick (JQuery.idRef (aRow).remove ()));
+    aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).setIcon (EDefaultIcon.DELETE)
+                                                                  .setOnClick (JQuery.idRef (aRow).remove ()));
 
     return aRow;
   }
@@ -722,9 +724,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                 : TMP_ID_PREFIX +
                                                                   Integer.toString (GlobalIDFactory.getNewIntID ());
 
-    final BootstrapPanel aPanel = new BootstrapPanel ().setID (sEntityID);
-    aPanel.getOrCreateHeader ().addChild ("Business Entity");
-    final HCDiv aBody = aPanel.getBody ();
+    final BootstrapCard aPanel = new BootstrapCard ().setID (sEntityID);
+    aPanel.createAndAddHeader ().addChild ("Business Entity");
+    final BootstrapCardBody aBody = aPanel.createAndAddBody ();
 
     final BootstrapViewForm aForm = aBody.addAndReturnChild (new BootstrapViewForm ());
 
@@ -879,7 +881,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                  .setCtrl (new BootstrapDateTimePicker (new RequestFieldDate (sFieldRegDate,
                                                                                                               aExistingEntity == null ? null
                                                                                                                                       : aExistingEntity.getRegistrationDate (),
-                                                                                                              aDisplayLocale)).setEndDate (null))
+                                                                                                              aDisplayLocale),
+                                                                                        EBootstrap4DateTimePickerMode.DATE))
                                                  .setErrorList (aFormErrors.getListOfField (sFieldRegDate)));
 
     final BootstrapButtonToolbar aToolbar = aBody.addAndReturnChild (new BootstrapButtonToolbar (aLEC));

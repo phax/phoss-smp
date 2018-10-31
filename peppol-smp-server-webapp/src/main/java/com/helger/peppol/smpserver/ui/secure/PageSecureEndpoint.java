@@ -41,6 +41,7 @@ import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
+import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -78,24 +79,24 @@ import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPTransportProfileSelect;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
-import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
-import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
-import com.helger.photon.bootstrap3.button.BootstrapButton;
-import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap3.form.BootstrapCheckBox;
-import com.helger.photon.bootstrap3.form.BootstrapForm;
-import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap3.form.BootstrapViewForm;
-import com.helger.photon.bootstrap3.grid.BootstrapRow;
-import com.helger.photon.bootstrap3.label.BootstrapLabel;
-import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
-import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
-import com.helger.photon.bootstrap3.table.BootstrapTable;
-import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
-import com.helger.photon.bootstrap3.uictrls.datetimepicker.BootstrapDateTimePicker;
+import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
+import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap4.badge.BootstrapBadge;
+import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
+import com.helger.photon.bootstrap4.button.BootstrapButton;
+import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap4.form.BootstrapForm;
+import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.form.BootstrapViewForm;
+import com.helger.photon.bootstrap4.grid.BootstrapRow;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap4.table.BootstrapTable;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap4.uictrls.datetimepicker.BootstrapDateTimePicker;
+import com.helger.photon.bootstrap4.uictrls.datetimepicker.EBootstrap4DateTimePickerMode;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
@@ -484,7 +485,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                                                  : SMPCommonUI.createCertificateDetailsTable (aEndpointCert,
                                                                                                                               aNowLDT,
                                                                                                                               aDisplayLocale)
-                                                                                              .getAsResponsiveTable ()));
+                                                                                              .setResponsive (true)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service description")
                                                  .setCtrl (aSelectedEndpoint.getServiceDescription ()));
@@ -796,9 +797,9 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_ENDPOINT_REFERENCE)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires Business Level Signature")
-                                                 .setCtrl (new BootstrapCheckBox (new RequestFieldBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
-                                                                                                           aSelectedEndpoint != null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
-                                                                                                                                     : SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE)))
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
+                                                                                                    aSelectedEndpoint != null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
+                                                                                                                              : SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE)))
                                                  .setHelpText ("Check the box if the recipient requires business-level signatures for\r\n" +
                                                                "the message, meaning a signature applied to the business message\r\n" +
                                                                "before the message is put on the transport. This is independent of\r\n" +
@@ -825,7 +826,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                  .setCtrl (new BootstrapDateTimePicker (new RequestFieldDate (FIELD_NOT_BEFORE,
                                                                                                               aSelectedEndpoint != null ? aSelectedEndpoint.getServiceActivationDate ()
                                                                                                                                         : null,
-                                                                                                              aDisplayLocale)).setEndDate (null))
+                                                                                                              aDisplayLocale),
+                                                                                        EBootstrap4DateTimePickerMode.DATE))
                                                  .setHelpText ("Activation date of the service. Senders should ignore services that " +
                                                                "are not yet activated.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_NOT_BEFORE)));
@@ -834,7 +836,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                  .setCtrl (new BootstrapDateTimePicker (new RequestFieldDate (FIELD_NOT_AFTER,
                                                                                                               aSelectedEndpoint != null ? aSelectedEndpoint.getServiceExpirationDate ()
                                                                                                                                         : null,
-                                                                                                              aDisplayLocale)).setEndDate (null))
+                                                                                                              aDisplayLocale),
+                                                                                        EBootstrap4DateTimePickerMode.DATE))
                                                  .setHelpText ("Expiration date of the service. Senders should ignore services that " +
                                                                "are expired.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_NOT_AFTER)));
@@ -1012,7 +1015,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
               aLI.addChild (aULP);
           }
         if (aServiceInfos == null || aServiceInfos.isEmpty () || aULDT.hasNoChildren ())
-          aLISG.addChild (new BootstrapLabel (EBootstrapLabelType.INFO).addChild ("This service group has no assigned endpoints!"));
+          aLISG.addChild (new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("This service group has no assigned endpoints!"));
         else
           aLISG.addChild (aULDT);
       }

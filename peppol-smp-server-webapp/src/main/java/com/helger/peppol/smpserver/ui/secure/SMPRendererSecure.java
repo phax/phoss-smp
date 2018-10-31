@@ -21,7 +21,6 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.url.ISimpleURL;
-import com.helger.css.property.CCSSProperties;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -34,19 +33,18 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.pub.SMPRendererPublic;
-import com.helger.photon.bootstrap3.CBootstrapCSS;
-import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap3.alert.EBootstrapAlertType;
-import com.helger.photon.bootstrap3.base.BootstrapContainer;
-import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbs;
-import com.helger.photon.bootstrap3.breadcrumbs.BootstrapBreadcrumbsProvider;
-import com.helger.photon.bootstrap3.button.BootstrapButton;
-import com.helger.photon.bootstrap3.grid.BootstrapRow;
-import com.helger.photon.bootstrap3.nav.BootstrapNav;
-import com.helger.photon.bootstrap3.navbar.BootstrapNavbar;
-import com.helger.photon.bootstrap3.navbar.EBootstrapNavbarPosition;
-import com.helger.photon.bootstrap3.navbar.EBootstrapNavbarType;
-import com.helger.photon.bootstrap3.uictrls.ext.BootstrapMenuItemRenderer;
+import com.helger.photon.bootstrap4.CBootstrapCSS;
+import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.alert.EBootstrapAlertType;
+import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumb;
+import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumbProvider;
+import com.helger.photon.bootstrap4.button.BootstrapButton;
+import com.helger.photon.bootstrap4.grid.BootstrapCol;
+import com.helger.photon.bootstrap4.grid.BootstrapRow;
+import com.helger.photon.bootstrap4.layout.BootstrapContainer;
+import com.helger.photon.bootstrap4.navbar.BootstrapNavbar;
+import com.helger.photon.bootstrap4.navbar.BootstrapNavbarToggleable;
+import com.helger.photon.bootstrap4.uictrls.ext.BootstrapMenuItemRenderer;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
@@ -78,33 +76,31 @@ public final class SMPRendererSecure
 
     final ISimpleURL aLinkToStartPage = aLEC.getLinkToMenuItem (aLEC.getMenuTree ().getDefaultMenuItemID ());
 
-    final BootstrapNavbar aNavBar = new BootstrapNavbar (EBootstrapNavbarType.STATIC_TOP, true, aDisplayLocale);
-    aNavBar.getContainer ().setFluid (true);
-    aNavBar.addBrand (SMPRendererPublic.createLogo (aLEC), aLinkToStartPage);
-    aNavBar.addBrand (new HCSpan ().addChild (CSMP.getApplicationSuffix () + " Administration"), aLinkToStartPage);
-    aNavBar.addText (EBootstrapNavbarPosition.COLLAPSIBLE_LEFT, " [" + SMPServerConfiguration.getSMLSMPID () + "]");
-    aNavBar.addButton (EBootstrapNavbarPosition.COLLAPSIBLE_LEFT,
-                       new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH +
-                                                                                        "/"))
-                                             .addChild ("Goto public view")
-                                             .addStyle (CCSSProperties.MARGIN_LEFT.newValue ("8px"))
-                                             .addStyle (CCSSProperties.MARGIN_RIGHT.newValue ("8px")));
+    final BootstrapNavbar aNavbar = new BootstrapNavbar ();
+    aNavbar.addBrand (SMPRendererPublic.createLogo (aLEC), aLinkToStartPage);
+    aNavbar.addBrand (new HCSpan ().addChild (CSMP.getApplicationSuffix () + " Administration"), aLinkToStartPage);
+    aNavbar.addAndReturnText ().addChild (" [" + SMPServerConfiguration.getSMLSMPID () + "]");
+
+    final BootstrapNavbarToggleable aToggleable = aNavbar.addAndReturnToggleable ();
 
     {
-      final BootstrapNav aNav = new BootstrapNav ();
-      final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
-      aNav.addText (new HCSpan ().addChild ("Logged in as ")
-                                 .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser,
-                                                                                                         aDisplayLocale))));
-      aNav.addButton (new BootstrapButton ().setOnClick (LinkHelper.getURLWithContext (aRequestScope,
-                                                                                       LogoutServlet.SERVLET_DEFAULT_PATH))
-                                            .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale))
-                                            .addStyle (CCSSProperties.MARGIN_LEFT.newValue ("8px"))
-                                            .addStyle (CCSSProperties.MARGIN_RIGHT.newValue ("8px")));
+      aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.ML_AUTO)
+                                                  .addClass (CBootstrapCSS.MR_2)
+                                                  .setOnClick (LinkHelper.getURLWithContext (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH +
+                                                                                             "/"))
+                                                  .addChild ("Goto public view"));
 
-      aNavBar.addNav (EBootstrapNavbarPosition.COLLAPSIBLE_RIGHT, aNav);
+      final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
+      aToggleable.addAndReturnText ()
+                 .addClass (CBootstrapCSS.MX_2)
+                 .addChild ("Logged in as ")
+                 .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser, aDisplayLocale)));
+      aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.MX_2)
+                                                  .setOnClick (LinkHelper.getURLWithContext (aRequestScope,
+                                                                                             LogoutServlet.SERVLET_DEFAULT_PATH))
+                                                  .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
     }
-    return aNavBar;
+    return aNavbar;
   }
 
   @Nonnull
@@ -183,21 +179,21 @@ public final class SMPRendererSecure
     // Breadcrumbs
     if (false)
     {
-      final BootstrapBreadcrumbs aBreadcrumbs = BootstrapBreadcrumbsProvider.createBreadcrumbs (aLEC);
-      aBreadcrumbs.addClass (CBootstrapCSS.HIDDEN_XS);
+      final BootstrapBreadcrumb aBreadcrumbs = BootstrapBreadcrumbProvider.createBreadcrumb (aLEC);
+      aBreadcrumbs.addClasses (CBootstrapCSS.D_NONE, CBootstrapCSS.D_SM_BLOCK);
       aOuterContainer.addChild (aBreadcrumbs);
     }
 
     // Content
     {
       final BootstrapRow aRow = aOuterContainer.addAndReturnChild (new BootstrapRow ());
-      final HCDiv aCol1 = aRow.createColumn (12, 4, 3, 2);
-      final HCDiv aCol2 = aRow.createColumn (12, 8, 9, 10);
+      final BootstrapCol aCol1 = aRow.createColumn (12, 12, 4, 3, 2);
+      final BootstrapCol aCol2 = aRow.createColumn (12, 12, 8, 9, 10);
 
       // left
       // We need a wrapper span for easy AJAX content replacement
       aCol1.addChild (new HCSpan ().setID (CLayout.LAYOUT_AREAID_MENU)
-                                   .addClass (CBootstrapCSS.HIDDEN_PRINT)
+                                   .addClass (CBootstrapCSS.D_PRINT_NONE)
                                    .addChild (getMenuContent (aLEC)));
       aCol1.addChild (new HCDiv ().setID (CLayout.LAYOUT_AREAID_SPECIAL));
 

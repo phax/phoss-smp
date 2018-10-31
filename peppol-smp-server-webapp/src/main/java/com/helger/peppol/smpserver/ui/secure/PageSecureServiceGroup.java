@@ -62,25 +62,25 @@ import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMPUserSelect;
 import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.peppol.url.PeppolDNSResolutionException;
-import com.helger.photon.bootstrap3.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap3.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap3.alert.BootstrapQuestionBox;
-import com.helger.photon.bootstrap3.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap3.alert.BootstrapWarnBox;
-import com.helger.photon.bootstrap3.button.BootstrapButton;
-import com.helger.photon.bootstrap3.button.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap3.button.EBootstrapButtonSize;
-import com.helger.photon.bootstrap3.button.EBootstrapButtonType;
-import com.helger.photon.bootstrap3.form.BootstrapForm;
-import com.helger.photon.bootstrap3.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap3.form.BootstrapViewForm;
-import com.helger.photon.bootstrap3.grid.BootstrapRow;
-import com.helger.photon.bootstrap3.label.BootstrapLabel;
-import com.helger.photon.bootstrap3.label.EBootstrapLabelType;
-import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageActionHandler;
-import com.helger.photon.bootstrap3.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
-import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap3.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
+import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
+import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
+import com.helger.photon.bootstrap4.badge.BootstrapBadge;
+import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
+import com.helger.photon.bootstrap4.button.BootstrapButton;
+import com.helger.photon.bootstrap4.button.EBootstrapButtonSize;
+import com.helger.photon.bootstrap4.button.EBootstrapButtonType;
+import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap4.form.BootstrapForm;
+import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.form.BootstrapViewForm;
+import com.helger.photon.bootstrap4.grid.BootstrapRow;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
@@ -260,29 +260,29 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                               aRow.addCell (new IPV4Addr (aInetAddress).getAsString ());
                               aRow.addCell (aNice == null ? null : aNice.getCanonicalHostName ());
                               aRow.addCell (new BootstrapButton (EBootstrapButtonType.DANGER,
-                                                                 EBootstrapButtonSize.MINI).addChild ("Unregister from SML")
-                                                                                           .setOnClick (aWPEC.getSelfHref ()
-                                                                                                             .add (CPageParam.PARAM_ACTION,
-                                                                                                                   ACTION_UNREGISTER_FROM_SML)
-                                                                                                             .add (CPageParam.PARAM_OBJECT,
-                                                                                                                   aServiceGroup.getID ()))
-                                                                                           .setDisabled (bOffLine ||
-                                                                                                         !SMPMetaManager.getSettings ()
-                                                                                                                        .isSMLActive ()));
+                                                                 EBootstrapButtonSize.SMALL).addChild ("Unregister from SML")
+                                                                                            .setOnClick (aWPEC.getSelfHref ()
+                                                                                                              .add (CPageParam.PARAM_ACTION,
+                                                                                                                    ACTION_UNREGISTER_FROM_SML)
+                                                                                                              .add (CPageParam.PARAM_OBJECT,
+                                                                                                                    aServiceGroup.getID ()))
+                                                                                            .setDisabled (bOffLine ||
+                                                                                                          !SMPMetaManager.getSettings ()
+                                                                                                                         .isSMLActive ()));
                             }
                             else
                             {
-                              aRow.addCell (new BootstrapLabel (EBootstrapLabelType.DANGER).addChild ("is not registered in SML"));
+                              aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("is not registered in SML"));
                               aRow.addCell ();
-                              aRow.addCell (new BootstrapButton (EBootstrapButtonSize.MINI).addChild ("Register in SML")
-                                                                                           .setOnClick (aWPEC.getSelfHref ()
-                                                                                                             .add (CPageParam.PARAM_ACTION,
-                                                                                                                   ACTION_REGISTER_TO_SML)
-                                                                                                             .add (CPageParam.PARAM_OBJECT,
-                                                                                                                   aServiceGroup.getID ()))
-                                                                                           .setDisabled (bOffLine ||
-                                                                                                         !SMPMetaManager.getSettings ()
-                                                                                                                        .isSMLActive ()));
+                              aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).addChild ("Register in SML")
+                                                                                            .setOnClick (aWPEC.getSelfHref ()
+                                                                                                              .add (CPageParam.PARAM_ACTION,
+                                                                                                                    ACTION_REGISTER_TO_SML)
+                                                                                                              .add (CPageParam.PARAM_OBJECT,
+                                                                                                                    aServiceGroup.getID ()))
+                                                                                            .setDisabled (bOffLine ||
+                                                                                                          !SMPMetaManager.getSettings ()
+                                                                                                                         .isSMLActive ()));
                             }
                           }
 
