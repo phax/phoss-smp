@@ -37,7 +37,6 @@ import com.helger.commons.log.InMemoryLogger;
 import com.helger.commons.log.LogMessage;
 import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.html.forms.HCCheckBox;
-import com.helger.html.hc.html.forms.HCEditFile;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
@@ -553,7 +552,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       final BootstrapForm aForm = aImport.addAndReturnChild (getUIHandler ().createFormFileUploadSelf (aWPEC));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("File to import")
-                                                   .setCtrl (new HCEditFile (FIELD_IMPORT_FILE))
+                                                   .setCtrl (new BootstrapFileUpload (FIELD_IMPORT_FILE))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_IMPORT_FILE)));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Overwrite existing elements")
                                                    .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_OVERWRITE_EXISTING,

@@ -57,3 +57,8 @@
 #menu .nav .nav .nav>li>a {
 	padding-left: 25px;
 }
+
+/* form fix */
+.invalid-feedback {
+  display: block;
+}

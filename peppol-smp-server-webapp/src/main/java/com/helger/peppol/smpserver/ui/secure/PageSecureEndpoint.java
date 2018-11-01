@@ -800,14 +800,14 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
                                                                                                     aSelectedEndpoint != null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
                                                                                                                               : SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE)))
-                                                 .setHelpText ("Check the box if the recipient requires business-level signatures for\r\n" +
-                                                               "the message, meaning a signature applied to the business message\r\n" +
-                                                               "before the message is put on the transport. This is independent of\r\n" +
-                                                               "the transport-level signatures that a specific transport profile, such\r\n" +
-                                                               "as the START profile, might mandate. This flag does not indicate\r\n" +
-                                                               "which type of business-level signature might be required. Setting or\r\n" +
-                                                               "consuming business-level signatures would typically be the\r\n" +
-                                                               "responsibility of the final senders and receivers of messages, rather\r\n" +
+                                                 .setHelpText ("Check the box if the recipient requires business-level signatures for " +
+                                                               "the message, meaning a signature applied to the business message " +
+                                                               "before the message is put on the transport. This is independent of " +
+                                                               "the transport-level signatures that a specific transport profile, such " +
+                                                               "as the START profile, might mandate. This flag does not indicate " +
+                                                               "which type of business-level signature might be required. Setting or " +
+                                                               "consuming business-level signatures would typically be the " +
+                                                               "responsibility of the final senders and receivers of messages, rather " +
                                                                "than a set of APs.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE)));
 
@@ -815,10 +815,10 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_MINIMUM_AUTHENTICATION_LEVEL,
                                                                                          aSelectedEndpoint != null ? aSelectedEndpoint.getMinimumAuthenticationLevel ()
                                                                                                                    : null)))
-                                                 .setHelpText ("Indicates the minimum authentication level that recipient requires.\r\n" +
-                                                               "The specific semantics of this field is defined in a specific instance\r\n" +
-                                                               "of the BUSDOX infrastructure. It could for example reflect the\r\n" +
-                                                               "value of the \"urn:eu:busdox:attribute:assurance-level\" SAML\r\n" +
+                                                 .setHelpText ("Indicates the minimum authentication level that recipient requires. " +
+                                                               "The specific semantics of this field is defined in a specific instance " +
+                                                               "of the BUSDOX infrastructure. It could for example reflect the " +
+                                                               "value of the \"urn:eu:busdox:attribute:assurance-level\" SAML " +
                                                                "attribute defined in the START specification.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_MINIMUM_AUTHENTICATION_LEVEL)));
 
