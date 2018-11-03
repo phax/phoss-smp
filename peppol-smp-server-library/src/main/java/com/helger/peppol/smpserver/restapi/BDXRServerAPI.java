@@ -282,11 +282,11 @@ public final class BDXRServerAPI
                                 @Nonnull final ServiceGroupType aServiceGroup,
                                 @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "PUT /" + sServiceGroupID + " ==> " + aServiceGroup;
+    final String sLog = LOG_PREFIX + "PUT /" + sServiceGroupID;
     final String sAction = "saveServiceGroup";
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+      LOGGER.info (sLog + " ==> " + aServiceGroup);
     s_aStatsCounterInvocation.increment (sAction);
 
     try
@@ -468,17 +468,11 @@ public final class BDXRServerAPI
                                            @Nonnull final ServiceMetadataType aServiceMetadata,
                                            @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX +
-                        "PUT /" +
-                        sServiceGroupID +
-                        "/services/" +
-                        sDocumentTypeID +
-                        " ==> " +
-                        aServiceMetadata;
+    final String sLog = LOG_PREFIX + "PUT /" + sServiceGroupID + "/services/" + sDocumentTypeID;
     final String sAction = "saveServiceRegistration";
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+      LOGGER.info (sLog + " ==> " + aServiceMetadata);
     s_aStatsCounterInvocation.increment (sAction);
 
     try
