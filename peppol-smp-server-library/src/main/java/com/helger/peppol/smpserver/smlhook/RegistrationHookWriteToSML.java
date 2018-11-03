@@ -65,7 +65,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     final URL aSMLEndpointURL = aSMLInfo.getManageParticipantIdentifierEndpointAddress ();
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Performing SML query to: '" + aSMLEndpointURL.toExternalForm () + "'");
+      LOGGER.info ("Performing SML query to '" + aSMLEndpointURL.toExternalForm () + "'");
 
     // SSL socket factory
     SSLSocketFactory aSocketFactory;
