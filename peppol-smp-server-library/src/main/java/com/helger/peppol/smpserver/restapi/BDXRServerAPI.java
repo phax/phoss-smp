@@ -88,9 +88,12 @@ public final class BDXRServerAPI
   @Nonnull
   public CompleteServiceGroupType getCompleteServiceGroup (final String sServiceGroupID) throws SMPServerException
   {
+    final String sLog = LOG_PREFIX + "GET /complete/" + sServiceGroupID;
+    final String sAction = "getCompleteServiceGroup";
+
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "GET /complete/" + sServiceGroupID);
-    s_aStatsCounterInvocation.increment ("getCompleteServiceGroup");
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
@@ -143,8 +146,8 @@ public final class BDXRServerAPI
     }
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "Finished getCompleteServiceGroup(" + sServiceGroupID + ")");
-    s_aStatsCounterSuccess.increment ("getCompleteServiceGroup");
+      LOGGER.info (sLog + " SUCCESS");
+    s_aStatsCounterSuccess.increment (sAction);
     return aCompleteServiceGroup;
   }
 
@@ -152,9 +155,12 @@ public final class BDXRServerAPI
   public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sUserID,
                                                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
+    final String sLog = LOG_PREFIX + "GET /list/" + sUserID;
+    final String sAction = "getServiceGroupReferenceList";
+
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "GET /list/" + sUserID);
-    s_aStatsCounterInvocation.increment ("getServiceGroupReferenceList");
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
 
     if (!aCredentials.getUserName ().equals (sUserID))
     {
@@ -182,17 +188,20 @@ public final class BDXRServerAPI
     }
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "Finished getServiceGroupReferenceList(" + sUserID + ")");
-    s_aStatsCounterSuccess.increment ("getServiceGroupReferenceList");
+      LOGGER.info (sLog + " SUCCESS");
+    s_aStatsCounterSuccess.increment (sAction);
     return aRefList;
   }
 
   @Nonnull
   public ServiceGroupType getServiceGroup (final String sServiceGroupID) throws SMPServerException
   {
+    final String sLog = LOG_PREFIX + "GET /" + sServiceGroupID;
+    final String sAction = "getServiceGroup";
+
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "GET /" + sServiceGroupID);
-    s_aStatsCounterInvocation.increment ("getServiceGroup");
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
@@ -234,19 +243,21 @@ public final class BDXRServerAPI
     aSG.setServiceMetadataReferenceCollection (aCollectionType);
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "Finished getServiceGroup(" + sServiceGroupID + ")");
-    s_aStatsCounterSuccess.increment ("getServiceGroup");
+      LOGGER.info (sLog + " SUCCESS");
+    s_aStatsCounterSuccess.increment (sAction);
     return aSG;
   }
 
-  @Nonnull
-  public ESuccess saveServiceGroup (@Nonnull final String sServiceGroupID,
-                                    @Nonnull final ServiceGroupType aServiceGroup,
-                                    @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+  public void saveServiceGroup (@Nonnull final String sServiceGroupID,
+                                @Nonnull final ServiceGroupType aServiceGroup,
+                                @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
+    final String sLog = LOG_PREFIX + "PUT /" + sServiceGroupID + " ==> " + aServiceGroup;
+    final String sAction = "saveServiceGroup";
+
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "PUT /" + sServiceGroupID + " ==> " + aServiceGroup);
-    s_aStatsCounterInvocation.increment ("saveServiceGroup");
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
@@ -284,49 +295,62 @@ public final class BDXRServerAPI
       aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aServiceGroupID, sExtension);
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "Finished saveServiceGroup(" + sServiceGroupID + "," + aServiceGroup + ") - success");
-    s_aStatsCounterSuccess.increment ("saveServiceGroup");
-    return ESuccess.SUCCESS;
+      LOGGER.info (sLog + " SUCCESS");
+    s_aStatsCounterSuccess.increment (sAction);
   }
 
-  @Nonnull
-  public ESuccess deleteServiceGroup (@Nonnull final String sServiceGroupID,
-                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+  public void deleteServiceGroup (@Nonnull final String sServiceGroupID,
+                                  @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "DELETE /" + sServiceGroupID);
-    s_aStatsCounterInvocation.increment ("deleteServiceGroup");
+    final String sLog = LOG_PREFIX + "DELETE /" + sServiceGroupID;
+    final String sAction = "deleteServiceGroup";
 
-    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-    if (aServiceGroupID == null)
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
+
+    try
     {
-      // Invalid identifier
-      throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
-                                        m_aAPIProvider.getCurrentURI ());
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      if (aServiceGroupID == null)
+      {
+        // Invalid identifier
+        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
+      }
+
+      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+
+      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
+      aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
+
+      aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
+
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info (sLog + " SUCCESS");
+      s_aStatsCounterSuccess.increment (sAction);
     }
-
-    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-
-    final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-    aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
-
-    aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
-
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "Finished deleteServiceGroup(" + sServiceGroupID + ")");
-    s_aStatsCounterSuccess.increment ("deleteServiceGroup");
-    return ESuccess.SUCCESS;
+    catch (final SMPServerException ex)
+    {
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn (sLog + " ERROR");
+      s_aStatsCounterError.increment (sAction);
+      throw ex;
+    }
   }
 
   @Nonnull
   public SignedServiceMetadataType getServiceRegistration (@Nonnull final String sServiceGroupID,
                                                            @Nonnull final String sDocumentTypeID) throws SMPServerException
   {
+    final String sLog = LOG_PREFIX + "GET /" + sServiceGroupID + "/services/" + sDocumentTypeID;
+    final String sAction = "getServiceRegistration";
+
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "GET /" + sServiceGroupID + "/services/" + sDocumentTypeID);
-    s_aStatsCounterInvocation.increment ("getServiceRegistration");
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
@@ -382,14 +406,8 @@ public final class BDXRServerAPI
     // Signature must be added by the rest service
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX +
-                   "Finished getServiceRegistration(" +
-                   sServiceGroupID +
-                   "," +
-                   sDocumentTypeID +
-                   ") " +
-                   (aRedirect != null ? "with redirect" : "with service information"));
-    s_aStatsCounterSuccess.increment ("getServiceRegistration");
+      LOGGER.info (sLog + " SUCCESS");
+    s_aStatsCounterSuccess.increment (sAction);
     return aSignedServiceMetadata;
   }
 
@@ -399,15 +417,18 @@ public final class BDXRServerAPI
                                            @Nonnull final ServiceMetadataType aServiceMetadata,
                                            @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
+    final String sLog = LOG_PREFIX +
+                        "PUT /" +
+                        sServiceGroupID +
+                        "/services/" +
+                        sDocumentTypeID +
+                        " ==> " +
+                        aServiceMetadata;
+    final String sAction = "saveServiceRegistration";
+
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX +
-                   "PUT /" +
-                   sServiceGroupID +
-                   "/services/" +
-                   sDocumentTypeID +
-                   " ==> " +
-                   aServiceMetadata);
-    s_aStatsCounterInvocation.increment ("saveServiceRegistration");
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
@@ -499,15 +520,8 @@ public final class BDXRServerAPI
                                                                                                           .getExtension ())) == null)
       {
         if (LOGGER.isErrorEnabled ())
-          LOGGER.error (LOG_PREFIX +
-                        "Finished saveServiceRegistration(" +
-                        sServiceGroupID +
-                        "," +
-                        sDocumentTypeID +
-                        "," +
-                        aServiceMetadata +
-                        ") - Redirect - failure");
-        s_aStatsCounterError.increment ("saveServiceRegistration");
+          LOGGER.error (sLog + " - Redirect - failure");
+        s_aStatsCounterError.increment (sAction);
         return ESuccess.FAILURE;
       }
     }
@@ -551,42 +565,28 @@ public final class BDXRServerAPI
                          .isFailure ())
       {
         if (LOGGER.isErrorEnabled ())
-          LOGGER.error (LOG_PREFIX +
-                        "Finished saveServiceRegistration(" +
-                        sServiceGroupID +
-                        "," +
-                        sDocumentTypeID +
-                        "," +
-                        aServiceMetadata +
-                        ") - ServiceInformation - failure");
-        s_aStatsCounterError.increment ("saveServiceRegistration");
+          LOGGER.error (sLog + " - ServiceInformation - failure");
+        s_aStatsCounterError.increment (sAction);
         return ESuccess.FAILURE;
       }
     }
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX +
-                   "Finished saveServiceRegistration(" +
-                   sServiceGroupID +
-                   "," +
-                   sDocumentTypeID +
-                   "," +
-                   aServiceMetadata +
-                   ") - " +
-                   (aServiceMetadata.getRedirect () != null ? "Redirect" : "ServiceInformation") +
-                   " - success");
-    s_aStatsCounterSuccess.increment ("saveServiceRegistration");
+      LOGGER.info (sLog + " SUCCESS");
+    s_aStatsCounterSuccess.increment (sAction);
     return ESuccess.SUCCESS;
   }
 
-  @Nonnull
-  public ESuccess deleteServiceRegistration (@Nonnull final String sServiceGroupID,
-                                             @Nonnull final String sDocumentTypeID,
-                                             @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+  public void deleteServiceRegistration (@Nonnull final String sServiceGroupID,
+                                         @Nonnull final String sDocumentTypeID,
+                                         @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
+    final String sLog = LOG_PREFIX + "DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID;
+    final String sAction = "deleteServiceRegistration";
+
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID);
-    s_aStatsCounterInvocation.increment ("deleteServiceRegistration");
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
@@ -613,9 +613,7 @@ public final class BDXRServerAPI
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (LOG_PREFIX + "Service group '" + sServiceGroupID + "' not on this SMP");
-      return ESuccess.FAILURE;
+      throw new SMPNotFoundException ("Service group '" + sServiceGroupID + "' not on this SMP");
     }
 
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -625,18 +623,19 @@ public final class BDXRServerAPI
     {
       // Handle service information
       final EChange eChange = aServiceInfoMgr.deleteSMPServiceInformation (aServiceInfo);
-      if (eChange.isChanged ())
+      if (eChange.isUnchanged ())
       {
-        if (LOGGER.isInfoEnabled ())
-          LOGGER.info (LOG_PREFIX +
-                       "Finished deleteServiceRegistration(" +
-                       sServiceGroupID +
-                       "," +
-                       sDocumentTypeID +
-                       ") - ServiceInformation");
-        s_aStatsCounterSuccess.increment ("deleteServiceRegistration");
-        return ESuccess.SUCCESS;
+        // Most likely an internal error or an inconsistency
+        throw new SMPNotFoundException ("serviceInformation (" +
+                                        aServiceGroupID.getURIEncoded () +
+                                        ", " +
+                                        aDocTypeID.getURIEncoded () +
+                                        ")",
+                                        m_aAPIProvider.getCurrentURI ());
       }
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info (sLog + " SUCCESS - ServiceInformation");
+      s_aStatsCounterSuccess.increment (sAction);
     }
     else
     {
@@ -648,35 +647,28 @@ public final class BDXRServerAPI
       {
         // Handle redirect
         final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
-        if (eChange.isChanged ())
+        if (eChange.isUnchanged ())
         {
-          if (LOGGER.isInfoEnabled ())
-            LOGGER.info (LOG_PREFIX +
-                         "Finished deleteServiceRegistration(" +
-                         sServiceGroupID +
-                         "," +
-                         sDocumentTypeID +
-                         ") - Redirect");
-          s_aStatsCounterSuccess.increment ("deleteServiceRegistration");
-          return ESuccess.SUCCESS;
+          // Most likely an internal error or an inconsistency
+          throw new SMPNotFoundException ("redirect(" +
+                                          aServiceGroupID.getURIEncoded () +
+                                          ", " +
+                                          aDocTypeID.getURIEncoded () +
+                                          ")",
+                                          m_aAPIProvider.getCurrentURI ());
         }
+          if (LOGGER.isInfoEnabled ())
+          LOGGER.info (sLog + " SUCCESS - Redirect");
+        s_aStatsCounterSuccess.increment (sAction);
       }
       else
       {
+        // Neither redirect nor endpoint found
         throw new SMPNotFoundException ("service(" + sServiceGroupID + "," + sDocumentTypeID + ")",
                                         m_aAPIProvider.getCurrentURI ());
       }
     }
-
-    if (LOGGER.isWarnEnabled ())
-      LOGGER.warn (LOG_PREFIX +
-                   "Service group '" +
-                   sServiceGroupID +
-                   "' has no document type '" +
-                   sDocumentTypeID +
-                   "' on this SMP!");
-    return ESuccess.FAILURE;
-  }
+ }
 
   /**
    * @return The statistics data with the invocation counter.

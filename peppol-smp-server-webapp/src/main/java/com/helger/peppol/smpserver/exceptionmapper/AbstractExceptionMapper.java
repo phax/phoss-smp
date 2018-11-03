@@ -31,7 +31,8 @@ public abstract class AbstractExceptionMapper <E extends Throwable> implements E
   @Nonnull
   public static String getResponseEntityWithoutStackTrace (@Nonnull final Throwable ex)
   {
-    return ex.getClass ().getName () + ": " + ex.getMessage ();
+    // The class name does not really matter
+    return ex.getMessage ();
   }
 
   @Nonnull
