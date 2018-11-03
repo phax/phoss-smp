@@ -27,7 +27,6 @@ import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
-import com.helger.peppol.smlclient.SMLExceptionHelper;
 import com.helger.peppol.smlclient.participant.NotFoundFault;
 import com.helger.peppol.smlclient.participant.UnauthorizedFault;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
@@ -128,15 +127,11 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     catch (final UnauthorizedFault ex)
     {
       final String sMsg = "Seems like this SMP is not registered to the SML, or you're providing invalid credentials!";
-      if (LOGGER.isErrorEnabled ())
-        LOGGER.error (sMsg + " " + SMLExceptionHelper.getFaultMessage (ex));
       throw new RegistrationHookException (sMsg, ex);
     }
     catch (final Exception ex)
     {
       final String sMsg = "Could not create business " + sParticipantID + " in SML";
-      if (LOGGER.isErrorEnabled ())
-        LOGGER.error (sMsg, ex);
       throw new RegistrationHookException (sMsg, ex);
     }
   }
@@ -162,8 +157,6 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     catch (final Exception ex)
     {
       final String sMsg = "Unable to rollback create business " + sParticipantID + " in SML";
-      if (LOGGER.isErrorEnabled ())
-        LOGGER.error (sMsg, ex);
       throw new RegistrationHookException (sMsg, ex);
     }
   }
@@ -187,15 +180,11 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
       final String sMsg = "The business " +
                           sParticipantID +
                           " was not present in the SML and hence could not be deleted.";
-      if (LOGGER.isErrorEnabled ())
-        LOGGER.error (sMsg, ex);
       throw new RegistrationHookException (sMsg, ex);
     }
     catch (final Exception ex)
     {
       final String sMsg = "Could not delete business " + sParticipantID + " from SML.";
-      if (LOGGER.isErrorEnabled ())
-        LOGGER.error (sMsg + " Technical details: " + ex.getClass ().getName () + " - " + ex.getMessage ());
       throw new RegistrationHookException (sMsg, ex);
     }
   }
@@ -221,8 +210,6 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     catch (final Exception ex)
     {
       final String sMsg = "Unable to rollback delete business " + sParticipantID + " in SML";
-      if (LOGGER.isErrorEnabled ())
-        LOGGER.error (sMsg, ex);
       throw new RegistrationHookException (sMsg, ex);
     }
   }
