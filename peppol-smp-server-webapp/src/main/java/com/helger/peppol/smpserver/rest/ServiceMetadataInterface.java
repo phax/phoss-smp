@@ -220,27 +220,22 @@ public final class ServiceMetadataInterface
     try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
-      ESuccess eSuccess;
       switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
           new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID,
                                                                       sDocumentTypeID,
                                                                       RestRequestHelper.getAuth (m_aHttpHeaders));
-          eSuccess = ESuccess.SUCCESS;
           break;
         case BDXR:
           new BDXRServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID,
                                                                        sDocumentTypeID,
                                                                        RestRequestHelper.getAuth (m_aHttpHeaders));
-          eSuccess = ESuccess.SUCCESS;
           break;
         default:
           throw new UnsupportedOperationException ("Unsupported REST type specified!");
       }
 
-      if (eSuccess.isFailure ())
-        return Response.status (Status.NOT_FOUND).build ();
       return Response.ok ().build ();
     }
   }
