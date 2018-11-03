@@ -16,24 +16,34 @@
  */
 package com.helger.peppol.smpserver.exceptionmapper;
 
+import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.mime.CMimeType;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 
 /**
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
 @Provider
-public class SMPUnknownUserExceptionMapper implements ExceptionMapper <SMPUnknownUserException>
+public class SMPUnknownUserExceptionMapper extends AbstractExceptionMapper <SMPUnknownUserException>
 {
-  public Response toResponse (final SMPUnknownUserException e)
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPUnknownUserExceptionMapper.class);
+
+  @Nonnull
+  public Response toResponse (@Nonnull final SMPUnknownUserException ex)
   {
+    if (SMPServerConfiguration.isRESTLogExceptions ())
+      LOGGER.error ("Unknown user", ex);
+
     return Response.status (Status.FORBIDDEN)
-                   .entity (e.getMessage ())
+                   .entity (getResponseEntityWithoutStackTrace (ex))
                    .type (CMimeType.TEXT_PLAIN.getAsString ())
                    .build ();
   }

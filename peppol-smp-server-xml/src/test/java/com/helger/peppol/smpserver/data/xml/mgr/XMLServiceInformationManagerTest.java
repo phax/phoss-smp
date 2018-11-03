@@ -44,6 +44,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -60,7 +61,7 @@ public final class XMLServiceInformationManagerTest
   public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
-  public void testServiceRegistration ()
+  public void testServiceRegistration () throws SMPServerException
   {
     // Ensure the user is present
     final IUser aTestUser = PhotonSecurityManager.getUserMgr ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
@@ -74,7 +75,7 @@ public final class XMLServiceInformationManagerTest
     // Delete existing service group
     final IParticipantIdentifier aPI = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                                        "0088:dummy");
-    aServiceGroupMgr.deleteSMPServiceGroup (aPI);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI);
 
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
     assertNotNull (aSG);

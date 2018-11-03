@@ -12,20 +12,18 @@ package com.helger.peppol.smpserver.exception;
 
 import javax.annotation.Nonnull;
 
+import com.helger.peppol.smpserver.smlhook.RegistrationHookException;
+
 /**
- * Base class for all SMP server specific exceptions
+ * This exception is thrown if an error occurred communicating with the SML
  *
  * @author Philip Helger
+ * @since 5.1.0
  */
-public class SMPServerException extends Exception
+public class SMPSMLException extends SMPServerException
 {
-  public SMPServerException (@Nonnull final String sMessage)
+  public SMPSMLException (@Nonnull final String sMsg, @Nonnull final RegistrationHookException aCause)
   {
-    super (sMessage);
-  }
-
-  public SMPServerException (@Nonnull final String sMessage, @Nonnull final Throwable aCause)
-  {
-    super (sMessage, aCause);
+    super (sMsg, aCause);
   }
 }

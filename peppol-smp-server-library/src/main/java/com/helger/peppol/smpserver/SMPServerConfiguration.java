@@ -69,6 +69,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_IDENTIFIER_TYPE = "smp.identifiertype";
   public static final String KEY_SMP_REST_TYPE = "smp.rest.type";
   public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
+  public static final String KEY_SMP_REST_LOG_EXCEPTIONS = "smp.rest.log.exceptions";
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
   public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.peppol.directory.integration.autoupdate";
@@ -85,6 +86,7 @@ public final class SMPServerConfiguration
   public static final ESMPIdentifierType DEFAULT_SMP_IDENTIFIER_TYPE = ESMPIdentifierType.PEPPOL;
   public static final ESMPRESTType DEFAULT_SMP_REST_TYPE = ESMPRESTType.PEPPOL;
   public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
+  public static final boolean DEFAULT_SMP_REST_LOG_EXCEPTIONS = false;
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
   public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = true;
   public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = true;
@@ -298,6 +300,16 @@ public final class SMPServerConfiguration
   {
     final String sType = getConfigFile ().getAsString (KEY_SMP_REST_TYPE);
     return ESMPRESTType.getFromIDOrDefault (sType, DEFAULT_SMP_REST_TYPE);
+  }
+
+  /**
+   * @return <code>true</code> if the exceptions in the REST API should be
+   *         logged, <code>false</code> if not. By default it is disabled.
+   * @since 5.1.0
+   */
+  public static boolean isRESTLogExceptions ()
+  {
+    return getConfigFile ().getAsBoolean (KEY_SMP_REST_LOG_EXCEPTIONS, DEFAULT_SMP_REST_LOG_EXCEPTIONS);
   }
 
   /**

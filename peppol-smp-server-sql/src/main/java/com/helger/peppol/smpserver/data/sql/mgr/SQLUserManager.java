@@ -35,6 +35,7 @@ import com.helger.peppol.smpserver.data.sql.model.DBUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 
@@ -155,7 +156,7 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
   }
 
   @Nonnull
-  public DBUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws Exception
+  public DBUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
     JPAExecutionResult <DBUser> ret;
     ret = doSelect ( () -> {
@@ -174,12 +175,20 @@ public final class SQLUserManager extends AbstractSMPJPAEnabledManager implement
         LOGGER.debug ("Verified credentials of user '" + sUserName + "' successfully");
       return aDBUser;
     });
-    return ret.getOrThrow ();
+    if (ret.hasException ())
+    {
+      final Exception ex = ret.getException ();
+      if (ex instanceof SMPServerException)
+        throw (SMPServerException) ex;
+      throw new SMPServerException ("Database error", ex);
+    }
+
+    return ret.get ();
   }
 
   @Nonnull
   public DBOwnership verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                      @Nonnull final ISMPUser aCredentials)
+                                      @Nonnull final ISMPUser aCredentials) throws SMPServerException
   {
     // Resolve service group
     // to throw a 404 if a service group does not exist

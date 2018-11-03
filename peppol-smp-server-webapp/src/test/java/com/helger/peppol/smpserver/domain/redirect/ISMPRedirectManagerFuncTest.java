@@ -35,6 +35,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 
 /**
@@ -48,7 +49,7 @@ public final class ISMPRedirectManagerFuncTest
   public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
-  public void testRedirect ()
+  public void testRedirect () throws SMPServerException
   {
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final String sUserID = "junitredir";
@@ -119,17 +120,17 @@ public final class ISMPRedirectManagerFuncTest
           assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
           assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG).isChanged ());
           assertEquals (nCount - 1, aRedirectMgr.getSMPRedirectCount ());
-          assertTrue (aSGMgr.deleteSMPServiceGroup (aPI2).isChanged ());
-          assertTrue (aSGMgr.deleteSMPServiceGroup (aPI1).isChanged ());
+          assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isChanged ());
+          assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isChanged ());
         }
         finally
         {
-          aSGMgr.deleteSMPServiceGroup (aPI2);
+          aSGMgr.deleteSMPServiceGroupNoEx (aPI2);
         }
       }
       finally
       {
-        aSGMgr.deleteSMPServiceGroup (aPI1);
+        aSGMgr.deleteSMPServiceGroupNoEx (aPI1);
       }
     }
     finally

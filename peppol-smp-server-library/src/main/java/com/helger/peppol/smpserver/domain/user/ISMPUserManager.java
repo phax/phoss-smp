@@ -20,8 +20,7 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.smpserver.exception.SMPNotFoundException;
-import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 
 /**
  * Abstraction interface for the user management depending on the used backend.
@@ -64,13 +63,13 @@ public interface ISMPUserManager extends ISMPUserProvider
    * @param aCredentials
    *        The credentials to be validated. May not be <code>null</code>.
    * @return The matching non-<code>null</code> {@link ISMPUser}.
-   * @throws Exception
+   * @throws SMPServerException
    *         If no user matching the passed user name is present or if the
    *         password in the credentials does not match the stored password
    *         (hash).
    */
   @Nonnull
-  ISMPUser validateUserCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws Exception;
+  ISMPUser validateUserCredentials (@Nonnull BasicAuthClientCredentials aCredentials) throws SMPServerException;
 
   /**
    * Verify that the passed service group is owned by the user specified in the
@@ -81,12 +80,13 @@ public interface ISMPUserManager extends ISMPUserProvider
    * @param aCurrentUser
    *        The user to verify.
    * @return Implementation specific return value.
-   * @throws SMPNotFoundException
-   *         If the passed service group does not exist on this SMP.
-   * @throws SMPUnauthorizedException
-   *         If the participant identifier is not owned by the user specified in
-   *         the credentials
+   * @throws SMPServerException
+   *         <code>SMPNotFoundException</code> If the passed service group does
+   *         not exist on this SMP. <code>SMPUnauthorizedException</code> If the
+   *         participant identifier is not owned by the user specified in the
+   *         credentials
    */
   @Nullable
-  Object verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID, @Nonnull final ISMPUser aCurrentUser);
+  Object verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
+                          @Nonnull final ISMPUser aCurrentUser) throws SMPServerException;
 }

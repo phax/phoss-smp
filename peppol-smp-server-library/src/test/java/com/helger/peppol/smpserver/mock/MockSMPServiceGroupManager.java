@@ -37,7 +37,21 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
     return m_aCBs;
   }
 
-  public EChange updateSMPServiceGroup (final String sSMPServiceGroupID, final String sOwnerID, final String sExtension)
+  public ISMPServiceGroup createSMPServiceGroup (final String sOwnerID,
+                                                 final IParticipantIdentifier aParticipantID,
+                                                 final String sExtension)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public EChange updateSMPServiceGroup (final IParticipantIdentifier aParticipantID,
+                                        final String sOwnerID,
+                                        final String sExtension)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public EChange deleteSMPServiceGroup (final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();
   }
@@ -63,18 +77,6 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
   }
 
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
-  {
-    throw new UnsupportedOperationException ();
-  }
-
-  public EChange deleteSMPServiceGroup (final IParticipantIdentifier aParticipantIdentifier)
-  {
-    throw new UnsupportedOperationException ();
-  }
-
-  public ISMPServiceGroup createSMPServiceGroup (final String sOwnerID,
-                                                 final IParticipantIdentifier aParticipantIdentifier,
-                                                 final String sExtension)
   {
     throw new UnsupportedOperationException ();
   }

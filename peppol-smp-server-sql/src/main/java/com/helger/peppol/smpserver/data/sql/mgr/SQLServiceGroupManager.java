@@ -19,6 +19,7 @@ import javax.persistence.EntityManager;
 
 import org.eclipse.persistence.config.CacheUsage;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
@@ -32,7 +33,6 @@ import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
-import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBOwnership;
@@ -40,11 +40,15 @@ import com.helger.peppol.smpserver.data.sql.model.DBOwnershipID;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceGroup;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceGroupID;
 import com.helger.peppol.smpserver.data.sql.model.DBUser;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
+import com.helger.peppol.smpserver.exception.SMPInternalErrorException;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.exception.SMPSMLException;
+import com.helger.peppol.smpserver.exception.SMPServerException;
+import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookException;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
@@ -63,11 +67,13 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
     return m_aCBs;
   }
 
-  @Nullable
+  @Nonnull
   public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
                                                 @Nonnull final IParticipantIdentifier aParticipantID,
-                                                @Nullable final String sExtension)
+                                                @Nullable final String sExtension) throws SMPServerException
   {
+    ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
+    ValueEnforcer.notNull (aParticipantID, "ParticpantID");
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup (" +
                     sOwnerID +
@@ -94,7 +100,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
       final DBUser aDBUser = aEM.find (DBUser.class, sOwnerID);
       if (aDBUser == null)
-        throw new IllegalStateException ("User '" + sOwnerID + "' does not exist!");
+        throw new SMPUnknownUserException (sOwnerID);
 
       {
         // It's a new service group - Create in SML and remember that
@@ -130,7 +136,15 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (ret.hasException ())
     {
-      return null;
+      // Propagate contained exception
+      final Exception ex = ret.getException ();
+      if (ex instanceof SMPServerException)
+        throw (SMPServerException) ex;
+      if (ex instanceof RegistrationHookException)
+        throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML",
+                                   (RegistrationHookException) ex);
+      throw new SMPInternalErrorException ("Error creating ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
+                                           ret.getException ());
     }
 
     if (LOGGER.isDebugEnabled ())
@@ -142,23 +156,20 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
   }
 
   @Nonnull
-  public EChange updateSMPServiceGroup (@Nullable final String sSMPServiceGroupID,
+  public EChange updateSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
                                         @Nonnull @Nonempty final String sNewOwnerID,
-                                        @Nullable final String sExtension)
+                                        @Nullable final String sExtension) throws SMPServerException
   {
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+    ValueEnforcer.notEmpty (sNewOwnerID, "NewOwnerID");
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup (" +
-                    sSMPServiceGroupID +
+                    aParticipantID.getURIEncoded () +
                     ", " +
                     sNewOwnerID +
                     ", " +
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
-
-    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sSMPServiceGroupID);
-    if (aParticipantID == null)
-      throw new IllegalStateException ("Failed to parse participant identifier '" + sSMPServiceGroupID + "'");
 
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
@@ -199,7 +210,11 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (ret.hasException ())
     {
-      return EChange.UNCHANGED;
+      final Exception ex = ret.getException ();
+      if (ex instanceof SMPServerException)
+        throw (SMPServerException) ex;
+      throw new SMPInternalErrorException ("Failed to update ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
+                                           ret.getException ());
     }
 
     final EChange eChange = ret.get ();
@@ -208,17 +223,15 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     // Callback only if something changed
     if (eChange.isChanged ())
-      m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (sSMPServiceGroupID));
+      m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (aParticipantID));
 
     return eChange;
   }
 
   @Nonnull
-  public EChange deleteSMPServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
+  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID) throws SMPServerException
   {
-    if (aParticipantID == null)
-      return EChange.UNCHANGED;
-
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
@@ -232,10 +245,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
       final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantID);
       final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
       if (aDBServiceGroup == null)
-      {
-        LOGGER.warn ("No such service group to delete: " + aParticipantID.getURIEncoded ());
-        return EChange.UNCHANGED;
-      }
+        throw new SMPNotFoundException ("No such service group '" + aParticipantID.getURIEncoded () + "'");
 
       {
         // Delete in SML - and remember that
@@ -267,7 +277,14 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (ret.hasException ())
     {
-      return EChange.UNCHANGED;
+      final Exception ex = ret.getException ();
+      if (ex instanceof SMPServerException)
+        throw (SMPServerException) ex;
+      if (ex instanceof RegistrationHookException)
+        throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML",
+                                   (RegistrationHookException) ex);
+      throw new SMPInternalErrorException ("Failed to delete ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
+                                           ret.getException ());
     }
 
     final EChange eChange = ret.get ();
@@ -276,8 +293,7 @@ public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager i
 
     if (eChange.isChanged ())
     {
-      final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
-      m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (sServiceGroupID));
+      m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
     }
 
     return eChange;

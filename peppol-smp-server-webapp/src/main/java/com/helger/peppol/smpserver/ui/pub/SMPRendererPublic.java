@@ -139,7 +139,7 @@ public final class SMPRendererPublic
       {
         // 300px would lead to a messy layout - so 250px is fine
         final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.P_2)
-                                       .addStyle (CCSSProperties.MIN_WIDTH.newValue ("300px"));
+                                       .addStyle (CCSSProperties.MIN_WIDTH.newValue ("400px"));
         aDiv.addChild (SMPCommonUI.createViewLoginForm (aLEC, null));
         aDropDown.addChild (aDiv);
       }

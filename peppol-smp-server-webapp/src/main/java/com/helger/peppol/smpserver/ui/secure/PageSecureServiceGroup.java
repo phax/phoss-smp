@@ -54,6 +54,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookException;
 import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
@@ -535,10 +536,21 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       {
         // Edit only the internal data objects because no change to the SML is
         // necessary. Only the owner and the extension can be edited!
-        aServiceGroupMgr.updateSMPServiceGroup (aSelectedObject.getID (), aOwningUser.getID (), sExtension);
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
+        try
+        {
+          aServiceGroupMgr.updateSMPServiceGroup (aParticipantID, aOwningUser.getID (), sExtension);
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP ServiceGroup for participant '" +
+                                                                              aParticipantID.getURIEncoded () +
+                                                                              "' was successfully updated."));
+        }
+        catch (final SMPServerException ex)
+        {
+          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error updating the SMP ServiceGroup for participant '" +
                                                                             aParticipantID.getURIEncoded () +
-                                                                            "' was successfully edited."));
+                                                                            "'." +
+                                                                            " Technical details: " +
+                                                                            ex.getMessage ()));
+        }
       }
       else
       {
@@ -553,7 +565,13 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         {
           aCaughtEx = ex;
         }
-        if (aSG == null)
+        if (aSG != null)
+        {
+          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
+                                                                              aParticipantID.getURIEncoded () +
+                                                                              "' was successfully created."));
+        }
+        else
         {
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the new SMP ServiceGroup for participant '" +
                                                                             aParticipantID.getURIEncoded () +
@@ -561,12 +579,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                             (aCaughtEx != null ? " Technical details: " +
                                                                                                  aCaughtEx.getMessage ()
                                                                                                : "")));
-        }
-        else
-        {
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new SMP ServiceGroup for participant '" +
-                                                                              aParticipantID.getURIEncoded () +
-                                                                              "' was successfully created."));
         }
       }
     }

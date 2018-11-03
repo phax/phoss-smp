@@ -36,6 +36,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 
 /**
@@ -49,7 +50,7 @@ public final class ISMPBusinessCardManagerFuncTest
   public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
-  public void testBusinessCard ()
+  public void testBusinessCard () throws SMPServerException
   {
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
@@ -140,21 +141,21 @@ public final class ISMPBusinessCardManagerFuncTest
           assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
           assertTrue (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard).isChanged ());
           assertEquals (nBCCount + 0, aBusinessCardMgr.getSMPBusinessCardCount ());
-          assertTrue (aSGMgr.deleteSMPServiceGroup (aPI2).isChanged ());
-          assertTrue (aSGMgr.deleteSMPServiceGroup (aPI1).isChanged ());
+          assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isChanged ());
+          assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isChanged ());
         }
         finally
         {
           // Real cleanup
           aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard2);
-          aSGMgr.deleteSMPServiceGroup (aPI2);
+          aSGMgr.deleteSMPServiceGroupNoEx (aPI2);
         }
       }
       finally
       {
         // Real cleanup
         aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
-        aSGMgr.deleteSMPServiceGroup (aPI1);
+        aSGMgr.deleteSMPServiceGroupNoEx (aPI1);
       }
     }
     finally

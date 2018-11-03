@@ -49,7 +49,7 @@ final class RestRequestHelper
    *         If no BasicAuth HTTP header is present
    */
   @Nonnull
-  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders aHttpHeaders)
+  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders aHttpHeaders) throws SMPUnauthorizedException
   {
     final List <String> aHeaders = aHttpHeaders.getRequestHeader (HttpHeaders.AUTHORIZATION);
     if (CollectionHelper.isEmpty (aHeaders))

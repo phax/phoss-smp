@@ -22,8 +22,6 @@ import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
-import com.helger.peppol.smpserver.exception.SMPNotFoundException;
-import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 
 /**
  * Mock implementation of {@link ISMPUserManager}.
@@ -75,14 +73,13 @@ final class MockSMPUserManager implements ISMPUserManager
   }
 
   @Nonnull
-  public ISMPUser validateUserCredentials (final BasicAuthClientCredentials aCredentials) throws Exception
+  public ISMPUser validateUserCredentials (final BasicAuthClientCredentials aCredentials)
   {
     throw new UnsupportedOperationException ();
   }
 
   @Nullable
-  public Object verifyOwnership (final IParticipantIdentifier aServiceGroupID,
-                                 final ISMPUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
+  public Object verifyOwnership (final IParticipantIdentifier aServiceGroupID, final ISMPUser aCurrentUser)
   {
     throw new UnsupportedOperationException ();
   }

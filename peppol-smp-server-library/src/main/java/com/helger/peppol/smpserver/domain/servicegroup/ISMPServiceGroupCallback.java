@@ -13,6 +13,7 @@ package com.helger.peppol.smpserver.domain.servicegroup;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.callback.ICallback;
+import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 
 /**
  * Interface for an SMP service group callback.
@@ -33,18 +34,18 @@ public interface ISMPServiceGroupCallback extends ICallback
   /**
    * Invoked after an SMP service group was updated.
    *
-   * @param sServiceGroupID
-   *        The updated object. Never <code>null</code>.
+   * @param aParticipantID
+   *        The ID of the updated object. Never <code>null</code>.
    */
-  default void onSMPServiceGroupUpdated (@Nonnull final String sServiceGroupID)
+  default void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
   {}
 
   /**
    * Invoked after an SMP service group was deleted.
    *
-   * @param sServiceGroupID
-   *        The deleted object. Never <code>null</code>.
+   * @param aParticipantID
+   *        The ID of the deleted object. Never <code>null</code>.
    */
-  default void onSMPServiceGroupDeleted (@Nonnull final String sServiceGroupID)
+  default void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID)
   {}
 }

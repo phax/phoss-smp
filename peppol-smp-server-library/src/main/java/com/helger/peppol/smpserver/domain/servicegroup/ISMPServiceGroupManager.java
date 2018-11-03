@@ -23,6 +23,7 @@ import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 
 /**
  * Base interface for a manager for {@link ISMPServiceGroup} objects.
@@ -50,36 +51,54 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @param sExtension
    *        The optional extension element that must be either a well-formed XML
    *        string (for PEPPOL SMP) or a valid JSON string (for BDXR SMP).
-   * @return The created service group object. May be <code>null</code> to
-   *         indicate the persistent storage failed.
+   * @return The created service group object. Never <code>null</code>.
+   * @throws SMPServerException
+   *         In case of error
    * @see com.helger.peppol.smp.SMPExtensionConverter
    * @see com.helger.peppol.bdxr.BDXRExtensionConverter
    */
-  @Nullable
+  @Nonnull
   ISMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty String sOwnerID,
                                           @Nonnull IParticipantIdentifier aParticipantIdentifier,
-                                          @Nullable String sExtension);
+                                          @Nullable String sExtension) throws SMPServerException;
 
   /**
    * Update an existing service group. Note: the participant ID of a service
    * group cannot be changed.
    *
-   * @param sSMPServiceGroupID
-   *        The ID of the service group to modify. Maybe <code>null</code>.
+   * @param aParticipantIdentifier
+   *        The ID of the service group to modify. May not be <code>null</code>.
    * @param sOwnerID
    *        The ID of the (new) owning user. May neither be <code>null</code>
    *        nor empty.
    * @param sExtension
    *        The optional (new) extension element that must be well-formed XML if
    *        present.
+   * @throws SMPServerException
+   *         In case of error
    * @return {@link EChange#CHANGED} if the passed service group is contained
    *         and at least one field was changed, {@link EChange#UNCHANGED}
    *         otherwise.
    */
   @Nonnull
-  EChange updateSMPServiceGroup (@Nullable String sSMPServiceGroupID,
+  EChange updateSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier,
                                  @Nonnull @Nonempty String sOwnerID,
-                                 @Nullable String sExtension);
+                                 @Nullable String sExtension) throws SMPServerException;
+
+  @Nonnull
+  default EChange updateSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier,
+                                             @Nonnull @Nonempty final String sOwnerID,
+                                             @Nullable final String sExtension)
+  {
+    try
+    {
+      return updateSMPServiceGroup (aParticipantIdentifier, sOwnerID, sExtension);
+    }
+    catch (final SMPServerException ex)
+    {
+      return EChange.UNCHANGED;
+    }
+  }
 
   /**
    * Delete an existing service group. If the service group exists and can be
@@ -89,14 +108,30 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * in the SML!
    *
    * @param aParticipantIdentifier
-   *        The participant identifier to be deleted. May be <code>null</code>.
+   *        The participant identifier to be deleted. May not be
+   *        <code>null</code>.
    * @return {@link EChange#CHANGED} if the passed service group is contained
    *         and was successfully deleted, {@link EChange#UNCHANGED} otherwise.
+   * @throws SMPServerException
+   *         In case of error
    * @see ISMPServiceInformationManager#deleteAllSMPServiceInformationOfServiceGroup(ISMPServiceGroup)
    * @see ISMPRedirectManager#deleteAllSMPRedirectsOfServiceGroup(ISMPServiceGroup)
    */
   @Nonnull
-  EChange deleteSMPServiceGroup (@Nullable IParticipantIdentifier aParticipantIdentifier);
+  EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier) throws SMPServerException;
+
+  @Nonnull
+  default EChange deleteSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  {
+    try
+    {
+      return deleteSMPServiceGroup (aParticipantIdentifier);
+    }
+    catch (final SMPServerException ex)
+    {
+      return EChange.UNCHANGED;
+    }
+  }
 
   /**
    * @return A non-<code>null</code> but maybe empty list of all contained

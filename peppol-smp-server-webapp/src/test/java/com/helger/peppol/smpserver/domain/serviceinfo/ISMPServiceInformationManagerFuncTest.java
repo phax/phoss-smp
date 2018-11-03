@@ -37,6 +37,7 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.mock.SMPServerTestRule;
 
 /**
@@ -50,7 +51,7 @@ public final class ISMPServiceInformationManagerFuncTest
   public final SMPServerTestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
-  public void testAll ()
+  public void testAll () throws SMPServerException
   {
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -74,7 +75,7 @@ public final class ISMPServiceInformationManagerFuncTest
 
     try
     {
-      aServiceGroupMgr.deleteSMPServiceGroup (aPI1);
+      aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1);
       final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (sUserID, aPI1, null);
       assertNotNull (aSG);
       try
@@ -104,7 +105,7 @@ public final class ISMPServiceInformationManagerFuncTest
       finally
       {
         // Don't care about the result
-        aServiceGroupMgr.deleteSMPServiceGroup (aPI1);
+        aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1);
       }
     }
     finally

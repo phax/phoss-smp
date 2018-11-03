@@ -16,33 +16,23 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * HTTP 404 exception wrapper
- * 
+ * HTTP 400 (Bad Request) exception wrapper
+ *
  * @author Philip Helger
+ * @since 5.1.0
  */
-public class SMPNotFoundException extends SMPServerException
+public class SMPBadRequestException extends SMPServerException
 {
   /**
-   * Create a HTTP 404 (Not Found) exception.
+   * Create a HTTP 400 (Bad request) exception.
    *
    * @param sMessage
-   *        the String that is the entity of the 404 response.
-   */
-  public SMPNotFoundException (@Nonnull final String sMessage)
-  {
-    super ("Not found: " + sMessage);
-  }
-
-  /**
-   * Create a HTTP 404 (Not Found) exception.
-   *
-   * @param sMessage
-   *        the String that is the entity of the 404 response.
+   *        the String that is the entity of the HTTP response.
    * @param aNotFoundURI
    *        The URI that was not found.
    */
-  public SMPNotFoundException (@Nonnull final String sMessage, @Nullable final URI aNotFoundURI)
+  public SMPBadRequestException (@Nonnull final String sMessage, @Nullable final URI aNotFoundURI)
   {
-    super ("Not found: " + sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
+    super ("Bad request: " + sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
   }
 }

@@ -37,6 +37,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
 import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -107,7 +108,7 @@ public final class XMLUserManager implements ISMPUserManager
   }
 
   @Nonnull
-  public XMLDataUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials)
+  public XMLDataUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
     final UserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final IUser aUser = aUserMgr.getUserOfLoginName (aCredentials.getUserName ());
@@ -135,13 +136,15 @@ public final class XMLUserManager implements ISMPUserManager
 
   @Nonnull
   public ISMPServiceGroup verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                           @Nonnull final ISMPUser aCurrentUser)
+                                           @Nonnull final ISMPUser aCurrentUser) throws SMPServerException
   {
     // Resolve service group
     final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
                                                          .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
+    {
       throw new SMPNotFoundException ("Service group " + aServiceGroupID.getURIEncoded () + " does not exist");
+    }
 
     // Resolve user
     final String sOwnerID = aServiceGroup.getOwnerID ();

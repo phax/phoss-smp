@@ -58,6 +58,7 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformationMicroTypeConverter;
 import com.helger.peppol.smpserver.domain.user.ISMPUser;
 import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
+import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPage;
 import com.helger.peppol.smpserver.ui.ajax.CAjax;
@@ -308,13 +309,20 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         for (final ISMPServiceGroup aDeleteServiceGroup : aDeleteServiceGroups)
         {
           final IParticipantIdentifier aPI = aDeleteServiceGroup.getParticpantIdentifier ();
-          if (aServiceGroupMgr.deleteSMPServiceGroup (aPI).isChanged ())
+          try
           {
-            aLogger.success ("Successfully deleted service group " + aDeleteServiceGroup.getID ());
-            aDeletedServiceGroups.add (aPI);
+            if (aServiceGroupMgr.deleteSMPServiceGroup (aPI).isChanged ())
+            {
+              aLogger.success ("Successfully deleted service group " + aDeleteServiceGroup.getID ());
+              aDeletedServiceGroups.add (aPI);
+            }
+            else
+              aLogger.error ("Failed to delete service group " + aDeleteServiceGroup.getID ());
           }
-          else
-            aLogger.error ("Failed to delete service group " + aDeleteServiceGroup.getID ());
+          catch (final SMPServerException ex)
+          {
+            aLogger.error ("Failed to delete service group " + aDeleteServiceGroup.getID (), ex);
+          }
         }
 
         // 2. create all service groups
@@ -327,8 +335,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
                                                                        aImportServiceGroup.getParticpantIdentifier (),
                                                                        aImportServiceGroup.getExtensionAsString ());
-            if (aNewServiceGroup != null)
-              aLogger.success ("Successfully created service group " + aImportServiceGroup.getID ());
+            aLogger.success ("Successfully created service group " + aImportServiceGroup.getID ());
           }
           catch (final Exception ex)
           {

@@ -26,24 +26,25 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.mime.CMimeType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.exception.SMPBadRequestException;
 
 /**
- * @author PEPPOL.AT, BRZ, Philip Helger
+ * @author Philip Helger
+ * @since 5.1.0
  */
 @Provider
-public final class RuntimeExceptionMapper extends AbstractExceptionMapper <RuntimeException>
+public class SMPBadRequestExceptionMapper extends AbstractExceptionMapper <SMPBadRequestException>
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (RuntimeExceptionMapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPBadRequestExceptionMapper.class);
 
   @Nonnull
-  public Response toResponse (@Nonnull final RuntimeException ex)
+  public Response toResponse (@Nonnull final SMPBadRequestException ex)
   {
     if (SMPServerConfiguration.isRESTLogExceptions ())
-      LOGGER.error ("RuntimeException", ex);
+      LOGGER.error ("Bad Request", ex);
 
-    // The stack trace may be beneficial here
-    return Response.status (Status.INTERNAL_SERVER_ERROR)
-                   .entity (getResponseEntityWithStackTrace (ex))
+    return Response.status (Status.BAD_REQUEST)
+                   .entity (getResponseEntityWithoutStackTrace (ex))
                    .type (CMimeType.TEXT_PLAIN.getAsString ())
                    .build ();
   }

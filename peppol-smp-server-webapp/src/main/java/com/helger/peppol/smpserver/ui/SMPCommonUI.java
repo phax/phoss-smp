@@ -168,6 +168,7 @@ public final class SMPCommonUI
     final String sIDErrorField = GlobalIDFactory.getNewStringID ();
 
     final BootstrapForm aForm = new BootstrapForm (aLEC).setAction (aLEC.getSelfHref ());
+    aForm.setLeft (4);
 
     // User name field
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel (EPhotonCoreText.EMAIL_ADDRESS.getDisplayText (aDisplayLocale))
