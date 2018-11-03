@@ -115,18 +115,24 @@ public final class ServiceGroupInterface
         {
           final com.helger.peppol.smp.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType ().read (aServiceGroupDoc);
           if (aServiceGroup != null)
-            eSuccess = new SMPServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID,
-                                                                          aServiceGroup,
-                                                                          RestRequestHelper.getAuth (m_aHttpHeaders));
+          {
+            new SMPServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID,
+                                                               aServiceGroup,
+                                                               RestRequestHelper.getAuth (m_aHttpHeaders));
+            eSuccess = ESuccess.SUCCESS;
+          }
           break;
         }
         case BDXR:
         {
           final com.helger.peppol.bdxr.ServiceGroupType aServiceGroup = new BDXRMarshallerServiceGroupType ().read (aServiceGroupDoc);
           if (aServiceGroup != null)
-            eSuccess = new BDXRServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID,
-                                                                           aServiceGroup,
-                                                                           RestRequestHelper.getAuth (m_aHttpHeaders));
+          {
+            new BDXRServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID,
+                                                                aServiceGroup,
+                                                                RestRequestHelper.getAuth (m_aHttpHeaders));
+            eSuccess = ESuccess.SUCCESS;
+          }
           break;
         }
         default:
@@ -155,14 +161,15 @@ public final class ServiceGroupInterface
       switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
-          eSuccess = new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID,
-                                                                          RestRequestHelper.getAuth (m_aHttpHeaders));
-
+          new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID,
+                                                               RestRequestHelper.getAuth (m_aHttpHeaders));
+          eSuccess = ESuccess.SUCCESS;
           break;
         case BDXR:
-          eSuccess = new BDXRServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID,
-                                                                           RestRequestHelper.getAuth (m_aHttpHeaders));
+          new BDXRServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID,
+                                                                RestRequestHelper.getAuth (m_aHttpHeaders));
 
+          eSuccess = ESuccess.SUCCESS;
           break;
         default:
           throw new UnsupportedOperationException ("Unsupported REST type specified!");

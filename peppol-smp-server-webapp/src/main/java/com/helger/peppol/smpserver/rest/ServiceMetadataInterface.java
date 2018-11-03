@@ -118,8 +118,8 @@ public final class ServiceMetadataInterface
       // Sign the document
       try
       {
-        SMPKeyManager.getInstance ().signXML (aDoc.getDocumentElement (),
-                                              SMPServerConfiguration.getRESTType ().isBDXR ());
+        SMPKeyManager.getInstance ()
+                     .signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
       }
       catch (final Exception ex)
       {
@@ -224,14 +224,16 @@ public final class ServiceMetadataInterface
       switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
-          eSuccess = new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID,
-                                                                                 sDocumentTypeID,
-                                                                                 RestRequestHelper.getAuth (m_aHttpHeaders));
+          new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID,
+                                                                      sDocumentTypeID,
+                                                                      RestRequestHelper.getAuth (m_aHttpHeaders));
+          eSuccess = ESuccess.SUCCESS;
           break;
         case BDXR:
-          eSuccess = new BDXRServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID,
-                                                                                  sDocumentTypeID,
-                                                                                  RestRequestHelper.getAuth (m_aHttpHeaders));
+          new BDXRServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID,
+                                                                       sDocumentTypeID,
+                                                                       RestRequestHelper.getAuth (m_aHttpHeaders));
+          eSuccess = ESuccess.SUCCESS;
           break;
         default:
           throw new UnsupportedOperationException ("Unsupported REST type specified!");
