@@ -169,10 +169,8 @@ public final class BusinessCardInterface
     try (final WebScoped aWebScoped = new WebScoped (m_aHttpRequest))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPServerAPIDataProvider (m_aUriInfo);
-      final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID,
-                                                                                              RestRequestHelper.getAuth (m_aHttpHeaders));
-      if (eSuccess.isFailure ())
-        return Response.status (Status.BAD_REQUEST).build ();
+      new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID,
+                                                                    RestRequestHelper.getAuth (m_aHttpHeaders));
       return Response.ok ().build ();
     }
   }

@@ -67,46 +67,59 @@ public final class BusinessCardServerAPI
   @Nonnull
   public PD3BusinessCardType getBusinessCard (final String sServiceGroupID) throws SMPServerException
   {
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "GET /businesscard/" + sServiceGroupID);
-    s_aStatsCounterInvocation.increment ("getBusinessCard");
-
-    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
-                                        m_aAPIProvider.getCurrentURI ());
-    }
-
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
-    if (aServiceGroup == null)
-    {
-      // No such service group
-      throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
-                                      m_aAPIProvider.getCurrentURI ());
-    }
-
-    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-    if (aBusinessCardMgr == null)
-    {
-      throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API",
-                                        m_aAPIProvider.getCurrentURI ());
-    }
-    final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aServiceGroup);
-    if (aBusinessCard == null)
-    {
-      // No such business card
-      throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" + sServiceGroupID + "'",
-                                      m_aAPIProvider.getCurrentURI ());
-    }
+    final String sLog = LOG_PREFIX + "GET /businesscard/" + sServiceGroupID;
+    final String sAction = "getBusinessCard";
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "Finished getBusinessCard(" + sServiceGroupID + ")");
-    s_aStatsCounterSuccess.increment ("getBusinessCard");
-    return aBusinessCard.getAsJAXBObject ();
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
+
+    try
+    {
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      if (aServiceGroupID == null)
+      {
+        // Invalid identifier
+        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
+      }
+
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+      if (aServiceGroup == null)
+      {
+        // No such service group
+        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
+                                        m_aAPIProvider.getCurrentURI ());
+      }
+
+      final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+      if (aBusinessCardMgr == null)
+      {
+        throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API",
+                                          m_aAPIProvider.getCurrentURI ());
+      }
+      final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aServiceGroup);
+      if (aBusinessCard == null)
+      {
+        // No such business card
+        throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" + sServiceGroupID + "'",
+                                        m_aAPIProvider.getCurrentURI ());
+      }
+
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info (sLog + " SUCCESS");
+      s_aStatsCounterSuccess.increment (sAction);
+      return aBusinessCard.getAsJAXBObject ();
+    }
+    catch (final SMPServerException ex)
+    {
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      s_aStatsCounterError.increment (sAction);
+      throw ex;
+    }
   }
 
   @Nonnull
@@ -114,76 +127,84 @@ public final class BusinessCardServerAPI
                                       @Nonnull final PDBusinessCard aBusinessCard,
                                       @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "PUT /businesscard/" + sServiceGroupID + " ==> " + aBusinessCard);
-    s_aStatsCounterInvocation.increment ("createBusinessCard");
-
-    // Parse and validate identifier
-    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
-                                        m_aAPIProvider.getCurrentURI ());
-    }
-
-    final IParticipantIdentifier aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aBusinessCard.getParticipantIdentifier ()
-                                                                                                                       .getScheme (),
-                                                                                                          aBusinessCard.getParticipantIdentifier ()
-                                                                                                                       .getValue ());
-    if (!aServiceGroupID.hasSameContent (aPayloadServiceGroupID))
-    {
-      // Business identifiers must be equal
-      throw new SMPBadRequestException ("Participant Inconsistency. The URL points to " +
-                                        aServiceGroupID.getURIEncoded () +
-                                        " whereas the BusinessCard contains " +
-                                        aPayloadServiceGroupID.getURIEncoded (),
-                                        m_aAPIProvider.getCurrentURI ());
-    }
-
-    // Retrieve the service group
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
-    if (aServiceGroup == null)
-    {
-      // No such service group (on this server)
-      throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
-                                      m_aAPIProvider.getCurrentURI ());
-    }
-
-    // Check credentials and verify service group is owned by provided user
-    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-    final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-    aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
-
-    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-    if (aBusinessCardMgr == null)
-    {
-      throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API",
-                                        m_aAPIProvider.getCurrentURI ());
-    }
-
-    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
-    for (final PDBusinessEntity aEntity : aBusinessCard.businessEntities ())
-      aEntities.add (SMPBusinessCardEntity.createFromGenericObject (aEntity));
-    if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aEntities) == null)
-    {
-      if (LOGGER.isErrorEnabled ())
-        LOGGER.error (LOG_PREFIX +
-                      "Finished createBusinessCard(" +
-                      sServiceGroupID +
-                      "," +
-                      aBusinessCard +
-                      ") - failure");
-      s_aStatsCounterError.increment ("createBusinessCard");
-      return ESuccess.FAILURE;
-    }
+    final String sLog = LOG_PREFIX + "PUT /businesscard/" + sServiceGroupID;
+    final String sAction = "createBusinessCard";
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "Finished createBusinessCard(" + sServiceGroupID + "," + aBusinessCard + ") - success");
-    s_aStatsCounterSuccess.increment ("createBusinessCard");
-    return ESuccess.SUCCESS;
+      LOGGER.info (sLog + " ==> " + aBusinessCard);
+    s_aStatsCounterInvocation.increment (sAction);
+
+    try
+    {
+      // Parse and validate identifier
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      if (aServiceGroupID == null)
+      {
+        // Invalid identifier
+        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
+      }
+
+      final IParticipantIdentifier aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aBusinessCard.getParticipantIdentifier ()
+                                                                                                                         .getScheme (),
+                                                                                                            aBusinessCard.getParticipantIdentifier ()
+                                                                                                                         .getValue ());
+      if (!aServiceGroupID.hasSameContent (aPayloadServiceGroupID))
+      {
+        // Business identifiers must be equal
+        throw new SMPBadRequestException ("Participant Inconsistency. The URL points to " +
+                                          aServiceGroupID.getURIEncoded () +
+                                          " whereas the BusinessCard contains " +
+                                          aPayloadServiceGroupID.getURIEncoded (),
+                                          m_aAPIProvider.getCurrentURI ());
+      }
+
+      // Retrieve the service group
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+      if (aServiceGroup == null)
+      {
+        // No such service group (on this server)
+        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
+                                        m_aAPIProvider.getCurrentURI ());
+      }
+
+      // Check credentials and verify service group is owned by provided user
+      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
+      aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
+
+      final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+      if (aBusinessCardMgr == null)
+      {
+        throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API",
+                                          m_aAPIProvider.getCurrentURI ());
+      }
+
+      final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
+      for (final PDBusinessEntity aEntity : aBusinessCard.businessEntities ())
+        aEntities.add (SMPBusinessCardEntity.createFromGenericObject (aEntity));
+      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aEntities) == null)
+      {
+        if (LOGGER.isWarnEnabled ())
+          LOGGER.warn (sLog + " ERROR");
+        s_aStatsCounterError.increment (sAction);
+        return ESuccess.FAILURE;
+      }
+
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info (sLog + " SUCCESS");
+      s_aStatsCounterSuccess.increment (sAction);
+      return ESuccess.SUCCESS;
+    }
+    catch (final SMPServerException ex)
+    {
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      s_aStatsCounterError.increment (sAction);
+      throw ex;
+    }
   }
 
   /**
@@ -193,52 +214,62 @@ public final class BusinessCardServerAPI
    *        The service group (participant) ID.
    * @param aCredentials
    *        The credentials to be used. May not be <code>null</code>.
-   * @return {@link ESuccess}
    * @throws SMPServerException
    *         In case of error
    * @since 5.0.2
    */
-  @Nonnull
-  public ESuccess deleteBusinessCard (@Nonnull final String sServiceGroupID,
-                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+  public void deleteBusinessCard (@Nonnull final String sServiceGroupID,
+                                  @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "DELETE /businesscard/" + sServiceGroupID);
-    s_aStatsCounterInvocation.increment ("deleteBusinessCard");
-
-    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-    if (aServiceGroupID == null)
-    {
-      // Invalid identifier
-      throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
-                                        m_aAPIProvider.getCurrentURI ());
-    }
-
-    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-    final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-    aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
-
-    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-    if (aBusinessCardMgr == null)
-    {
-      throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API",
-                                        m_aAPIProvider.getCurrentURI ());
-    }
-    final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (sServiceGroupID);
-    if (aBusinessCard == null)
-    {
-      // No such business card
-      throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" + sServiceGroupID + "'",
-                                      m_aAPIProvider.getCurrentURI ());
-    }
-
-    aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
+    final String sLog = LOG_PREFIX + "DELETE /businesscard/" + sServiceGroupID;
+    final String sAction = "deleteBusinessCard";
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info (LOG_PREFIX + "Finished deleteBusinessCard(" + sServiceGroupID + ")");
-    s_aStatsCounterSuccess.increment ("deleteBusinessCard");
-    return ESuccess.SUCCESS;
+      LOGGER.info (sLog);
+    s_aStatsCounterInvocation.increment (sAction);
+
+    try
+    {
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      if (aServiceGroupID == null)
+      {
+        // Invalid identifier
+        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
+      }
+
+      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
+      aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
+
+      final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+      if (aBusinessCardMgr == null)
+      {
+        throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API",
+                                          m_aAPIProvider.getCurrentURI ());
+      }
+      final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (sServiceGroupID);
+      if (aBusinessCard == null)
+      {
+        // No such business card
+        throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" + sServiceGroupID + "'",
+                                        m_aAPIProvider.getCurrentURI ());
+      }
+
+      aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
+
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info (sLog + " SUCCESS");
+      s_aStatsCounterSuccess.increment (sAction);
+    }
+    catch (final SMPServerException ex)
+    {
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      s_aStatsCounterError.increment (sAction);
+      throw ex;
+    }
   }
 
   /**
