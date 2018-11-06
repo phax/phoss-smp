@@ -24,6 +24,9 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.name.IHasDisplayName;
+import com.helger.commons.url.SimpleURL;
+import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.photon.core.form.RequestField;
@@ -36,6 +39,16 @@ public class HCSMLSelect extends HCExtSelect
   public static String getDisplayName (@Nonnull final ISMLInfo aObj)
   {
     return "[" + aObj.getDisplayName () + "] " + aObj.getManagementServiceURL () + " (" + aObj.getDNSZone () + ")";
+  }
+
+  @Nonnull
+  @Nonempty
+  public static HCNodeList getDisplayNameNode (@Nonnull final ISMLInfo aObj)
+  {
+    return new HCNodeList ().addChild ("[" + aObj.getDisplayName () + "] ")
+                            .addChild (new HCA (new SimpleURL (aObj.getManagementServiceURL ())).setTargetBlank ()
+                                                                                                .addChild (aObj.getManagementServiceURL ()))
+                            .addChild (" (" + aObj.getDNSZone () + ")");
   }
 
   public HCSMLSelect (@Nonnull final RequestField aRF,

@@ -20,7 +20,7 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * This class defines the menu item constants for the secure application
- * 
+ *
  * @author Philip Helger
  */
 @Immutable
@@ -43,7 +43,8 @@ public final class CMenuSecure
 
   public static final String MENU_ADMIN = "admin";
   public static final String MENU_SML = "sml";
-  public static final String MENU_SML_INFO = "sml_info";
+  // Legacy name
+  public static final String MENU_SML_CONFIGURATION = "sml_info";
   public static final String MENU_SML_REGISTRATION = "sml_registration";
   public static final String MENU_SMP_SETTINGS = "smp_settings";
   public static final String MENU_CHANGE_PASSWORD = "change_pw";

@@ -38,6 +38,8 @@ import com.helger.peppol.smpserver.settings.ISMPSettings;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageSimpleForm;
 import com.helger.peppol.smpserver.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.card.BootstrapCard;
+import com.helger.photon.bootstrap4.card.BootstrapCardBody;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
@@ -76,30 +78,50 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 
-    final BootstrapViewForm aTable = aNodeList.addAndReturnChild (new BootstrapViewForm ());
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
-                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isRESTWritableAPIDisabled (),
-                                                                                        aDisplayLocale)));
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration enabled?")
-                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationEnabled (),
-                                                                                        aDisplayLocale)));
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration automatic update?")
-                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationAutoUpdate (),
-                                                                                        aDisplayLocale)));
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " hostname")
-                                                  .setCtrl (HCA.createLinkedWebsite (aObject.getPEPPOLDirectoryHostName ())));
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
-                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLActive (),
-                                                                                        aDisplayLocale)));
-    aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection needed?")
-                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLNeeded (),
-                                                                                        aDisplayLocale)));
+    {
+      final BootstrapCard aCard = aNodeList.addAndReturnChild (new BootstrapCard ());
+      aCard.createAndAddHeader ().addChild ("REST API");
+      final BootstrapCardBody aCardBody = aCard.createAndAddBody ();
+
+      final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
+                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isRESTWritableAPIDisabled (),
+                                                                                          aDisplayLocale)));
+    }
 
     {
+      final BootstrapCard aCard = aNodeList.addAndReturnChild (new BootstrapCard ());
+      aCard.createAndAddHeader ().addChild (sDirectoryName);
+      final BootstrapCardBody aCardBody = aCard.createAndAddBody ();
+
+      final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration enabled?")
+                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationEnabled (),
+                                                                                          aDisplayLocale)));
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration automatic update?")
+                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationAutoUpdate (),
+                                                                                          aDisplayLocale)));
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " hostname")
+                                                    .setCtrl (HCA.createLinkedWebsite (aObject.getPEPPOLDirectoryHostName ())));
+    }
+
+    {
+      final BootstrapCard aCard = aNodeList.addAndReturnChild (new BootstrapCard ());
+      aCard.createAndAddHeader ().addChild ("SMK/SML");
+      final BootstrapCardBody aCardBody = aCard.createAndAddBody ();
+
+      final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
+                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLActive (),
+                                                                                          aDisplayLocale)));
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection needed?")
+                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLNeeded (),
+                                                                                          aDisplayLocale)));
+
       final ISMLInfo aSMLInfo = aObject.getSMLInfo ();
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML to be used")
                                                     .setCtrl (aSMLInfo == null ? new HCEM ().addChild ("none")
-                                                                               : new HCTextNode (HCSMLSelect.getDisplayName (aSMLInfo))));
+                                                                               : HCSMLSelect.getDisplayNameNode (aSMLInfo)));
     }
   }
 
@@ -167,11 +189,15 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   {
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+
+    aForm.addChild (getUIHandler ().createDataGroupHeader ("REST API"));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_REST_WRITABLE_API_DISABLED,
                                                                                                     aObject.isRESTWritableAPIDisabled ())))
                                                  .setHelpText ("If this checkbox is checked, all non-standard writing REST APIs are disabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_REST_WRITABLE_API_DISABLED)));
+
+    aForm.addChild (getUIHandler ().createDataGroupHeader (sDirectoryName));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration enabled?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
                                                                                                     aObject.isPEPPOLDirectoryIntegrationEnabled ())))
@@ -197,6 +223,8 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                sDirectoryName +
                                                                " integration (see above) is enabled.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME)));
+
+    aForm.addChild (getUIHandler ().createDataGroupHeader ("SMK/SML"));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SML_ACTIVE,
                                                                                                     aObject.isSMLActive ())))
@@ -212,7 +240,9 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                                               aObject.getSMLInfoID ()),
                                                                             aDisplayLocale,
                                                                             null))
-                                                 .setHelpText (new HCTextNode ("Select the SML to operate on. The list of available configurations can be customized."))
+                                                 .setHelpText (new HCTextNode ("Select the SML to operate on. The list of available configurations can be "),
+                                                               new HCA (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SML_CONFIGURATION)).addChild ("customized"),
+                                                               new HCTextNode ("."))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SML_INFO)));
   }
 }
