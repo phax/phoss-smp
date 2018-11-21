@@ -252,7 +252,7 @@ public final class BusinessCardInterfaceTest
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get BC - must work
-      PD1BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD1BusinessCardType.class);
+      PD2BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD2BusinessCardType.class);
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
 
@@ -271,7 +271,7 @@ public final class BusinessCardInterfaceTest
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get BC - must work
-      aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD1BusinessCardType.class);
+      aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD2BusinessCardType.class);
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
 
