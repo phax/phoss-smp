@@ -157,8 +157,8 @@ public final class BusinessCardInterfaceTest
                                              .request ()).put (Entity.xml (m_aBC1ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
-      // Get BC - must work
-      PD1BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD1BusinessCardType.class);
+      // Get BC - must work (always V3)
+      PD3BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
 
@@ -176,8 +176,8 @@ public final class BusinessCardInterfaceTest
                                              .request ()).put (Entity.xml (m_aBC1ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
-      // Get BC - must work
-      aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD1BusinessCardType.class);
+      // Get BC - must work (always V3)
+      aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
 
@@ -255,8 +255,8 @@ public final class BusinessCardInterfaceTest
                                              .request ()).put (Entity.xml (m_aBC2ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
-      // Get BC - must work
-      PD2BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD2BusinessCardType.class);
+      // Get BC - must work (always V3)
+      PD3BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
 
@@ -274,8 +274,8 @@ public final class BusinessCardInterfaceTest
                                              .request ()).put (Entity.xml (m_aBC2ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
-      // Get BC - must work
-      aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD2BusinessCardType.class);
+      // Get BC - must work (always V3)
+      aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
 
@@ -353,7 +353,7 @@ public final class BusinessCardInterfaceTest
                                              .request ()).put (Entity.xml (m_aBC3ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
-      // Get BC - must work
+      // Get BC - must work (always V3)
       PD3BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
@@ -372,7 +372,7 @@ public final class BusinessCardInterfaceTest
                                              .request ()).put (Entity.xml (m_aBC3ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
-      // Get BC - must work
+      // Get BC - must work (always V3)
       aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
