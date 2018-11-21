@@ -83,10 +83,11 @@ public class SMPSettingsManager extends AbstractPhotonSimpleDAO implements ISMPS
   @Nonnull
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
                                  final boolean bPEPPOLDirectoryIntegrationEnabled,
+                                 final boolean bPEPPOLDirectoryIntegrationRequired,
                                  final boolean bPEPPOLDirectoryIntegrationAutoUpdate,
                                  @Nullable final String sPEPPOLDirectoryHostName,
                                  final boolean bSMLActive,
-                                 final boolean bSMLNeeded,
+                                 final boolean bSMLRequired,
                                  @Nullable final ISMLInfo aSMLInfo)
   {
     EChange eChange = EChange.UNCHANGED;
@@ -95,10 +96,11 @@ public class SMPSettingsManager extends AbstractPhotonSimpleDAO implements ISMPS
     {
       eChange = eChange.or (m_aSettings.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
       eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationEnabled (bPEPPOLDirectoryIntegrationEnabled));
+      eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationRequired (bPEPPOLDirectoryIntegrationRequired));
       eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationAutoUpdate (bPEPPOLDirectoryIntegrationAutoUpdate));
       eChange = eChange.or (m_aSettings.setPEPPOLDirectoryHostName (sPEPPOLDirectoryHostName));
       eChange = eChange.or (m_aSettings.setSMLActive (bSMLActive));
-      eChange = eChange.or (m_aSettings.setSMLNeeded (bSMLNeeded));
+      eChange = eChange.or (m_aSettings.setSMLRequired (bSMLRequired));
       eChange = eChange.or (m_aSettings.setSMLInfo (aSMLInfo == null ? null : aSMLInfo.getID ()));
       if (eChange.isChanged ())
         markAsChanged ();

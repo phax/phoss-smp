@@ -37,6 +37,7 @@ import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
@@ -97,6 +98,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final LocalDateTime aNowDT = PDTFactory.getCurrentLocalDateTime ();
     final LocalDateTime aNowPlusDT = aNowDT.plusMonths (3);
+    final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 
     aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page tries to identify upcoming tasks and potential problems in the SMP configuration. It is meant to highlight immediate and upcoming action items as well as potential misconfiguration."));
 
@@ -120,30 +122,35 @@ public class PageSecureTasks extends AbstractSMPWebPage
     }
 
     // check truststore configuration
+    if (!SMPTrustManager.isCertificateValid ())
     {
-      if (!SMPTrustManager.isCertificateValid ())
-      {
-        // Ignore error if no trust store is configured
-        if (SMPTrustManager.getInitializationErrorCode () != EKeyStoreLoadError.KEYSTORE_NO_PATH)
-          aOL.addItem (_createWarning ("Problem with the truststore configuration"),
-                       new HCDiv ().addChild (SMPTrustManager.getInitializationError ()));
-      }
+      // Ignore error if no trust store is configured
+      if (SMPTrustManager.getInitializationErrorCode () != EKeyStoreLoadError.KEYSTORE_NO_PATH)
+        aOL.addItem (_createWarning ("Problem with the truststore configuration"),
+                     new HCDiv ().addChild (SMPTrustManager.getInitializationError ()));
     }
 
     // Check SML configuration
+    if (!SMPMetaManager.getSettings ().isSMLActive ())
     {
-      if (!SMPMetaManager.getSettings ().isSMLActive ())
-      {
-        // Warn only if SML is needed
-        if (SMPMetaManager.getSettings ().isSMLNeeded ())
-          aOL.addItem (_createWarning ("The connection to the SML is not active."),
-                       new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
-      }
+      // Warn only if SML is needed
+      if (SMPMetaManager.getSettings ().isSMLRequired ())
+        aOL.addItem (_createWarning ("The connection to the SML is not active."),
+                     new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
     }
 
+    // Check that public URL is set
+    if (StringHelper.hasNoText (SMPServerConfiguration.getPublicServerURL ()))
+    {
+      aOL.addItem (_createWarning ("The public server URL is not configured"),
+                   new HCDiv ().addChild ("The configuration property " +
+                                          SMPServerConfiguration.KEY_SMP_PUBLIC_URL +
+                                          " is not set. This property is usually required to create valid outside URLs"));
+    }
+
+    // Check Directory configuration
     if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
-      final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
       if (StringHelper.hasNoText (SMPMetaManager.getSettings ().getPEPPOLDirectoryHostName ()))
         aOL.addItem (_createError ("An empty " + sDirectoryName + " hostname is provided"),
                      new HCDiv ().addChild ("A connection to the " + sDirectoryName + " server cannot be establised!"));
@@ -154,6 +161,12 @@ public class PageSecureTasks extends AbstractSMPWebPage
       if (aLoadedKeyStore.isFailure ())
         aOL.addItem (_createError ("The " + sDirectoryName + " client certificate configuration is invalid."),
                      new HCDiv ().addChild (PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore)));
+    }
+    else
+    {
+      // Warn only if Directory is required
+      if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationRequired ())
+        aOL.addItem (_createWarning ("The connection to " + sDirectoryName + " is not enabled."));
     }
 
     // check service groups and redirects

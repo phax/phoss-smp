@@ -598,7 +598,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    if (SMPMetaManager.getSettings ().isSMLNeeded ())
+    if (SMPMetaManager.getSettings ().isSMLRequired ())
     {
       // Disable button if no SML URL is configured
       // Disable button if no service group is present

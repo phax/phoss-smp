@@ -93,6 +93,18 @@ public class SMPSettings implements ISMPSettings
                               bPEPPOLDirectoryIntegrationEnabled);
   }
 
+  public boolean isPEPPOLDirectoryIntegrationRequired ()
+  {
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_REQUIRED,
+                                     SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_REQUIRED);
+  }
+
+  @Nonnull
+  public EChange setPEPPOLDirectoryIntegrationRequired (final boolean bPEPPOLDirectoryIntegrationRequired)
+  {
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_REQUIRED, bPEPPOLDirectoryIntegrationRequired);
+  }
+
   public boolean isPEPPOLDirectoryIntegrationAutoUpdate ()
   {
     return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
@@ -130,15 +142,16 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_ACTIVE, bSMLActive);
   }
 
-  public boolean isSMLNeeded ()
+  public boolean isSMLRequired ()
   {
-    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_NEEDED, SMPServerConfiguration.DEFAULT_SML_NEEDED);
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_REQUIRED,
+                                     SMPServerConfiguration.DEFAULT_SML_REQUIRED);
   }
 
   @Nonnull
-  public EChange setSMLNeeded (final boolean bSMLNeeded)
+  public EChange setSMLRequired (final boolean bSMLRequired)
   {
-    return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_NEEDED, bSMLNeeded);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SML_REQUIRED, bSMLRequired);
   }
 
   @Nullable

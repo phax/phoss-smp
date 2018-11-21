@@ -43,6 +43,15 @@ public interface ISMPSettings extends ITypedObject <String>
   boolean isPEPPOLDirectoryIntegrationEnabled ();
 
   /**
+   * @return <code>true</code> if the Directory is required and warnings should
+   *         be emitted if it is disabled, <code>false</code> if not. Default is
+   *         <code>true</code>.
+   * @see #isPEPPOLDirectoryIntegrationEnabled()
+   * @since 5.1.0
+   */
+  boolean isPEPPOLDirectoryIntegrationRequired ();
+
+  /**
    * If the PEPPOL Directory integration is enabled, should the changes be
    * pushed automatically?
    *
@@ -76,26 +85,13 @@ public interface ISMPSettings extends ITypedObject <String>
   boolean isSMLActive ();
 
   /**
-   * @return <code>true</code> if the SML is needed and warnings should be
+   * @return <code>true</code> if the SML is required and warnings should be
    *         emitted if it is disabled, <code>false</code> if not. Default is
    *         <code>true</code>.
    * @see #isSMLActive()
    * @since 5.0.4
    */
-  boolean isSMLNeeded ();
-
-  /**
-   * @return The SML URL to use (the manage participant endpoint - e.g.
-   *         <code>https://acc.edelivery.tech.ec.europa.eu/edelivery-sml/manageparticipantidentifier</code>).
-   *         Only relevant when {@link #isSMLActive()} is <code>true</code>.
-   */
-  @Nullable
-  @Deprecated
-  default String getSMLURL ()
-  {
-    final ISMLInfo aSMLInfo = getSMLInfo ();
-    return aSMLInfo == null ? null : aSMLInfo.getManageParticipantIdentifierEndpointAddress ().toExternalForm ();
-  }
+  boolean isSMLRequired ();
 
   /**
    * @return The SML information object to be used. May be <code>null</code>.

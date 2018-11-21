@@ -44,7 +44,7 @@ public final class MenuSecure
                                                           SMPMetaManager.hasBusinessCardMgr ();
     final IMenuObjectFilter aFilterSMLConnectionActive = x -> SMPMetaManager.getSettings ().isSMLActive ();
     final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> SMPMetaManager.getSettings ().isSMLActive () ||
-                                                                      SMPMetaManager.getSettings ().isSMLNeeded ();
+                                                                      SMPMetaManager.getSettings ().isSMLRequired ();
 
     if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
     {

@@ -53,11 +53,12 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <ISMPSettings>
 {
   private static final String FIELD_SMP_REST_WRITABLE_API_DISABLED = "smprwad";
-  private static final String FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "smppdie";
-  private static final String FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smppdiau";
-  private static final String FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smppdh";
+  private static final String FIELD_SMP_DIRECTORY_INTEGRATION_ENABLED = "smppdie";
+  private static final String FIELD_SML_DIRECTORY_INTEGRATION_REQUIRED = "smppdin";
+  private static final String FIELD_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smppdiau";
+  private static final String FIELD_SMP_DIRECTORY_HOSTNAME = "smppdh";
   private static final String FIELD_SML_ACTIVE = "smla";
-  private static final String FIELD_SML_NEEDED = "smln";
+  private static final String FIELD_SML_REQUIRED = "smln";
   private static final String FIELD_SML_INFO = "smlinfo";
 
   public PageSecureSMPSettings (@Nonnull @Nonempty final String sID)
@@ -98,6 +99,9 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration enabled?")
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationEnabled (),
                                                                                           aDisplayLocale)));
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration required?")
+                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationRequired (),
+                                                                                          aDisplayLocale)));
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration automatic update?")
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isPEPPOLDirectoryIntegrationAutoUpdate (),
                                                                                           aDisplayLocale)));
@@ -114,8 +118,8 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLActive (),
                                                                                           aDisplayLocale)));
-      aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection needed?")
-                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLNeeded (),
+      aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection required?")
+                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLRequired (),
                                                                                           aDisplayLocale)));
 
       final ISMLInfo aSMLInfo = aObject.getSMLInfo ();
@@ -135,26 +139,29 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                   .isCheckBoxChecked (FIELD_SMP_REST_WRITABLE_API_DISABLED,
                                                                       SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
     final boolean bPEPPOLDirectoryIntegrationEnabled = aWPEC.params ()
-                                                            .isCheckBoxChecked (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
+                                                            .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_ENABLED,
                                                                                 SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED);
+    final boolean bPEPPOLDirectoryIntegrationRequired = aWPEC.params ()
+                                                             .isCheckBoxChecked (FIELD_SML_DIRECTORY_INTEGRATION_REQUIRED,
+                                                                                 SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_REQUIRED);
     final boolean bPEPPOLDirectoryIntegrationAutoUpdate = aWPEC.params ()
-                                                               .isCheckBoxChecked (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                                               .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                                                                    SMPServerConfiguration.DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE);
-    final String sPEPPOLDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME);
+    final String sPEPPOLDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_DIRECTORY_HOSTNAME);
     final boolean bSMLActive = aWPEC.params ()
                                     .isCheckBoxChecked (FIELD_SML_ACTIVE, SMPServerConfiguration.DEFAULT_SML_ACTIVE);
-    final boolean bSMLNeeded = aWPEC.params ()
-                                    .isCheckBoxChecked (FIELD_SML_NEEDED, SMPServerConfiguration.DEFAULT_SML_NEEDED);
+    final boolean bSMLRequired = aWPEC.params ()
+                                      .isCheckBoxChecked (FIELD_SML_REQUIRED,
+                                                          SMPServerConfiguration.DEFAULT_SML_REQUIRED);
     final String sSMLInfoID = aWPEC.params ().getAsString (FIELD_SML_INFO);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLInfoID);
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 
     if (StringHelper.hasNoText (sPEPPOLDirectoryHostName))
-      aFormErrors.addFieldError (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME, sDirectoryName + " hostname may not be empty.");
+      aFormErrors.addFieldError (FIELD_SMP_DIRECTORY_HOSTNAME, sDirectoryName + " hostname may not be empty.");
     else
       if (!URLValidator.isValid (sPEPPOLDirectoryHostName))
-        aFormErrors.addFieldError (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME,
-                                   sDirectoryName + " hostname must be a valid URL.");
+        aFormErrors.addFieldError (FIELD_SMP_DIRECTORY_HOSTNAME, sDirectoryName + " hostname must be a valid URL.");
 
     if (bSMLActive && !SMPKeyManager.isCertificateValid ())
       aFormErrors.addFieldError (FIELD_SML_ACTIVE,
@@ -171,10 +178,11 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       SMPMetaManager.getSettingsMgr ()
                     .updateSettings (bRESTWritableAPIDisabled,
                                      bPEPPOLDirectoryIntegrationEnabled,
+                                     bPEPPOLDirectoryIntegrationRequired,
                                      bPEPPOLDirectoryIntegrationAutoUpdate,
                                      sPEPPOLDirectoryHostName,
                                      bSMLActive,
-                                     bSMLNeeded,
+                                     bSMLRequired,
                                      aSMLInfo);
       aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP settings were successfully saved."));
     }
@@ -199,30 +207,37 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
 
     aForm.addChild (getUIHandler ().createDataGroupHeader (sDirectoryName));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration enabled?")
-                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED,
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_DIRECTORY_INTEGRATION_ENABLED,
                                                                                                     aObject.isPEPPOLDirectoryIntegrationEnabled ())))
                                                  .setHelpText ("If this checkbox is checked, the " +
                                                                sDirectoryName +
                                                                " integration is enabled.")
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED)));
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SMP_DIRECTORY_INTEGRATION_ENABLED)));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " connection required?")
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SML_DIRECTORY_INTEGRATION_REQUIRED,
+                                                                                                    aObject.isPEPPOLDirectoryIntegrationRequired ())))
+                                                 .setHelpText ("If this checkbox is checked, warnings are emitted if the " +
+                                                               sDirectoryName +
+                                                               " connection is not enabled.")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SML_DIRECTORY_INTEGRATION_REQUIRED)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration automatic update?")
-                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                                                                                     aObject.isPEPPOLDirectoryIntegrationAutoUpdate ())))
                                                  .setHelpText ("If the " +
                                                                sDirectoryName +
                                                                " integration is enabled and this checkbox is checked, all business card creations, modifications and deletions are automatically pushed to the " +
                                                                sDirectoryName +
                                                                " server.")
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED)));
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SMP_DIRECTORY_INTEGRATION_ENABLED)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " hostname")
-                                                 .setCtrl (new HCEdit (new RequestField (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME,
+                                                 .setCtrl (new HCEdit (new RequestField (FIELD_SMP_DIRECTORY_HOSTNAME,
                                                                                          aObject.getPEPPOLDirectoryHostName ())))
                                                  .setHelpText ("The " +
                                                                sDirectoryName +
                                                                " host where the business cards should be published to. This URL is only used if the " +
                                                                sDirectoryName +
                                                                " integration (see above) is enabled.")
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SMP_PEPPOL_DIRECTORY_HOSTNAME)));
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SMP_DIRECTORY_HOSTNAME)));
 
     aForm.addChild (getUIHandler ().createDataGroupHeader ("SMK/SML"));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
@@ -230,11 +245,11 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                                                     aObject.isSMLActive ())))
                                                  .setHelpText ("If this checkbox is checked, service group changes are propagated to the SML.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SML_ACTIVE)));
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection needed?")
-                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SML_NEEDED,
-                                                                                                    aObject.isSMLNeeded ())))
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection required?")
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SML_REQUIRED,
+                                                                                                    aObject.isSMLRequired ())))
                                                  .setHelpText ("If this checkbox is checked, warnings are emitted if the SML connection is not enabled.")
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SML_NEEDED)));
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_SML_REQUIRED)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML configuration")
                                                  .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_INFO,
                                                                                               aObject.getSMLInfoID ()),

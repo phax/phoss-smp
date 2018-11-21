@@ -45,6 +45,8 @@ public interface ISMPSettingsManager
    *        <code>true</code> to enable writable access by REST services
    * @param bPEPPOLDirectoryIntegrationEnabled
    *        <code>true</code> to enable PEPPOL Directory integration
+   * @param bPEPPOLDirectoryIntegrationRequired
+   *        <code>true</code> to warn if Directory is disabled
    * @param bPEPPOLDirectoryIntegrationAutoUpdate
    *        <code>true</code> to automatically update the PEPPOL Directory if a
    *        business card changes
@@ -53,7 +55,7 @@ public interface ISMPSettingsManager
    *        qualified including the protocol.
    * @param bSMLActive
    *        <code>true</code> to enable write access to the SML
-   * @param bSMLNeeded
+   * @param bSMLRequired
    *        <code>true</code> to warn if SML is disabled
    * @param aSMLInfo
    *        The SMLInfo object to use. May be <code>null</code> if not active.
@@ -62,9 +64,10 @@ public interface ISMPSettingsManager
   @Nonnull
   EChange updateSettings (boolean bRESTWritableAPIDisabled,
                           boolean bPEPPOLDirectoryIntegrationEnabled,
+                          boolean bPEPPOLDirectoryIntegrationRequired,
                           boolean bPEPPOLDirectoryIntegrationAutoUpdate,
                           @Nullable String sPEPPOLDirectoryHostName,
                           boolean bSMLActive,
-                          boolean bSMLNeeded,
+                          boolean bSMLRequired,
                           @Nullable ISMLInfo aSMLInfo);
 }

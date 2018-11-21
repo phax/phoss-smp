@@ -122,18 +122,18 @@ public final class SMPRendererSecure
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                    .addChild (" No SML is selected. ")
                                    .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
-        aBox.setType (EBootstrapAlertType.DANGER);
+        aBox.setTypeIfWorse (EBootstrapAlertType.DANGER);
       }
     }
     else
     {
       // Warn only if SML is needed
-      if (SMPMetaManager.getSettings ().isSMLNeeded ())
+      if (SMPMetaManager.getSettings ().isSMLRequired ())
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.MINUS.getAsNode ())
                                    .addChild (" SML connection is NOT active. ")
                                    .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
-        aBox.setType (EBootstrapAlertType.WARNING);
+        aBox.setTypeIfWorse (EBootstrapAlertType.WARNING);
       }
     }
 
@@ -146,11 +146,14 @@ public final class SMPRendererSecure
       }
       else
       {
-        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.MINUS.getAsNode ())
-                                   .addChild (" Directory support is disabled. ")
-                                   .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
-        if (aBox.getType () == EBootstrapAlertType.SUCCESS)
-          aBox.setType (EBootstrapAlertType.INFO);
+        // Warn only if Directory is needed
+        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationRequired ())
+        {
+          aBox.addChild (new HCDiv ().addChild (EDefaultIcon.MINUS.getAsNode ())
+                                     .addChild (" Directory support is disabled. ")
+                                     .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
+          aBox.setTypeIfWorse (EBootstrapAlertType.WARNING);
+        }
       }
     }
 
@@ -159,7 +162,7 @@ public final class SMPRendererSecure
     {
       aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                  .addChild (" Certificate configuration is invalid. REST queries will not work!"));
-      aBox.setType (EBootstrapAlertType.DANGER);
+      aBox.setTypeIfWorse (EBootstrapAlertType.DANGER);
     }
     ret.addChild (aBox);
 

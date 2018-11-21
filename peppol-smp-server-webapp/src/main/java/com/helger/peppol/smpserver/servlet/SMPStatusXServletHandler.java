@@ -85,7 +85,7 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
 
     // SML information
     aStatusData.add ("smp.sml.enabled", aSettings.isSMLActive ());
-    aStatusData.add ("smp.sml.needed", aSettings.isSMLNeeded ());
+    aStatusData.add ("smp.sml.needed", aSettings.isSMLRequired ());
     if (aSMLInfo != null)
     {
       aStatusData.add ("smp.sml.url", aSMLInfo.getManagementServiceURL ());
@@ -96,6 +96,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
 
     // Directory information
     aStatusData.add ("smp.pd.enabled", aSettings.isPEPPOLDirectoryIntegrationEnabled ());
+    // New in 5.1.0
+    aStatusData.add ("smp.pd.needed", aSettings.isPEPPOLDirectoryIntegrationRequired ());
     aStatusData.add ("smp.pd.auto-update", aSettings.isPEPPOLDirectoryIntegrationAutoUpdate ());
     aStatusData.add ("smp.pd.hostname", aSettings.getPEPPOLDirectoryHostName ());
 
