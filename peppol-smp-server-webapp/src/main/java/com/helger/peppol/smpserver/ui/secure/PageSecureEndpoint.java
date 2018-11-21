@@ -96,12 +96,10 @@ import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap4.uictrls.datetimepicker.BootstrapDateTimePicker;
-import com.helger.photon.bootstrap4.uictrls.datetimepicker.EBootstrap4DateTimePickerMode;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
-import com.helger.photon.core.form.RequestFieldDate;
 import com.helger.photon.core.form.SessionBackedRequestField;
 import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.uicore.css.CPageParam;
@@ -823,21 +821,19 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_MINIMUM_AUTHENTICATION_LEVEL)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not before")
-                                                 .setCtrl (new BootstrapDateTimePicker (new RequestFieldDate (FIELD_NOT_BEFORE,
-                                                                                                              aSelectedEndpoint != null ? aSelectedEndpoint.getServiceActivationDate ()
-                                                                                                                                        : null,
-                                                                                                              aDisplayLocale),
-                                                                                        EBootstrap4DateTimePickerMode.DATE))
+                                                 .setCtrl (BootstrapDateTimePicker.create (FIELD_NOT_BEFORE,
+                                                                                           aSelectedEndpoint != null ? aSelectedEndpoint.getServiceActivationDate ()
+                                                                                                                     : null,
+                                                                                           aDisplayLocale))
                                                  .setHelpText ("Activation date of the service. Senders should ignore services that " +
                                                                "are not yet activated.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_NOT_BEFORE)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not after")
-                                                 .setCtrl (new BootstrapDateTimePicker (new RequestFieldDate (FIELD_NOT_AFTER,
-                                                                                                              aSelectedEndpoint != null ? aSelectedEndpoint.getServiceExpirationDate ()
-                                                                                                                                        : null,
-                                                                                                              aDisplayLocale),
-                                                                                        EBootstrap4DateTimePickerMode.DATE))
+                                                 .setCtrl (BootstrapDateTimePicker.create (FIELD_NOT_AFTER,
+                                                                                           aSelectedEndpoint != null ? aSelectedEndpoint.getServiceExpirationDate ()
+                                                                                                                     : null,
+                                                                                           aDisplayLocale))
                                                  .setHelpText ("Expiration date of the service. Senders should ignore services that " +
                                                                "are expired.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_NOT_AFTER)));

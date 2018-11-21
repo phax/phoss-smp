@@ -94,14 +94,12 @@ import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap4.uictrls.datetimepicker.BootstrapDateTimePicker;
-import com.helger.photon.bootstrap4.uictrls.datetimepicker.EBootstrap4DateTimePickerMode;
 import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.ajax.decl.AjaxFunctionDeclaration;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
 import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
-import com.helger.photon.core.form.RequestFieldDate;
 import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.html.select.HCCountrySelect;
@@ -878,11 +876,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     final String sFieldRegDate = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_REG_DATE);
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Registration Date")
-                                                 .setCtrl (new BootstrapDateTimePicker (new RequestFieldDate (sFieldRegDate,
-                                                                                                              aExistingEntity == null ? null
-                                                                                                                                      : aExistingEntity.getRegistrationDate (),
-                                                                                                              aDisplayLocale),
-                                                                                        EBootstrap4DateTimePickerMode.DATE))
+                                                 .setCtrl (BootstrapDateTimePicker.create (sFieldRegDate,
+                                                                                           aExistingEntity == null ? null
+                                                                                                                   : aExistingEntity.getRegistrationDate (),
+                                                                                           aDisplayLocale))
                                                  .setErrorList (aFormErrors.getListOfField (sFieldRegDate)));
 
     final BootstrapButtonToolbar aToolbar = aBody.addAndReturnChild (new BootstrapButtonToolbar (aLEC));
