@@ -25,10 +25,14 @@ vVaztY+EpsNIh9mwkO3YjW4KGS3DGKiqJ0uA/tElX0EUNoQ55re8WM="
 install:
 #  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -U -P jdeps
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -U
-  
+
 cache:
   directories:
     - $HOME/.m2
+
+branches:
+  only:
+    - master
 
 jobs:
   include:
@@ -47,4 +51,3 @@ jobs:
       jdk: openjdk11
       script:
         - mvn test -B
-  
