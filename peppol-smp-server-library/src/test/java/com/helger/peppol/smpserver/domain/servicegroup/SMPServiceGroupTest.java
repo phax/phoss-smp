@@ -18,7 +18,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.string.StringHelper;
@@ -63,7 +62,7 @@ public final class SMPServiceGroupTest
   }
 
   @Test
-  public void testBDXRExtension () throws SAXException
+  public void testBDXRExtension ()
   {
     final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
                                                      .createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
@@ -78,8 +77,8 @@ public final class SMPServiceGroupTest
     // Must be an array!
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID,
                                                      aPI,
-                                                     BDXRExtensionConverter.convertToString (new CommonsArrayList<> (aExt,
-                                                                                                                     aExt2)));
+                                                     BDXRExtensionConverter.convertToString (new CommonsArrayList <> (aExt,
+                                                                                                                      aExt2)));
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticpantIdentifier ());
