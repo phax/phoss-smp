@@ -39,8 +39,6 @@ import com.helger.photon.bootstrap4.alert.EBootstrapAlertType;
 import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumb;
 import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumbProvider;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
-import com.helger.photon.bootstrap4.grid.BootstrapCol;
-import com.helger.photon.bootstrap4.grid.BootstrapRow;
 import com.helger.photon.bootstrap4.layout.BootstrapContainer;
 import com.helger.photon.bootstrap4.navbar.BootstrapNavbar;
 import com.helger.photon.bootstrap4.navbar.BootstrapNavbarToggleable;
@@ -189,15 +187,16 @@ public final class SMPRendererSecure
 
     // Content
     {
-      final BootstrapRow aRow = aOuterContainer.addAndReturnChild (new BootstrapRow ());
-      final BootstrapCol aCol1 = aRow.createColumn (12, 12, 4, 3, 2);
-      final BootstrapCol aCol2 = aRow.createColumn (12, 12, 8, 9, 10);
+      final HCDiv aRow = aOuterContainer.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX));
+      final HCDiv aCol1 = aRow.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX)
+                                                              .addClass (CBootstrapCSS.MR_2));
+      final HCDiv aCol2 = aRow.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.FLEX_FILL));
 
       // left
+
       // We need a wrapper span for easy AJAX content replacement
-      aCol1.addChild (new HCSpan ().setID (CLayout.LAYOUT_AREAID_MENU)
-                                   .addClass (CBootstrapCSS.D_PRINT_NONE)
-                                   .addChild (getMenuContent (aLEC)));
+      aCol1.addClass (CBootstrapCSS.D_PRINT_NONE)
+           .addChild (new HCSpan ().setID (CLayout.LAYOUT_AREAID_MENU).addChild (getMenuContent (aLEC)));
       aCol1.addChild (new HCDiv ().setID (CLayout.LAYOUT_AREAID_SPECIAL));
 
       // content - determine is exactly same as for view

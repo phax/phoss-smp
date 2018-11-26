@@ -137,7 +137,6 @@ public final class SMPRendererPublic
       final BootstrapNavbarNav aNav = aToggleable.addAndReturnNav ();
       final BootstrapDropdownMenu aDropDown = new BootstrapDropdownMenu ();
       {
-        // 300px would lead to a messy layout - so 250px is fine
         final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.P_2)
                                        .addStyle (CCSSProperties.MIN_WIDTH.newValue ("400px"));
         aDiv.addChild (SMPCommonUI.createViewLoginForm (aLEC, null));
