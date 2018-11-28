@@ -14,6 +14,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -158,6 +159,18 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   public KeyStore.PrivateKeyEntry getPrivateKeyEntry ()
   {
     return m_aKeyEntry;
+  }
+
+  @Nullable
+  public X509Certificate getPrivateKeyCertificate ()
+  {
+    if (m_aKeyEntry != null)
+    {
+      final Certificate aCert = m_aKeyEntry.getCertificate ();
+      if (aCert instanceof X509Certificate)
+        return (X509Certificate) aCert;
+    }
+    return null;
   }
 
   /**
