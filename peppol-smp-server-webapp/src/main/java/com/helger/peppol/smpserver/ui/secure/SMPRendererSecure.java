@@ -109,7 +109,7 @@ public final class SMPRendererSecure
 
     ret.addChild (BootstrapMenuItemRenderer.createSideBarMenu (aLEC));
 
-    final BootstrapSuccessBox aBox = new BootstrapSuccessBox ();
+    final BootstrapSuccessBox aBox = new BootstrapSuccessBox ().addClass (CBootstrapCSS.MT_2);
 
     // Information on SML usage
     if (aSettings.isSMLActive ())

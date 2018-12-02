@@ -143,9 +143,9 @@ public class PageSecureTasks extends AbstractSMPWebPage
     if (StringHelper.hasNoText (SMPServerConfiguration.getPublicServerURL ()))
     {
       aOL.addItem (_createWarning ("The public server URL is not configured"),
-                   new HCDiv ().addChild ("The configuration property " +
-                                          SMPServerConfiguration.KEY_SMP_PUBLIC_URL +
-                                          " is not set. This property is usually required to create valid outside URLs"));
+                   new HCDiv ().addChild ("The configuration property ")
+                               .addChild (new HCCode ().addChild (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
+                               .addChild (" is not set. This property is usually required to create valid Internet-URLs."));
     }
 
     // Check Directory configuration
