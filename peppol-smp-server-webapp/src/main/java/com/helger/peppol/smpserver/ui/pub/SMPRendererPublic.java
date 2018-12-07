@@ -57,8 +57,6 @@ import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumbProvider;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.dropdown.BootstrapDropdownMenu;
 import com.helger.photon.bootstrap4.ext.BootstrapSystemMessage;
-import com.helger.photon.bootstrap4.grid.BootstrapCol;
-import com.helger.photon.bootstrap4.grid.BootstrapRow;
 import com.helger.photon.bootstrap4.layout.BootstrapContainer;
 import com.helger.photon.bootstrap4.navbar.BootstrapNavbar;
 import com.helger.photon.bootstrap4.navbar.BootstrapNavbarNav;
@@ -317,25 +315,7 @@ public final class SMPRendererPublic
     // Content
     try
     {
-      if (true)
-      {
-        // Show no menu
-        aOuterContainer.addChild (getPageContent (aLEC));
-      }
-      else
-      {
-        final BootstrapRow aRow = aOuterContainer.addAndReturnChild (new BootstrapRow ());
-        final BootstrapCol aCol1 = aRow.createColumn (12, 12, 4, 4, 3);
-        final BootstrapCol aCol2 = aRow.createColumn (12, 12, 8, 8, 9);
-
-        // left
-        // We need a wrapper span for easy AJAX content replacement
-        aCol1.addChild (new HCSpan ().setID (CLayout.LAYOUT_AREAID_MENU).addChild (getMenuContent (aLEC)));
-        aCol1.addChild (new HCDiv ().setID (CLayout.LAYOUT_AREAID_SPECIAL));
-
-        // content
-        aCol2.addChild (getPageContent (aLEC));
-      }
+      aOuterContainer.addChild (getPageContent (aLEC));
     }
     catch (final ForcedRedirectException ex)
     {
