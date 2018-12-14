@@ -82,6 +82,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("smp.identifiertype", SMPServerConfiguration.getIdentifierType ().getID ());
     aStatusData.add ("smp.id", SMPServerConfiguration.getSMLSMPID ());
     aStatusData.add ("smp.writable-rest-api.enabled", !aSettings.isRESTWritableAPIDisabled ());
+    // New in 5.1.0
+    aStatusData.add ("smp.publicurl", SMPServerConfiguration.getPublicServerURL ());
 
     // SML information
     aStatusData.add ("smp.sml.enabled", aSettings.isSMLActive ());
