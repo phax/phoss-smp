@@ -48,6 +48,10 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
  */
 public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
 {
+  public static final String PATH_WEBAPP_PROPERTIES = "webapp.properties";
+  public static final String WEBAPP_KEY_GLOBAL_DEBUG = "global.debug";
+  public static final String WEBAPP_KEY_GLOBAL_PRODUCTION = "global.production";
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppConfiguration.class);
 
   private static final ConfigFile s_aConfigFile;
@@ -56,8 +60,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   {
     final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromSystemProperty ("peppol.smp.webapp.properties.path")
                                                            .addPathFromSystemProperty ("smp.webapp.properties.path")
-                                                           .addPath ("private-webapp.properties")
-                                                           .addPath ("webapp.properties");
+                                                           .addPath ("private-" + PATH_WEBAPP_PROPERTIES)
+                                                           .addPath (PATH_WEBAPP_PROPERTIES);
 
     s_aConfigFile = aCFB.build ();
     if (!s_aConfigFile.isRead ())
@@ -89,7 +93,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getGlobalDebug ()
   {
-    return s_aConfigFile.getAsString ("global.debug");
+    return s_aConfigFile.getAsString (WEBAPP_KEY_GLOBAL_DEBUG);
   }
 
   /**
@@ -99,7 +103,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getGlobalProduction ()
   {
-    return s_aConfigFile.getAsString ("global.production");
+    return s_aConfigFile.getAsString (WEBAPP_KEY_GLOBAL_PRODUCTION);
   }
 
   /**

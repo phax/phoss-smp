@@ -28,6 +28,7 @@ import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
+import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -143,9 +144,41 @@ public class PageSecureTasks extends AbstractSMPWebPage
     if (StringHelper.hasNoText (SMPServerConfiguration.getPublicServerURL ()))
     {
       aOL.addItem (_createWarning ("The public server URL is not configured"),
-                   new HCDiv ().addChild ("The configuration property ")
+                   new HCDiv ().addChild ("The configuration file property ")
                                .addChild (new HCCode ().addChild (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
-                               .addChild (" is not set. This property is usually required to create valid Internet-URLs."));
+                               .addChild (" in file " +
+                                          SMPServerConfiguration.PATH_SMP_SERVER_PROPERTIES +
+                                          " is not set. This property is usually required to create valid Internet-URLs."));
+    }
+
+    // Check that the global debug setting is off
+    if (GlobalDebug.isDebugMode ())
+    {
+      aOL.addItem (_createWarning ("Debug mode is enabled."),
+                   new HCDiv ().addChild ("This mode enables increased debug checks and logging and therefore results in reduced performance.")
+                               .addChild (" This should not be enabled in a production system.")
+                               .addChild (" The configuration file property ")
+                               .addChild (new HCCode ().addChild (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_DEBUG))
+                               .addChild (" in file " +
+                                          SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
+                                          " should be set to ")
+                               .addChild (new HCCode ().addChild ("false"))
+                               .addChild (" to fix this."));
+    }
+
+    // Check that the global production mode is on
+    if (!GlobalDebug.isProductionMode ())
+    {
+      aOL.addItem (_createWarning ("Production mode is disabled."),
+                   new HCDiv ().addChild ("This mode is required so that all background jobs are enabled and mail sending works (if configured).")
+                               .addChild (" This should be enabled in a production system.")
+                               .addChild (" The configuration file property ")
+                               .addChild (new HCCode ().addChild (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_PRODUCTION))
+                               .addChild (" in file " +
+                                          SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
+                                          " should be set to ")
+                               .addChild (new HCCode ().addChild ("true"))
+                               .addChild (" to fix this."));
     }
 
     // Check Directory configuration
