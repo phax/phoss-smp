@@ -128,7 +128,7 @@ public final class SMPRendererSecure
       // Warn only if SML is needed
       if (SMPMetaManager.getSettings ().isSMLRequired ())
       {
-        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.MINUS.getAsNode ())
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                    .addChild (" SML connection is NOT active. ")
                                    .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
         aBox.setTypeIfWorse (EBootstrapAlertType.WARNING);
@@ -147,7 +147,7 @@ public final class SMPRendererSecure
         // Warn only if Directory is needed
         if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationRequired ())
         {
-          aBox.addChild (new HCDiv ().addChild (EDefaultIcon.MINUS.getAsNode ())
+          aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                      .addChild (" Directory support is disabled. ")
                                      .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
           aBox.setTypeIfWorse (EBootstrapAlertType.WARNING);
@@ -159,7 +159,7 @@ public final class SMPRendererSecure
     if (!SMPKeyManager.isCertificateValid ())
     {
       aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
-                                 .addChild (" Certificate configuration is invalid. REST queries will not work!"));
+                                 .addChild (" Certificate configuration is invalid."));
       aBox.setTypeIfWorse (EBootstrapAlertType.DANGER);
     }
     ret.addChild (aBox);
