@@ -265,7 +265,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final FormErrorList aFormErrors = new FormErrorList ();
 
-    aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("Prepare the update of your PEPPOL SMP certificate in the future."),
+    aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("Prepare the update of your SMP certificate in the future."),
                                                              new HCDiv ().addChild ("Note: this is a custom SML extension that only works with the CEF SML instances!")));
 
     // check for expired certificate
@@ -310,7 +310,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
       final int nLeft = 3;
       final BootstrapForm aForm = getUIHandler ().createFormFileUploadSelf (aWPEC);
       aForm.setLeft (nLeft);
-      aForm.addChild (new BootstrapWarnBox ().addChild ("It is your responsibility to actually perform the update of the PEPPOL certificate in this SMP at the specified time! This does NOT happen automatically."));
+      aForm.addChild (new BootstrapWarnBox ().addChild ("It is your responsibility to actually perform the update of the certificate in this SMP at the specified time! This does NOT happen automatically."));
 
       final BootstrapDateTimePicker aDTP = BootstrapDateTimePicker.create (FIELD_PM_MIGRATION_DATE,
                                                                            (LocalDate) null,
