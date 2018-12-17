@@ -31,6 +31,7 @@ import com.helger.html.jscode.JSExpr;
 import com.helger.html.jscode.html.JSHtml;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 
+// TODO remove in ph-oton 8.1.2
 public class BootstrapFileUpload extends AbstractHCDiv <BootstrapFileUpload>
 {
   private final String m_sName;
