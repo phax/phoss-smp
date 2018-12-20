@@ -76,6 +76,7 @@ import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
 import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
+import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
@@ -611,26 +612,34 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final HCRow aRow = new HCRow ();
 
     // Identifier scheme
-    final String sFieldScheme = RequestParamMap.getFieldName (PREFIX_ENTITY,
-                                                              sEntityID,
-                                                              PREFIX_IDENTIFIER,
-                                                              sIdentifierID,
-                                                              SUFFIX_SCHEME);
-    aRow.addCell (new HCEdit (new RequestField (sFieldScheme,
-                                                aExistingIdentifier == null ? null : aExistingIdentifier.getScheme ()))
-                                                                                                                       .setPlaceholder ("Identifier scheme"),
-                  SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldScheme), aDisplayLocale));
+    {
+      final String sFieldScheme = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                                sEntityID,
+                                                                PREFIX_IDENTIFIER,
+                                                                sIdentifierID,
+                                                                SUFFIX_SCHEME);
+      final HCEdit aCtrl = new HCEdit (new RequestField (sFieldScheme,
+                                                         aExistingIdentifier == null ? null
+                                                                                     : aExistingIdentifier.getScheme ())).setPlaceholder ("Identifier scheme");
+      aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
+      aRow.addCell (aCtrl,
+                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldScheme), aDisplayLocale));
+    }
 
     // Identifier Value
-    final String sFieldValue = RequestParamMap.getFieldName (PREFIX_ENTITY,
-                                                             sEntityID,
-                                                             PREFIX_IDENTIFIER,
-                                                             sIdentifierID,
-                                                             SUFFIX_VALUE);
-    aRow.addCell (new HCEdit (new RequestField (sFieldValue,
-                                                aExistingIdentifier == null ? null : aExistingIdentifier.getValue ()))
-                                                                                                                      .setPlaceholder ("Identifier value"),
-                  SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
+    {
+      final String sFieldValue = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                               sEntityID,
+                                                               PREFIX_IDENTIFIER,
+                                                               sIdentifierID,
+                                                               SUFFIX_VALUE);
+      final HCEdit aCtrl = new HCEdit (new RequestField (sFieldValue,
+                                                         aExistingIdentifier == null ? null
+                                                                                     : aExistingIdentifier.getValue ())).setPlaceholder ("Identifier value");
+      aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
+      aRow.addCell (aCtrl,
+                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
+    }
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).setIcon (EDefaultIcon.DELETE)
                                                                   .setOnClick (JQuery.idRef (aRow).remove ()));
@@ -659,10 +668,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                               PREFIX_CONTACT,
                                                               sContactID,
                                                               SUFFIX_TYPE);
-      aRow.addCell (new HCEdit (new RequestField (sFieldType,
-                                                  aExistingContact == null ? null : aExistingContact.getType ()))
-                                                                                                                 .setPlaceholder ("Contact type"),
-                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldType), aDisplayLocale));
+      final HCEdit aCtrl = new HCEdit (new RequestField (sFieldType,
+                                                         aExistingContact == null ? null : aExistingContact.getType ()))
+                                                                                                                        .setPlaceholder ("Contact type");
+      aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
+      aRow.addCell (aCtrl, SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldType), aDisplayLocale));
     }
 
     // Name
@@ -672,10 +682,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                               PREFIX_CONTACT,
                                                               sContactID,
                                                               SUFFIX_NAME);
-      aRow.addCell (new HCEdit (new RequestField (sFieldName,
-                                                  aExistingContact == null ? null : aExistingContact.getName ()))
-                                                                                                                 .setPlaceholder ("Contact name"),
-                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldName), aDisplayLocale));
+      final HCEdit aCtrl = new HCEdit (new RequestField (sFieldName,
+                                                         aExistingContact == null ? null : aExistingContact.getName ()))
+                                                                                                                        .setPlaceholder ("Contact name");
+      aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
+      aRow.addCell (aCtrl, SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldName), aDisplayLocale));
     }
 
     // Phone number
@@ -685,9 +696,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                PREFIX_CONTACT,
                                                                sContactID,
                                                                SUFFIX_PHONE);
-      aRow.addCell (new HCEdit (new RequestField (sFieldPhone,
-                                                  aExistingContact == null ? null : aExistingContact.getPhoneNumber ()))
-                                                                                                                        .setPlaceholder ("Contact phone number"),
+      final HCEdit aCtrl = new HCEdit (new RequestField (sFieldPhone,
+                                                         aExistingContact == null ? null
+                                                                                  : aExistingContact.getPhoneNumber ())).setPlaceholder ("Contact phone number");
+      aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
+      aRow.addCell (aCtrl,
                     SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldPhone), aDisplayLocale));
     }
 
@@ -698,9 +711,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                PREFIX_CONTACT,
                                                                sContactID,
                                                                SUFFIX_EMAIL);
-      aRow.addCell (new HCEdit (new RequestField (sFieldEmail,
-                                                  aExistingContact == null ? null : aExistingContact.getEmail ()))
-                                                                                                                  .setPlaceholder ("Contact email address"),
+      final HCEdit aCtrl = new HCEdit (new RequestField (sFieldEmail,
+                                                         aExistingContact == null ? null
+                                                                                  : aExistingContact.getEmail ())).setPlaceholder ("Contact email address");
+      aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
+      aRow.addCell (aCtrl,
                     SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldEmail), aDisplayLocale));
     }
 
