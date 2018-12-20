@@ -34,6 +34,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.html.forms.HCEdit;
+import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
@@ -92,7 +93,6 @@ import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
@@ -476,9 +476,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_OWNING_USER_ID)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                 .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_EXTENSION,
-                                                                                                     aSelectedObject != null ? aSelectedObject.getFirstExtensionXML ()
-                                                                                                                             : null)))
+                                                 .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION,
+                                                                                             aSelectedObject != null ? aSelectedObject.getFirstExtensionXML ()
+                                                                                                                     : null)))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }

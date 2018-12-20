@@ -45,6 +45,7 @@ import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.forms.HCEdit;
+import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.tabular.HCRow;
@@ -110,7 +111,6 @@ import com.helger.photon.uicore.js.JSJQueryHelper;
 import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
@@ -768,9 +768,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     final String sFieldGeoInfo = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_GEO_INFO);
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Geographical Information")
-                                                 .setCtrl (new HCTextAreaAutosize (new RequestField (sFieldGeoInfo,
-                                                                                                     aExistingEntity == null ? null
-                                                                                                                             : aExistingEntity.getGeographicalInformation ())))
+                                                 .setCtrl (new HCTextArea (new RequestField (sFieldGeoInfo,
+                                                                                             aExistingEntity == null ? null
+                                                                                                                     : aExistingEntity.getGeographicalInformation ())))
                                                  .setErrorList (aFormErrors.getListOfField (sFieldGeoInfo)));
 
     // Identifiers
@@ -826,10 +826,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     // Website URIs
     final String sFieldWebsiteURIs = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_WEBSITE_URIS);
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs")
-                                                 .setCtrl (new HCTextAreaAutosize (new RequestField (sFieldWebsiteURIs,
-                                                                                                     aExistingEntity == null ? null
-                                                                                                                             : StringHelper.getImploded ('\n',
-                                                                                                                                                         aExistingEntity.websiteURIs ()))))
+                                                 .setCtrl (new HCTextArea (new RequestField (sFieldWebsiteURIs,
+                                                                                             aExistingEntity == null ? null
+                                                                                                                     : StringHelper.getImploded ('\n',
+                                                                                                                                                 aExistingEntity.websiteURIs ()))))
                                                  .setHelpText ("Put each Website URI in a separate line")
                                                  .setErrorList (aFormErrors.getListOfField (sFieldWebsiteURIs)));
 
@@ -884,9 +884,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     final String sFieldAdditionalInfo = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_ADDITIONAL_INFO);
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Additional Information")
-                                                 .setCtrl (new HCTextAreaAutosize (new RequestField (sFieldAdditionalInfo,
-                                                                                                     aExistingEntity == null ? null
-                                                                                                                             : aExistingEntity.getAdditionalInformation ())))
+                                                 .setCtrl (new HCTextArea (new RequestField (sFieldAdditionalInfo,
+                                                                                             aExistingEntity == null ? null
+                                                                                                                     : aExistingEntity.getAdditionalInformation ())))
                                                  .setErrorList (aFormErrors.getListOfField (sFieldAdditionalInfo)));
 
     final String sFieldRegDate = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, SUFFIX_REG_DATE);

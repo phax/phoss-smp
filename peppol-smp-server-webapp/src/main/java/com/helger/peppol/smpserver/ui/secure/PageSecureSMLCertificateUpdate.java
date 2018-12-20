@@ -38,6 +38,7 @@ import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
+import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
@@ -60,7 +61,6 @@ import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.security.certificate.CertificateHelper;
 import com.sun.xml.ws.client.ClientTransportException;
 
@@ -237,9 +237,11 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
                                            aMigrationDate);
       }
       catch (final com.helger.peppol.smlclient.bdmsl.BadRequestFault
-          | com.helger.peppol.smlclient.bdmsl.InternalErrorFault | com.helger.peppol.smlclient.bdmsl.NotFoundFault
-          | com.helger.peppol.smlclient.bdmsl.UnauthorizedFault | ClientTransportException
-          | GeneralSecurityException ex)
+                   | com.helger.peppol.smlclient.bdmsl.InternalErrorFault
+                   | com.helger.peppol.smlclient.bdmsl.NotFoundFault
+                   | com.helger.peppol.smlclient.bdmsl.UnauthorizedFault
+                   | ClientTransportException
+                   | GeneralSecurityException ex)
       {
         final String sMsg = "Error preparing migration of SMP certificate at SML '" +
                             aSMLInfo.getManagementServiceURL () +
@@ -322,7 +324,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_PM_MIGRATION_DATE)));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New public key")
-                                                   .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_PM_PUBLIC_KEY)).setRows (5))
+                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_PM_PUBLIC_KEY)).setRows (5))
                                                    .setHelpText ("Paste the public part of your new certificate here (using PEM encoding). Do NOT paste your new private key here.")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_PM_PUBLIC_KEY)));
 

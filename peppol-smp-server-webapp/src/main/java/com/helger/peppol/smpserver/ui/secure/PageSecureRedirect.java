@@ -32,6 +32,7 @@ import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
+import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -68,7 +69,6 @@ import com.helger.photon.core.url.LinkHelper;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
@@ -388,9 +388,9 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SUBJECT_UNIQUE_IDENTIFIER)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                 .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_EXTENSION,
-                                                                                                     aSelectedObject != null ? aSelectedObject.getFirstExtensionXML ()
-                                                                                                                             : null)))
+                                                 .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION,
+                                                                                             aSelectedObject != null ? aSelectedObject.getFirstExtensionXML ()
+                                                                                                                     : null)))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }

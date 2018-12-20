@@ -40,6 +40,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCHiddenField;
+import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.sections.HCH3;
@@ -73,7 +74,6 @@ import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
@@ -285,8 +285,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_OLD_CERTIFICATE)));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New certificate")
-                                                   .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_NEW_CERTIFICATE,
-                                                                                                       sOldCert)))
+                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_NEW_CERTIFICATE,
+                                                                                               sOldCert)))
                                                    .setHelpText ("The new certificate that is used instead")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_NEW_CERTIFICATE)));
 

@@ -44,6 +44,7 @@ import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
+import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCLI;
 import com.helger.html.hc.html.grouping.HCUL;
@@ -108,7 +109,6 @@ import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uicore.page.handler.IWebPageActionHandler;
-import com.helger.photon.uictrls.autosize.HCTextAreaAutosize;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
@@ -839,9 +839,9 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_NOT_AFTER)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Certificate")
-                                                 .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_CERTIFICATE,
-                                                                                                     aSelectedEndpoint != null ? aSelectedEndpoint.getCertificate ()
-                                                                                                                               : null)))
+                                                 .setCtrl (new HCTextArea (new RequestField (FIELD_CERTIFICATE,
+                                                                                             aSelectedEndpoint != null ? aSelectedEndpoint.getCertificate ()
+                                                                                                                       : null)))
                                                  .setHelpText ("Holds the complete signing certificate of the recipient AP, as a " +
                                                                "PEM base 64 encoded X509 DER formatted value.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CERTIFICATE)));
@@ -871,9 +871,9 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_TECHNICAL_INFORMATION)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                 .setCtrl (new HCTextAreaAutosize (new RequestField (FIELD_EXTENSION,
-                                                                                                     aSelectedEndpoint != null ? aSelectedEndpoint.getFirstExtensionXML ()
-                                                                                                                               : null)))
+                                                 .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION,
+                                                                                             aSelectedEndpoint != null ? aSelectedEndpoint.getFirstExtensionXML ()
+                                                                                                                       : null)))
                                                  .setHelpText ("Optional extension to the endpoint. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }
