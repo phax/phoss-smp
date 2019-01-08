@@ -75,7 +75,6 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
 import com.helger.peppol.smpserver.ui.AbstractSMPWebPageForm;
-import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
@@ -89,6 +88,7 @@ import com.helger.photon.bootstrap4.card.BootstrapCard;
 import com.helger.photon.bootstrap4.card.BootstrapCardBody;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.form.BootstrapFormHelper;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
@@ -623,7 +623,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                      : aExistingIdentifier.getScheme ())).setPlaceholder ("Identifier scheme");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
       aRow.addCell (aCtrl,
-                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldScheme), aDisplayLocale));
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldScheme),
+                                                                aDisplayLocale));
     }
 
     // Identifier Value
@@ -638,7 +639,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                      : aExistingIdentifier.getValue ())).setPlaceholder ("Identifier value");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
       aRow.addCell (aCtrl,
-                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldValue),
+                                                                aDisplayLocale));
     }
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).setIcon (EDefaultIcon.DELETE)
@@ -672,7 +674,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                          aExistingContact == null ? null : aExistingContact.getType ()))
                                                                                                                         .setPlaceholder ("Contact type");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
-      aRow.addCell (aCtrl, SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldType), aDisplayLocale));
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldType),
+                                                                aDisplayLocale));
     }
 
     // Name
@@ -686,7 +690,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                          aExistingContact == null ? null : aExistingContact.getName ()))
                                                                                                                         .setPlaceholder ("Contact name");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
-      aRow.addCell (aCtrl, SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldName), aDisplayLocale));
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldName),
+                                                                aDisplayLocale));
     }
 
     // Phone number
@@ -701,7 +707,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                   : aExistingContact.getPhoneNumber ())).setPlaceholder ("Contact phone number");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
       aRow.addCell (aCtrl,
-                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldPhone), aDisplayLocale));
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldPhone),
+                                                                aDisplayLocale));
     }
 
     // Email address
@@ -716,7 +723,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                   : aExistingContact.getEmail ())).setPlaceholder ("Contact email address");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
       aRow.addCell (aCtrl,
-                    SMPCommonUI.createStandaloneError (aFormErrors.getListOfField (sFieldEmail), aDisplayLocale));
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldEmail),
+                                                                aDisplayLocale));
     }
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).setIcon (EDefaultIcon.DELETE)

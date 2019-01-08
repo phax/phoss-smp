@@ -36,8 +36,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
-import com.helger.commons.error.IError;
-import com.helger.commons.error.list.IErrorList;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.html.hc.IHCNode;
@@ -74,7 +72,6 @@ import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.ext.BootstrapSystemMessage;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap4.form.DefaultBootstrapFormGroupRenderer;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
@@ -345,18 +342,5 @@ public final class SMPCommonUI
       aNL.addChild (new HCPrismJS (EPrismLanguage.MARKUP).addChild (sXML));
     }
     return aNL;
-  }
-
-  @Nullable
-  public static IHCNode createStandaloneError (@Nullable final IErrorList aFormErrors,
-                                               @Nonnull final Locale aDisplayLocale)
-  {
-    if (aFormErrors == null || aFormErrors.isEmpty ())
-      return null;
-
-    final HCNodeList ret = new HCNodeList ();
-    for (final IError aError : aFormErrors)
-      ret.addChild (DefaultBootstrapFormGroupRenderer.createDefaultErrorNode (aError, aDisplayLocale));
-    return ret;
   }
 }
