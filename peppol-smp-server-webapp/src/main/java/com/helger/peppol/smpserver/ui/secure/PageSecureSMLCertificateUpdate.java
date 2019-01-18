@@ -16,7 +16,6 @@
  */
 package com.helger.peppol.smpserver.ui.secure;
 
-import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -62,7 +61,6 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.certificate.CertificateHelper;
-import com.sun.xml.ws.client.ClientTransportException;
 
 public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 {
@@ -236,12 +234,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
                                            sMigrationPublicKey,
                                            aMigrationDate);
       }
-      catch (final com.helger.peppol.smlclient.bdmsl.BadRequestFault
-                   | com.helger.peppol.smlclient.bdmsl.InternalErrorFault
-                   | com.helger.peppol.smlclient.bdmsl.NotFoundFault
-                   | com.helger.peppol.smlclient.bdmsl.UnauthorizedFault
-                   | ClientTransportException
-                   | GeneralSecurityException ex)
+      catch (final Exception ex)
       {
         final String sMsg = "Error preparing migration of SMP certificate at SML '" +
                             aSMLInfo.getManagementServiceURL () +
