@@ -84,6 +84,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("smp.writable-rest-api.enabled", !aSettings.isRESTWritableAPIDisabled ());
     // New in 5.1.0
     aStatusData.add ("smp.publicurl", SMPServerConfiguration.getPublicServerURL ());
+    // New in 5.1.0
+    aStatusData.add ("smp.forceroot", SMPServerConfiguration.isForceRoot ());
 
     // SML information
     aStatusData.add ("smp.sml.enabled", aSettings.isSMLActive ());
