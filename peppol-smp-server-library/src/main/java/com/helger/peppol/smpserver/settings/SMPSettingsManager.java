@@ -46,7 +46,6 @@ public class SMPSettingsManager extends AbstractPhotonSimpleDAO implements ISMPS
     initialRead ();
   }
 
-  @SuppressWarnings ("null")
   @Override
   @Nonnull
   protected EChange onRead (@Nonnull final IMicroDocument aDoc)
