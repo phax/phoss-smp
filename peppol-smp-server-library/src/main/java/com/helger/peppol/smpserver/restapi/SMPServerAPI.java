@@ -188,14 +188,13 @@ public final class SMPServerAPI
                                                                            .getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
 
       final ServiceGroupReferenceListType aRefList = new ServiceGroupReferenceListType ();
-      final List <ServiceGroupReferenceType> aReferenceTypes = aRefList.getServiceGroupReference ();
       for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
       {
         final String sHref = m_aAPIProvider.getServiceGroupHref (aServiceGroup.getParticpantIdentifier ());
 
         final ServiceGroupReferenceType aServGroupRefType = new ServiceGroupReferenceType ();
         aServGroupRefType.setHref (sHref);
-        aReferenceTypes.add (aServGroupRefType);
+        aRefList.addServiceGroupReference (aServGroupRefType);
       }
 
       if (LOGGER.isInfoEnabled ())
