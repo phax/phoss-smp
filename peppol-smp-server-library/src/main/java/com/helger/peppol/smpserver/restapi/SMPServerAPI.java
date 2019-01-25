@@ -301,17 +301,27 @@ public final class SMPServerAPI
 
       // Parse the content of the payload with the same identifier factory to
       // ensure same case sensitivity
-      final IParticipantIdentifier aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceGroup.getParticipantIdentifier ()
-                                                                                                                         .getScheme (),
-                                                                                                            aServiceGroup.getParticipantIdentifier ()
-                                                                                                                         .getValue ());
+      final IParticipantIdentifier aPayloadServiceGroupID;
+      if (aServiceGroup.getParticipantIdentifier () == null)
+      {
+        // Can happen when tampering with the input data
+        aPayloadServiceGroupID = null;
+      }
+      else
+      {
+        aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceGroup.getParticipantIdentifier ()
+                                                                                              .getScheme (),
+                                                                                 aServiceGroup.getParticipantIdentifier ()
+                                                                                              .getValue ());
+      }
       if (!aServiceGroupID.hasSameContent (aPayloadServiceGroupID))
       {
         // Business identifiers must be equal
         throw new SMPBadRequestException ("ServiceGroup Inconsistency. The URL points to " +
                                           aServiceGroupID.getURIEncoded () +
                                           " whereas the ServiceGroup contains " +
-                                          aPayloadServiceGroupID.getURIEncoded (),
+                                          (aPayloadServiceGroupID == null ? "!NO PARTICIPANT ID!"
+                                                                          : aPayloadServiceGroupID.getURIEncoded ()),
                                           m_aAPIProvider.getCurrentURI ());
       }
 
@@ -505,15 +515,26 @@ public final class SMPServerAPI
                                             aServiceGroupID.getURIEncoded (),
                                             m_aAPIProvider.getCurrentURI ());
         }
-        final IParticipantIdentifier aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceInformation.getParticipantIdentifier ()
-                                                                                                                                 .getScheme (),
-                                                                                                              aServiceInformation.getParticipantIdentifier ()
-                                                                                                                                 .getValue ());
+        final IParticipantIdentifier aPayloadServiceGroupID;
+        if (aServiceInformation.getParticipantIdentifier () == null)
+        {
+          // Can happen when tampering with the input data
+          aPayloadServiceGroupID = null;
+        }
+        else
+        {
+          aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceInformation.getParticipantIdentifier ()
+                                                                                                      .getScheme (),
+                                                                                   aServiceInformation.getParticipantIdentifier ()
+                                                                                                      .getValue ());
+        }
+
         if (!aServiceGroupID.hasSameContent (aPayloadServiceGroupID))
         {
           // Participant ID in URL must match the one in XML structure
           throw new SMPBadRequestException ("Save service metadata was called with bad parameters. serviceInfo:" +
-                                            aPayloadServiceGroupID.getURIEncoded () +
+                                            (aPayloadServiceGroupID == null ? "!NO PARTICIPANT ID!"
+                                                                            : aPayloadServiceGroupID.getURIEncoded ()) +
                                             " param:" +
                                             aServiceGroupID.getURIEncoded (),
                                             m_aAPIProvider.getCurrentURI ());
@@ -572,49 +593,56 @@ public final class SMPServerAPI
         }
       }
       else
-      {
-        // Handle service information
-        final ProcessListType aJAXBProcesses = aServiceMetadata.getServiceInformation ().getProcessList ();
-        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
-        for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
+        if (aServiceInformation != null)
         {
-          final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
-          for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
+          // Handle service information
+          final ProcessListType aJAXBProcesses = aServiceInformation.getProcessList ();
+          final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
+          for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
           {
-            final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),
-                                                           W3CEndpointReferenceHelper.getAddress (aJAXBEndpoint.getEndpointReference ()),
-                                                           aJAXBEndpoint.isRequireBusinessLevelSignature (),
-                                                           aJAXBEndpoint.getMinimumAuthenticationLevel (),
-                                                           aJAXBEndpoint.getServiceActivationDate (),
-                                                           aJAXBEndpoint.getServiceExpirationDate (),
-                                                           aJAXBEndpoint.getCertificate (),
-                                                           aJAXBEndpoint.getServiceDescription (),
-                                                           aJAXBEndpoint.getTechnicalContactUrl (),
-                                                           aJAXBEndpoint.getTechnicalInformationUrl (),
-                                                           SMPExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
-            aEndpoints.add (aEndpoint);
+            final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
+            for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
+            {
+              final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),
+                                                             W3CEndpointReferenceHelper.getAddress (aJAXBEndpoint.getEndpointReference ()),
+                                                             aJAXBEndpoint.isRequireBusinessLevelSignature (),
+                                                             aJAXBEndpoint.getMinimumAuthenticationLevel (),
+                                                             aJAXBEndpoint.getServiceActivationDate (),
+                                                             aJAXBEndpoint.getServiceExpirationDate (),
+                                                             aJAXBEndpoint.getCertificate (),
+                                                             aJAXBEndpoint.getServiceDescription (),
+                                                             aJAXBEndpoint.getTechnicalContactUrl (),
+                                                             aJAXBEndpoint.getTechnicalInformationUrl (),
+                                                             SMPExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
+              aEndpoints.add (aEndpoint);
+            }
+            final SMPProcess aProcess = new SMPProcess (aJAXBProcess.getProcessIdentifier (),
+                                                        aEndpoints,
+                                                        SMPExtensionConverter.convertToString (aJAXBProcess.getExtension ()));
+            aProcesses.add (aProcess);
           }
-          final SMPProcess aProcess = new SMPProcess (aJAXBProcess.getProcessIdentifier (),
-                                                      aEndpoints,
-                                                      SMPExtensionConverter.convertToString (aJAXBProcess.getExtension ()));
-          aProcesses.add (aProcess);
-        }
 
-        final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-        final String sExtensionXML = SMPExtensionConverter.convertToString (aServiceMetadata.getServiceInformation ()
-                                                                                            .getExtension ());
-        if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
-                                                                                   aDocTypeID,
-                                                                                   aProcesses,
-                                                                                   sExtensionXML))
-                           .isFailure ())
+          final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+          final String sExtensionXML = SMPExtensionConverter.convertToString (aServiceInformation.getExtension ());
+          if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
+                                                                                     aDocTypeID,
+                                                                                     aProcesses,
+                                                                                     sExtensionXML))
+                             .isFailure ())
+          {
+            if (LOGGER.isErrorEnabled ())
+              LOGGER.error (sLog + " - ServiceInformation - failure");
+            s_aStatsCounterError.increment (sAction);
+            return ESuccess.FAILURE;
+          }
+        }
+        else
         {
           if (LOGGER.isErrorEnabled ())
-            LOGGER.error (sLog + " - ServiceInformation - failure");
+            LOGGER.error (sLog + " - neither Redirect nor ServiceInformation");
           s_aStatsCounterError.increment (sAction);
           return ESuccess.FAILURE;
         }
-      }
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
