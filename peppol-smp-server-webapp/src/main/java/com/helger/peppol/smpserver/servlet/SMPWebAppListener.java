@@ -55,6 +55,7 @@ import com.helger.photon.basic.configfile.EConfigurationFileSyntax;
 import com.helger.photon.bootstrap4.servlet.WebAppListenerBootstrap;
 import com.helger.photon.core.ajax.IAjaxInvoker;
 import com.helger.servlet.ServletContextPathHolder;
+import com.helger.servlet.response.UnifiedResponseDefaultSettings;
 import com.helger.wsclient.WSHelper;
 
 /**
@@ -114,6 +115,12 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       ServletContextPathHolder.setCustomContextPath ("");
     }
     RequestParameterManager.getInstance ().setParameterHandler (new RequestParameterHandlerURLPathNamed ());
+
+    // Handled via the XServletSettings instead
+    UnifiedResponseDefaultSettings.setReferrerPolicy (null);
+    UnifiedResponseDefaultSettings.setXFrameOptions (null, null);
+    // SMP is http only
+    UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
 
     // Check SMP ID
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
@@ -181,7 +188,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
                                                                                                 .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
     aCFM.registerConfigurationFile (new ConfigurationFile (SMPWebAppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
-                                                                                                   .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
+                                                                                                         .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
     final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
     if (aConfigRes != null)
       aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
