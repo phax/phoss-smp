@@ -113,6 +113,7 @@ public final class ServiceGroupInterface
       {
         case PEPPOL:
         {
+          // TODO use logging exception handler
           final com.helger.peppol.smp.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType ().read (aServiceGroupDoc);
           if (aServiceGroup != null)
           {
@@ -125,6 +126,7 @@ public final class ServiceGroupInterface
         }
         case BDXR:
         {
+          // TODO use logging exception handler
           final com.helger.peppol.bdxr.ServiceGroupType aServiceGroup = new BDXRMarshallerServiceGroupType ().read (aServiceGroupDoc);
           if (aServiceGroup != null)
           {
