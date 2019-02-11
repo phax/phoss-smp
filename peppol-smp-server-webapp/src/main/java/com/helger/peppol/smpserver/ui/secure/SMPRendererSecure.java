@@ -50,7 +50,6 @@ import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.core.url.LinkHelper;
-import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.icon.EDefaultIcon;
@@ -88,7 +87,7 @@ public final class SMPRendererSecure
                                                                                              "/"))
                                                   .addChild ("Goto public view"));
 
-      final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
+      final IUser aUser = aLEC.getLoggedInUser ();
       aToggleable.addAndReturnText ()
                  .addClass (CBootstrapCSS.MX_2)
                  .addChild ("Logged in as ")

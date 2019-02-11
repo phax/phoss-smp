@@ -73,7 +73,6 @@ import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.core.url.LinkHelper;
-import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.page.IWebPage;
@@ -108,7 +107,7 @@ public final class SMPRendererPublic
                                              @Nonnull final BootstrapNavbar aNavbar)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
-    final IUser aUser = LoggedInUserManager.getInstance ().getCurrentUser ();
+    final IUser aUser = aLEC.getLoggedInUser ();
 
     final BootstrapNavbarToggleable aToggleable = aNavbar.addAndReturnToggleable ();
 
