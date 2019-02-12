@@ -19,6 +19,7 @@ public class Rest2Filter extends AbstractHttpServletFilter
 {
   public static final String PARAM_SERVICE_GROUP_ID = "ServiceGroupId";
   public static final String PARAM_USER_ID = "UserId";
+  public static final String PARAM_DOCUMENT_TYPE_ID = "DocumentTypeId";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (Rest2Filter.class);
 
@@ -30,12 +31,12 @@ public class Rest2Filter extends AbstractHttpServletFilter
                                                                            "}"),
                                                               new APIExecutorBusinessCardGet ());
 
-    final APIDescriptor aPostBusinessCard = new APIDescriptor (APIPath.post ("/businesscard/{" +
-                                                                             PARAM_SERVICE_GROUP_ID +
-                                                                             "}"),
-                                                               new APIExecutorBusinessCardPost ());
-    aPostBusinessCard.allowedMimeTypes ()
-                     .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+    final APIDescriptor aPutBusinessCard = new APIDescriptor (APIPath.put ("/businesscard/{" +
+                                                                           PARAM_SERVICE_GROUP_ID +
+                                                                           "}"),
+                                                              new APIExecutorBusinessCardPut ());
+    aPutBusinessCard.allowedMimeTypes ()
+                    .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
 
     final APIDescriptor aDeleteBusinessCard = new APIDescriptor (APIPath.delete ("/businesscard/{" +
                                                                                  PARAM_SERVICE_GROUP_ID +
@@ -56,13 +57,30 @@ public class Rest2Filter extends AbstractHttpServletFilter
     final APIDescriptor aGetServiceGroup = new APIDescriptor (APIPath.get ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                               new APIExecutorListGet ());
 
-    final APIDescriptor aPostServiceGroup = new APIDescriptor (APIPath.post ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
-                                                               new APIExecutorServiceGroupPost ());
-    aPostServiceGroup.allowedMimeTypes ()
-                     .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+    final APIDescriptor aPutServiceGroup = new APIDescriptor (APIPath.put ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
+                                                              new APIExecutorServiceGroupPut ());
+    aPutServiceGroup.allowedMimeTypes ()
+                    .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
 
     final APIDescriptor aDeleteServiceGroup = new APIDescriptor (APIPath.delete ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                  new APIExecutorServiceGroupDelete ());
+
+    // ServiceMetadata
+    final APIDescriptor aGetServiceMetadata = new APIDescriptor (APIPath.get ("/{" +
+                                                                              PARAM_SERVICE_GROUP_ID +
+                                                                              "}/services/{" +
+                                                                              PARAM_DOCUMENT_TYPE_ID +
+                                                                              "}"),
+                                                                 new APIExecutorServiceMetadataGet ());
+
+    final APIDescriptor aPutServiceMetadata = new APIDescriptor (APIPath.put ("/{" +
+                                                                              PARAM_SERVICE_GROUP_ID +
+                                                                              "}/services/{" +
+                                                                              PARAM_DOCUMENT_TYPE_ID +
+                                                                              "}"),
+                                                                 new APIExecutorServiceMetadataPut ());
+    aPutServiceMetadata.allowedMimeTypes ()
+                       .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
   }
 
   @Override

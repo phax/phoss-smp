@@ -31,9 +31,9 @@ import com.helger.photon.core.api.IAPIExecutor;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.read.DOMReader;
 
-public final class APIExecutorBusinessCardPost implements IAPIExecutor
+public final class APIExecutorBusinessCardPut implements IAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardPost.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardPut.class);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -98,6 +98,7 @@ public final class APIExecutorBusinessCardPost implements IAPIExecutor
           final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
           final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
           final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
+
           final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
                                                                                                   aBC,
                                                                                                   aBasicAuth);

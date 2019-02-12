@@ -9,17 +9,19 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
+import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
+import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.api.IAPIDescriptor;
 import com.helger.photon.core.api.IAPIExecutor;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-public final class APIExecutorBusinessCardDelete implements IAPIExecutor
+public final class APIExecutorServiceMetadataDelete implements IAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardDelete.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceMetadataDelete.class);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -30,16 +32,27 @@ public final class APIExecutorBusinessCardDelete implements IAPIExecutor
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn ("The writable REST API is disabled. deleteBusinessCard will not be executed.");
+      LOGGER.warn ("The writable REST API is disabled. deleteServiceRegistration will not be executed.");
       aUnifiedResponse.createNotFound ();
     }
     else
     {
       final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
+      final String sDocumentTypeID = aPathVariables.get (Rest2Filter.PARAM_DOCUMENT_TYPE_ID);
       final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
       final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
 
-      new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID, aBasicAuth);
+      switch (SMPServerConfiguration.getRESTType ())
+      {
+        case PEPPOL:
+          new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
+          break;
+        case BDXR:
+          new BDXRServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
+          break;
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
       aUnifiedResponse.createOk ();
     }
   }

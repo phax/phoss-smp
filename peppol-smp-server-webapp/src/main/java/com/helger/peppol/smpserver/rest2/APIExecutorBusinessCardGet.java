@@ -49,8 +49,8 @@ public final class APIExecutorBusinessCardGet implements IAPIExecutor
        */
       final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
       final byte [] aBytes = new PD3BusinessCardMarshaller ().getAsBytes (ret);
-      aUnifiedResponse.setContent (aBytes);
-      aUnifiedResponse.setMimeType (CMimeType.TEXT_XML);
+
+      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML);
     }
   }
 }
