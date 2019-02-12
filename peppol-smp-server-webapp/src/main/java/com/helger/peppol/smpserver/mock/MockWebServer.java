@@ -79,12 +79,7 @@ final class MockWebServer
   @Nonnull
   private static WebappContext _createContext (final String sURI)
   {
-    final ICommonsMap <String, String> aInitParams = new CommonsHashMap<> ();
-    aInitParams.put ("jersey.config.server.provider.packages",
-                     com.helger.peppol.smpserver.rest.ServiceGroupInterface.class.getPackage ().getName () +
-                                                               "," +
-                                                               com.helger.peppol.smpserver.exceptionmapper.RuntimeExceptionMapper.class.getPackage ()
-                                                                                                                                       .getName ());
+    final ICommonsMap <String, String> aInitParams = new CommonsHashMap <> ();
     return _createContext (URI.create (sURI), ServletContainer.class, null, aInitParams, null);
   }
 
