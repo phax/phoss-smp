@@ -2,6 +2,7 @@ package com.helger.peppol.smpserver.rest2;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -10,10 +11,25 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.mime.CMimeType;
+import com.helger.commons.state.EHandled;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.exception.SMPBadRequestException;
+import com.helger.peppol.smpserver.exception.SMPInternalErrorException;
+import com.helger.peppol.smpserver.exception.SMPNotFoundException;
+import com.helger.peppol.smpserver.exception.SMPSMLException;
+import com.helger.peppol.smpserver.exception.SMPServerException;
+import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
+import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
+import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.api.APIDescriptor;
 import com.helger.photon.core.api.APIPath;
+import com.helger.photon.core.api.AbstractAPIExceptionMapper;
+import com.helger.photon.core.api.IAPIExceptionMapper;
+import com.helger.photon.core.api.InvokableAPIDescriptor;
 import com.helger.servlet.filter.AbstractHttpServletFilter;
+import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public class Rest2Filter extends AbstractHttpServletFilter
 {
@@ -25,6 +41,96 @@ public class Rest2Filter extends AbstractHttpServletFilter
 
   public Rest2Filter ()
   {
+    final IAPIExceptionMapper aExceptionMapper = new AbstractAPIExceptionMapper ()
+    {
+      @Nonnull
+      public EHandled applyExceptionOnResponse (final InvokableAPIDescriptor aInvokableDescriptor,
+                                                final IRequestWebScopeWithoutResponse aRequestScope,
+                                                final PhotonUnifiedResponse aUnifiedResponse,
+                                                final Throwable aThrowable)
+      {
+        // From specific to general
+        if (aThrowable instanceof SMPUnauthorizedException)
+        {
+          if (SMPServerConfiguration.isRESTLogExceptions ())
+            LOGGER.error ("Unauthorized", aThrowable);
+          setSimpleTextResponse (aUnifiedResponse,
+                                 HttpServletResponse.SC_FORBIDDEN,
+                                 getResponseEntityWithoutStackTrace (aThrowable));
+          return EHandled.HANDLED;
+        }
+        if (aThrowable instanceof SMPUnknownUserException)
+        {
+          if (SMPServerConfiguration.isRESTLogExceptions ())
+            LOGGER.error ("Unknown user", aThrowable);
+          setSimpleTextResponse (aUnifiedResponse,
+                                 HttpServletResponse.SC_FORBIDDEN,
+                                 getResponseEntityWithoutStackTrace (aThrowable));
+          return EHandled.HANDLED;
+        }
+        if (aThrowable instanceof SMPSMLException)
+        {
+          if (SMPServerConfiguration.isRESTLogExceptions ())
+            LOGGER.error ("SMP SML error", aThrowable);
+          setSimpleTextResponse (aUnifiedResponse,
+                                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                                 GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
+                                                            : getResponseEntityWithoutStackTrace (aThrowable));
+          return EHandled.HANDLED;
+        }
+        if (aThrowable instanceof SMPNotFoundException)
+        {
+          if (SMPServerConfiguration.isRESTLogExceptions ())
+            LOGGER.error ("Not found", aThrowable);
+          setSimpleTextResponse (aUnifiedResponse,
+                                 HttpServletResponse.SC_NOT_FOUND,
+                                 getResponseEntityWithoutStackTrace (aThrowable));
+          return EHandled.HANDLED;
+        }
+        if (aThrowable instanceof SMPInternalErrorException)
+        {
+          if (SMPServerConfiguration.isRESTLogExceptions ())
+            LOGGER.error ("Internal error", aThrowable);
+          setSimpleTextResponse (aUnifiedResponse,
+                                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                                 GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
+                                                            : getResponseEntityWithoutStackTrace (aThrowable));
+          return EHandled.HANDLED;
+        }
+        if (aThrowable instanceof SMPBadRequestException)
+        {
+          if (SMPServerConfiguration.isRESTLogExceptions ())
+            LOGGER.error ("Bad request", aThrowable);
+          setSimpleTextResponse (aUnifiedResponse,
+                                 HttpServletResponse.SC_BAD_REQUEST,
+                                 getResponseEntityWithoutStackTrace (aThrowable));
+          return EHandled.HANDLED;
+        }
+        if (aThrowable instanceof SMPServerException)
+        {
+          // Generic fallback only
+          if (SMPServerConfiguration.isRESTLogExceptions ())
+            LOGGER.error ("Generic SMP server", aThrowable);
+          setSimpleTextResponse (aUnifiedResponse,
+                                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                                 getResponseEntityWithoutStackTrace (aThrowable));
+          return EHandled.HANDLED;
+        }
+        if (aThrowable instanceof RuntimeException)
+        {
+          if (SMPServerConfiguration.isRESTLogExceptions ())
+            LOGGER.error ("Runtime exception - " + aThrowable.getClass ().getName (), aThrowable);
+          setSimpleTextResponse (aUnifiedResponse,
+                                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                                 GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
+                                                            : getResponseEntityWithoutStackTrace (aThrowable));
+          return EHandled.HANDLED;
+        }
+
+        return EHandled.UNHANDLED;
+      }
+    };
+
     // BusinessCard
     final APIDescriptor aGetBusinessCard = new APIDescriptor (APIPath.get ("/businesscard/{" +
                                                                            PARAM_SERVICE_GROUP_ID +
