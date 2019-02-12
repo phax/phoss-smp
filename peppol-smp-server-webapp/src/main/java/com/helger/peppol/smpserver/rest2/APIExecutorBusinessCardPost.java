@@ -11,6 +11,7 @@ import org.w3c.dom.Document;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.state.ESuccess;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.pd.businesscard.generic.PDBusinessCard;
 import com.helger.pd.businesscard.v1.PD1APIHelper;
 import com.helger.pd.businesscard.v1.PD1BusinessCardMarshaller;
@@ -96,13 +97,14 @@ public final class APIExecutorBusinessCardPost implements IAPIExecutor
         {
           final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
           final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+          final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
           final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
                                                                                                   aBC,
-                                                                                                  Rest2RequestHelper.getAuth (aRequestScope.headers ()));
+                                                                                                  aBasicAuth);
           if (eSuccess.isFailure ())
             aUnifiedResponse.createBadRequest ();
           else
-            aUnifiedResponse.createAccepted ();
+            aUnifiedResponse.createOk ();
         }
       }
     }
