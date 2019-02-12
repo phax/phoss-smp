@@ -81,6 +81,13 @@ public class Rest2Filter extends AbstractHttpServletFilter
                                                                  new APIExecutorServiceMetadataPut ());
     aPutServiceMetadata.allowedMimeTypes ()
                        .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+
+    final APIDescriptor aDeleteServiceMetadata = new APIDescriptor (APIPath.delete ("/{" +
+                                                                                    PARAM_SERVICE_GROUP_ID +
+                                                                                    "}/services/{" +
+                                                                                    PARAM_DOCUMENT_TYPE_ID +
+                                                                                    "}"),
+                                                                    new APIExecutorServiceMetadataDelete ());
   }
 
   @Override
