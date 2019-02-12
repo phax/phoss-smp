@@ -36,17 +36,17 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  *
  * @author Philip Helger
  */
-public class SMPMyRESTAPIDataProvider implements ISMPServerAPIDataProvider
+public class Rest2DataProvider implements ISMPServerAPIDataProvider
 {
   private final IRequestWebScopeWithoutResponse m_aRequestScope;
   private final boolean m_bUseStaticServerInfo;
 
-  public SMPMyRESTAPIDataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope)
+  public Rest2DataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope)
   {
     this (aRequestScope, true);
   }
 
-  public SMPMyRESTAPIDataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+  public Rest2DataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                                    final boolean bUseStaticServerInfo)
   {
     m_aRequestScope = ValueEnforcer.notNull (aRequestScope, "UriInfo");
