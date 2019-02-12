@@ -3,6 +3,7 @@ package com.helger.peppol.smpserver.rest2;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +13,9 @@ import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
-import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.api.IAPIDescriptor;
 import com.helger.photon.core.api.IAPIExecutor;
+import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public final class APIExecutorBusinessCardDelete implements IAPIExecutor
@@ -25,13 +26,13 @@ public final class APIExecutorBusinessCardDelete implements IAPIExecutor
                          @Nonnull @Nonempty final String sPath,
                          @Nonnull final Map <String, String> aPathVariables,
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       LOGGER.warn ("The writable REST API is disabled. deleteBusinessCard will not be executed.");
-      aUnifiedResponse.createNotFound ();
+      aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
     }
     else
     {
@@ -40,7 +41,7 @@ public final class APIExecutorBusinessCardDelete implements IAPIExecutor
       final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
 
       new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID, aBasicAuth);
-      aUnifiedResponse.createOk ();
+      aUnifiedResponse.setStatus (HttpServletResponse.SC_OK);
     }
   }
 }

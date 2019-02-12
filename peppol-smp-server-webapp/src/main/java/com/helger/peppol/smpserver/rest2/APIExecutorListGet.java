@@ -3,6 +3,7 @@ package com.helger.peppol.smpserver.rest2;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +17,9 @@ import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
-import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.api.IAPIDescriptor;
 import com.helger.photon.core.api.IAPIExecutor;
+import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public final class APIExecutorListGet implements IAPIExecutor
@@ -29,7 +30,7 @@ public final class APIExecutorListGet implements IAPIExecutor
                          @Nonnull @Nonempty final String sPath,
                          @Nonnull final Map <String, String> aPathVariables,
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sUserID = aPathVariables.get (Rest2Filter.PARAM_USER_ID);
     final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
@@ -62,7 +63,7 @@ public final class APIExecutorListGet implements IAPIExecutor
     {
       // Internal error serializing the payload
       LOGGER.warn ("Failed to convert the returned CompleteServiceGroup to XML");
-      aUnifiedResponse.createInternalServerError ();
+      aUnifiedResponse.setStatus (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
     else
     {

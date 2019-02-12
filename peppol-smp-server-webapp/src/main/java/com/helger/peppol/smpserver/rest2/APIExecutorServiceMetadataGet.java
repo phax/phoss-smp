@@ -3,6 +3,7 @@ package com.helger.peppol.smpserver.rest2;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -23,9 +24,9 @@ import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
 import com.helger.peppol.smpserver.security.SMPKeyManager;
-import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.api.IAPIDescriptor;
 import com.helger.photon.core.api.IAPIExecutor;
+import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.write.IXMLWriterSettings;
 import com.helger.xml.serialize.write.XMLWriter;
@@ -40,7 +41,7 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
                          @Nonnull @Nonempty final String sPath,
                          @Nonnull final Map <String, String> aPathVariables,
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
@@ -50,7 +51,7 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
       LOGGER.warn ("The " +
                    SMPWebAppConfiguration.getDirectoryName () +
                    " integration is disabled. getBusinessCard will not be executed.");
-      aUnifiedResponse.createNotFound ();
+      aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
     }
     else
     {

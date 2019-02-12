@@ -22,13 +22,13 @@ import com.helger.peppol.smpserver.exception.SMPSMLException;
 import com.helger.peppol.smpserver.exception.SMPServerException;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
 import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
-import com.helger.photon.core.PhotonUnifiedResponse;
 import com.helger.photon.core.api.APIDescriptor;
 import com.helger.photon.core.api.APIPath;
 import com.helger.photon.core.api.AbstractAPIExceptionMapper;
 import com.helger.photon.core.api.IAPIExceptionMapper;
 import com.helger.photon.core.api.InvokableAPIDescriptor;
 import com.helger.servlet.filter.AbstractHttpServletFilter;
+import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public class Rest2Filter extends AbstractHttpServletFilter
@@ -46,7 +46,7 @@ public class Rest2Filter extends AbstractHttpServletFilter
       @Nonnull
       public EHandled applyExceptionOnResponse (final InvokableAPIDescriptor aInvokableDescriptor,
                                                 final IRequestWebScopeWithoutResponse aRequestScope,
-                                                final PhotonUnifiedResponse aUnifiedResponse,
+                                                final UnifiedResponse aUnifiedResponse,
                                                 final Throwable aThrowable)
       {
         // From specific to general
@@ -136,6 +136,7 @@ public class Rest2Filter extends AbstractHttpServletFilter
                                                                            PARAM_SERVICE_GROUP_ID +
                                                                            "}"),
                                                               new APIExecutorBusinessCardGet ());
+    aGetBusinessCard.setExceptionMapper (aExceptionMapper);
 
     final APIDescriptor aPutBusinessCard = new APIDescriptor (APIPath.put ("/businesscard/{" +
                                                                            PARAM_SERVICE_GROUP_ID +
@@ -143,33 +144,40 @@ public class Rest2Filter extends AbstractHttpServletFilter
                                                               new APIExecutorBusinessCardPut ());
     aPutBusinessCard.allowedMimeTypes ()
                     .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+    aPutBusinessCard.setExceptionMapper (aExceptionMapper);
 
     final APIDescriptor aDeleteBusinessCard = new APIDescriptor (APIPath.delete ("/businesscard/{" +
                                                                                  PARAM_SERVICE_GROUP_ID +
                                                                                  "}"),
                                                                  new APIExecutorBusinessCardDelete ());
+    aDeleteBusinessCard.setExceptionMapper (aExceptionMapper);
 
     // CompleteServiceGroup
     final APIDescriptor aGetCompleteServiceGroup = new APIDescriptor (APIPath.get ("/complete/{" +
                                                                                    PARAM_SERVICE_GROUP_ID +
                                                                                    "}"),
                                                                       new APIExecutorCompleteServiceGroupGet ());
+    aGetCompleteServiceGroup.setExceptionMapper (aExceptionMapper);
 
     // List
     final APIDescriptor aGetList = new APIDescriptor (APIPath.get ("/list/{" + PARAM_USER_ID + "}"),
                                                       new APIExecutorListGet ());
+    aGetList.setExceptionMapper (aExceptionMapper);
 
     // ServiceGroup
     final APIDescriptor aGetServiceGroup = new APIDescriptor (APIPath.get ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                               new APIExecutorListGet ());
+    aGetServiceGroup.setExceptionMapper (aExceptionMapper);
 
     final APIDescriptor aPutServiceGroup = new APIDescriptor (APIPath.put ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                               new APIExecutorServiceGroupPut ());
     aPutServiceGroup.allowedMimeTypes ()
                     .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+    aPutServiceGroup.setExceptionMapper (aExceptionMapper);
 
     final APIDescriptor aDeleteServiceGroup = new APIDescriptor (APIPath.delete ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                  new APIExecutorServiceGroupDelete ());
+    aDeleteServiceGroup.setExceptionMapper (aExceptionMapper);
 
     // ServiceMetadata
     final APIDescriptor aGetServiceMetadata = new APIDescriptor (APIPath.get ("/{" +
@@ -178,6 +186,7 @@ public class Rest2Filter extends AbstractHttpServletFilter
                                                                               PARAM_DOCUMENT_TYPE_ID +
                                                                               "}"),
                                                                  new APIExecutorServiceMetadataGet ());
+    aGetServiceMetadata.setExceptionMapper (aExceptionMapper);
 
     final APIDescriptor aPutServiceMetadata = new APIDescriptor (APIPath.put ("/{" +
                                                                               PARAM_SERVICE_GROUP_ID +
@@ -187,6 +196,7 @@ public class Rest2Filter extends AbstractHttpServletFilter
                                                                  new APIExecutorServiceMetadataPut ());
     aPutServiceMetadata.allowedMimeTypes ()
                        .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+    aPutServiceMetadata.setExceptionMapper (aExceptionMapper);
 
     final APIDescriptor aDeleteServiceMetadata = new APIDescriptor (APIPath.delete ("/{" +
                                                                                     PARAM_SERVICE_GROUP_ID +
@@ -194,6 +204,7 @@ public class Rest2Filter extends AbstractHttpServletFilter
                                                                                     PARAM_DOCUMENT_TYPE_ID +
                                                                                     "}"),
                                                                     new APIExecutorServiceMetadataDelete ());
+    aDeleteServiceMetadata.setExceptionMapper (aExceptionMapper);
   }
 
   @Override
