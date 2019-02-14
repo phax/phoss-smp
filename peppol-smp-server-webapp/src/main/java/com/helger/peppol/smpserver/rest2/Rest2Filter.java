@@ -33,7 +33,7 @@ import com.helger.xservlet.AbstractXFilterUnifiedResponse;
 
 /**
  * This is the SMP REST filter that MUST be implemented as a filter on "/*"
- * 
+ *
  * @author Philip Helger
  */
 public class Rest2Filter extends AbstractXFilterUnifiedResponse
@@ -244,12 +244,23 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                                        ServletException
   {
     final APIPath aAPIPath = APIPath.createFromRequest (aRequestScope);
+
+    if (aAPIPath.getPath ()
+                .matches ("^/(stream|public|secure|ajax|resbundle|smp-status|error|logout|favicon.ico)(/.*)?$"))
+    {
+      // Explicitly other servlet
+      LOGGER.info ("Ignoring '" + aAPIPath.getPath () + "' because it is an applicatin servlet.");
+      return EContinue.CONTINUE;
+    }
+
     final InvokableAPIDescriptor aInvokableDescriptor = m_aAPIs.getMatching (aAPIPath);
     if (aInvokableDescriptor == null)
     {
       // No API match
       return EContinue.CONTINUE;
     }
+
+    LOGGER.info ("Found API match for '" + aAPIPath.getPath () + "': " + aInvokableDescriptor);
 
     // Invoke API and stop
     try
