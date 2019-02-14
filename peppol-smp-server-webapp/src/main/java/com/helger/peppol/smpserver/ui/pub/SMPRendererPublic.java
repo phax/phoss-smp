@@ -198,7 +198,7 @@ public final class SMPRendererPublic
 
   @SuppressWarnings ("unchecked")
   @Nonnull
-  public static IHCNode getPageContent (@Nonnull final LayoutExecutionContext aLEC)
+  public static IHCNode getPageContent (@Nonnull final ILayoutExecutionContext aLEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
 

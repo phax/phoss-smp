@@ -45,7 +45,6 @@ import com.helger.photon.bootstrap4.navbar.BootstrapNavbarToggleable;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapMenuItemRenderer;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.app.context.ILayoutExecutionContext;
-import com.helger.photon.core.app.context.LayoutExecutionContext;
 import com.helger.photon.core.app.layout.CLayout;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 import com.helger.photon.core.servlet.LogoutServlet;
@@ -101,7 +100,7 @@ public final class SMPRendererSecure
   }
 
   @Nonnull
-  public static IHCNode getMenuContent (@Nonnull final LayoutExecutionContext aLEC)
+  public static IHCNode getMenuContent (@Nonnull final ILayoutExecutionContext aLEC)
   {
     final HCNodeList ret = new HCNodeList ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
@@ -167,7 +166,7 @@ public final class SMPRendererSecure
   }
 
   @Nonnull
-  public static IHCNode getContent (@Nonnull final LayoutExecutionContext aLEC)
+  public static IHCNode getContent (@Nonnull final ILayoutExecutionContext aLEC)
   {
     final HCNodeList ret = new HCNodeList ();
 
@@ -186,7 +185,8 @@ public final class SMPRendererSecure
 
     // Content
     {
-      final HCDiv aRow = aOuterContainer.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX));
+      final HCDiv aRow = aOuterContainer.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX)
+                                                                        .addClass (CBootstrapCSS.MT_2));
       final HCDiv aCol1 = aRow.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX)
                                                               .addClass (CBootstrapCSS.MR_2));
       final HCDiv aCol2 = aRow.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.FLEX_FILL));
