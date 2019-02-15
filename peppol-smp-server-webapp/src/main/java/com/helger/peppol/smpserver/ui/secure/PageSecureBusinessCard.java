@@ -31,7 +31,6 @@ import com.helger.commons.compare.CompareHelper;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.datetime.PDTToString;
-import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.locale.country.CountryCache;
 import com.helger.commons.regex.RegExHelper;
@@ -153,7 +152,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       final IHCNode aNode = _createEntityInputForm (aLEC,
                                                     (SMPBusinessCardEntity) null,
                                                     (String) null,
-                                                    new FormErrorList ());
+                                                    new FormErrorList (),
+                                                    false);
 
       // Build the HTML response
       aAjaxResponse.html (aNode);
@@ -737,7 +737,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   private static IHCNode _createEntityInputForm (@Nonnull final LayoutExecutionContext aLEC,
                                                  @Nullable final SMPBusinessCardEntity aExistingEntity,
                                                  @Nullable final String sExistingID,
-                                                 @Nonnull final FormErrorList aFormErrors)
+                                                 @Nonnull final FormErrorList aFormErrors,
+                                                 final boolean bFormSubmitted)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -793,11 +794,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
       final IRequestParamMap aIdentifiers = aLEC.getRequestParamMap ()
                                                 .getMap (PREFIX_ENTITY, sEntityID, PREFIX_IDENTIFIER);
-      if (aIdentifiers != null)
+      if (bFormSubmitted)
       {
         // Re-show of form
-        for (final String sIdentifierRowID : aIdentifiers.keySet ())
-          aTable.addBodyRow (_createIdentifierInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
+        if (aIdentifiers != null)
+          for (final String sIdentifierRowID : aIdentifiers.keySet ())
+            aTable.addBodyRow (_createIdentifierInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
       }
       else
       {
@@ -854,11 +856,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aTable.setBodyID (sBodyID);
 
       final IRequestParamMap aContacts = aLEC.getRequestParamMap ().getMap (PREFIX_ENTITY, sEntityID, PREFIX_CONTACT);
-      if (aContacts != null)
+      if (bFormSubmitted)
       {
         // Re-show of form
-        for (final String sIdentifierRowID : aContacts.keySet ())
-          aTable.addBodyRow (_createContactInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
+        if (aContacts != null)
+          for (final String sIdentifierRowID : aContacts.keySet ())
+            aTable.addBodyRow (_createContactInputForm (aLEC, sEntityID, null, sIdentifierRowID, aFormErrors));
       }
       else
       {
@@ -947,11 +950,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final HCDiv aEntityContainer = aForm.addAndReturnChild (new HCDiv ().setID ("entitycontainer"));
 
     final IRequestParamMap aEntities = aWPEC.getRequestParamMap ().getMap (PREFIX_ENTITY);
-    if (aEntities != null)
+    if (bFormSubmitted)
     {
       // Re-show of form
-      for (final String sEntityRowID : aEntities.keySet ())
-        aEntityContainer.addChild (_createEntityInputForm (aWPEC, null, sEntityRowID, aFormErrors));
+      if (aEntities != null)
+        for (final String sEntityRowID : aEntities.keySet ())
+          aEntityContainer.addChild (_createEntityInputForm (aWPEC, null, sEntityRowID, aFormErrors, bFormSubmitted));
     }
     else
     {
@@ -959,7 +963,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         // add all existing stored entities
         for (final SMPBusinessCardEntity aEntity : aSelectedObject.getAllEntities ())
-          aEntityContainer.addChild (_createEntityInputForm (aWPEC, aEntity, (String) null, aFormErrors));
+          aEntityContainer.addChild (_createEntityInputForm (aWPEC,
+                                                             aEntity,
+                                                             (String) null,
+                                                             aFormErrors,
+                                                             bFormSubmitted));
       }
     }
 
@@ -1012,9 +1020,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                                       .setTargetBlank ()
                                                                                                       .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
 
-    if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate () || GlobalDebug.isDebugMode ())
+    // When auto update is enabled, there is no need for a manual update
+    // Change: update possibility always, in case document type was changed
+    // if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate
+    // () || GlobalDebug.isDebugMode ())
     {
-      // When auto update is enabled, there is no need for a manual update
       ret.addChildren (new HCTextNode (" "),
                        new HCA (aWPEC.getSelfHref ()
                                      .add (CPageParam.PARAM_ACTION, ACTION_PUBLISH_TO_INDEXER)
