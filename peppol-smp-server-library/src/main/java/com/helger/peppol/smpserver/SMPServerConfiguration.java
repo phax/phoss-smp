@@ -134,7 +134,8 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESuccess reloadConfiguration ()
   {
-    final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromSystemProperty (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH)
+    final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromEnvVar ("SMP_SERVER_CONFIG")
+                                                           .addPathFromSystemProperty (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH)
                                                            .addPathFromSystemProperty (SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH)
                                                            .addPath (PATH_PRIVATE_SMP_SERVER_PROPERTIES)
                                                            .addPath (PATH_SMP_SERVER_PROPERTIES);

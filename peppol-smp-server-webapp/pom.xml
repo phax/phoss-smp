@@ -97,6 +97,11 @@
       <artifactId>peppol-smp-client</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-oton-jetty</artifactId>
+      <optional>true</optional>
+    </dependency>
     
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -108,11 +113,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-grizzly2-servlet</artifactId>
       <optional>true</optional>
     </dependency>
 

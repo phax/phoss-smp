@@ -50,16 +50,17 @@ public class SMPServerTestRule extends PhotonBasicWebTestRule
   {
     super.before ();
     SMPMetaManager.initBackendFromConfiguration ();
-    PhotonSecurityManager.getUserMgr ().createPredefinedUser (CSecurity.USER_ADMINISTRATOR_ID,
-                                                              CSecurity.USER_ADMINISTRATOR_LOGIN,
-                                                              CSecurity.USER_ADMINISTRATOR_EMAIL,
-                                                              CSecurity.USER_ADMINISTRATOR_PASSWORD,
-                                                              "SMP",
-                                                              "Admin",
-                                                              "Description",
-                                                              Locale.US,
-                                                              (Map <String, String>) null,
-                                                              false);
+    PhotonSecurityManager.getUserMgr ()
+                         .createPredefinedUser (CSecurity.USER_ADMINISTRATOR_ID,
+                                                CSecurity.USER_ADMINISTRATOR_LOGIN,
+                                                CSecurity.USER_ADMINISTRATOR_EMAIL,
+                                                CSecurity.USER_ADMINISTRATOR_PASSWORD,
+                                                "SMP",
+                                                "Admin",
+                                                "Description",
+                                                Locale.US,
+                                                (Map <String, String>) null,
+                                                false);
   }
 
   @Override

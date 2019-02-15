@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.debug.GlobalDebug;
+import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.state.EContinue;
 import com.helger.commons.state.EHandled;
@@ -184,7 +185,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     // ServiceGroup
     {
       final APIDescriptor aGetServiceGroup = new APIDescriptor (APIPath.get ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
-                                                                new APIExecutorListGet ());
+                                                                new APIExecutorServiceGroupGet ());
       aGetServiceGroup.setExceptionMapper (aExceptionMapper);
       m_aAPIs.addDescriptor (aGetServiceGroup);
     }
@@ -243,7 +244,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                       @Nonnull final UnifiedResponse aUnifiedResponse) throws IOException,
                                                                                        ServletException
   {
-    final APIPath aAPIPath = APIPath.createFromRequest (aRequestScope);
+    final APIPath aAPIPath = APIPath.createForFilter (aRequestScope);
 
     if (aAPIPath.getPath ()
                 .matches ("^/(stream|public|secure|ajax|resbundle|smp-status|error|logout|favicon.ico)(/.*)?$"))
@@ -261,6 +262,9 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     }
 
     LOGGER.info ("Found API match for '" + aAPIPath.getPath () + "': " + aInvokableDescriptor);
+
+    if (aRequestScope.getHttpMethod () == EHttpMethod.GET)
+      aUnifiedResponse.disableCaching ();
 
     // Invoke API and stop
     try

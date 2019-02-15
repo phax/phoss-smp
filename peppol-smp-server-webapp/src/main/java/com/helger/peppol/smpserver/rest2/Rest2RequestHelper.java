@@ -18,9 +18,9 @@ package com.helger.peppol.smpserver.rest2;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
-import javax.ws.rs.core.HttpHeaders;
 
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.http.HttpHeaderMap;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.http.basicauth.HttpBasicAuth;
@@ -50,10 +50,10 @@ final class Rest2RequestHelper
   @Nonnull
   public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaderMap aHttpHeaders) throws SMPUnauthorizedException
   {
-    final ICommonsList <String> aHeaders = aHttpHeaders.getAllHeaderValues (HttpHeaders.AUTHORIZATION);
+    final ICommonsList <String> aHeaders = aHttpHeaders.getAllHeaderValues (CHttpHeader.AUTHORIZATION);
     if (aHeaders.isEmpty ())
       throw new SMPUnauthorizedException ("Missing required HTTP header '" +
-                                          HttpHeaders.AUTHORIZATION +
+                                          CHttpHeader.AUTHORIZATION +
                                           "' for user authentication");
 
     return HttpBasicAuth.getBasicAuthClientCredentials (aHeaders.getFirst ());

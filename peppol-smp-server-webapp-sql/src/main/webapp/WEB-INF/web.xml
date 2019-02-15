@@ -34,16 +34,7 @@
 
   <filter>
     <filter-name>RestFilter</filter-name>
-    <filter-class>org.glassfish.jersey.servlet.ServletContainer</filter-class>
-    <init-param>
-      <param-name>jersey.config.server.provider.packages</param-name>
-      <!-- add package separated by ";" -->
-      <param-value>com.helger.peppol.smpserver.rest;com.helger.peppol.smpserver.exceptionmapper</param-value>
-    </init-param>
-    <init-param>
-      <param-name>jersey.config.servlet.filter.staticContentRegex</param-name>
-      <param-value>/(stream|public|secure|ajax|resbundle|smp-status|error)/.*|/favicon.ico|/logout</param-value>
-    </init-param>
+    <filter-class>com.helger.peppol.smpserver.rest2.Rest2Filter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>RestFilter</filter-name>

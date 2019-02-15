@@ -28,6 +28,6 @@ public class MockSMPClient extends SMPClient
 {
   public MockSMPClient ()
   {
-    super (URLHelper.getAsURI (MockWebServer.BASE_URI_HTTP));
+    super (URLHelper.getAsURI ("http://localhost:" + MockWebServer.PORT + MockWebServer.CONTEXT_PATH));
   }
 }

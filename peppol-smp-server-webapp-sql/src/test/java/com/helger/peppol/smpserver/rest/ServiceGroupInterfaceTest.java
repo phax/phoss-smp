@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -53,10 +54,10 @@ import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.mock.MockSMPClient;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
+import com.helger.peppol.smpserver.rest2.Rest2Filter;
 
 /**
- * Test class for class {@link ServiceGroupInterface}. This test class is
- * automatically run for XML and SQL backend!
+ * Test class for class {@link Rest2Filter}.
  *
  * @author Philip Helger
  */
@@ -107,7 +108,7 @@ public final class ServiceGroupInterfaceTest
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
-    final WebTarget aTarget = m_aRule.getWebTarget ();
+    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
     Response aResponseMsg;
 
     // GET

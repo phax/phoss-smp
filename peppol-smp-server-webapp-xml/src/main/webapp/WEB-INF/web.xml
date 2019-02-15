@@ -24,10 +24,6 @@
          id="SMP_WebApp" 
          version="2.5">
   <display-name>phoss SMP server (XML backend)</display-name>
-  
-  <welcome-file-list>
-    <welcome-file>public</welcome-file>
-  </welcome-file-list>
 
   <listener>
     <listener-class>com.helger.peppol.smpserver.servlet.SMPWebAppListener</listener-class>

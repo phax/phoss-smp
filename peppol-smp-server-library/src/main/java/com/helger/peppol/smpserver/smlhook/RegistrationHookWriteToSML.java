@@ -93,7 +93,8 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
 
     // Hostname verifier
     HostnameVerifier aHostnameVerifier;
-    if (aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US).contains ("//localhost"))
+    final String sLowerURL = aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US);
+    if (sLowerURL.contains ("//localhost") || sLowerURL.contains ("//127.0.0.1"))
       aHostnameVerifier = new HostnameVerifierVerifyAll ();
     else
       aHostnameVerifier = null;

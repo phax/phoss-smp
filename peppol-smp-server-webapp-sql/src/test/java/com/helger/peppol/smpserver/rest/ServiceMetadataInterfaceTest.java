@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -69,11 +70,11 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.mock.MockSMPClient;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
+import com.helger.peppol.smpserver.rest2.Rest2Filter;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 
 /**
- * Test class for class {@link ServiceMetadataInterface}. This test class is
- * automatically run for XML and SQL backend!
+ * Test class for class {@link Rest2Filter}.
  *
  * @author Philip Helger
  */
@@ -152,7 +153,7 @@ public final class ServiceMetadataInterfaceTest
     }
     aSM.setServiceInformation (aSI);
 
-    final WebTarget aTarget = m_aRule.getWebTarget ();
+    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
     Response aResponseMsg;
 
     final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), new int [] { 404, 500 });
@@ -370,7 +371,7 @@ public final class ServiceMetadataInterfaceTest
     aRedir.setCertificateUID ("APP_0000000000000");
     aSM.setRedirect (aRedir);
 
-    final WebTarget aTarget = m_aRule.getWebTarget ();
+    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
     Response aResponseMsg;
 
     final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), new int [] { 404, 500 });

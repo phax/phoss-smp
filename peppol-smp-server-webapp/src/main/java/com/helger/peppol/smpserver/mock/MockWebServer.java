@@ -16,21 +16,9 @@
  */
 package com.helger.peppol.smpserver.mock;
 
-import java.net.URI;
-import java.util.Map;
-
 import javax.annotation.Nonnull;
-import javax.servlet.Servlet;
 
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.servlet.ServletRegistration;
-import org.glassfish.grizzly.servlet.WebappContext;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.servlet.ServletContainer;
-import org.glassfish.jersey.uri.UriComponent;
-
-import com.helger.commons.collection.impl.CommonsHashMap;
-import com.helger.commons.collection.impl.ICommonsMap;
+import com.helger.photon.jetty.JettyRunner;
 
 /**
  * WebServer based on Grizzly for standalone SMP server testing.
@@ -39,65 +27,27 @@ import com.helger.commons.collection.impl.ICommonsMap;
  */
 final class MockWebServer
 {
-  // Base URI the Grizzly HTTP server will listen on
-  public static final String BASE_URI_HTTP = "http://localhost:9090/unittest/";
-
-  @Nonnull
-  private static WebappContext _createContext (final URI u,
-                                               final Class <? extends Servlet> aServletClass,
-                                               final Servlet aServlet,
-                                               final Map <String, String> aInitParams,
-                                               final Map <String, String> aContextInitParams)
-  {
-    String path = u.getPath ();
-    if (path == null)
-      throw new IllegalArgumentException ("The URI path, of the URI " + u + ", must be non-null");
-    if (path.isEmpty ())
-      throw new IllegalArgumentException ("The URI path, of the URI " + u + ", must be present");
-    if (path.charAt (0) != '/')
-      throw new IllegalArgumentException ("The URI path, of the URI " + u + ". must start with a '/'");
-    path = String.format ("/%s", UriComponent.decodePath (u.getPath (), true).get (1).toString ());
-
-    final WebappContext aContext = new WebappContext ("GrizzlyContext", path);
-    ServletRegistration aRegistration;
-    if (aServletClass != null)
-      aRegistration = aContext.addServlet (aServletClass.getName (), aServletClass);
-    else
-      aRegistration = aContext.addServlet (aServlet.getClass ().getName (), aServlet);
-    aRegistration.addMapping ("/*");
-
-    if (aContextInitParams != null)
-      for (final Map.Entry <String, String> e : aContextInitParams.entrySet ())
-        aContext.setInitParameter (e.getKey (), e.getValue ());
-
-    if (aInitParams != null)
-      aRegistration.setInitParameters (aInitParams);
-
-    return aContext;
-  }
-
-  @Nonnull
-  private static WebappContext _createContext (final String sURI)
-  {
-    final ICommonsMap <String, String> aInitParams = new CommonsHashMap <> ();
-    return _createContext (URI.create (sURI), ServletContainer.class, null, aInitParams, null);
-  }
+  public static final String CONTEXT_PATH = "/unittest";
+  public static final int PORT = 9090;
 
   /**
-   * Starts Grizzly HTTP server exposing JAX-RS resources defined in this
-   * application.
+   * Starts HTTP server exposing JAX-RS resources defined in this application.
    *
-   * @return Grizzly HTTP server.
+   * @return The Jetty runner
    */
   @Nonnull
-  public static HttpServer startRegularServer ()
+  public static JettyRunner startRegularServer ()
   {
-    final WebappContext aContext = _createContext (BASE_URI_HTTP);
-
-    // create and start a new instance of grizzly http server
-    // exposing the Jersey application at BASE_URI
-    final HttpServer ret = GrizzlyHttpServerFactory.createHttpServer (URI.create (BASE_URI_HTTP));
-    aContext.deploy (ret);
+    final JettyRunner ret = new JettyRunner ();
+    ret.setContextPath (CONTEXT_PATH).setPort (PORT);
+    try
+    {
+      ret.startServer ();
+    }
+    catch (final Exception ex)
+    {
+      throw new IllegalStateException ("Failed to start server", ex);
+    }
     return ret;
   }
 }

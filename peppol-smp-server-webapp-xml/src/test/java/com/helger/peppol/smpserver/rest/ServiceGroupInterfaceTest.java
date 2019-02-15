@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -53,17 +54,18 @@ import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.mock.MockSMPClient;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
+import com.helger.peppol.smpserver.rest2.Rest2Filter;
 import com.helger.photon.security.CSecurity;
 
 /**
- * Test class for class {@link ServiceGroupInterface}.
+ * Test class for class {@link Rest2Filter}
  *
  * @author Philip Helger
  */
 public final class ServiceGroupInterfaceTest
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (ServiceGroupInterfaceTest.class);
-  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_LOGIN,
+  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   @Rule
@@ -110,7 +112,7 @@ public final class ServiceGroupInterfaceTest
     aSG_UC.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_UC));
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    final WebTarget aTarget = m_aRule.getWebTarget ();
+    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
     Response aResponseMsg;
 
     // GET
