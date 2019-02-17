@@ -28,8 +28,8 @@ import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.state.EContinue;
 import com.helger.photon.core.api.APIDescriptor;
-import com.helger.photon.core.api.APIDescriptorList;
 import com.helger.photon.core.api.APIPath;
+import com.helger.photon.core.api.GlobalAPIInvoker;
 import com.helger.photon.core.api.IAPIExceptionMapper;
 import com.helger.photon.core.api.InvokableAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -49,11 +49,10 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
 
   private static final Logger LOGGER = LoggerFactory.getLogger (Rest2Filter.class);
 
-  private final APIDescriptorList m_aAPIs = new APIDescriptorList ();
-
   public Rest2Filter ()
   {
     final IAPIExceptionMapper aExceptionMapper = new Rest2ExceptionMapper ();
+    final GlobalAPIInvoker aInvoker = GlobalAPIInvoker.getInstance ();
 
     // BusinessCard
     {
@@ -62,7 +61,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                              "}"),
                                                                 new APIExecutorBusinessCardGet ());
       aGetBusinessCard.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aGetBusinessCard);
+      aInvoker.registerAPI (aGetBusinessCard);
     }
     {
       final APIDescriptor aPutBusinessCard = new APIDescriptor (APIPath.put ("/businesscard/{" +
@@ -72,7 +71,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
       aPutBusinessCard.allowedMimeTypes ()
                       .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
       aPutBusinessCard.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aPutBusinessCard);
+      aInvoker.registerAPI (aPutBusinessCard);
     }
     {
       final APIDescriptor aDeleteBusinessCard = new APIDescriptor (APIPath.delete ("/businesscard/{" +
@@ -80,7 +79,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                                    "}"),
                                                                    new APIExecutorBusinessCardDelete ());
       aDeleteBusinessCard.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aDeleteBusinessCard);
+      aInvoker.registerAPI (aDeleteBusinessCard);
     }
     // CompleteServiceGroup
     {
@@ -89,21 +88,21 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                                      "}"),
                                                                         new APIExecutorCompleteServiceGroupGet ());
       aGetCompleteServiceGroup.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aGetCompleteServiceGroup);
+      aInvoker.registerAPI (aGetCompleteServiceGroup);
     }
     // List
     {
       final APIDescriptor aGetList = new APIDescriptor (APIPath.get ("/list/{" + PARAM_USER_ID + "}"),
                                                         new APIExecutorListGet ());
       aGetList.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aGetList);
+      aInvoker.registerAPI (aGetList);
     }
     // ServiceGroup
     {
       final APIDescriptor aGetServiceGroup = new APIDescriptor (APIPath.get ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                 new APIExecutorServiceGroupGet ());
       aGetServiceGroup.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aGetServiceGroup);
+      aInvoker.registerAPI (aGetServiceGroup);
     }
     {
       final APIDescriptor aPutServiceGroup = new APIDescriptor (APIPath.put ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
@@ -111,13 +110,13 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
       aPutServiceGroup.allowedMimeTypes ()
                       .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
       aPutServiceGroup.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aPutServiceGroup);
+      aInvoker.registerAPI (aPutServiceGroup);
     }
     {
       final APIDescriptor aDeleteServiceGroup = new APIDescriptor (APIPath.delete ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                    new APIExecutorServiceGroupDelete ());
       aDeleteServiceGroup.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aDeleteServiceGroup);
+      aInvoker.registerAPI (aDeleteServiceGroup);
     }
     // ServiceMetadata
     {
@@ -128,7 +127,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                                 "}"),
                                                                    new APIExecutorServiceMetadataGet ());
       aGetServiceMetadata.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aGetServiceMetadata);
+      aInvoker.registerAPI (aGetServiceMetadata);
     }
     {
       final APIDescriptor aPutServiceMetadata = new APIDescriptor (APIPath.put ("/{" +
@@ -140,7 +139,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
       aPutServiceMetadata.allowedMimeTypes ()
                          .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
       aPutServiceMetadata.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aPutServiceMetadata);
+      aInvoker.registerAPI (aPutServiceMetadata);
     }
     {
       final APIDescriptor aDeleteServiceMetadata = new APIDescriptor (APIPath.delete ("/{" +
@@ -150,7 +149,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                                       "}"),
                                                                       new APIExecutorServiceMetadataDelete ());
       aDeleteServiceMetadata.setExceptionMapper (aExceptionMapper);
-      m_aAPIs.addDescriptor (aDeleteServiceMetadata);
+      aInvoker.registerAPI (aDeleteServiceMetadata);
     }
   }
 
@@ -171,7 +170,8 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
       return EContinue.CONTINUE;
     }
 
-    final InvokableAPIDescriptor aInvokableDescriptor = m_aAPIs.getMatching (aAPIPath);
+    final GlobalAPIInvoker aInvoker = GlobalAPIInvoker.getInstance ();
+    final InvokableAPIDescriptor aInvokableDescriptor = aInvoker.getAPIByPath (aAPIPath);
     if (aInvokableDescriptor == null)
     {
       // No API match
@@ -187,28 +187,17 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     // Invoke API and stop
     try
     {
-      aInvokableDescriptor.invokeAPI (aRequestScope, aUnifiedResponse);
+      // Exception handler is handled internally
+      aInvoker.invoke (aInvokableDescriptor, aRequestScope, aUnifiedResponse);
     }
-    catch (final Throwable t)
+    catch (final Exception ex)
     {
-      boolean bHandled = false;
-      final IAPIExceptionMapper aExMapper = aInvokableDescriptor.getAPIDescriptor ().getExceptionMapper ();
-      if (aExMapper != null)
-      {
-        // Apply exception mapper
-        bHandled = aExMapper.applyExceptionOnResponse (aInvokableDescriptor, aRequestScope, aUnifiedResponse, t)
-                            .isHandled ();
-      }
-
-      if (!bHandled)
-      {
-        // Re-throw
-        if (t instanceof IOException)
-          throw (IOException) t;
-        if (t instanceof ServletException)
-          throw (ServletException) t;
-        throw new ServletException (t);
-      }
+      // Re-throw
+      if (ex instanceof IOException)
+        throw (IOException) ex;
+      if (ex instanceof ServletException)
+        throw (ServletException) ex;
+      throw new ServletException (ex);
     }
 
     return EContinue.BREAK;
