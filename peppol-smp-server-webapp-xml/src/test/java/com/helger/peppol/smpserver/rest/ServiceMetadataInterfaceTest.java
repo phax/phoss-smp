@@ -70,11 +70,12 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.mock.MockSMPClient;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
+import com.helger.peppol.smpserver.rest2.Rest2Filter;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.photon.security.CSecurity;
 
 /**
- * Test class for class {@link ServiceMetadataInterface}.
+ * Test class for class {@link Rest2Filter}.
  *
  * @author Philip Helger
  */
