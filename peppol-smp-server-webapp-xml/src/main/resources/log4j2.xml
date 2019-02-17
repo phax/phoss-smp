@@ -28,8 +28,5 @@
     <Root level="info">
       <AppenderRef ref="STDOUT" />
     </Root>
-    <Logger name="org.glassfish.jersey.tracing.general" level="debug">
-      <AppenderRef ref="STDOUT" />
-    </Logger>
   </Loggers>
 </Configuration>

@@ -68,7 +68,6 @@
 
   <properties>
     <log4j.version>2.11.2</log4j.version>
-    <jersey.version>2.28</jersey.version>
     <eclipselink.version>2.7.4</eclipselink.version>
   </properties>
   
@@ -138,13 +137,6 @@
         <scope>import</scope>
       </dependency>
       
-      <dependency>
-        <groupId>org.glassfish.jersey</groupId>
-        <artifactId>jersey-bom</artifactId>
-        <version>${jersey.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-core</artifactId>

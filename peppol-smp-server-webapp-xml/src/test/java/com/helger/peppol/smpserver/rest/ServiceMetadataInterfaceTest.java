@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -80,7 +81,7 @@ import com.helger.photon.security.CSecurity;
 public final class ServiceMetadataInterfaceTest
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (ServiceMetadataInterfaceTest.class);
-  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_LOGIN,
+  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   @Rule
@@ -154,7 +155,7 @@ public final class ServiceMetadataInterfaceTest
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aSIMgr = SMPMetaManager.getServiceInformationMgr ();
-    final WebTarget aTarget = m_aRule.getWebTarget ();
+    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
     Response aResponseMsg;
 
     _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
@@ -357,7 +358,7 @@ public final class ServiceMetadataInterfaceTest
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPRedirectManager aSRMgr = SMPMetaManager.getRedirectMgr ();
-    final WebTarget aTarget = m_aRule.getWebTarget ();
+    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
     Response aResponseMsg;
 
     _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);

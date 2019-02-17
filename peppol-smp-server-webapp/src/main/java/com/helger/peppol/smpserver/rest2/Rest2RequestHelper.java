@@ -14,15 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.rest;
-
-import java.util.List;
+package com.helger.peppol.smpserver.rest2;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
-import javax.ws.rs.core.HttpHeaders;
 
-import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.http.CHttpHeader;
+import com.helger.commons.http.HttpHeaderMap;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.http.basicauth.HttpBasicAuth;
 import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
@@ -31,12 +30,12 @@ import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
  * This class is used for retrieving the HTTP BASIC AUTH header from the HTTP
  * Authorization Header.
  *
- * @author PEPPOL.AT, BRZ, Philip Helger
+ * @author Philip Helger
  */
 @Immutable
-final class RestRequestHelper
+final class Rest2RequestHelper
 {
-  private RestRequestHelper ()
+  private Rest2RequestHelper ()
   {}
 
   /**
@@ -49,15 +48,14 @@ final class RestRequestHelper
    *         If no BasicAuth HTTP header is present
    */
   @Nonnull
-  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaders aHttpHeaders) throws SMPUnauthorizedException
+  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaderMap aHttpHeaders) throws SMPUnauthorizedException
   {
-    final List <String> aHeaders = aHttpHeaders.getRequestHeader (HttpHeaders.AUTHORIZATION);
-    if (CollectionHelper.isEmpty (aHeaders))
+    final ICommonsList <String> aHeaders = aHttpHeaders.getAllHeaderValues (CHttpHeader.AUTHORIZATION);
+    if (aHeaders.isEmpty ())
       throw new SMPUnauthorizedException ("Missing required HTTP header '" +
-                                          HttpHeaders.AUTHORIZATION +
+                                          CHttpHeader.AUTHORIZATION +
                                           "' for user authentication");
 
-    final String sAuthHeader = CollectionHelper.getFirstElement (aHeaders);
-    return HttpBasicAuth.getBasicAuthClientCredentials (sAuthHeader);
+    return HttpBasicAuth.getBasicAuthClientCredentials (aHeaders.getFirst ());
   }
 }

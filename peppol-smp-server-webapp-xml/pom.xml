@@ -81,13 +81,23 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-grizzly2-servlet</artifactId>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-oton-jetty</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-oton-jetty</artifactId>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-jaxb</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

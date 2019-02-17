@@ -16,54 +16,47 @@
  */
 package com.helger.peppol.smpserver.mock;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
+import java.io.IOException;
 
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.jersey.logging.LoggingFeature;
-import org.glassfish.jersey.logging.LoggingFeature.Verbosity;
+import javax.annotation.Nullable;
+
+import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.servlet.StaticServerInfo;
+import com.helger.commons.system.SystemProperties;
+import com.helger.peppol.sml.ESML;
+import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.photon.jetty.JettyRunner;
 
-public class SMPServerRESTTestRule extends SMPServerTestRule
+public class SMPServerRESTTestRule extends ExternalResource
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerRESTTestRule.class);
 
-  private HttpServer m_aServer;
-  private WebTarget m_aTarget;
+  private JettyRunner m_aServer;
 
   public SMPServerRESTTestRule (@Nullable final String sSMPServerPropertiesPath)
   {
-    super (sSMPServerPropertiesPath);
+    SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH,
+                                       sSMPServerPropertiesPath);
+    SMPServerConfiguration.reloadConfiguration ();
   }
 
   @Override
-  public void before ()
+  public void before () throws Throwable
   {
     super.before ();
-
-    // Init once
-    if (!StaticServerInfo.isSet ())
-      StaticServerInfo.init ("http", "localhost", 80, "");
 
     // http only
     m_aServer = MockWebServer.startRegularServer ();
 
-    final Client aClient = ClientBuilder.newClient ();
+    // Ensure non-invasive setup
+    // PD enabled but no auto-update
+    // SML disabled
+    SMPMetaManager.getSettingsMgr ()
+                  .updateSettings (false, true, false, false, "dummy", false, false, ESML.DEVELOPMENT_LOCAL);
 
-    // Enable the feature to activate logging of HTTP requests
-    if (false)
-      aClient.register (new LoggingFeature (java.util.logging.Logger.getLogger ("SMPServerRESTTestRule"),
-                                            java.util.logging.Level.INFO,
-                                            Verbosity.PAYLOAD_ANY,
-                                            null));
-
-    m_aTarget = aClient.target (MockWebServer.BASE_URI_HTTP);
     LOGGER.info ("Finished before");
   }
 
@@ -73,10 +66,16 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
     try
     {
       LOGGER.info ("Shutting down server");
-      m_aTarget = null;
       if (m_aServer != null)
-        m_aServer.shutdownNow ();
+        m_aServer.shutDownServer ();
+
+      // Reset for next run
+      SMPMetaManager.setManagerProvider (null);
       LOGGER.info ("Finished shutting down server");
+    }
+    catch (final IOException | InterruptedException ex)
+    {
+      LOGGER.error ("Failed to shut down server", ex);
     }
     finally
     {
@@ -85,9 +84,8 @@ public class SMPServerRESTTestRule extends SMPServerTestRule
     }
   }
 
-  @Nonnull
-  public WebTarget getWebTarget ()
+  public String getFullURL ()
   {
-    return m_aTarget;
+    return "http://localhost:" + MockWebServer.PORT + MockWebServer.CONTEXT_PATH;
   }
 }

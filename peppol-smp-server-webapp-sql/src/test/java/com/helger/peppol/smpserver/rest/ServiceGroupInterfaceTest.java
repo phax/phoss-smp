@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -53,10 +54,12 @@ import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.mock.MockSMPClient;
 import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
+import com.helger.peppol.smpserver.rest2.Rest2Filter;
+import com.helger.servlet.mock.MockHttpServletRequest;
+import com.helger.web.scope.mgr.WebScoped;
 
 /**
- * Test class for class {@link ServiceGroupInterface}. This test class is
- * automatically run for XML and SQL backend!
+ * Test class for class {@link Rest2Filter}.
  *
  * @author Philip Helger
  */
@@ -107,67 +110,70 @@ public final class ServiceGroupInterfaceTest
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
 
-    final WebTarget aTarget = m_aRule.getWebTarget ();
-    Response aResponseMsg;
-
-    // GET
-    final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), new int [] { 404, 500 });
-    if (nStatus == 500)
+    try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
     {
-      // Seems like MySQL is not running
-      return;
-    }
-    _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
+      final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
+      Response aResponseMsg;
 
-    try
-    {
-      // PUT 1 - create
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
-      _testResponseJerseyClient (aResponseMsg, 200);
-
-      // Both regular and upper case must work
-      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
-      assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
-
-      // PUT 2 - overwrite
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
-      _testResponseJerseyClient (aResponseMsg, 200);
-      aResponseMsg = _addCredentials (aTarget.path (sPI_UC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
-      _testResponseJerseyClient (aResponseMsg, 200);
-
-      // Both regular and upper case must work
-      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
-      assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
-
-      // DELETE 1
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
-      _testResponseJerseyClient (aResponseMsg, 200);
-
-      // Both must be deleted
-      _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+      // GET
+      final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), new int [] { 404, 500 });
+      if (nStatus == 500)
+      {
+        // Seems like MySQL is not running
+        return;
+      }
       _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
-    }
-    finally
-    {
-      // DELETE 2
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
-      // May be 500 if no MySQL is running
-      _testResponseJerseyClient (aResponseMsg, 200, 404);
 
-      // Both must be deleted
-      _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
-      _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
-      assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      try
+      {
+        // PUT 1 - create
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        _testResponseJerseyClient (aResponseMsg, 200);
+
+        // Both regular and upper case must work
+        assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+        assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
+        assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+        assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+
+        // PUT 2 - overwrite
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        _testResponseJerseyClient (aResponseMsg, 200);
+        aResponseMsg = _addCredentials (aTarget.path (sPI_UC)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        _testResponseJerseyClient (aResponseMsg, 200);
+
+        // Both regular and upper case must work
+        assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+        assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
+        assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+        assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+
+        // DELETE 1
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
+        _testResponseJerseyClient (aResponseMsg, 200);
+
+        // Both must be deleted
+        _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+        _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
+        assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+        assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      }
+      finally
+      {
+        // DELETE 2
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
+        // May be 500 if no MySQL is running
+        _testResponseJerseyClient (aResponseMsg, 200, 404);
+
+        // Both must be deleted
+        _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+        _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
+        assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
+        assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
+      }
     }
   }
 
