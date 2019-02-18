@@ -32,6 +32,10 @@
 	display: inline;
 }
 
+#menu {
+	min-width: 16rem;
+}
+
 #menu .nav>li>a {
 	color: #716B7A;
 	display: block;

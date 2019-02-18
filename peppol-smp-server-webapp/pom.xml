@@ -131,6 +131,13 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>com.helger.maven</groupId>
+        <artifactId>ph-csscompress-maven-plugin</artifactId>
+        <configuration>
+          <sourceDirectory>src/main/resources/css</sourceDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
