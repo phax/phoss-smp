@@ -140,7 +140,9 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
           }
         }
 
-        aUnifiedResponse.setContent (aBAOS.toByteArray ()).setMimeType (CMimeType.TEXT_XML);
+        aUnifiedResponse.setContent (aBAOS.toByteArray ())
+                        .setMimeType (CMimeType.TEXT_XML)
+                        .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
       }
     }
   }

@@ -36,6 +36,7 @@ import com.helger.photon.core.api.IAPIDescriptor;
 import com.helger.photon.core.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xml.serialize.write.XMLWriterSettings;
 
 public final class APIExecutorBusinessCardGet implements IAPIExecutor
 {
@@ -67,7 +68,9 @@ public final class APIExecutorBusinessCardGet implements IAPIExecutor
       final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
       final byte [] aBytes = new PD3BusinessCardMarshaller ().getAsBytes (ret);
 
-      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML);
+      aUnifiedResponse.setContent (aBytes)
+                      .setMimeType (CMimeType.TEXT_XML)
+                      .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
     }
   }
 }

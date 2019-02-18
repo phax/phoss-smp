@@ -36,6 +36,7 @@ import com.helger.photon.core.api.IAPIDescriptor;
 import com.helger.photon.core.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xml.serialize.write.XMLWriterSettings;
 
 public final class APIExecutorServiceGroupGet implements IAPIExecutor
 {
@@ -77,7 +78,9 @@ public final class APIExecutorServiceGroupGet implements IAPIExecutor
     }
     else
     {
-      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML);
+      aUnifiedResponse.setContent (aBytes)
+                      .setMimeType (CMimeType.TEXT_XML)
+                      .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
     }
   }
 }
