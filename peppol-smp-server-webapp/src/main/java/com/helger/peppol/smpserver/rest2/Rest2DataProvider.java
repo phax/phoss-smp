@@ -47,7 +47,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
   }
 
   public Rest2DataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                                   final boolean bUseStaticServerInfo)
+                            final boolean bUseStaticServerInfo)
   {
     m_aRequestScope = ValueEnforcer.notNull (aRequestScope, "UriInfo");
     m_bUseStaticServerInfo = bUseStaticServerInfo;
@@ -110,7 +110,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
     return getBaseUriBuilder () +
            "/" +
            aServiceGroupID.getURIPercentEncoded () +
-           "/" +
+           "/services/" +
            aDocTypeID.getURIPercentEncoded ();
   }
 }
