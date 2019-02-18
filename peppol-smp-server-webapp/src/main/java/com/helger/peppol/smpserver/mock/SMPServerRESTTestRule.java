@@ -73,9 +73,14 @@ public class SMPServerRESTTestRule extends ExternalResource
       SMPMetaManager.setManagerProvider (null);
       LOGGER.info ("Finished shutting down server");
     }
-    catch (final IOException | InterruptedException ex)
+    catch (final IOException ex)
     {
       LOGGER.error ("Failed to shut down server", ex);
+    }
+    catch (final InterruptedException ex)
+    {
+      LOGGER.error ("Failed to shut down server", ex);
+      Thread.currentThread ().interrupt ();
     }
     finally
     {
