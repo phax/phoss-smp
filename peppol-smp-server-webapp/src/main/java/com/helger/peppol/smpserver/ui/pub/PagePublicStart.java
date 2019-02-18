@@ -98,7 +98,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
         // Static
         final BootstrapTable aTable = new BootstrapTable ();
         aTable.setBordered (true);
-        aTable.setCondensed (false);
+        aTable.setCondensed (true);
         aTable.setStriped (true);
         aTable.addHeaderRow ()
               .addCell ("Participant ID")
