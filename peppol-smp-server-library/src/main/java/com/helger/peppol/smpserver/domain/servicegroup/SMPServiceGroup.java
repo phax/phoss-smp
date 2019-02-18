@@ -62,7 +62,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
       throw new IllegalStateException ("Failed to clone " +
                                        aParticipantIdentifier +
                                        " with identifier factory " +
-                                       aParticipantIdentifier);
+                                       aIdentifierFactory);
     return ret;
   }
 
