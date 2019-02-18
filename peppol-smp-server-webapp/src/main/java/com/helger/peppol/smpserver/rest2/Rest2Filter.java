@@ -165,8 +165,8 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                 .matches ("^/(stream|public|secure|ajax|resbundle|smp-status|error|logout|favicon.ico)(/.*)?$"))
     {
       // Explicitly other servlet
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info ("Ignoring '" + aAPIPath.getPath () + "' because it is an application servlet.");
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Ignoring '" + aAPIPath.getPath () + "' because it is an application servlet.");
       return EContinue.CONTINUE;
     }
 
@@ -178,8 +178,8 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
       return EContinue.CONTINUE;
     }
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Found API match for '" + aAPIPath.getPath () + "': " + aInvokableDescriptor);
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Found API match for '" + aAPIPath.getPath () + "': " + aInvokableDescriptor);
 
     if (aRequestScope.getHttpMethod () == EHttpMethod.GET)
       aUnifiedResponse.disableCaching ();
