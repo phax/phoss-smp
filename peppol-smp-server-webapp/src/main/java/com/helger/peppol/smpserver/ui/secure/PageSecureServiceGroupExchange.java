@@ -74,6 +74,7 @@ import com.helger.photon.bootstrap4.card.BootstrapCard;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
+import com.helger.photon.bootstrap4.uictrls.ext.BootstrapFileUpload;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
@@ -559,7 +560,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       final BootstrapForm aForm = aImport.addAndReturnChild (getUIHandler ().createFormFileUploadSelf (aWPEC));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("File to import")
-                                                   .setCtrl (new BootstrapFileUpload (FIELD_IMPORT_FILE))
+                                                   .setCtrl (new BootstrapFileUpload (FIELD_IMPORT_FILE,
+                                                                                      aDisplayLocale))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_IMPORT_FILE)));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Overwrite existing elements")
                                                    .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_OVERWRITE_EXISTING,
