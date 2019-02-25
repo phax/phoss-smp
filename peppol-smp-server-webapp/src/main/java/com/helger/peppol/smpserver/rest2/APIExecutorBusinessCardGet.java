@@ -50,9 +50,7 @@ public final class APIExecutorBusinessCardGet implements IAPIExecutor
   {
     if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
     {
-      /*
-       * PD integration is disabled
-       */
+      // PD integration is disabled
       LOGGER.warn ("The " +
                    SMPWebAppConfiguration.getDirectoryName () +
                    " integration is disabled. getBusinessCard will not be executed.");

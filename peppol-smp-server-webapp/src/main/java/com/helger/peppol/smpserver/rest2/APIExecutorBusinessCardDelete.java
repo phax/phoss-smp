@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
@@ -51,13 +52,22 @@ public final class APIExecutorBusinessCardDelete implements IAPIExecutor
       aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
     }
     else
-    {
-      final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-      final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
-      final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
+      if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
+      {
+        // PD integration is disabled
+        LOGGER.warn ("The " +
+                     SMPWebAppConfiguration.getDirectoryName () +
+                     " integration is disabled. deleteBusinessCard will not be executed.");
+        aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
+      }
+      else
+      {
+        final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
+        final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+        final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
 
-      new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID, aBasicAuth);
-      aUnifiedResponse.setStatus (HttpServletResponse.SC_OK);
-    }
+        new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID, aBasicAuth);
+        aUnifiedResponse.setStatus (HttpServletResponse.SC_OK);
+      }
   }
 }

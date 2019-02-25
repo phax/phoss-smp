@@ -19,7 +19,6 @@ package com.helger.peppol.smpserver.rest2;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -34,8 +33,6 @@ import com.helger.commons.mime.CMimeType;
 import com.helger.peppol.bdxr.marshal.BDXRMarshallerSignedServiceMetadataType;
 import com.helger.peppol.smp.marshal.SMPMarshallerSignedServiceMetadataType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
 import com.helger.peppol.smpserver.restapi.SMPServerAPI;
@@ -59,91 +56,81 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
-    {
-      /*
-       * PD integration is disabled
-       */
-      LOGGER.warn ("The " +
-                   SMPWebAppConfiguration.getDirectoryName () +
-                   " integration is disabled. getBusinessCard will not be executed.");
-      aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
-    }
-    else
-    {
-      final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-      final String sDocumentTypeID = aPathVariables.get (Rest2Filter.PARAM_DOCUMENT_TYPE_ID);
-      final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+    final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
+    final String sDocumentTypeID = aPathVariables.get (Rest2Filter.PARAM_DOCUMENT_TYPE_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
 
-      // Create the unsigned response document
-      Document aDoc;
-      switch (SMPServerConfiguration.getRESTType ())
+    // Create the unsigned response document
+    Document aDoc;
+    switch (SMPServerConfiguration.getRESTType ())
+    {
+      case PEPPOL:
       {
-        case PEPPOL:
-        {
-          final com.helger.peppol.smp.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
+        final com.helger.peppol.smp.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
+                                                                                                                             sDocumentTypeID);
+
+        // Convert to DOM document
+        final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType ();
+        aDoc = aMarshaller.getAsDocument (ret);
+        break;
+      }
+      case BDXR:
+      {
+        final com.helger.peppol.bdxr.SignedServiceMetadataType ret = new BDXRServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
                                                                                                                                sDocumentTypeID);
 
-          // Convert to DOM document
-          final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType ();
-          aDoc = aMarshaller.getAsDocument (ret);
-          break;
-        }
-        case BDXR:
-        {
-          final com.helger.peppol.bdxr.SignedServiceMetadataType ret = new BDXRServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
-                                                                                                                                 sDocumentTypeID);
-
-          // Convert to DOM document
-          final BDXRMarshallerSignedServiceMetadataType aMarshaller = new BDXRMarshallerSignedServiceMetadataType ();
-          aDoc = aMarshaller.getAsDocument (ret);
-          break;
-        }
-        default:
-          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+        // Convert to DOM document
+        final BDXRMarshallerSignedServiceMetadataType aMarshaller = new BDXRMarshallerSignedServiceMetadataType ();
+        aDoc = aMarshaller.getAsDocument (ret);
+        break;
       }
+      default:
+        throw new UnsupportedOperationException ("Unsupported REST type specified!");
+    }
+    if (aDoc == null)
+      throw new IllegalStateException ("Failed to serialize unsigned node!");
 
-      // Sign the document
-      try
+    // Sign the document
+    try
+    {
+      SMPKeyManager.getInstance ()
+                   .signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
+      LOGGER.info ("Successfully signed response XML");
+    }
+    catch (final Exception ex)
+    {
+      throw new RuntimeException ("Error in signing xml", ex);
+    }
+
+    // Serialize the signed document
+    try (final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ())
+    {
+      if (false)
       {
-        SMPKeyManager.getInstance ()
-                     .signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
+        // IMPORTANT: no indent and no align!
+        final IXMLWriterSettings aSettings = XMLWriterSettings.createForCanonicalization ();
+
+        // Write the result to a byte array
+        if (XMLWriter.writeToStream (aDoc, aBAOS, aSettings).isFailure ())
+          throw new IllegalStateException ("Failed to serialize signed node!");
       }
-      catch (final Exception ex)
+      else
       {
-        throw new RuntimeException ("Error in signing xml", ex);
+        // Use this because it correctly serializes &#13; which is important
+        // for validating the signature!
+        try
+        {
+          XMLTransformerFactory.newTransformer ().transform (new DOMSource (aDoc), new StreamResult (aBAOS));
+        }
+        catch (final TransformerException ex)
+        {
+          throw new IllegalStateException ("Failed to serialized signed node", ex);
+        }
       }
 
-      // Serialize the signed document
-      try (final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ())
-      {
-        if (false)
-        {
-          // IMPORTANT: no indent and no align!
-          final IXMLWriterSettings aSettings = XMLWriterSettings.createForCanonicalization ();
-
-          // Write the result to a byte array
-          if (XMLWriter.writeToStream (aDoc, aBAOS, aSettings).isFailure ())
-            throw new IllegalStateException ("Failed to serialize signed node!");
-        }
-        else
-        {
-          // Use this because it correctly serializes &#13; which is important
-          // for validating the signature!
-          try
-          {
-            XMLTransformerFactory.newTransformer ().transform (new DOMSource (aDoc), new StreamResult (aBAOS));
-          }
-          catch (final TransformerException ex)
-          {
-            throw new IllegalStateException ("Failed to serialized signed node", ex);
-          }
-        }
-
-        aUnifiedResponse.setContent (aBAOS.toByteArray ())
-                        .setMimeType (CMimeType.TEXT_XML)
-                        .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
-      }
+      aUnifiedResponse.setContent (aBAOS.toByteArray ())
+                      .setMimeType (CMimeType.TEXT_XML)
+                      .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
     }
   }
 }

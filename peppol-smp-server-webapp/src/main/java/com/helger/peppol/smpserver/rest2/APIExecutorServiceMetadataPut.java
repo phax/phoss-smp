@@ -52,9 +52,7 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    /*
-     * Is the writable API disabled?
-     */
+    // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       LOGGER.warn ("The writable REST API is disabled. saveServiceRegistration will not be executed.");

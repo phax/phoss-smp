@@ -31,6 +31,7 @@ import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.pd.businesscard.generic.PDBusinessCard;
 import com.helger.pd.businesscard.helper.PDBusinessCardHelper;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.restapi.BusinessCardServerAPI;
 import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
@@ -49,39 +50,46 @@ public final class APIExecutorBusinessCardPut implements IAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    /*
-     * Is the writable API disabled?
-     */
+    // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       LOGGER.warn ("The writable REST API is disabled. saveBusinessCard will not be executed.");
       aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
     }
     else
-    {
-      // Parse main payload
-      final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
-      final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aPayload, (Charset) null);
-      if (aBC == null)
+      if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
       {
-        // Cannot parse
-        LOGGER.warn ("Failed to parse XML payload as BusinessCard.");
-        aUnifiedResponse.setStatus (HttpServletResponse.SC_BAD_REQUEST);
+        // PD integration is disabled
+        LOGGER.warn ("The " +
+                     SMPWebAppConfiguration.getDirectoryName () +
+                     " integration is disabled. saveBusinessCard will not be executed.");
+        aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
       }
       else
       {
-        final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-        final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
-        final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
-
-        final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
-                                                                                                aBC,
-                                                                                                aBasicAuth);
-        if (eSuccess.isFailure ())
-          aUnifiedResponse.setStatus (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        // Parse main payload
+        final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
+        final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aPayload, (Charset) null);
+        if (aBC == null)
+        {
+          // Cannot parse
+          LOGGER.warn ("Failed to parse XML payload as BusinessCard.");
+          aUnifiedResponse.setStatus (HttpServletResponse.SC_BAD_REQUEST);
+        }
         else
-          aUnifiedResponse.setStatus (HttpServletResponse.SC_OK);
+        {
+          final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
+          final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+          final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
+
+          final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
+                                                                                                  aBC,
+                                                                                                  aBasicAuth);
+          if (eSuccess.isFailure ())
+            aUnifiedResponse.setStatus (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          else
+            aUnifiedResponse.setStatus (HttpServletResponse.SC_OK);
+        }
       }
-    }
   }
 }
