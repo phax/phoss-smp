@@ -39,6 +39,9 @@ import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardCallback;
+import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.peppol.smpserver.ui.ajax.CAjax;
 import com.helger.peppol.smpserver.ui.pub.MenuPublic;
@@ -203,30 +206,89 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     SMPMetaManager.getSettingsMgr ().callbacks ().add (x -> PDClientProvider.getInstance ().resetPDClient ());
 
     // Callback on BusinessCard manager - if something happens, notify PD server
-    SMPMetaManager.getBusinessCardMgr ().bcCallbacks ().add (new ISMPBusinessCardCallback ()
+    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+    if (aBusinessCardMgr != null)
     {
-      public void onCreateOrUpdateSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
+      aBusinessCardMgr.bcCallbacks ().add (new ISMPBusinessCardCallback ()
       {
-        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+        public void onCreateOrUpdateSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
         {
-          // Notify PD server: add
-          PDClientProvider.getInstance ()
-                          .getPDClient ()
-                          .addServiceGroupToIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ());
+          if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+          {
+            // Notify PD server: add
+            PDClientProvider.getInstance ()
+                            .getPDClient ()
+                            .addServiceGroupToIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ());
+          }
         }
-      }
 
-      public void onDeleteSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
-      {
-        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+        public void onDeleteSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
         {
-          // Notify PD server: delete
-          PDClientProvider.getInstance ()
-                          .getPDClient ()
-                          .deleteServiceGroupFromIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ());
+          if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+          {
+            // Notify PD server: delete
+            PDClientProvider.getInstance ()
+                            .getPDClient ()
+                            .deleteServiceGroupFromIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ());
+          }
         }
-      }
-    });
+      });
+
+      // If a service information is create, updated or deleted, also update
+      // Business Card at PD
+      SMPMetaManager.getServiceInformationMgr ()
+                    .serviceInformationCallbacks ()
+                    .add (new ISMPServiceInformationCallback ()
+                    {
+                      public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
+                      {
+                        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+                        {
+                          // Only if a business card is present
+                          if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
+                          {
+                            // Notify PD server: update
+                            PDClientProvider.getInstance ()
+                                            .getPDClient ()
+                                            .addServiceGroupToIndex (aServiceInformation.getServiceGroup ()
+                                                                                        .getParticpantIdentifier ());
+                          }
+                        }
+                      }
+
+                      public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
+                      {
+                        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+                        {
+                          // Only if a business card is present
+                          if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
+                          {
+                            // Notify PD server: update
+                            PDClientProvider.getInstance ()
+                                            .getPDClient ()
+                                            .addServiceGroupToIndex (aServiceInformation.getServiceGroup ()
+                                                                                        .getParticpantIdentifier ());
+                          }
+                        }
+                      }
+
+                      public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
+                      {
+                        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+                        {
+                          // Only if a business card is present
+                          if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
+                          {
+                            // Notify PD server: update
+                            PDClientProvider.getInstance ()
+                                            .getPDClient ()
+                                            .addServiceGroupToIndex (aServiceInformation.getServiceGroup ()
+                                                                                        .getParticpantIdentifier ());
+                          }
+                        }
+                      }
+                    });
+    }
 
     // Register global proxy servers
     ProxySelectorProxySettingsManager.setAsDefault (true);
