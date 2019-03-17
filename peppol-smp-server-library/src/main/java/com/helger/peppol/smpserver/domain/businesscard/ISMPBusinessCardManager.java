@@ -87,6 +87,20 @@ public interface ISMPBusinessCardManager
   ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
 
   /**
+   * Check if a business card of the passed service group exists.
+   *
+   * @param aServiceGroup
+   *        The service group to use. May be <code>null</code>.
+   * @return <code>true</code> if a business card is contained,
+   *         <code>false</code> if not.
+   * @since 5.1.0
+   */
+  default boolean containsSMPBusinessCardOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  {
+    return getSMPBusinessCardOfServiceGroup (aServiceGroup) != null;
+  }
+
+  /**
    * Get the business card of the passed ID (= Service group ID).
    *
    * @param sID
