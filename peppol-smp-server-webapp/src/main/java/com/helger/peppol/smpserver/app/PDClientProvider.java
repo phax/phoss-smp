@@ -75,15 +75,24 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   {
     PDClient ret = m_aRWLock.readLocked ( () -> m_aPDClient);
     if (ret == null)
-      ret = m_aRWLock.writeLocked ( () -> {
-        if (m_aPDClient == null)
+    {
+      m_aRWLock.writeLock ().lock ();
+      try
+      {
+        // Try again in write lock
+        ret = m_aPDClient;
+        if (ret == null)
         {
           // Create a new one
-          m_aPDClient = new PDClient (SMPMetaManager.getSettings ().getPEPPOLDirectoryHostName ());
+          ret = m_aPDClient = new PDClient (SMPMetaManager.getSettings ().getPEPPOLDirectoryHostName ());
           // Note: by default a logging exception handler is installed
         }
-        return m_aPDClient;
-      });
+      }
+      finally
+      {
+        m_aRWLock.writeLock ().unlock ();
+      }
+    }
     return ret;
   }
 }
