@@ -25,10 +25,12 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.ESortOrder;
+import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.tabular.AbstractHCTable;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
@@ -83,13 +85,15 @@ public final class PagePublicStart extends AbstractSMPWebPage
 
       // Use dynamic or static table?
       final boolean bUseDataTables = SMPWebAppConfiguration.isStartPageDynamicTable ();
+      final boolean bShowExtensionDetails = SMPWebAppConfiguration.isStartPageExtensionsShow ();
 
       AbstractHCTable <?> aFinalTable;
       if (bUseDataTables)
       {
         // Dynamic
         final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                            new DTCol ("Extension?").setDataSort (1, 0),
+                                            new DTCol (bShowExtensionDetails ? "Extension"
+                                                                             : "Extension?").setDataSort (1, 0),
                                             new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
         aFinalTable = aTable;
       }
@@ -102,7 +106,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
         aTable.setStriped (true);
         aTable.addHeaderRow ()
               .addCell ("Participant ID")
-              .addCell ("Extension?")
+              .addCell (bShowExtensionDetails ? "Extension" : "Extension?")
               .addCell (EPhotonCoreText.ACTIONS.getDisplayText (aDisplayLocale));
         aFinalTable = aTable;
 
@@ -116,7 +120,17 @@ public final class PagePublicStart extends AbstractSMPWebPage
 
         final HCRow aRow = aFinalTable.addBodyRow ();
         aRow.addCell (sDisplayName);
-        aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
+        if (bShowExtensionDetails)
+        {
+          if (aServiceGroup.hasExtension ())
+            aRow.addCell (new HCCode ().addChildren (HCExtHelper.nl2divList (aServiceGroup.getFirstExtensionXML ())));
+          else
+            aRow.addCell ();
+        }
+        else
+        {
+          aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
+        }
         aRow.addCell (new HCA (LinkHelper.getURLWithServerAndContext (aServiceGroup.getParticpantIdentifier ()
                                                                                    .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
                                                                                                                         sDisplayName)

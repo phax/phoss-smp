@@ -153,6 +153,16 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> to show extension details, <code>false</code> to
+   *         just show a yes or no indicator. Default is <code>false</code>.
+   * @since 5.1.0
+   */
+  public static boolean isStartPageExtensionsShow ()
+  {
+    return s_aConfigFile.getAsBoolean ("webapp.startpage.extensions.show", false);
+  }
+
+  /**
    * @return <code>true</code> to show no participants on the start page.
    *         Default is <code>false</code>.
    * @since 5.0.4
