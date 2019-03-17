@@ -34,6 +34,8 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
  * of the "smp-server.properties" file. The order of the properties file
  * resolving is as follows:
  * <ol>
+ * <li>Check for the value of the environment variable
+ * <code>SMP_SERVER_CONFIG</code> (since 5.1.0)</li>
  * <li>Check for the value of the system property
  * <code>peppol.smp.server.properties.path</code></li>
  * <li>Check for the value of the system property
