@@ -21,13 +21,17 @@ import org.eclipse.persistence.config.CacheUsage;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsMap;
+import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.wrapper.Wrapper;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
@@ -48,6 +52,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
@@ -61,8 +66,17 @@ import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledManager implements
                                                 ISMPServiceInformationManager
 {
+  private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
+
   public SQLServiceInformationManager ()
   {}
+
+  @Nonnull
+  @ReturnsMutableObject
+  public CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ()
+  {
+    return m_aCBs;
+  }
 
   private static void _update (@Nonnull final EntityManager aEM,
                                @Nonnull final DBServiceMetadata aDBMetadata,
@@ -199,44 +213,52 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
   }
 
   @Nonnull
-  public ESuccess mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aServiceInformation)
+  public ESuccess mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aSMPServiceInformation)
   {
-    ValueEnforcer.notNull (aServiceInformation, "ServiceInformation");
+    ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
 
+    final MutableBoolean aUpdated = new MutableBoolean (false);
     JPAExecutionResult <DBServiceMetadata> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
-      final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceInformation.getServiceGroup ()
-                                                                                            .getParticpantIdentifier (),
-                                                                         aServiceInformation.getDocumentTypeIdentifier ());
+      final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aSMPServiceInformation.getServiceGroup ()
+                                                                                               .getParticpantIdentifier (),
+                                                                         aSMPServiceInformation.getDocumentTypeIdentifier ());
       DBServiceMetadata aDBMetadata = aEM.find (DBServiceMetadata.class, aDBMetadataID);
+      aUpdated.set (aDBMetadata != null);
       if (aDBMetadata != null)
       {
         // Edit an existing one
-        _update (aEM, aDBMetadata, aServiceInformation);
+        _update (aEM, aDBMetadata, aSMPServiceInformation);
         aEM.merge (aDBMetadata);
       }
       else
       {
         // Create a new one
-        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aServiceInformation.getServiceGroup ()
-                                                                                            .getParticpantIdentifier ());
+        final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aSMPServiceInformation.getServiceGroup ()
+                                                                                               .getParticpantIdentifier ());
         final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
         if (aDBServiceGroup == null)
-          throw new IllegalStateException ("Failed to resolve service group for " + aServiceInformation);
+          throw new IllegalStateException ("Failed to resolve service group for " + aSMPServiceInformation);
 
         aDBMetadata = new DBServiceMetadata (aDBMetadataID,
                                              aDBServiceGroup,
-                                             aServiceInformation.getExtensionAsString ());
-        _update (aEM, aDBMetadata, aServiceInformation);
+                                             aSMPServiceInformation.getExtensionAsString ());
+        _update (aEM, aDBMetadata, aSMPServiceInformation);
         aEM.persist (aDBMetadata);
       }
       return aDBMetadata;
     });
+
     if (ret.hasException ())
-    {
       return ESuccess.FAILURE;
-    }
+
+    // Callback outside of transaction
+    if (aUpdated.booleanValue ())
+      m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aSMPServiceInformation));
+    else
+      m_aCBs.forEach (x -> x.onSMPServiceInformationCreated (aSMPServiceInformation));
+
     return ESuccess.SUCCESS;
   }
 
@@ -280,10 +302,14 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       aEM.remove (aDBMetadata);
       return EChange.CHANGED;
     });
+
     if (ret.hasException ())
-    {
       return EChange.UNCHANGED;
-    }
+
+    // Callback outside of transaction
+    if (ret.get ().isChanged ())
+      m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
+
     return ret.get ();
   }
 
@@ -293,20 +319,36 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
     if (aServiceGroup == null)
       return EChange.UNCHANGED;
 
+    final Wrapper <ICommonsList <ISMPServiceInformation>> aDeletedInfos = new Wrapper <> ();
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
+      // Remember what will be deleted (never null)
+      aDeletedInfos.set (getAllSMPServiceInformationOfServiceGroup (aServiceGroup));
+
       final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadata p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
                                                         DBServiceMetadataRedirection.class)
                                           .setParameter ("scheme",
                                                          aServiceGroup.getParticpantIdentifier ().getScheme ())
                                           .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
                                           .executeUpdate ();
+
+      if (aDeletedInfos.get ().size () != nCnt)
+        if (LOGGER.isWarnEnabled ())
+          LOGGER.warn ("Retrieved " +
+                       aDeletedInfos.get ().size () +
+                       " ServiceMetadata entries but deleted " +
+                       nCnt +
+                       " - this number should be identical!");
+
       return EChange.valueOf (nCnt > 0);
     });
     if (ret.hasException ())
-    {
       return EChange.UNCHANGED;
-    }
+
+    // Callback outside of transaction
+    for (final ISMPServiceInformation aSMPServiceInformation : aDeletedInfos.get ())
+      m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
+
     return ret.get ();
   }
 
@@ -344,9 +386,8 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return EChange.valueOf (nCnt > 0);
     });
     if (ret.hasException ())
-    {
       return EChange.UNCHANGED;
-    }
+
     return ret.get ();
   }
 
@@ -394,9 +435,7 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                                    DBServiceMetadata.class)
                                                      .getResultList ());
     if (ret.hasException ())
-    {
       return new CommonsArrayList <> ();
-    }
 
     final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
     for (final DBServiceMetadata aDBMetadata : ret.get ())
@@ -413,9 +452,8 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return Long.valueOf (nCount);
     });
     if (ret.hasException ())
-    {
       return 0;
-    }
+
     return ret.get ().intValue ();
   }
 
@@ -436,13 +474,11 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
                                                                       aServiceGroup.getParticpantIdentifier ()
                                                                                    .getValue ())
                                                        .getResultList ());
-      if (ret.hasException ())
+      if (!ret.hasException ())
       {
-        return new CommonsArrayList <> ();
+        for (final DBServiceMetadata aDBMetadata : ret.get ())
+          aServiceInformations.add (_convert (aDBMetadata));
       }
-
-      for (final DBServiceMetadata aDBMetadata : ret.get ())
-        aServiceInformations.add (_convert (aDBMetadata));
     }
     return aServiceInformations;
   }
@@ -477,9 +513,8 @@ public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledMan
       return getEntityManager ().find (DBServiceMetadata.class, aDBMetadataID, aProps);
     });
     if (ret.hasException ())
-    {
       return null;
-    }
+
     return ret.get ();
   }
 

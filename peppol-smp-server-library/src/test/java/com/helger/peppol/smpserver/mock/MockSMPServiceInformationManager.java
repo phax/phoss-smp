@@ -13,6 +13,8 @@ package com.helger.peppol.smpserver.mock;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
@@ -22,6 +24,7 @@ import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 
 /**
@@ -31,6 +34,15 @@ import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationMana
  */
 final class MockSMPServiceInformationManager implements ISMPServiceInformationManager
 {
+  private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
+
+  @Nonnull
+  @ReturnsMutableObject
+  public CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ()
+  {
+    return m_aCBs;
+  }
+
   @Nonnull
   public ESuccess mergeSMPServiceInformation (final ISMPServiceInformation aServiceInformation)
   {

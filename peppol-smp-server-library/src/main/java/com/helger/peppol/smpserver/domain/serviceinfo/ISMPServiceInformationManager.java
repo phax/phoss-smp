@@ -15,6 +15,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
@@ -31,6 +33,13 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
  */
 public interface ISMPServiceInformationManager
 {
+  /**
+   * @return A non-<code>null</code> mutable list of callbacks.
+   */
+  @Nonnull
+  @ReturnsMutableObject
+  CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ();
+
   /**
    * Create or update an SMP service information object. An existing service
    * information object is searched by service group, document type ID, process

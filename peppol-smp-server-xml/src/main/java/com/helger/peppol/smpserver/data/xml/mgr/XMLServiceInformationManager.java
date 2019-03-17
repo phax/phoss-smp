@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.equals.EqualsHelper;
@@ -39,6 +41,7 @@ import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
 import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
@@ -56,9 +59,18 @@ public final class XMLServiceInformationManager extends
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (XMLServiceInformationManager.class);
 
+  private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
+
   public XMLServiceInformationManager (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceInformation.class, sFilename);
+  }
+
+  @Nonnull
+  @ReturnsMutableObject
+  public CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ()
+  {
+    return m_aCBs;
   }
 
   @Nullable
@@ -119,6 +131,8 @@ public final class XMLServiceInformationManager extends
 
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - updated");
+
+      m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aSMPServiceInformation));
     }
     else
     {
@@ -130,7 +144,8 @@ public final class XMLServiceInformationManager extends
         if (aOldInformation != null)
         {
           // Delete only if present
-          bRemovedOld = EqualsHelper.identityEqual (internalDeleteItem (aOldInformation.getID ()), aOldInformation);
+          final SMPServiceInformation aDeletedInformation = internalDeleteItem (aOldInformation.getID ());
+          bRemovedOld = EqualsHelper.identityEqual (aDeletedInformation, aOldInformation);
         }
 
         internalCreateItem (aSMPServiceInformation);
@@ -164,6 +179,11 @@ public final class XMLServiceInformationManager extends
                                         aSMPServiceInformation.getExtensionAsString ());
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - created");
+
+      if (aOldInformation != null)
+        m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aSMPServiceInformation));
+      else
+        m_aCBs.forEach (x -> x.onSMPServiceInformationCreated (aSMPServiceInformation));
     }
     return ESuccess.SUCCESS;
   }
@@ -201,6 +221,8 @@ public final class XMLServiceInformationManager extends
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceInformation - success");
+
+    m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
 
     return EChange.CHANGED;
   }
