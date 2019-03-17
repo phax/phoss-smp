@@ -33,12 +33,14 @@ import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
+import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
@@ -48,6 +50,7 @@ import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.ESMPRESTType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.domain.SMPMetaManager;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
@@ -592,6 +595,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
+    final boolean bShowExtensionDetails = SMPWebAppConfiguration.isServiceGroupsExtensionsShow ();
 
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
 
@@ -613,7 +617,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
-                                        new DTCol (new HCSpan ().addChild ("Ext?")
+                                        new DTCol (new HCSpan ().addChild (bShowExtensionDetails ? "Ext" : "Ext?")
                                                                 .setTitle ("Is an Extension present?")),
                                         new DTCol (new HCSpan ().addChild ("Docs")
                                                                 .setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
@@ -642,7 +646,17 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
       aRow.addCell (SMPCommonUI.getOwnerName (aCurObject.getOwnerID ()));
-      aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.hasExtension (), aDisplayLocale));
+      if (bShowExtensionDetails)
+      {
+        if (aCurObject.hasExtension ())
+          aRow.addCell (new HCCode ().addChildren (HCExtHelper.nl2divList (aCurObject.getFirstExtensionXML ())));
+        else
+          aRow.addCell ();
+      }
+      else
+      {
+        aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.hasExtension (), aDisplayLocale));
+      }
       aRow.addCell (Integer.toString (aSIs.size ()));
       aRow.addCell (Integer.toString (nProcesses));
       aRow.addCell (Integer.toString (nEndpoints));

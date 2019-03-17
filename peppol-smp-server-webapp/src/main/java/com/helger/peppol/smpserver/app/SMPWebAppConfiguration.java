@@ -156,8 +156,9 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> to show extension details, <code>false</code> to
-   *         just show a yes or no indicator. Default is <code>false</code>.
+   * @return <code>true</code> to show extension details on the public start
+   *         page, <code>false</code> to just show a yes or no indicator.
+   *         Default is <code>false</code>.
    * @since 5.1.0
    */
   public static boolean isStartPageExtensionsShow ()
@@ -184,5 +185,16 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static String getDirectoryName ()
   {
     return s_aConfigFile.getAsString ("webapp.directory.name", "PEPPOL Directory");
+  }
+
+  /**
+   * @return <code>true</code> to show extension details in the secure service
+   *         group list, <code>false</code> to just show a yes or no indicator.
+   *         Default is <code>false</code>.
+   * @since 5.1.0
+   */
+  public static boolean isServiceGroupsExtensionsShow ()
+  {
+    return s_aConfigFile.getAsBoolean ("webapp.servicegroups.extensions.show", true);
   }
 }
