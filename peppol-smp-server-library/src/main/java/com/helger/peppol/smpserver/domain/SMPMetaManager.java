@@ -23,17 +23,13 @@ import com.helger.peppol.identifier.factory.BDXRIdentifierFactory;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.factory.SimpleIdentifierFactory;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.ESMPIdentifierType;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.backend.SMPBackendRegistry;
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
 import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.peppol.smpserver.domain.servicegroup.LoggingSMPServiceGroupCallback;
-import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
 import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
 import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
@@ -119,21 +115,10 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     if (m_aBusinessCardMgr != null)
     {
       // If service group is deleted, also delete respective business card
-      m_aServiceGroupMgr.serviceGroupCallbacks ().add (new ISMPServiceGroupCallback ()
-      {
-        @Override
-        public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID)
-        {
-          final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
-          final ISMPBusinessCard aBusinessCard = m_aBusinessCardMgr.getSMPBusinessCardOfID (sServiceGroupID);
-          if (aBusinessCard != null)
-            m_aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
-        }
-      });
+      m_aServiceGroupMgr.serviceGroupCallbacks ().add (new BusinessCardSMPServiceGroupCallback (m_aBusinessCardMgr));
     }
   }
 
-  @SuppressWarnings ("null")
   @Override
   protected void onAfterInstantiation (@Nonnull final IScope aScope)
   {
