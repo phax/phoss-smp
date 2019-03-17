@@ -34,6 +34,8 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
  * This class provides access to the web application settings. The order of the
  * properties file resolving is as follows:
  * <ol>
+ * <li>Check for the value of the environment variable
+ * <code>SMP_WEBAPP_CONFIG</code> (since 5.1.0)</li>
  * <li>Check for the value of the system property
  * <code>peppol.smp.webapp.properties.path</code></li>
  * <li>Check for the value of the system property
@@ -58,7 +60,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
 
   static
   {
-    final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromSystemProperty ("peppol.smp.webapp.properties.path")
+    final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromEnvVar ("SMP_WEBAPP_CONFIG")
+                                                           .addPathFromSystemProperty ("peppol.smp.webapp.properties.path")
                                                            .addPathFromSystemProperty ("smp.webapp.properties.path")
                                                            .addPath ("private-" + PATH_WEBAPP_PROPERTIES)
                                                            .addPath (PATH_WEBAPP_PROPERTIES);
