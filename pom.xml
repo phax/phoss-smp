@@ -277,6 +277,7 @@
             <exclude>**/*.j2</exclude>
             <exclude>**/*.p12</exclude>
             <exclude>**/*.jks</exclude>
+            <exclude>**/*.txt</exclude>
           </excludes>
         </configuration>
       </plugin>
