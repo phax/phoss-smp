@@ -156,6 +156,16 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> to show no participants on the start page.
+   *         Default is <code>false</code>.
+   * @since 5.0.4
+   */
+  public static boolean isStartPageParticipantsNone ()
+  {
+    return s_aConfigFile.getAsBoolean ("webapp.startpage.participants.none", false);
+  }
+
+  /**
    * @return <code>true</code> to show extension details on the public start
    *         page, <code>false</code> to just show a yes or no indicator.
    *         Default is <code>false</code>.
@@ -164,16 +174,6 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static boolean isStartPageExtensionsShow ()
   {
     return s_aConfigFile.getAsBoolean ("webapp.startpage.extensions.show", false);
-  }
-
-  /**
-   * @return <code>true</code> to show no participants on the start page.
-   *         Default is <code>false</code>.
-   * @since 5.0.4
-   */
-  public static boolean isStartPageParticipantsNone ()
-  {
-    return s_aConfigFile.getAsBoolean ("webapp.startpage.participants.none", false);
   }
 
   /**
@@ -195,6 +195,6 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isServiceGroupsExtensionsShow ()
   {
-    return s_aConfigFile.getAsBoolean ("webapp.servicegroups.extensions.show", true);
+    return s_aConfigFile.getAsBoolean ("webapp.servicegroups.extensions.show", false);
   }
 }
