@@ -67,10 +67,8 @@
 
     home_dir: "/home/{{ansible_user_id}}"    
     sources_dir: "{{ home_dir }}/sources"
-#    tomcat_ver: "8.0.41"
-#    tomcat_md5: "ae4cedb59d6dd66bcbcd4e3822ebcfab"
-    tomcat_ver: "8.5.11"
-    tomcat_md5: "56839d68e04d02f7e832978d27633b96"
+    tomcat_ver: "8.5.38"
+    tomcat_sha512: "3a3e624014faf87091e6dbb8bad13c68240955d62301d22cf3d75a1766859dd97500d6850fbd5d3dc012f08f9301eb24c24fa7175bcca616767fa5c18875072d"
     tomcat_dir: "{{home_dir}}/apache-tomcat-{{tomcat_ver}}"
     smp_data: "{{tomcat_dir}}/smp-data"
     smp_keystore_path: "{{tomcat_dir}}/conf/smpKeystore.jks"
@@ -84,7 +82,7 @@
     get_url: 
       url: "http://www-eu.apache.org/dist/tomcat/tomcat-8/v{{tomcat_ver}}/bin/apache-tomcat-{{tomcat_ver}}.tar.gz"
       dest: "{{home_dir}}/Downloads/apache-tomcat-{{tomcat_ver}}.tar.gz"
-      checksum: md5:{{tomcat_md5}}
+      checksum: sha512:{{tomcat_sha512}}
   
   - name: Deploy Tomcat {{tomcat_ver}}
     unarchive:
