@@ -38,6 +38,8 @@ This allows you to define a password for the `ubuntu` user which you can than us
 
 Note: Windows users need an ssh executable in their PATH. Get one at https://github.com/PowerShell/Win32-OpenSSH/releases/
 
-Note: because the `ubuntu/xenial64` box is used as the basis, the default user is `ubuntu` and **NOT** `vagrant`!
+Note: because the `ubuntu/xenial64` box is used as the basis, the default shell user is `ubuntu` and **NOT** `vagrant`!
 
 Note: the virtual machine has an English keyboard layout! Use `sudo dpkg-reconfigure keyboard-configuration` to change it.
+
+Note: when using Virtual Box 6.x on Windows, make sure to disable Hyper V and reboot Windows
