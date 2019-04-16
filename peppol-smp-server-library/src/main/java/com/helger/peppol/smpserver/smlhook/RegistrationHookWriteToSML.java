@@ -63,13 +63,15 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     if (aSMLInfo == null)
       throw new IllegalStateException ("Failed to get SML manage participant endpoint URL");
     final URL aSMLEndpointURL = aSMLInfo.getManageParticipantIdentifierEndpointAddress ();
+    final String sEndpointURL = aSMLEndpointURL.toExternalForm ();
+    final String sLowerURL = sEndpointURL.toLowerCase (Locale.US);
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Performing SML query to '" + aSMLEndpointURL.toExternalForm () + "'");
+      LOGGER.info ("Performing SML query to '" + sEndpointURL + "'");
 
     // SSL socket factory
     SSLSocketFactory aSocketFactory;
-    if ("https".equals (aSMLEndpointURL.getProtocol ()))
+    if (sLowerURL.startsWith ("https://"))
     {
       // https connection
       if (!SMPKeyManager.isCertificateValid ())
@@ -93,9 +95,11 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
 
     // Hostname verifier
     HostnameVerifier aHostnameVerifier;
-    final String sLowerURL = aSMLEndpointURL.toExternalForm ().toLowerCase (Locale.US);
     if (sLowerURL.contains ("//localhost") || sLowerURL.contains ("//127.0.0.1"))
-      aHostnameVerifier = new HostnameVerifierVerifyAll ();
+    {
+      // Accept all hostnames
+      aHostnameVerifier = new HostnameVerifierVerifyAll (false);
+    }
     else
       aHostnameVerifier = null;
 

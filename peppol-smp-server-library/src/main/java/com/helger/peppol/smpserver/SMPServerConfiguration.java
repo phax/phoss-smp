@@ -459,7 +459,7 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return A single object for all http proxy settings. May be
+   * @return A single object for all http (but not https) proxy settings. May be
    *         <code>null</code>.
    * @see #getAsHttpsProxySettings()
    * @since 5.0.7
@@ -475,7 +475,7 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return A single object for all https proxy settings. May be
+   * @return A single object for all https (but not http) proxy settings. May be
    *         <code>null</code>.
    * @see #getAsHttpProxySettings()
    * @since 5.0.7
