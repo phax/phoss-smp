@@ -110,9 +110,9 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     final Integer aConnectionTimeoutMS = SMPServerConfiguration.getSMLConnectionTimeoutMS ();
     if (aConnectionTimeoutMS != null)
       ret.setConnectionTimeoutMS (aConnectionTimeoutMS.intValue ());
-    final Integer aRequestTimeoutMS = SMPServerConfiguration.getSMLRequestTimeoutMS ();
-    if (aRequestTimeoutMS != null)
-      ret.setRequestTimeoutMS (aRequestTimeoutMS.intValue ());
+    final int nRequestTimeoutMS = SMPServerConfiguration.getSMLRequestTimeoutMS ();
+    if (nRequestTimeoutMS >= 0)
+      ret.setRequestTimeoutMS (nRequestTimeoutMS);
     return ret;
   }
 

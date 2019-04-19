@@ -20,6 +20,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.CGlobal;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
@@ -97,6 +98,7 @@ public final class SMPServerConfiguration
   public static final String DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME = "https://directory.peppol.eu";
   public static final boolean DEFAULT_SML_ACTIVE = false;
   public static final boolean DEFAULT_SML_REQUIRED = true;
+  public static final int DEFAULT_SML_REQUEST_TIMEOUT_MS = 30 * (int) CGlobal.MILLISECONDS_PER_SECOND;
 
   /**
    * The name of the primary system property which points to the
@@ -386,10 +388,9 @@ public final class SMPServerConfiguration
    *         timeout should be used.
    * @since 5.0.4
    */
-  @Nullable
-  public static Integer getSMLRequestTimeoutMS ()
+  public static int getSMLRequestTimeoutMS ()
   {
-    return getConfigFile ().getAsIntObj (KEY_SML_REQUEST_TIMEOUT_MS);
+    return getConfigFile ().getAsInt (KEY_SML_REQUEST_TIMEOUT_MS, DEFAULT_SML_REQUEST_TIMEOUT_MS);
   }
 
   /**
