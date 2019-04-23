@@ -19,7 +19,8 @@
 FROM tomcat:8.5
 
 # Special encoded slash handling for SMP
-ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"
+# Use non-blocking random
+ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.security.egd=file:/dev/urandom"
 
 # Install vim
 RUN apt-get update \
