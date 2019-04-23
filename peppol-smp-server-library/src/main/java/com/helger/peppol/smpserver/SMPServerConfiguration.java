@@ -384,8 +384,8 @@ public final class SMPServerConfiguration
 
   /**
    * @return The request timeout in milliseconds used for connecting to the SML
-   *         server. May be <code>null</code> in which case the system default
-   *         timeout should be used.
+   *         server. The default is defined in
+   *         {@link #DEFAULT_SML_REQUEST_TIMEOUT_MS} since 5.1.1.
    * @since 5.0.4
    */
   public static int getSMLRequestTimeoutMS ()

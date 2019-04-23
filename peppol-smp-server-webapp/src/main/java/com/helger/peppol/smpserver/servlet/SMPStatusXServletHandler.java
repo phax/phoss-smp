@@ -96,7 +96,7 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
       aStatusData.add ("smp.sml.dnszone", aSMLInfo.getDNSZone ());
     }
     aStatusData.addIfNotNull ("smp.sml.connection-timeout-ms", SMPServerConfiguration.getSMLConnectionTimeoutMS ());
-    aStatusData.addIfNotNull ("smp.sml.request-timeout-ms", SMPServerConfiguration.getSMLRequestTimeoutMS ());
+    aStatusData.add ("smp.sml.request-timeout-ms", SMPServerConfiguration.getSMLRequestTimeoutMS ());
 
     // Directory information
     aStatusData.add ("smp.pd.enabled", aSettings.isPEPPOLDirectoryIntegrationEnabled ());
