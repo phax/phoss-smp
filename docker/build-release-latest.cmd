@@ -21,7 +21,7 @@ set XVER=5.1.1
 docker pull tomcat:8.5
 if errorlevel 1 goto end
 
-docker build --build-arg VERSION=%XVER% -t phoss-smp-release-binary-xml-%XVER% -f Dockerfile-release-binary-xml .
+docker build --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-xml-%XVER% -f Dockerfile-release-binary-xml .
 if errorlevel 1 goto end
 
 docker tag phoss-smp-release-binary-xml-%XVER% phelger/smp:%XVER%

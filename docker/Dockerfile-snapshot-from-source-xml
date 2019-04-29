@@ -20,7 +20,7 @@ LABEL version="HEAD"
  
 # Checkout from git and build
 WORKDIR /home/git
-RUN echo Building phoss SMP $VERSION \
+RUN echo Building phoss SMP latest SNAPSHOT \
   && git clone https://github.com/phax/peppol-smp-server.git . \
   && git checkout -b work \
   && mvn clean install -DskipTests
