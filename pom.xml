@@ -125,7 +125,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>6.2.3</version>
+        <version>6.2.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -150,7 +150,7 @@
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.15</version>
+        <version>8.0.16</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
