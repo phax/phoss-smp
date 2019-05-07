@@ -12,6 +12,12 @@ E82gMQvGGpB6yGoS5sACLozenVS+DJlGSvIvzXpZVcqkpf+NJGGadDPX0Cii3hIetirjha3/bDekGOZx
 Q1/P0w7NEHjP+EsOs/hg/dMRAC7WxoRCY/v8lEOK+ady9Zkz14blqxEAN+YmuMwhakojmoXZYzmFbBL5IMKsJkvM4MRCWP95Om45Z5J8YN264g/3fn7T6H1k
 Atyrchr3PhqWwwETaKWcMDTrywRl9KDaL3sXQNpf+u4M6HkMRWciYoMd06sLrZwXhVdT0NYXXVbRT8ieWSXHIOaEnAR94Hcs/pDofv9Ogi0HObxNic9FvFwD
 2mTVRW0bORg2EFAvb0oNQBZUV3NKGqeTEHv4PbBb1idlLU1hweNyncjnGppKPSuv36EJb9n/dGoFQTbluByXjkgJ/g/iX4="
+    - DOCKER_USERNAME=phelger
+    - secure: "O6MzNHzpMaOcp4Rnwie7mSX27dLs9kdkfH/1QIPmu+XpKsYGh7lmRqV/PvPJKpfMXj3nP+wo3B05pNxO62VMx9c3ZlKmkRGxxnUnQqKS6uNPcKjXfAe8DB7TsrQ27jwNya+Upr8MhIikDVQIPHxq0
+KJPT8N3asYI/CpUhbXE9eeDmJow3/5qz57Y2+cA0hrcRZjIocsVqa0Mk2/MWXZ1nAA/XG4y9lnqAOKWJLyLn2nFbkEZMqv2jPcm6cZXBjqoOgse26MDt8WJ5MQO2aQkuArATgm+zbpJn9EpdUiJYymo/CwLVXX+h
+7feVQFZ/L1ZyOX/lZMHPUC+iGlEdQqEcX2Dwj9+nbNbX6iXV5Wwlsx0K6Nsn2gxCcXt+S/3+pas3iSMTQpqV0iZ58RLS2naTBX7Os/RFEYd5sbQPncQ3NV68x1r+rir+BBm9UAxeOInMHLeniqkEhyvGS2tOuxT5
+Q6NjWK7QYd3tCCWB6Klv1Z+vVS4m8KM07aMr9gtnvrOVJGTbMc76jpefFFmjHUnY0EC+DJI1Tj7yJhPdC2W3/N9udTW5vr/96AB4xS5P0CfjeGcegqf1Gz7PiCUFnCsY8PTpFlrDqTI8utQu8vazJoEEwe0xZnb1
+ZPLWVXouSl6cpXzE412fDmZ82mPafrsAal3mUJel8a2lUco1mYi9mk="
 
 addons:
   sonarcloud:
@@ -46,6 +52,9 @@ jobs:
         - bash <(curl -s https://codecov.io/bash)
         - docker pull tomcat:9-jre11
         - docker build -t phoss-smp-snapshot-from-source-xml -f docker/Dockerfile-snapshot-from-source-xml .
+        - docker tag phoss-smp-snapshot-from-source-xml phelger/smp:snapshot
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push phelger/smp:snapshot
     - stage: test
       jdk: openjdk11
       script:
