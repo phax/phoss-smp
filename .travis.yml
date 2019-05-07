@@ -1,6 +1,7 @@
 dist: xenial
 sudo: required
 language: java
+services: docker
 
 env:
   global:
@@ -43,6 +44,7 @@ jobs:
       after_success:
         - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
         - bash <(curl -s https://codecov.io/bash)
+        - docker build -t phoss-smp-snapshot-from-source-xml -f docker/Dockerfile-snapshot-from-source-xml .
     - stage: test
       jdk: openjdk11
       script:
