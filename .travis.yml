@@ -47,10 +47,10 @@ jobs:
       jdk: openjdk8
       script:
         - mvn test -B -P coverage sonar:sonar
+        - docker pull tomcat:9-jre11
       after_success:
         - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
         - bash <(curl -s https://codecov.io/bash)
-        - docker pull tomcat:9-jre11
         - docker build -t phoss-smp-snapshot-from-source-xml -f docker/Dockerfile-snapshot-from-source-xml .
         - docker tag phoss-smp-snapshot-from-source-xml phelger/smp:snapshot
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
