@@ -40,7 +40,8 @@ WORKDIR /home/git
 RUN echo Building phoss SMP latest SNAPSHOT \
   && git clone https://github.com/phax/peppol-smp-server.git . \
   && git checkout -b work \
-  && mvn clean install -DskipTests
-
+  && mvn clean install -DskipTests \
 # Copy result to Tomcat webapps dir
-RUN cp -r peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-*/ $CATALINA_HOME/webapps/ROOT
+  && cp -r peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-*/ $CATALINA_HOME/webapps/ROOT \
+  && mvn clean \
+  && rm -rf /root/.m2/repository
