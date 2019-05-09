@@ -55,6 +55,7 @@ jobs:
         - docker tag phoss-smp-snapshot-from-source-xml phelger/smp:snapshot
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker push phelger/smp:snapshot
+        - docker logout
     - stage: test
       jdk: openjdk11
       script:
