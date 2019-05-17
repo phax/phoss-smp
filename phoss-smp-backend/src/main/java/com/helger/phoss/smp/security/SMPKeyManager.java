@@ -49,7 +49,6 @@ import org.w3c.dom.Element;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.exception.InitializationException;
-import com.helger.commons.random.RandomHelper;
 import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.phoss.smp.SMPServerConfiguration;
@@ -203,7 +202,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
     // Assign key manager and empty trust manager to SSL/TLS context
     final SSLContext aSSLCtx = SSLContext.getInstance ("TLS");
-    aSSLCtx.init (aKeyManagerFactory.getKeyManagers (), aTrustManagers, RandomHelper.getSecureRandom ());
+    aSSLCtx.init (aKeyManagerFactory.getKeyManagers (), aTrustManagers, null);
     return aSSLCtx;
   }
 
