@@ -22,6 +22,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.impl.CommonsHashSet;
+import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
@@ -46,10 +49,12 @@ import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
@@ -57,7 +62,9 @@ import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
+import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
+import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
@@ -69,6 +76,15 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
   private static final String FIELD_NAME = "name";
   private static final String FIELD_DEPRECATED = "deprecated";
   private static final boolean DEFAULT_DEPRECATED = false;
+  private static final String ACTION_ENSURE_DEFAULT = "ensure-default";
+
+  private static final ICommonsSet <ESMPTransportProfile> DEFAULT_PROFILES = new CommonsHashSet <> ();
+  private static final ICommonsSet <String> DEFAULT_PROFILE_IDS;
+  static
+  {
+    DEFAULT_PROFILES.addAll (ESMPTransportProfile.values (), x -> !x.isDeprecated ());
+    DEFAULT_PROFILE_IDS = new CommonsHashSet <> (DEFAULT_PROFILES, ESMPTransportProfile::getID);
+  }
 
   public PageSecureTransportProfile (@Nonnull @Nonempty final String sID)
   {
@@ -100,6 +116,50 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
                                                                             "'!"));
       }
     });
+    addCustomHandler (ACTION_ENSURE_DEFAULT,
+                      new AbstractBootstrapWebPageActionHandler <ISMPTransportProfile, WebPageExecutionContext> (false)
+                      {
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nullable final ISMPTransportProfile aSelectedObject)
+                        {
+                          final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+                          final BootstrapSuccessBox aSuccessBox = new BootstrapSuccessBox ();
+                          final BootstrapSuccessBox aErrorBox = new BootstrapSuccessBox ();
+                          for (final ESMPTransportProfile eTP : DEFAULT_PROFILES)
+                            if (!aTransportProfileMgr.containsSMPTransportProfileWithID (eTP.getID ()))
+                            {
+                              if (aTransportProfileMgr.createSMPTransportProfile (eTP.getID (),
+                                                                                  eTP.getName (),
+                                                                                  eTP.isDeprecated ()) != null)
+                              {
+                                aSuccessBox.addChild (new HCDiv ().addChild ("Successfully created the transport profile '" +
+                                                                             eTP.getName () +
+                                                                             "' with ID '" +
+                                                                             eTP.getID () +
+                                                                             "'"));
+                              }
+                              else
+                              {
+                                aErrorBox.addChild (new HCDiv ().addChild ("Failed to create the transport profile '" +
+                                                                           eTP.getName () +
+                                                                           "' with ID '" +
+                                                                           eTP.getID () +
+                                                                           "'"));
+                              }
+                            }
+                          final HCNodeList aSummary = new HCNodeList ().addChild (aSuccessBox.hasChildren () ? aSuccessBox
+                                                                                                             : null)
+                                                                       .addChild (aErrorBox.hasChildren () ? aErrorBox
+                                                                                                           : null);
+                          if (aSummary.hasChildren ())
+                            aWPEC.postRedirectGetInternal (aSummary);
+                          else
+                            aWPEC.getNodeList ()
+                                 .addChild (new BootstrapInfoBox ().addChild ("All default transport profiles are already registered."));
+                          return EShowList.SHOW_LIST;
+                        }
+                      });
   }
 
   @Override
@@ -255,15 +315,29 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
 
     aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page lets you create custom transport profiles that can be used in service information endpoints."));
 
+    final ICommonsList <ISMPTransportProfile> aList = aTransportProfileMgr.getAllSMPTransportProfiles ();
+
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-    aToolbar.addButton ("Create new transport profile", createCreateURL (aWPEC), EDefaultIcon.NEW);
+    aToolbar.addChild (new BootstrapButton ().addChild ("Create new transport profile")
+                                             .setOnClick (createCreateURL (aWPEC))
+                                             .setIcon (EDefaultIcon.NEW));
+
+    final ICommonsSet <String> aExistingIDs = new CommonsHashSet <> (aList, ISMPTransportProfile::getID);
+    if (!aExistingIDs.containsAll (DEFAULT_PROFILE_IDS))
+    {
+      // Show button only on demand
+      aToolbar.addChild (new BootstrapButton ().addChild ("Ensure all default transport profiles")
+                                               .setOnClick (aWPEC.getSelfHref ()
+                                                                 .add (CPageParam.PARAM_ACTION, ACTION_ENSURE_DEFAULT))
+                                               .setIcon (EDefaultIcon.PLUS));
+    }
     aNodeList.addChild (aToolbar);
 
     final HCTable aTable = new HCTable (new DTCol ("ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Name"),
                                         new DTCol ("Deprecated?"),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPTransportProfile aCurObject : aTransportProfileMgr.getAllSMPTransportProfiles ())
+    for (final ISMPTransportProfile aCurObject : aList)
     {
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
 
