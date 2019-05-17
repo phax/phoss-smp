@@ -73,23 +73,35 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 {
   private enum EPredefinedCert
   {
+    // PEPPOL PKI v2
     PEPPOL_PILOT_V2 ("PEPPOL pilot v2",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK",
                      3),
     PEPPOL_PRODUCTION_V2 ("PEPPOL production v2",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK",
                           3),
+    // PEPPOL PKI v3
     PEPPOL_PILOT_V3 ("PEPPOL pilot v3",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
                      3),
     PEPPOL_PRODUCTION_V3 ("PEPPOL production v3",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
-                          3);
+                          3),
+    // TOOP Pilot PKI
+    TOOP_PILOT_SMP ("TOOP pilot", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3);
 
     private final String m_sName;
     private final String m_sIssuer;
     private final int m_nCerts;
 
+    /**
+     * @param sName
+     *        Display name
+     * @param sIssuer
+     *        Required issuer
+     * @param nCerts
+     *        Required depth of PKI
+     */
     private EPredefinedCert (@Nonnull @Nonempty final String sName,
                              @Nonnull @Nonempty final String sIssuer,
                              @Nonnegative final int nCerts)
