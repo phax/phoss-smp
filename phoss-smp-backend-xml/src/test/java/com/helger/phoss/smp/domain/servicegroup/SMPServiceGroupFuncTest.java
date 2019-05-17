@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.domain.servicegroup;
+package com.helger.phoss.smp.domain.servicegroup;
 
 import static org.junit.Assert.assertNotNull;
 

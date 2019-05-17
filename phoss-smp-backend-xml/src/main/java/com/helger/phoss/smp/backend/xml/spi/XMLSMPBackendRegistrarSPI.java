@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml.spi;
+package com.helger.phoss.smp.backend.xml.spi;
 
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.peppol.smpserver.data.xml.mgr.XMLManagerProvider;
 import com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI;
 import com.helger.phoss.smp.backend.ISMPBackendRegistry;
+import com.helger.phoss.smp.backend.xml.mgr.XMLManagerProvider;
 
 /**
  * Register the XML backend to the global SMP backend registry.

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.data.xml.mgr;
+package com.helger.phoss.smp.backend.xml.mgr;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -31,7 +31,7 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.smpserver.data.xml.domain.XMLDataUser;
+import com.helger.phoss.smp.backend.xml.domain.XMLDataUser;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.user.ISMPUser;
