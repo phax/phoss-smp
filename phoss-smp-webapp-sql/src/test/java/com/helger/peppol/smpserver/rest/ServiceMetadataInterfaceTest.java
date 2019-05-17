@@ -63,15 +63,15 @@ import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpclient.SMPClient;
 import com.helger.peppol.smpclient.exception.SMPClientException;
 import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
-import com.helger.peppol.smpserver.mock.MockSMPClient;
-import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
-import com.helger.peppol.smpserver.rest2.Rest2Filter;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.mock.MockSMPClient;
+import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
+import com.helger.phoss.smp.rest2.Rest2Filter;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.web.scope.mgr.WebScoped;
 

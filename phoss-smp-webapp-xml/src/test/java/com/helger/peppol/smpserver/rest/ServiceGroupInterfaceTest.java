@@ -50,11 +50,11 @@ import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smpclient.SMPClient;
 import com.helger.peppol.smpclient.exception.SMPClientException;
 import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
-import com.helger.peppol.smpserver.mock.MockSMPClient;
-import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
-import com.helger.peppol.smpserver.rest2.Rest2Filter;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.mock.MockSMPClient;
+import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
+import com.helger.phoss.smp.rest2.Rest2Filter;
 import com.helger.photon.security.CSecurity;
 
 /**

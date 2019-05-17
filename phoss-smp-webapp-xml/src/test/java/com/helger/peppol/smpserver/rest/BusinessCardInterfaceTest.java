@@ -57,12 +57,12 @@ import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smpserver.mock.SMPServerRESTTestRule;
-import com.helger.peppol.smpserver.rest2.Rest2Filter;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
+import com.helger.phoss.smp.rest2.Rest2Filter;
 import com.helger.photon.security.CSecurity;
 
 /**
