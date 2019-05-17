@@ -23,18 +23,18 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          id="SMP_WebApp" 
          version="2.5">
-  <display-name>phoss SMP server (SQL backend)</display-name>
+  <display-name>phoss SMP (SQL backend)</display-name>
 
   <listener>
-    <listener-class>com.helger.peppol.smpserver.servlet.SMPWebAppListener</listener-class>
+    <listener-class>com.helger.phoss.smp.servlet.SMPWebAppListener</listener-class>
   </listener>
   <listener>
-    <listener-class>com.helger.peppol.smpserver.servlet.TimeZoneCorrectorListener</listener-class>
+    <listener-class>com.helger.phoss.smp.servlet.TimeZoneCorrectorListener</listener-class>
   </listener>
 
   <filter>
     <filter-name>RestFilter</filter-name>
-    <filter-class>com.helger.peppol.smpserver.rest2.Rest2Filter</filter-class>
+    <filter-class>com.helger.phoss.smp.rest2.Rest2Filter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>RestFilter</filter-name>
@@ -45,7 +45,7 @@
   
   <servlet>
     <servlet-name>SMPStatusServlet</servlet-name>
-    <servlet-class>com.helger.peppol.smpserver.servlet.SMPStatusServlet</servlet-class>
+    <servlet-class>com.helger.phoss.smp.servlet.SMPStatusServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>SMPStatusServlet</servlet-name>
@@ -56,7 +56,7 @@
 
   <filter>
     <filter-name>SecureLoginFilter</filter-name>
-    <filter-class>com.helger.peppol.smpserver.servlet.SecureLoginFilter</filter-class>
+    <filter-class>com.helger.phoss.smp.servlet.SecureLoginFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>SecureLoginFilter</filter-name>
@@ -65,7 +65,7 @@
   
   <servlet>
     <servlet-name>SecureApplicationServlet</servlet-name>
-    <servlet-class>com.helger.peppol.smpserver.servlet.SecureApplicationServlet</servlet-class>
+    <servlet-class>com.helger.phoss.smp.servlet.SecureApplicationServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>SecureApplicationServlet</servlet-name>
@@ -74,7 +74,7 @@
   
   <servlet>
     <servlet-name>PublicApplicationServlet</servlet-name>
-    <servlet-class>com.helger.peppol.smpserver.servlet.PublicApplicationServlet</servlet-class>
+    <servlet-class>com.helger.phoss.smp.servlet.PublicApplicationServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>PublicApplicationServlet</servlet-name>
@@ -83,7 +83,7 @@
   
   <servlet>
     <servlet-name>RootServlet</servlet-name>
-    <servlet-class>com.helger.peppol.smpserver.servlet.SMPRootServlet</servlet-class>
+    <servlet-class>com.helger.phoss.smp.servlet.SMPRootServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>RootServlet</servlet-name>
