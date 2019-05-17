@@ -41,6 +41,7 @@ import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smpserver.SMPServerConfiguration;
 import com.helger.peppol.smpserver.app.CSMP;
+import com.helger.peppol.smpserver.app.SMPWebAppConfiguration;
 import com.helger.peppol.smpserver.ui.SMPCommonUI;
 import com.helger.photon.basic.app.appid.CApplicationID;
 import com.helger.photon.basic.app.appid.PhotonGlobalState;
@@ -106,6 +107,9 @@ public final class SMPRendererPublic
   private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC,
                                              @Nonnull final BootstrapNavbar aNavbar)
   {
+    if (!SMPWebAppConfiguration.isPublicLoginEnabled ())
+      return;
+
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final IUser aUser = aLEC.getLoggedInUser ();
 
@@ -286,9 +290,9 @@ public final class SMPRendererPublic
                              .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ()
                                                                                                     .addChild ("@philiphelger"))
                              .addChild (" - ")
-                             .addChild (new HCA (new SimpleURL ("https://github.com/phax/peppol-smp-server")).setTargetBlank ()
-                                                                                                             .addChild (CSMP.APPLICATION_TITLE +
-                                                                                                                        " on GitHub")));
+                             .addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
+                                                                                                     .addChild (CSMP.APPLICATION_TITLE +
+                                                                                                                " on GitHub")));
     return aDiv;
   }
 
