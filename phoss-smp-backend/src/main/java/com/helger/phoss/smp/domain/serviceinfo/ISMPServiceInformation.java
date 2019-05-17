@@ -124,7 +124,7 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    *         REST interface. Never <code>null</code>.
    */
   @Nonnull
-  com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR ();
+  com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ();
 
   @Nonnull
   static IComparator <ISMPServiceInformation> comparator ()

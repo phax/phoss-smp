@@ -23,7 +23,7 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.peppol.bdxr.smp1.BDXRExtensionConverter;
+import com.helger.peppol.bdxr.smp1.BDXR1ExtensionConverter;
 import com.helger.xml.serialize.write.XMLWriter;
 
 /**
@@ -54,7 +54,7 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
   {
     if (m_aExtensions.isEmpty ())
       return null;
-    return BDXRExtensionConverter.convertToString (m_aExtensions);
+    return BDXR1ExtensionConverter.convertToString (m_aExtensions);
   }
 
   @Nullable
@@ -76,9 +76,9 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
     {
       // Soft migration :)
       if (sExtension.charAt (0) == '<')
-        aNewExt = BDXRExtensionConverter.convertXMLToSingleExtension (sExtension);
+        aNewExt = BDXR1ExtensionConverter.convertXMLToSingleExtension (sExtension);
       else
-        aNewExt = BDXRExtensionConverter.convert (sExtension);
+        aNewExt = BDXR1ExtensionConverter.convert (sExtension);
     }
     if (m_aExtensions.equals (aNewExt))
       return EChange.UNCHANGED;

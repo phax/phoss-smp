@@ -110,7 +110,7 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
    *         REST interface. Never <code>null</code>.
    */
   @Nonnull
-  com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR ();
+  com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR1 ();
 
   @Nonnull
   static IComparator <ISMPProcess> comparator ()

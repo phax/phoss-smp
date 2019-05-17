@@ -125,7 +125,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   }
 
   @Nonnull
-  public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.RedirectType aRedirect = new com.helger.xsds.bdxr.smp1.RedirectType ();
     aRedirect.setHref (m_sTargetHref);

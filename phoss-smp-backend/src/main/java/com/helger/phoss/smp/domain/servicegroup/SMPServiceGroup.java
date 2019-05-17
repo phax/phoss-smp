@@ -123,7 +123,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   }
 
   @Nonnull
-  public com.helger.xsds.bdxr.smp1.ServiceGroupType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.ServiceGroupType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.ServiceGroupType ret = new com.helger.xsds.bdxr.smp1.ServiceGroupType ();
     // Explicit constructor call is needed here!

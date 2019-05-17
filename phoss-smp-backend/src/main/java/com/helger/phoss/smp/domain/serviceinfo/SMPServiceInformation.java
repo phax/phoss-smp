@@ -190,7 +190,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   }
 
   @Nonnull
-  public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.ServiceInformationType aSI = new com.helger.xsds.bdxr.smp1.ServiceInformationType ();
     // Explicit constructor call is needed here!
@@ -198,7 +198,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     aSI.setDocumentIdentifier (new BDXR1DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.xsds.bdxr.smp1.ProcessListType aProcesses = new com.helger.xsds.bdxr.smp1.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
-      aProcesses.addProcess (aProcess.getAsJAXBObjectBDXR ());
+      aProcesses.addProcess (aProcess.getAsJAXBObjectBDXR1 ());
     aSI.setProcessList (aProcesses);
     aSI.setExtension (getAsBDXRExtension ());
 

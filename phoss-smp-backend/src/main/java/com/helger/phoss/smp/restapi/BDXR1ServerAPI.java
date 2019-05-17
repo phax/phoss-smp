@@ -29,7 +29,7 @@ import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.bdxr.smp1.BDXRExtensionConverter;
+import com.helger.peppol.bdxr.smp1.BDXR1ExtensionConverter;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
@@ -69,20 +69,20 @@ import com.helger.xsds.bdxr.smp1.SignedServiceMetadataType;
  *
  * @author Philip Helger
  */
-public final class BDXRServerAPI
+public final class BDXR1ServerAPI
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (BDXRServerAPI.class);
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterInvocation = StatisticsManager.getKeyedCounterHandler (BDXRServerAPI.class.getName () +
+  private static final Logger LOGGER = LoggerFactory.getLogger (BDXR1ServerAPI.class);
+  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterInvocation = StatisticsManager.getKeyedCounterHandler (BDXR1ServerAPI.class.getName () +
                                                                                                                                    "$call");
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (BDXRServerAPI.class.getName () +
+  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (BDXR1ServerAPI.class.getName () +
                                                                                                                                 "$success");
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterError = StatisticsManager.getKeyedCounterHandler (BDXRServerAPI.class.getName () +
+  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterError = StatisticsManager.getKeyedCounterHandler (BDXR1ServerAPI.class.getName () +
                                                                                                                               "$error");
-  private static final String LOG_PREFIX = "[BDXR REST API] ";
+  private static final String LOG_PREFIX = "[BDXR1 REST API] ";
 
   private final ISMPServerAPIDataProvider m_aAPIProvider;
 
-  public BDXRServerAPI (@Nonnull final ISMPServerAPIDataProvider aDataProvider)
+  public BDXR1ServerAPI (@Nonnull final ISMPServerAPIDataProvider aDataProvider)
   {
     m_aAPIProvider = ValueEnforcer.notNull (aDataProvider, "DataProvider");
   }
@@ -138,7 +138,7 @@ public final class BDXRServerAPI
         aMetadataReferences.add (aMetadataReference);
       }
 
-      final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR ();
+      final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR1 ();
       aSG.setServiceMetadataReferenceCollection (aRefCollection);
 
       final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
@@ -146,7 +146,7 @@ public final class BDXRServerAPI
 
       for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
       {
-        aCompleteServiceGroup.addServiceMetadata (aServiceInfo.getAsJAXBObjectBDXR ());
+        aCompleteServiceGroup.addServiceMetadata (aServiceInfo.getAsJAXBObjectBDXR1 ());
       }
 
       if (LOGGER.isInfoEnabled ())
@@ -248,7 +248,7 @@ public final class BDXRServerAPI
       }
 
       // Then add the service metadata references
-      final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR ();
+      final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR1 ();
       final ServiceMetadataReferenceCollectionType aCollectionType = new ServiceMetadataReferenceCollectionType ();
       final List <ServiceMetadataReferenceType> aMetadataReferences = aCollectionType.getServiceMetadataReference ();
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
@@ -331,7 +331,7 @@ public final class BDXRServerAPI
       final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final String sExtension = BDXRExtensionConverter.convertToString (aServiceGroup.getExtension ());
+      final String sExtension = BDXR1ExtensionConverter.convertToString (aServiceGroup.getExtension ());
       if (aServiceGroupMgr.containsSMPServiceGroupWithID (aServiceGroupID))
         aServiceGroupMgr.updateSMPServiceGroup (aServiceGroupID, aSMPUser.getID (), sExtension);
       else
@@ -437,7 +437,7 @@ public final class BDXRServerAPI
       final SignedServiceMetadataType aSignedServiceMetadata = new SignedServiceMetadataType ();
       if (aRedirect != null)
       {
-        aSignedServiceMetadata.setServiceMetadata (aRedirect.getAsJAXBObjectBDXR ());
+        aSignedServiceMetadata.setServiceMetadata (aRedirect.getAsJAXBObjectBDXR1 ());
       }
       else
       {
@@ -447,7 +447,7 @@ public final class BDXRServerAPI
                                                                                                                            aDocTypeID);
         if (aServiceInfo != null)
         {
-          aSignedServiceMetadata.setServiceMetadata (aServiceInfo.getAsJAXBObjectBDXR ());
+          aSignedServiceMetadata.setServiceMetadata (aServiceInfo.getAsJAXBObjectBDXR1 ());
         }
         else
         {
@@ -585,8 +585,8 @@ public final class BDXRServerAPI
                                                     aDocTypeID,
                                                     aServiceMetadata.getRedirect ().getHref (),
                                                     aServiceMetadata.getRedirect ().getCertificateUID (),
-                                                    BDXRExtensionConverter.convertToString (aServiceMetadata.getRedirect ()
-                                                                                                            .getExtension ())) == null)
+                                                    BDXR1ExtensionConverter.convertToString (aServiceMetadata.getRedirect ()
+                                                                                                             .getExtension ())) == null)
         {
           if (LOGGER.isErrorEnabled ())
             LOGGER.error (sLog + " - Redirect - failure");
@@ -616,17 +616,17 @@ public final class BDXRServerAPI
                                                              aJAXBEndpoint.getServiceDescription (),
                                                              aJAXBEndpoint.getTechnicalContactUrl (),
                                                              aJAXBEndpoint.getTechnicalInformationUrl (),
-                                                             BDXRExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
+                                                             BDXR1ExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
               aEndpoints.add (aEndpoint);
             }
             final SMPProcess aProcess = new SMPProcess (SimpleProcessIdentifier.wrap (aJAXBProcess.getProcessIdentifier ()),
                                                         aEndpoints,
-                                                        BDXRExtensionConverter.convertToString (aJAXBProcess.getExtension ()));
+                                                        BDXR1ExtensionConverter.convertToString (aJAXBProcess.getExtension ()));
             aProcesses.add (aProcess);
           }
 
           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-          final String sExtensionXML = BDXRExtensionConverter.convertToString (aServiceInformation.getExtension ());
+          final String sExtensionXML = BDXR1ExtensionConverter.convertToString (aServiceInformation.getExtension ());
           if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup,
                                                                                      aDocTypeID,
                                                                                      aProcesses,

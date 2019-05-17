@@ -30,10 +30,10 @@ import org.w3c.dom.Document;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.mime.CMimeType;
-import com.helger.peppol.bdxr.smp1.marshal.BDXRMarshallerSignedServiceMetadataType;
+import com.helger.peppol.bdxr.smp1.marshal.BDXR1MarshallerSignedServiceMetadataType;
 import com.helger.peppol.smp.marshal.SMPMarshallerSignedServiceMetadataType;
 import com.helger.phoss.smp.SMPServerConfiguration;
-import com.helger.phoss.smp.restapi.BDXRServerAPI;
+import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.phoss.smp.security.SMPKeyManager;
@@ -76,11 +76,11 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
       }
       case BDXR:
       {
-        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType ret = new BDXRServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
+        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType ret = new BDXR1ServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
                                                                                                                                   sDocumentTypeID);
 
         // Convert to DOM document
-        final BDXRMarshallerSignedServiceMetadataType aMarshaller = new BDXRMarshallerSignedServiceMetadataType ();
+        final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType ();
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }

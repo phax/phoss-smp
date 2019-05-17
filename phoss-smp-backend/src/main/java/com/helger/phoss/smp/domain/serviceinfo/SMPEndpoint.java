@@ -194,8 +194,9 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   public com.helger.peppol.smp.EndpointType getAsJAXBObjectPeppol ()
   {
     final com.helger.peppol.smp.EndpointType ret = new com.helger.peppol.smp.EndpointType ();
-    if (m_sEndpointReference != null)
-      ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (m_sEndpointReference));
+    // EndpointReference element is mandatory
+    ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (m_sEndpointReference != null ? m_sEndpointReference
+                                                                                                               : ""));
     ret.setRequireBusinessLevelSignature (m_bRequireBusinessLevelSignature);
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
     ret.setServiceActivationDate (m_aServiceActivationDT);
@@ -212,7 +213,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   }
 
   @Nonnull
-  public com.helger.xsds.bdxr.smp1.EndpointType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.EndpointType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.EndpointType ret = new com.helger.xsds.bdxr.smp1.EndpointType ();
     ret.setEndpointURI (m_sEndpointReference);

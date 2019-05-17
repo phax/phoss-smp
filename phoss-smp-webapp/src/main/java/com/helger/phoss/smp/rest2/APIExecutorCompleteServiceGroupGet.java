@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
-import com.helger.peppol.bdxr.smp1.marshal.BDXRMarshallerCompleteServiceGroupType;
+import com.helger.peppol.bdxr.smp1.marshal.BDXR1MarshallerCompleteServiceGroupType;
 import com.helger.peppol.smp.marshal.SMPMarshallerCompleteServiceGroupType;
 import com.helger.phoss.smp.SMPServerConfiguration;
-import com.helger.phoss.smp.restapi.BDXRServerAPI;
+import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.core.api.IAPIDescriptor;
@@ -64,8 +64,8 @@ public final class APIExecutorCompleteServiceGroupGet implements IAPIExecutor
       case BDXR:
       {
         // Unspecified extension
-        final com.helger.xsds.bdxr.smp1.CompleteServiceGroupType ret = new BDXRServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
-        aBytes = new BDXRMarshallerCompleteServiceGroupType ().getAsBytes (ret);
+        final com.helger.xsds.bdxr.smp1.CompleteServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
+        aBytes = new BDXR1MarshallerCompleteServiceGroupType ().getAsBytes (ret);
         break;
       }
       default:

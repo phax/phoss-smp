@@ -29,11 +29,11 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.bdxr.smp1.marshal.BDXRMarshallerServiceMetadataType;
+import com.helger.peppol.bdxr.smp1.marshal.BDXR1MarshallerServiceMetadataType;
 import com.helger.peppol.smp.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.restapi.BDXRServerAPI;
+import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.core.api.IAPIDescriptor;
@@ -90,9 +90,9 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
           }
           case BDXR:
           {
-            final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXRMarshallerServiceMetadataType ().read (aServiceMetadataDoc);
+            final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType ().read (aServiceMetadataDoc);
             if (aServiceMetadata != null)
-              eSuccess = new BDXRServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
+              eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
                                                                                     sDocumentTypeID,
                                                                                     aServiceMetadata,
                                                                                     aBasicAuth);

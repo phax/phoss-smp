@@ -139,14 +139,14 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   }
 
   @Nonnull
-  public com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.ProcessType ret = new com.helger.xsds.bdxr.smp1.ProcessType ();
     // Explicit constructor call is needed here!
     ret.setProcessIdentifier (new BDXR1ProcessIdentifier (m_aProcessIdentifier));
     final com.helger.xsds.bdxr.smp1.ServiceEndpointList aEndpointList = new com.helger.xsds.bdxr.smp1.ServiceEndpointList ();
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
-      aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectBDXR ());
+      aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectBDXR1 ());
     ret.setServiceEndpointList (aEndpointList);
     ret.setExtension (getAsBDXRExtension ());
     return ret;

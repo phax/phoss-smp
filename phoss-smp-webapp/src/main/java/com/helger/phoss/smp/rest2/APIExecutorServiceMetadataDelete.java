@@ -28,7 +28,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.restapi.BDXRServerAPI;
+import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.core.api.IAPIDescriptor;
@@ -65,7 +65,7 @@ public final class APIExecutorServiceMetadataDelete implements IAPIExecutor
           new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
           break;
         case BDXR:
-          new BDXRServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
+          new BDXR1ServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
           break;
         default:
           throw new UnsupportedOperationException ("Unsupported REST type specified!");

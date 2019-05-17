@@ -63,7 +63,7 @@ public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHas
    *         REST interface. Never <code>null</code>.
    */
   @Nonnull
-  com.helger.xsds.bdxr.smp1.ServiceGroupType getAsJAXBObjectBDXR ();
+  com.helger.xsds.bdxr.smp1.ServiceGroupType getAsJAXBObjectBDXR1 ();
 
   @Nonnull
   static Comparator <ISMPServiceGroup> comparator ()
