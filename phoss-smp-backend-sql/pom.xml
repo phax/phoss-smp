@@ -76,11 +76,11 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Automatic-Module-Name>com.helger.peppol.smpserver.data.sql</Automatic-Module-Name>
-            <Export-Package>com.helger.peppol.smpserver.data.sql.*</Export-Package>
+            <Automatic-Module-Name>com.helger.phoss.smp.backend.sql</Automatic-Module-Name>
+            <Export-Package>com.helger.phoss.smp.backend.sql.*</Export-Package>
             <Import-Package>!javax.annotation.*,*</Import-Package>
             <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
-            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.peppol.smpserver.backend.ISMPBackendRegistrarSPI</Provide-Capability>
+            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI</Provide-Capability>
           </instructions>
         </configuration>
       </plugin>
