@@ -12,7 +12,7 @@ package com.helger.phoss.smp.mock;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;

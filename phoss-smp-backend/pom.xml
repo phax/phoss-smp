@@ -80,7 +80,7 @@
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>peppol-directory-businesscard</artifactId>
+      <artifactId>phoss-directory-businesscard</artifactId>
     </dependency>
 
     <dependency>

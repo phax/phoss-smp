@@ -29,7 +29,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.bdxr.marshal.BDXRMarshallerServiceMetadataType;
+import com.helger.peppol.bdxr.smp1.marshal.BDXRMarshallerServiceMetadataType;
 import com.helger.peppol.smp.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -90,7 +90,7 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
           }
           case BDXR:
           {
-            final com.helger.peppol.bdxr.ServiceMetadataType aServiceMetadata = new BDXRMarshallerServiceMetadataType ().read (aServiceMetadataDoc);
+            final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXRMarshallerServiceMetadataType ().read (aServiceMetadataDoc);
             if (aServiceMetadata != null)
               eSuccess = new BDXRServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
                                                                                     sDocumentTypeID,

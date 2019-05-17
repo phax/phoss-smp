@@ -21,13 +21,13 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
-import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
+import com.helger.peppol.identifier.simple.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.simple.process.SimpleProcessIdentifier;
 
 /**
  * The ID of a single process.

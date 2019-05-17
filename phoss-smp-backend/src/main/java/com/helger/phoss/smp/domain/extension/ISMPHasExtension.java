@@ -27,7 +27,7 @@ public interface ISMPHasExtension
 {
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <com.helger.peppol.bdxr.ExtensionType> getAllExtensions ();
+  ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> getAllExtensions ();
 
   /**
    * @return The string representation of the extension element. May be

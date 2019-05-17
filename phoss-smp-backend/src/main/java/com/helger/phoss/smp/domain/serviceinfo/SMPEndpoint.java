@@ -21,6 +21,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
@@ -211,14 +212,14 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   }
 
   @Nonnull
-  public com.helger.peppol.bdxr.EndpointType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.EndpointType getAsJAXBObjectBDXR ()
   {
-    final com.helger.peppol.bdxr.EndpointType ret = new com.helger.peppol.bdxr.EndpointType ();
+    final com.helger.xsds.bdxr.smp1.EndpointType ret = new com.helger.xsds.bdxr.smp1.EndpointType ();
     ret.setEndpointURI (m_sEndpointReference);
     ret.setRequireBusinessLevelSignature (Boolean.valueOf (m_bRequireBusinessLevelSignature));
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
-    ret.setServiceActivationDate (m_aServiceActivationDT);
-    ret.setServiceExpirationDate (m_aServiceExpirationDT);
+    ret.setServiceActivationDate (PDTXMLConverter.getXMLCalendar (m_aServiceActivationDT));
+    ret.setServiceExpirationDate (PDTXMLConverter.getXMLCalendar (m_aServiceExpirationDT));
     ret.setCertificate (CertificateHelper.convertCertificateStringToByteArray (m_sCertificate));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);

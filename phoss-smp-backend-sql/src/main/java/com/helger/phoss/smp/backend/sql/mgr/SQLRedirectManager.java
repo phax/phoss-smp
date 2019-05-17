@@ -28,7 +28,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.backend.sql.AbstractSMPJPAEnabledManager;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataRedirection;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataRedirectionID;

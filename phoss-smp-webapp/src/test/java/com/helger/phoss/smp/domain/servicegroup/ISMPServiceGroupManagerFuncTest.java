@@ -29,13 +29,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.mock.SMPServerTestRule;

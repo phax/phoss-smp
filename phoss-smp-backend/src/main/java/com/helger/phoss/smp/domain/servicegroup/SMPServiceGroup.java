@@ -20,10 +20,10 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.peppol.identifier.bdxr.participant.BDXRParticipantIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 
@@ -123,11 +123,11 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   }
 
   @Nonnull
-  public com.helger.peppol.bdxr.ServiceGroupType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.ServiceGroupType getAsJAXBObjectBDXR ()
   {
-    final com.helger.peppol.bdxr.ServiceGroupType ret = new com.helger.peppol.bdxr.ServiceGroupType ();
+    final com.helger.xsds.bdxr.smp1.ServiceGroupType ret = new com.helger.xsds.bdxr.smp1.ServiceGroupType ();
     // Explicit constructor call is needed here!
-    ret.setParticipantIdentifier (new BDXRParticipantIdentifier (m_aParticipantIdentifier));
+    ret.setParticipantIdentifier (new BDXR1ParticipantIdentifier (m_aParticipantIdentifier));
     if (false)
     {
       // This is set by the REST server

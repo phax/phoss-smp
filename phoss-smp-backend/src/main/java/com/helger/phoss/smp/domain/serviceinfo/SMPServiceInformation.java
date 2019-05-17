@@ -28,12 +28,12 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.peppol.identifier.bdxr.doctype.BDXRDocumentTypeIdentifier;
-import com.helger.peppol.identifier.bdxr.participant.BDXRParticipantIdentifier;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IProcessIdentifier;
+import com.helger.peppol.identifier.bdxr.smp1.doctype.BDXR1DocumentTypeIdentifier;
+import com.helger.peppol.identifier.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
+import com.helger.peppol.identifier.simple.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
@@ -190,19 +190,19 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   }
 
   @Nonnull
-  public com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR ()
   {
-    final com.helger.peppol.bdxr.ServiceInformationType aSI = new com.helger.peppol.bdxr.ServiceInformationType ();
+    final com.helger.xsds.bdxr.smp1.ServiceInformationType aSI = new com.helger.xsds.bdxr.smp1.ServiceInformationType ();
     // Explicit constructor call is needed here!
-    aSI.setParticipantIdentifier (new BDXRParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
-    aSI.setDocumentIdentifier (new BDXRDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
-    final com.helger.peppol.bdxr.ProcessListType aProcesses = new com.helger.peppol.bdxr.ProcessListType ();
+    aSI.setParticipantIdentifier (new BDXR1ParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
+    aSI.setDocumentIdentifier (new BDXR1DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
+    final com.helger.xsds.bdxr.smp1.ProcessListType aProcesses = new com.helger.xsds.bdxr.smp1.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
       aProcesses.addProcess (aProcess.getAsJAXBObjectBDXR ());
     aSI.setProcessList (aProcesses);
     aSI.setExtension (getAsBDXRExtension ());
 
-    final com.helger.peppol.bdxr.ServiceMetadataType ret = new com.helger.peppol.bdxr.ServiceMetadataType ();
+    final com.helger.xsds.bdxr.smp1.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp1.ServiceMetadataType ();
     ret.setServiceInformation (aSI);
     return ret;
   }
@@ -244,7 +244,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     for (final com.helger.peppol.smp.ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,
-                                      aServiceInformation.getDocumentIdentifier (),
+                                      SimpleDocumentTypeIdentifier.wrap (aServiceInformation.getDocumentIdentifier ()),
                                       aProcesses,
                                       SMPExtensionConverter.convertToString (aServiceInformation.getExtension ()));
   }

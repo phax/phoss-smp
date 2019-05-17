@@ -30,7 +30,7 @@ import org.w3c.dom.Document;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.mime.CMimeType;
-import com.helger.peppol.bdxr.marshal.BDXRMarshallerSignedServiceMetadataType;
+import com.helger.peppol.bdxr.smp1.marshal.BDXRMarshallerSignedServiceMetadataType;
 import com.helger.peppol.smp.marshal.SMPMarshallerSignedServiceMetadataType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.BDXRServerAPI;
@@ -76,8 +76,8 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
       }
       case BDXR:
       {
-        final com.helger.peppol.bdxr.SignedServiceMetadataType ret = new BDXRServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
-                                                                                                                               sDocumentTypeID);
+        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType ret = new BDXRServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
+                                                                                                                                  sDocumentTypeID);
 
         // Convert to DOM document
         final BDXRMarshallerSignedServiceMetadataType aMarshaller = new BDXRMarshallerSignedServiceMetadataType ();

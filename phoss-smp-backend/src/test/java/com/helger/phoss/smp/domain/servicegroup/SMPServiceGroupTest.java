@@ -21,17 +21,16 @@ import org.w3c.dom.Document;
 
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.string.StringHelper;
-import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.bdxr.ExtensionType;
-import com.helger.peppol.bdxr.marshal.BDXRMarshallerServiceGroupType;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.bdxr.smp1.BDXRExtensionConverter;
+import com.helger.peppol.bdxr.smp1.marshal.BDXRMarshallerServiceGroupType;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.xml.serialize.read.DOMReader;
+import com.helger.xsds.bdxr.smp1.ExtensionType;
 
 /**
  * Test class for class {@link SMPServiceGroup}.
@@ -85,7 +84,7 @@ public final class SMPServiceGroupTest
     assertEquals (aPI, aSG.getParticpantIdentifier ());
     assertNotNull (aSG.getExtensionAsString ());
 
-    final com.helger.peppol.bdxr.ServiceGroupType aSGBDXR = aSG.getAsJAXBObjectBDXR ();
+    final com.helger.xsds.bdxr.smp1.ServiceGroupType aSGBDXR = aSG.getAsJAXBObjectBDXR ();
     assertEquals (2, aSGBDXR.getExtension ().size ());
 
     final Document aDoc = new BDXRMarshallerServiceGroupType ().getAsDocument (aSGBDXR);

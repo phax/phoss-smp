@@ -22,8 +22,8 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.url.URLHelper;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.servlet.StaticServerInfo;

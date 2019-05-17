@@ -20,7 +20,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.exception.SMPServerException;
@@ -55,7 +55,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @throws SMPServerException
    *         In case of error
    * @see com.helger.peppol.smp.SMPExtensionConverter
-   * @see com.helger.peppol.bdxr.BDXRExtensionConverter
+   * @see com.helger.peppol.bdxr.smp1.BDXRExtensionConverter
    */
   @Nonnull
   ISMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty String sOwnerID,

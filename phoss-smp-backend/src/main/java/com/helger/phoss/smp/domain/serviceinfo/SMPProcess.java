@@ -28,9 +28,9 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.peppol.identifier.bdxr.process.BDXRProcessIdentifier;
-import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
-import com.helger.peppol.identifier.generic.process.SimpleProcessIdentifier;
+import com.helger.peppol.identifier.IProcessIdentifier;
+import com.helger.peppol.identifier.bdxr.smp1.process.BDXR1ProcessIdentifier;
+import com.helger.peppol.identifier.simple.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.ProcessType;
@@ -60,12 +60,12 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   }
 
   @Nonnull
-  public IProcessIdentifier getProcessIdentifier ()
+  public final IProcessIdentifier getProcessIdentifier ()
   {
     return m_aProcessIdentifier;
   }
 
-  public void setProcessIdentifier (@Nonnull final IProcessIdentifier aProcessIdentifier)
+  public final void setProcessIdentifier (@Nonnull final IProcessIdentifier aProcessIdentifier)
   {
     ValueEnforcer.notNull (aProcessIdentifier, "ProcessIdentifier");
     m_aProcessIdentifier = aProcessIdentifier;
@@ -139,12 +139,12 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   }
 
   @Nonnull
-  public com.helger.peppol.bdxr.ProcessType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR ()
   {
-    final com.helger.peppol.bdxr.ProcessType ret = new com.helger.peppol.bdxr.ProcessType ();
+    final com.helger.xsds.bdxr.smp1.ProcessType ret = new com.helger.xsds.bdxr.smp1.ProcessType ();
     // Explicit constructor call is needed here!
-    ret.setProcessIdentifier (new BDXRProcessIdentifier (m_aProcessIdentifier));
-    final com.helger.peppol.bdxr.ServiceEndpointList aEndpointList = new com.helger.peppol.bdxr.ServiceEndpointList ();
+    ret.setProcessIdentifier (new BDXR1ProcessIdentifier (m_aProcessIdentifier));
+    final com.helger.xsds.bdxr.smp1.ServiceEndpointList aEndpointList = new com.helger.xsds.bdxr.smp1.ServiceEndpointList ();
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
       aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectBDXR ());
     ret.setServiceEndpointList (aEndpointList);
@@ -189,7 +189,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
     for (final EndpointType aEndpoint : aProcess.getServiceEndpointList ().getEndpoint ())
       aEndpoints.add (SMPEndpoint.createFromJAXB (aEndpoint));
-    return new SMPProcess (aProcess.getProcessIdentifier (),
+    return new SMPProcess (SimpleProcessIdentifier.wrap (aProcess.getProcessIdentifier ()),
                            aEndpoints,
                            SMPExtensionConverter.convertToString (aProcess.getExtension ()));
   }

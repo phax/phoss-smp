@@ -17,13 +17,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
-import com.helger.phoss.smp.domain.redirect.SMPRedirect;
+import com.helger.peppol.identifier.simple.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;

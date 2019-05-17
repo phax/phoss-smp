@@ -33,7 +33,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;

@@ -21,9 +21,9 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
+import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
 
 /**
  * ServiceGroupId == participant ID

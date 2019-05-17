@@ -30,7 +30,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.phoss.smp.backend.xml.domain.XMLDataUser;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;

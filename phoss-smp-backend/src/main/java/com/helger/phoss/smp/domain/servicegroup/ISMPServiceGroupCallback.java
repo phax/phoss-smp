@@ -13,7 +13,7 @@ package com.helger.phoss.smp.domain.servicegroup;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.callback.ICallback;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 
 /**
  * Interface for an SMP service group callback.

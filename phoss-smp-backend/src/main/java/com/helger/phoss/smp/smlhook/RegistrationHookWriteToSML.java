@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.ws.HostnameVerifierVerifyAll;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.participant.SimpleParticipantIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.NotFoundFault;

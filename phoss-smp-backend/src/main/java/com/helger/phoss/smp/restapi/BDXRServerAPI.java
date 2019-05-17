@@ -27,23 +27,13 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
+import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.bdxr.CompleteServiceGroupType;
-import com.helger.peppol.bdxr.EndpointType;
-import com.helger.peppol.bdxr.ProcessListType;
-import com.helger.peppol.bdxr.ProcessType;
-import com.helger.peppol.bdxr.ServiceGroupReferenceListType;
-import com.helger.peppol.bdxr.ServiceGroupReferenceType;
-import com.helger.peppol.bdxr.ServiceGroupType;
-import com.helger.peppol.bdxr.ServiceInformationType;
-import com.helger.peppol.bdxr.ServiceMetadataReferenceCollectionType;
-import com.helger.peppol.bdxr.ServiceMetadataReferenceType;
-import com.helger.peppol.bdxr.ServiceMetadataType;
-import com.helger.peppol.bdxr.SignedServiceMetadataType;
+import com.helger.peppol.bdxr.smp1.BDXRExtensionConverter;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -60,6 +50,18 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
+import com.helger.xsds.bdxr.smp1.CompleteServiceGroupType;
+import com.helger.xsds.bdxr.smp1.EndpointType;
+import com.helger.xsds.bdxr.smp1.ProcessListType;
+import com.helger.xsds.bdxr.smp1.ProcessType;
+import com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType;
+import com.helger.xsds.bdxr.smp1.ServiceGroupReferenceType;
+import com.helger.xsds.bdxr.smp1.ServiceGroupType;
+import com.helger.xsds.bdxr.smp1.ServiceInformationType;
+import com.helger.xsds.bdxr.smp1.ServiceMetadataReferenceCollectionType;
+import com.helger.xsds.bdxr.smp1.ServiceMetadataReferenceType;
+import com.helger.xsds.bdxr.smp1.ServiceMetadataType;
+import com.helger.xsds.bdxr.smp1.SignedServiceMetadataType;
 
 /**
  * This class implements all the service methods, that must be provided by the
@@ -608,8 +610,8 @@ public final class BDXRServerAPI
                                                              BooleanHelper.getBooleanValue (aJAXBEndpoint.isRequireBusinessLevelSignature (),
                                                                                             false),
                                                              aJAXBEndpoint.getMinimumAuthenticationLevel (),
-                                                             aJAXBEndpoint.getServiceActivationDate (),
-                                                             aJAXBEndpoint.getServiceExpirationDate (),
+                                                             PDTXMLConverter.getLocalDateTime (aJAXBEndpoint.getServiceActivationDate ()),
+                                                             PDTXMLConverter.getLocalDateTime (aJAXBEndpoint.getServiceExpirationDate ()),
                                                              Base64.encodeBytes (aJAXBEndpoint.getCertificate ()),
                                                              aJAXBEndpoint.getServiceDescription (),
                                                              aJAXBEndpoint.getTechnicalContactUrl (),
@@ -617,7 +619,7 @@ public final class BDXRServerAPI
                                                              BDXRExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
               aEndpoints.add (aEndpoint);
             }
-            final SMPProcess aProcess = new SMPProcess (aJAXBProcess.getProcessIdentifier (),
+            final SMPProcess aProcess = new SMPProcess (SimpleProcessIdentifier.wrap (aJAXBProcess.getProcessIdentifier ()),
                                                         aEndpoints,
                                                         BDXRExtensionConverter.convertToString (aJAXBProcess.getExtension ()));
             aProcesses.add (aProcess);

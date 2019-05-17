@@ -195,7 +195,7 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    *         REST interface. Never <code>null</code>.
    */
   @Nonnull
-  com.helger.peppol.bdxr.EndpointType getAsJAXBObjectBDXR ();
+  com.helger.xsds.bdxr.smp1.EndpointType getAsJAXBObjectBDXR ();
 
   @Nonnull
   static IComparator <ISMPEndpoint> comparator ()

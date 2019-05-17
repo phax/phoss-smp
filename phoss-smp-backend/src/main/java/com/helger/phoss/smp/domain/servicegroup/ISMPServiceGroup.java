@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
 /**
@@ -63,7 +63,7 @@ public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHas
    *         REST interface. Never <code>null</code>.
    */
   @Nonnull
-  com.helger.peppol.bdxr.ServiceGroupType getAsJAXBObjectBDXR ();
+  com.helger.xsds.bdxr.smp1.ServiceGroupType getAsJAXBObjectBDXR ();
 
   @Nonnull
   static Comparator <ISMPServiceGroup> comparator ()

@@ -89,7 +89,7 @@
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>peppol-directory-client</artifactId>
+      <artifactId>phoss-directory-client</artifactId>
     </dependency>
 
     <dependency>

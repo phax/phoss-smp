@@ -29,7 +29,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.bdxr.marshal.BDXRMarshallerServiceGroupType;
+import com.helger.peppol.bdxr.smp1.marshal.BDXRMarshallerServiceGroupType;
 import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -91,7 +91,7 @@ public final class APIExecutorServiceGroupPut implements IAPIExecutor
           case BDXR:
           {
             // TODO use logging exception handler
-            final com.helger.peppol.bdxr.ServiceGroupType aServiceGroup = new BDXRMarshallerServiceGroupType ().read (aServiceGroupDoc);
+            final com.helger.xsds.bdxr.smp1.ServiceGroupType aServiceGroup = new BDXRMarshallerServiceGroupType ().read (aServiceGroupDoc);
             if (aServiceGroup != null)
             {
               new BDXRServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, aBasicAuth);

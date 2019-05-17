@@ -19,7 +19,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
@@ -125,14 +125,14 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   }
 
   @Nonnull
-  public com.helger.peppol.bdxr.ServiceMetadataType getAsJAXBObjectBDXR ()
+  public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR ()
   {
-    final com.helger.peppol.bdxr.RedirectType aRedirect = new com.helger.peppol.bdxr.RedirectType ();
+    final com.helger.xsds.bdxr.smp1.RedirectType aRedirect = new com.helger.xsds.bdxr.smp1.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
     aRedirect.setExtension (getAsBDXRExtension ());
 
-    final com.helger.peppol.bdxr.ServiceMetadataType ret = new com.helger.peppol.bdxr.ServiceMetadataType ();
+    final com.helger.xsds.bdxr.smp1.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp1.ServiceMetadataType ();
     ret.setRedirect (aRedirect);
     return ret;
   }

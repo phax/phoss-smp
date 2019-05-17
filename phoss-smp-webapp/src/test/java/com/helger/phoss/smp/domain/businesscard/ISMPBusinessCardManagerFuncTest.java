@@ -30,15 +30,9 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
-import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
-import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardContact;
-import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
-import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
-import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;

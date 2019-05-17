@@ -23,29 +23,28 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.peppol.bdxr.BDXRExtensionConverter;
-import com.helger.peppol.bdxr.ExtensionType;
+import com.helger.peppol.bdxr.smp1.BDXRExtensionConverter;
 import com.helger.xml.serialize.write.XMLWriter;
 
 /**
  * Abstract implementation class for {@link ISMPHasExtension}. All extensions
  * are internally stored as instances of
- * {@link com.helger.peppol.bdxr.ExtensionType} since this the biggest data type
- * which can be used for PEPPOL SMP and BDXR SMP.
+ * {@link com.helger.xsds.bdxr.smp1.ExtensionType} since this the biggest data
+ * type which can be used for PEPPOL SMP and BDXR SMP.
  *
  * @author Philip Helger
  */
 @NotThreadSafe
 public abstract class AbstractSMPHasExtension implements ISMPHasExtension
 {
-  private final ICommonsList <com.helger.peppol.bdxr.ExtensionType> m_aExtensions = new CommonsArrayList<> ();
+  private final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> m_aExtensions = new CommonsArrayList <> ();
 
   protected AbstractSMPHasExtension ()
   {}
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <com.helger.peppol.bdxr.ExtensionType> getAllExtensions ()
+  public ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> getAllExtensions ()
   {
     return m_aExtensions.getClone ();
   }
@@ -72,7 +71,7 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
   @Nonnull
   public EChange setExtensionAsString (@Nullable final String sExtension)
   {
-    ICommonsList <ExtensionType> aNewExt = null;
+    ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> aNewExt = null;
     if (StringHelper.hasText (sExtension))
     {
       // Soft migration :)
@@ -102,7 +101,7 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
 
   @Nullable
   @ReturnsMutableCopy
-  public ICommonsList <com.helger.peppol.bdxr.ExtensionType> getAsBDXRExtension ()
+  public ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> getAsBDXRExtension ()
   {
     if (m_aExtensions.isEmpty ())
       return null;

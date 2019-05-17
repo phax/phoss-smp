@@ -21,9 +21,9 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 
 /**

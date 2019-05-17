@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.bdxr.marshal.BDXRMarshallerServiceGroupReferenceListType;
+import com.helger.peppol.bdxr.smp1.marshal.BDXRMarshallerServiceGroupReferenceListType;
 import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupReferenceListType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.BDXRServerAPI;
@@ -66,8 +66,8 @@ public final class APIExecutorListGet implements IAPIExecutor
       case BDXR:
       {
         // Unspecified extension
-        final com.helger.peppol.bdxr.ServiceGroupReferenceListType ret = new BDXRServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
-                                                                                                                                         aBasicAuth);
+        final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXRServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
+                                                                                                                                            aBasicAuth);
         aBytes = new BDXRMarshallerServiceGroupReferenceListType ().getAsBytes (ret);
         break;
       }

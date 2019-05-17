@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
-import com.helger.peppol.identifier.factory.BDXRIdentifierFactory;
+import com.helger.peppol.identifier.factory.BDXR1IdentifierFactory;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.factory.SimpleIdentifierFactory;
@@ -136,8 +136,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         case PEPPOL:
           m_aIdentifierFactory = PeppolIdentifierFactory.INSTANCE;
           break;
-        case BDXR:
-          m_aIdentifierFactory = BDXRIdentifierFactory.INSTANCE;
+        case BDXR1:
+          m_aIdentifierFactory = BDXR1IdentifierFactory.INSTANCE;
           break;
         default:
           throw new IllegalStateException ("Unsupporeted identifier type " + eIdentifierType + "!");

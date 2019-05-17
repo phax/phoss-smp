@@ -12,7 +12,7 @@ package com.helger.phoss.smp.smlhook;
 
 import javax.annotation.Nonnull;
 
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 
 /**
  * Base interface for the callback to modify the SML.

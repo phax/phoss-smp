@@ -20,7 +20,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
+import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
@@ -110,7 +110,7 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
    *         REST interface. Never <code>null</code>.
    */
   @Nonnull
-  com.helger.peppol.bdxr.ProcessType getAsJAXBObjectBDXR ();
+  com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR ();
 
   @Nonnull
   static IComparator <ISMPProcess> comparator ()

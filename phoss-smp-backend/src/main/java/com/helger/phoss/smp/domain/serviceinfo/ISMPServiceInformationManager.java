@@ -20,8 +20,8 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 

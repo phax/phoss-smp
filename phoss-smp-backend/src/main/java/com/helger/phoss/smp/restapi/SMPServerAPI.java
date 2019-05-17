@@ -26,9 +26,10 @@ import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
+import com.helger.peppol.identifier.simple.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.CompleteServiceGroupType;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ProcessListType;
@@ -615,7 +616,7 @@ public final class SMPServerAPI
                                                              SMPExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
               aEndpoints.add (aEndpoint);
             }
-            final SMPProcess aProcess = new SMPProcess (aJAXBProcess.getProcessIdentifier (),
+            final SMPProcess aProcess = new SMPProcess (SimpleProcessIdentifier.wrap (aJAXBProcess.getProcessIdentifier ()),
                                                         aEndpoints,
                                                         SMPExtensionConverter.convertToString (aJAXBProcess.getExtension ()));
             aProcesses.add (aProcess);

@@ -14,8 +14,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.helger.phoss.smp.settings.SMPSettings;
-
 /**
  * Test class for class {@link SMPSettings}.
  *

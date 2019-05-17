@@ -57,8 +57,8 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.html.jscode.html.JSHtml;
-import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
 import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
@@ -323,12 +323,12 @@ public final class SMPCommonUI
   @Nullable
   public static IHCNode getExtensionDisplay (@Nonnull final ISMPHasExtension aHasExtension)
   {
-    final ICommonsList <com.helger.peppol.bdxr.ExtensionType> aExtensions = aHasExtension.getAllExtensions ();
+    final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> aExtensions = aHasExtension.getAllExtensions ();
     if (aExtensions.isEmpty ())
       return null;
 
     final HCNodeList aNL = new HCNodeList ();
-    for (final com.helger.peppol.bdxr.ExtensionType aExtension : aExtensions)
+    for (final com.helger.xsds.bdxr.smp1.ExtensionType aExtension : aExtensions)
     {
       if (aNL.hasChildren ())
       {

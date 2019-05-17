@@ -27,7 +27,8 @@ public enum ESMPIdentifierType implements IHasID <String>
 {
   SIMPLE ("simple"),
   PEPPOL ("peppol"),
-  BDXR ("bdxr");
+  BDXR1 ("bdxr1"),
+  BDXR2 ("bdxr2");
 
   private final String m_sID;
 
@@ -46,6 +47,10 @@ public enum ESMPIdentifierType implements IHasID <String>
   @Nullable
   public static ESMPIdentifierType getFromIDOrNull (@Nullable final String sID)
   {
+    // Legacy ID
+    if ("bdxr".equals (sID))
+      return BDXR1;
+
     return EnumHelper.getFromIDOrNull (ESMPIdentifierType.class, sID);
   }
 
@@ -53,6 +58,10 @@ public enum ESMPIdentifierType implements IHasID <String>
   public static ESMPIdentifierType getFromIDOrDefault (@Nullable final String sID,
                                                        @Nullable final ESMPIdentifierType eDefault)
   {
+    // Legacy ID
+    if ("bdxr".equals (sID))
+      return BDXR1;
+
     return EnumHelper.getFromIDOrDefault (ESMPIdentifierType.class, sID, eDefault);
   }
 }

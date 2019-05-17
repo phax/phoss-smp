@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
-import com.helger.peppol.bdxr.marshal.BDXRMarshallerServiceGroupType;
+import com.helger.peppol.bdxr.smp1.marshal.BDXRMarshallerServiceGroupType;
 import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.BDXRServerAPI;
@@ -62,7 +62,7 @@ public final class APIExecutorServiceGroupGet implements IAPIExecutor
       }
       case BDXR:
       {
-        final com.helger.peppol.bdxr.ServiceGroupType ret = new BDXRServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
+        final com.helger.xsds.bdxr.smp1.ServiceGroupType ret = new BDXRServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
         aBytes = new BDXRMarshallerServiceGroupType ().getAsBytes (ret);
         break;
       }
