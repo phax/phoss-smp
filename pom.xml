@@ -24,12 +24,12 @@
     <artifactId>parent-pom</artifactId>
     <version>1.10.8</version>
   </parent>
-  <artifactId>peppol-smp-server-parent-pom</artifactId>
+  <artifactId>phoss-smp-parent-pom</artifactId>
   <version>5.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>peppol-smp-server-parent-pom</name>
-  <description>Base POM to build the peppol-smp-server projects</description>
-  <url>https://github.com/phax/peppol-smp-server</url>
+  <name>phoss-smp-parent-pom</name>
+  <description>Base POM to build the phoss SMP projects</description>
+  <url>https://github.com/phax/phoss-smp</url>
   <inceptionYear>2015</inceptionYear>
  
   <licenses>
@@ -46,9 +46,9 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:git@github.com:phax/peppol-smp-server.git</connection>
-    <developerConnection>scm:git:git@github.com:phax/peppol-smp-server.git</developerConnection>
-    <url>http://github.com/phax/peppol-smp-server</url>
+    <connection>scm:git:git@github.com:phax/phoss-smp.git</connection>
+    <developerConnection>scm:git:git@github.com:phax/phoss-smp.git</developerConnection>
+    <url>http://github.com/phax/phoss-smp</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -180,22 +180,22 @@
 
       <dependency>
         <groupId>com.helger</groupId>
-        <artifactId>peppol-smp-server-library</artifactId>
+        <artifactId>phoss-smp-backend</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
-        <artifactId>peppol-smp-server-sql</artifactId>
+        <artifactId>phoss-smp-backend-sql</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
-        <artifactId>peppol-smp-server-xml</artifactId>
+        <artifactId>phoss-smp-backend-xml</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
-        <artifactId>peppol-smp-server-webapp</artifactId>
+        <artifactId>phoss-smp-webapp</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
@@ -214,12 +214,12 @@
   </dependencies>
   
   <modules>
-    <module>peppol-smp-server-library</module>
-    <module>peppol-smp-server-sql</module>
-    <module>peppol-smp-server-xml</module>
-    <module>peppol-smp-server-webapp</module>
-    <module>peppol-smp-server-webapp-sql</module>
-    <module>peppol-smp-server-webapp-xml</module>
+    <module>phoss-smp-backend</module>
+    <module>phoss-smp-backend-sql</module>
+    <module>phoss-smp-backend-xml</module>
+    <module>phoss-smp-webapp</module>
+    <module>phoss-smp-webapp-sql</module>
+    <module>phoss-smp-webapp-xml</module>
   </modules>
   
   <build>

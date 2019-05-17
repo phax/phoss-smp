@@ -20,14 +20,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.helger</groupId>
-    <artifactId>peppol-smp-server-parent-pom</artifactId>
+    <artifactId>phoss-smp-parent-pom</artifactId>
     <version>5.1.2-SNAPSHOT</version>
   </parent>
-  <artifactId>peppol-smp-server-webapp-sql</artifactId>
+  <artifactId>phoss-smp-webapp-sql</artifactId>
   <packaging>war</packaging>
-  <name>peppol-smp-server-webapp-sql</name>
-  <description>SMP webapp with management GUI</description>
-  <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-webapp-sql</url>
+  <name>phoss-smp-webapp-sql</name>
+  <description>SMP webapp with management GUI and SQL backened</description>
+  <url>https://github.com/phax/phoss-smp/phoss-smp-webapp-sql</url>
   <inceptionYear>2015</inceptionYear>
 
   <licenses>
@@ -61,11 +61,11 @@
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>peppol-smp-server-webapp</artifactId>
+      <artifactId>phoss-smp-webapp</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>peppol-smp-server-sql</artifactId>
+      <artifactId>phoss-smp-backend-sql</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

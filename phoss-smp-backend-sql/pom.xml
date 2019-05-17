@@ -15,15 +15,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.helger</groupId>
-    <artifactId>peppol-smp-server-parent-pom</artifactId>
+    <artifactId>phoss-smp-parent-pom</artifactId>
     <version>5.1.2-SNAPSHOT</version>
   </parent>
-  <artifactId>peppol-smp-server-sql</artifactId>
+  <artifactId>phoss-smp-backend-sql</artifactId>
   <packaging>bundle</packaging>
-  <name>peppol-smp-server-sql</name>
-  <description>SMP MySQL backend</description>
-  <url>https://github.com/phax/peppol-smp-server/peppol-smp-server-sql</url>
+  <name>phoss-smp-backend-sql</name>
+  <description>SMP SQL backend</description>
+  <url>https://github.com/phax/phoss-smp/phoss-smp-backend-sql</url>
   <inceptionYear>2015</inceptionYear>
+
   <licenses>
     <license>
       <name>MPL 2.0</name>
@@ -31,10 +32,12 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
   <organization>
     <name>Philip Helger</name>
     <url>http://www.helger.com</url>
   </organization>
+
   <developers>
     <developer>
       <id>philip</id>
@@ -43,10 +46,11 @@
       <url>http://www.helger.com</url>
     </developer>
   </developers>
+
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>peppol-smp-server-library</artifactId>
+      <artifactId>phoss-smp-backend</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
@@ -56,12 +60,14 @@
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
