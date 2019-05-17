@@ -22,7 +22,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.pd.client.PDClient;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.scope.IScope;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 

@@ -32,12 +32,12 @@ import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirectionID;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
-import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
-import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.redirect.SMPRedirect;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 
 /**
  * Manager for all {@link SMPRedirect} objects.

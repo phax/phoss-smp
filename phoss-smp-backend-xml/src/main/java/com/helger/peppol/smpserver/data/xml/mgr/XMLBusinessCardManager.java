@@ -36,12 +36,12 @@ import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.dao.DAOException;
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardCallback;
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.businesscard.SMPBusinessCard;
+import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.basic.audit.AuditHelper;
 

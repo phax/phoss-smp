@@ -40,18 +40,18 @@ import com.helger.peppol.smpserver.data.sql.model.DBOwnershipID;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceGroup;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceGroupID;
 import com.helger.peppol.smpserver.data.sql.model.DBUser;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupCallback;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.domain.servicegroup.SMPServiceGroup;
-import com.helger.peppol.smpserver.exception.SMPInternalErrorException;
-import com.helger.peppol.smpserver.exception.SMPNotFoundException;
-import com.helger.peppol.smpserver.exception.SMPSMLException;
-import com.helger.peppol.smpserver.exception.SMPServerException;
-import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
-import com.helger.peppol.smpserver.smlhook.IRegistrationHook;
-import com.helger.peppol.smpserver.smlhook.RegistrationHookException;
-import com.helger.peppol.smpserver.smlhook.RegistrationHookFactory;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
+import com.helger.phoss.smp.exception.SMPInternalErrorException;
+import com.helger.phoss.smp.exception.SMPNotFoundException;
+import com.helger.phoss.smp.exception.SMPSMLException;
+import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.phoss.smp.exception.SMPUnknownUserException;
+import com.helger.phoss.smp.smlhook.IRegistrationHook;
+import com.helger.phoss.smp.smlhook.RegistrationHookException;
+import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 
 public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager implements ISMPServiceGroupManager
 {

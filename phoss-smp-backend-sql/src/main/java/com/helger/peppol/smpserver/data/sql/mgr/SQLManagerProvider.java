@@ -15,18 +15,18 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
-import com.helger.peppol.smpserver.domain.ISMPManagerProvider;
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
-import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.peppol.smpserver.domain.sml.ISMLInfoManager;
-import com.helger.peppol.smpserver.domain.sml.SMLInfoManager;
-import com.helger.peppol.smpserver.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.peppol.smpserver.domain.transportprofile.SMPTransportProfileManager;
-import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
-import com.helger.peppol.smpserver.settings.ISMPSettingsManager;
-import com.helger.peppol.smpserver.settings.SMPSettingsManager;
+import com.helger.phoss.smp.domain.ISMPManagerProvider;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
+import com.helger.phoss.smp.domain.sml.SMLInfoManager;
+import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
+import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManager;
+import com.helger.phoss.smp.domain.user.ISMPUserManager;
+import com.helger.phoss.smp.settings.ISMPSettingsManager;
+import com.helger.phoss.smp.settings.SMPSettingsManager;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.

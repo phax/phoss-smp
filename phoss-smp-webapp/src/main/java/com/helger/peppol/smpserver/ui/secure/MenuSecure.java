@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import com.helger.peppol.smpserver.app.CSMP;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.basic.app.menu.IMenuItemPage;
 import com.helger.photon.basic.app.menu.IMenuObjectFilter;
 import com.helger.photon.basic.app.menu.IMenuTree;

@@ -23,7 +23,7 @@ import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.id.IHasID;
 import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.peppol.smp.ISMPTransportProfile;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.core.form.RequestField;
 
 /**

@@ -28,7 +28,7 @@ import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 

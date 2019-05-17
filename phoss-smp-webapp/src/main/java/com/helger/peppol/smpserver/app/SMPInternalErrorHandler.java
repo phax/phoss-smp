@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.email.EmailAddress;
 import com.helger.commons.string.StringHelper;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.photon.core.app.error.InternalErrorBuilder;
 import com.helger.photon.core.app.error.InternalErrorSettings;
 import com.helger.photon.core.app.error.callback.AbstractErrorCallback;

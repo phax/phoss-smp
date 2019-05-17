@@ -13,9 +13,9 @@ package com.helger.peppol.smpserver.data.sql.spi;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.peppol.smpserver.backend.ISMPBackendRegistrarSPI;
-import com.helger.peppol.smpserver.backend.ISMPBackendRegistry;
 import com.helger.peppol.smpserver.data.sql.mgr.SQLManagerProvider;
+import com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI;
+import com.helger.phoss.smp.backend.ISMPBackendRegistry;
 
 /**
  * Register the SQL backend to the global SMP backend registry.

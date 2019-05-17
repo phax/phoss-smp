@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.system.SystemProperties;
 import com.helger.peppol.sml.ESML;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.jetty.JettyRunner;
 
 public class SMPServerRESTTestRule extends ExternalResource

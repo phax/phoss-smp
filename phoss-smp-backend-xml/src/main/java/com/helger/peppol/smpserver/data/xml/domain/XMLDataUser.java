@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.peppol.smpserver.domain.user.ISMPUser;
+import com.helger.phoss.smp.domain.user.ISMPUser;
 import com.helger.photon.security.user.IUser;
 
 /**

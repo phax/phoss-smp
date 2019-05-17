@@ -46,17 +46,17 @@ import com.helger.peppol.smpserver.data.sql.model.DBServiceGroupID;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadata;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataID;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceMetadataRedirection;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPEndpoint;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPProcess;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformation;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationCallback;
-import com.helger.peppol.smpserver.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPEndpoint;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPProcess;
-import com.helger.peppol.smpserver.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
+import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 
 /**
  * Manager for all {@link SMPServiceInformation} objects.

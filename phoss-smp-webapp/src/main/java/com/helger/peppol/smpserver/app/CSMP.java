@@ -28,7 +28,7 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.locale.LocaleCache;
 import com.helger.commons.string.StringHelper;
-import com.helger.peppol.smpserver.CSMPServer;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.photon.security.CSecurity;
 
 /**

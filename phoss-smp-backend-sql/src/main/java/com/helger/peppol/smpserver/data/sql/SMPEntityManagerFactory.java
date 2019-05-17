@@ -24,7 +24,7 @@ import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.db.jpa.AbstractGlobalEntityManagerFactory;
 import com.helger.db.jpa.JPAEnabledManager;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.scope.IScope;
 import com.helger.settings.exchange.configfile.ConfigFile;
 

@@ -33,12 +33,16 @@ import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.identifier.generic.process.IProcessIdentifier;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
-import com.helger.peppol.smpserver.exception.SMPServerException;
-import com.helger.peppol.smpserver.mock.SMPServerTestRule;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
+import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.domain.user.ISMPUserManager;
+import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.phoss.smp.mock.SMPServerTestRule;
 
 /**
  * Test class for class {@link ISMPServiceInformationManager}.

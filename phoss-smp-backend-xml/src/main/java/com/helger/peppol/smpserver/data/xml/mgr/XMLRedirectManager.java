@@ -34,10 +34,10 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
 import com.helger.peppol.identifier.generic.doctype.IDocumentTypeIdentifier;
-import com.helger.peppol.smpserver.domain.redirect.ISMPRedirect;
-import com.helger.peppol.smpserver.domain.redirect.ISMPRedirectManager;
-import com.helger.peppol.smpserver.domain.redirect.SMPRedirect;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.redirect.SMPRedirect;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.basic.audit.AuditHelper;
 

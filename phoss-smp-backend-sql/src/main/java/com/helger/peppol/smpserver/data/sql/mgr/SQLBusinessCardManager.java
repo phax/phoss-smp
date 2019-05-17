@@ -40,17 +40,17 @@ import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
 import com.helger.peppol.smpserver.data.sql.AbstractSMPJPAEnabledManager;
 import com.helger.peppol.smpserver.data.sql.model.DBBusinessCardEntity;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCard;
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardCallback;
-import com.helger.peppol.smpserver.domain.businesscard.ISMPBusinessCardManager;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCard;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardContact;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardEntity;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardIdentifier;
-import com.helger.peppol.smpserver.domain.businesscard.SMPBusinessCardName;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroup;
-import com.helger.peppol.smpserver.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.businesscard.SMPBusinessCard;
+import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardContact;
+import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
+import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
+import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 
 /**
  * Manager for all {@link SMPBusinessCard} objects.

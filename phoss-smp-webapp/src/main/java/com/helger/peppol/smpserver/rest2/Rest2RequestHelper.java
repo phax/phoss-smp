@@ -24,7 +24,7 @@ import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.http.HttpHeaderMap;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.http.basicauth.HttpBasicAuth;
-import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
+import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 
 /**
  * This class is used for retrieving the HTTP BASIC AUTH header from the HTTP

@@ -32,12 +32,12 @@ import com.helger.peppol.smpserver.data.sql.model.DBOwnershipID;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceGroup;
 import com.helger.peppol.smpserver.data.sql.model.DBServiceGroupID;
 import com.helger.peppol.smpserver.data.sql.model.DBUser;
-import com.helger.peppol.smpserver.domain.user.ISMPUser;
-import com.helger.peppol.smpserver.domain.user.ISMPUserManager;
-import com.helger.peppol.smpserver.exception.SMPNotFoundException;
-import com.helger.peppol.smpserver.exception.SMPServerException;
-import com.helger.peppol.smpserver.exception.SMPUnauthorizedException;
-import com.helger.peppol.smpserver.exception.SMPUnknownUserException;
+import com.helger.phoss.smp.domain.user.ISMPUser;
+import com.helger.phoss.smp.domain.user.ISMPUserManager;
+import com.helger.phoss.smp.exception.SMPNotFoundException;
+import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.phoss.smp.exception.SMPUnauthorizedException;
+import com.helger.phoss.smp.exception.SMPUnknownUserException;
 
 /**
  * A EclipseLink based implementation of the {@link ISMPUserManager} interface.

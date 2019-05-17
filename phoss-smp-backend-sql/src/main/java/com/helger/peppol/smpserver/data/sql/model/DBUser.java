@@ -24,7 +24,7 @@ import javax.persistence.Transient;
 
 import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
-import com.helger.peppol.smpserver.domain.user.ISMPUserEditable;
+import com.helger.phoss.smp.domain.user.ISMPUserEditable;
 
 /**
  * Represents a single user within the SMP database.

@@ -26,11 +26,11 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.smpserver.SMPServerConfiguration;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
-import com.helger.peppol.smpserver.restapi.BDXRServerAPI;
-import com.helger.peppol.smpserver.restapi.ISMPServerAPIDataProvider;
-import com.helger.peppol.smpserver.restapi.SMPServerAPI;
+import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.restapi.BDXRServerAPI;
+import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.core.api.IAPIDescriptor;
 import com.helger.photon.core.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;

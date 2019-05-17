@@ -27,7 +27,7 @@ import com.helger.db.jpa.annotation.UsedOnlyByJPA;
 import com.helger.db.jpa.eclipselink.converter.JPALocalDateConverter;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.identifier.generic.participant.IParticipantIdentifier;
-import com.helger.peppol.smpserver.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 
 /**
  * DB Business Card Entity representation

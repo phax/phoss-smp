@@ -16,7 +16,7 @@
  */
 package com.helger.peppol.smpserver.standalone;
 
-import com.helger.peppol.smpserver.SMPServerConfiguration;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.photon.jetty.JettyStarter;
 
 /**
