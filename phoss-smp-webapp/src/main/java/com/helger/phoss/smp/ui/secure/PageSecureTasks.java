@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
@@ -30,13 +32,16 @@ import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.grouping.HCUL;
+import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.phoss.smp.SMPServerConfiguration;
@@ -50,6 +55,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
@@ -100,6 +106,8 @@ public class PageSecureTasks extends AbstractSMPWebPage
     final LocalDateTime aNowDT = PDTFactory.getCurrentLocalDateTime ();
     final LocalDateTime aNowPlusDT = aNowDT.plusMonths (3);
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
+    final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
+    final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
 
     aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page tries to identify upcoming tasks and potential problems in the SMP configuration. It is meant to highlight immediate and upcoming action items as well as potential misconfiguration."));
 
@@ -132,12 +140,40 @@ public class PageSecureTasks extends AbstractSMPWebPage
     }
 
     // Check SML configuration
-    if (!SMPMetaManager.getSettings ().isSMLActive ())
+    if (aSMPSettings.isSMLRequired ())
     {
-      // Warn only if SML is needed
-      if (SMPMetaManager.getSettings ().isSMLRequired ())
-        aOL.addItem (_createWarning ("The connection to the SML is not active."),
+      if (!aSMPSettings.isSMLActive ())
+      {
+        aOL.addItem (_createWarning ("The connection to the SML is not configured."),
                      new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+      }
+
+      final ISMLInfo aSMLInfo = aSMPSettings.getSMLInfo ();
+      if (aSMLInfo == null)
+      {
+        aOL.addItem (_createError ("No SML is selected."),
+                     new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+      }
+      else
+      {
+        // Check if this SMP is already registered
+        final String sPublisherDNSName = sSMPID + "." + aSMLInfo.getPublisherDNSZone ();
+        try
+        {
+          InetAddress.getByName (sPublisherDNSName);
+          // On success, ignore
+        }
+        catch (final UnknownHostException ex)
+        {
+          // continue
+          aOL.addItem (_createWarning ("It seems like this SMP was not yet registered to the SMP."),
+                       new HCDiv ().addChild ("This is a one-time action that should be performed once. It requires a valid SMP certificate to work."),
+                       new HCDiv ().addChild ("The registration check was performed with the URL ")
+                                   .addChild (new HCA ().setHref (new SimpleURL ("http://" + sPublisherDNSName))
+                                                        .setTargetBlank ()
+                                                        .addChild (new HCCode ().addChild (sPublisherDNSName))));
+        }
+      }
     }
 
     // Check that public URL is set
@@ -182,9 +218,9 @@ public class PageSecureTasks extends AbstractSMPWebPage
     }
 
     // Check Directory configuration
-    if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
+    if (aSMPSettings.isPEPPOLDirectoryIntegrationEnabled ())
     {
-      if (StringHelper.hasNoText (SMPMetaManager.getSettings ().getPEPPOLDirectoryHostName ()))
+      if (StringHelper.hasNoText (aSMPSettings.getPEPPOLDirectoryHostName ()))
         aOL.addItem (_createError ("An empty " + sDirectoryName + " hostname is provided"),
                      new HCDiv ().addChild ("A connection to the " + sDirectoryName + " server cannot be establised!"));
 
@@ -198,8 +234,8 @@ public class PageSecureTasks extends AbstractSMPWebPage
     else
     {
       // Warn only if Directory is required
-      if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationRequired ())
-        aOL.addItem (_createWarning ("The connection to " + sDirectoryName + " is not enabled."));
+      if (aSMPSettings.isPEPPOLDirectoryIntegrationRequired ())
+        aOL.addItem (_createWarning ("The connection to " + sDirectoryName + " is not configured."));
     }
 
     // check service groups and redirects
