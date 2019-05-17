@@ -57,6 +57,7 @@ import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
+import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -121,6 +122,7 @@ public final class BusinessCardInterfaceTest
 
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
+    aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
     final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
     Response aResponseMsg;
@@ -219,6 +221,7 @@ public final class BusinessCardInterfaceTest
 
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
+    aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
     final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
     Response aResponseMsg;
@@ -317,6 +320,7 @@ public final class BusinessCardInterfaceTest
 
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
+    aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
     final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
     Response aResponseMsg;

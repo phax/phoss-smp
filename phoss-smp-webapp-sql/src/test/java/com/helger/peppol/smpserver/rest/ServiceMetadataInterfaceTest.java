@@ -59,6 +59,7 @@ import com.helger.peppol.smp.RedirectType;
 import com.helger.peppol.smp.ServiceEndpointList;
 import com.helger.peppol.smp.ServiceGroupType;
 import com.helger.peppol.smp.ServiceInformationType;
+import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smpclient.SMPClient;
 import com.helger.peppol.smpclient.exception.SMPClientException;
@@ -133,6 +134,7 @@ public final class ServiceMetadataInterfaceTest
 
       final ServiceGroupType aSG = new ServiceGroupType ();
       aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+      aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
       final ServiceMetadataType aSM = new ServiceMetadataType ();
       final ServiceInformationType aSI = new ServiceInformationType ();
@@ -252,6 +254,7 @@ public final class ServiceMetadataInterfaceTest
 
       final ServiceGroupType aSG = new ServiceGroupType ();
       aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+      aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
       final ServiceInformationType aSI = new ServiceInformationType ();
       aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
@@ -374,6 +377,7 @@ public final class ServiceMetadataInterfaceTest
 
       final ServiceGroupType aSG = new ServiceGroupType ();
       aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+      aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
       final ServiceMetadataType aSM = new ServiceMetadataType ();
       final RedirectType aRedir = new RedirectType ();
@@ -471,6 +475,7 @@ public final class ServiceMetadataInterfaceTest
 
       final ServiceGroupType aSG = new ServiceGroupType ();
       aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+      aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
       final RedirectType aRedir = new RedirectType ();
       aRedir.setHref ("http://other-smp.domain.xyz");

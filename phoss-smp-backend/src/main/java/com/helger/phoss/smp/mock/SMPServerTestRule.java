@@ -20,7 +20,7 @@ import com.helger.commons.system.SystemProperties;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.serviceinfo.LoggingSMPServiceInformationCallback;
-import com.helger.photon.basic.mock.PhotonBasicWebTestRule;
+import com.helger.photon.app.mock.PhotonAppWebTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 
@@ -29,7 +29,7 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
  *
  * @author Philip Helger
  */
-public class SMPServerTestRule extends PhotonBasicWebTestRule
+public class SMPServerTestRule extends PhotonAppWebTestRule
 {
   public SMPServerTestRule ()
   {

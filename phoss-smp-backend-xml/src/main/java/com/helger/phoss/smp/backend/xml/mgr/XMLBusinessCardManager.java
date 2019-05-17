@@ -42,8 +42,8 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
-import com.helger.photon.basic.audit.AuditHelper;
+import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
+import com.helger.photon.audit.AuditHelper;
 
 /**
  * Manager for all {@link SMPBusinessCard} objects.
@@ -116,10 +116,10 @@ public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <
     ValueEnforcer.notNull (aEntities, "Entities");
 
     LOGGER.info ("createOrUpdateSMPBusinessCard (" +
-                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                    ", " +
-                    CollectionHelper.getSize (aEntities) +
-                    " entities)");
+                 aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                 ", " +
+                 CollectionHelper.getSize (aEntities) +
+                 " entities)");
 
     final ISMPBusinessCard aOldBusinessCard = getSMPBusinessCardOfServiceGroup (aServiceGroup);
     final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aServiceGroup, aEntities);

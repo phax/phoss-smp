@@ -19,8 +19,8 @@ package com.helger.phoss.smp.ui;
 import javax.annotation.Nonnull;
 
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.photon.app.html.IHTMLProvider;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapLoginManager;
-import com.helger.photon.core.app.html.IHTMLProvider;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
 
 /**

@@ -47,7 +47,7 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
-import com.helger.photon.basic.audit.AuditHelper;
+import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;

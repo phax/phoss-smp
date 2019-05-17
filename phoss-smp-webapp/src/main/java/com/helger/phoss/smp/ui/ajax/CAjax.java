@@ -22,9 +22,9 @@ import javax.annotation.concurrent.Immutable;
 import com.helger.commons.functional.IPredicate;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.phoss.smp.app.CSMP;
-import com.helger.photon.core.ajax.IAjaxInvoker;
-import com.helger.photon.core.ajax.decl.AjaxFunctionDeclaration;
-import com.helger.photon.core.ajax.decl.IAjaxFunctionDeclaration;
+import com.helger.photon.ajax.IAjaxRegistry;
+import com.helger.photon.ajax.decl.AjaxFunctionDeclaration;
+import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
@@ -59,11 +59,11 @@ public final class CAjax
   private CAjax ()
   {}
 
-  public static void init (@Nonnull final IAjaxInvoker aAjaxInvoker)
+  public static void init (@Nonnull final IAjaxRegistry aAjaxRegistry)
   {
-    aAjaxInvoker.registerFunction (DATATABLES);
-    aAjaxInvoker.registerFunction (DATATABLES_I18N);
-    aAjaxInvoker.registerFunction (LOGIN);
-    aAjaxInvoker.registerFunction (FUNCTION_EXPORT_ALL_SERVICE_GROUPS);
+    aAjaxRegistry.registerFunction (DATATABLES);
+    aAjaxRegistry.registerFunction (DATATABLES_I18N);
+    aAjaxRegistry.registerFunction (LOGIN);
+    aAjaxRegistry.registerFunction (FUNCTION_EXPORT_ALL_SERVICE_GROUPS);
   }
 }

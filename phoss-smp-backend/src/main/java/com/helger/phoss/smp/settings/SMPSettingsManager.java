@@ -19,7 +19,7 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
 import com.helger.dao.DAOException;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.photon.basic.app.dao.AbstractPhotonSimpleDAO;
+import com.helger.photon.app.dao.AbstractPhotonSimpleDAO;
 import com.helger.settings.ISettings;
 import com.helger.settings.Settings;
 import com.helger.settings.exchange.xml.SettingsMicroDocumentConverter;

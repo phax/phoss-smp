@@ -18,7 +18,7 @@ package com.helger.phoss.smp.servlet;
 
 import com.helger.phoss.smp.ui.SMPLayoutHTMLProvider;
 import com.helger.phoss.smp.ui.secure.SMPRendererSecure;
-import com.helger.photon.core.app.html.IHTMLProvider;
+import com.helger.photon.app.html.IHTMLProvider;
 import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;

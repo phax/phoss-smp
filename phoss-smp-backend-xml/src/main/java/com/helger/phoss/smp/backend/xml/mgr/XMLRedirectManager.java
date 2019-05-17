@@ -38,8 +38,8 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.photon.basic.app.dao.AbstractPhotonMapBasedWALDAO;
-import com.helger.photon.basic.audit.AuditHelper;
+import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
+import com.helger.photon.audit.AuditHelper;
 
 /**
  * Manager for all {@link SMPRedirect} objects.

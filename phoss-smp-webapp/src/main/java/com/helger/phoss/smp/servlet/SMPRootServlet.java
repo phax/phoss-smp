@@ -17,8 +17,8 @@
 package com.helger.phoss.smp.servlet;
 
 import com.helger.commons.http.EHttpMethod;
-import com.helger.photon.basic.xservlet.RootXServletHandler;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
+import com.helger.photon.core.servlet.RootXServletHandler;
 import com.helger.xservlet.AbstractXServlet;
 
 public class SMPRootServlet extends AbstractXServlet

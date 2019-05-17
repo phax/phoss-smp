@@ -48,6 +48,7 @@ import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
 import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppol.smp.ObjectFactory;
 import com.helger.peppol.smp.ServiceGroupType;
+import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
 import com.helger.peppol.smpclient.SMPClient;
 import com.helger.peppol.smpclient.exception.SMPClientException;
 import com.helger.peppol.smpclient.exception.SMPClientNotFoundException;
@@ -107,8 +108,10 @@ public final class ServiceGroupInterfaceTest
     // Upper case version
     final IParticipantIdentifier aPI_UC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:XXX");
     final String sPI_UC = aPI_UC.getURIEncoded ();
+
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+    aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
     try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
     {
@@ -184,8 +187,10 @@ public final class ServiceGroupInterfaceTest
     final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9930:de203827312");
     // Upper case version
     final IParticipantIdentifier aPI_UC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9930:DE203827312");
+
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+    aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
     JPAEnabledManager.exceptionCallbacks ().removeAll ();
     final SMPClient aSMPClient = new MockSMPClient ();

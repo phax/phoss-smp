@@ -46,17 +46,17 @@ import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.pub.MenuPublic;
 import com.helger.phoss.smp.ui.secure.MenuSecure;
-import com.helger.photon.basic.app.appid.CApplicationID;
-import com.helger.photon.basic.app.appid.PhotonGlobalState;
-import com.helger.photon.basic.app.locale.ILocaleManager;
-import com.helger.photon.basic.app.menu.MenuTree;
-import com.helger.photon.basic.app.request.RequestParameterHandlerURLPathNamed;
-import com.helger.photon.basic.app.request.RequestParameterManager;
-import com.helger.photon.basic.configfile.ConfigurationFile;
-import com.helger.photon.basic.configfile.ConfigurationFileManager;
-import com.helger.photon.basic.configfile.EConfigurationFileSyntax;
+import com.helger.photon.ajax.IAjaxRegistry;
 import com.helger.photon.bootstrap4.servlet.WebAppListenerBootstrap;
-import com.helger.photon.core.ajax.IAjaxInvoker;
+import com.helger.photon.core.appid.CApplicationID;
+import com.helger.photon.core.appid.PhotonGlobalState;
+import com.helger.photon.core.configfile.ConfigurationFile;
+import com.helger.photon.core.configfile.ConfigurationFileManager;
+import com.helger.photon.core.configfile.EConfigurationFileSyntax;
+import com.helger.photon.core.locale.ILocaleManager;
+import com.helger.photon.core.menu.MenuTree;
+import com.helger.photon.core.requestparam.RequestParameterHandlerURLPathNamed;
+import com.helger.photon.core.requestparam.RequestParameterManager;
 import com.helger.servlet.ServletContextPathHolder;
 import com.helger.servlet.response.UnifiedResponseDefaultSettings;
 import com.helger.wsclient.WSHelper;
@@ -165,9 +165,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
-  public void initAjax (@Nonnull final IAjaxInvoker aAjaxInvoker)
+  protected void initAjax (@Nonnull final IAjaxRegistry aAjaxRegistry)
   {
-    CAjax.init (aAjaxInvoker);
+    CAjax.init (aAjaxRegistry);
   }
 
   @Override

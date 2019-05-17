@@ -28,7 +28,7 @@ import com.helger.phoss.smp.ui.pub.SMPRendererPublic;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapLoginHTMLProvider;
 import com.helger.photon.bootstrap4.utils.BootstrapPageHeader;
-import com.helger.photon.core.app.context.ISimpleWebExecutionContext;
+import com.helger.photon.core.execcontext.ISimpleWebExecutionContext;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
 
 /**

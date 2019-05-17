@@ -33,8 +33,8 @@ import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
-import com.helger.photon.core.api.IAPIDescriptor;
-import com.helger.photon.core.api.IAPIExecutor;
+import com.helger.photon.api.IAPIDescriptor;
+import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 

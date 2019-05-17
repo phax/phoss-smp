@@ -19,7 +19,7 @@ package com.helger.phoss.smp.ui.pub;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.photon.basic.app.menu.IMenuTree;
+import com.helger.photon.core.menu.IMenuTree;
 
 /**
  * This class contains the menu structure for the public application.

@@ -56,6 +56,14 @@
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
+      <artifactId>ph-settings</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-jaxb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
       <artifactId>peppol-commons</artifactId>
     </dependency>
     <dependency>
@@ -68,15 +76,7 @@
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-oton-basic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-settings</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-jaxb</artifactId>
+      <artifactId>ph-oton-app</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>

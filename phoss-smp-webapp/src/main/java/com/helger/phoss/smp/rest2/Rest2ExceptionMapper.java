@@ -32,8 +32,8 @@ import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exception.SMPUnknownUserException;
-import com.helger.photon.core.api.AbstractAPIExceptionMapper;
-import com.helger.photon.core.api.InvokableAPIDescriptor;
+import com.helger.photon.api.AbstractAPIExceptionMapper;
+import com.helger.photon.api.InvokableAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
