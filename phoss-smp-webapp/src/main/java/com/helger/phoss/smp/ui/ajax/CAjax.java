@@ -22,6 +22,7 @@ import javax.annotation.concurrent.Immutable;
 import com.helger.commons.functional.IPredicate;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.ajax.IAjaxRegistry;
 import com.helger.photon.ajax.decl.AjaxFunctionDeclaration;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
@@ -46,7 +47,7 @@ public final class CAjax
                                                                                         .build ();
   private static final IPredicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () == EHttpMethod.POST;
   public static final IAjaxFunctionDeclaration LOGIN = AjaxFunctionDeclaration.builder ("login")
-                                                                              .withFilter (FILTER_HTTP_POST)
+                                                                              .withFilter (FILTER_HTTP_POST.and (x -> SMPWebAppConfiguration.isPublicLoginEnabled ()))
                                                                               .withExecutor (AjaxExecutorPublicLogin.class)
                                                                               .build ();
   private static final IPredicate <? super IRequestWebScopeWithoutResponse> FILTER_LOGIN = x -> LoggedInUserManager.getInstance ()

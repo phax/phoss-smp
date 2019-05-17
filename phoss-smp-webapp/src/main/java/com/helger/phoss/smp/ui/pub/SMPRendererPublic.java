@@ -41,6 +41,7 @@ import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
@@ -106,6 +107,9 @@ public final class SMPRendererPublic
   private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC,
                                              @Nonnull final BootstrapNavbar aNavbar)
   {
+    if (!SMPWebAppConfiguration.isPublicLoginEnabled ())
+      return;
+
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final IUser aUser = aLEC.getLoggedInUser ();
 
@@ -287,8 +291,8 @@ public final class SMPRendererPublic
                                                                                                     .addChild ("@philiphelger"))
                              .addChild (" - ")
                              .addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
-                                                                                                             .addChild (CSMP.APPLICATION_TITLE +
-                                                                                                                        " on GitHub")));
+                                                                                                     .addChild (CSMP.APPLICATION_TITLE +
+                                                                                                                " on GitHub")));
     return aDiv;
   }
 

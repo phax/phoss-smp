@@ -197,4 +197,17 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   {
     return s_aConfigFile.getAsBoolean ("webapp.servicegroups.extensions.show", false);
   }
+
+  /**
+   * Settings for issue #102
+   * 
+   * @return <code>true</code> if the Login UI elements should be shown,
+   *         <code>false</code> to to not show them. Default is
+   *         <code>true</code>.
+   * @since 5.2.0
+   */
+  public static boolean isPublicLoginEnabled ()
+  {
+    return s_aConfigFile.getAsBoolean ("webapp.public.login.enabled", true);
+  }
 }
