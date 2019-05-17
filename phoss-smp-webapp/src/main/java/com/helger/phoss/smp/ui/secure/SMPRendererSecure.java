@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -138,18 +139,22 @@ public final class SMPRendererSecure
       if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ())
-                                   .addChild (" Directory support is enabled."));
+                                   .addChild (" Directory support is configured."));
+        if (StringHelper.hasNoText (aSettings.getPEPPOLDirectoryHostName ()))
+        {
+          aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
+                                     .addChild (" No Directory host is provided. ")
+                                     .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
+          aBox.setTypeIfWorse (EBootstrapAlertType.DANGER);
+        }
       }
       else
       {
         // Warn only if Directory is needed
-        if (aSettings.isPEPPOLDirectoryIntegrationRequired ())
-        {
-          aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
-                                     .addChild (" Directory support is disabled. ")
-                                     .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
-          aBox.setTypeIfWorse (EBootstrapAlertType.WARNING);
-        }
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
+                                   .addChild (" Directory support is NOT configured. ")
+                                   .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
+        aBox.setTypeIfWorse (EBootstrapAlertType.WARNING);
       }
     }
 
@@ -160,6 +165,7 @@ public final class SMPRendererSecure
                                  .addChild (" Certificate configuration is invalid."));
       aBox.setTypeIfWorse (EBootstrapAlertType.DANGER);
     }
+
     ret.addChild (aBox);
 
     return ret;
