@@ -63,8 +63,12 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
     if (m_aExtensions.isEmpty ())
       return null;
 
+    final Object aFirst = m_aExtensions.getFirst ().getAny ();
+    if (!(aFirst instanceof Element))
+      return null;
+
     // Use only the XML element of the first extension
-    final Element aAny = (Element) m_aExtensions.getFirst ().getAny ();
+    final Element aAny = (Element) aFirst;
     return XMLWriter.getNodeAsString (aAny);
   }
 
