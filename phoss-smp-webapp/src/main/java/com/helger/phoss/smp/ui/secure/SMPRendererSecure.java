@@ -112,8 +112,8 @@ public final class SMPRendererSecure
     // Information on SML usage
     if (aSettings.isSMLActive ())
     {
-      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ()).addChild (" SML connection is active."));
-      if (SMPMetaManager.getSettings ().getSMLInfo () == null)
+      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ()).addChild (" SML connection is configured."));
+      if (aSettings.getSMLInfo () == null)
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                    .addChild (" No SML is selected. ")
@@ -124,16 +124,16 @@ public final class SMPRendererSecure
     else
     {
       // Warn only if SML is needed
-      if (SMPMetaManager.getSettings ().isSMLRequired ())
+      if (aSettings.isSMLRequired ())
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
-                                   .addChild (" SML connection is NOT active. ")
+                                   .addChild (" SML connection is NOT configured. ")
                                    .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
         aBox.setTypeIfWorse (EBootstrapAlertType.WARNING);
       }
     }
 
-    if (SMPServerConfiguration.getRESTType ().isPEPPOL ())
+    if (aSettings.isPEPPOLDirectoryIntegrationRequired ())
     {
       if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
       {
@@ -143,7 +143,7 @@ public final class SMPRendererSecure
       else
       {
         // Warn only if Directory is needed
-        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationRequired ())
+        if (aSettings.isPEPPOLDirectoryIntegrationRequired ())
         {
           aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                      .addChild (" Directory support is disabled. ")
