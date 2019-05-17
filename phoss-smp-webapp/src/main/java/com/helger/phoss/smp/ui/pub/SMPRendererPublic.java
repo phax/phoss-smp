@@ -286,7 +286,7 @@ public final class SMPRendererPublic
                              .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ()
                                                                                                     .addChild ("@philiphelger"))
                              .addChild (" - ")
-                             .addChild (new HCA (new SimpleURL ("https://github.com/phax/peppol-smp-server")).setTargetBlank ()
+                             .addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
                                                                                                              .addChild (CSMP.APPLICATION_TITLE +
                                                                                                                         " on GitHub")));
     return aDiv;

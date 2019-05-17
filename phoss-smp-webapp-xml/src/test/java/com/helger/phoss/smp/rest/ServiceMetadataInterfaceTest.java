@@ -145,7 +145,7 @@ public final class ServiceMetadataInterfaceTest
       aEndpoint.setRequireBusinessLevelSignature (false);
       aEndpoint.setCertificate ("blacert");
       aEndpoint.setServiceDescription ("Unit test service");
-      aEndpoint.setTechnicalContactUrl ("https://github.com/phax/peppol-smp-server");
+      aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
       aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ());
       aSEL.addEndpoint (aEndpoint);
       aProcess.setServiceEndpointList (aSEL);
@@ -253,7 +253,7 @@ public final class ServiceMetadataInterfaceTest
       aEndpoint.setRequireBusinessLevelSignature (false);
       aEndpoint.setCertificate ("blacert");
       aEndpoint.setServiceDescription ("Unit test service");
-      aEndpoint.setTechnicalContactUrl ("https://github.com/phax/peppol-smp-server");
+      aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
       aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ());
       aSEL.addEndpoint (aEndpoint);
       aProcess.setServiceEndpointList (aSEL);

@@ -16,8 +16,8 @@
 #
 
 ---
-# First the tasks that need a priviledged user
-- name: Installation of prerequisistes (Bootstrapping)
+# First the tasks that need a privileged user
+- name: Installation of prerequisites (Bootstrapping)
   hosts: all
   become: yes
   remote_user: ubuntu
@@ -115,19 +115,19 @@
   - name: Configure pd-client.properties.path (required for config files)
     lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^peppol.pd.client.properties.path=" line="peppol.pd.client.properties.path={{tomcat_dir}}/conf/pdclient.properties"    
 
-  - name: Clone the phoss SMP Server in {{ sources_dir }}/peppol-smp-server
-    git: repo=https://github.com/phax/peppol-smp-server.git dest={{ sources_dir }}/peppol-smp-server version=peppol-smp-server-parent-pom-5.1.1
+  - name: Clone the phoss SMP Server in {{ sources_dir }}/phoss-smp
+    git: repo=https://github.com/phax/phoss-smp.git dest={{ sources_dir }}/phoss-smp version=phoss-smp-parent-pom-5.1.1
     register: smp_result
 
-  - name: Build SMP Server from {{ sources_dir }}/peppol-smp-server 
+  - name: Build SMP Server from {{ sources_dir }}/phoss-smp 
     when: smp_result | changed
     command: "mvn clean install -DskipTests"
 #    command: 'mvn clean install -DskipTests -Dhttp.proxyHost=1.2.3.4 -Dhttp.proxyPort=8080 -Dhttps.proxyHost=1.2.3.4 -Dhttps.proxyPort=8080 -Dhttp.nonProxyHosts="localhost|127.0.0.1"'
     args:
-      chdir: "{{ sources_dir }}/peppol-smp-server"
+      chdir: "{{ sources_dir }}/phoss-smp"
 
   - name: Deploy SMP Server to tomcat
-    copy: src="{{ sources_dir }}/peppol-smp-server/peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-5.1.1.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
+    copy: src="{{ sources_dir }}/phoss-smp/phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-5.1.1.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
 
   - name: Copy SMP Keystore to tomcat
     copy: src="{{smp_keystore}}" dest="{{smp_keystore_path}}" mode=0600 backup=yes

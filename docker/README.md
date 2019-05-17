@@ -1,7 +1,8 @@
 # phoss SMP Docker configuration
 
 This folder contains the Docker configuration file for phoss SMP.
-It is based on the official `tomcat:8.5` image.
+It is based on the official `tomcat:9-jre11` image since v5.2.0.
+It was previously based on the official `tomcat:8.5` image.
 
 Prebuild images are available from https://hub.docker.com/r/phelger/smp/
 
@@ -111,7 +112,7 @@ Short explanation on docker running
 
 Upon successful completion opening http://localhost:8888 in your browser should show you the start page of phoss SMP.
 
-Default credentials are in the Wiki at https://github.com/phax/peppol-smp-server/wiki/Running#default-login
+Default credentials are in the Wiki at https://github.com/phax/phoss-smp/wiki/Running#default-login
 
 The data directory inside the Docker image, where the data is stored is usually `/home/git/conf`.
  
@@ -160,5 +161,5 @@ To persistently save all the data stored by the SMP add another volume that moun
 On my Windows machine I use the following command to run the whole SMP on port 8888 with the correct configuration and the persistent storage like this: 
 
 ```
-docker run -d --name phoss-smp-with-config -p 8888:8080 -v c:\dev\git\peppol-smp-server\docker\example-config-dir:/config -v C:\dev\git\peppol-smp-server\docker\persistent\:/home/git/conf phoss-smp-with-config
+docker run -d --name phoss-smp-with-config -p 8888:8080 -v c:\dev\git\phoss-smp\docker\example-config-dir:/config -v C:\dev\git\phoss-smp\docker\persistent\:/home/git/conf phoss-smp-with-config
 ```

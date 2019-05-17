@@ -21,7 +21,7 @@ import com.helger.xservlet.AbstractXServlet;
 
 /**
  * The servlet to show the application status.<br>
- * Source: https://github.com/phax/peppol-smp-server/issues/73
+ * Source: https://github.com/phax/phoss-smp/issues/73
  *
  * @author Philip Helger
  * @since 5.0.6

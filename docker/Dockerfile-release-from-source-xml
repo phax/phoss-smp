@@ -43,9 +43,9 @@ LABEL version=$SMP_VERSION
 # Checkout from git and build
 WORKDIR /home/git
 RUN echo Building phoss SMP $SMP_VERSION \
-  && git clone https://github.com/phax/peppol-smp-server.git . \
-  && git checkout tags/peppol-smp-server-parent-pom-$SMP_VERSION -b work \
+  && git clone https://github.com/phax/phoss-smp.git . \
+  && git checkout tags/phoss-smp-parent-pom-$SMP_VERSION -b work \
   && mvn clean install -DskipTests
 
 # Copy result to Tomcat webapps dir
-RUN cp -r peppol-smp-server-webapp-xml/target/peppol-smp-server-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT
+RUN cp -r phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT

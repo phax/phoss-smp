@@ -50,7 +50,7 @@ import com.helger.xservlet.handler.simple.IXServletSimpleHandler;
 
 /**
  * Create SMP status as JSON object. See
- * https://github.com/phax/peppol-smp-server/wiki/Status-API for details.
+ * https://github.com/phax/phoss-smp/wiki/Status-API for details.
  *
  * @author Philip Helger
  * @since 5.0.6

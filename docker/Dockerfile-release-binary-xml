@@ -43,7 +43,7 @@ LABEL version=$SMP_VERSION
 # Download, unzip and copy result to Tomcat webapps dir
 WORKDIR /home/git
 RUN echo Downloading phoss SMP $SMP_VERSION \
-  && wget -nv https://github.com/phax/peppol-smp-server/releases/download/peppol-smp-server-parent-pom-$SMP_VERSION/peppol-smp-server-webapp-xml-$SMP_VERSION.war -O smp.zip \ 
+  && wget -nv https://github.com/phax/phoss-smp/releases/download/phoss-smp-parent-pom-$SMP_VERSION/phoss-smp-webapp-xml-$SMP_VERSION.war -O smp.zip \ 
   && unzip smp.zip -d smp/ \
   && cp -r smp/ $CATALINA_HOME/webapps/ROOT \
   && rm smp.zip
