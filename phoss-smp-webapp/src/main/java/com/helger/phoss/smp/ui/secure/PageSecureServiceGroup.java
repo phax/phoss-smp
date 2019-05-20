@@ -46,6 +46,7 @@ import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.network.dns.IPV4Addr;
+import com.helger.network.port.NetworkOnlineStatusDeterminator;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.url.IPeppolURLProvider;
@@ -198,17 +199,14 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                           }
 
                           // Simple check if we're online or not
-                          boolean bOffLine = false;
-                          try
+                          final boolean bOffline = NetworkOnlineStatusDeterminator.getNetworkStatus ().isOffline ();
+                          if (bOffline)
                           {
-                            // Throws exception in case of error
-                            InetAddress.getByName ("www.google.com");
-                            aNodeList.addChild (new BootstrapInfoBox ().addChild ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
-                          }
-                          catch (final UnknownHostException ex)
-                          {
-                            bOffLine = true;
                             aNodeList.addChild (new BootstrapWarnBox ().addChild ("It seems like you are offline! So please interpret the results on this page with care!"));
+                          }
+                          else
+                          {
+                            aNodeList.addChild (new BootstrapInfoBox ().addChild ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
                           }
 
                           final String sSMLZoneName = SMPMetaManager.getSettings ().getSMLDNSZone ();
@@ -270,7 +268,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                     ACTION_UNREGISTER_FROM_SML)
                                                                                                               .add (CPageParam.PARAM_OBJECT,
                                                                                                                     aServiceGroup.getID ()))
-                                                                                            .setDisabled (bOffLine ||
+                                                                                            .setDisabled (bOffline ||
                                                                                                           !SMPMetaManager.getSettings ()
                                                                                                                          .isSMLActive ()));
                             }
@@ -284,7 +282,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                     ACTION_REGISTER_TO_SML)
                                                                                                               .add (CPageParam.PARAM_OBJECT,
                                                                                                                     aServiceGroup.getID ()))
-                                                                                            .setDisabled (bOffLine ||
+                                                                                            .setDisabled (bOffline ||
                                                                                                           !SMPMetaManager.getSettings ()
                                                                                                                          .isSMLActive ()));
                             }
