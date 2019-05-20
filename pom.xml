@@ -195,6 +195,11 @@
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
+        <artifactId>phoss-smp-backend-mongodb</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
         <artifactId>phoss-smp-webapp</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -217,9 +222,11 @@
     <module>phoss-smp-backend</module>
     <module>phoss-smp-backend-sql</module>
     <module>phoss-smp-backend-xml</module>
+    <module>phoss-smp-backend-mongodb</module>
     <module>phoss-smp-webapp</module>
     <module>phoss-smp-webapp-sql</module>
     <module>phoss-smp-webapp-xml</module>
+    <module>phoss-smp-webapp-mongodb</module>
   </modules>
   
   <build>
