@@ -37,7 +37,7 @@ public final class MongoDBManagerProvider implements ISMPManagerProvider
   @Nonnull
   public ISMLInfoManager createSMLInfoMgr ()
   {
-    return null;
+    return new MongoDBSMLInfoManager ();
   }
 
   @Nonnull

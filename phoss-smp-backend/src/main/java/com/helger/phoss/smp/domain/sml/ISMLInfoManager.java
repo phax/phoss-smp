@@ -10,8 +10,6 @@
  */
 package com.helger.phoss.smp.domain.sml;
 
-import java.util.function.Predicate;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -120,17 +118,6 @@ public interface ISMLInfoManager
   ISMLInfo getSMLInfoOfID (@Nullable String sID);
 
   /**
-   * Find the first SML information that matches the provided predicate.
-   *
-   * @param aFilter
-   *        The predicate to be applied for searching. May not be
-   *        <code>null</code>.
-   * @return <code>null</code> if no such SML information exists.
-   */
-  @Nullable
-  ISMLInfo findFirst (@Nullable Predicate <? super ISMLInfo> aFilter);
-
-  /**
    * Check if a SML information with the passed ID is contained.
    *
    * @param sID
@@ -140,4 +127,15 @@ public interface ISMLInfoManager
    *         otherwise.
    */
   boolean containsSMLInfoWithID (@Nullable String sID);
+
+  /**
+   * Find the first SML information that contains the provided manage
+   * participant identifier endpoint address.
+   *
+   * @param sAddress
+   *        The address to search. May be <code>null</code>.
+   * @return <code>null</code> if no such SML information exists.
+   */
+  @Nullable
+  ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (@Nullable String sAddress);
 }

@@ -144,4 +144,12 @@ public final class SMLInfoManager extends AbstractPhotonMapBasedWALDAO <ISMLInfo
   {
     return containsWithID (sID);
   }
+
+  @Nullable
+  public ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (@Nullable final String sAddress)
+  {
+    if (StringHelper.hasNoText (sAddress))
+      return null;
+    return findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ().equals (sAddress));
+  }
 }

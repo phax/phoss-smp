@@ -62,11 +62,13 @@
       <groupId>com.helger</groupId>
       <artifactId>ph-oton-security</artifactId>
     </dependency>
+    
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>

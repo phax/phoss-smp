@@ -102,7 +102,8 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setPEPPOLDirectoryIntegrationRequired (final boolean bPEPPOLDirectoryIntegrationRequired)
   {
-    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_REQUIRED, bPEPPOLDirectoryIntegrationRequired);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_REQUIRED,
+                              bPEPPOLDirectoryIntegrationRequired);
   }
 
   public boolean isPEPPOLDirectoryIntegrationAutoUpdate ()
@@ -188,9 +189,7 @@ public class SMPSettings implements ISMPSettings
       {
         // Check if any SML item matches
         final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ()
-                                                .findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ()
-                                                                  .toExternalForm ()
-                                                                  .equals (sOldSMLURL));
+                                                .findFirstWithManageParticipantIdentifierEndpointAddress (sOldSMLURL);
         if (aSMLInfo != null)
           m_aSettings.put (KEY_SML_INFO_ID, aSMLInfo.getID ());
       }

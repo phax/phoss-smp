@@ -179,6 +179,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.mongodb</groupId>
+        <artifactId>mongodb-driver-sync</artifactId>
+        <version>3.10.2</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-smp-backend</artifactId>
         <version>${project.version}</version>
