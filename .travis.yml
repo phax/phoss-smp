@@ -48,10 +48,16 @@ jobs:
       script:
         - mvn test -B -P coverage sonar:sonar
         - docker pull tomcat:9-jre11
+# build XML version
         - docker build -t phoss-smp-snapshot-from-source-xml -f docker/Dockerfile-snapshot-from-source-xml .
         - docker tag phoss-smp-snapshot-from-source-xml phelger/smp:snapshot
+# build SQL version
+        - docker build -t phoss-smp-snapshot-from-source-sql -f docker/Dockerfile-snapshot-from-source-sql .
+        - docker tag phoss-smp-snapshot-from-source-sql phelger/smp:snapshot-sql
+# push both
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker push phelger/smp:snapshot
+        - docker push phelger/smp:snapshot-sql
         - docker logout
       after_success:
         - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
