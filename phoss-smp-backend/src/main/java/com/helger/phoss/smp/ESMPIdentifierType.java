@@ -47,11 +47,7 @@ public enum ESMPIdentifierType implements IHasID <String>
   @Nullable
   public static ESMPIdentifierType getFromIDOrNull (@Nullable final String sID)
   {
-    // Legacy ID
-    if ("bdxr".equals (sID))
-      return BDXR1;
-
-    return EnumHelper.getFromIDOrNull (ESMPIdentifierType.class, sID);
+    return getFromIDOrDefault (sID, null);
   }
 
   @Nullable
