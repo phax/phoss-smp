@@ -51,13 +51,13 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
 
   @Nonnull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMLInfo aInfo)
+  public static Document toBson (@Nonnull final ISMLInfo aValue)
   {
-    return new Document ().append (BSON_ID, aInfo.getID ())
-                          .append (BSON_DISPLAYNAME, aInfo.getDisplayName ())
-                          .append (BSON_DNSZONE, aInfo.getDNSZone ())
-                          .append (BSON_SERVICEURL, aInfo.getManagementServiceURL ())
-                          .append (BSON_CLIENTCERT, Boolean.valueOf (aInfo.isClientCertificateRequired ()));
+    return new Document ().append (BSON_ID, aValue.getID ())
+                          .append (BSON_DISPLAYNAME, aValue.getDisplayName ())
+                          .append (BSON_DNSZONE, aValue.getDNSZone ())
+                          .append (BSON_SERVICEURL, aValue.getManagementServiceURL ())
+                          .append (BSON_CLIENTCERT, Boolean.valueOf (aValue.isClientCertificateRequired ()));
   }
 
   @Nonnull

@@ -17,6 +17,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import org.w3c.dom.Element;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.hashcode.HashCodeGenerator;
@@ -43,8 +44,15 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
   {}
 
   @Nonnull
+  @ReturnsMutableObject
+  public final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> extensions ()
+  {
+    return m_aExtensions;
+  }
+
+  @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> getAllExtensions ()
+  public final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> getAllExtensions ()
   {
     return m_aExtensions.getClone ();
   }
@@ -73,7 +81,7 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
   }
 
   @Nonnull
-  public EChange setExtensionAsString (@Nullable final String sExtension)
+  public final EChange setExtensionAsString (@Nullable final String sExtension)
   {
     ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> aNewExt = null;
     if (StringHelper.hasText (sExtension))

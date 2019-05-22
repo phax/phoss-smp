@@ -11,22 +11,30 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 import org.bson.Document;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.peppol.identifier.IIdentifier;
+import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.mongodb.client.MongoCollection;
 
 /**
  * Abstract base class for MongoDB backends
- * 
+ *
  * @author Philip Helger
  */
 public abstract class AbstractManagerMongoDB implements AutoCloseable
 {
+  private static final String BSON_SCHEME = "scheme";
+  private static final String BSON_VALUE = "value";
+
   private final String m_sCollectionName;
   private final MongoCollection <Document> m_aCollection;
 
@@ -56,5 +64,22 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   protected final MongoCollection <Document> getCollection ()
   {
     return m_aCollection;
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static Document toBson (@Nonnull final IIdentifier aValue)
+  {
+    return new Document ().append (BSON_SCHEME, aValue.getScheme ()).append (BSON_VALUE, aValue.getValue ());
+  }
+
+  @Nullable
+  @ReturnsMutableCopy
+  public static IParticipantIdentifier toParticipantID (@Nullable final Document aDoc)
+  {
+    if (aDoc == null)
+      return null;
+    return SMPMetaManager.getIdentifierFactory ()
+                         .createParticipantIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
   }
 }

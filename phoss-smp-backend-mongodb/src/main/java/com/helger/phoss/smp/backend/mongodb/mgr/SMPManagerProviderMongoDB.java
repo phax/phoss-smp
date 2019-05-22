@@ -62,7 +62,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    return null;
+    return new SMPServiceGroupManagerMongoDB ();
   }
 
   @Nonnull

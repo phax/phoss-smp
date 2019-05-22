@@ -27,6 +27,10 @@ public interface ISMPHasExtension
 {
   @Nonnull
   @ReturnsMutableCopy
+  ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> extensions ();
+
+  @Nonnull
+  @ReturnsMutableCopy
   ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> getAllExtensions ();
 
   /**

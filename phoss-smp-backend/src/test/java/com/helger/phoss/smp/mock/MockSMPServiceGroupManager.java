@@ -61,12 +61,12 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
     throw new UnsupportedOperationException ();
   }
 
-  public int getSMPServiceGroupCountOfOwner (final String sOwnerID)
+  public long getSMPServiceGroupCountOfOwner (final String sOwnerID)
   {
     return 0;
   }
 
-  public int getSMPServiceGroupCount ()
+  public long getSMPServiceGroupCount ()
   {
     return 0;
   }

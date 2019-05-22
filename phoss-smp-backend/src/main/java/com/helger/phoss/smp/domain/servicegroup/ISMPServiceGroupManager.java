@@ -161,7 +161,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return A non-negative count. 0 if the passed owner ID is unknown.
    */
   @Nonnegative
-  int getSMPServiceGroupCountOfOwner (@Nonnull String sOwnerID);
+  long getSMPServiceGroupCountOfOwner (@Nonnull String sOwnerID);
 
   /**
    * Check if a service group with the passed participant identifier is
@@ -178,5 +178,5 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return The total number of contained service groups. Always &ge; 0.
    */
   @Nonnegative
-  int getSMPServiceGroupCount ();
+  long getSMPServiceGroupCount ();
 }

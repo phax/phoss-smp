@@ -50,11 +50,11 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
 
   @Nonnull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPTransportProfile aInfo)
+  public static Document toBson (@Nonnull final ISMPTransportProfile aValue)
   {
-    return new Document ().append (BSON_ID, aInfo.getID ())
-                          .append (BSON_NAME, aInfo.getName ())
-                          .append (BSON_DEPRECATED, Boolean.valueOf (aInfo.isDeprecated ()));
+    return new Document ().append (BSON_ID, aValue.getID ())
+                          .append (BSON_NAME, aValue.getName ())
+                          .append (BSON_DEPRECATED, Boolean.valueOf (aValue.isDeprecated ()));
   }
 
   @Nonnull

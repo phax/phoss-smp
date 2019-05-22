@@ -92,7 +92,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   }
 
   @Nonnull
-  public EChange setOwnerID (@Nonnull @Nonempty final String sOwnerID)
+  public final EChange setOwnerID (@Nonnull @Nonempty final String sOwnerID)
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
     if (sOwnerID.equals (m_sOwnerID))

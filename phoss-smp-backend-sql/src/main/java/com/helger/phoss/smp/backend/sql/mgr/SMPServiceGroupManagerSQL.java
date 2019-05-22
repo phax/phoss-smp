@@ -236,7 +236,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
       LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
-    final MutableBoolean aDeletedServiceGroup = new MutableBoolean (false);
+    final MutableBoolean aDeletedServiceGroupInSML = new MutableBoolean (false);
 
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
@@ -251,7 +251,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
         // Delete in SML - and remember that
         // throws exception in case of error
         aHook.deleteServiceGroup (aParticipantID);
-        aDeletedServiceGroup.set (true);
+        aDeletedServiceGroupInSML.set (true);
       }
 
       aEM.remove (aDBServiceGroup);
@@ -261,7 +261,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (ret.isFailure ())
     {
       // Error writing to the DB
-      if (aDeletedServiceGroup.booleanValue ())
+      if (aDeletedServiceGroupInSML.booleanValue ())
       {
         // Undo deletion in SML!
         try
@@ -366,7 +366,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
   }
 
   @Nonnegative
-  public int getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
+  public long getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupCountOfOwner(" + sOwnerID + ")");
@@ -382,7 +382,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     {
       return 0;
     }
-    return ret.get ().intValue ();
+    return ret.get ().longValue ();
   }
 
   @Nullable
@@ -442,7 +442,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
   }
 
   @Nonnegative
-  public int getSMPServiceGroupCount ()
+  public long getSMPServiceGroupCount ()
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupCount()");
@@ -456,6 +456,6 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     {
       return 0;
     }
-    return ret.get ().intValue ();
+    return ret.get ().longValue ();
   }
 }

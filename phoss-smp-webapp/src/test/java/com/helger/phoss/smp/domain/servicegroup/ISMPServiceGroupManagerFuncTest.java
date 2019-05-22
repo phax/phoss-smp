@@ -80,7 +80,7 @@ public final class ISMPServiceGroupManagerFuncTest
     try
     {
       // Check empty state
-      final int nCount = aSGMgr.getSMPServiceGroupCount ();
+      final long nCount = aSGMgr.getSMPServiceGroupCount ();
       assertEquals (nCount, aSGMgr.getAllSMPServiceGroups ().size ());
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI1));
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI2));

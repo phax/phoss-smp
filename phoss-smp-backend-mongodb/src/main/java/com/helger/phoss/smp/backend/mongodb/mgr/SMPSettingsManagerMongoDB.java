@@ -42,22 +42,22 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
 
   @Nonnull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPSettings aSettings)
+  public static Document toBson (@Nonnull final ISMPSettings aValue)
   {
     return new Document ().append (BSON_ID, ID_DUMMY)
                           .append (SMPServerConfiguration.KEY_SMP_REST_WRITABLE_API_DISABLED,
-                                   Boolean.valueOf (aSettings.isRESTWritableAPIDisabled ()))
+                                   Boolean.valueOf (aValue.isRESTWritableAPIDisabled ()))
                           .append (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,
-                                   Boolean.valueOf (aSettings.isDirectoryIntegrationRequired ()))
+                                   Boolean.valueOf (aValue.isDirectoryIntegrationRequired ()))
                           .append (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_ENABLED,
-                                   Boolean.valueOf (aSettings.isDirectoryIntegrationEnabled ()))
+                                   Boolean.valueOf (aValue.isDirectoryIntegrationEnabled ()))
                           .append (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                   Boolean.valueOf (aSettings.isDirectoryIntegrationAutoUpdate ()))
-                          .append (SMPServerConfiguration.KEY_SMP_DIRECTORY_HOSTNAME, aSettings.getDirectoryHostName ())
+                                   Boolean.valueOf (aValue.isDirectoryIntegrationAutoUpdate ()))
+                          .append (SMPServerConfiguration.KEY_SMP_DIRECTORY_HOSTNAME, aValue.getDirectoryHostName ())
                           .append (SMPServerConfiguration.KEY_SML_REQUIRED,
-                                   Boolean.valueOf (aSettings.isSMLRequired ()))
-                          .append (SMPServerConfiguration.KEY_SML_ENABLED, Boolean.valueOf (aSettings.isSMLEnabled ()))
-                          .append (KEY_SML_INFO_ID, aSettings.getSMLInfoID ());
+                                   Boolean.valueOf (aValue.isSMLRequired ()))
+                          .append (SMPServerConfiguration.KEY_SML_ENABLED, Boolean.valueOf (aValue.isSMLEnabled ()))
+                          .append (KEY_SML_INFO_ID, aValue.getSMLInfoID ());
   }
 
   public static void toDomain (@Nonnull final Document aDoc, @Nonnull final SMPSettings aTarget)

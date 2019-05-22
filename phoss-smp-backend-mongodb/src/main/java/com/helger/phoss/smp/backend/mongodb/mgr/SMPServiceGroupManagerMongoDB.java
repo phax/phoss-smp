@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.backend.xml.mgr;
+package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,45 +29,45 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
-import com.helger.dao.DAOException;
 import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
-import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
-import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 
 /**
  * Implementation of {@link ISMPServiceGroupManager} for the XML backend.
  *
  * @author Philip Helger
  */
-public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPServiceGroup, SMPServiceGroup>
-                                             implements
-                                             ISMPServiceGroupManager
+public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB implements ISMPServiceGroupManager
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerXML.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerMongoDB.class);
+  private static final String BSON_ID = "id";
+  private static final String BSON_OWNER_ID = "ownerid";
+  private static final String BSON_PARTICIPANT_ID = "participantid";
+  private static final String BSON_EXTENSION = "extension";
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceGroupManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPServiceGroupManagerMongoDB ()
   {
-    super (SMPServiceGroup.class, sFilename);
+    super ("smp-servicegroup");
+    getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
   @Nonnull
@@ -74,6 +75,27 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {
     return m_aCBs;
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static Document toBson (@Nonnull final ISMPServiceGroup aValue)
+  {
+    final Document ret = new Document ().append (BSON_ID, aValue.getID ())
+                                        .append (BSON_OWNER_ID, aValue.getOwnerID ())
+                                        .append (BSON_PARTICIPANT_ID, toBson (aValue.getParticpantIdentifier ()));
+    if (aValue.hasExtension ())
+      ret.append (BSON_EXTENSION, aValue.getExtensionAsString ());
+    return ret;
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static SMPServiceGroup toDomain (@Nonnull final Document aDoc)
+  {
+    return new SMPServiceGroup (aDoc.getString (BSON_OWNER_ID),
+                                toParticipantID (aDoc.get (BSON_PARTICIPANT_ID, Document.class)),
+                                aDoc.getString (BSON_EXTENSION));
   }
 
   @Nonnull
@@ -105,10 +127,9 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML", ex);
     }
 
-    m_aRWLock.writeLock ().lock ();
     try
     {
-      internalCreateItem (aSMPServiceGroup);
+      getCollection ().insertOne (toBson (aSMPServiceGroup));
     }
     catch (final RuntimeException ex)
     {
@@ -124,10 +145,6 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
         LOGGER.error ("Failed to undoCreateServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex2);
       }
       throw ex;
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
     }
 
     AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
@@ -160,33 +177,13 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                     ")");
 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
-    final SMPServiceGroup aSMPServiceGroup = getOfID (sServiceGroupID);
-    if (aSMPServiceGroup == null)
-    {
-      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "no-such-id", sServiceGroupID);
-      if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("updateSMPServiceGroup - failure");
-      throw new SMPNotFoundException ("No such service group '" + sServiceGroupID + "'");
-    }
-
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      EChange eChange = EChange.UNCHANGED;
-      eChange = eChange.or (aSMPServiceGroup.setOwnerID (sNewOwnerID));
-      eChange = eChange.or (aSMPServiceGroup.setExtensionAsString (sExtension));
-      if (eChange.isUnchanged ())
-      {
-        if (LOGGER.isDebugEnabled ())
-          LOGGER.debug ("updateSMPServiceGroup - unchanged");
-        return EChange.UNCHANGED;
-      }
-      internalUpdateItem (aSMPServiceGroup);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
+    final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sServiceGroupID),
+                                                                Updates.combine (Updates.set (BSON_OWNER_ID,
+                                                                                              sNewOwnerID),
+                                                                                 Updates.set (BSON_EXTENSION,
+                                                                                              sExtension)));
+    if (aOldDoc == null)
+      return EChange.UNCHANGED;
 
     AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sServiceGroupID, sNewOwnerID, sExtension);
     if (LOGGER.isDebugEnabled ())
@@ -204,15 +201,8 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
-    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
-    final SMPServiceGroup aSMPServiceGroup = getOfID (sServiceGroupID);
-    if (aSMPServiceGroup == null)
-    {
-      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
-      if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("deleteSMPServiceGroup - failure");
-      throw new SMPNotFoundException ("No such service group '" + aParticipantID.getURIEncoded () + "'");
-    }
+    if (!containsSMPServiceGroupWithID (aParticipantID))
+      return EChange.UNCHANGED;
 
     // Delete in SML - throws exception in case of error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
@@ -225,85 +215,30 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", ex);
     }
 
-    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    ICommonsList <ISMPRedirect> aOldRedirects = null;
-    ICommonsList <ISMPServiceInformation> aOldServiceInformation = null;
+    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
 
-    m_aRWLock.writeLock ().lock ();
-    try
+    final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sServiceGroupID));
+    if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      if (internalDeleteItem (aSMPServiceGroup.getID ()) == null)
-      {
-        AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aSMPServiceGroup.getID ());
-        if (LOGGER.isDebugEnabled ())
-          LOGGER.debug ("deleteSMPServiceGroup - failure");
+      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("deleteSMPServiceGroup - failure");
 
-        // Restore in SML again
-        try
-        {
-          aHook.undoDeleteServiceGroup (aParticipantID);
-        }
-        catch (final RegistrationHookException ex2)
-        {
-          LOGGER.error ("Failed to undoDeleteServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex2);
-        }
-        return EChange.UNCHANGED;
-      }
-
-      // Remember all redirects (in case of an error) and delete them
-      aOldRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
-      aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
-
-      // Remember all service information (in case of an error) and delete them
-      aOldServiceInformation = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
-      aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
-    }
-    catch (final RuntimeException ex)
-    {
-      // Deletion failed - shit
-
-      // Try to rollback the actions
-      if (!containsWithID (aSMPServiceGroup.getID ()))
-        internalCreateItem (aSMPServiceGroup);
-
-      // Restore redirects (if any)
-      if (aOldRedirects != null)
-        for (final ISMPRedirect aOldRedirect : aOldRedirects)
-        {
-          // ignore return value - we cannot do anything anyway
-          aRedirectMgr.createOrUpdateSMPRedirect (aSMPServiceGroup,
-                                                  aOldRedirect.getDocumentTypeIdentifier (),
-                                                  aOldRedirect.getTargetHref (),
-                                                  aOldRedirect.getSubjectUniqueIdentifier (),
-                                                  aOldRedirect.getExtensionAsString ());
-        }
-
-      // Restore service information (if any)
-      if (aOldServiceInformation != null)
-        for (final ISMPServiceInformation aOldServiceInfo : aOldServiceInformation)
-        {
-          // ignore return value - we cannot do anything anyway
-          aServiceInfoMgr.mergeSMPServiceInformation (aOldServiceInfo);
-        }
-
-      // An error occurred - restore in SML again
+      // restore in SML
+      // Undo deletion in SML!
       try
       {
         aHook.undoDeleteServiceGroup (aParticipantID);
       }
-      catch (final RegistrationHookException ex2)
+      catch (final RegistrationHookException ex)
       {
-        LOGGER.error ("Failed to undoDeleteServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex2);
+        LOGGER.error ("Failed to undoDeleteServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex);
       }
-      throw ex;
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
+
+      throw new SMPNotFoundException ("No such service group '" + aParticipantID.getURIEncoded () + "'");
     }
 
-    AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID ());
+    AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aParticipantID);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup - success");
 
@@ -316,20 +251,25 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
-    return getAll ();
+    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
+    getCollection ().find ().forEach ( (final Document x) -> ret.add (toDomain (x)));
+    return ret;
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
-    return getAll (x -> x.getOwnerID ().equals (sOwnerID));
+    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
+    getCollection ().find (new Document (BSON_OWNER_ID, sOwnerID))
+                    .forEach ( (final Document x) -> ret.add (toDomain (x)));
+    return ret;
   }
 
   @Nonnegative
   public long getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
   {
-    return getCount (x -> x.getOwnerID ().equals (sOwnerID));
+    return getCollection ().countDocuments (new Document (BSON_OWNER_ID, sOwnerID));
   }
 
   public ISMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantID)
@@ -338,7 +278,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       return null;
 
     final String sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
-    return getOfID (sID);
+    return getCollection ().find (new Document (BSON_ID, sID)).map (x -> toDomain (x)).first ();
   }
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantID)
@@ -347,12 +287,12 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       return false;
 
     final String sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
-    return containsWithID (sID);
+    return getCollection ().find (new Document (BSON_ID, sID)).first () != null;
   }
 
   @Nonnegative
   public long getSMPServiceGroupCount ()
   {
-    return size ();
+    return getCollection ().countDocuments ();
   }
 }
