@@ -46,12 +46,12 @@ import com.helger.photon.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class XMLRedirectManager extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements
+public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements
                                       ISMPRedirectManager
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (XMLServiceInformationManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceInformationManagerXML.class);
 
-  public XMLRedirectManager (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPRedirectManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPRedirect.class, sFilename);
   }

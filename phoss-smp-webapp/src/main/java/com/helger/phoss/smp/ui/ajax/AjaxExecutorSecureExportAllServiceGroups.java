@@ -85,7 +85,7 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
     }
 
     // Add Business cards only if PD integration is enabled
-    if (aSettingsMgr.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
+    if (aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ())
     {
       // Add all business cards
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();

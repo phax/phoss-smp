@@ -49,11 +49,11 @@ import com.helger.photon.security.user.UserManager;
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public final class XMLUserManager implements ISMPUserManager
+public final class SMPUserManagerXML implements ISMPUserManager
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (XMLUserManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerXML.class);
 
-  public XMLUserManager ()
+  public SMPUserManagerXML ()
   {}
 
   public boolean isSpecialUserManagementNeeded ()

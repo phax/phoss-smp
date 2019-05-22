@@ -44,9 +44,9 @@ import com.helger.phoss.smp.exception.SMPUnknownUserException;
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
-public final class SQLUserManager extends AbstractSMPJPAEnabledManager implements ISMPUserManager
+public final class SMPUserManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPUserManager
 {
-  public SQLUserManager ()
+  public SMPUserManagerSQL ()
   {}
 
   public boolean isSpecialUserManagementNeeded ()

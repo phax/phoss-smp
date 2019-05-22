@@ -56,15 +56,15 @@ import com.helger.photon.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class XMLServiceGroupManager extends AbstractPhotonMapBasedWALDAO <ISMPServiceGroup, SMPServiceGroup>
+public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPServiceGroup, SMPServiceGroup>
                                           implements
                                           ISMPServiceGroupManager
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (XMLServiceGroupManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerXML.class);
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
-  public XMLServiceGroupManager (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPServiceGroupManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceGroup.class, sFilename);
   }

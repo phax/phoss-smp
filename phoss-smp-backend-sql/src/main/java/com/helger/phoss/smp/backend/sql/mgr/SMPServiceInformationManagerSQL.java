@@ -63,12 +63,12 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
  *
  * @author Philip Helger
  */
-public final class SQLServiceInformationManager extends AbstractSMPJPAEnabledManager implements
+public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabledManager implements
                                                 ISMPServiceInformationManager
 {
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
-  public SQLServiceInformationManager ()
+  public SMPServiceInformationManagerSQL ()
   {}
 
   @Nonnull

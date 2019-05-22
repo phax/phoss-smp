@@ -144,7 +144,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
           m_aIdentifierFactory = BDXR2IdentifierFactory.INSTANCE;
           break;
         default:
-          throw new IllegalStateException ("Unsupporeted identifier type " + eIdentifierType + "!");
+          throw new IllegalStateException ("Unsupported identifier type " + eIdentifierType + "!");
       }
 
       // Initialize first because the service group manager initializes the

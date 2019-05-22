@@ -57,7 +57,7 @@ public final class APIExecutorBusinessCardPut implements IAPIExecutor
       aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
     }
     else
-      if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
+      if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
       {
         // PD integration is disabled
         LOGGER.warn ("The " +

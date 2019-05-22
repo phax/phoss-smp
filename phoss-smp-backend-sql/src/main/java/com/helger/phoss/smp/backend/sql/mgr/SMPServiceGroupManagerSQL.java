@@ -53,11 +53,11 @@ import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 
-public final class SQLServiceGroupManager extends AbstractSMPJPAEnabledManager implements ISMPServiceGroupManager
+public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPServiceGroupManager
 {
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
-  public SQLServiceGroupManager ()
+  public SMPServiceGroupManagerSQL ()
   {}
 
   @Nonnull

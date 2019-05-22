@@ -51,7 +51,7 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 
 /**
- * Test class for class {@link XMLServiceInformationManager}.
+ * Test class for class {@link SMPServiceInformationManagerXML}.
  *
  * @author Philip Helger
  */

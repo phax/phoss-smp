@@ -21,25 +21,25 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
-import com.helger.phoss.smp.domain.sml.SMLInfoManager;
+import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManager;
+import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
-import com.helger.phoss.smp.settings.SMPSettingsManager;
+import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.
  *
  * @author Philip Helger
  */
-public final class SQLManagerProvider implements ISMPManagerProvider
+public final class SMPManagerProviderSQL implements ISMPManagerProvider
 {
   private static final String SML_INFO_XML = "sml-info.xml";
   private static final String SMP_SETTINGS_XML = "smp-settings.xml";
   private static final String SMP_TRANSPORT_PROFILES_XML = "transportprofiles.xml";
 
-  public SQLManagerProvider ()
+  public SMPManagerProviderSQL ()
   {}
 
   // TODO currently also file based
@@ -48,7 +48,7 @@ public final class SQLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new SMLInfoManager (SML_INFO_XML);
+      return new SMLInfoManagerXML (SML_INFO_XML);
     }
     catch (final DAOException ex)
     {
@@ -62,7 +62,7 @@ public final class SQLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new SMPSettingsManager (SMP_SETTINGS_XML);
+      return new SMPSettingsManagerXML (SMP_SETTINGS_XML);
     }
     catch (final DAOException ex)
     {
@@ -76,7 +76,7 @@ public final class SQLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new SMPTransportProfileManager (SMP_TRANSPORT_PROFILES_XML);
+      return new SMPTransportProfileManagerXML (SMP_TRANSPORT_PROFILES_XML);
     }
     catch (final DAOException ex)
     {
@@ -87,31 +87,31 @@ public final class SQLManagerProvider implements ISMPManagerProvider
   @Nonnull
   public ISMPUserManager createUserMgr ()
   {
-    return new SQLUserManager ();
+    return new SMPUserManagerSQL ();
   }
 
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    return new SQLServiceGroupManager ();
+    return new SMPServiceGroupManagerSQL ();
   }
 
   @Nonnull
   public ISMPRedirectManager createRedirectMgr ()
   {
-    return new SQLRedirectManager ();
+    return new SMPRedirectManagerSQL ();
   }
 
   @Nonnull
   public ISMPServiceInformationManager createServiceInformationMgr ()
   {
-    return new SQLServiceInformationManager ();
+    return new SMPServiceInformationManagerSQL ();
   }
 
   @Nullable
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SQLBusinessCardManager (aServiceGroupMgr);
+    return new SMPBusinessCardManagerSQL (aServiceGroupMgr);
   }
 
   @Override

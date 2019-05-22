@@ -35,12 +35,12 @@ import com.helger.xml.microdom.MicroDocument;
  * @author Philip Helger
  */
 @ThreadSafe
-public class SMPSettingsManager extends AbstractPhotonSimpleDAO implements ISMPSettingsManager
+public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements ISMPSettingsManager
 {
   private final SMPSettings m_aSettings = new SMPSettings ();
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
 
-  public SMPSettingsManager (@Nullable final String sFilename) throws DAOException
+  public SMPSettingsManagerXML (@Nullable final String sFilename) throws DAOException
   {
     super (sFilename);
     initialRead ();
@@ -81,10 +81,10 @@ public class SMPSettingsManager extends AbstractPhotonSimpleDAO implements ISMPS
 
   @Nonnull
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
-                                 final boolean bPEPPOLDirectoryIntegrationEnabled,
-                                 final boolean bPEPPOLDirectoryIntegrationRequired,
-                                 final boolean bPEPPOLDirectoryIntegrationAutoUpdate,
-                                 @Nullable final String sPEPPOLDirectoryHostName,
+                                 final boolean bDirectoryIntegrationEnabled,
+                                 final boolean bDirectoryIntegrationRequired,
+                                 final boolean bDirectoryIntegrationAutoUpdate,
+                                 @Nullable final String sDirectoryHostName,
                                  final boolean bSMLActive,
                                  final boolean bSMLRequired,
                                  @Nullable final ISMLInfo aSMLInfo)
@@ -94,13 +94,13 @@ public class SMPSettingsManager extends AbstractPhotonSimpleDAO implements ISMPS
     try
     {
       eChange = eChange.or (m_aSettings.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
-      eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationEnabled (bPEPPOLDirectoryIntegrationEnabled));
-      eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationRequired (bPEPPOLDirectoryIntegrationRequired));
-      eChange = eChange.or (m_aSettings.setPEPPOLDirectoryIntegrationAutoUpdate (bPEPPOLDirectoryIntegrationAutoUpdate));
-      eChange = eChange.or (m_aSettings.setPEPPOLDirectoryHostName (sPEPPOLDirectoryHostName));
-      eChange = eChange.or (m_aSettings.setSMLActive (bSMLActive));
+      eChange = eChange.or (m_aSettings.setDirectoryIntegrationRequired (bDirectoryIntegrationRequired));
+      eChange = eChange.or (m_aSettings.setDirectoryIntegrationEnabled (bDirectoryIntegrationEnabled));
+      eChange = eChange.or (m_aSettings.setDirectoryIntegrationAutoUpdate (bDirectoryIntegrationAutoUpdate));
+      eChange = eChange.or (m_aSettings.setDirectoryHostName (sDirectoryHostName));
       eChange = eChange.or (m_aSettings.setSMLRequired (bSMLRequired));
-      eChange = eChange.or (m_aSettings.setSMLInfo (aSMLInfo == null ? null : aSMLInfo.getID ()));
+      eChange = eChange.or (m_aSettings.setSMLEnabled (bSMLActive));
+      eChange = eChange.or (m_aSettings.setSMLInfoID (aSMLInfo == null ? null : aSMLInfo.getID ()));
       if (eChange.isChanged ())
         markAsChanged ();
     }

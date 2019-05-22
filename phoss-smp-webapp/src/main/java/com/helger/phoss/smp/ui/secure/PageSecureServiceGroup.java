@@ -134,7 +134,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                     .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."));
         if (SMPMetaManager.hasBusinessCardMgr ())
           aQB.addChild (new HCDiv ().addChild ("If a Business Card for this service group exists, it will also be deleted."));
-        if (SMPMetaManager.getSettings ().isSMLActive ())
+        if (SMPMetaManager.getSettings ().isSMLEnabled ())
           aQB.addChild (new HCDiv ().addChild ("Since the connection to the SML is active this service group will also be deleted from the SML!"));
 
         aForm.addChild (aQB);
@@ -270,7 +270,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                     aServiceGroup.getID ()))
                                                                                             .setDisabled (bOffline ||
                                                                                                           !SMPMetaManager.getSettings ()
-                                                                                                                         .isSMLActive ()));
+                                                                                                                         .isSMLEnabled ()));
                             }
                             else
                             {
@@ -284,7 +284,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                     aServiceGroup.getID ()))
                                                                                             .setDisabled (bOffline ||
                                                                                                           !SMPMetaManager.getSettings ()
-                                                                                                                         .isSMLActive ()));
+                                                                                                                         .isSMLEnabled ()));
                             }
                           }
 
@@ -609,7 +609,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                    EDefaultIcon.MAGNIFIER)
               .setDisabled (SMPMetaManager.getSettings ().getSMLDNSZone () == null ||
                             aAllServiceGroups.isEmpty () ||
-                            !SMPMetaManager.getSettings ().isSMLActive ());
+                            !SMPMetaManager.getSettings ().isSMLEnabled ());
     }
     aNodeList.addChild (aToolbar);
 

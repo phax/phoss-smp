@@ -219,7 +219,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     // Now read the business cards
     final ICommonsOrderedSet <ISMPBusinessCard> aImportBusinessCards = new CommonsLinkedHashSet <> ();
     final ICommonsList <ISMPBusinessCard> aDeleteBusinessCards = new CommonsArrayList <> ();
-    if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
+    if (aSettings.isDirectoryIntegrationEnabled ())
     {
       // Read them only if the PEPPOL Directory integration is enabled
       int nBCIndex = 0;
@@ -284,7 +284,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
     if (aImportServiceGroups.isEmpty () && aImportBusinessCards.isEmpty ())
     {
-      if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
+      if (aSettings.isDirectoryIntegrationEnabled ())
         aLogger.warn ("Found neither a service group nor a business card to import.");
       else
         aLogger.warn ("Found no service group to import.");
@@ -513,7 +513,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     }
 
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
-    final boolean bHandleBusinessCards = aSettings.isPEPPOLDirectoryIntegrationEnabled ();
+    final boolean bHandleBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
 
     // Export tab
     {

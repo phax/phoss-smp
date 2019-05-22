@@ -25,9 +25,9 @@ import com.helger.peppol.sml.SMLInfo;
 import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
 
-public final class SMLInfoManager extends AbstractPhotonMapBasedWALDAO <ISMLInfo, SMLInfo> implements ISMLInfoManager
+public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLInfo, SMLInfo> implements ISMLInfoManager
 {
-  public SMLInfoManager (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMLInfoManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMLInfo.class, sFilename);
   }

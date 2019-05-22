@@ -297,7 +297,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     }
 
     // PEPPOL Directory client certificate
-    if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
+    if (SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
     {
       final HCNodeList aTab = new HCNodeList ();
 

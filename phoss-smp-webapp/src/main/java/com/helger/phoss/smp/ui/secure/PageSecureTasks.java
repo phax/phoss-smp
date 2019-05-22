@@ -142,7 +142,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
     // Check SML configuration
     if (aSMPSettings.isSMLRequired ())
     {
-      if (!aSMPSettings.isSMLActive ())
+      if (!aSMPSettings.isSMLEnabled ())
       {
         aOL.addItem (_createWarning ("The connection to the SML is not configured."),
                      new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
@@ -218,9 +218,9 @@ public class PageSecureTasks extends AbstractSMPWebPage
     }
 
     // Check Directory configuration
-    if (aSMPSettings.isPEPPOLDirectoryIntegrationEnabled ())
+    if (aSMPSettings.isDirectoryIntegrationEnabled ())
     {
-      if (StringHelper.hasNoText (aSMPSettings.getPEPPOLDirectoryHostName ()))
+      if (StringHelper.hasNoText (aSMPSettings.getDirectoryHostName ()))
         aOL.addItem (_createError ("An empty " + sDirectoryName + " hostname is provided"),
                      new HCDiv ().addChild ("A connection to the " + sDirectoryName + " server cannot be establised!"));
 
@@ -234,7 +234,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
     else
     {
       // Warn only if Directory is required
-      if (aSMPSettings.isPEPPOLDirectoryIntegrationRequired ())
+      if (aSMPSettings.isDirectoryIntegrationRequired ())
         aOL.addItem (_createWarning ("The connection to " + sDirectoryName + " is not configured."));
     }
 

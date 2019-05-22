@@ -27,19 +27,19 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
-import com.helger.phoss.smp.domain.sml.SMLInfoManager;
+import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManager;
+import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
-import com.helger.phoss.smp.settings.SMPSettingsManager;
+import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.
  *
  * @author Philip Helger
  */
-public final class XMLManagerProvider implements ISMPManagerProvider
+public final class SMPManagerProviderXML implements ISMPManagerProvider
 {
   public static final String SML_INFO_XML = "sml-info.xml";
   public static final String SMP_SETTINGS_XML = "smp-settings.xml";
@@ -49,7 +49,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   public static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
   public static final String SMP_BUSINESS_CARD_XML = "smp-business-card.xml";
 
-  public XMLManagerProvider ()
+  public SMPManagerProviderXML ()
   {}
 
   @Nonnull
@@ -57,7 +57,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new SMLInfoManager (SML_INFO_XML);
+      return new SMLInfoManagerXML (SML_INFO_XML);
     }
     catch (final DAOException ex)
     {
@@ -70,7 +70,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new SMPSettingsManager (SMP_SETTINGS_XML);
+      return new SMPSettingsManagerXML (SMP_SETTINGS_XML);
     }
     catch (final DAOException ex)
     {
@@ -83,7 +83,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new SMPTransportProfileManager (SMP_TRANSPORT_PROFILES_XML);
+      return new SMPTransportProfileManagerXML (SMP_TRANSPORT_PROFILES_XML);
     }
     catch (final DAOException ex)
     {
@@ -94,7 +94,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   @Nonnull
   public ISMPUserManager createUserMgr ()
   {
-    return new XMLUserManager ();
+    return new SMPUserManagerXML ();
   }
 
   @Nonnull
@@ -102,7 +102,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new XMLServiceGroupManager (SMP_SERVICE_GROUP_XML);
+      return new SMPServiceGroupManagerXML (SMP_SERVICE_GROUP_XML);
     }
     catch (final DAOException ex)
     {
@@ -115,7 +115,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new XMLRedirectManager (SMP_REDIRECT_XML);
+      return new SMPRedirectManagerXML (SMP_REDIRECT_XML);
     }
     catch (final DAOException ex)
     {
@@ -128,7 +128,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new XMLServiceInformationManager (SMP_SERVICE_INFORMATION_XML);
+      return new SMPServiceInformationManagerXML (SMP_SERVICE_INFORMATION_XML);
     }
     catch (final DAOException ex)
     {
@@ -141,7 +141,7 @@ public final class XMLManagerProvider implements ISMPManagerProvider
   {
     try
     {
-      return new XMLBusinessCardManager (SMP_BUSINESS_CARD_XML);
+      return new SMPBusinessCardManagerXML (SMP_BUSINESS_CARD_XML);
     }
     catch (final DAOException ex)
     {

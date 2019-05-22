@@ -50,15 +50,15 @@ import com.helger.photon.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class XMLBusinessCardManager extends AbstractPhotonMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard>
+public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard>
                                           implements
                                           ISMPBusinessCardManager
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (XMLBusinessCardManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerXML.class);
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public XMLBusinessCardManager (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPBusinessCardManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPBusinessCard.class, sFilename);
   }

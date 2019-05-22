@@ -34,22 +34,22 @@ public interface ISMPSettings extends ITypedObject <String>
   boolean isRESTWritableAPIDisabled ();
 
   /**
-   * Check if the PEPPOL Directory integration (offering the /businesscard API)
-   * is enabled.
+   * @return <code>true</code> if the Directory is required and warnings should
+   *         be emitted if it is disabled, <code>false</code> if not. Default is
+   *         <code>true</code>.
+   * @see #isDirectoryIntegrationEnabled()
+   * @since 5.1.0
+   */
+  boolean isDirectoryIntegrationRequired ();
+
+  /**
+   * Check if the Directory integration (offering the /businesscard API) is
+   * enabled.
    *
    * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
    *         By default it is disabled.
    */
-  boolean isPEPPOLDirectoryIntegrationEnabled ();
-
-  /**
-   * @return <code>true</code> if the Directory is required and warnings should
-   *         be emitted if it is disabled, <code>false</code> if not. Default is
-   *         <code>true</code>.
-   * @see #isPEPPOLDirectoryIntegrationEnabled()
-   * @since 5.1.0
-   */
-  boolean isPEPPOLDirectoryIntegrationRequired ();
+  boolean isDirectoryIntegrationEnabled ();
 
   /**
    * If the PEPPOL Directory integration is enabled, should the changes be
@@ -58,44 +58,34 @@ public interface ISMPSettings extends ITypedObject <String>
    * @return <code>true</code> if it is enabled, <code>false</code> otherwise.
    *         By default it is disabled.
    */
-  boolean isPEPPOLDirectoryIntegrationAutoUpdate ();
+  boolean isDirectoryIntegrationAutoUpdate ();
 
   /**
    * @return The host name of the PEPPOL Directory server. Never
    *         <code>null</code>.
    */
   @Nonnull
-  String getPEPPOLDirectoryHostName ();
-
-  /**
-   * @return <code>true</code> if the SML connection is active,
-   *         <code>false</code> if not.
-   */
-  @Deprecated
-  default boolean isWriteToSML ()
-  {
-    return isSMLActive ();
-  }
-
-  /**
-   * @return <code>true</code> if the SML connection is active,
-   *         <code>false</code> if not.
-   * @since 5.0.4 - renamed
-   */
-  boolean isSMLActive ();
+  String getDirectoryHostName ();
 
   /**
    * @return <code>true</code> if the SML is required and warnings should be
    *         emitted if it is disabled, <code>false</code> if not. Default is
    *         <code>true</code>.
-   * @see #isSMLActive()
+   * @see #isSMLEnabled()
    * @since 5.0.4
    */
   boolean isSMLRequired ();
 
   /**
+   * @return <code>true</code> if the SML connection is active,
+   *         <code>false</code> if not.
+   * @since 5.2.0 - renamed
+   */
+  boolean isSMLEnabled ();
+
+  /**
    * @return The SML information object to be used. May be <code>null</code>.
-   *         Only relevant when {@link #isSMLActive()} is <code>true</code>.
+   *         Only relevant when {@link #isSMLEnabled()} is <code>true</code>.
    * @since 5.0.7
    */
   @Nullable
@@ -103,7 +93,7 @@ public interface ISMPSettings extends ITypedObject <String>
 
   /**
    * @return The ID of SML information object to be used. May be
-   *         <code>null</code>. Only relevant when {@link #isSMLActive()} is
+   *         <code>null</code>. Only relevant when {@link #isSMLEnabled()} is
    *         <code>true</code>.
    * @since 5.0.7
    */

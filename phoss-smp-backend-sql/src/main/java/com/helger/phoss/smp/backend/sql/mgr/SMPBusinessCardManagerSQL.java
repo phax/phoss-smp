@@ -57,7 +57,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
  *
  * @author Philip Helger
  */
-public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager implements ISMPBusinessCardManager
+public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPBusinessCardManager
 {
   // Create as minimal as possible
   private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false)
@@ -66,7 +66,7 @@ public final class SQLBusinessCardManager extends AbstractSMPJPAEnabledManager i
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SQLBusinessCardManager (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public SMPBusinessCardManagerSQL (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     ValueEnforcer.notNull (aServiceGroupMgr, "ServiceGroupMgr");
     m_aServiceGroupMgr = aServiceGroupMgr;

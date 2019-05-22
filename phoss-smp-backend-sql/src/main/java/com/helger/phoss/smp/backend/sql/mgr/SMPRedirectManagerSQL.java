@@ -44,9 +44,9 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
  *
  * @author Philip Helger
  */
-public final class SQLRedirectManager extends AbstractSMPJPAEnabledManager implements ISMPRedirectManager
+public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPRedirectManager
 {
-  public SQLRedirectManager ()
+  public SMPRedirectManagerSQL ()
   {}
 
   /**

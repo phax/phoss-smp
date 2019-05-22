@@ -48,7 +48,7 @@ public final class APIExecutorBusinessCardGet implements IAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
+    if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
     {
       // PD integration is disabled
       LOGGER.warn ("The " +

@@ -59,14 +59,17 @@ import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 public final class SMPServerConfiguration
 {
   public static final String KEY_SMP_BACKEND = "smp.backend";
+
   public static final String KEY_SMP_KEYSTORE_TYPE = "smp.keystore.type";
   public static final String KEY_SMP_KEYSTORE_PATH = "smp.keystore.path";
   public static final String KEY_SMP_KEYSTORE_PASSWORD = "smp.keystore.password";
   public static final String KEY_SMP_KEYSTORE_KEY_ALIAS = "smp.keystore.key.alias";
   public static final String KEY_SMP_KEYSTORE_KEY_PASSWORD = "smp.keystore.key.password";
+
   public static final String KEY_SMP_TRUSTSTORE_TYPE = "smp.truststore.type";
   public static final String KEY_SMP_TRUSTSTORE_PATH = "smp.truststore.path";
   public static final String KEY_SMP_TRUSTSTORE_PASSWORD = "smp.truststore.password";
+
   public static final String KEY_SMP_FORCE_ROOT = "smp.forceroot";
   public static final String KEY_SMP_PUBLIC_URL = "smp.publicurl";
   public static final String KEY_SMP_IDENTIFIER_TYPE = "smp.identifiertype";
@@ -74,11 +77,17 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
   public static final String KEY_SMP_REST_LOG_EXCEPTIONS = "smp.rest.log.exceptions";
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
-  public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
-  public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_REQUIRED = "smp.peppol.directory.integration.required";
-  public static final String KEY_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.peppol.directory.integration.autoupdate";
-  public static final String KEY_SMP_PEPPOL_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
-  public static final String KEY_SML_ACTIVE = "sml.active";
+  /* legacy name */
+  public static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
+  /* legacy name */
+  public static final String KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED = "smp.peppol.directory.integration.required";
+  /* legacy name */
+  public static final String KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.peppol.directory.integration.autoupdate";
+  /* legacy name */
+  public static final String KEY_SMP_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
+  /* legacy name */
+  public static final String KEY_SML_ENABLED = "sml.active";
+  /* legacy name */
   public static final String KEY_SML_REQUIRED = "sml.needed";
   public static final String KEY_SML_SMPID = "sml.smpid";
   public static final String KEY_SML_SMP_IP = "sml.smp.ip";
@@ -92,13 +101,13 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
   public static final boolean DEFAULT_SMP_REST_LOG_EXCEPTIONS = false;
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
-  public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_ENABLED = true;
-  public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_REQUIRED = true;
-  public static final boolean DEFAULT_SMP_PEPPOL_DIRECTORY_INTEGRATION_AUTO_UPDATE = true;
-  public static final String DEFAULT_SMP_PEPPOL_DIRECTORY_HOSTNAME = "https://directory.peppol.eu";
-  public static final boolean DEFAULT_SML_ACTIVE = false;
   public static final boolean DEFAULT_SML_REQUIRED = true;
+  public static final boolean DEFAULT_SML_ENABLED = false;
   public static final int DEFAULT_SML_REQUEST_TIMEOUT_MS = 30 * (int) CGlobal.MILLISECONDS_PER_SECOND;
+  public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED = true;
+  public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED = true;
+  public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = true;
+  public static final String DEFAULT_SMP_DIRECTORY_HOSTNAME = "https://directory.peppol.eu";
 
   /**
    * The name of the primary system property which points to the

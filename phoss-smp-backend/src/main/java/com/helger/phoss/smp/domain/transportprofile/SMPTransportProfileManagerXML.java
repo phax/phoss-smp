@@ -26,12 +26,12 @@ import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
 
-public final class SMPTransportProfileManager extends
+public final class SMPTransportProfileManagerXML extends
                                               AbstractPhotonMapBasedWALDAO <ISMPTransportProfile, SMPTransportProfile>
                                               implements
                                               ISMPTransportProfileManager
 {
-  public SMPTransportProfileManager (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPTransportProfileManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPTransportProfile.class, sFilename);
   }
