@@ -28,6 +28,8 @@ import com.helger.commons.annotation.ELockType;
 import com.helger.commons.annotation.IsLocked;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
@@ -35,6 +37,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
@@ -47,13 +50,22 @@ import com.helger.photon.audit.AuditHelper;
  * @author Philip Helger
  */
 public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements
-                                      ISMPRedirectManager
+                                         ISMPRedirectManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceInformationManagerXML.class);
+
+  private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
   public SMPRedirectManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPRedirect.class, sFilename);
+  }
+
+  @Nonnull
+  @ReturnsMutableObject
+  public CallbackList <ISMPRedirectCallback> redirectCallbacks ()
+  {
+    return m_aCallbacks;
   }
 
   @Nonnull
@@ -118,33 +130,21 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createOrUpdateSMPRedirect (" +
-                       aServiceGroup +
-                       ", " +
-                       aDocumentTypeIdentifier +
-                       ", " +
-                       sTargetHref +
-                       ", " +
-                       sSubjectUniqueIdentifier +
-                       ", " +
-                       (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
-                       ")");
+                    aServiceGroup +
+                    ", " +
+                    aDocumentTypeIdentifier +
+                    ", " +
+                    sTargetHref +
+                    ", " +
+                    sSubjectUniqueIdentifier +
+                    ", " +
+                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ")");
 
     final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                    aDocumentTypeIdentifier);
     SMPRedirect aNewRedirect;
-    if (aOldRedirect != null)
-    {
-      // Reuse old ID
-      aNewRedirect = new SMPRedirect (aServiceGroup,
-                                      aDocumentTypeIdentifier,
-                                      sTargetHref,
-                                      sSubjectUniqueIdentifier,
-                                      sExtension);
-      _updateSMPRedirect (aNewRedirect);
-      if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("createOrUpdateSMPRedirect - success - updated");
-    }
-    else
+    if (aOldRedirect == null)
     {
       // Create new ID
       aNewRedirect = new SMPRedirect (aServiceGroup,
@@ -155,6 +155,22 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
       _createSMPRedirect (aNewRedirect);
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("createOrUpdateSMPRedirect - success - created");
+
+      m_aCallbacks.forEach (x -> x.onSMPRedirectCreated (aNewRedirect));
+    }
+    else
+    {
+      // Reuse old ID
+      aNewRedirect = new SMPRedirect (aServiceGroup,
+                                      aDocumentTypeIdentifier,
+                                      sTargetHref,
+                                      sSubjectUniqueIdentifier,
+                                      sExtension);
+      _updateSMPRedirect (aNewRedirect);
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("createOrUpdateSMPRedirect - success - updated");
+
+      m_aCallbacks.forEach (x -> x.onSMPRedirectUpdated (aNewRedirect));
     }
     return aNewRedirect;
   }
@@ -188,6 +204,9 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     {
       m_aRWLock.writeLock ().unlock ();
     }
+
+    m_aCallbacks.forEach (x -> x.onSMPRedirectUpdated (aSMPRedirect));
+
     AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),

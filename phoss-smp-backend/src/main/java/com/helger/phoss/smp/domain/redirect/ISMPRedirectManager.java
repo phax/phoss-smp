@@ -16,6 +16,8 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
@@ -29,6 +31,13 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
  */
 public interface ISMPRedirectManager
 {
+  /**
+   * @return A non-<code>null</code> mutable list of callbacks.
+   */
+  @Nonnull
+  @ReturnsMutableObject
+  CallbackList <ISMPRedirectCallback> redirectCallbacks ();
+
   /**
    * Create or update a redirect for a service group.
    *

@@ -57,8 +57,8 @@ import com.helger.photon.audit.AuditHelper;
  * @author Philip Helger
  */
 public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPServiceGroup, SMPServiceGroup>
-                                          implements
-                                          ISMPServiceGroupManager
+                                             implements
+                                             ISMPServiceGroupManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerXML.class);
 
@@ -70,7 +70,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   }
 
   @Nonnull
-  @ReturnsMutableObject ("by design")
+  @ReturnsMutableObject
   public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {
     return m_aCBs;

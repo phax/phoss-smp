@@ -10,10 +10,15 @@
  */
 package com.helger.phoss.smp.mock;
 
+import javax.annotation.Nonnull;
+
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
@@ -24,6 +29,15 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
  */
 final class MockSMPRedirectManager implements ISMPRedirectManager
 {
+  private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
+
+  @Nonnull
+  @ReturnsMutableObject
+  public CallbackList <ISMPRedirectCallback> redirectCallbacks ()
+  {
+    return m_aCallbacks;
+  }
+
   public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (final ISMPServiceGroup aServiceGroup,
                                                                    final IDocumentTypeIdentifier aDocTypeID)
   {
