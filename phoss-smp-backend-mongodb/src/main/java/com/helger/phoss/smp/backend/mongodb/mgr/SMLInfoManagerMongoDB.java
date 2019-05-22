@@ -30,6 +30,11 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 
+/**
+ * Implementation of {@link ISMLInfoManager} for MongoDB
+ *
+ * @author Philip Helger
+ */
 public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISMLInfoManager
 {
   private static final String BSON_ID = "id";

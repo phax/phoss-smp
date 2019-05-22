@@ -26,6 +26,11 @@ import com.helger.phoss.smp.settings.ISMPSettingsCallback;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettings;
 
+/**
+ * Implementation of {@link ISMPSettingsManager} for MongoDB
+ *
+ * @author Philip Helger
+ */
 public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements ISMPSettingsManager
 {
   private static final String BSON_ID = "id";

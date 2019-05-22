@@ -20,6 +20,11 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.mongodb.client.MongoCollection;
 
+/**
+ * Abstract base class for MongoDB backends
+ * 
+ * @author Philip Helger
+ */
 public abstract class AbstractManagerMongoDB implements AutoCloseable
 {
   private final String m_sCollectionName;

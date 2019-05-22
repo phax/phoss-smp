@@ -23,7 +23,8 @@ public class SMPMongoDBTestRule extends PhotonAppWebTestRule
     super.before ();
     // Ensure manager provider is setup
     // Requires all managers to be implemented
-    SMPMetaManager.setManagerProvider (SMPBackendRegistry.getInstance ()
-                                                         .getManagerProvider (MongoDBSMPBackendRegistrarSPI.BACKEND_ID));
+    if (false)
+      SMPMetaManager.setManagerProvider (SMPBackendRegistry.getInstance ()
+                                                           .getManagerProvider (MongoDBSMPBackendRegistrarSPI.BACKEND_ID));
   }
 }

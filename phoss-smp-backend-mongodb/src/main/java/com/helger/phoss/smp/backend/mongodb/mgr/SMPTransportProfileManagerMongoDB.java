@@ -30,6 +30,11 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 
+/**
+ * Implementation of {@link ISMPTransportProfileManager} for MongoDB
+ * 
+ * @author Philip Helger
+ */
 public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMongoDB implements
                                                      ISMPTransportProfileManager
 {
