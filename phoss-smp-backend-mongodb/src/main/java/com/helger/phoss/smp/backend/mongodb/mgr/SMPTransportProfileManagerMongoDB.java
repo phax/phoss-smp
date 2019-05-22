@@ -8,42 +8,57 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.helger.phoss.smp.domain.transportprofile;
+package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.bson.Document;
+
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
-import com.helger.dao.DAOException;
-import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
-import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
+import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.photon.audit.AuditHelper;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 
-public final class SMPTransportProfileManagerXML extends
-                                                 AbstractPhotonMapBasedWALDAO <ISMPTransportProfile, SMPTransportProfile>
-                                                 implements
-                                                 ISMPTransportProfileManager
+public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMongoDB implements
+                                                     ISMPTransportProfileManager
 {
-  public SMPTransportProfileManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
+  private static final String BSON_ID = "id";
+  private static final String BSON_NAME = "name";
+  private static final String BSON_DEPRECATED = "deprecated";
+
+  public SMPTransportProfileManagerMongoDB ()
   {
-    super (SMPTransportProfile.class, sFilename);
+    super ("smp-transportprofile");
+    getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
-  @Override
   @Nonnull
-  protected EChange onInit ()
+  @ReturnsMutableCopy
+  public static Document toBson (@Nonnull final ISMPTransportProfile aInfo)
   {
-    // Add the default transport profiles
-    for (final ESMPTransportProfile eTransportProfile : ESMPTransportProfile.values ())
-      internalCreateItem (new SMPTransportProfile (eTransportProfile));
-    return EChange.CHANGED;
+    return new Document ().append (BSON_ID, aInfo.getID ())
+                          .append (BSON_NAME, aInfo.getName ())
+                          .append (BSON_DEPRECATED, Boolean.valueOf (aInfo.isDeprecated ()));
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static SMPTransportProfile toDomain (@Nonnull final Document aDoc)
+  {
+    return new SMPTransportProfile (aDoc.getString (BSON_ID),
+                                    aDoc.getString (BSON_NAME),
+                                    aDoc.getBoolean (BSON_DEPRECATED, SMPTransportProfile.DEFAULT_DEPRECATED));
   }
 
   @Nullable
@@ -52,14 +67,13 @@ public final class SMPTransportProfileManagerXML extends
                                                          final boolean bIsDeprecated)
   {
     // Double ID needs to be taken care of
-    if (containsWithID (sID))
+    if (containsSMPTransportProfileWithID (sID))
       return null;
 
     final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID, sName, bIsDeprecated);
 
-    m_aRWLock.writeLocked ( () -> {
-      internalCreateItem (aSMPTransportProfile);
-    });
+    getCollection ().insertOne (toBson (aSMPTransportProfile));
+
     AuditHelper.onAuditCreateSuccess (SMPTransportProfile.OT, sID, sName, Boolean.valueOf (bIsDeprecated));
     return aSMPTransportProfile;
   }
@@ -69,28 +83,13 @@ public final class SMPTransportProfileManagerXML extends
                                             @Nonnull @Nonempty final String sName,
                                             final boolean bIsDeprecated)
   {
-    final SMPTransportProfile aSMPTransportProfile = getOfID (sSMPTransportProfileID);
-    if (aSMPTransportProfile == null)
-    {
-      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id");
+    final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sSMPTransportProfileID),
+                                                                Updates.combine (Updates.set (BSON_NAME, sName),
+                                                                                 Updates.set (BSON_DEPRECATED,
+                                                                                              Boolean.valueOf (bIsDeprecated))));
+    if (aOldDoc == null)
       return EChange.UNCHANGED;
-    }
 
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      EChange eChange = EChange.UNCHANGED;
-      eChange = eChange.or (aSMPTransportProfile.setName (sName));
-      eChange = eChange.or (aSMPTransportProfile.setDeprecated (bIsDeprecated));
-      if (eChange.isUnchanged ())
-        return EChange.UNCHANGED;
-
-      internalUpdateItem (aSMPTransportProfile);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
     AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT,
                                       "all",
                                       sSMPTransportProfileID,
@@ -105,19 +104,11 @@ public final class SMPTransportProfileManagerXML extends
     if (StringHelper.hasNoText (sSMPTransportProfileID))
       return EChange.UNCHANGED;
 
-    m_aRWLock.writeLock ().lock ();
-    try
+    final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sSMPTransportProfileID));
+    if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      final SMPTransportProfile aSMPTransportProfile = internalDeleteItem (sSMPTransportProfileID);
-      if (aSMPTransportProfile == null)
-      {
-        AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", sSMPTransportProfileID);
-        return EChange.UNCHANGED;
-      }
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
+      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", sSMPTransportProfileID);
+      return EChange.UNCHANGED;
     }
     AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT, sSMPTransportProfileID);
     return EChange.CHANGED;
@@ -127,17 +118,19 @@ public final class SMPTransportProfileManagerXML extends
   @ReturnsMutableCopy
   public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
   {
-    return getAll ();
+    final ICommonsList <ISMPTransportProfile> ret = new CommonsArrayList <> ();
+    getCollection ().find ().forEach ( (final Document x) -> ret.add (toDomain (x)));
+    return ret;
   }
 
   @Nullable
   public ISMPTransportProfile getSMPTransportProfileOfID (@Nullable final String sID)
   {
-    return getOfID (sID);
+    return getCollection ().find (new Document (BSON_ID, sID)).map (x -> toDomain (x)).first ();
   }
 
   public boolean containsSMPTransportProfileWithID (@Nullable final String sID)
   {
-    return containsWithID (sID);
+    return getCollection ().find (new Document (BSON_ID, sID)).first () != null;
   }
 }

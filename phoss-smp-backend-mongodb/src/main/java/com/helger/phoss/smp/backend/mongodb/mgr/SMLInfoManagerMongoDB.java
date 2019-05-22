@@ -100,7 +100,6 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
                                                                                               sManagementServiceURL),
                                                                                  Updates.set (BSON_CLIENTCERT,
                                                                                               Boolean.valueOf (bClientCertificateRequired))));
-
     if (aOldDoc == null)
       return EChange.UNCHANGED;
 
@@ -117,6 +116,9 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   @Nullable
   public EChange removeSMLInfo (@Nullable final String sSMLInfoID)
   {
+    if (StringHelper.hasNoText (sSMLInfoID))
+      return EChange.UNCHANGED;
+
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sSMLInfoID));
     if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
@@ -139,7 +141,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   @Nullable
   public ISMLInfo getSMLInfoOfID (@Nullable final String sID)
   {
-    return getCollection ().find (new Document (BSON_ID, sID)).map (SMLInfoManagerMongoDB::toDomain).first ();
+    return getCollection ().find (new Document (BSON_ID, sID)).map (x -> toDomain (x)).first ();
   }
 
   public boolean containsSMLInfoWithID (@Nullable final String sID)

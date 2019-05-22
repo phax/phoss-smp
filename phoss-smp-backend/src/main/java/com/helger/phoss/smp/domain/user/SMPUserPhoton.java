@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.backend.xml.domain;
+package com.helger.phoss.smp.domain.user;
 
 import javax.annotation.Nonnull;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.phoss.smp.domain.user.ISMPUser;
 import com.helger.photon.security.user.IUser;
 
 /**
@@ -28,12 +27,12 @@ import com.helger.photon.security.user.IUser;
  * 
  * @author Philip Helger
  */
-public class XMLDataUser implements ISMPUser
+public class SMPUserPhoton implements ISMPUser
 {
   private final IUser m_aUser;
   private final String m_sName;
 
-  public XMLDataUser (@Nonnull final IUser aUser)
+  public SMPUserPhoton (@Nonnull final IUser aUser)
   {
     m_aUser = ValueEnforcer.notNull (aUser, "User");
     m_sName = aUser.getLoginName () + " (" + aUser.getDisplayName () + ")";

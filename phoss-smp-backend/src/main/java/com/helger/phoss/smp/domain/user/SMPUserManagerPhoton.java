@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.backend.xml.mgr;
+package com.helger.phoss.smp.domain.user;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -31,11 +31,8 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.phoss.smp.backend.xml.domain.XMLDataUser;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.user.ISMPUser;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
@@ -45,15 +42,16 @@ import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.UserManager;
 
 /**
- * The DAO based {@link ISMPUserManager}.
+ * Implementation {@link ISMPUserManager} using the build-in ph-oton user
+ * management.
  *
- * @author PEPPOL.AT, BRZ, Philip Helger
+ * @author Philip Helger
  */
-public final class SMPUserManagerXML implements ISMPUserManager
+public final class SMPUserManagerPhoton implements ISMPUserManager
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerXML.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerPhoton.class);
 
-  public SMPUserManagerXML ()
+  public SMPUserManagerPhoton ()
   {}
 
   public boolean isSpecialUserManagementNeeded ()
@@ -96,19 +94,19 @@ public final class SMPUserManagerXML implements ISMPUserManager
   {
     final ICommonsList <ISMPUser> ret = new CommonsArrayList <> ();
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ().getAllActiveUsers ())
-      ret.add (new XMLDataUser (aUser));
+      ret.add (new SMPUserPhoton (aUser));
     return ret;
   }
 
   @Nullable
-  public XMLDataUser getUserOfID (@Nullable final String sUserID)
+  public SMPUserPhoton getUserOfID (@Nullable final String sUserID)
   {
     final IUser aUser = PhotonSecurityManager.getUserMgr ().getUserOfID (sUserID);
-    return aUser == null ? null : new XMLDataUser (aUser);
+    return aUser == null ? null : new SMPUserPhoton (aUser);
   }
 
   @Nonnull
-  public XMLDataUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+  public SMPUserPhoton validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
     final UserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final IUser aUser = aUserMgr.getUserOfLoginName (aCredentials.getUserName ());
@@ -122,16 +120,16 @@ public final class SMPUserManagerXML implements ISMPUserManager
       LOGGER.info ("Invalid password provided for '" + aCredentials.getUserName () + "'");
       throw new SMPUnauthorizedException ("Username and/or password are invalid!");
     }
-    return new XMLDataUser (aUser);
+    return new SMPUserPhoton (aUser);
   }
 
   @Nonnull
-  public XMLDataUser createPreAuthenticatedUser (@Nonnull @Nonempty final String sUserName)
+  public SMPUserPhoton createPreAuthenticatedUser (@Nonnull @Nonempty final String sUserName)
   {
     final IUser aUser = PhotonSecurityManager.getUserMgr ().getUserOfLoginName (sUserName);
     if (aUser == null)
       throw new IllegalArgumentException ("Failed to resolve user of login name '" + sUserName + "'");
-    return new XMLDataUser (aUser);
+    return new SMPUserPhoton (aUser);
   }
 
   @Nonnull

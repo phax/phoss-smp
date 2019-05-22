@@ -22,6 +22,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
+import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 
 /**
@@ -49,13 +50,13 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
   @Nonnull
   public ISMPTransportProfileManager createTransportProfileMgr ()
   {
-    return null;
+    return new SMPTransportProfileManagerMongoDB ();
   }
 
   @Nonnull
   public ISMPUserManager createUserMgr ()
   {
-    return null;
+    return new SMPUserManagerPhoton ();
   }
 
   @Nonnull
