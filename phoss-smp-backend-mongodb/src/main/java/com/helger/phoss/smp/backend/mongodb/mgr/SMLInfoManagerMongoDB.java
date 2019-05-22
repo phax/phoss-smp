@@ -16,10 +16,11 @@ import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.photon.audit.AuditHelper;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 
-public class MongoDBSMLInfoManager extends AbstractMongoDBManager implements ISMLInfoManager
+public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISMLInfoManager
 {
   private static final String BSON_ID = "id";
   private static final String BSON_DISPLAYNAME = "displayname";
@@ -27,9 +28,10 @@ public class MongoDBSMLInfoManager extends AbstractMongoDBManager implements ISM
   private static final String BSON_SERVICEURL = "serviceurl";
   private static final String BSON_CLIENTCERT = "clientcert";
 
-  public MongoDBSMLInfoManager ()
+  public SMLInfoManagerMongoDB ()
   {
-    super ("smlinfo");
+    super ("smp-smlinfo");
+    getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
   @Nonnull
@@ -127,7 +129,7 @@ public class MongoDBSMLInfoManager extends AbstractMongoDBManager implements ISM
   @Nullable
   public ISMLInfo getSMLInfoOfID (@Nullable final String sID)
   {
-    return getCollection ().find (new Document (BSON_ID, sID)).map (MongoDBSMLInfoManager::toDomain).first ();
+    return getCollection ().find (new Document (BSON_ID, sID)).map (SMLInfoManagerMongoDB::toDomain).first ();
   }
 
   public boolean containsSMLInfoWithID (@Nullable final String sID)
@@ -145,7 +147,7 @@ public class MongoDBSMLInfoManager extends AbstractMongoDBManager implements ISM
     final String sSearchAddress = StringHelper.trimEnd (sAddress,
                                                         '/' + CSMLDefault.MANAGEMENT_SERVICE_PARTICIPANTIDENTIFIER);
     return getCollection ().find (new Document (BSON_SERVICEURL, sSearchAddress))
-                           .map (MongoDBSMLInfoManager::toDomain)
+                           .map (SMLInfoManagerMongoDB::toDomain)
                            .first ();
   }
 }

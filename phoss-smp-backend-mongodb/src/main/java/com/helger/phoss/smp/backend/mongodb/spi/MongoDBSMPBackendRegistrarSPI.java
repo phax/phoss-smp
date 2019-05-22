@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI;
 import com.helger.phoss.smp.backend.ISMPBackendRegistry;
-import com.helger.phoss.smp.backend.mongodb.mgr.MongoDBManagerProvider;
+import com.helger.phoss.smp.backend.mongodb.mgr.SMPManagerProviderMongoDB;
 
 /**
  * Register the MongoDB backend to the global SMP backend registry.
@@ -25,8 +25,10 @@ import com.helger.phoss.smp.backend.mongodb.mgr.MongoDBManagerProvider;
 @IsSPIImplementation
 public final class MongoDBSMPBackendRegistrarSPI implements ISMPBackendRegistrarSPI
 {
+  public static final String BACKEND_ID = "mongodb";
+
   public void registerSMPBackend (@Nonnull final ISMPBackendRegistry aRegistry)
   {
-    aRegistry.registerSMPBackend ("mongodb", MongoDBManagerProvider::new);
+    aRegistry.registerSMPBackend (BACKEND_ID, SMPManagerProviderMongoDB::new);
   }
 }

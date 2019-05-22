@@ -10,12 +10,12 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.mongodb.client.MongoCollection;
 
-public abstract class AbstractMongoDBManager implements AutoCloseable
+public abstract class AbstractManagerMongoDB implements AutoCloseable
 {
   private final String m_sCollectionName;
   private final MongoCollection <Document> m_aCollection;
 
-  public AbstractMongoDBManager (@Nonnull @Nonempty final String sCollectionName)
+  public AbstractManagerMongoDB (@Nonnull @Nonempty final String sCollectionName)
   {
     ValueEnforcer.notNull (sCollectionName, "CollectionName");
     m_sCollectionName = sCollectionName;

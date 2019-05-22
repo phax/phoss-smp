@@ -29,21 +29,21 @@ import com.helger.phoss.smp.settings.ISMPSettingsManager;
  *
  * @author Philip Helger
  */
-public final class MongoDBManagerProvider implements ISMPManagerProvider
+public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
 {
-  public MongoDBManagerProvider ()
+  public SMPManagerProviderMongoDB ()
   {}
 
   @Nonnull
   public ISMLInfoManager createSMLInfoMgr ()
   {
-    return new MongoDBSMLInfoManager ();
+    return new SMLInfoManagerMongoDB ();
   }
 
   @Nonnull
   public ISMPSettingsManager createSettingsMgr ()
   {
-    return null;
+    return new SMPSettingsManagerMongoDB ();
   }
 
   @Nonnull

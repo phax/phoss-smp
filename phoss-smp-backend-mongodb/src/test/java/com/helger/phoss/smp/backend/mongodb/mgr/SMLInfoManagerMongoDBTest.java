@@ -10,22 +10,22 @@ import org.junit.Test;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.photon.app.mock.PhotonAppWebTestRule;
+import com.helger.phoss.smp.backend.mongodb.SMPMongoDBTestRule;
 
 /**
- * Test class for class {@link MongoDBSMLInfoManager}
+ * Test class for class {@link SMLInfoManagerMongoDB}
  *
  * @author Philip Helger
  */
-public final class MongoDBSMLInfoManagerTest
+public final class SMLInfoManagerMongoDBTest
 {
   @Rule
-  public final PhotonAppWebTestRule m_aRule = new PhotonAppWebTestRule ();
+  public final SMPMongoDBTestRule m_aRule = new SMPMongoDBTestRule ();
 
   @Test
   public void testBasic ()
   {
-    try (final MongoDBSMLInfoManager aMgr = new MongoDBSMLInfoManager ())
+    try (final SMLInfoManagerMongoDB aMgr = new SMLInfoManagerMongoDB ())
     {
       assertEquals (0, aMgr.getAllSMLInfos ().size ());
       final ICommonsList <ISMLInfo> aCreated = aMgr.getAllSMLInfos ();
