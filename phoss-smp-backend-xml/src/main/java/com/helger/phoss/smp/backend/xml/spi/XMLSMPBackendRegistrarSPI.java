@@ -31,8 +31,10 @@ import com.helger.phoss.smp.backend.xml.mgr.SMPManagerProviderXML;
 @IsSPIImplementation
 public final class XMLSMPBackendRegistrarSPI implements ISMPBackendRegistrarSPI
 {
+  public static final String BACKEND_ID = "xml";
+
   public void registerSMPBackend (@Nonnull final ISMPBackendRegistry aRegistry)
   {
-    aRegistry.registerSMPBackend ("xml", SMPManagerProviderXML::new);
+    aRegistry.registerSMPBackend (BACKEND_ID, SMPManagerProviderXML::new);
   }
 }

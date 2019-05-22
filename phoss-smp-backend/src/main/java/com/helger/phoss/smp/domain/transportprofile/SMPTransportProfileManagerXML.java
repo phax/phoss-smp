@@ -27,9 +27,9 @@ import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
 
 public final class SMPTransportProfileManagerXML extends
-                                              AbstractPhotonMapBasedWALDAO <ISMPTransportProfile, SMPTransportProfile>
-                                              implements
-                                              ISMPTransportProfileManager
+                                                 AbstractPhotonMapBasedWALDAO <ISMPTransportProfile, SMPTransportProfile>
+                                                 implements
+                                                 ISMPTransportProfileManager
 {
   public SMPTransportProfileManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
   {

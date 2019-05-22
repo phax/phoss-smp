@@ -93,9 +93,9 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
             final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType ().read (aServiceMetadataDoc);
             if (aServiceMetadata != null)
               eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
-                                                                                    sDocumentTypeID,
-                                                                                    aServiceMetadata,
-                                                                                    aBasicAuth);
+                                                                                     sDocumentTypeID,
+                                                                                     aServiceMetadata,
+                                                                                     aBasicAuth);
             break;
           }
           default:

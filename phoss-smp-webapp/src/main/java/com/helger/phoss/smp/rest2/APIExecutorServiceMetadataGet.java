@@ -77,7 +77,7 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
       case BDXR:
       {
         final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType ret = new BDXR1ServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
-                                                                                                                                  sDocumentTypeID);
+                                                                                                                                   sDocumentTypeID);
 
         // Convert to DOM document
         final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType ();

@@ -25,8 +25,10 @@ import com.helger.phoss.smp.backend.sql.mgr.SMPManagerProviderSQL;
 @IsSPIImplementation
 public final class SQLSMPBackendRegistrarSPI implements ISMPBackendRegistrarSPI
 {
+  public static final String BACKEND_ID = "sql";
+
   public void registerSMPBackend (@Nonnull final ISMPBackendRegistry aRegistry)
   {
-    aRegistry.registerSMPBackend ("sql", SMPManagerProviderSQL::new);
+    aRegistry.registerSMPBackend (BACKEND_ID, SMPManagerProviderSQL::new);
   }
 }
