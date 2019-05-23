@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.domain.redirect;
 
+import java.security.cert.X509Certificate;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -51,6 +53,9 @@ public interface ISMPRedirectManager
    * @param sSubjectUniqueIdentifier
    *        The subject unique identifier of the target SMPs certificate used to
    *        sign its resources. May neither be <code>null</code> nor empty.
+   * @param aCertificate
+   *        The certificate of the target SMP. Required for OASIS BDXR SMP v2
+   *        May be <code>null</code>.
    * @param sExtension
    *        Optional extension element. May be <code>null</code>. If present it
    *        must be well-formed XML content.
@@ -62,6 +67,7 @@ public interface ISMPRedirectManager
                                           @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                           @Nonnull @Nonempty String sTargetHref,
                                           @Nonnull @Nonempty String sSubjectUniqueIdentifier,
+                                          @Nullable X509Certificate aCertificate,
                                           @Nullable String sExtension);
 
   /**

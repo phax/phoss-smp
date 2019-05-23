@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.domain.redirect;
 
+import java.security.cert.X509Certificate;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -38,17 +40,20 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
   private String m_sTargetHref;
   private String m_sSubjectUniqueIdentifier;
+  private X509Certificate m_aCertificate;
 
   public SMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
                       @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                       @Nonnull @Nonempty final String sTargetHref,
                       @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
+                      @Nullable final X509Certificate aCertificate,
                       @Nullable final String sExtension)
   {
     m_aServiceGroup = ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     setDocumentTypeIdentifier (aDocumentTypeIdentifier);
     setTargetHref (sTargetHref);
     setSubjectUniqueIdentifier (sSubjectUniqueIdentifier);
+    setCertificate (aCertificate);
     setExtensionAsString (sExtension);
     m_sID = aServiceGroup.getID () + "-" + aDocumentTypeIdentifier.getURIEncoded ();
   }
@@ -74,12 +79,12 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   }
 
   @Nonnull
-  public IDocumentTypeIdentifier getDocumentTypeIdentifier ()
+  public final IDocumentTypeIdentifier getDocumentTypeIdentifier ()
   {
     return m_aDocumentTypeIdentifier;
   }
 
-  public void setDocumentTypeIdentifier (@Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
+  public final void setDocumentTypeIdentifier (@Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
     m_aDocumentTypeIdentifier = aDocumentTypeIdentifier;
@@ -87,12 +92,12 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
 
   @Nonnull
   @Nonempty
-  public String getTargetHref ()
+  public final String getTargetHref ()
   {
     return m_sTargetHref;
   }
 
-  public void setTargetHref (@Nonnull @Nonempty final String sTargetHref)
+  public final void setTargetHref (@Nonnull @Nonempty final String sTargetHref)
   {
     ValueEnforcer.notEmpty (sTargetHref, "TargetHref");
     m_sTargetHref = sTargetHref;
@@ -100,15 +105,26 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
 
   @Nonnull
   @Nonempty
-  public String getSubjectUniqueIdentifier ()
+  public final String getSubjectUniqueIdentifier ()
   {
     return m_sSubjectUniqueIdentifier;
   }
 
-  public void setSubjectUniqueIdentifier (@Nonnull @Nonempty final String sSubjectUniqueIdentifier)
+  public final void setSubjectUniqueIdentifier (@Nonnull @Nonempty final String sSubjectUniqueIdentifier)
   {
     ValueEnforcer.notEmpty (sSubjectUniqueIdentifier, "SubjectUniqueIdentifier");
     m_sSubjectUniqueIdentifier = sSubjectUniqueIdentifier;
+  }
+
+  @Nullable
+  public final X509Certificate getCertificate ()
+  {
+    return m_aCertificate;
+  }
+
+  public final void setCertificate (@Nullable final X509Certificate aCertificate)
+  {
+    m_aCertificate = aCertificate;
   }
 
   @Nonnull
@@ -118,6 +134,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
     aRedirect.setExtension (getAsPeppolExtension ());
+    // Certificate is not used here
 
     final com.helger.peppol.smp.ServiceMetadataType ret = new com.helger.peppol.smp.ServiceMetadataType ();
     ret.setRedirect (aRedirect);
@@ -131,6 +148,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
     aRedirect.setExtension (getAsBDXRExtension ());
+    // Certificate is not used here
 
     final com.helger.xsds.bdxr.smp1.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp1.ServiceMetadataType ();
     ret.setRedirect (aRedirect);
@@ -164,6 +182,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
                             .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
                             .append ("TargetHref", m_sTargetHref)
                             .append ("SubjectUniqueIdentifier", m_sSubjectUniqueIdentifier)
+                            .append ("Certificate", m_aCertificate)
                             .getToString ();
   }
 }

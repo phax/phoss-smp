@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.annotation.Nonnegative;
@@ -62,28 +63,12 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     return m_aCallbacks;
   }
 
-  /**
-   * Create or update a redirect for a service group.
-   *
-   * @param aServiceGroup
-   *        Service group
-   * @param aDocumentTypeIdentifier
-   *        Document type identifier affected.
-   * @param sTargetHref
-   *        Target URL of the new SMP
-   * @param sSubjectUniqueIdentifier
-   *        The subject unique identifier of the target SMPs certificate used to
-   *        sign its resources.
-   * @param sExtension
-   *        Optional extension element
-   * @return The new or updated {@link ISMPRedirect}. Only <code>null</code> in
-   *         case of unthrown exception.
-   */
   @Nullable
   public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
                                                  @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                                  @Nonnull @Nonempty final String sTargetHref,
                                                  @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
+                                                 @Nullable final X509Certificate aCertificate,
                                                  @Nullable final String sExtension)
   {
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
@@ -103,6 +88,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
         aDBRedirect = new DBServiceMetadataRedirection (aDBRedirectID,
                                                         sTargetHref,
                                                         sSubjectUniqueIdentifier,
+                                                        aCertificate,
                                                         sExtension);
         aEM.persist (aDBRedirect);
         aCreatedNew.set (true);
@@ -112,6 +98,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
         // Edit the existing one
         aDBRedirect.setRedirectionUrl (sTargetHref);
         aDBRedirect.setCertificateUid (sSubjectUniqueIdentifier);
+        aDBRedirect.setCertificate (aCertificate);
         aDBRedirect.setExtension (sExtension);
         aEM.merge (aDBRedirect);
         aCreatedNew.set (false);
@@ -125,6 +112,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
                                                    aDocumentTypeIdentifier,
                                                    sTargetHref,
                                                    sSubjectUniqueIdentifier,
+                                                   aCertificate,
                                                    sExtension);
 
     if (aCreatedNew.booleanValue ())
@@ -212,6 +200,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
                             aDBRedirect.getId ().getAsDocumentTypeIdentifier (),
                             aDBRedirect.getRedirectionUrl (),
                             aDBRedirect.getCertificateUid (),
+                            aDBRedirect.getCertificate (),
                             aDBRedirect.getExtension ());
   }
 
@@ -307,6 +296,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
                             aDocTypeID,
                             aDBRedirect.getRedirectionUrl (),
                             aDBRedirect.getCertificateUid (),
+                            aDBRedirect.getCertificate (),
                             aDBRedirect.getExtension ());
   }
 }

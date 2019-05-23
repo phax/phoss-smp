@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.mock;
 
+import java.security.cert.X509Certificate;
+
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.ReturnsMutableObject;
@@ -73,6 +75,7 @@ final class MockSMPRedirectManager implements ISMPRedirectManager
                                                  final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                                  final String sTargetHref,
                                                  final String sSubjectUniqueIdentifier,
+                                                 final X509Certificate aCertificate,
                                                  final String sExtension)
   {
     throw new UnsupportedOperationException ();

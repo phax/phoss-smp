@@ -11,6 +11,8 @@
 package com.helger.phoss.smp.domain.redirect;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import org.junit.Rule;
@@ -47,11 +49,13 @@ public final class SMPRedirectTest
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     // Create new one
-    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", "<extredirect/>");
+    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", null, "<extredirect/>");
     assertSame (aSG, aRedirect.getServiceGroup ());
     assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
     assertEquals ("target", aRedirect.getTargetHref ());
     assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
+    assertNull (aRedirect.getCertificate ());
+    assertFalse (aRedirect.hasCertificate ());
     assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionAsString ());
   }
 }

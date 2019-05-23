@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import java.security.cert.X509Certificate;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -273,6 +274,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     IDocumentTypeIdentifier aDocTypeID = null;
     final String sRedirectTo = aWPEC.params ().getAsString (FIELD_REDIRECT_TO);
     final String sSubjectUniqueIdentifier = aWPEC.params ().getAsString (FIELD_SUBJECT_UNIQUE_IDENTIFIER);
+    // TODO add certificate redirect support
+    final X509Certificate aCertificate = null;
     final String sExtension = aWPEC.params ().getAsString (FIELD_EXTENSION);
 
     // validations
@@ -329,6 +332,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                   aDocTypeID,
                                                   sRedirectTo,
                                                   sSubjectUniqueIdentifier,
+                                                  aCertificate,
                                                   sExtension) == null)
         aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the Redirect for Service Group '" +
                                                                           sServiceGroupID +

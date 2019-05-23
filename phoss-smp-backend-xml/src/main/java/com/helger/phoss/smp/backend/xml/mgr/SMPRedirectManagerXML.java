@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.xml.mgr;
 
+import java.security.cert.X509Certificate;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -52,7 +54,7 @@ import com.helger.photon.audit.AuditHelper;
 public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements
                                          ISMPRedirectManager
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceInformationManagerXML.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPRedirectManagerXML.class);
 
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
@@ -81,6 +83,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                                       aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
+                                      aSMPRedirect.getCertificate (),
                                       aSMPRedirect.getExtensionAsString ());
     return aSMPRedirect;
   }
@@ -98,31 +101,17 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                                       aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
+                                      aSMPRedirect.getCertificate (),
                                       aSMPRedirect.getExtensionAsString ());
     return aSMPRedirect;
   }
 
-  /**
-   * Create or update a redirect for a service group.
-   *
-   * @param aServiceGroup
-   *        Service group
-   * @param aDocumentTypeIdentifier
-   *        Document type identifier affected.
-   * @param sTargetHref
-   *        Target URL of the new SMP
-   * @param sSubjectUniqueIdentifier
-   *        The subject unique identifier of the target SMPs certificate used to
-   *        sign its resources.
-   * @param sExtension
-   *        Optional extension element
-   * @return The new or updated {@link ISMPRedirect}. Never <code>null</code>.
-   */
   @Nonnull
   public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
                                                  @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                                  @Nonnull @Nonempty final String sTargetHref,
                                                  @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
+                                                 @Nullable final X509Certificate aCertificate,
                                                  @Nullable final String sExtension)
   {
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
@@ -138,6 +127,8 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                     ", " +
                     sSubjectUniqueIdentifier +
                     ", " +
+                    aCertificate +
+                    ", " +
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
@@ -151,6 +142,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                                       aDocumentTypeIdentifier,
                                       sTargetHref,
                                       sSubjectUniqueIdentifier,
+                                      aCertificate,
                                       sExtension);
       _createSMPRedirect (aNewRedirect);
       if (LOGGER.isDebugEnabled ())
@@ -165,6 +157,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                                       aDocumentTypeIdentifier,
                                       sTargetHref,
                                       sSubjectUniqueIdentifier,
+                                      aCertificate,
                                       sExtension);
       _updateSMPRedirect (aNewRedirect);
       if (LOGGER.isDebugEnabled ())

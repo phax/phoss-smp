@@ -365,6 +365,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                                                             aImportRedirect.getDocumentTypeIdentifier (),
                                                             aImportRedirect.getTargetHref (),
                                                             aImportRedirect.getSubjectUniqueIdentifier (),
+                                                            aImportRedirect.getCertificate (),
                                                             aImportRedirect.getExtensionAsString ()) != null)
                   aLogger.success ("Successfully created redirect for " + aImportServiceGroup.getID ());
               }

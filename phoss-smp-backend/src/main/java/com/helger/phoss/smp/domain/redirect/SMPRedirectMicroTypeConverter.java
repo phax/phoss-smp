@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.redirect;
 
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -19,6 +22,7 @@ import com.helger.peppol.identifier.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupProvider;
+import com.helger.security.certificate.CertificateHelper;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
@@ -36,6 +40,7 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
   private static final String ELEMENT_DOCUMENT_TYPE_IDENTIFIER = "doctypeidentifier";
   private static final String ATTR_TARGET_HREF = "targethref";
   private static final String ELEMENT_CERTIFICATE_SUID = "suid";
+  private static final String ELEMENT_CERTIFICATE = "certificate";
   private static final String ELEMENT_EXTENSION = "extension";
 
   @Nonnull
@@ -50,6 +55,9 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
                                                                     ELEMENT_DOCUMENT_TYPE_IDENTIFIER));
     aElement.setAttribute (ATTR_TARGET_HREF, aValue.getTargetHref ());
     aElement.appendElement (sNamespaceURI, ELEMENT_CERTIFICATE_SUID).appendText (aValue.getSubjectUniqueIdentifier ());
+    if (aValue.hasCertificate ())
+      aElement.appendElement (sNamespaceURI, ELEMENT_CERTIFICATE)
+              .appendText (CertificateHelper.getPEMEncodedCertificate (aValue.getCertificate ()));
     if (aValue.hasExtension ())
       aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionAsString ());
     return aElement;
@@ -69,9 +77,24 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
                                                                                                 SimpleDocumentTypeIdentifier.class);
     final String sTargetHref = aElement.getAttributeValue (ATTR_TARGET_HREF);
     final String sSubjectUniqueIdentifier = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE_SUID);
+    final X509Certificate aCertificate;
+    try
+    {
+      aCertificate = CertificateHelper.convertStringToCertficate (MicroHelper.getChildTextContentTrimmed (aElement,
+                                                                                                          ELEMENT_CERTIFICATE));
+    }
+    catch (final CertificateException ex)
+    {
+      throw new IllegalStateException ("Certificate parsing error", ex);
+    }
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPRedirect (aServiceGroup, aDocTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, sExtension);
+    return new SMPRedirect (aServiceGroup,
+                            aDocTypeIdentifier,
+                            sTargetHref,
+                            sSubjectUniqueIdentifier,
+                            aCertificate,
+                            sExtension);
   }
 
   @Nonnull

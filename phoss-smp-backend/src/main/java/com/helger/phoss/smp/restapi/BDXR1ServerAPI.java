@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.restapi;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -581,10 +582,13 @@ public final class BDXR1ServerAPI
       {
         // Handle redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+        // not available in OASIS BDXR SMP v1 mode
+        final X509Certificate aCertificate = null;
         if (aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
                                                     aDocTypeID,
                                                     aServiceMetadata.getRedirect ().getHref (),
                                                     aServiceMetadata.getRedirect ().getCertificateUID (),
+                                                    aCertificate,
                                                     BDXR1ExtensionConverter.convertToString (aServiceMetadata.getRedirect ()
                                                                                                              .getExtension ())) == null)
         {

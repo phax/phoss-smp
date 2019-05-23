@@ -121,6 +121,17 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
     return m_aExtensions.getClone ();
   }
 
+  @Nullable
+  @ReturnsMutableCopy
+  public com.helger.xsds.bdxr.smp2.ec.SMPExtensionsType getAsBDXR2Extension ()
+  {
+    if (m_aExtensions.isEmpty ())
+      return null;
+
+    // TODO
+    return null;
+  }
+
   @Override
   public boolean equals (final Object o)
   {
