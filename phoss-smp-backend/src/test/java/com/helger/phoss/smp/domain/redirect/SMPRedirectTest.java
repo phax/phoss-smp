@@ -39,12 +39,33 @@ public final class SMPRedirectTest
   public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
-  public void testRedirect ()
+  public void testBasic ()
   {
     final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                         "0088:dummy");
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
                                                                                  "testdoctype");
+
+    final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
+
+    // Create new one
+    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", null, "<extredirect/>");
+    assertSame (aSG, aRedirect.getServiceGroup ());
+    assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
+    assertEquals ("target", aRedirect.getTargetHref ());
+    assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
+    assertNull (aRedirect.getCertificate ());
+    assertFalse (aRedirect.hasCertificate ());
+    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionAsString ());
+  }
+
+  @Test
+  public void testCaseSensitivity ()
+  {
+    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                        "0088:UpperCase");
+    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
+                                                                                 "testDocType");
 
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 

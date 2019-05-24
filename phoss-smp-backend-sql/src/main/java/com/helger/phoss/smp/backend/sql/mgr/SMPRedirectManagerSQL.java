@@ -252,7 +252,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
   }
 
   @Nonnegative
-  public int getSMPRedirectCount ()
+  public long getSMPRedirectCount ()
   {
     JPAExecutionResult <Long> ret;
     ret = doSelect ( () -> {
@@ -263,7 +263,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     {
       return 0;
     }
-    return ret.get ().intValue ();
+    return ret.get ().longValue ();
   }
 
   @Nullable

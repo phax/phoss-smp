@@ -55,7 +55,7 @@ import com.helger.photon.security.user.IUser;
  *
  * @author Philip Helger
  */
-public final class XMLServiceInformationManagerTest
+public final class SMPServiceInformationManagerXMLTest
 {
   @Rule
   public final TestRule m_aTestRule = new SMPServerTestRule ();

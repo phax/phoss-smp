@@ -120,6 +120,17 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   @Nonnull
   EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier) throws SMPServerException;
 
+  /**
+   * Delete the service group, and swallow all exceptions. This is only
+   * recommended for unit tests.
+   * 
+   * @param aParticipantIdentifier
+   *        The participant identifier to be deleted. May not be
+   *        <code>null</code>.
+   * @return {@link EChange#CHANGED} if the passed service group is contained
+   *         and was successfully deleted, {@link EChange#UNCHANGED} otherwise.
+   * @see #deleteSMPServiceGroup(IParticipantIdentifier)
+   */
   @Nonnull
   default EChange deleteSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
   {

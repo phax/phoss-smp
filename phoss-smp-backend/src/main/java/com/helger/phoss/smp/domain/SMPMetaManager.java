@@ -195,8 +195,10 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         throw new IllegalStateException ("Failed to create Redirect manager!");
 
       m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr ();
-      if (m_aServiceInformationMgr == null)
-        throw new IllegalStateException ("Failed to create ServiceInformation manager!");
+      // TODO re-enable
+      if (false)
+        if (m_aServiceInformationMgr == null)
+          throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 
       // May be null!
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aServiceGroupMgr);

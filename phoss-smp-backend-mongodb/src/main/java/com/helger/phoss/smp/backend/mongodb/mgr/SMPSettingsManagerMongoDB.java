@@ -1,12 +1,18 @@
 /**
- * Copyright (C) 2015-2019 Philip Helger and contributors
+ * Copyright (C) 2014-2019 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
@@ -35,7 +41,14 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
 {
   private static final String BSON_ID = "id";
   private static final String ID_DUMMY = "singleton";
-  private static final String KEY_SML_INFO_ID = "smlinfo.id";
+  private static final String BSON_SMP_REST_WRITABLE_API_DISABLED = "smp-rest-writable-api-disabled";
+  private static final String BSON_DIRECTORY_INTEGRATION_REQUIRED = "directory-required";
+  private static final String BSON_DIRECTORY_INTEGRATION_ENABLED = "directory-enabled";
+  private static final String BSON_DIRECTORY_INTEGRATION_AUTO_UPDATE = "directory-auto-update";
+  private static final String BSON_DIRECTORY_HOSTNAME = "directory-hostname";
+  private static final String BSON_SML_REQUIRED = "sml-required";
+  private static final String BSON_SML_ENABLED = "sml-enabled";
+  private static final String BSON_SML_INFO_ID = "smlinfo-id";
 
   private final SMPSettings m_aSettings = new SMPSettings ();
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
@@ -45,37 +58,34 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   public static Document toBson (@Nonnull final ISMPSettings aValue)
   {
     return new Document ().append (BSON_ID, ID_DUMMY)
-                          .append (SMPServerConfiguration.KEY_SMP_REST_WRITABLE_API_DISABLED,
+                          .append (BSON_SMP_REST_WRITABLE_API_DISABLED,
                                    Boolean.valueOf (aValue.isRESTWritableAPIDisabled ()))
-                          .append (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,
+                          .append (BSON_DIRECTORY_INTEGRATION_REQUIRED,
                                    Boolean.valueOf (aValue.isDirectoryIntegrationRequired ()))
-                          .append (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_ENABLED,
+                          .append (BSON_DIRECTORY_INTEGRATION_ENABLED,
                                    Boolean.valueOf (aValue.isDirectoryIntegrationEnabled ()))
-                          .append (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                          .append (BSON_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                    Boolean.valueOf (aValue.isDirectoryIntegrationAutoUpdate ()))
-                          .append (SMPServerConfiguration.KEY_SMP_DIRECTORY_HOSTNAME, aValue.getDirectoryHostName ())
-                          .append (SMPServerConfiguration.KEY_SML_REQUIRED,
-                                   Boolean.valueOf (aValue.isSMLRequired ()))
-                          .append (SMPServerConfiguration.KEY_SML_ENABLED, Boolean.valueOf (aValue.isSMLEnabled ()))
-                          .append (KEY_SML_INFO_ID, aValue.getSMLInfoID ());
+                          .append (BSON_DIRECTORY_HOSTNAME, aValue.getDirectoryHostName ())
+                          .append (BSON_SML_REQUIRED, Boolean.valueOf (aValue.isSMLRequired ()))
+                          .append (BSON_SML_ENABLED, Boolean.valueOf (aValue.isSMLEnabled ()))
+                          .append (BSON_SML_INFO_ID, aValue.getSMLInfoID ());
   }
 
   public static void toDomain (@Nonnull final Document aDoc, @Nonnull final SMPSettings aTarget)
   {
-    aTarget.setRESTWritableAPIDisabled (aDoc.getBoolean (SMPServerConfiguration.KEY_SMP_REST_WRITABLE_API_DISABLED,
+    aTarget.setRESTWritableAPIDisabled (aDoc.getBoolean (BSON_SMP_REST_WRITABLE_API_DISABLED,
                                                          SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED));
-    aTarget.setDirectoryIntegrationRequired (aDoc.getBoolean (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,
+    aTarget.setDirectoryIntegrationRequired (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_REQUIRED,
                                                               SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED));
-    aTarget.setDirectoryIntegrationEnabled (aDoc.getBoolean (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_ENABLED,
+    aTarget.setDirectoryIntegrationEnabled (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_ENABLED,
                                                              SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED));
-    aTarget.setDirectoryIntegrationAutoUpdate (aDoc.getBoolean (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+    aTarget.setDirectoryIntegrationAutoUpdate (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                                                 SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE));
-    aTarget.setDirectoryHostName (aDoc.getString (SMPServerConfiguration.KEY_SMP_DIRECTORY_HOSTNAME));
-    aTarget.setSMLRequired (aDoc.getBoolean (SMPServerConfiguration.KEY_SML_REQUIRED,
-                                             SMPServerConfiguration.DEFAULT_SML_REQUIRED));
-    aTarget.setSMLEnabled (aDoc.getBoolean (SMPServerConfiguration.KEY_SML_ENABLED,
-                                            SMPServerConfiguration.DEFAULT_SML_ENABLED));
-    aTarget.setSMLInfoID (aDoc.getString (KEY_SML_INFO_ID));
+    aTarget.setDirectoryHostName (aDoc.getString (BSON_DIRECTORY_HOSTNAME));
+    aTarget.setSMLRequired (aDoc.getBoolean (BSON_SML_REQUIRED, SMPServerConfiguration.DEFAULT_SML_REQUIRED));
+    aTarget.setSMLEnabled (aDoc.getBoolean (BSON_SML_ENABLED, SMPServerConfiguration.DEFAULT_SML_ENABLED));
+    aTarget.setSMLInfoID (aDoc.getString (BSON_SML_INFO_ID));
   }
 
   public SMPSettingsManagerMongoDB ()

@@ -90,7 +90,7 @@ public final class ISMPRedirectManagerFuncTest
         assertEquals ("target", aRedirect.getTargetHref ());
         assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
         assertEquals ("<extredirect />", aRedirect.getFirstExtensionXML ().trim ());
-        final int nCount = aRedirectMgr.getSMPRedirectCount ();
+        final long nCount = aRedirectMgr.getSMPRedirectCount ();
 
         // Update existing
         aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Philip Helger and contributors
+ * Copyright (C) 2014-2019 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.backend.xml.mgr;
+package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.security.cert.X509Certificate;
 
@@ -22,6 +22,8 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,31 +38,45 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
-import com.helger.dao.DAOException;
 import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppol.identifier.factory.IIdentifierFactory;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.security.certificate.CertificateHelper;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 
 /**
  * Manager for all {@link SMPRedirect} objects.
  *
  * @author Philip Helger
  */
-public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements
-                                         ISMPRedirectManager
+public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB implements ISMPRedirectManager
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (SMPRedirectManagerXML.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPRedirectManagerMongoDB.class);
+
+  private static final String BSON_ID = "id";
+  private static final String BSON_SERVICE_GROUP_ID = "sgid";
+  private static final String BSON_DOCTYPE_ID = "doctypeid";
+  private static final String BSON_TARGET_HREF = "target";
+  private static final String BSON_TARGET_SUBJECT_CN = "subjectcn";
+  private static final String BSON_TARGET_CERTIFICATE = "certificate";
+  private static final String BSON_EXTENSION = "extension";
 
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
-  public SMPRedirectManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPRedirectManagerMongoDB ()
   {
-    super (SMPRedirect.class, sFilename);
+    super ("smp-redirect");
+    getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
   @Nonnull
@@ -71,12 +87,42 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   }
 
   @Nonnull
+  @ReturnsMutableCopy
+  public static Document toBson (@Nonnull final ISMPRedirect aValue)
+  {
+    final Document ret = new Document ().append (BSON_ID, aValue.getID ())
+                                        .append (BSON_SERVICE_GROUP_ID, aValue.getServiceGroupID ())
+                                        .append (BSON_DOCTYPE_ID, toBson (aValue.getDocumentTypeIdentifier ()))
+                                        .append (BSON_TARGET_HREF, aValue.getTargetHref ())
+                                        .append (BSON_TARGET_SUBJECT_CN, aValue.getSubjectUniqueIdentifier ());
+    if (aValue.hasCertificate ())
+      ret.append (BSON_TARGET_CERTIFICATE, CertificateHelper.getPEMEncodedCertificate (aValue.getCertificate ()));
+    if (aValue.hasExtension ())
+      ret.append (BSON_EXTENSION, aValue.getExtensionAsString ());
+    return ret;
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static SMPRedirect toDomain (@Nonnull final Document aDoc)
+  {
+    final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+    // The ID itself is derived from ServiceGroupID and DocTypeID
+    return new SMPRedirect (aSGMgr.getSMPServiceGroupOfID (aIF.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID))),
+                            toDocumentTypeID (aDoc.get (BSON_DOCTYPE_ID, Document.class)),
+                            aDoc.getString (BSON_TARGET_HREF),
+                            aDoc.getString (BSON_TARGET_SUBJECT_CN),
+                            CertificateHelper.convertStringToCertficateOrNull (aDoc.getString (BSON_TARGET_CERTIFICATE)),
+                            aDoc.getString (BSON_EXTENSION));
+  }
+
+  @Nonnull
   @IsLocked (ELockType.WRITE)
   private ISMPRedirect _createSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
   {
-    m_aRWLock.writeLocked ( () -> {
-      internalCreateItem (aSMPRedirect);
-    });
+    getCollection ().insertOne (toBson (aSMPRedirect));
+
     AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
@@ -88,22 +134,31 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     return aSMPRedirect;
   }
 
-  @Nonnull
   @IsLocked (ELockType.WRITE)
-  private ISMPRedirect _updateSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
+  private void _updateSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
   {
-    m_aRWLock.writeLocked ( () -> {
-      internalUpdateItem (aSMPRedirect);
-    });
-    AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
-                                      aSMPRedirect.getID (),
-                                      aSMPRedirect.getServiceGroupID (),
-                                      aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
-                                      aSMPRedirect.getTargetHref (),
-                                      aSMPRedirect.getSubjectUniqueIdentifier (),
-                                      aSMPRedirect.getCertificate (),
-                                      aSMPRedirect.getExtensionAsString ());
-    return aSMPRedirect;
+    // ServiceGroup and DocType are never changed -> therefore the ID is never
+    // changed
+    final ICommonsList <Bson> aUpdates = new CommonsArrayList <> ();
+    aUpdates.add (Updates.set (BSON_TARGET_HREF, aSMPRedirect.getTargetHref ()));
+    aUpdates.add (Updates.set (BSON_TARGET_SUBJECT_CN, aSMPRedirect.getSubjectUniqueIdentifier ()));
+    if (aSMPRedirect.hasCertificate ())
+      aUpdates.add (Updates.set (BSON_TARGET_CERTIFICATE,
+                                 CertificateHelper.getPEMEncodedCertificate (aSMPRedirect.getCertificate ())));
+    if (aSMPRedirect.hasExtension ())
+      aUpdates.add (Updates.set (BSON_EXTENSION, aSMPRedirect.getExtensionAsString ()));
+
+    final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, aSMPRedirect.getID ()),
+                                                                Updates.combine (aUpdates));
+    if (aOldDoc != null)
+      AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
+                                        aSMPRedirect.getID (),
+                                        aSMPRedirect.getServiceGroupID (),
+                                        aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPRedirect.getTargetHref (),
+                                        aSMPRedirect.getSubjectUniqueIdentifier (),
+                                        aSMPRedirect.getCertificate (),
+                                        aSMPRedirect.getExtensionAsString ());
   }
 
   @Nonnull
@@ -181,21 +236,13 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
       return EChange.UNCHANGED;
     }
 
-    m_aRWLock.writeLock ().lock ();
-    try
+    final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, aSMPRedirect.getID ()));
+    if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      final SMPRedirect aRealRedirect = internalDeleteItem (aSMPRedirect.getID ());
-      if (aRealRedirect == null)
-      {
-        AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
-        if (LOGGER.isDebugEnabled ())
-          LOGGER.debug ("deleteSMPRedirect - failure");
-        return EChange.UNCHANGED;
-      }
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
+      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("deleteSMPRedirect - failure");
+      return EChange.UNCHANGED;
     }
 
     m_aCallbacks.forEach (x -> x.onSMPRedirectDeleted (aSMPRedirect));
@@ -225,7 +272,9 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
-    return getAll ();
+    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
+    getCollection ().find ().forEach ( (final Document x) -> ret.add (toDomain (x)));
+    return ret;
   }
 
   @Nonnull
@@ -241,14 +290,15 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   {
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (StringHelper.hasText (sServiceGroupID))
-      findAll (x -> x.getServiceGroupID ().equals (sServiceGroupID), ret::add);
+      getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, sServiceGroupID))
+                      .forEach ( (final Document x) -> ret.add (toDomain (x)));
     return ret;
   }
 
   @Nonnegative
   public long getSMPRedirectCount ()
   {
-    return size ();
+    return getCollection ().countDocuments ();
   }
 
   @Nullable
@@ -260,7 +310,12 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     if (aDocTypeID == null)
       return null;
 
-    return findFirst (x -> x.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
-                           aDocTypeID.hasSameContent (x.getDocumentTypeIdentifier ()));
+    final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID,
+                                                                              aServiceGroup.getID ()),
+                                                                toBson (aDocTypeID)))
+                                            .first ();
+    if (aMatch == null)
+      return null;
+    return toDomain (aMatch);
   }
 }

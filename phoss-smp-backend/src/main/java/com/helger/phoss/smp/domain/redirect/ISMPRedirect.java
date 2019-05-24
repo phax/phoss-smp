@@ -32,6 +32,14 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 public interface ISMPRedirect extends IHasID <String>, Serializable, ISMPHasExtension
 {
   /**
+   * The ID of an SMP redirect is usually the combination of service group ID
+   * and document type ID. So this is NOT the same as the service group ID.
+   */
+  @Nonnull
+  @Nonempty
+  String getID ();
+
+  /**
    * @return The service group which this redirect should handle.
    */
   @Nonnull

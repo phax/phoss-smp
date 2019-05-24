@@ -157,10 +157,23 @@ public class SMPSettings implements ISMPSettings
   }
 
   @Nullable
+  private String _getSMLInfoID ()
+  {
+    return m_aSettings.getAsString (KEY_SML_INFO_ID);
+  }
+
+  @Nullable
   public ISMLInfo getSMLInfo ()
   {
-    final String sID = m_aSettings.getAsString (KEY_SML_INFO_ID);
+    final String sID = _getSMLInfoID ();
     return SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sID);
+  }
+
+  @Nullable
+  @Override
+  public String getSMLInfoID ()
+  {
+    return _getSMLInfoID ();
   }
 
   @Nonnull

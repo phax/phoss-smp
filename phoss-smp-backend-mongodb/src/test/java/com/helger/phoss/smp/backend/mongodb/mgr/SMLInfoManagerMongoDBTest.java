@@ -1,12 +1,18 @@
 /**
- * Copyright (C) 2015-2019 Philip Helger and contributors
+ * Copyright (C) 2014-2019 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
@@ -20,7 +26,7 @@ import org.junit.Test;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.phoss.smp.backend.mongodb.SMPMongoDBTestRule;
+import com.helger.phoss.smp.mock.SMPServerTestRule;
 
 /**
  * Test class for class {@link SMLInfoManagerMongoDB}
@@ -30,7 +36,7 @@ import com.helger.phoss.smp.backend.mongodb.SMPMongoDBTestRule;
 public final class SMLInfoManagerMongoDBTest
 {
   @Rule
-  public final SMPMongoDBTestRule m_aRule = new SMPMongoDBTestRule ();
+  public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
 
   @Test
   public void testBasic ()
@@ -65,7 +71,7 @@ public final class SMLInfoManagerMongoDBTest
         assertTrue (aInfo.getDisplayName ().startsWith ("bla "));
       }
       for (final ISMLInfo aCreate : aCreated)
-        assertTrue (aMgr.removeSMLInfo (aCreate.getID ()).isChanged ());
+        assertTrue (aMgr.deleteSMLInfo (aCreate.getID ()).isChanged ());
       assertEquals (0, aMgr.getAllSMLInfos ().size ());
     }
   }

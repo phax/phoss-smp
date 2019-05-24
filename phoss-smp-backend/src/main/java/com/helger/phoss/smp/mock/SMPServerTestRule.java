@@ -19,6 +19,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.redirect.LoggingSMPRedirectCallback;
 import com.helger.phoss.smp.domain.serviceinfo.LoggingSMPServiceInformationCallback;
 import com.helger.photon.app.mock.PhotonAppWebTestRule;
 import com.helger.photon.security.CSecurity;
@@ -52,9 +53,12 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
     super.before ();
     SMPMetaManager.initBackendFromConfiguration ();
     // Add some logging
-    SMPMetaManager.getServiceInformationMgr ()
-                  .serviceInformationCallbacks ()
-                  .add (new LoggingSMPServiceInformationCallback ());
+    if (false)
+      SMPMetaManager.getServiceInformationMgr ()
+                    .serviceInformationCallbacks ()
+                    .add (new LoggingSMPServiceInformationCallback ());
+    SMPMetaManager.getRedirectMgr ().redirectCallbacks ().add (new LoggingSMPRedirectCallback ());
+
     PhotonSecurityManager.getUserMgr ()
                          .createPredefinedUser (CSecurity.USER_ADMINISTRATOR_ID,
                                                 CSecurity.USER_ADMINISTRATOR_LOGIN,

@@ -97,7 +97,7 @@ public interface ISMLInfoManager
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
   @Nullable
-  EChange removeSMLInfo (@Nullable String sSMLInfoID);
+  EChange deleteSMLInfo (@Nullable String sSMLInfoID);
 
   /**
    * @return An unsorted collection of all contained SML information. Never

@@ -10,7 +10,6 @@
  */
 package com.helger.phoss.smp.domain.redirect;
 
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
@@ -77,16 +76,8 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
                                                                                                 SimpleDocumentTypeIdentifier.class);
     final String sTargetHref = aElement.getAttributeValue (ATTR_TARGET_HREF);
     final String sSubjectUniqueIdentifier = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE_SUID);
-    final X509Certificate aCertificate;
-    try
-    {
-      aCertificate = CertificateHelper.convertStringToCertficate (MicroHelper.getChildTextContentTrimmed (aElement,
-                                                                                                          ELEMENT_CERTIFICATE));
-    }
-    catch (final CertificateException ex)
-    {
-      throw new IllegalStateException ("Certificate parsing error", ex);
-    }
+    final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (MicroHelper.getChildTextContentTrimmed (aElement,
+                                                                                                                                    ELEMENT_CERTIFICATE));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
     return new SMPRedirect (aServiceGroup,

@@ -104,7 +104,7 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
   }
 
   @Nullable
-  public EChange removeSMLInfo (@Nullable final String sSMLInfoID)
+  public EChange deleteSMLInfo (@Nullable final String sSMLInfoID)
   {
     if (StringHelper.hasNoText (sSMLInfoID))
       return EChange.UNCHANGED;

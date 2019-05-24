@@ -114,7 +114,7 @@ public interface ISMPRedirectManager
    * @return The count of all contained redirects. Always &ge; 0.
    */
   @Nonnegative
-  int getSMPRedirectCount ();
+  long getSMPRedirectCount ();
 
   /**
    * Find the redirect that matches the passed tuple of service group and

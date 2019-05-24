@@ -46,7 +46,7 @@ final class MockSMPRedirectManager implements ISMPRedirectManager
     throw new UnsupportedOperationException ();
   }
 
-  public int getSMPRedirectCount ()
+  public long getSMPRedirectCount ()
   {
     return 0;
   }

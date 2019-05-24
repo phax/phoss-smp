@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Philip Helger and contributors
+ * Copyright (C) 2014-2019 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,10 +34,13 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
@@ -201,7 +204,9 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
-    if (!containsSMPServiceGroupWithID (aParticipantID))
+    // Check first in memory, to avoid unnecessary deletion
+    final ISMPServiceGroup aServiceGroup = getSMPServiceGroupOfID (aParticipantID);
+    if (aServiceGroup == null)
       return EChange.UNCHANGED;
 
     // Delete in SML - throws exception in case of error
@@ -215,8 +220,16 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
       throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", ex);
     }
 
-    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+    // Delete all redirects (must be done before the SG is deleted)
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+    aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aServiceGroup);
 
+    // Delete all service information (must be done before the SG is deleted)
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    if (aServiceInfoMgr != null)
+      aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup);
+
+    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sServiceGroupID));
     if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {

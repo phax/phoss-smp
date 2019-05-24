@@ -1,12 +1,18 @@
 /**
- * Copyright (C) 2015-2019 Philip Helger and contributors
+ * Copyright (C) 2014-2019 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
@@ -19,8 +25,10 @@ import org.bson.Document;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.peppol.identifier.IDocumentTypeIdentifier;
 import com.helger.peppol.identifier.IIdentifier;
 import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.mongodb.client.MongoCollection;
@@ -75,11 +83,31 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
 
   @Nullable
   @ReturnsMutableCopy
+  public static IDocumentTypeIdentifier toDocumentTypeID (@Nullable final Document aDoc)
+  {
+    if (aDoc == null)
+      return null;
+    return SMPMetaManager.getIdentifierFactory ()
+                         .createDocumentTypeIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
+  }
+
+  @Nullable
+  @ReturnsMutableCopy
   public static IParticipantIdentifier toParticipantID (@Nullable final Document aDoc)
   {
     if (aDoc == null)
       return null;
     return SMPMetaManager.getIdentifierFactory ()
                          .createParticipantIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
+  }
+
+  @Nullable
+  @ReturnsMutableCopy
+  public static IProcessIdentifier toProcessID (@Nullable final Document aDoc)
+  {
+    if (aDoc == null)
+      return null;
+    return SMPMetaManager.getIdentifierFactory ()
+                         .createProcessIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
   }
 }

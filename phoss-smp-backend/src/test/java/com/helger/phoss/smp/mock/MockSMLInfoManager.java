@@ -31,7 +31,7 @@ final class MockSMLInfoManager implements ISMLInfoManager
     throw new UnsupportedOperationException ();
   }
 
-  public EChange removeSMLInfo (final String sSMLInfoID)
+  public EChange deleteSMLInfo (final String sSMLInfoID)
   {
     throw new UnsupportedOperationException ();
   }
