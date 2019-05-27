@@ -128,7 +128,7 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
     if (m_aExtensions.isEmpty ())
       return null;
 
-    // TODO
+    // TODO BDXR2 Extensions
     return null;
   }
 
