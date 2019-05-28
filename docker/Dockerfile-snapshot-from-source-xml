@@ -36,7 +36,7 @@ LABEL vendor="Philip Helger"
 LABEL version="HEAD"
  
 # Checkout from git and build
-# Note: Up to and including v5.1.1 the folders were called "peppol-smp-server-*" instead of "phoss-smp-*"
+# Note: Up to and including v5.1.2 the folders were called "peppol-smp-server-*" instead of "phoss-smp-*"
 WORKDIR /home/git
 RUN echo Building phoss SMP latest SNAPSHOT \
   && git clone https://github.com/phax/phoss-smp.git . \

@@ -4,9 +4,9 @@ phoss SMP is a complete SMP server that supports both the PEPPOL SMP specificati
 It comes with a management GUI and an XML backend for simplified operations.  
 It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/OASIS+SMP+conformant+solutions).
 
-[![Gitter](https://badges.gitter.im/phax/phoss-smp.svg)](https://gitter.im/phax/phoss-smp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://badges.gitter.im/phax/phoss-smp.svg)](https://gitter.im/phax/peppol-smp-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Latest version: **[5.1.1](https://github.com/phax/phoss-smp/releases/tag/peppol-smp-server-parent-pom-5.1.1)** (2019-04-23).
+Latest version: **[5.1.2](https://github.com/phax/phoss-smp/releases/tag/peppol-smp-server-parent-pom-5.1.2)** (2019-05-28).
 A Docker container can be found at [https://hub.docker.com/r/phelger/smp/tags/](https://hub.docker.com/r/phelger/smp/tags/).
 If you are on an old 4.x version see the special [Upgrade guide to v5.0.0](https://github.com/phax/phoss-smp/wiki/Upgrade-Guide-V5).
 

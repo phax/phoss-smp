@@ -16,9 +16,9 @@
 @REM
 
 @echo off
-set XVER=5.1.1
+set XVER=5.1.2
 
-docker pull tomcat:8.5
+docker pull tomcat:9-jre11
 if errorlevel 1 goto end
 
 docker build --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-xml-%XVER% -f Dockerfile-release-binary-xml .
