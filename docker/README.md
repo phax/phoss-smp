@@ -81,7 +81,7 @@ Open `http://localhost:8888` in your browser.
 To change the version build of release versions you can specify the version on the commandline when building:
 
 ```
-docker build --build-arg VERSION=5.1.1 -t phoss-smp-release-binary-xml-5.1.1 -f Dockerfile-release-binary-xml .
+docker build --build-arg SMP_VERSION=5.1.2 -t phoss-smp-release-binary-xml-5.1.2 -f Dockerfile-release-binary-xml .
 ```
 
 Note: since the file system layout changed between 5.0.0 and 5.0.1, the current version is only applicable to versions &ge; 5.0.1
@@ -91,9 +91,9 @@ Note: since the file system layout changed between 5.0.0 and 5.0.1, the current 
 Running a pre-build image (XML backend only):
 
 ```
-docker run -d --name phoss-smp-release-binary-xml-5.1.1 -p 8888:8080 phelger/smp:5.1.1
-docker stop phoss-smp-release-binary-xml-5.1.1
-docker rm phoss-smp-release-binary-xml-5.1.1
+docker run -d --name phoss-smp-release-binary-xml-5.1.2 -p 8888:8080 phelger/smp:5.1.2
+docker stop phoss-smp-release-binary-xml-5.1.2
+docker rm phoss-smp-release-binary-xml-5.1.2
 ```
 
 It exposes port 8888 where Tomcat is running successfully.
@@ -109,7 +109,7 @@ Short explanation on docker running
 
 Upon successful completion opening http://localhost:8888 in your browser should show you the start page of phoss SMP.
 
-Default credentials are in the Wiki at https://github.com/phax/peppol-smp-server/wiki/Running#default-login
+Default credentials are in the Wiki at https://github.com/phax/phoss-smp/wiki/Running#default-login
 
 The data directory inside the Docker image, where the data is stored is usually `/home/git/conf`.
  
@@ -158,5 +158,5 @@ To persistently save all the data stored by the SMP add another volume that moun
 On my Windows machine I use the following command to run the whole SMP on port 8888 with the correct configuration and the persistent storage like this: 
 
 ```
-docker run -d --name phoss-smp-with-config -p 8888:8080 -v c:\dev\git\peppol-smp-server\docker\example-config-dir:/config -v C:\dev\git\peppol-smp-server\docker\persistent\:/home/git/conf phoss-smp-with-config
+docker run -d --name phoss-smp-with-config -p 8888:8080 -v c:\dev\git\phoss-smp\docker\example-config-dir:/config -v C:\dev\git\phoss-smp\docker\persistent\:/home/git/conf phoss-smp-with-config
 ```
