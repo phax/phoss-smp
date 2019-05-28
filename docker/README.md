@@ -1,7 +1,8 @@
 # phoss SMP Docker configuration
 
 This folder contains the Docker configuration file for phoss SMP.
-It is based on the official `tomcat:8.5` image.
+It is based on the official `tomcat:9-jre11` image since v5.2.0.
+It was previously based on the official `tomcat:8.5` image.
 
 Prebuild images are available from https://hub.docker.com/r/phelger/smp/
 
@@ -85,6 +86,8 @@ docker build --build-arg SMP_VERSION=5.1.2 -t phoss-smp-release-binary-xml-5.1.2
 ```
 
 Note: since the file system layout changed between 5.0.0 and 5.0.1, the current version is only applicable to versions &ge; 5.0.1
+
+Note: up to and including v5.1.1 the variable `SMP_VERSION` was called `VERSION` 
 
 ## Running pre-build image from Docker Hub
 
