@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.rest;
+package com.helger.phoss.smp.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -88,7 +88,7 @@ public final class ServiceMetadataInterfaceTest
                                                                                                 "Test1234");
 
   @Rule
-  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-sql.properties")
+  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-mongodb.properties")
                                                                                            .getAbsolutePath ());
 
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();

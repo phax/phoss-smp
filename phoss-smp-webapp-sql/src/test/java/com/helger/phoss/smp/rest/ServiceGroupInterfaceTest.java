@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.rest;
+package com.helger.phoss.smp.rest;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -41,6 +41,7 @@ import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.db.jpa.JPAEnabledManager;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.identifier.IParticipantIdentifier;
 import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
@@ -70,7 +71,7 @@ public final class ServiceGroupInterfaceTest
                                                                                                 "Test1234");
 
   @Rule
-  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-mongodb.properties")
+  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-sql.properties")
                                                                                            .getAbsolutePath ());
 
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
@@ -78,6 +79,7 @@ public final class ServiceGroupInterfaceTest
   @Nonnull
   private static Builder _addCredentials (@Nonnull final Builder aBuilder)
   {
+    // Use default credentials for SQL backend
     return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
@@ -190,6 +192,7 @@ public final class ServiceGroupInterfaceTest
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
     aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
+    JPAEnabledManager.exceptionCallbacks ().removeAll ();
     final SMPClient aSMPClient = new MockSMPClient ();
 
     // GET

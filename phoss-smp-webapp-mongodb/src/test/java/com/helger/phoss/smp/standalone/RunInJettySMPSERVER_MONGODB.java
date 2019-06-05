@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.standalone;
+package com.helger.phoss.smp.standalone;
 
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.photon.jetty.JettyStarter;

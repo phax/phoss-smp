@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.peppol.smpserver.standalone;
+package com.helger.phoss.smp;
 
-import java.io.IOException;
+import org.junit.Test;
 
-import com.helger.photon.jetty.JettyStopper;
+import com.helger.commons.mock.SPITestHelper;
+import com.helger.photon.core.mock.PhotonCoreValidator;
 
-/**
- * @author PEPPOL.AT, BRZ, Philip Helger
- */
-public final class JettyStopSMPSERVER_MONGODB
+public final class SPITest
 {
-  public static void main (final String [] args) throws IOException
+  @Test
+  public void testBasic () throws Exception
   {
-    new JettyStopper ().setStopPort (8078).run ();
+    SPITestHelper.testIfAllSPIImplementationsAreValid ();
+    PhotonCoreValidator.validateExternalResources ();
   }
 }
