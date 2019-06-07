@@ -32,7 +32,7 @@ import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.backend.sql.AbstractSMPJPAEnabledManager;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataRedirection;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataRedirectionID;

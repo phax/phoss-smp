@@ -20,11 +20,11 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
-import com.helger.peppol.identifier.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
-import com.helger.peppol.identifier.factory.IIdentifierFactory;
-import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
+import com.helger.peppolid.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 

@@ -25,7 +25,7 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.backend.sql.AbstractSMPJPAEnabledManager;
 import com.helger.phoss.smp.backend.sql.model.DBOwnership;
 import com.helger.phoss.smp.backend.sql.model.DBOwnershipID;

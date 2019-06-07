@@ -22,7 +22,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**

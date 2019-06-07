@@ -14,8 +14,8 @@ import java.net.URI;
 
 import javax.annotation.Nonnull;
 
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 
 /**
  * This interface must be implemented by all real SMP implementations, so that

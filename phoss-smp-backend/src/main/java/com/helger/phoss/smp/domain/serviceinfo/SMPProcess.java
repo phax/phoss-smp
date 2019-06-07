@@ -28,13 +28,13 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.peppol.identifier.IProcessIdentifier;
-import com.helger.peppol.identifier.bdxr.smp1.process.BDXR1ProcessIdentifier;
-import com.helger.peppol.identifier.simple.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
+import com.helger.peppolid.IProcessIdentifier;
+import com.helger.peppolid.bdxr.smp1.process.BDXR1ProcessIdentifier;
+import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 
 /**
