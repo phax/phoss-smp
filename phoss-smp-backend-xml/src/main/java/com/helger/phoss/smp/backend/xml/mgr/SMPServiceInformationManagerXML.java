@@ -53,9 +53,9 @@ import com.helger.photon.audit.AuditHelper;
  * @author Philip Helger
  */
 public final class SMPServiceInformationManagerXML extends
-                                                AbstractPhotonMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
-                                                implements
-                                                ISMPServiceInformationManager
+                                                   AbstractPhotonMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
+                                                   implements
+                                                   ISMPServiceInformationManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceInformationManagerXML.class);
 
@@ -295,7 +295,7 @@ public final class SMPServiceInformationManagerXML extends
   }
 
   @Nonnegative
-  public int getSMPServiceInformationCount ()
+  public long getSMPServiceInformationCount ()
   {
     return size ();
   }

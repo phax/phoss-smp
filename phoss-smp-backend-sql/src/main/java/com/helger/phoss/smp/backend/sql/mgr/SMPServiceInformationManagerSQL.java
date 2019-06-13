@@ -64,7 +64,7 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
  * @author Philip Helger
  */
 public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabledManager implements
-                                                ISMPServiceInformationManager
+                                                   ISMPServiceInformationManager
 {
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
@@ -444,7 +444,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
   }
 
   @Nonnegative
-  public int getSMPServiceInformationCount ()
+  public long getSMPServiceInformationCount ()
   {
     JPAExecutionResult <Long> ret;
     ret = doSelect ( () -> {
@@ -454,7 +454,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
     if (ret.hasException ())
       return 0;
 
-    return ret.get ().intValue ();
+    return ret.get ().longValue ();
   }
 
   @Nonnull

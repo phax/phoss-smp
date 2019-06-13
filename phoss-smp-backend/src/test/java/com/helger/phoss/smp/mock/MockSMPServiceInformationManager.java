@@ -55,7 +55,7 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     throw new UnsupportedOperationException ();
   }
 
-  public int getSMPServiceInformationCount ()
+  public long getSMPServiceInformationCount ()
   {
     return 0;
   }

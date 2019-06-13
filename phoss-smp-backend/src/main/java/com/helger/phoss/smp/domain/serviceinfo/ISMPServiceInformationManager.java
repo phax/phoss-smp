@@ -135,7 +135,7 @@ public interface ISMPServiceInformationManager
    * @return The count of all service information objects. Always &ge; 0.
    */
   @Nonnegative
-  int getSMPServiceInformationCount ();
+  long getSMPServiceInformationCount ();
 
   /**
    * Get all service information objects that belong to the provided service
