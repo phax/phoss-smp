@@ -20,7 +20,6 @@ import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.peppol.url.IPeppolURLProvider;
-import com.helger.peppol.url.PeppolURLProvider;
 import com.helger.peppolid.factory.BDXR1IdentifierFactory;
 import com.helger.peppolid.factory.BDXR2IdentifierFactory;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -166,8 +165,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         // fall through. Certificate stays invalid, no SML access possible.
       }
 
-      // TODO make customizable
-      m_aPeppolURLProvider = PeppolURLProvider.INSTANCE;
+      m_aPeppolURLProvider = s_aManagerProvider.createPeppolURLProvider ();
+      if (m_aPeppolURLProvider == null)
+        throw new IllegalStateException ("Failed to create PEPPOL URL Provider!");
 
       m_aSMLInfoMgr = s_aManagerProvider.createSMLInfoMgr ();
       if (m_aSMLInfoMgr == null)
