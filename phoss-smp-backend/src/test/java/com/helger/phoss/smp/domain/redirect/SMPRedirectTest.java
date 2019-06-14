@@ -56,7 +56,7 @@ public final class SMPRedirectTest
     assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
     assertNull (aRedirect.getCertificate ());
     assertFalse (aRedirect.hasCertificate ());
-    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionAsString ());
+    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionsAsString ());
   }
 
   @Test
@@ -77,6 +77,6 @@ public final class SMPRedirectTest
     assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
     assertNull (aRedirect.getCertificate ());
     assertFalse (aRedirect.hasCertificate ());
-    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionAsString ());
+    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionsAsString ());
   }
 }

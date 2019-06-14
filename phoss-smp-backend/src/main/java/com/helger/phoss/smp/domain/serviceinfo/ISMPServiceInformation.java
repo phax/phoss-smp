@@ -50,7 +50,10 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    */
   @Nonnull
   @Nonempty
-  String getServiceGroupID ();
+  default String getServiceGroupID ()
+  {
+    return getServiceGroup ().getID ();
+  }
 
   /**
    * @return The document type identifier of this service information. Never

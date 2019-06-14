@@ -69,7 +69,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   private static final String BSON_TARGET_HREF = "target";
   private static final String BSON_TARGET_SUBJECT_CN = "subjectcn";
   private static final String BSON_TARGET_CERTIFICATE = "certificate";
-  private static final String BSON_EXTENSION = "extension";
+  private static final String BSON_EXTENSIONS = "extensions";
 
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
@@ -97,8 +97,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                                         .append (BSON_TARGET_SUBJECT_CN, aValue.getSubjectUniqueIdentifier ());
     if (aValue.hasCertificate ())
       ret.append (BSON_TARGET_CERTIFICATE, CertificateHelper.getPEMEncodedCertificate (aValue.getCertificate ()));
-    if (aValue.hasExtension ())
-      ret.append (BSON_EXTENSION, aValue.getExtensionAsString ());
+    if (aValue.extensions ().isNotEmpty ())
+      ret.append (BSON_EXTENSIONS, aValue.getExtensionsAsString ());
     return ret;
   }
 
@@ -114,7 +114,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                             aDoc.getString (BSON_TARGET_HREF),
                             aDoc.getString (BSON_TARGET_SUBJECT_CN),
                             CertificateHelper.convertStringToCertficateOrNull (aDoc.getString (BSON_TARGET_CERTIFICATE)),
-                            aDoc.getString (BSON_EXTENSION));
+                            aDoc.getString (BSON_EXTENSIONS));
   }
 
   @Nonnull
@@ -130,7 +130,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
                                       aSMPRedirect.getCertificate (),
-                                      aSMPRedirect.getExtensionAsString ());
+                                      aSMPRedirect.getExtensionsAsString ());
     return aSMPRedirect;
   }
 
@@ -145,8 +145,12 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     if (aSMPRedirect.hasCertificate ())
       aUpdates.add (Updates.set (BSON_TARGET_CERTIFICATE,
                                  CertificateHelper.getPEMEncodedCertificate (aSMPRedirect.getCertificate ())));
-    if (aSMPRedirect.hasExtension ())
-      aUpdates.add (Updates.set (BSON_EXTENSION, aSMPRedirect.getExtensionAsString ()));
+    else
+      aUpdates.add (Updates.unset (BSON_TARGET_CERTIFICATE));
+    if (aSMPRedirect.extensions ().isNotEmpty ())
+      aUpdates.add (Updates.set (BSON_EXTENSIONS, aSMPRedirect.getExtensionsAsString ()));
+    else
+      aUpdates.add (Updates.unset (BSON_EXTENSIONS));
 
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, aSMPRedirect.getID ()),
                                                                 Updates.combine (aUpdates));
@@ -158,7 +162,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                                         aSMPRedirect.getTargetHref (),
                                         aSMPRedirect.getSubjectUniqueIdentifier (),
                                         aSMPRedirect.getCertificate (),
-                                        aSMPRedirect.getExtensionAsString ());
+                                        aSMPRedirect.getExtensionsAsString ());
   }
 
   @Nonnull

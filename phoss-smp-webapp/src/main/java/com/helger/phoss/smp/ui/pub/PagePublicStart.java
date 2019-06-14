@@ -122,14 +122,14 @@ public final class PagePublicStart extends AbstractSMPWebPage
         aRow.addCell (sDisplayName);
         if (bShowExtensionDetails)
         {
-          if (aServiceGroup.hasExtension ())
+          if (aServiceGroup.extensions ().isNotEmpty ())
             aRow.addCell (new HCCode ().addChildren (HCExtHelper.nl2divList (aServiceGroup.getFirstExtensionXML ())));
           else
             aRow.addCell ();
         }
         else
         {
-          aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.hasExtension (), aDisplayLocale));
+          aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.extensions ().isNotEmpty (), aDisplayLocale));
         }
         aRow.addCell (new HCA (LinkHelper.getURLWithServerAndContext (aServiceGroup.getParticpantIdentifier ()
                                                                                    .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +

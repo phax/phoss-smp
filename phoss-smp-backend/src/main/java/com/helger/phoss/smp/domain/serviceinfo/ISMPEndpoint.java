@@ -18,6 +18,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.compare.CompareHelper;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
@@ -114,9 +115,9 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    *         datetime, <code>false</code> otherwise.
    * @see #getServiceActivationDate()
    */
-  default boolean hasServiceActivationDate ()
+  default boolean hasServiceActivationDateTime ()
   {
-    return getServiceActivationDate () != null;
+    return getServiceActivationDateTime () != null;
   }
 
   /**
@@ -151,24 +152,36 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    * @return the complete signing certificate of the recipient AP, as a PEM base
    *         64 encoded X509 DER formatted value.
    */
-  @Nonnull
-  @Nonempty
+  @Nullable
   String getCertificate ();
+
+  default boolean hasCertificate ()
+  {
+    return StringHelper.hasText (getCertificate ());
+  }
 
   /**
    * @return A human readable description of the service
    */
-  @Nonnull
-  @Nonempty
+  @Nullable
   String getServiceDescription ();
+
+  default boolean hasServiceDescription ()
+  {
+    return StringHelper.hasText (getServiceDescription ());
+  }
 
   /**
    * @return a link to human readable contact information. This might also be an
    *         email address.
    */
-  @Nonnull
-  @Nonempty
+  @Nullable
   String getTechnicalContactUrl ();
+
+  default boolean hasTechnicalContactUrl ()
+  {
+    return StringHelper.hasText (getTechnicalContactUrl ());
+  }
 
   /**
    * @return A URL to human readable documentation of the service format. This
@@ -203,7 +216,7 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
     return (aElement1, aElement2) -> {
       int ret = aElement1.getTransportProfile ().compareTo (aElement2.getTransportProfile ());
       if (ret == 0)
-        ret = aElement1.getEndpointReference ().compareTo (aElement2.getEndpointReference ());
+        ret = CompareHelper.compare (aElement1.getEndpointReference (), aElement2.getEndpointReference ());
       return ret;
     };
   }

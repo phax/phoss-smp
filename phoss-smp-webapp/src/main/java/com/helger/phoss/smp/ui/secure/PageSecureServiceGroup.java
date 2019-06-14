@@ -416,7 +416,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                           .getURIEncoded ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
                                                  .setCtrl (SMPCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
-    if (aSelectedObject.hasExtension ())
+    if (aSelectedObject.extensions ().isNotEmpty ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
 
@@ -646,14 +646,14 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aRow.addCell (SMPCommonUI.getOwnerName (aCurObject.getOwnerID ()));
       if (bShowExtensionDetails)
       {
-        if (aCurObject.hasExtension ())
+        if (aCurObject.extensions ().isNotEmpty ())
           aRow.addCell (new HCCode ().addChildren (HCExtHelper.nl2divList (aCurObject.getFirstExtensionXML ())));
         else
           aRow.addCell ();
       }
       else
       {
-        aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.hasExtension (), aDisplayLocale));
+        aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.extensions ().isNotEmpty (), aDisplayLocale));
       }
       aRow.addCell (Integer.toString (aSIs.size ()));
       aRow.addCell (Integer.toString (nProcesses));

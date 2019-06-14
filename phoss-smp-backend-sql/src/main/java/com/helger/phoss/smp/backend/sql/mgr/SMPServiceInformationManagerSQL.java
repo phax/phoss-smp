@@ -111,7 +111,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
                 aDBEndpoint.setServiceDescription (aEndpoint.getServiceDescription ());
                 aDBEndpoint.setTechnicalContactUrl (aEndpoint.getTechnicalContactUrl ());
                 aDBEndpoint.setTechnicalInformationUrl (aEndpoint.getTechnicalInformationUrl ());
-                aDBEndpoint.setExtension (aEndpoint.getExtensionAsString ());
+                aDBEndpoint.setExtension (aEndpoint.getExtensionsAsString ());
                 break;
               }
 
@@ -149,14 +149,14 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
                                                              aEndpoint.getServiceDescription (),
                                                              aEndpoint.getTechnicalContactUrl (),
                                                              aEndpoint.getTechnicalInformationUrl (),
-                                                             aEndpoint.getExtensionAsString ());
+                                                             aEndpoint.getExtensionsAsString ());
               aDBProcess.getEndpoints ().add (aDBEndpoint);
               aEM.persist (aDBEndpoint);
             }
           }
 
           aDBProcess.setServiceMetadata (aDBMetadata);
-          aDBProcess.setExtension (aProcess.getExtensionAsString ());
+          aDBProcess.setExtension (aProcess.getExtensionsAsString ());
           break;
         }
 
@@ -185,7 +185,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
         final DBProcess aDBProcess = new DBProcess (new DBProcessID (aDBMetadata.getId (),
                                                                      aProcess.getProcessIdentifier ()),
                                                     aDBMetadata,
-                                                    aProcess.getExtensionAsString ());
+                                                    aProcess.getExtensionsAsString ());
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
           final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (),
@@ -200,7 +200,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
                                                          aEndpoint.getServiceDescription (),
                                                          aEndpoint.getTechnicalContactUrl (),
                                                          aEndpoint.getTechnicalInformationUrl (),
-                                                         aEndpoint.getExtensionAsString ());
+                                                         aEndpoint.getExtensionsAsString ());
           aDBProcess.getEndpoints ().add (aDBEndpoint);
           aEM.persist (aDBEndpoint);
         }
@@ -209,7 +209,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
       }
     }
 
-    aDBMetadata.setExtension (aServiceInfo.getExtensionAsString ());
+    aDBMetadata.setExtension (aServiceInfo.getExtensionsAsString ());
   }
 
   @Nonnull
@@ -243,7 +243,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
 
         aDBMetadata = new DBServiceMetadata (aDBMetadataID,
                                              aDBServiceGroup,
-                                             aSMPServiceInformation.getExtensionAsString ());
+                                             aSMPServiceInformation.getExtensionsAsString ());
         _update (aEM, aDBMetadata, aSMPServiceInformation);
         aEM.persist (aDBMetadata);
       }

@@ -84,7 +84,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
                                       aSMPRedirect.getCertificate (),
-                                      aSMPRedirect.getExtensionAsString ());
+                                      aSMPRedirect.getExtensionsAsString ());
     return aSMPRedirect;
   }
 
@@ -102,7 +102,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
                                       aSMPRedirect.getCertificate (),
-                                      aSMPRedirect.getExtensionAsString ());
+                                      aSMPRedirect.getExtensionsAsString ());
     return aSMPRedirect;
   }
 

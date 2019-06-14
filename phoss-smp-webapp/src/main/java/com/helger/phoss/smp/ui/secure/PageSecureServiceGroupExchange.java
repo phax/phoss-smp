@@ -335,7 +335,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           {
             aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
                                                                        aImportServiceGroup.getParticpantIdentifier (),
-                                                                       aImportServiceGroup.getExtensionAsString ());
+                                                                       aImportServiceGroup.getExtensionsAsString ());
             aLogger.success ("Successfully created service group " + aImportServiceGroup.getID ());
           }
           catch (final Exception ex)
@@ -366,7 +366,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                                                             aImportRedirect.getTargetHref (),
                                                             aImportRedirect.getSubjectUniqueIdentifier (),
                                                             aImportRedirect.getCertificate (),
-                                                            aImportRedirect.getExtensionAsString ()) != null)
+                                                            aImportRedirect.getExtensionsAsString ()) != null)
                   aLogger.success ("Successfully created redirect for " + aImportServiceGroup.getID ());
               }
               catch (final Exception ex)

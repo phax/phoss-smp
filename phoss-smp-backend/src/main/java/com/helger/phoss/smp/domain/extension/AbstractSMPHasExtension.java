@@ -50,15 +50,8 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
     return m_aExtensions;
   }
 
-  @Nonnull
-  @ReturnsMutableCopy
-  public final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> getAllExtensions ()
-  {
-    return m_aExtensions.getClone ();
-  }
-
   @Nullable
-  public String getExtensionAsString ()
+  public String getExtensionsAsString ()
   {
     if (m_aExtensions.isEmpty ())
       return null;

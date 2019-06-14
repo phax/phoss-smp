@@ -323,7 +323,7 @@ public final class SMPCommonUI
   @Nullable
   public static IHCNode getExtensionDisplay (@Nonnull final ISMPHasExtension aHasExtension)
   {
-    final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> aExtensions = aHasExtension.getAllExtensions ();
+    final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> aExtensions = aHasExtension.extensions ();
     if (aExtensions.isEmpty ())
       return null;
 

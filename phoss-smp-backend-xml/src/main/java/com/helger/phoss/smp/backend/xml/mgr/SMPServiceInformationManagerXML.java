@@ -127,7 +127,7 @@ public final class SMPServiceInformationManagerXML extends
                                         aOldInformation.getServiceGroupID (),
                                         aOldInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aOldInformation.getAllProcesses (),
-                                        aOldInformation.getExtensionAsString ());
+                                        aOldInformation.getExtensionsAsString ());
 
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - updated");
@@ -176,7 +176,7 @@ public final class SMPServiceInformationManagerXML extends
                                         aSMPServiceInformation.getServiceGroupID (),
                                         aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aSMPServiceInformation.getAllProcesses (),
-                                        aSMPServiceInformation.getExtensionAsString ());
+                                        aSMPServiceInformation.getExtensionsAsString ());
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - created");
 

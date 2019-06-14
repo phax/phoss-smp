@@ -93,13 +93,6 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   }
 
   @Nonnull
-  @Nonempty
-  public String getServiceGroupID ()
-  {
-    return m_aServiceGroup.getID ();
-  }
-
-  @Nonnull
   public IDocumentTypeIdentifier getDocumentTypeIdentifier ()
   {
     return m_aDocumentTypeIdentifier;

@@ -277,7 +277,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                                                   aOldRedirect.getTargetHref (),
                                                   aOldRedirect.getSubjectUniqueIdentifier (),
                                                   aOldRedirect.getCertificate (),
-                                                  aOldRedirect.getExtensionAsString ());
+                                                  aOldRedirect.getExtensionsAsString ());
         }
 
       // Restore service information (if any)

@@ -45,8 +45,8 @@ public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter <
                                                                     ELEMENT_PROCESS_IDENTIFIER));
     for (final ISMPEndpoint aEndpoint : aValue.getAllEndpoints ())
       aElement.appendChild (MicroTypeConverter.convertToMicroElement (aEndpoint, sNamespaceURI, ELEMENT_ENDPOINT));
-    if (aValue.hasExtension ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionAsString ());
+    if (aValue.extensions ().isNotEmpty ())
+      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionsAsString ());
     return aElement;
   }
 

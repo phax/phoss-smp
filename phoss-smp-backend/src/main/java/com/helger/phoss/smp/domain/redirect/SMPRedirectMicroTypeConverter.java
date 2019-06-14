@@ -57,8 +57,8 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
     if (aValue.hasCertificate ())
       aElement.appendElement (sNamespaceURI, ELEMENT_CERTIFICATE)
               .appendText (CertificateHelper.getPEMEncodedCertificate (aValue.getCertificate ()));
-    if (aValue.hasExtension ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionAsString ());
+    if (aValue.extensions ().isNotEmpty ())
+      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionsAsString ());
     return aElement;
   }
 

@@ -452,50 +452,47 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedEndpoint.isRequireBusinessLevelSignature (),
                                                                                        aDisplayLocale)));
 
-    if (StringHelper.hasText (aSelectedEndpoint.getMinimumAuthenticationLevel ()))
+    if (aSelectedEndpoint.hasMinimumAuthenticationLevel ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Minimum authentication level")
                                                    .setCtrl (aSelectedEndpoint.getMinimumAuthenticationLevel ()));
 
-    if (aSelectedEndpoint.getServiceActivationDateTime () != null)
+    if (aSelectedEndpoint.hasServiceActivationDateTime ())
     {
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not before")
                                                    .setCtrl (PDTToString.getAsString (aSelectedEndpoint.getServiceActivationDateTime (),
                                                                                       aDisplayLocale)));
     }
-    if (aSelectedEndpoint.getServiceExpirationDateTime () != null)
+    if (aSelectedEndpoint.hasServiceExpirationDateTime ())
     {
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not after")
                                                    .setCtrl (PDTToString.getAsString (aSelectedEndpoint.getServiceExpirationDateTime (),
                                                                                       aDisplayLocale)));
     }
 
-    X509Certificate aEndpointCert = null;
-    try
+    if (aSelectedEndpoint.hasCertificate ())
     {
-      aEndpointCert = CertificateHelper.convertStringToCertficate (aSelectedEndpoint.getCertificate ());
+      final X509Certificate aEndpointCert = CertificateHelper.convertStringToCertficateOrNull (aSelectedEndpoint.getCertificate ());
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate")
+                                                   .setCtrl (aEndpointCert == null ? new HCStrong ().addChild ("!!!FAILED TO INTERPRETE!!!")
+                                                                                   : SMPCommonUI.createCertificateDetailsTable (aEndpointCert,
+                                                                                                                                aNowLDT,
+                                                                                                                                aDisplayLocale)
+                                                                                                .setResponsive (true)));
     }
-    catch (final CertificateException ex)
-    {
-      // Ignore
-    }
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate")
-                                                 .setCtrl (aEndpointCert == null ? new HCStrong ().addChild ("!!!FAILED TO INTERPRETE!!!")
-                                                                                 : SMPCommonUI.createCertificateDetailsTable (aEndpointCert,
-                                                                                                                              aNowLDT,
-                                                                                                                              aDisplayLocale)
-                                                                                              .setResponsive (true)));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service description")
-                                                 .setCtrl (aSelectedEndpoint.getServiceDescription ()));
+    if (aSelectedEndpoint.hasServiceDescription ())
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service description")
+                                                   .setCtrl (aSelectedEndpoint.getServiceDescription ()));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical contact")
-                                                 .setCtrl (HCA_MailTo.createLinkedEmail (aSelectedEndpoint.getTechnicalContactUrl ())));
+    if (aSelectedEndpoint.hasTechnicalContactUrl ())
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical contact")
+                                                   .setCtrl (HCA_MailTo.createLinkedEmail (aSelectedEndpoint.getTechnicalContactUrl ())));
 
     if (aSelectedEndpoint.hasTechnicalInformationUrl ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical information")
                                                    .setCtrl (HCA.createLinkedWebsite (aSelectedEndpoint.getTechnicalInformationUrl (),
                                                                                       HC_Target.BLANK)));
-    if (aSelectedEndpoint.hasExtension ())
+    if (aSelectedEndpoint.extensions ().isNotEmpty ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedEndpoint)));
 

@@ -247,7 +247,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                                                     HC_Target.BLANK)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Subject unique identifier")
                                                  .setCtrl (aSelectedObject.getSubjectUniqueIdentifier ()));
-    if (aSelectedObject.hasExtension ())
+    if (aSelectedObject.extensions ().isNotEmpty ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
 
