@@ -274,6 +274,9 @@ public final class SMPServiceInformationManagerXML extends
           LOGGER.debug ("deleteSMPProcess - failure");
         return EChange.UNCHANGED;
       }
+
+      // Save changes
+      internalUpdateItem (aRealServiceInformation);
     }
     finally
     {
