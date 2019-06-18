@@ -292,6 +292,21 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                 .setIcon (EDefaultIcon.YES));
       return EValidity.INVALID;
     }
+
+    final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+    if (aTransportProfileMgr.getSMPTransportProfileCount () == 0)
+    {
+      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No transport profile is present! At least one transport profile must be present to create an endpoint for it."));
+      aNodeList.addChild (new BootstrapButton ().addChild ("Create new transport profile")
+                                                .setOnClick (createCreateURL (aWPEC,
+                                                                              CMenuSecure.MENU_TRANSPORT_PROFILES))
+                                                .setIcon (EDefaultIcon.YES));
+      aNodeList.addChild (new BootstrapButton ().addChild ("Check default transport profiles")
+                                                .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_TRANSPORT_PROFILES))
+                                                .setIcon (EDefaultIcon.YES));
+      return EValidity.INVALID;
+    }
+
     return super.isValidToDisplayPage (aWPEC);
   }
 

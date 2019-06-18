@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain.transportprofile;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -139,5 +140,11 @@ public final class SMPTransportProfileManagerXML extends
   public boolean containsSMPTransportProfileWithID (@Nullable final String sID)
   {
     return containsWithID (sID);
+  }
+
+  @Nonnegative
+  public long getSMPTransportProfileCount ()
+  {
+    return size ();
   }
 }

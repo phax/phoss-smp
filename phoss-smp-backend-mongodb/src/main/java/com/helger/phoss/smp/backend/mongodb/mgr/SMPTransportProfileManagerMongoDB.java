@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -38,7 +39,7 @@ import com.mongodb.client.result.DeleteResult;
 
 /**
  * Implementation of {@link ISMPTransportProfileManager} for MongoDB
- * 
+ *
  * @author Philip Helger
  */
 public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMongoDB implements
@@ -143,5 +144,11 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
   public boolean containsSMPTransportProfileWithID (@Nullable final String sID)
   {
     return getCollection ().find (new Document (BSON_ID, sID)).first () != null;
+  }
+
+  @Nonnegative
+  public long getSMPTransportProfileCount ()
+  {
+    return getCollection ().countDocuments ();
   }
 }
