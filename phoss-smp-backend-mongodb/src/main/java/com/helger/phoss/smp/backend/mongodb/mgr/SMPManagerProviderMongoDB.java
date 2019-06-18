@@ -80,12 +80,13 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
   @Nonnull
   public ISMPServiceInformationManager createServiceInformationMgr ()
   {
-    return null;
+    return new SMPServiceInformationManagerMongoDB ();
   }
 
   @Nullable
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
+    // TODO implement and set
     return null;
   }
 

@@ -23,7 +23,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,6 @@ import com.helger.photon.audit.AuditHelper;
 import com.helger.security.certificate.CertificateHelper;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 
 /**
@@ -139,21 +137,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   {
     // ServiceGroup and DocType are never changed -> therefore the ID is never
     // changed
-    final ICommonsList <Bson> aUpdates = new CommonsArrayList <> ();
-    aUpdates.add (Updates.set (BSON_TARGET_HREF, aSMPRedirect.getTargetHref ()));
-    aUpdates.add (Updates.set (BSON_TARGET_SUBJECT_CN, aSMPRedirect.getSubjectUniqueIdentifier ()));
-    if (aSMPRedirect.hasCertificate ())
-      aUpdates.add (Updates.set (BSON_TARGET_CERTIFICATE,
-                                 CertificateHelper.getPEMEncodedCertificate (aSMPRedirect.getCertificate ())));
-    else
-      aUpdates.add (Updates.unset (BSON_TARGET_CERTIFICATE));
-    if (aSMPRedirect.extensions ().isNotEmpty ())
-      aUpdates.add (Updates.set (BSON_EXTENSIONS, aSMPRedirect.getExtensionsAsString ()));
-    else
-      aUpdates.add (Updates.unset (BSON_EXTENSIONS));
-
-    final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, aSMPRedirect.getID ()),
-                                                                Updates.combine (aUpdates));
+    final Document aOldDoc = getCollection ().findOneAndReplace (new Document (BSON_ID, aSMPRedirect.getID ()),
+                                                                 toBson (aSMPRedirect));
     if (aOldDoc != null)
       AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
                                         aSMPRedirect.getID (),
@@ -193,16 +178,15 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
 
     final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                    aDocumentTypeIdentifier);
-    SMPRedirect aNewRedirect;
+    final SMPRedirect aNewRedirect = new SMPRedirect (aServiceGroup,
+                                                      aDocumentTypeIdentifier,
+                                                      sTargetHref,
+                                                      sSubjectUniqueIdentifier,
+                                                      aCertificate,
+                                                      sExtension);
     if (aOldRedirect == null)
     {
       // Create new ID
-      aNewRedirect = new SMPRedirect (aServiceGroup,
-                                      aDocumentTypeIdentifier,
-                                      sTargetHref,
-                                      sSubjectUniqueIdentifier,
-                                      aCertificate,
-                                      sExtension);
       _createSMPRedirect (aNewRedirect);
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("createOrUpdateSMPRedirect - success - created");
@@ -212,12 +196,6 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     else
     {
       // Reuse old ID
-      aNewRedirect = new SMPRedirect (aServiceGroup,
-                                      aDocumentTypeIdentifier,
-                                      sTargetHref,
-                                      sSubjectUniqueIdentifier,
-                                      aCertificate,
-                                      sExtension);
       _updateSMPRedirect (aNewRedirect);
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("createOrUpdateSMPRedirect - success - updated");
