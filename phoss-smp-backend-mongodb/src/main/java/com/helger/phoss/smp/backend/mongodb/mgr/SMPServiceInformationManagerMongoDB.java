@@ -18,6 +18,7 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -381,8 +382,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     // Find implementation object
     final SMPServiceInformation aRealServiceInformation = getCollection ().find (new Document (BSON_ID,
                                                                                                aSMPServiceInformation.getID ()))
-                                                                          .map ( (final Document x) -> toServiceInformation (x,
-                                                                                                                             true))
+                                                                          .map (x -> toServiceInformation (x, true))
                                                                           .first ();
     if (aRealServiceInformation == null)
     {
@@ -421,7 +421,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
-    getCollection ().find ().forEach ( (final Document x) -> ret.add (toServiceInformation (x, true)));
+    getCollection ().find ().forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, true)));
     return ret;
   }
 
@@ -438,7 +438,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
       getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()))
-                      .forEach ( (final Document x) -> ret.add (toServiceInformation (x, true)));
+                      .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, true)));
     return ret;
   }
 
@@ -450,8 +450,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     if (aServiceGroup != null)
     {
       getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()))
-                      .forEach ( (final Document x) -> ret.add (toServiceInformation (x,
-                                                                                      false).getDocumentTypeIdentifier ()));
+                      .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x,
+                                                                                          false).getDocumentTypeIdentifier ()));
     }
     return ret;
   }
@@ -468,7 +468,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()),
                                         new Document (BSON_DOCTYPE_ID, toBson (aDocumentTypeIdentifier))))
-                    .forEach ( (final Document x) -> ret.add (toServiceInformation (x, true)));
+                    .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, true)));
 
     if (ret.isEmpty ())
       return null;

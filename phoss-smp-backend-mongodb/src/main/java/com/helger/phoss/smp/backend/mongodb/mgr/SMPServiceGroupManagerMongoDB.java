@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
+import java.util.function.Consumer;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -265,7 +267,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
-    getCollection ().find ().forEach ( (final Document x) -> ret.add (toDomain (x)));
+    getCollection ().find ().forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
     return ret;
   }
 
@@ -275,7 +277,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   {
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     getCollection ().find (new Document (BSON_OWNER_ID, sOwnerID))
-                    .forEach ( (final Document x) -> ret.add (toDomain (x)));
+                    .forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
     return ret;
   }
 

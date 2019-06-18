@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.security.cert.X509Certificate;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -255,7 +256,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
-    getCollection ().find ().forEach ( (final Document x) -> ret.add (toDomain (x)));
+    getCollection ().find ().forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
     return ret;
   }
 
@@ -273,7 +274,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (StringHelper.hasText (sServiceGroupID))
       getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, sServiceGroupID))
-                      .forEach ( (final Document x) -> ret.add (toDomain (x)));
+                      .forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
     return ret;
   }
 
