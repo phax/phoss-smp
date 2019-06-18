@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -35,6 +36,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.typeconvert.TypeConverter;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -107,9 +109,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     if (aValue.hasMinimumAuthenticationLevel ())
       ret.append (BSON_MINIMUM_AUTHENTICATION_LEVEL, aValue.getMinimumAuthenticationLevel ());
     if (aValue.hasServiceActivationDateTime ())
-      ret.append (BSON_SERVICEACTIVATION, aValue.getServiceActivationDateTime ());
+      ret.append (BSON_SERVICEACTIVATION, TypeConverter.convert (aValue.getServiceActivationDateTime (), Date.class));
     if (aValue.hasServiceExpirationDateTime ())
-      ret.append (BSON_SERVICEEXPIRATION, aValue.getServiceExpirationDateTime ());
+      ret.append (BSON_SERVICEEXPIRATION, TypeConverter.convert (aValue.getServiceExpirationDateTime (), Date.class));
     if (aValue.hasCertificate ())
       ret.append (BSON_CERTIFICATE, aValue.getCertificate ());
     if (aValue.hasServiceDescription ())
@@ -133,8 +135,10 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                                                                     SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aDoc.getString (BSON_MINIMUM_AUTHENTICATION_LEVEL);
     // TODO fix conversion twice
-    final LocalDateTime aServiceActivationDT = aDoc.get (BSON_SERVICEACTIVATION, LocalDateTime.class);
-    final LocalDateTime aServiceExpirationDT = aDoc.get (BSON_SERVICEEXPIRATION, LocalDateTime.class);
+    final LocalDateTime aServiceActivationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEACTIVATION),
+                                                                      LocalDateTime.class);
+    final LocalDateTime aServiceExpirationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEEXPIRATION),
+                                                                      LocalDateTime.class);
     final String sCertificate = aDoc.getString (BSON_CERTIFICATE);
     final String sServiceDescription = aDoc.getString (BSON_SERVICE_DESCRIPTION);
     final String sTechnicalContactUrl = aDoc.getString (BSON_TECHCONTACTURL);
