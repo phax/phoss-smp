@@ -89,7 +89,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                     @Nonnull final ISMLInfo aSelectedObject)
       {
         final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
-        if (aSMLInfoMgr.removeSMLInfo (aSelectedObject.getID ()).isChanged ())
+        if (aSMLInfoMgr.deleteSMLInfo (aSelectedObject.getID ()).isChanged ())
           aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SML configuration '" +
                                                                               aSelectedObject.getDisplayName () +
                                                                               "' was successfully deleted!"));

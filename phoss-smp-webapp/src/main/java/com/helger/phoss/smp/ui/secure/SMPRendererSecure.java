@@ -111,7 +111,7 @@ public final class SMPRendererSecure
     final BootstrapSuccessBox aBox = new BootstrapSuccessBox ().addClass (CBootstrapCSS.MT_2);
 
     // Information on SML usage
-    if (aSettings.isSMLActive ())
+    if (aSettings.isSMLEnabled ())
     {
       aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ()).addChild (" SML connection is configured."));
       if (aSettings.getSMLInfo () == null)
@@ -134,13 +134,13 @@ public final class SMPRendererSecure
       }
     }
 
-    if (aSettings.isPEPPOLDirectoryIntegrationRequired ())
+    if (aSettings.isDirectoryIntegrationRequired ())
     {
-      if (aSettings.isPEPPOLDirectoryIntegrationEnabled ())
+      if (aSettings.isDirectoryIntegrationEnabled ())
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ())
                                    .addChild (" Directory support is configured."));
-        if (StringHelper.hasNoText (aSettings.getPEPPOLDirectoryHostName ()))
+        if (StringHelper.hasNoText (aSettings.getDirectoryHostName ()))
         {
           aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                      .addChild (" No Directory host is provided. ")

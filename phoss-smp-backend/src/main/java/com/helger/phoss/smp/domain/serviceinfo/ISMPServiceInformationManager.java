@@ -20,9 +20,9 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -135,7 +135,7 @@ public interface ISMPServiceInformationManager
    * @return The count of all service information objects. Always &ge; 0.
    */
   @Nonnegative
-  int getSMPServiceInformationCount ();
+  long getSMPServiceInformationCount ();
 
   /**
    * Get all service information objects that belong to the provided service

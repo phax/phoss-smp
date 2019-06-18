@@ -40,10 +40,10 @@ public final class MenuSecure
   {
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID);
     final IMenuObjectFilter aFilterPEPPOLDirectory = x -> SMPMetaManager.getSettings ()
-                                                                        .isPEPPOLDirectoryIntegrationEnabled () &&
+                                                                        .isDirectoryIntegrationEnabled () &&
                                                           SMPMetaManager.hasBusinessCardMgr ();
-    final IMenuObjectFilter aFilterSMLConnectionActive = x -> SMPMetaManager.getSettings ().isSMLActive ();
-    final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> SMPMetaManager.getSettings ().isSMLActive () ||
+    final IMenuObjectFilter aFilterSMLConnectionActive = x -> SMPMetaManager.getSettings ().isSMLEnabled ();
+    final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> SMPMetaManager.getSettings ().isSMLEnabled () ||
                                                                       SMPMetaManager.getSettings ().isSMLRequired ();
 
     if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())

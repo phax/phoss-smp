@@ -25,6 +25,6 @@ public class SMPSettingsTest
   public void testBasic ()
   {
     final SMPSettings aSettings = new SMPSettings ();
-    assertTrue (aSettings.isPEPPOLDirectoryIntegrationRequired ());
+    assertTrue (aSettings.isDirectoryIntegrationRequired ());
   }
 }

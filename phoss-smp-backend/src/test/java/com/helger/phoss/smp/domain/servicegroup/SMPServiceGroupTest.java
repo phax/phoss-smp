@@ -23,9 +23,9 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.bdxr.smp1.BDXR1ExtensionConverter;
 import com.helger.peppol.bdxr.smp1.marshal.BDXR1MarshallerServiceGroupType;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
 import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupType;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
@@ -52,7 +52,7 @@ public final class SMPServiceGroupTest
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticpantIdentifier ());
-    assertEquals ("[{\"Any\":\"<foobar />\"}]", aSG.getExtensionAsString ());
+    assertEquals ("[{\"Any\":\"<foobar />\"}]", aSG.getExtensionsAsString ());
 
     final com.helger.peppol.smp.ServiceGroupType aSGPeppol = aSG.getAsJAXBObjectPeppol ();
     assertNotNull (aSGPeppol.getExtension ());
@@ -84,7 +84,7 @@ public final class SMPServiceGroupTest
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticpantIdentifier ());
-    assertNotNull (aSG.getExtensionAsString ());
+    assertNotNull (aSG.getExtensionsAsString ());
 
     final com.helger.xsds.bdxr.smp1.ServiceGroupType aSGBDXR = aSG.getAsJAXBObjectBDXR1 ();
     aSGBDXR.setServiceMetadataReferenceCollection (new com.helger.xsds.bdxr.smp1.ServiceMetadataReferenceCollectionType ());

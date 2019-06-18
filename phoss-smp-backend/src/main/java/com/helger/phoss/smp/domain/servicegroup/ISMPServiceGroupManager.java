@@ -20,7 +20,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.exception.SMPServerException;
@@ -120,6 +120,17 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   @Nonnull
   EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier) throws SMPServerException;
 
+  /**
+   * Delete the service group, and swallow all exceptions. This is only
+   * recommended for unit tests.
+   * 
+   * @param aParticipantIdentifier
+   *        The participant identifier to be deleted. May not be
+   *        <code>null</code>.
+   * @return {@link EChange#CHANGED} if the passed service group is contained
+   *         and was successfully deleted, {@link EChange#UNCHANGED} otherwise.
+   * @see #deleteSMPServiceGroup(IParticipantIdentifier)
+   */
   @Nonnull
   default EChange deleteSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
   {
@@ -161,7 +172,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return A non-negative count. 0 if the passed owner ID is unknown.
    */
   @Nonnegative
-  int getSMPServiceGroupCountOfOwner (@Nonnull String sOwnerID);
+  long getSMPServiceGroupCountOfOwner (@Nonnull String sOwnerID);
 
   /**
    * Check if a service group with the passed participant identifier is
@@ -178,5 +189,5 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return The total number of contained service groups. Always &ge; 0.
    */
   @Nonnegative
-  int getSMPServiceGroupCount ();
+  long getSMPServiceGroupCount ();
 }

@@ -11,6 +11,7 @@
 package com.helger.phoss.smp.backend.sql.model;
 
 import java.io.Serializable;
+import java.security.cert.X509Certificate;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -32,6 +33,7 @@ public class DBServiceMetadataRedirection implements Serializable
   private DBServiceMetadataRedirectionID m_aID;
   private String m_sRedirectionUrl;
   private String m_sCertificateUid;
+  private X509Certificate m_aCertificate;
   private String m_sExtension;
 
   @Deprecated
@@ -42,12 +44,14 @@ public class DBServiceMetadataRedirection implements Serializable
   public DBServiceMetadataRedirection (final DBServiceMetadataRedirectionID aID,
                                        final String sRedirectionUrl,
                                        final String sCertificateUid,
+                                       final X509Certificate aCertificate,
                                        final String sExtension)
   {
     m_aID = aID;
     m_sRedirectionUrl = sRedirectionUrl;
-    m_sExtension = sExtension;
     m_sCertificateUid = sCertificateUid;
+    m_aCertificate = aCertificate;
+    m_sExtension = sExtension;
   }
 
   @EmbeddedId
@@ -95,5 +99,16 @@ public class DBServiceMetadataRedirection implements Serializable
   public void setExtension (final String sExtension)
   {
     m_sExtension = sExtension;
+  }
+
+  // TODO JPA annotation
+  public X509Certificate getCertificate ()
+  {
+    return m_aCertificate;
+  }
+
+  public void setCertificate (final X509Certificate aCertificate)
+  {
+    m_aCertificate = aCertificate;
   }
 }

@@ -17,6 +17,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import org.w3c.dom.Element;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.hashcode.HashCodeGenerator;
@@ -43,14 +44,14 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
   {}
 
   @Nonnull
-  @ReturnsMutableCopy
-  public ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> getAllExtensions ()
+  @ReturnsMutableObject
+  public final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> extensions ()
   {
-    return m_aExtensions.getClone ();
+    return m_aExtensions;
   }
 
   @Nullable
-  public String getExtensionAsString ()
+  public String getExtensionsAsString ()
   {
     if (m_aExtensions.isEmpty ())
       return null;
@@ -73,7 +74,7 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
   }
 
   @Nonnull
-  public EChange setExtensionAsString (@Nullable final String sExtension)
+  public final EChange setExtensionAsString (@Nullable final String sExtension)
   {
     ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> aNewExt = null;
     if (StringHelper.hasText (sExtension))
@@ -111,6 +112,17 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
       return null;
 
     return m_aExtensions.getClone ();
+  }
+
+  @Nullable
+  @ReturnsMutableCopy
+  public com.helger.xsds.bdxr.smp2.ec.SMPExtensionsType getAsBDXR2Extension ()
+  {
+    if (m_aExtensions.isEmpty ())
+      return null;
+
+    // TODO BDXR2 Extensions
+    return null;
   }
 
   @Override

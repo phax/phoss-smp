@@ -10,8 +10,6 @@
  */
 package com.helger.phoss.smp.mock;
 
-import java.util.function.Predicate;
-
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppol.sml.ISMLInfo;
@@ -33,17 +31,12 @@ final class MockSMLInfoManager implements ISMLInfoManager
     throw new UnsupportedOperationException ();
   }
 
-  public EChange removeSMLInfo (final String sSMLInfoID)
+  public EChange deleteSMLInfo (final String sSMLInfoID)
   {
     throw new UnsupportedOperationException ();
   }
 
   public ISMLInfo getSMLInfoOfID (final String sID)
-  {
-    return null;
-  }
-
-  public ISMLInfo findFirst (final Predicate <? super ISMLInfo> aFilter)
   {
     return null;
   }
@@ -64,5 +57,10 @@ final class MockSMLInfoManager implements ISMLInfoManager
   public boolean containsSMLInfoWithID (final String sID)
   {
     return false;
+  }
+
+  public ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (final String sAddress)
+  {
+    return null;
   }
 }

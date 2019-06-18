@@ -41,6 +41,6 @@ public final class RegistrationHookFactory
   @Nonnull
   public static IRegistrationHook getInstance ()
   {
-    return SMPMetaManager.getSettings ().isSMLActive () ? s_aWriteToSML : s_aDoNothing;
+    return SMPMetaManager.getSettings ().isSMLEnabled () ? s_aWriteToSML : s_aDoNothing;
   }
 }

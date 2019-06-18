@@ -54,9 +54,9 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                       @Nullable final String sMinimumAuthenticationLevel,
                       @Nullable final LocalDateTime aServiceActivationDT,
                       @Nullable final LocalDateTime aServiceExpirationDT,
-                      @Nonnull @Nonempty final String sCertificate,
-                      @Nonnull @Nonempty final String sServiceDescription,
-                      @Nonnull @Nonempty final String sTechnicalContactUrl,
+                      @Nullable final String sCertificate,
+                      @Nullable final String sServiceDescription,
+                      @Nullable final String sTechnicalContactUrl,
                       @Nullable final String sTechnicalInformationUrl,
                       @Nullable final String sExtension)
   {
@@ -140,42 +140,36 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     m_aServiceExpirationDT = aServiceExpirationDate;
   }
 
-  @Nonnull
-  @Nonempty
+  @Nullable
   public String getCertificate ()
   {
     return m_sCertificate;
   }
 
-  public void setCertificate (@Nonnull @Nonempty final String sCertificate)
+  public void setCertificate (@Nullable final String sCertificate)
   {
-    ValueEnforcer.notEmpty (sCertificate, "Certificate");
     m_sCertificate = sCertificate;
   }
 
-  @Nonnull
-  @Nonempty
+  @Nullable
   public String getServiceDescription ()
   {
     return m_sServiceDescription;
   }
 
-  public void setServiceDescription (@Nonnull @Nonempty final String sServiceDescription)
+  public void setServiceDescription (@Nullable final String sServiceDescription)
   {
-    ValueEnforcer.notEmpty (sServiceDescription, "ServiceDescription");
     m_sServiceDescription = sServiceDescription;
   }
 
-  @Nonnull
-  @Nonempty
+  @Nullable
   public String getTechnicalContactUrl ()
   {
     return m_sTechnicalContactUrl;
   }
 
-  public void setTechnicalContactUrl (@Nonnull @Nonempty final String sTechnicalContactUrl)
+  public void setTechnicalContactUrl (@Nullable final String sTechnicalContactUrl)
   {
-    ValueEnforcer.notEmpty (sTechnicalContactUrl, "TechnicalContactUrl");
     m_sTechnicalContactUrl = sTechnicalContactUrl;
   }
 

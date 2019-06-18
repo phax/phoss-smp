@@ -13,8 +13,8 @@ package com.helger.phoss.smp.smlhook;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.PeppolIdentifierFactory;
 
 /**
  * Test class for class {@link RegistrationHookWriteToSML}.

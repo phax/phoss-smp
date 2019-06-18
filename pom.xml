@@ -97,7 +97,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css-parent-pom</artifactId>
-        <version>6.1.2</version>
+        <version>6.1.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -111,7 +111,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>9.1.2-SNAPSHOT</version>
+        <version>9.1.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -125,7 +125,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -179,6 +179,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.mongodb</groupId>
+        <artifactId>mongodb-driver-sync</artifactId>
+        <version>3.10.2</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-smp-backend</artifactId>
         <version>${project.version}</version>
@@ -191,6 +197,11 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-smp-backend-xml</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>phoss-smp-backend-mongodb</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -217,9 +228,11 @@
     <module>phoss-smp-backend</module>
     <module>phoss-smp-backend-sql</module>
     <module>phoss-smp-backend-xml</module>
+    <module>phoss-smp-backend-mongodb</module>
     <module>phoss-smp-webapp</module>
     <module>phoss-smp-webapp-sql</module>
     <module>phoss-smp-webapp-xml</module>
+    <module>phoss-smp-webapp-mongodb</module>
   </modules>
   
   <build>
@@ -244,7 +257,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>6.1.2</version><!--$NO-MVN-MAN-VER$-->
+          <version>6.1.3</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>

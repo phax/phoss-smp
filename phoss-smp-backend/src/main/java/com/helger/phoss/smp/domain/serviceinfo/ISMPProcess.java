@@ -20,8 +20,8 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.IProcessIdentifier;
 import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
 /**

@@ -11,17 +11,19 @@
 package com.helger.phoss.smp.domain.redirect;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.identifier.simple.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.peppol.PeppolIdentifierHelper;
+import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
@@ -37,7 +39,7 @@ public final class SMPRedirectTest
   public final TestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
-  public void testRedirect ()
+  public void testBasic ()
   {
     final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                         "0088:dummy");
@@ -47,11 +49,34 @@ public final class SMPRedirectTest
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     // Create new one
-    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", "<extredirect/>");
+    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", null, "<extredirect/>");
     assertSame (aSG, aRedirect.getServiceGroup ());
     assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
     assertEquals ("target", aRedirect.getTargetHref ());
     assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
-    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionAsString ());
+    assertNull (aRedirect.getCertificate ());
+    assertFalse (aRedirect.hasCertificate ());
+    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionsAsString ());
+  }
+
+  @Test
+  public void testCaseSensitivity ()
+  {
+    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                        "0088:UpperCase");
+    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
+                                                                                 "testDocType");
+
+    final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
+
+    // Create new one
+    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", null, "<extredirect/>");
+    assertSame (aSG, aRedirect.getServiceGroup ());
+    assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
+    assertEquals ("target", aRedirect.getTargetHref ());
+    assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
+    assertNull (aRedirect.getCertificate ());
+    assertFalse (aRedirect.hasCertificate ());
+    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionsAsString ());
   }
 }

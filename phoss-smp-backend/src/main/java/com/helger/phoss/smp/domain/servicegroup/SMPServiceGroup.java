@@ -20,10 +20,11 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
-import com.helger.peppol.identifier.factory.IIdentifierFactory;
-import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
+import com.helger.peppolid.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 
@@ -92,7 +93,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   }
 
   @Nonnull
-  public EChange setOwnerID (@Nonnull @Nonempty final String sOwnerID)
+  public final EChange setOwnerID (@Nonnull @Nonempty final String sOwnerID)
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
     if (sOwnerID.equals (m_sOwnerID))
@@ -134,6 +135,22 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
       ret.setServiceMetadataReferenceCollection (null);
     }
     ret.setExtension (getAsBDXRExtension ());
+    return ret;
+  }
+
+  @Nonnull
+  public com.helger.xsds.bdxr.smp2.ServiceGroupType getAsJAXBObjectBDXR2 ()
+  {
+    final com.helger.xsds.bdxr.smp2.ServiceGroupType ret = new com.helger.xsds.bdxr.smp2.ServiceGroupType ();
+    ret.setSMPExtensions (getAsBDXR2Extension ());
+    ret.setSMPVersionID ("2.0");
+    // Explicit constructor call is needed here!
+    ret.setParticipantID (new BDXR2ParticipantIdentifier (m_aParticipantIdentifier));
+    if (false)
+    {
+      // This is set by the REST server
+      ret.setServiceReference (null);
+    }
     return ret;
   }
 

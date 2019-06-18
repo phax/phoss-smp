@@ -10,15 +10,19 @@
  */
 package com.helger.phoss.smp.domain.redirect;
 
+import java.security.cert.X509Certificate;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -29,6 +33,13 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
  */
 public interface ISMPRedirectManager
 {
+  /**
+   * @return A non-<code>null</code> mutable list of callbacks.
+   */
+  @Nonnull
+  @ReturnsMutableObject
+  CallbackList <ISMPRedirectCallback> redirectCallbacks ();
+
   /**
    * Create or update a redirect for a service group.
    *
@@ -42,6 +53,9 @@ public interface ISMPRedirectManager
    * @param sSubjectUniqueIdentifier
    *        The subject unique identifier of the target SMPs certificate used to
    *        sign its resources. May neither be <code>null</code> nor empty.
+   * @param aCertificate
+   *        The certificate of the target SMP. Required for OASIS BDXR SMP v2
+   *        May be <code>null</code>.
    * @param sExtension
    *        Optional extension element. May be <code>null</code>. If present it
    *        must be well-formed XML content.
@@ -53,6 +67,7 @@ public interface ISMPRedirectManager
                                           @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                           @Nonnull @Nonempty String sTargetHref,
                                           @Nonnull @Nonempty String sSubjectUniqueIdentifier,
+                                          @Nullable X509Certificate aCertificate,
                                           @Nullable String sExtension);
 
   /**
@@ -99,7 +114,7 @@ public interface ISMPRedirectManager
    * @return The count of all contained redirects. Always &ge; 0.
    */
   @Nonnegative
-  int getSMPRedirectCount ();
+  long getSMPRedirectCount ();
 
   /**
    * Find the redirect that matches the passed tuple of service group and

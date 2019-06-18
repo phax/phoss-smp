@@ -47,10 +47,10 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.network.dns.IPV4Addr;
 import com.helger.network.port.NetworkOnlineStatusDeterminator;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.factory.IIdentifierFactory;
 import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.peppol.url.PeppolDNSResolutionException;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -134,7 +134,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                     .addChild (new HCDiv ().addChild ("This means that all endpoints and all redirects are deleted as well."));
         if (SMPMetaManager.hasBusinessCardMgr ())
           aQB.addChild (new HCDiv ().addChild ("If a Business Card for this service group exists, it will also be deleted."));
-        if (SMPMetaManager.getSettings ().isSMLActive ())
+        if (SMPMetaManager.getSettings ().isSMLEnabled ())
           aQB.addChild (new HCDiv ().addChild ("Since the connection to the SML is active this service group will also be deleted from the SML!"));
 
         aForm.addChild (aQB);
@@ -270,7 +270,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                     aServiceGroup.getID ()))
                                                                                             .setDisabled (bOffline ||
                                                                                                           !SMPMetaManager.getSettings ()
-                                                                                                                         .isSMLActive ()));
+                                                                                                                         .isSMLEnabled ()));
                             }
                             else
                             {
@@ -284,7 +284,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                     aServiceGroup.getID ()))
                                                                                             .setDisabled (bOffline ||
                                                                                                           !SMPMetaManager.getSettings ()
-                                                                                                                         .isSMLActive ()));
+                                                                                                                         .isSMLEnabled ()));
                             }
                           }
 
@@ -416,7 +416,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                           .getURIEncoded ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
                                                  .setCtrl (SMPCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
-    if (aSelectedObject.hasExtension ())
+    if (aSelectedObject.extensions ().isNotEmpty ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
 
@@ -609,7 +609,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                    EDefaultIcon.MAGNIFIER)
               .setDisabled (SMPMetaManager.getSettings ().getSMLDNSZone () == null ||
                             aAllServiceGroups.isEmpty () ||
-                            !SMPMetaManager.getSettings ().isSMLActive ());
+                            !SMPMetaManager.getSettings ().isSMLEnabled ());
     }
     aNodeList.addChild (aToolbar);
 
@@ -646,14 +646,14 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aRow.addCell (SMPCommonUI.getOwnerName (aCurObject.getOwnerID ()));
       if (bShowExtensionDetails)
       {
-        if (aCurObject.hasExtension ())
+        if (aCurObject.extensions ().isNotEmpty ())
           aRow.addCell (new HCCode ().addChildren (HCExtHelper.nl2divList (aCurObject.getFirstExtensionXML ())));
         else
           aRow.addCell ();
       }
       else
       {
-        aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.hasExtension (), aDisplayLocale));
+        aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.extensions ().isNotEmpty (), aDisplayLocale));
       }
       aRow.addCell (Integer.toString (aSIs.size ()));
       aRow.addCell (Integer.toString (nProcesses));

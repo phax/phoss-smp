@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import java.security.cert.X509Certificate;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -38,10 +39,10 @@ import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
-import com.helger.peppol.identifier.CIdentifier;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.factory.IIdentifierFactory;
+import com.helger.peppolid.CIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -246,7 +247,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                                                     HC_Target.BLANK)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Subject unique identifier")
                                                  .setCtrl (aSelectedObject.getSubjectUniqueIdentifier ()));
-    if (aSelectedObject.hasExtension ())
+    if (aSelectedObject.extensions ().isNotEmpty ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
 
@@ -273,6 +274,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     IDocumentTypeIdentifier aDocTypeID = null;
     final String sRedirectTo = aWPEC.params ().getAsString (FIELD_REDIRECT_TO);
     final String sSubjectUniqueIdentifier = aWPEC.params ().getAsString (FIELD_SUBJECT_UNIQUE_IDENTIFIER);
+    // TODO add certificate redirect support
+    final X509Certificate aCertificate = null;
     final String sExtension = aWPEC.params ().getAsString (FIELD_EXTENSION);
 
     // validations
@@ -329,6 +332,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                   aDocTypeID,
                                                   sRedirectTo,
                                                   sSubjectUniqueIdentifier,
+                                                  aCertificate,
                                                   sExtension) == null)
         aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the Redirect for Service Group '" +
                                                                           sServiceGroupID +

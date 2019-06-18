@@ -16,7 +16,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -61,12 +61,12 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
     throw new UnsupportedOperationException ();
   }
 
-  public int getSMPServiceGroupCountOfOwner (final String sOwnerID)
+  public long getSMPServiceGroupCountOfOwner (final String sOwnerID)
   {
     return 0;
   }
 
-  public int getSMPServiceGroupCount ()
+  public long getSMPServiceGroupCount ()
   {
     return 0;
   }

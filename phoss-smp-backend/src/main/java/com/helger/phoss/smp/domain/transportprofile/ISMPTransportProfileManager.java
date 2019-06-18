@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain.transportprofile;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -104,4 +105,10 @@ public interface ISMPTransportProfileManager
    *         otherwise.
    */
   boolean containsSMPTransportProfileWithID (@Nullable String sID);
+
+  /**
+   * @return The total number of contained service groups. Always &ge; 0.
+   */
+  @Nonnegative
+  long getSMPTransportProfileCount ();
 }

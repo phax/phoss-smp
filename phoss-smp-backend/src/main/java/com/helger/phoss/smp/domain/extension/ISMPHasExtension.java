@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.string.StringHelper;
 
 /**
  * Base interface for objects having an extension (service group, redirect,
@@ -27,16 +26,15 @@ public interface ISMPHasExtension
 {
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> getAllExtensions ();
+  ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> extensions ();
 
   /**
-   * @return The string representation of the extension element. May be
-   *         <code>null</code>. If an extension is present it must be
-   *         well-formed XML content.
-   * @see #hasExtension()
+   * @return The string representation of all extension elements together (like
+   *         a CLOB). May be <code>null</code>. If an extension is present it
+   *         must be well-formed JSON content.
    */
   @Nullable
-  String getExtensionAsString ();
+  String getExtensionsAsString ();
 
   /**
    * @return The XML content of the first extension or <code>null</code> if no
@@ -44,13 +42,4 @@ public interface ISMPHasExtension
    */
   @Nullable
   String getFirstExtensionXML ();
-
-  /**
-   * @return <code>true</code> if an extension is present, <code>false</code>
-   *         otherwise.
-   */
-  default boolean hasExtension ()
-  {
-    return StringHelper.hasText (getExtensionAsString ());
-  }
 }

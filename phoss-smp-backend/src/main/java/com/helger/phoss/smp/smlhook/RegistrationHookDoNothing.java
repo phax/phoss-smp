@@ -13,7 +13,7 @@ package com.helger.phoss.smp.smlhook;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 
 /**
  * An implementation of {@link IRegistrationHook} that does nothing.

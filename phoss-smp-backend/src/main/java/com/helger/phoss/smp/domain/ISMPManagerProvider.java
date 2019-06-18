@@ -13,6 +13,8 @@ package com.helger.phoss.smp.domain;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.peppol.url.IPeppolURLProvider;
+import com.helger.peppol.url.PeppolURLProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -31,6 +33,15 @@ import com.helger.phoss.smp.settings.ISMPSettingsManager;
  */
 public interface ISMPManagerProvider
 {
+  /**
+   * @return The PEPPOL URL provider to be used. May not be <code>null</code>.
+   */
+  @Nonnull
+  default IPeppolURLProvider createPeppolURLProvider ()
+  {
+    return PeppolURLProvider.INSTANCE;
+  }
+
   /**
    * @return A new SML information manager. May not be <code>null</code>.
    */

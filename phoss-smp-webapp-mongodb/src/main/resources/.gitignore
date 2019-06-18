@@ -1,0 +1,4 @@
+private-*
+prod.*
+*.jks
+*.p12

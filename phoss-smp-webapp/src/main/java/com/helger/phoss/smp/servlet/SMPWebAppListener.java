@@ -213,7 +213,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         public void onCreateOrUpdateSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
         {
-          if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+          if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
           {
             // Notify PD server: add
             PDClientProvider.getInstance ()
@@ -224,7 +224,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
         public void onDeleteSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
         {
-          if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+          if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
           {
             // Notify PD server: delete
             PDClientProvider.getInstance ()
@@ -242,7 +242,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                     {
                       public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
                       {
-                        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+                        if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
                         {
                           // Only if a business card is present
                           if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
@@ -258,7 +258,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
                       public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
                       {
-                        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+                        if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
                         {
                           // Only if a business card is present
                           if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
@@ -274,7 +274,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
                       public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
                       {
-                        if (SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate ())
+                        if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
                         {
                           // Only if a business card is present
                           if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))

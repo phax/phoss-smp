@@ -19,12 +19,12 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
-import com.helger.peppol.identifier.factory.BDXR1IdentifierFactory;
-import com.helger.peppol.identifier.factory.IIdentifierFactory;
-import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
-import com.helger.peppol.identifier.factory.SimpleIdentifierFactory;
 import com.helger.peppol.url.IPeppolURLProvider;
-import com.helger.peppol.url.PeppolURLProvider;
+import com.helger.peppolid.factory.BDXR1IdentifierFactory;
+import com.helger.peppolid.factory.BDXR2IdentifierFactory;
+import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.peppolid.factory.PeppolIdentifierFactory;
+import com.helger.peppolid.factory.SimpleIdentifierFactory;
 import com.helger.phoss.smp.ESMPIdentifierType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.backend.SMPBackendRegistry;
@@ -139,8 +139,11 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         case BDXR1:
           m_aIdentifierFactory = BDXR1IdentifierFactory.INSTANCE;
           break;
+        case BDXR2:
+          m_aIdentifierFactory = BDXR2IdentifierFactory.INSTANCE;
+          break;
         default:
-          throw new IllegalStateException ("Unsupporeted identifier type " + eIdentifierType + "!");
+          throw new IllegalStateException ("Unsupported identifier type " + eIdentifierType + "!");
       }
 
       // Initialize first because the service group manager initializes the
@@ -162,8 +165,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         // fall through. Certificate stays invalid, no SML access possible.
       }
 
-      // TODO make customizable
-      m_aPeppolURLProvider = PeppolURLProvider.INSTANCE;
+      m_aPeppolURLProvider = s_aManagerProvider.createPeppolURLProvider ();
+      if (m_aPeppolURLProvider == null)
+        throw new IllegalStateException ("Failed to create PEPPOL URL Provider!");
 
       m_aSMLInfoMgr = s_aManagerProvider.createSMLInfoMgr ();
       if (m_aSMLInfoMgr == null)

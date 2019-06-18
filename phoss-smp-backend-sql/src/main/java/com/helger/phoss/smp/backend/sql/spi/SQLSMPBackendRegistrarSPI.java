@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI;
 import com.helger.phoss.smp.backend.ISMPBackendRegistry;
-import com.helger.phoss.smp.backend.sql.mgr.SQLManagerProvider;
+import com.helger.phoss.smp.backend.sql.mgr.SMPManagerProviderSQL;
 
 /**
  * Register the SQL backend to the global SMP backend registry.
@@ -25,8 +25,10 @@ import com.helger.phoss.smp.backend.sql.mgr.SQLManagerProvider;
 @IsSPIImplementation
 public final class SQLSMPBackendRegistrarSPI implements ISMPBackendRegistrarSPI
 {
+  public static final String BACKEND_ID = "sql";
+
   public void registerSMPBackend (@Nonnull final ISMPBackendRegistry aRegistry)
   {
-    aRegistry.registerSMPBackend ("sql", SQLManagerProvider::new);
+    aRegistry.registerSMPBackend (BACKEND_ID, SMPManagerProviderSQL::new);
   }
 }

@@ -59,8 +59,8 @@ import com.helger.html.jscode.JSAnonymousFunction;
 import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.factory.IIdentifierFactory;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -210,7 +210,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         {
           aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!" +
                                                                               (SMPMetaManager.getSettings ()
-                                                                                             .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+                                                                                             .isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
         }
         else
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
@@ -257,7 +257,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
     final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
-    if (!aSettingsMgr.getSettings ().isPEPPOLDirectoryIntegrationEnabled ())
+    if (!aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ())
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild (SMPWebAppConfiguration.getDirectoryName () +
                                                             " integration is disabled hence no Business Cards can be created."));
@@ -589,7 +589,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                             aServiceGroup.getID () +
                                                                             "' was successfully saved." +
                                                                             (SMPMetaManager.getSettings ()
-                                                                                           .isPEPPOLDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+                                                                                           .isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
       else
         aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the Business Card for Service Group '" +
                                                                           aServiceGroup.getID () +

@@ -67,7 +67,7 @@ public final class APIExecutorListGet implements IAPIExecutor
       {
         // Unspecified extension
         final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
-                                                                                                                                            aBasicAuth);
+                                                                                                                                             aBasicAuth);
         aBytes = new BDXR1MarshallerServiceGroupReferenceListType ().getAsBytes (ret);
         break;
       }

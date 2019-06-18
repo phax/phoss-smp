@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.restapi;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -26,10 +27,6 @@ import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.factory.IIdentifierFactory;
-import com.helger.peppol.identifier.simple.process.SimpleProcessIdentifier;
 import com.helger.peppol.smp.CompleteServiceGroupType;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ProcessListType;
@@ -44,6 +41,10 @@ import com.helger.peppol.smp.ServiceMetadataReferenceType;
 import com.helger.peppol.smp.ServiceMetadataType;
 import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -579,10 +580,13 @@ public final class SMPServerAPI
       {
         // Handle redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+        // not available in PEPPOL mode
+        final X509Certificate aCertificate = null;
         if (aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
                                                     aDocTypeID,
                                                     aServiceMetadata.getRedirect ().getHref (),
                                                     aServiceMetadata.getRedirect ().getCertificateUID (),
+                                                    aCertificate,
                                                     SMPExtensionConverter.convertToString (aServiceMetadata.getRedirect ()
                                                                                                            .getExtension ())) == null)
         {

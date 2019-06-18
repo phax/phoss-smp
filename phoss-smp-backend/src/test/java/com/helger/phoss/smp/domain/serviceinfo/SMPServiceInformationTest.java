@@ -23,14 +23,14 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.datetime.PDTFactory;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.IProcessIdentifier;
-import com.helger.peppol.identifier.factory.PeppolIdentifierFactory;
-import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
-import com.helger.peppol.identifier.simple.doctype.SimpleDocumentTypeIdentifier;
-import com.helger.peppol.identifier.simple.participant.SimpleParticipantIdentifier;
-import com.helger.peppol.identifier.simple.process.SimpleProcessIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.IProcessIdentifier;
+import com.helger.peppolid.factory.PeppolIdentifierFactory;
+import com.helger.peppolid.peppol.PeppolIdentifierHelper;
+import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
+import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
@@ -75,14 +75,14 @@ public final class SMPServiceInformationTest
     assertEquals ("sd", aEP.getServiceDescription ());
     assertEquals ("tc", aEP.getTechnicalContactUrl ());
     assertEquals ("ti", aEP.getTechnicalInformationUrl ());
-    assertEquals ("[{\"Any\":\"<extep />\"}]", aEP.getExtensionAsString ());
+    assertEquals ("[{\"Any\":\"<extep />\"}]", aEP.getExtensionsAsString ());
 
     final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                        "testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "<extproc/>");
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
-    assertEquals ("[{\"Any\":\"<extproc />\"}]", aProcess.getExtensionAsString ());
+    assertEquals ("[{\"Any\":\"<extproc />\"}]", aProcess.getExtensionsAsString ());
 
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
                                                                                  "testdoctype");
@@ -93,7 +93,7 @@ public final class SMPServiceInformationTest
     assertSame (aSG, aSI.getServiceGroup ());
     assertEquals (aDocTypeID, aSI.getDocumentTypeIdentifier ());
     assertEquals (1, aSI.getAllProcesses ().size ());
-    assertEquals ("[{\"Any\":\"<extsi />\"}]", aSI.getExtensionAsString ());
+    assertEquals ("[{\"Any\":\"<extsi />\"}]", aSI.getExtensionsAsString ());
   }
 
   @Test
@@ -124,14 +124,14 @@ public final class SMPServiceInformationTest
     assertEquals ("sd", aEP.getServiceDescription ());
     assertEquals ("tc", aEP.getTechnicalContactUrl ());
     assertNull (aEP.getTechnicalInformationUrl ());
-    assertNull (aEP.getExtensionAsString ());
+    assertNull (aEP.getExtensionsAsString ());
 
     final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                        "testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), (String) null);
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
-    assertNull (aProcess.getExtensionAsString ());
+    assertNull (aProcess.getExtensionsAsString ());
 
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
                                                                                  "testdoctype");
@@ -142,6 +142,6 @@ public final class SMPServiceInformationTest
     assertSame (aSG, aSI.getServiceGroup ());
     assertEquals (aDocTypeID, aSI.getDocumentTypeIdentifier ());
     assertEquals (1, aSI.getAllProcesses ().size ());
-    assertNull (aSI.getExtensionAsString ());
+    assertNull (aSI.getExtensionsAsString ());
   }
 }

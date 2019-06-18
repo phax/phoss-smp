@@ -22,8 +22,8 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IProcessIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
@@ -50,7 +50,10 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    */
   @Nonnull
   @Nonempty
-  String getServiceGroupID ();
+  default String getServiceGroupID ()
+  {
+    return getServiceGroup ().getID ();
+  }
 
   /**
    * @return The document type identifier of this service information. Never

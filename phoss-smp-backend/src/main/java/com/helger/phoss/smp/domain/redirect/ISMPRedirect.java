@@ -11,13 +11,15 @@
 package com.helger.phoss.smp.domain.redirect;
 
 import java.io.Serializable;
+import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
@@ -29,6 +31,14 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
  */
 public interface ISMPRedirect extends IHasID <String>, Serializable, ISMPHasExtension
 {
+  /**
+   * The ID of an SMP redirect is usually the combination of service group ID
+   * and document type ID. So this is NOT the same as the service group ID.
+   */
+  @Nonnull
+  @Nonempty
+  String getID ();
+
   /**
    * @return The service group which this redirect should handle.
    */
@@ -64,6 +74,25 @@ public interface ISMPRedirect extends IHasID <String>, Serializable, ISMPHasExte
   @Nonnull
   @Nonempty
   String getSubjectUniqueIdentifier ();
+
+  /**
+   * @return The X509 public certificate of the new SMP where the redirect
+   *         points to. This is needed since OASIS BDXR SMP v2. May be
+   *         <code>null</code>.
+   * @since 5.2.0
+   */
+  @Nullable
+  X509Certificate getCertificate ();
+
+  /**
+   * @return <code>true</code> if a redirect certificate is present,
+   *         <code>false</code> if not.
+   * @since 5.2.0
+   */
+  default boolean hasCertificate ()
+  {
+    return getCertificate () != null;
+  }
 
   /**
    * @return This redirect object as a PEPPOL SMP JAXB object for the REST

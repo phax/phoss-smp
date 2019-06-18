@@ -57,11 +57,11 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.html.jscode.html.JSHtml;
-import com.helger.peppol.identifier.IDocumentTypeIdentifier;
-import com.helger.peppol.identifier.IProcessIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.EPredefinedDocumentTypeIdentifier;
-import com.helger.peppol.identifier.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
-import com.helger.peppol.identifier.peppol.process.EPredefinedProcessIdentifier;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IProcessIdentifier;
+import com.helger.peppolid.peppol.doctype.EPredefinedDocumentTypeIdentifier;
+import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
+import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 import com.helger.phoss.smp.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.phoss.smp.ui.ajax.CAjax;
@@ -323,7 +323,7 @@ public final class SMPCommonUI
   @Nullable
   public static IHCNode getExtensionDisplay (@Nonnull final ISMPHasExtension aHasExtension)
   {
-    final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> aExtensions = aHasExtension.getAllExtensions ();
+    final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> aExtensions = aHasExtension.extensions ();
     if (aExtensions.isEmpty ())
       return null;
 

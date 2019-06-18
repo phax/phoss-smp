@@ -12,7 +12,7 @@ package com.helger.phoss.smp.domain.servicegroup;
 
 import javax.annotation.Nullable;
 
-import com.helger.peppol.identifier.IParticipantIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 
 /**
  * Base interface for an {@link ISMPServiceGroup} provider.

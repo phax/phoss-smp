@@ -21,8 +21,8 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.db.jpa.annotation.UsedOnlyByJPA;
-import com.helger.peppol.identifier.IParticipantIdentifier;
-import com.helger.peppol.identifier.peppol.PeppolIdentifierHelper;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 
 /**
  * ID for the ownership

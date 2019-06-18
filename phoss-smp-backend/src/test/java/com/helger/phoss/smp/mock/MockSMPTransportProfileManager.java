@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.mock;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -64,5 +65,11 @@ final class MockSMPTransportProfileManager implements ISMPTransportProfileManage
   public boolean containsSMPTransportProfileWithID (final String sID)
   {
     return false;
+  }
+
+  @Nonnegative
+  public long getSMPTransportProfileCount ()
+  {
+    return 0;
   }
 }

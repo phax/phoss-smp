@@ -88,7 +88,7 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("smp.forceroot", SMPServerConfiguration.isForceRoot ());
 
     // SML information
-    aStatusData.add ("smp.sml.enabled", aSettings.isSMLActive ());
+    aStatusData.add ("smp.sml.enabled", aSettings.isSMLEnabled ());
     aStatusData.add ("smp.sml.needed", aSettings.isSMLRequired ());
     if (aSMLInfo != null)
     {
@@ -99,11 +99,11 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("smp.sml.request-timeout-ms", SMPServerConfiguration.getSMLRequestTimeoutMS ());
 
     // Directory information
-    aStatusData.add ("smp.pd.enabled", aSettings.isPEPPOLDirectoryIntegrationEnabled ());
+    aStatusData.add ("smp.pd.enabled", aSettings.isDirectoryIntegrationEnabled ());
     // New in 5.1.0
-    aStatusData.add ("smp.pd.needed", aSettings.isPEPPOLDirectoryIntegrationRequired ());
-    aStatusData.add ("smp.pd.auto-update", aSettings.isPEPPOLDirectoryIntegrationAutoUpdate ());
-    aStatusData.add ("smp.pd.hostname", aSettings.getPEPPOLDirectoryHostName ());
+    aStatusData.add ("smp.pd.needed", aSettings.isDirectoryIntegrationRequired ());
+    aStatusData.add ("smp.pd.auto-update", aSettings.isDirectoryIntegrationAutoUpdate ());
+    aStatusData.add ("smp.pd.hostname", aSettings.getDirectoryHostName ());
 
     // Certificate information
     final boolean bCertConfigOk = SMPKeyManager.isCertificateValid ();
