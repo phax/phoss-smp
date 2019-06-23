@@ -22,12 +22,18 @@ import org.bson.Document;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.UsedViaReflection;
+import com.helger.commons.string.StringHelper;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.scope.IScope;
+import com.helger.settings.exchange.configfile.ConfigFile;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 import com.mongodb.client.MongoCollection;
 
 public class MongoClientSingleton extends AbstractGlobalWebSingleton
 {
+  public static final String CONFIG_MONGODB_CONNECTION_STRING = "mongodb.connectionstring";
+  public static final String CONFIG_MONGODB_DB_NAME = "mongodb.dbname";
+
   private MongoClientProvider m_aProvider;
 
   @Deprecated
@@ -36,11 +42,22 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
   {}
 
   @Override
-  protected void onAfterInstantiation (final IScope aScope)
+  protected void onAfterInstantiation (@Nonnull final IScope aScope)
   {
-    // TODO make customizable
-    final String sConnectionString = "mongodb://localhost";
-    final String sDBName = "phoss-smp";
+    // Standard configuration file
+    final ConfigFile aConfigFile = SMPServerConfiguration.getConfigFile ();
+    final String sConnectionString = aConfigFile.getAsString (CONFIG_MONGODB_CONNECTION_STRING);
+    if (StringHelper.hasNoText (sConnectionString))
+      throw new IllegalStateException ("The MongoDB connection string is missing in the configuration. See property '" +
+                                       CONFIG_MONGODB_CONNECTION_STRING +
+                                       "'");
+
+    final String sDBName = aConfigFile.getAsString (CONFIG_MONGODB_DB_NAME);
+    if (StringHelper.hasNoText (sDBName))
+      throw new IllegalStateException ("The MongoDB database name is missing in the configuration. See property '" +
+                                       CONFIG_MONGODB_DB_NAME +
+                                       "'");
+
     m_aProvider = new MongoClientProvider (sConnectionString, sDBName);
   }
 

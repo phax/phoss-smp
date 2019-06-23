@@ -135,7 +135,6 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final boolean bRequireBusinessLevelSignature = aDoc.getBoolean (BSON_BUSINESSLEVELSIG,
                                                                     SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aDoc.getString (BSON_MINIMUM_AUTHENTICATION_LEVEL);
-    // TODO fix conversion twice
     final LocalDateTime aServiceActivationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEACTIVATION),
                                                                       LocalDateTime.class);
     final LocalDateTime aServiceExpirationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEEXPIRATION),
