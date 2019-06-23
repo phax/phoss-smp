@@ -295,7 +295,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
 
     final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID,
                                                                               aServiceGroup.getID ()),
-                                                                toBson (aDocTypeID)))
+                                                                new Document (BSON_DOCTYPE_ID, toBson (aDocTypeID))))
                                             .first ();
     if (aMatch == null)
       return null;

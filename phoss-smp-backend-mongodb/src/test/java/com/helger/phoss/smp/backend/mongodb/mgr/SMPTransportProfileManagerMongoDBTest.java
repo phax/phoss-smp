@@ -43,6 +43,10 @@ public final class SMPTransportProfileManagerMongoDBTest
   {
     try (final SMPTransportProfileManagerMongoDB aMgr = new SMPTransportProfileManagerMongoDB ())
     {
+      // Remove all - start empty
+      for (final ISMPTransportProfile aTP : aMgr.getAllSMPTransportProfiles ())
+        aMgr.removeSMPTransportProfile (aTP.getID ());
+
       assertEquals (0, aMgr.getAllSMPTransportProfiles ().size ());
       final ICommonsList <ISMPTransportProfile> aCreated = aMgr.getAllSMPTransportProfiles ();
       for (final ESMPTransportProfile e : ESMPTransportProfile.values ())

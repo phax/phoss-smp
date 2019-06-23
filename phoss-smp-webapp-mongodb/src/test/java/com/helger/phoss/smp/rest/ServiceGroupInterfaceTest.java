@@ -55,6 +55,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.mock.MockSMPClient;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.phoss.smp.rest2.Rest2Filter;
+import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.web.scope.mgr.WebScoped;
 
@@ -66,8 +67,8 @@ import com.helger.web.scope.mgr.WebScoped;
 public final class ServiceGroupInterfaceTest
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (ServiceGroupInterfaceTest.class);
-  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials ("peppol_user",
-                                                                                                "Test1234");
+  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
+                                                                                                CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   @Rule
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-mongodb.properties")
