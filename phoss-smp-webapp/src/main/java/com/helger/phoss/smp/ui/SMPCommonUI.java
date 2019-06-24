@@ -29,6 +29,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.helger.commons.CGlobal;
@@ -100,6 +102,7 @@ import com.helger.xml.serialize.write.XMLWriter;
 @Immutable
 public final class SMPCommonUI
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPCommonUI.class);
   private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25)
                                                                                      .addItem (50)
                                                                                      .addItem (100)
@@ -358,6 +361,8 @@ public final class SMPCommonUI
     if (t == null)
       return null;
 
+    LOGGER.warn ("Technical details", t);
+
     final HCNodeList ret = new HCNodeList ();
     Throwable aCur = t;
     while (aCur != null)
@@ -376,6 +381,8 @@ public final class SMPCommonUI
   {
     if (t == null)
       return null;
+
+    LOGGER.warn ("Technical details", t);
 
     final StringBuilder ret = new StringBuilder ();
     Throwable aCur = t;
