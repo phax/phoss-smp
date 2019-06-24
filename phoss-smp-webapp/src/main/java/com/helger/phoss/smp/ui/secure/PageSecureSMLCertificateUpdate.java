@@ -73,7 +73,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 
   public PageSecureSMLCertificateUpdate (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "SML Certificate Update");
+    super (sID, "SML certificate update");
   }
 
   @Override
