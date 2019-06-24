@@ -288,8 +288,8 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         }
         catch (final GeneralSecurityException ex)
         {
-          aUL.addItem (new BootstrapErrorBox ().addChild ("Error iterating trust store. Technical details: " +
-                                                          ex.getMessage ()));
+          aUL.addItem (new BootstrapErrorBox ().addChild ("Error iterating trust store.")
+                                               .addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         }
         aTab.addChild (aUL);
       }

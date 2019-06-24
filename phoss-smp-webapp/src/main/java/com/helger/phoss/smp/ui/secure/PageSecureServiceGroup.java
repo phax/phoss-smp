@@ -172,8 +172,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error deleting the SMP ServiceGroup for participant '" +
                                                                             aSelectedObject.getParticpantIdentifier ()
                                                                                            .getURIEncoded () +
-                                                                            "'. Technical details: " +
-                                                                            ex.getMessage ()));
+                                                                            "'.")
+                                                                 .addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         }
       }
     });
@@ -324,10 +324,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error registering the Service group '" +
                                                                                               aSelectedObject.getParticpantIdentifier ()
                                                                                                              .getURIEncoded () +
-                                                                                              "' at the configured SML! Technical details: " +
-                                                                                              (ex.getCause () != null ? ex.getCause ()
-                                                                                                                          .getMessage ()
-                                                                                                                      : ex.getMessage ())),
+                                                                                              "' at the configured SML!")
+                                                                                   .addChild (SMPCommonUI.getTechnicalDetailsUI (ex)),
                                                            aTargetParams);
                           }
                           // Never reached
@@ -358,10 +356,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error unregistering the Service group '" +
                                                                                               aSelectedObject.getParticpantIdentifier ()
                                                                                                              .getURIEncoded () +
-                                                                                              "' from the configured SML! Technical details: " +
-                                                                                              (ex.getCause () != null ? ex.getCause ()
-                                                                                                                          .getMessage ()
-                                                                                                                      : ex.getMessage ())),
+                                                                                              "' from the configured SML!")
+                                                                                   .addChild (SMPCommonUI.getTechnicalDetailsUI (ex)),
                                                            aTargetParams);
                           }
                           // Never reached
@@ -548,9 +544,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         {
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error updating the SMP ServiceGroup for participant '" +
                                                                             aParticipantID.getURIEncoded () +
-                                                                            "'." +
-                                                                            " Technical details: " +
-                                                                            ex.getMessage ()));
+                                                                            "'.")
+                                                                 .addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         }
       }
       else
@@ -576,10 +571,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         {
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the new SMP ServiceGroup for participant '" +
                                                                             aParticipantID.getURIEncoded () +
-                                                                            "'." +
-                                                                            (aCaughtEx != null ? " Technical details: " +
-                                                                                                 aCaughtEx.getMessage ()
-                                                                                               : "")));
+                                                                            "'.")
+                                                                 .addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
         }
       }
     }

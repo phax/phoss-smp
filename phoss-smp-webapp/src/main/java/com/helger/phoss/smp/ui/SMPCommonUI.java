@@ -38,6 +38,8 @@ import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.id.factory.GlobalIDFactory;
+import com.helger.commons.lang.ClassHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCEditPassword;
@@ -342,5 +344,49 @@ public final class SMPCommonUI
       aNL.addChild (new HCPrismJS (EPrismLanguage.MARKUP).addChild (sXML));
     }
     return aNL;
+  }
+
+  @Nonnull
+  private static String _getString (@Nonnull final Throwable t)
+  {
+    return StringHelper.getConcatenatedOnDemand (ClassHelper.getClassLocalName (t.getClass ()), " - ", t.getMessage ());
+  }
+
+  @Nullable
+  public static HCNodeList getTechnicalDetailsUI (@Nullable final Throwable t)
+  {
+    if (t == null)
+      return null;
+
+    final HCNodeList ret = new HCNodeList ();
+    Throwable aCur = t;
+    while (aCur != null)
+    {
+      if (ret.hasNoChildren ())
+        ret.addChild (new HCDiv ().addChild ("Technical details: " + _getString (aCur)));
+      else
+        ret.addChild (new HCDiv ().addChild ("Caused by: " + _getString (aCur)));
+      aCur = aCur.getCause ();
+    }
+    return ret;
+  }
+
+  @Nullable
+  public static String getTechnicalDetailsString (@Nullable final Throwable t)
+  {
+    if (t == null)
+      return null;
+
+    final StringBuilder ret = new StringBuilder ();
+    Throwable aCur = t;
+    while (aCur != null)
+    {
+      if (ret.length () == 0)
+        ret.append ("Technical details: ").append (_getString (aCur));
+      else
+        ret.append ("\nCaused by: ").append (_getString (aCur));
+      aCur = aCur.getCause ();
+    }
+    return ret.toString ();
   }
 }

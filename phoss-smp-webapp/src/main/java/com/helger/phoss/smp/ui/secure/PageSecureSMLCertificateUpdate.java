@@ -33,7 +33,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.datetime.PDTToString;
-import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
@@ -46,6 +45,7 @@ import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
@@ -92,13 +92,6 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
       return EValidity.INVALID;
     }
     return super.isValidToDisplayPage (aWPEC);
-  }
-
-  @Nonnull
-  @Nonempty
-  private static String _getTechnicalDetails (@Nonnull final Throwable t)
-  {
-    return " Technical details: " + ClassHelper.getClassLocalName (t) + " " + StringHelper.getNotNull (t.getMessage ());
   }
 
   @Nonnull
@@ -240,7 +233,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
         LOGGER.error (sMsg, ex);
-        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg + _getTechnicalDetails (ex)));
+        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-update-cert",
                                            aSMLInfo.getManagementServiceURL (),
                                            sMigrationPublicKey,

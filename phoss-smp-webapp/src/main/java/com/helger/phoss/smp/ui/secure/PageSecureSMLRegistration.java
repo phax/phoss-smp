@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.StringParser;
@@ -46,6 +45,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
@@ -80,13 +80,6 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
   public PageSecureSMLRegistration (@Nonnull @Nonempty final String sID)
   {
     super (sID, "SML registration");
-  }
-
-  @Nonnull
-  @Nonempty
-  private static String _getTechnicalDetails (@Nonnull final Throwable t)
-  {
-    return " Technical details: " + ClassHelper.getClassLocalName (t) + " " + StringHelper.getNotNull (t.getMessage ());
   }
 
   private static boolean _canShowPage (@Nonnull final WebPageExecutionContext aWPEC)
@@ -149,8 +142,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         catch (final UnknownHostException ex)
         {
           aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS,
-                                     "The provided IP address does not resolve to a valid host." +
-                                                             _getTechnicalDetails (ex));
+                                     "The provided IP address does not resolve to a valid host. " +
+                                                             SMPCommonUI.getTechnicalDetailsString (ex));
         }
       }
 
@@ -222,7 +215,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
         LOGGER.error (sMsg, ex);
-        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg + _getTechnicalDetails (ex)));
+        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-create",
                                            sSMPID,
                                            sPhysicalAddress,
@@ -268,8 +261,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         catch (final UnknownHostException ex)
         {
           aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS,
-                                     "The provided IP address does not resolve to a valid host." +
-                                                             _getTechnicalDetails (ex));
+                                     "The provided IP address does not resolve to a valid host. " +
+                                                             SMPCommonUI.getTechnicalDetailsString (ex));
         }
       }
 
@@ -341,7 +334,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
         LOGGER.error (sMsg, ex);
-        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg + _getTechnicalDetails (ex)));
+        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-update",
                                            sSMPID,
                                            sPhysicalAddress,
@@ -391,7 +384,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
         LOGGER.error (sMsg, ex);
-        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg + _getTechnicalDetails (ex)));
+        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-delete",
                                            sSMPID,
                                            aSMLInfo.getManagementServiceURL (),

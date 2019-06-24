@@ -61,6 +61,7 @@ import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPUserSelect;
 import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
@@ -394,11 +395,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           }
           catch (final Exception ex)
           {
-            aLogger.error ("Failed to delete business card " +
-                           aDeleteBusinessCard.getID () +
-                           "; Technical details: " +
-                           ex.getMessage (),
-                           ex);
+            aLogger.error ("Failed to delete business card " + aDeleteBusinessCard.getID (), ex);
           }
 
         // 5. create all new business cards
@@ -490,13 +487,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                   else
                     eBadgeType = EBootstrapBadgeType.SUCCESS;
 
-              String sMsg = aLogMsg.getMessage ().toString ();
-              if (aLogMsg.getThrowable () != null)
-                sMsg += " Technical details: " +
-                        aLogMsg.getThrowable ().getClass ().getName () +
-                        " - " +
-                        aLogMsg.getThrowable ().getMessage ();
-              aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild (sMsg));
+              aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild (aLogMsg.getMessage ().toString ())
+                                                                      .addChild (SMPCommonUI.getTechnicalDetailsUI (aLogMsg.getThrowable ())));
             }
           }
           else
