@@ -32,6 +32,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.StringParser;
+import com.helger.commons.text.util.TextHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -70,8 +71,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
   private static final String FIELD_LOGICAL_ADDRESS = "logicaladdr";
 
   private static final String HELPTEXT_SMP_ID = "This is the unique ID your SMP will have inside the SML. All continuing operations must use this ID. This ID is taken from the configuration file. All uppercase names are appreciated!";
-  private static final String HELPTEXT_PHYSICAL_ADDRESS = "This must be the public IPv4 address of your SMP. IPv6 addresses are not yet supported! By default the IP address of localhost is used.";
-  private static final String HELPTEXT_LOGICAL_ADDRESS = "This must be the public fully qualified domain name of your SMP. This can be either a domain name like 'http://smp.example.org' or an IP address like 'http://1.1.1.1'! By default the hostname of localhost is used.";
+  private static final String HELPTEXT_PHYSICAL_ADDRESS = "This must be the public IPv4 address of your SMP. IPv6 addresses are not yet supported! By default the IP address of localhost is used. The IP address of localhost is ''{0}''.";
+  private static final String HELPTEXT_LOGICAL_ADDRESS = "This must be the public fully qualified domain name of your SMP. This can be either a domain name like ''http://smp.example.org'' or an IP address like ''http://1.1.1.1''! The hostname of localhost is ''{0}''.";
 
   private static final String SUBACTION_SMP_REGISTER = "smpregister";
   private static final String SUBACTION_SMP_UPDATE = "smpupdate";
@@ -214,7 +215,6 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' to the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        LOGGER.error (sMsg, ex);
         aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-create",
                                            sSMPID,
@@ -333,7 +333,6 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' to the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        LOGGER.error (sMsg, ex);
         aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-update",
                                            sSMPID,
@@ -383,7 +382,6 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' from the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        LOGGER.error (sMsg, ex);
         aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-delete",
                                            sSMPID,
@@ -445,16 +443,16 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     if (bShowInput)
     {
       // Get default from configuration
-      String sPhysicalAddress = SMPServerConfiguration.getSMLSMPIP ();
-      String sLogicalAddress = SMPServerConfiguration.getSMLSMPHostname ();
+      final String sPhysicalAddress = SMPServerConfiguration.getSMLSMPIP ();
+      final String sLogicalAddress = SMPServerConfiguration.getSMLSMPHostname ();
+      String sDefaultPhysicalAddress = "";
+      String sDefaultLogicalAddress = "";
 
       try
       {
         final InetAddress aLocalHost = InetAddress.getLocalHost ();
-        if (StringHelper.hasNoText (sPhysicalAddress))
-          sPhysicalAddress = aLocalHost.getHostAddress ();
-        if (StringHelper.hasNoText (sLogicalAddress))
-          sLogicalAddress = "http://" + aLocalHost.getCanonicalHostName ();
+        sDefaultPhysicalAddress = aLocalHost.getHostAddress ();
+        sDefaultLogicalAddress = "http://" + aLocalHost.getCanonicalHostName ();
       }
       catch (final UnknownHostException ex)
       {
@@ -482,12 +480,14 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Physical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_PHYSICAL_ADDRESS,
                                                                                              sPhysicalAddress)).setPlaceholder ("The IPv4 address of your SMP. E.g. 1.2.3.4"))
-                                                     .setHelpText (HELPTEXT_PHYSICAL_ADDRESS)
+                                                     .setHelpText (TextHelper.getFormattedText (HELPTEXT_PHYSICAL_ADDRESS,
+                                                                                                sDefaultPhysicalAddress))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_PHYSICAL_ADDRESS)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Logical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_LOGICAL_ADDRESS,
                                                                                              sLogicalAddress)).setPlaceholder ("The domain name of your SMP server. E.g. http://smp.example.org"))
-                                                     .setHelpText (HELPTEXT_LOGICAL_ADDRESS)
+                                                     .setHelpText (TextHelper.getFormattedText (HELPTEXT_LOGICAL_ADDRESS,
+                                                                                                sDefaultLogicalAddress))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_LOGICAL_ADDRESS)));
 
         final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
@@ -516,12 +516,14 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Physical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_PHYSICAL_ADDRESS,
                                                                                              sPhysicalAddress)).setPlaceholder ("The IPv4 address of your SMP. E.g. 1.2.3.4"))
-                                                     .setHelpText (HELPTEXT_PHYSICAL_ADDRESS)
+                                                     .setHelpText (TextHelper.getFormattedText (HELPTEXT_PHYSICAL_ADDRESS,
+                                                                                                sDefaultPhysicalAddress))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_PHYSICAL_ADDRESS)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Logical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_LOGICAL_ADDRESS,
                                                                                              sLogicalAddress)).setPlaceholder ("The domain name of your SMP server. E.g. http://smp.example.org"))
-                                                     .setHelpText (HELPTEXT_LOGICAL_ADDRESS)
+                                                     .setHelpText (TextHelper.getFormattedText (HELPTEXT_LOGICAL_ADDRESS,
+                                                                                                sDefaultLogicalAddress))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_LOGICAL_ADDRESS)));
 
         final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
