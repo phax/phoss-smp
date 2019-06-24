@@ -414,13 +414,13 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       try
       {
         final InetAddress aIA = InetAddress.getByName (sPublisherDNSName);
-        aNodeList.addChild (new BootstrapInfoBox ().addChild (new HCDiv ().addChild ("An SMP is already registered at the configured SML using the DNS name '" +
-                                                                                     sPublisherDNSName +
-                                                                                     "'. The determined IP address is " +
-                                                                                     aIA.getHostAddress ()))
-                                                   .addChild (new HCDiv ().addChild ("Note: this can be a different machine than this one, if another SMP uses the same ID as this one (" +
-                                                                                     sSMPID +
-                                                                                     ")")));
+        aNodeList.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("An SMP is already registered at the configured SML using the DNS name '" +
+                                                                                        sPublisherDNSName +
+                                                                                        "'. The determined IP address is " +
+                                                                                        aIA.getHostAddress ()))
+                                                      .addChild (new HCDiv ().addChild ("Note: this can be a different machine than this one, if another SMP uses the same ID as this one (" +
+                                                                                        sSMPID +
+                                                                                        ")")));
       }
       catch (final UnknownHostException ex)
       {
