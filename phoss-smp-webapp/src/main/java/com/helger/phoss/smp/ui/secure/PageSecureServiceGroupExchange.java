@@ -343,6 +343,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           {
             // E.g. if SML connection failed
             aLogger.error ("Error creating the new service group " + aImportServiceGroup.getID (), ex);
+
+            // Delete Business Card again, if already present
+            aImportBusinessCards.removeIf (x -> x.getServiceGroupID ().equals (aImportServiceGroup.getID ()));
           }
           if (aNewServiceGroup != null)
           {
