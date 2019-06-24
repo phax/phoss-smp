@@ -43,6 +43,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.security.certificate.CertificateHelper;
 
 /**
  * Manager for all {@link SMPRedirect} objects.
@@ -82,13 +83,15 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
                                                                                                aDocumentTypeIdentifier);
       DBServiceMetadataRedirection aDBRedirect = aEM.find (DBServiceMetadataRedirection.class, aDBRedirectID);
 
+      final String sCertificate = aCertificate == null ? null
+                                                       : CertificateHelper.getPEMEncodedCertificate (aCertificate);
       if (aDBRedirect == null)
       {
         // Create a new one
         aDBRedirect = new DBServiceMetadataRedirection (aDBRedirectID,
                                                         sTargetHref,
                                                         sSubjectUniqueIdentifier,
-                                                        aCertificate,
+                                                        sCertificate,
                                                         sExtension);
         aEM.persist (aDBRedirect);
         aCreatedNew.set (true);
@@ -98,7 +101,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
         // Edit the existing one
         aDBRedirect.setRedirectionUrl (sTargetHref);
         aDBRedirect.setCertificateUid (sSubjectUniqueIdentifier);
-        aDBRedirect.setCertificate (aCertificate);
+        aDBRedirect.setCertificate (sCertificate);
         aDBRedirect.setExtension (sExtension);
         aEM.merge (aDBRedirect);
         aCreatedNew.set (false);
@@ -196,11 +199,12 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
   private static SMPRedirect _convert (@Nonnull final DBServiceMetadataRedirection aDBRedirect)
   {
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (aDBRedirect.getCertificate ());
     return new SMPRedirect (aServiceGroupMgr.getSMPServiceGroupOfID (aDBRedirect.getId ().getAsBusinessIdentifier ()),
                             aDBRedirect.getId ().getAsDocumentTypeIdentifier (),
                             aDBRedirect.getRedirectionUrl (),
                             aDBRedirect.getCertificateUid (),
-                            aDBRedirect.getCertificate (),
+                            aCertificate,
                             aDBRedirect.getExtension ());
   }
 
@@ -292,11 +296,12 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     if (aDBRedirect == null)
       return null;
 
+    final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (aDBRedirect.getCertificate ());
     return new SMPRedirect (aServiceGroup,
                             aDocTypeID,
                             aDBRedirect.getRedirectionUrl (),
                             aDBRedirect.getCertificateUid (),
-                            aDBRedirect.getCertificate (),
+                            aCertificate,
                             aDBRedirect.getExtension ());
   }
 }

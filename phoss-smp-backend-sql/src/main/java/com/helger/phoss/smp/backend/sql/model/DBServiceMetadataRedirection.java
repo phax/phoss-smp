@@ -11,8 +11,8 @@
 package com.helger.phoss.smp.backend.sql.model;
 
 import java.io.Serializable;
-import java.security.cert.X509Certificate;
 
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -33,7 +33,7 @@ public class DBServiceMetadataRedirection implements Serializable
   private DBServiceMetadataRedirectionID m_aID;
   private String m_sRedirectionUrl;
   private String m_sCertificateUid;
-  private X509Certificate m_aCertificate;
+  private String m_sCertificate;
   private String m_sExtension;
 
   @Deprecated
@@ -43,14 +43,14 @@ public class DBServiceMetadataRedirection implements Serializable
 
   public DBServiceMetadataRedirection (final DBServiceMetadataRedirectionID aID,
                                        final String sRedirectionUrl,
-                                       final String sCertificateUid,
-                                       final X509Certificate aCertificate,
-                                       final String sExtension)
+                                       @Nullable final String sCertificateUid,
+                                       @Nullable final String sCertificate,
+                                       @Nullable final String sExtension)
   {
     m_aID = aID;
     m_sRedirectionUrl = sRedirectionUrl;
     m_sCertificateUid = sCertificateUid;
-    m_aCertificate = aCertificate;
+    m_sCertificate = sCertificate;
     m_sExtension = sExtension;
   }
 
@@ -78,7 +78,7 @@ public class DBServiceMetadataRedirection implements Serializable
     m_sRedirectionUrl = sRedirectionUrl;
   }
 
-  @Column (name = "certificateUID", nullable = false, length = 256)
+  @Column (name = "certificateUID", length = 256)
   public String getCertificateUid ()
   {
     return m_sCertificateUid;
@@ -89,6 +89,20 @@ public class DBServiceMetadataRedirection implements Serializable
     m_sCertificateUid = sCertificateUid;
   }
 
+  @Nullable
+  @Lob
+  @Column (name = "certificate")
+  public String getCertificate ()
+  {
+    return m_sCertificate;
+  }
+
+  public void setCertificate (@Nullable final String sCertificate)
+  {
+    m_sCertificate = sCertificate;
+  }
+
+  @Nullable
   @Lob
   @Column (name = "extension")
   public String getExtension ()
@@ -96,19 +110,8 @@ public class DBServiceMetadataRedirection implements Serializable
     return m_sExtension;
   }
 
-  public void setExtension (final String sExtension)
+  public void setExtension (@Nullable final String sExtension)
   {
     m_sExtension = sExtension;
-  }
-
-  // TODO JPA annotation
-  public X509Certificate getCertificate ()
-  {
-    return m_aCertificate;
-  }
-
-  public void setCertificate (final X509Certificate aCertificate)
-  {
-    m_aCertificate = aCertificate;
   }
 }
