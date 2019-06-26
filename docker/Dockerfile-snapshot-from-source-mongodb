@@ -40,8 +40,8 @@ WORKDIR /home/git
 RUN echo Building phoss SMP latest SNAPSHOT \
   && git clone https://github.com/phax/phoss-smp.git . \
   && git checkout -b work \
-  && mvn clean install -DskipTests \
+  && mvn clean install -DskipTests -q \
 # Copy result to Tomcat webapps dir
   && cp -r phoss-smp-webapp-mongodb/target/phoss-smp-webapp-mongodb-*/ $CATALINA_HOME/webapps/ROOT \
-  && mvn clean \
+  && mvn clean -q \
   && rm -rf /root/.m2/repository
