@@ -47,12 +47,6 @@
     </developer>
   </developers>
 
-  <properties>
-    <!-- https://stackoverflow.com/questions/13228472/how-to-access-maven-build-timestamp-for-resource-filtering -->
-    <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
-    <build.timestamp>${maven.build.timestamp}</build.timestamp>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
