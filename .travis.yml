@@ -56,20 +56,20 @@ jobs:
 # build SQL version
         - docker build -t phoss-smp-snapshot-from-source-sql -f docker/Dockerfile-snapshot-from-source-sql .
         - docker tag phoss-smp-snapshot-from-source-sql phelger/smp:snapshot-sql
+# build MongoDB version
+        - docker build -t phoss-smp-snapshot-from-source-mongodb -f docker/Dockerfile-snapshot-from-source-mongodb .
+        - docker tag phoss-smp-snapshot-from-source-mongodb phelger/smp:snapshot-mongodb
 # push both
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker push phelger/smp:snapshot
         - docker push phelger/smp:snapshot-sql
+        - docker push phelger/smp:snapshot-mongodb
         - docker logout
       after_success:
         - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
         - bash <(curl -s https://codecov.io/bash)
     - stage: test
       jdk: openjdk11
-      script:
-        - mvn test -B
-    - stage: test
-      jdk: oraclejdk11
       script:
         - mvn test -B
     - stage: test
