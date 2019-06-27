@@ -284,15 +284,22 @@ public final class SMPRendererPublic
                                         " with " +
                                         SMPServerConfiguration.getRESTType ().getDisplayName () +
                                         " API"));
-    aDiv.addChild (new HCP ().addChild ("Created by ")
-                             .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"))
-                             .addChild (" - Twitter: ")
-                             .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ()
-                                                                                                    .addChild ("@philiphelger"))
-                             .addChild (" - ")
-                             .addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
-                                                                                                     .addChild (CSMP.APPLICATION_TITLE +
-                                                                                                                " on GitHub")));
+
+    final HCP aBy = new HCP ().addChild ("Created by ")
+                              .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"));
+    {
+      // Twitter
+      aBy.addChild (" - ")
+         .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ()
+                                                                                .addChild ("@philiphelger"));
+    }
+
+    // Source
+    aBy.addChild (" - ")
+       .addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
+                                                                               .addChild (CSMP.APPLICATION_TITLE +
+                                                                                          " on GitHub"));
+    aDiv.addChild (aBy);
     return aDiv;
   }
 
