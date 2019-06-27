@@ -231,14 +231,17 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             }
 
                             InetAddress aInetAddress = null;
-                            try
-                            {
-                              aInetAddress = InetAddress.getByName (sDNSName);
-                            }
-                            catch (final UnknownHostException ex)
-                            {
-                              // Ignore
-                            }
+                            // Avoid that the loopback interface is returned
+                            if (sDNSName != null)
+                              try
+                              {
+                                aInetAddress = InetAddress.getByName (sDNSName);
+                              }
+                              catch (final UnknownHostException ex)
+                              {
+                                // Ignore
+                              }
+
                             InetAddress aNice = null;
                             if (aInetAddress != null)
                               try
