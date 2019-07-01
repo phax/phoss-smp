@@ -18,5 +18,5 @@
 
 -->
 <mapping>
-  <map key="description" value="phoss SMP server" />
+  <map key="description" value="phoss SMP server (MongoDB)" />
 </mapping>
