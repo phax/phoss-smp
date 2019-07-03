@@ -208,7 +208,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
   }
 
   @Nonnegative
-  public int getSMPBusinessCardCount ()
+  public long getSMPBusinessCardCount ()
   {
     return size ();
   }

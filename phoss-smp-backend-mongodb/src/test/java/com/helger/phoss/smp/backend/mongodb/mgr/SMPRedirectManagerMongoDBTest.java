@@ -147,7 +147,9 @@ public final class SMPRedirectManagerMongoDBTest
     final Document aDoc = SMPRedirectManagerMongoDB.toBson (aSrc);
     assertNotNull (aDoc);
 
-    final ISMPRedirect aSrc2 = SMPRedirectManagerMongoDB.toDomain (aDoc);
+    final ISMPRedirect aSrc2 = SMPRedirectManagerMongoDB.toDomain (SMPMetaManager.getIdentifierFactory (),
+                                                                   SMPMetaManager.getServiceGroupMgr (),
+                                                                   aDoc);
     assertNotNull (aSrc2);
     assertEquals (aSrc, aSrc2);
   }

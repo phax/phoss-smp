@@ -48,7 +48,7 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
     throw new UnsupportedOperationException ();
   }
 
-  public int getSMPBusinessCardCount ()
+  public long getSMPBusinessCardCount ()
   {
     return 0;
   }

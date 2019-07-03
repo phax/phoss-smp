@@ -12,6 +12,7 @@ package com.helger.phoss.smp.mock;
 
 import javax.annotation.Nonnull;
 
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -63,19 +64,22 @@ public final class MockSMPManagerProvider implements ISMPManagerProvider
   }
 
   @Nonnull
-  public ISMPRedirectManager createRedirectMgr ()
+  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
+                                                @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new MockSMPRedirectManager ();
   }
 
   @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr ()
+  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
+                                                                    @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new MockSMPServiceInformationManager ();
   }
 
   @Nonnull
-  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
+                                                        @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new MockSMPBusinessCardManager ();
   }

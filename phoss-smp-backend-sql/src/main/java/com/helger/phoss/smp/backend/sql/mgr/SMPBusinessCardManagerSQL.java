@@ -358,7 +358,7 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
   }
 
   @Nonnegative
-  public int getSMPBusinessCardCount ()
+  public long getSMPBusinessCardCount ()
   {
     JPAExecutionResult <Number> ret;
     ret = doInTransaction ( () -> {

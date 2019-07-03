@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -72,22 +73,24 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
   }
 
   @Nonnull
-  public ISMPRedirectManager createRedirectMgr ()
+  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
+                                                @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPRedirectManagerMongoDB ();
+    return new SMPRedirectManagerMongoDB (aIdentifierFactory, aServiceGroupMgr);
   }
 
   @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr ()
+  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
+                                                                    @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPServiceInformationManagerMongoDB ();
+    return new SMPServiceInformationManagerMongoDB (aIdentifierFactory, aServiceGroupMgr);
   }
 
   @Nullable
-  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
+                                                        @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    // TODO implement and set
-    return null;
+    return new SMPBusinessCardManagerMongoDB (aIdentifierFactory, aServiceGroupMgr);
   }
 
   @Override

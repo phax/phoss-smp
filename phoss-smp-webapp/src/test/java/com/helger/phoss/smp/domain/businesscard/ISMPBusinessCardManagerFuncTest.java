@@ -96,7 +96,7 @@ public final class ISMPBusinessCardManagerFuncTest
       ISMPBusinessCard aBusinessCard = null;
       try
       {
-        final int nBCCount = aBusinessCardMgr.getSMPBusinessCardCount ();
+        final long nBCCount = aBusinessCardMgr.getSMPBusinessCardCount ();
 
         // Create new one
         aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aSG, new CommonsArrayList <> (aEntity1));

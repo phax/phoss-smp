@@ -36,7 +36,6 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.phoss.smp.backend.sql.AbstractSMPJPAEnabledManager;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataRedirection;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataRedirectionID;
-import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -52,10 +51,13 @@ import com.helger.security.certificate.CertificateHelper;
  */
 public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPRedirectManager
 {
+  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
-  public SMPRedirectManagerSQL ()
-  {}
+  public SMPRedirectManagerSQL (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  {
+    m_aServiceGroupMgr = aServiceGroupMgr;
+  }
 
   @Nonnull
   @ReturnsMutableObject
@@ -196,11 +198,10 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
   }
 
   @Nonnull
-  private static SMPRedirect _convert (@Nonnull final DBServiceMetadataRedirection aDBRedirect)
+  private SMPRedirect _convert (@Nonnull final DBServiceMetadataRedirection aDBRedirect)
   {
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (aDBRedirect.getCertificate ());
-    return new SMPRedirect (aServiceGroupMgr.getSMPServiceGroupOfID (aDBRedirect.getId ().getAsBusinessIdentifier ()),
+    return new SMPRedirect (m_aServiceGroupMgr.getSMPServiceGroupOfID (aDBRedirect.getId ().getAsBusinessIdentifier ()),
                             aDBRedirect.getId ().getAsDocumentTypeIdentifier (),
                             aDBRedirect.getRedirectionUrl (),
                             aDBRedirect.getCertificateUid (),

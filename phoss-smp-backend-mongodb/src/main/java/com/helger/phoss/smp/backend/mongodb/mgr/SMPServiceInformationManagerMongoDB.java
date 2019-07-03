@@ -42,7 +42,6 @@ import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -85,11 +84,16 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   private static final String BSON_TECHCONTACTURL = "techcontacturl";
   private static final String BSON_TECHINFOURL = "techinfourl";
 
+  private final IIdentifierFactory m_aIdentifierFactory;
+  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceInformationManagerMongoDB ()
+  public SMPServiceInformationManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory,
+                                              @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     super ("smp-serviceinfo");
+    m_aIdentifierFactory = aIdentifierFactory;
+    m_aServiceGroupMgr = aServiceGroupMgr;
   }
 
   @Nonnull
@@ -203,11 +207,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
   @Nonnull
   @ReturnsMutableCopy
-  public static SMPServiceInformation toServiceInformation (@Nonnull final Document aDoc, final boolean bNeedProcesses)
+  public SMPServiceInformation toServiceInformation (@Nonnull final Document aDoc, final boolean bNeedProcesses)
   {
-    final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
-    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (aIF.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID)));
+    final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID)));
     final IDocumentTypeIdentifier aDocTypeID = toDocumentTypeID (aDoc.get (BSON_DOCTYPE_ID, Document.class));
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     if (bNeedProcesses)

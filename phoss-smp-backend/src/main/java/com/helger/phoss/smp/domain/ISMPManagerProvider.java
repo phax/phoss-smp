@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 
 import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.peppol.url.PeppolURLProvider;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -73,23 +74,36 @@ public interface ISMPManagerProvider
   ISMPServiceGroupManager createServiceGroupMgr ();
 
   /**
+   * @param aIdentifierFactory
+   *        The identifier factory to be used. May not be <code>null</code>.
+   * @param aServiceGroupMgr
+   *        The service group manager to use. May not be <code>null</code>.
    * @return A new SMP redirect manager. May not be <code>null</code>.
    */
   @Nonnull
-  ISMPRedirectManager createRedirectMgr ();
+  ISMPRedirectManager createRedirectMgr (@Nonnull IIdentifierFactory aIdentifierFactory,
+                                         @Nonnull ISMPServiceGroupManager aServiceGroupMgr);
 
   /**
+   * @param aIdentifierFactory
+   *        The identifier factory to be used. May not be <code>null</code>.
+   * @param aServiceGroupMgr
+   *        The service group manager to use. May not be <code>null</code>.
    * @return A new SMP service information manager. May not be
    *         <code>null</code>.
    */
   @Nonnull
-  ISMPServiceInformationManager createServiceInformationMgr ();
+  ISMPServiceInformationManager createServiceInformationMgr (@Nonnull IIdentifierFactory aIdentifierFactory,
+                                                             @Nonnull ISMPServiceGroupManager aServiceGroupMgr);
 
   /**
+   * @param aIdentifierFactory
+   *        The identifier factory to be used. May not be <code>null</code>.
    * @param aServiceGroupMgr
    *        The service group manager to use. May not be <code>null</code>.
    * @return A new SMP business card manager. May be <code>null</code>!
    */
   @Nullable
-  ISMPBusinessCardManager createBusinessCardMgr (@Nonnull ISMPServiceGroupManager aServiceGroupMgr);
+  ISMPBusinessCardManager createBusinessCardMgr (@Nonnull IIdentifierFactory aIdentifierFactory,
+                                                 @Nonnull ISMPServiceGroupManager aServiceGroupMgr);
 }

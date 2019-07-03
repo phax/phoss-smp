@@ -115,5 +115,5 @@ public interface ISMPBusinessCardManager
    * @return The count of all contained business cards. Always &ge; 0.
    */
   @Nonnegative
-  int getSMPBusinessCardCount ();
+  long getSMPBusinessCardCount ();
 }

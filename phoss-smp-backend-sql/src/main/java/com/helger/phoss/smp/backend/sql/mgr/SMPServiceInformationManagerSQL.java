@@ -46,7 +46,6 @@ import com.helger.phoss.smp.backend.sql.model.DBServiceGroupID;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadata;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataID;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataRedirection;
-import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -66,10 +65,13 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabledManager implements
                                                    ISMPServiceInformationManager
 {
+  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceInformationManagerSQL ()
-  {}
+  public SMPServiceInformationManagerSQL (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  {
+    m_aServiceGroupMgr = aServiceGroupMgr;
+  }
 
   @Nonnull
   @ReturnsMutableObject
@@ -392,9 +394,8 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
   }
 
   @Nonnull
-  private static SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
+  private SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
   {
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
     {
@@ -419,8 +420,8 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
                                                   aDBProcess.getExtension ());
       aProcesses.add (aProcess);
     }
-    return new SMPServiceInformation (aServiceGroupMgr.getSMPServiceGroupOfID (aDBMetadata.getId ()
-                                                                                          .getAsBusinessIdentifier ()),
+    return new SMPServiceInformation (m_aServiceGroupMgr.getSMPServiceGroupOfID (aDBMetadata.getId ()
+                                                                                            .getAsBusinessIdentifier ()),
                                       aDBMetadata.getId ().getAsDocumentTypeIdentifier (),
                                       aProcesses,
                                       aDBMetadata.getExtension ());

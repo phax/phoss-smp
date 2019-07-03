@@ -40,7 +40,6 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -70,11 +69,16 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   private static final String BSON_TARGET_CERTIFICATE = "certificate";
   private static final String BSON_EXTENSIONS = "extensions";
 
+  private final IIdentifierFactory m_aIdentifierFactory;
+  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
-  public SMPRedirectManagerMongoDB ()
+  public SMPRedirectManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory,
+                                    @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     super ("smp-redirect");
+    m_aIdentifierFactory = aIdentifierFactory;
+    m_aServiceGroupMgr = aServiceGroupMgr;
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
@@ -103,17 +107,27 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
 
   @Nonnull
   @ReturnsMutableCopy
-  public static SMPRedirect toDomain (@Nonnull final Document aDoc)
+  public static SMPRedirect toDomain (@Nonnull final IIdentifierFactory aIdentifierFactory,
+                                      @Nonnull final ISMPServiceGroupManager aServiceGroupMgr,
+                                      @Nonnull final Document aDoc)
   {
-    final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
-    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     // The ID itself is derived from ServiceGroupID and DocTypeID
-    return new SMPRedirect (aSGMgr.getSMPServiceGroupOfID (aIF.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID))),
-                            toDocumentTypeID (aDoc.get (BSON_DOCTYPE_ID, Document.class)),
+    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID)));
+    final IDocumentTypeIdentifier aDocTypeID = toDocumentTypeID (aDoc.get (BSON_DOCTYPE_ID, Document.class));
+    final X509Certificate aCert = CertificateHelper.convertStringToCertficateOrNull (aDoc.getString (BSON_TARGET_CERTIFICATE));
+    return new SMPRedirect (aServiceGroup,
+                            aDocTypeID,
                             aDoc.getString (BSON_TARGET_HREF),
                             aDoc.getString (BSON_TARGET_SUBJECT_CN),
-                            CertificateHelper.convertStringToCertficateOrNull (aDoc.getString (BSON_TARGET_CERTIFICATE)),
+                            aCert,
                             aDoc.getString (BSON_EXTENSIONS));
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public SMPRedirect toDomain (@Nonnull final Document aDoc)
+  {
+    return toDomain (m_aIdentifierFactory, m_aServiceGroupMgr, aDoc);
   }
 
   @Nonnull
