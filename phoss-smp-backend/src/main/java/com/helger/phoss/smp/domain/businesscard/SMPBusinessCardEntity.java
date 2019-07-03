@@ -154,7 +154,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   @ReturnsMutableObject
   public ICommonsList <String> websiteURIs ()
   {
-    return m_aWebsiteURIs.getClone ();
+    return m_aWebsiteURIs;
   }
 
   @Nonnull
