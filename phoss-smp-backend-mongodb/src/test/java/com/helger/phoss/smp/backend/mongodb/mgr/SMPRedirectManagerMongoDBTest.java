@@ -22,6 +22,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+import javax.annotation.Nonnull;
+
+import org.bson.Document;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -32,6 +35,7 @@ import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.exception.SMPServerException;
@@ -131,6 +135,43 @@ public final class SMPRedirectManagerMongoDBTest
       assertEquals ("foo", aRedirect.getSubjectUniqueIdentifier ());
       assertNull (aRedirect.getCertificate ());
       assertEquals ("<ext />", aRedirect.getFirstExtensionXML ().trim ());
+    }
+    finally
+    {
+      aServiceGroupMgr.deleteSMPServiceGroup (aPI);
+    }
+  }
+
+  private static void _testConversion (@Nonnull final ISMPRedirect aSrc)
+  {
+    final Document aDoc = SMPRedirectManagerMongoDB.toBson (aSrc);
+    assertNotNull (aDoc);
+
+    final ISMPRedirect aSrc2 = SMPRedirectManagerMongoDB.toDomain (aDoc);
+    assertNotNull (aSrc2);
+    assertEquals (aSrc, aSrc2);
+  }
+
+  @Test
+  public void testConversion () throws SMPServerException
+  {
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+
+    final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
+                                                                                                "doctype4711");
+
+    // Delete existing service group
+    final IParticipantIdentifier aPI = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                       "0088:dummy");
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI);
+
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup ("blub", aPI, null);
+    assertNotNull (aSG);
+    try
+    {
+      _testConversion (new SMPRedirect (aSG, aDocTypeID, "target href", "what ever", null, null));
+      _testConversion (new SMPRedirect (aSG, aDocTypeID, "target href", "what ever", null, "<ext/>"));
     }
     finally
     {

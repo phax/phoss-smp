@@ -20,12 +20,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.bson.Document;
 import org.junit.Rule;
 import org.junit.Test;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.sml.SMLInfo;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 
 /**
@@ -74,5 +76,17 @@ public final class SMLInfoManagerMongoDBTest
         assertTrue (aMgr.deleteSMLInfo (aCreate.getID ()).isChanged ());
       assertEquals (0, aMgr.getAllSMLInfos ().size ());
     }
+  }
+
+  @Test
+  public void testConversion ()
+  {
+    final ISMLInfo aInfo = new SMLInfo ("displayName", "DNSZone", "https://url/url", true);
+    final Document aSrc = SMLInfoManagerMongoDB.toBson (aInfo);
+    assertNotNull (aSrc);
+
+    final ISMLInfo aSrc2 = SMLInfoManagerMongoDB.toDomain (aSrc);
+    assertNotNull (aSrc2);
+    assertEquals (aInfo, aSrc2);
   }
 }
