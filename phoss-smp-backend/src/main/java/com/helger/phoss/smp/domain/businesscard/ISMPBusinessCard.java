@@ -48,7 +48,10 @@ public interface ISMPBusinessCard extends IHasID <String>, Serializable
    */
   @Nonnull
   @Nonempty
-  String getServiceGroupID ();
+  default String getServiceGroupID ()
+  {
+    return getServiceGroup ().getID ();
+  }
 
   /**
    * @return A copy of all {@link SMPBusinessCardEntity} objects. Never

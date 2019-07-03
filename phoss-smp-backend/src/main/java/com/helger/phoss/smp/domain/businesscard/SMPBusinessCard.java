@@ -50,8 +50,8 @@ public class SMPBusinessCard implements ISMPBusinessCard
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aEntities, "Entities");
 
+    m_sID = aServiceGroup.getID ();
     m_aServiceGroup = aServiceGroup;
-    m_sID = m_aServiceGroup.getID ();
     m_aEntities = new CommonsArrayList <> (aEntities);
   }
 
@@ -68,20 +68,13 @@ public class SMPBusinessCard implements ISMPBusinessCard
     return m_aServiceGroup;
   }
 
-  @Nonnull
-  @Nonempty
-  public String getServiceGroupID ()
-  {
-    return m_aServiceGroup.getID ();
-  }
-
   /**
    * @return A mutable list with all {@link SMPBusinessCardEntity} objects.
    *         Never <code>null</code>.
    */
   @Nonnull
-  @ReturnsMutableObject ("design")
-  public ICommonsList <SMPBusinessCardEntity> directGetEntities ()
+  @ReturnsMutableObject
+  public ICommonsList <SMPBusinessCardEntity> entities ()
   {
     return m_aEntities;
   }
