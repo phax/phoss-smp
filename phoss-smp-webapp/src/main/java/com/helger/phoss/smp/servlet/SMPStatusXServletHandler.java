@@ -34,6 +34,7 @@ import com.helger.commons.datetime.PDTWebDateHelper;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
@@ -127,6 +128,12 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
         }
       }
     }
+
+    // Proxy configuration (since 5.2.0)
+    aStatusData.add ("proxy.http.configured", SMPServerConfiguration.getAsHttpProxySettings () != null);
+    aStatusData.add ("proxy.https.configured", SMPServerConfiguration.getAsHttpsProxySettings () != null);
+    aStatusData.add ("proxy.username.configured", StringHelper.hasText (SMPServerConfiguration.getProxyUsername ()));
+
     return aStatusData;
   }
 
