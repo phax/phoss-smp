@@ -66,6 +66,11 @@ public class SMPBusinessCardName implements Serializable
     return m_sLanguageCode;
   }
 
+  public boolean hasLanguageCode ()
+  {
+    return StringHelper.hasText (m_sLanguageCode);
+  }
+
   public boolean hasNoLanguageCode ()
   {
     return StringHelper.hasNoText (m_sLanguageCode);
