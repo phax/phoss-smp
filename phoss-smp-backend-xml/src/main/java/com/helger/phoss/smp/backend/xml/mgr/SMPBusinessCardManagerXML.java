@@ -32,7 +32,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.dao.DAOException;
@@ -51,8 +50,8 @@ import com.helger.photon.audit.AuditHelper;
  * @author Philip Helger
  */
 public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard>
-                                          implements
-                                          ISMPBusinessCardManager
+                                             implements
+                                             ISMPBusinessCardManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerXML.class);
 
@@ -115,11 +114,12 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
     ValueEnforcer.notNull (aEntities, "Entities");
 
-    LOGGER.info ("createOrUpdateSMPBusinessCard (" +
-                 aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                 ", " +
-                 CollectionHelper.getSize (aEntities) +
-                 " entities)");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
+                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                    ", " +
+                    aEntities.size () +
+                    " entities)");
 
     final ISMPBusinessCard aOldBusinessCard = getSMPBusinessCardOfServiceGroup (aServiceGroup);
     final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aServiceGroup, aEntities);
@@ -127,13 +127,17 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     {
       // Reuse old ID
       _updateSMPBusinessCard (aNewBusinessCard);
-      LOGGER.info ("createOrUpdateSMPBusinessCard update successful");
+
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("createOrUpdateSMPBusinessCard update successful");
     }
     else
     {
       // Create new ID
       _createSMPBusinessCard (aNewBusinessCard);
-      LOGGER.info ("createOrUpdateSMPBusinessCard create successful");
+
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("createOrUpdateSMPBusinessCard create successful");
     }
 
     // Invoke generic callbacks
@@ -148,7 +152,8 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     if (aSMPBusinessCard == null)
       return EChange.UNCHANGED;
 
-    LOGGER.info ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
     m_aRWLock.writeLock ().lock ();
     try
@@ -172,7 +177,9 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
                                       aSMPBusinessCard.getID (),
                                       aSMPBusinessCard.getServiceGroupID (),
                                       Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
-    LOGGER.info ("deleteSMPBusinessCard successful");
+
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPBusinessCard successful");
 
     return EChange.CHANGED;
   }

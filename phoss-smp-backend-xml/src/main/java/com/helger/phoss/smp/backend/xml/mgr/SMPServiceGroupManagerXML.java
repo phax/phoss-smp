@@ -83,6 +83,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
     ValueEnforcer.notNull (aParticipantID, "ParticpantID");
+
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup (" +
                     sOwnerID +
@@ -150,6 +151,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notEmpty (sNewOwnerID, "NewOwnerID");
+
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup (" +
                     aParticipantID.getURIEncoded () +
@@ -189,6 +191,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     }
 
     AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sServiceGroupID, sNewOwnerID, sExtension);
+
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup - success");
 
@@ -201,6 +204,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
 
@@ -305,6 +309,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     }
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID ());
+
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup - success");
 

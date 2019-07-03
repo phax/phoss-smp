@@ -219,6 +219,7 @@ public final class SMPServiceInformationManagerXML extends
     }
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
+
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceInformation - success");
 
@@ -285,8 +286,10 @@ public final class SMPServiceInformationManagerXML extends
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
                                       aSMPServiceInformation.getID (),
                                       aProcess.getProcessIdentifier ().getURIEncoded ());
+
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPProcess - success");
+
     return EChange.CHANGED;
   }
 
