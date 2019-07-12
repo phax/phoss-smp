@@ -42,15 +42,26 @@ import com.mongodb.client.MongoCollection;
  */
 public class MongoDBAuditor implements IAuditor
 {
+  /** The default collection name if none is provided */
   public static final String DEFAULT_COLLECTION_NAME = "smp-audit";
 
   private final MongoCollection <Document> m_aCollection;
 
+  /**
+   * Default constructor using {@link #DEFAULT_COLLECTION_NAME} as the
+   * collection name.
+   */
   public MongoDBAuditor ()
   {
     this (DEFAULT_COLLECTION_NAME);
   }
 
+  /**
+   * Constructor
+   * 
+   * @param sCollectionName
+   *        Collection name to use. May neither be <code>null</code> nor empty.
+   */
   public MongoDBAuditor (@Nonnull @Nonempty final String sCollectionName)
   {
     m_aCollection = MongoClientSingleton.getInstance ().getCollection (sCollectionName);
