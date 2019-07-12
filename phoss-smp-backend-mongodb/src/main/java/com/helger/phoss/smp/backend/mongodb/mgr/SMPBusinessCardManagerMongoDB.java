@@ -18,6 +18,7 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnegative;
@@ -38,6 +39,7 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.typeconvert.TypeConverter;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
@@ -199,7 +201,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     if (aValue.hasAdditionalInformation ())
       ret.append (BSON_ADDITIONAL, aValue.getAdditionalInformation ());
     if (aValue.hasRegistrationDate ())
-      ret.append (BSON_REGDATE, aValue.getRegistrationDate ());
+      ret.append (BSON_REGDATE, TypeConverter.convert (aValue.getRegistrationDate (), Date.class));
 
     return ret;
   }
@@ -220,7 +222,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     for (final Document aItemDoc : aDoc.getList (BSON_CONTACTS, Document.class))
       ret.contacts ().add (toBCContact (aItemDoc));
     ret.setAdditionalInformation (aDoc.getString (BSON_ADDITIONAL));
-    ret.setRegistrationDate (aDoc.get (BSON_REGDATE, LocalDate.class));
+    ret.setRegistrationDate (TypeConverter.convert (aDoc.get (BSON_REGDATE, Date.class), LocalDate.class));
     return ret;
   }
 
