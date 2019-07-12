@@ -30,6 +30,14 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+/**
+ * A provider for {@link MongoCollection} instances. This class ensures, that
+ * the underlying {@link MongoClient} instance is closed correctly in the
+ * {@link #close()} method. Use {@link MongoClientSingleton#getInstance()} to
+ * create an instance of this class.
+ *
+ * @author Philip Helger
+ */
 public class MongoClientProvider implements AutoCloseable
 {
   public static final Integer INDEX_ASCENDING = Integer.valueOf (1);
@@ -57,9 +65,18 @@ public class MongoClientProvider implements AutoCloseable
     StreamHelper.close (m_aMongoClient);
   }
 
+  /**
+   * Get the accessor to the MongoDB collection with the specified name
+   *
+   * @param sName
+   *        Collection name. May neither be <code>null</code> nor empty.
+   * @return The collection with the specified name.
+   */
   @Nonnull
-  public MongoCollection <Document> getCollection (@Nonnull final String sName)
+  public MongoCollection <Document> getCollection (@Nonnull @Nonempty final String sName)
   {
+    ValueEnforcer.notEmpty (sName, "Name");
+
     return m_aDatabase.getCollection (sName);
   }
 }
