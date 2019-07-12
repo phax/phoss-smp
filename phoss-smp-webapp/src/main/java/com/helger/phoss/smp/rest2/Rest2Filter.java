@@ -24,7 +24,6 @@ import javax.servlet.ServletException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.state.EContinue;
 import com.helger.photon.api.APIDescriptor;
@@ -183,8 +182,8 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Found API match for '" + aAPIPath.getPath () + "': " + aInvokableDescriptor);
 
-    if (aRequestScope.getHttpMethod () == EHttpMethod.GET)
-      aUnifiedResponse.disableCaching ();
+    // Always disable caching
+    aUnifiedResponse.disableCaching ();
 
     // Invoke API and stop
     try
