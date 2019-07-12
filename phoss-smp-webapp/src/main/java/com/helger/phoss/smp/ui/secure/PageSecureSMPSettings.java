@@ -87,6 +87,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       final BootstrapCardBody aCardBody = aCard.createAndAddBody ();
 
       final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
+      aTable.setLeft (4);
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isRESTWritableAPIDisabled (),
                                                                                           aDisplayLocale)));
@@ -98,6 +99,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       final BootstrapCardBody aCardBody = aCard.createAndAddBody ();
 
       final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
+      aTable.setLeft (4);
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection required?")
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLRequired (),
                                                                                           aDisplayLocale)));
@@ -117,6 +119,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       final BootstrapCardBody aCardBody = aCard.createAndAddBody ();
 
       final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
+      aTable.setLeft (4);
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration required?")
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isDirectoryIntegrationRequired (),
                                                                                           aDisplayLocale)));
@@ -210,6 +213,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
+    aForm.setLeft (3);
     aForm.addChild (getUIHandler ().createDataGroupHeader ("REST API"));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_REST_WRITABLE_API_DISABLED,

@@ -119,7 +119,7 @@ public final class SMPRendererSecure
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                    .addChild (" No SML is selected. ")
                                    .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
-        aBox.setTypeIfWorse (EBootstrapAlertType.DANGER);
+        aBox.setType (EBootstrapAlertType.DANGER);
       }
     }
     else
@@ -145,7 +145,7 @@ public final class SMPRendererSecure
           aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                      .addChild (" No Directory host is provided. ")
                                      .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
-          aBox.setTypeIfWorse (EBootstrapAlertType.DANGER);
+          aBox.setType (EBootstrapAlertType.DANGER);
         }
       }
       else
@@ -163,7 +163,7 @@ public final class SMPRendererSecure
     {
       aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                  .addChild (" Certificate configuration is invalid."));
-      aBox.setTypeIfWorse (EBootstrapAlertType.DANGER);
+      aBox.setType (EBootstrapAlertType.DANGER);
     }
 
     ret.addChild (aBox);
