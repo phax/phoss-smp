@@ -21,7 +21,8 @@ import javax.annotation.Nonnull;
 import com.helger.photon.jetty.JettyRunner;
 
 /**
- * WebServer based on Grizzly for standalone SMP server testing.
+ * WebServer based on Jetty for standalone SMP server testing. It starts a
+ * server on Port 9090 using the context path "/unittest".
  *
  * @author Philip Helger
  */
