@@ -33,11 +33,22 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ObjectFactory;
-import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
+import com.helger.peppol.smp.ProcessListType;
+import com.helger.peppol.smp.ProcessType;
+import com.helger.peppol.smp.ServiceEndpointList;
+import com.helger.peppol.smp.ServiceInformationType;
+import com.helger.peppol.smp.ServiceMetadataType;
+import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
+import com.helger.peppolid.peppol.doctype.EPredefinedDocumentTypeIdentifier;
+import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
+import com.helger.peppolid.peppol.process.PeppolProcessIdentifier;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.backend.mongodb.audit.MongoDBAuditor;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.audit.AuditHelper;
@@ -46,14 +57,14 @@ import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
- * Create one million service groups - please make sure the SML connection is
- * not enabled.
+ * Create one million endpoints. Run this AFTER
+ * {@link MainCreate1MillionServiceGroups}.
  *
  * @author Philip Helger
  */
-public final class MainCreate1MillionServiceGroups
+public final class MainCreate1MillionEndpoints
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (MainCreate1MillionServiceGroups.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (MainCreate1MillionEndpoints.class);
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
@@ -76,6 +87,10 @@ public final class MainCreate1MillionServiceGroups
     {
       AuditHelper.setAuditor (new MongoDBAuditor ());
       final ObjectFactory aObjFactory = new ObjectFactory ();
+      final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
+      final String sDT = aDT.getURIEncoded ();
+      final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V2.getAsProcessIdentifier ();
+
       final StopWatch aSWOverall = StopWatch.createdStarted ();
       for (int i = 0; i < 1_000_000; ++i)
       {
@@ -85,9 +100,28 @@ public final class MainCreate1MillionServiceGroups
                                                                                                                                                             7));
         final String sPI = aPI.getURIEncoded ();
 
-        final ServiceGroupType aSG = new ServiceGroupType ();
-        aSG.setParticipantIdentifier (aPI);
-        aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
+        final ServiceMetadataType aSM = new ServiceMetadataType ();
+        final ServiceInformationType aSI = new ServiceInformationType ();
+        aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
+        aSI.setDocumentIdentifier (aDT);
+        {
+          final ProcessListType aPL = new ProcessListType ();
+          final ProcessType aProcess = new ProcessType ();
+          aProcess.setProcessIdentifier (aProcID);
+          final ServiceEndpointList aSEL = new ServiceEndpointList ();
+          final EndpointType aEndpoint = new EndpointType ();
+          aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as2"));
+          aEndpoint.setRequireBusinessLevelSignature (false);
+          aEndpoint.setCertificate ("blacert");
+          aEndpoint.setServiceDescription ("Unit test service");
+          aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
+          aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ());
+          aSEL.addEndpoint (aEndpoint);
+          aProcess.setServiceEndpointList (aSEL);
+          aPL.addProcess (aProcess);
+          aSI.setProcessList (aPL);
+        }
+        aSM.setServiceInformation (aSI);
 
         try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
         {
@@ -96,6 +130,8 @@ public final class MainCreate1MillionServiceGroups
             ClientBuilder.newClient ()
                          .target (aRule.getFullURL ())
                          .path (sPI)
+                         .path ("services")
+                         .path (sDT)
                          .request ()
                          .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
                          .delete ();
@@ -104,9 +140,11 @@ public final class MainCreate1MillionServiceGroups
           final Response aResponseMsg = ClientBuilder.newClient ()
                                                      .target (aRule.getFullURL ())
                                                      .path (sPI)
+                                                     .path ("services")
+                                                     .path (sDT)
                                                      .request ()
                                                      .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                                                     .put (Entity.xml (aObjFactory.createServiceGroup (aSG)));
+                                                     .put (Entity.xml (aObjFactory.createServiceMetadata (aSM)));
           _testResponseJerseyClient (aResponseMsg, 200);
         }
 
