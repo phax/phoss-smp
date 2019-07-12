@@ -58,7 +58,7 @@ public class MongoDBAuditor implements IAuditor
 
   /**
    * Constructor
-   * 
+   *
    * @param sCollectionName
    *        Collection name to use. May neither be <code>null</code> nor empty.
    */
@@ -85,7 +85,19 @@ public class MongoDBAuditor implements IAuditor
     {
       final ICommonsList <Document> aDocArgs = new CommonsArrayList <> ();
       for (final Object aArg : aArgs)
-        aDocArgs.add (new Document ().append ("arg", aArg));
+      {
+        Object aRealArg;
+        if (aArg == null)
+        {
+          aRealArg = null;
+        }
+        else
+        {
+          // Manually convert to String
+          aRealArg = String.valueOf (aArg);
+        }
+        aDocArgs.add (new Document ().append ("arg", aRealArg));
+      }
       aDoc.append ("args", aDocArgs);
     }
 
