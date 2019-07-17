@@ -384,10 +384,10 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_SUBJECT_UNIQUE_IDENTIFIER,
                                                                                          aSelectedObject != null ? aSelectedObject.getSubjectUniqueIdentifier ()
                                                                                                                  : null)))
-                                                 .setHelpText ("Holds the Subject Unique Identifier of the certificate of the\r\n" +
-                                                               "destination SMP. A client SHOULD validate that the Subject\r\n" +
-                                                               "Unique Identifier of the certificate used to sign the resource at the\r\n" +
-                                                               "destination SMP matches the Subject Unique Identifier published in\r\n" +
+                                                 .setHelpText ("Holds the Subject Unique Identifier of the certificate of the " +
+                                                               "destination SMP. A client SHOULD validate that the Subject " +
+                                                               "Unique Identifier of the certificate used to sign the resource at the " +
+                                                               "destination SMP matches the Subject Unique Identifier published in " +
                                                                "the redirecting SMP.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SUBJECT_UNIQUE_IDENTIFIER)));
 
