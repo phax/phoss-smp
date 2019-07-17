@@ -99,7 +99,7 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
     }
     catch (final Exception ex)
     {
-      throw new RuntimeException ("Error in signing xml", ex);
+      throw new IllegalStateException ("Error in signing the response XML", ex);
     }
 
     // Serialize the signed document
