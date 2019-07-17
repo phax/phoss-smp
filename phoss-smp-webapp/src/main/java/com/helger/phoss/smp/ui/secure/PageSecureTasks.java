@@ -335,25 +335,28 @@ public class PageSecureTasks extends AbstractSMPWebPage
                   if (aEndpoint.getServiceActivationDateTime () != null)
                   {
                     if (aEndpoint.getServiceActivationDateTime ().isAfter (aNowDT))
-                      aULPerEndpoint.addItem (_createWarning ("The endpoint is not yet active. It will be active from " +
-                                                              PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (),
-                                                                                       aDisplayLocale) +
-                                                              "."));
+                      aULPerEndpoint.addItem (_createWarning ("The endpoint is not yet active."),
+                                              new HCDiv ().addChild ("It will be active from " +
+                                                                     PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (),
+                                                                                              aDisplayLocale) +
+                                                                     "."));
                   }
 
                   if (aEndpoint.getServiceExpirationDateTime () != null)
                   {
                     if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowDT))
-                      aULPerEndpoint.addItem (_createError ("The endpoint is not longer active. It was valid until " +
-                                                            PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
-                                                                                     aDisplayLocale) +
-                                                            "."));
+                      aULPerEndpoint.addItem (_createError ("The endpoint is no longer active."),
+                                              new HCDiv ().addChild ("It was valid until " +
+                                                                     PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
+                                                                                              aDisplayLocale) +
+                                                                     "."));
                     else
                       if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowPlusDT))
-                        aULPerEndpoint.addItem (_createWarning ("The endpoint will be inactive soon. It is only valid until " +
-                                                                PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
-                                                                                         aDisplayLocale) +
-                                                                "."));
+                        aULPerEndpoint.addItem (_createWarning ("The endpoint will be inactive soon."),
+                                                new HCDiv ().addChild ("It is only valid until " +
+                                                                       PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
+                                                                                                aDisplayLocale) +
+                                                                       "."));
                   }
 
                   X509Certificate aX509Cert = null;
@@ -385,7 +388,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
                                                                                               aDisplayLocale) +
                                                                      "."));
                     else
-                      if (aNowPlusDT.isBefore (aNotAfter))
+                      if (aNowPlusDT.isAfter (aNotAfter))
                         aULPerEndpoint.addItem (_createWarning ("The endpoint certificate will expire soon."),
                                                 new HCDiv ().addChild ("It is only valid until " +
                                                                        PDTToString.getAsString (aNotAfter,
