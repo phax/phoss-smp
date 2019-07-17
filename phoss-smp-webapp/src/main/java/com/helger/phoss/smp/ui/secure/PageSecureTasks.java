@@ -18,9 +18,12 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -31,6 +34,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.debug.GlobalDebug;
+import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.IHCNode;
@@ -120,14 +124,61 @@ public class PageSecureTasks extends AbstractSMPWebPage
     {
       aOL.addItem (_createError ("Please change the password of the default user " +
                                  CSecurity.USER_ADMINISTRATOR_EMAIL +
-                                 "!"));
+                                 "!"),
+                   new HCDiv ().addChild ("This is a severe security risk"));
     }
 
     // check keystore configuration
     {
       if (!SMPKeyManager.isCertificateValid ())
+      {
+        // Loading failed - wrong path or wrong password or so
         aOL.addItem (_createError ("Problem with the certificate configuration"),
                      new HCDiv ().addChild (SMPKeyManager.getInitializationError ()));
+      }
+      else
+      {
+        final PrivateKeyEntry aKeyEntry = SMPKeyManager.getInstance ().getPrivateKeyEntry ();
+        if (aKeyEntry != null)
+        {
+          final Certificate [] aChain = aKeyEntry.getCertificateChain ();
+          final ZonedDateTime aNowZDT = PDTFactory.getCurrentZonedDateTime ();
+          final LocalDateTime aNowLDT = aNowZDT.toLocalDateTime ();
+
+          for (final Certificate aCert : aChain)
+          {
+            if (aCert instanceof X509Certificate)
+            {
+              final X509Certificate aX509Cert = (X509Certificate) aCert;
+              final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
+              final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
+
+              if (aNowLDT.isBefore (aNotBefore))
+              {
+                aOL.addItem (_createError ("The provided certificate with subject '" +
+                                           aX509Cert.getSubjectX500Principal ().getName () +
+                                           "' is not yet valid."),
+                             new HCDiv ().addChild ("Validity starts at " +
+                                                    PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+              }
+              if (aNowLDT.isAfter (aNotAfter))
+              {
+                aOL.addItem (_createError ("The provided certificate with subject '" +
+                                           aX509Cert.getSubjectX500Principal ().getName () +
+                                           "' is already expired."),
+                             new HCDiv ().addChild ("The expiration date was " +
+                                                    PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+              }
+            }
+            else
+            {
+              aOL.addItem (_createError ("At least one of the certificates is not an X.509 certificate! It is internally a " +
+                                         ClassHelper.getClassName (aCert)));
+              break;
+            }
+          }
+        }
+      }
     }
 
     // check truststore configuration

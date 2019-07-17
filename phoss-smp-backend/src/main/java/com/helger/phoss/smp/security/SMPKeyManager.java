@@ -105,7 +105,6 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     }
     m_aKeyStore = aLoadedKeyStore.getKeyStore ();
 
-    @SuppressWarnings ("null")
     final LoadedKey <KeyStore.PrivateKeyEntry> aLoadedKey = KeyStoreHelper.loadPrivateKey (m_aKeyStore,
                                                                                            SMPServerConfiguration.getKeyStorePath (),
                                                                                            SMPServerConfiguration.getKeyStoreKeyAlias (),
