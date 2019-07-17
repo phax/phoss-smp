@@ -16,13 +16,19 @@
 @REM
 
 @echo off
-set XVER=5.1.2
+set XVER=5.2.0
+
+@REM --------------- Building -----------------------
 
 docker pull tomcat:9-jre11
 if errorlevel 1 goto end
 
+@REM --------------- XML -----------------------
+
 docker build --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-xml-%XVER% -f Dockerfile-release-binary-xml .
 if errorlevel 1 goto end
+
+@REM legacy names
 
 docker tag phoss-smp-release-binary-xml-%XVER% phelger/smp:%XVER%
 if errorlevel 1 goto end
@@ -30,13 +36,69 @@ if errorlevel 1 goto end
 docker tag phoss-smp-release-binary-xml-%XVER% phelger/smp:latest
 if errorlevel 1 goto end
 
+@REM new names
+
+docker tag phoss-smp-release-binary-xml-%XVER% phelger/phoss-smp-xml:%XVER%
+if errorlevel 1 goto end
+
+docker tag phoss-smp-release-binary-xml-%XVER% phelger/phoss-smp-xml:latest
+if errorlevel 1 goto end
+
+@REM --------------- SQL -----------------------
+
+docker build --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-sql-%XVER% -f Dockerfile-release-binary-sql .
+if errorlevel 1 goto end
+
+docker tag phoss-smp-release-binary-sql-%XVER% phelger/phoss-smp-sql:%XVER%
+if errorlevel 1 goto end
+
+docker tag phoss-smp-release-binary-sql-%XVER% phelger/phoss-smp-sql:latest
+if errorlevel 1 goto end
+
+@REM --------------- MongoDB -----------------------
+
+docker build --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-mongodb-%XVER% -f Dockerfile-release-binary-mongodb .
+if errorlevel 1 goto end
+
+docker tag phoss-smp-release-binary-mongodb-%XVER% phelger/phoss-smp-mongodb:%XVER%
+if errorlevel 1 goto end
+
+docker tag phoss-smp-release-binary-mongodb-%XVER% phelger/phoss-smp-mongodb:latest
+if errorlevel 1 goto end
+
+@REM --------------- Pushing -----------------------
+
 docker login
 if errorlevel 1 goto end
+
+@REM --------------- XML -----------------------
 
 docker push phelger/smp:%XVER%
 if errorlevel 1 goto end
 
 docker push phelger/smp:latest
+if errorlevel 1 goto end
+
+docker push phelger/phoss-smp-xml:%XVER%
+if errorlevel 1 goto end
+
+docker push phelger/phoss-smp-xml:latest
+if errorlevel 1 goto end
+
+@REM --------------- SQL -----------------------
+
+docker push phelger/phoss-smp-sql:%XVER%
+if errorlevel 1 goto end
+
+docker push phelger/phoss-smp-sql:latest
+if errorlevel 1 goto end
+
+@REM --------------- MongoDB -----------------------
+
+docker push phelger/phoss-smp-mongodb:%XVER%
+if errorlevel 1 goto end
+
+docker push phelger/phoss-smp-mongodb:latest
 if errorlevel 1 goto end
 
 docker logout
