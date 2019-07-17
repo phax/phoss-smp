@@ -46,6 +46,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
   public static final String PARAM_SERVICE_GROUP_ID = "ServiceGroupId";
   public static final String PARAM_USER_ID = "UserId";
   public static final String PARAM_DOCUMENT_TYPE_ID = "DocumentTypeId";
+  static final String LOG_PREFIX = "[REST API] ";
   private static final String PATH_PREFIX_OASIS_BDXR_SMP_2 = "/bdxr-smp-2";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (Rest2Filter.class);
@@ -167,7 +168,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     {
       // Explicitly other servlet
       if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("Ignoring '" + aAPIPath.getPath () + "' because it is an application servlet.");
+        LOGGER.debug (LOG_PREFIX + "Ignoring '" + aAPIPath.getPath () + "' because it is an application servlet.");
       return EContinue.CONTINUE;
     }
 
@@ -180,7 +181,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     }
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Found API match for '" + aAPIPath.getPath () + "': " + aInvokableDescriptor);
+      LOGGER.debug (LOG_PREFIX + "Found API match for '" + aAPIPath.getPath () + "': " + aInvokableDescriptor);
 
     // Always disable caching
     aUnifiedResponse.disableCaching ();
