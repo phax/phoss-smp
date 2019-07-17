@@ -46,17 +46,28 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (Rest2ExceptionMapper.class);
 
+  private static void _logRestException (@Nonnull final String sMsg, @Nonnull final Throwable t)
+  {
+    if (SMPServerConfiguration.isRESTLogExceptions ())
+      LOGGER.error (Rest2Filter.LOG_PREFIX + sMsg, t);
+    else
+      LOGGER.error (Rest2Filter.LOG_PREFIX +
+                    sMsg +
+                    " - " +
+                    getResponseEntityWithoutStackTrace (t) +
+                    " (turn on REST exception logging to see all details)");
+  }
+
   @Nonnull
-  public EHandled applyExceptionOnResponse (final InvokableAPIDescriptor aInvokableDescriptor,
-                                            final IRequestWebScopeWithoutResponse aRequestScope,
-                                            final UnifiedResponse aUnifiedResponse,
-                                            final Throwable aThrowable)
+  public EHandled applyExceptionOnResponse (@Nonnull final InvokableAPIDescriptor aInvokableDescriptor,
+                                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                                            @Nonnull final UnifiedResponse aUnifiedResponse,
+                                            @Nonnull final Throwable aThrowable)
   {
     // From specific to general
     if (aThrowable instanceof SMPUnauthorizedException)
     {
-      if (SMPServerConfiguration.isRESTLogExceptions ())
-        LOGGER.error ("Unauthorized", aThrowable);
+      _logRestException ("Unauthorized", aThrowable);
       setSimpleTextResponse (aUnifiedResponse,
                              HttpServletResponse.SC_FORBIDDEN,
                              getResponseEntityWithoutStackTrace (aThrowable));
@@ -64,8 +75,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     }
     if (aThrowable instanceof SMPUnknownUserException)
     {
-      if (SMPServerConfiguration.isRESTLogExceptions ())
-        LOGGER.error ("Unknown user", aThrowable);
+      _logRestException ("Unknown user", aThrowable);
       setSimpleTextResponse (aUnifiedResponse,
                              HttpServletResponse.SC_FORBIDDEN,
                              getResponseEntityWithoutStackTrace (aThrowable));
@@ -73,8 +83,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     }
     if (aThrowable instanceof SMPSMLException)
     {
-      if (SMPServerConfiguration.isRESTLogExceptions ())
-        LOGGER.error ("SMP SML error", aThrowable);
+      _logRestException ("SMP SML error", aThrowable);
       setSimpleTextResponse (aUnifiedResponse,
                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                              GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
@@ -83,8 +92,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     }
     if (aThrowable instanceof SMPNotFoundException)
     {
-      if (SMPServerConfiguration.isRESTLogExceptions ())
-        LOGGER.error ("Not found", aThrowable);
+      _logRestException ("Not found", aThrowable);
       setSimpleTextResponse (aUnifiedResponse,
                              HttpServletResponse.SC_NOT_FOUND,
                              getResponseEntityWithoutStackTrace (aThrowable));
@@ -92,8 +100,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     }
     if (aThrowable instanceof SMPInternalErrorException)
     {
-      if (SMPServerConfiguration.isRESTLogExceptions ())
-        LOGGER.error ("Internal error", aThrowable);
+      _logRestException ("Internal error", aThrowable);
       setSimpleTextResponse (aUnifiedResponse,
                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                              GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
@@ -102,8 +109,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     }
     if (aThrowable instanceof SMPBadRequestException)
     {
-      if (SMPServerConfiguration.isRESTLogExceptions ())
-        LOGGER.error ("Bad request", aThrowable);
+      _logRestException ("Bad request", aThrowable);
       setSimpleTextResponse (aUnifiedResponse,
                              HttpServletResponse.SC_BAD_REQUEST,
                              getResponseEntityWithoutStackTrace (aThrowable));
@@ -112,8 +118,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     if (aThrowable instanceof SMPServerException)
     {
       // Generic fallback only
-      if (SMPServerConfiguration.isRESTLogExceptions ())
-        LOGGER.error ("Generic SMP server", aThrowable);
+      _logRestException ("Generic SMP error", aThrowable);
       setSimpleTextResponse (aUnifiedResponse,
                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                              getResponseEntityWithoutStackTrace (aThrowable));
@@ -121,8 +126,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     }
     if (aThrowable instanceof RuntimeException)
     {
-      if (SMPServerConfiguration.isRESTLogExceptions ())
-        LOGGER.error ("Runtime exception - " + aThrowable.getClass ().getName (), aThrowable);
+      _logRestException ("Runtime exception - " + aThrowable.getClass ().getName (), aThrowable);
       setSimpleTextResponse (aUnifiedResponse,
                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                              GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
