@@ -87,6 +87,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("smp.publicurl", SMPServerConfiguration.getPublicServerURL ());
     // New in 5.1.0
     aStatusData.add ("smp.forceroot", SMPServerConfiguration.isForceRoot ());
+    // New in 5.2.0
+    aStatusData.add ("smp.rest.log-exceptions", SMPServerConfiguration.isRESTLogExceptions ());
 
     // SML information
     aStatusData.add ("smp.sml.enabled", aSettings.isSMLEnabled ());
