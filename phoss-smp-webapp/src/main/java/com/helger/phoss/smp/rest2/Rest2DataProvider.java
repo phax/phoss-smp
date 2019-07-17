@@ -53,7 +53,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
     m_bUseStaticServerInfo = bUseStaticServerInfo;
   }
 
-  protected final boolean isUseStaticServerInfo ()
+  public final boolean isUseStaticServerInfo ()
   {
     return m_bUseStaticServerInfo;
   }
