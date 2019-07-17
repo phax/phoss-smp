@@ -23,7 +23,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -142,33 +141,37 @@ public class PageSecureTasks extends AbstractSMPWebPage
         if (aKeyEntry != null)
         {
           final Certificate [] aChain = aKeyEntry.getCertificateChain ();
-          final ZonedDateTime aNowZDT = PDTFactory.getCurrentZonedDateTime ();
-          final LocalDateTime aNowLDT = aNowZDT.toLocalDateTime ();
 
           for (final Certificate aCert : aChain)
           {
             if (aCert instanceof X509Certificate)
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
-              final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
 
-              if (aNowLDT.isBefore (aNotBefore))
+              final String sLogPrefix = "The provided certificate with subject '" +
+                                        aX509Cert.getSubjectX500Principal ().getName () +
+                                        "' ";
+
+              final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
+              if (aNowDT.isBefore (aNotBefore))
               {
-                aOL.addItem (_createError ("The provided certificate with subject '" +
-                                           aX509Cert.getSubjectX500Principal ().getName () +
-                                           "' is not yet valid."),
-                             new HCDiv ().addChild ("Validity starts at " +
+                aOL.addItem (_createError (sLogPrefix + " is not yet valid."),
+                             new HCDiv ().addChild ("It will be valid from " +
                                                     PDTToString.getAsString (aNotBefore, aDisplayLocale)));
               }
-              if (aNowLDT.isAfter (aNotAfter))
+
+              final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
+              if (aNowDT.isAfter (aNotAfter))
               {
-                aOL.addItem (_createError ("The provided certificate with subject '" +
-                                           aX509Cert.getSubjectX500Principal ().getName () +
-                                           "' is already expired."),
-                             new HCDiv ().addChild ("The expiration date was " +
+                aOL.addItem (_createError (sLogPrefix + " is already expired."),
+                             new HCDiv ().addChild ("It was valid until " +
                                                     PDTToString.getAsString (aNotAfter, aDisplayLocale)));
               }
+              else
+                if (aNowPlusDT.isAfter (aNotAfter))
+                  aOL.addItem (_createWarning (sLogPrefix + " will expire soon."),
+                               new HCDiv ().addChild ("It is only valid until " +
+                                                      PDTToString.getAsString (aNotAfter, aDisplayLocale)));
             }
             else
             {
@@ -286,7 +289,7 @@ public class PageSecureTasks extends AbstractSMPWebPage
     {
       // Warn only if Directory is required
       if (aSMPSettings.isDirectoryIntegrationRequired ())
-        aOL.addItem (_createWarning ("The connection to " + sDirectoryName + " is not configured."));
+        aOL.addItem (_createWarning ("The connection to " + sDirectoryName + " is not enabled."));
     }
 
     // check service groups and redirects
@@ -367,21 +370,27 @@ public class PageSecureTasks extends AbstractSMPWebPage
                   else
                   {
                     final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
-                    if (aNotBefore.isAfter (aNowDT))
-                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is not yet active. It will be active from " +
-                                                            PDTToString.getAsString (aNotBefore, aDisplayLocale) +
-                                                            "."));
+                    if (aNowDT.isBefore (aNotBefore))
+                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is not yet active."),
+                                              new HCDiv ().addChild ("It will be valid from " +
+                                                                     PDTToString.getAsString (aNotBefore,
+                                                                                              aDisplayLocale) +
+                                                                     "."));
 
                     final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
-                    if (aNotAfter.isBefore (aNowDT))
-                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is already expired. It was valid until " +
-                                                            PDTToString.getAsString (aNotAfter, aDisplayLocale) +
-                                                            "."));
+                    if (aNowDT.isAfter (aNotAfter))
+                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is already expired."),
+                                              new HCDiv ().addChild ("It was valid until " +
+                                                                     PDTToString.getAsString (aNotAfter,
+                                                                                              aDisplayLocale) +
+                                                                     "."));
                     else
-                      if (aNotAfter.isBefore (aNowPlusDT))
-                        aULPerEndpoint.addItem (_createWarning ("The endpoint certificate will expire soon. It is only valid until " +
-                                                                PDTToString.getAsString (aNotAfter, aDisplayLocale) +
-                                                                "."));
+                      if (aNowPlusDT.isBefore (aNotAfter))
+                        aULPerEndpoint.addItem (_createWarning ("The endpoint certificate will expire soon."),
+                                                new HCDiv ().addChild ("It is only valid until " +
+                                                                       PDTToString.getAsString (aNotAfter,
+                                                                                                aDisplayLocale) +
+                                                                       "."));
                   }
 
                   // Show per endpoint errors
