@@ -166,6 +166,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                          DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
                                                                          ". The changes are reflected below."));
       }
+    // TODO in phoss-directory 0.8.1 add PD Client Configuration reload
 
     {
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
