@@ -49,6 +49,7 @@ import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
+import com.helger.html.hc.html.tabular.IHCCell;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
@@ -113,6 +114,7 @@ import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
+import com.helger.photon.uictrls.famfam.EFamFamFlagIcon;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.servlet.request.IRequestParamMap;
 import com.helger.servlet.request.RequestParamMap;
@@ -1079,9 +1081,17 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
           final HCRow aRow = aTable.addBodyRow ();
           aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
           aRow.addCell (aEntity.names ().getFirst ().getName ());
-          aRow.addCell (CountryCache.getInstance ()
-                                    .getCountry (aEntity.getCountryCode ())
-                                    .getDisplayCountry (aDisplayLocale));
+
+          final Locale aCountry = CountryCache.getInstance ().getCountry (aEntity.getCountryCode ());
+          final IHCCell <?> aCountryCell = aRow.addCell ();
+          final EFamFamFlagIcon eIcon = EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
+          if (eIcon != null)
+          {
+            aCountryCell.addChild (eIcon.getAsNode ());
+            aCountryCell.addChild (" ");
+          }
+          aCountryCell.addChild (aCountry.getDisplayCountry (aDisplayLocale));
+
           aRow.addCell (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ()));
           {
             final HCNodeList aIdentifiers = new HCNodeList ();
