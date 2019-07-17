@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.rest2;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.state.EHandled;
+import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
@@ -58,6 +60,15 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
                     " (turn on REST exception logging to see all details)");
   }
 
+  private static void _setSimpleTextResponse (@Nonnull final UnifiedResponse aUnifiedResponse,
+                                              final int nStatusCode,
+                                              @Nullable final String sContent)
+  {
+    setSimpleTextResponse (aUnifiedResponse, nStatusCode, sContent);
+    if (StringHelper.hasText (sContent))
+      aUnifiedResponse.disableCaching ();
+  }
+
   @Nonnull
   public EHandled applyExceptionOnResponse (@Nonnull final InvokableAPIDescriptor aInvokableDescriptor,
                                             @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
@@ -68,69 +79,69 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     if (aThrowable instanceof SMPUnauthorizedException)
     {
       _logRestException ("Unauthorized", aThrowable);
-      setSimpleTextResponse (aUnifiedResponse,
-                             HttpServletResponse.SC_FORBIDDEN,
-                             getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              HttpServletResponse.SC_FORBIDDEN,
+                              getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPUnknownUserException)
     {
       _logRestException ("Unknown user", aThrowable);
-      setSimpleTextResponse (aUnifiedResponse,
-                             HttpServletResponse.SC_FORBIDDEN,
-                             getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              HttpServletResponse.SC_FORBIDDEN,
+                              getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPSMLException)
     {
       _logRestException ("SMP SML error", aThrowable);
-      setSimpleTextResponse (aUnifiedResponse,
-                             HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                             GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
-                                                        : getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                              GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
+                                                         : getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPNotFoundException)
     {
       _logRestException ("Not found", aThrowable);
-      setSimpleTextResponse (aUnifiedResponse,
-                             HttpServletResponse.SC_NOT_FOUND,
-                             getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              HttpServletResponse.SC_NOT_FOUND,
+                              getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPInternalErrorException)
     {
       _logRestException ("Internal error", aThrowable);
-      setSimpleTextResponse (aUnifiedResponse,
-                             HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                             GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
-                                                        : getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                              GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
+                                                         : getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPBadRequestException)
     {
       _logRestException ("Bad request", aThrowable);
-      setSimpleTextResponse (aUnifiedResponse,
-                             HttpServletResponse.SC_BAD_REQUEST,
-                             getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              HttpServletResponse.SC_BAD_REQUEST,
+                              getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPServerException)
     {
       // Generic fallback only
       _logRestException ("Generic SMP error", aThrowable);
-      setSimpleTextResponse (aUnifiedResponse,
-                             HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                             getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                              getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof RuntimeException)
     {
       _logRestException ("Runtime exception - " + aThrowable.getClass ().getName (), aThrowable);
-      setSimpleTextResponse (aUnifiedResponse,
-                             HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                             GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
-                                                        : getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                              GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
+                                                         : getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
 

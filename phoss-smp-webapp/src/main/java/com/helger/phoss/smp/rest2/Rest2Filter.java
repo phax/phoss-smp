@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.state.EContinue;
 import com.helger.photon.api.APIDescriptor;
@@ -183,8 +184,15 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug (LOG_PREFIX + "Found API match for '" + aAPIPath.getPath () + "': " + aInvokableDescriptor);
 
-    // Always disable caching
-    aUnifiedResponse.disableCaching ();
+    // Always disable caching for GET requests
+    if (aRequestScope.getHttpMethod () == EHttpMethod.GET)
+      aUnifiedResponse.disableCaching ();
+    else
+    {
+      // If only a status code is provided, the caching option would be ignored
+      // anyway, so for other HTTP methods the caching must be done explicitly
+      // per request
+    }
 
     // Invoke API and stop
     try
