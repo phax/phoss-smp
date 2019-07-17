@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014-2019 Philip Helger and contributors
+ * Copyright (C) 2019 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,7 +92,7 @@ public final class MainCreate1MillionEndpoints
       final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V2.getAsProcessIdentifier ();
 
       final StopWatch aSWOverall = StopWatch.createdStarted ();
-      for (int i = 0; i < 1_000_000; ++i)
+      for (int i = 575_504; i < 1_000_000; ++i)
       {
         final StopWatch aSW = StopWatch.createdStarted ();
         final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
