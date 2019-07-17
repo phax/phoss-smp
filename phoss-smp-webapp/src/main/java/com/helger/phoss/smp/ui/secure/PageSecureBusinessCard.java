@@ -72,6 +72,7 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
@@ -208,9 +209,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
         if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
         {
+          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
           aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!" +
-                                                                              (SMPMetaManager.getSettings ()
-                                                                                             .isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+                                                                              (aSettings.isDirectoryIntegrationEnabled () &&
+                                                                               aSettings.isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
         }
         else
           aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
@@ -585,11 +587,14 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                         .getName ()
                                         .compareToIgnoreCase (o2.names ().getFirst ().getName ()));
       if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities) != null)
+      {
+        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
         aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
                                                                             aServiceGroup.getID () +
                                                                             "' was successfully saved." +
-                                                                            (SMPMetaManager.getSettings ()
-                                                                                           .isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+                                                                            (aSettings.isDirectoryIntegrationEnabled () &&
+                                                                             aSettings.isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+      }
       else
         aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the Business Card for Service Group '" +
                                                                           aServiceGroup.getID () +

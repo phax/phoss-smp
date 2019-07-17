@@ -42,6 +42,7 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.pub.MenuPublic;
@@ -213,7 +214,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         public void onCreateOrUpdateSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
         {
-          if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
+          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+          if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
           {
             // Notify PD server: add
             PDClientProvider.getInstance ()
@@ -224,7 +226,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
         public void onDeleteSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
         {
-          if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
+          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+          if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
           {
             // Notify PD server: delete
             PDClientProvider.getInstance ()
@@ -242,7 +245,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                     {
                       public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
                       {
-                        if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
+                        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+                        if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
                         {
                           // Only if a business card is present
                           if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
@@ -258,7 +262,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
                       public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
                       {
-                        if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
+                        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+                        if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
                         {
                           // Only if a business card is present
                           if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
@@ -274,7 +279,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
                       public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
                       {
-                        if (SMPMetaManager.getSettings ().isDirectoryIntegrationAutoUpdate ())
+                        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+                        if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
                         {
                           // Only if a business card is present
                           if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
