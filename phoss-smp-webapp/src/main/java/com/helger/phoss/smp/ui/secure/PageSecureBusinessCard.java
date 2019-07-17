@@ -318,13 +318,19 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
       aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Name")
                                                     .setCtrl (aEntity.names ().getFirst ().getName ()));
-      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code")
-                                                    .setCtrl (CountryCache.getInstance ()
-                                                                          .getCountry (aEntity.getCountryCode ())
-                                                                          .getDisplayCountry (aDisplayLocale) +
-                                                              " [" +
-                                                              aEntity.getCountryCode () +
-                                                              "]"));
+
+      {
+        final Locale aCountry = CountryCache.getInstance ().getCountry (aEntity.getCountryCode ());
+        final HCNodeList aCtrl = new HCNodeList ();
+        final EFamFamFlagIcon eIcon = EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
+        if (eIcon != null)
+        {
+          aCtrl.addChild (eIcon.getAsNode ());
+          aCtrl.addChild (" ");
+        }
+        aCtrl.addChild (aCountry.getDisplayCountry (aDisplayLocale) + " [" + aEntity.getCountryCode () + "]");
+        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code").setCtrl (aCtrl));
+      }
       if (aEntity.hasGeographicalInformation ())
       {
         aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Geographical information")
