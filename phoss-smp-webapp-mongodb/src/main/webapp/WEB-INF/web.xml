@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2014-2019 Philip Helger and contributors
+    Copyright (C) 2019 Philip Helger and contributors
     philip[at]helger[dot]com
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
   <display-name>phoss SMP (MongoDB backend)</display-name>
 
   <listener>
-    <listener-class>com.helger.phoss.smp.servlet.SMPWebAppListener</listener-class>
+    <listener-class>com.helger.phoss.smp.mongodb.servlet.SMPWebAppListenerMongoDB</listener-class>
   </listener>
   <listener>
     <listener-class>com.helger.phoss.smp.servlet.TimeZoneCorrectorListener</listener-class>
