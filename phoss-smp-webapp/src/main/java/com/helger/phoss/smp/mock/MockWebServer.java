@@ -30,6 +30,7 @@ final class MockWebServer
 {
   public static final String CONTEXT_PATH = "/unittest";
   public static final int PORT = 9090;
+  public static final int STOP_PORT = PORT - 1;
 
   /**
    * Starts HTTP server exposing JAX-RS resources defined in this application.
@@ -40,7 +41,7 @@ final class MockWebServer
   public static JettyRunner startRegularServer ()
   {
     final JettyRunner ret = new JettyRunner ();
-    ret.setContextPath (CONTEXT_PATH).setPort (PORT);
+    ret.setContextPath (CONTEXT_PATH).setPort (PORT).setStopPort (STOP_PORT);
     try
     {
       ret.startServer ();
