@@ -92,7 +92,7 @@ public final class MainCreate1MillionEndpoints
       final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V2.getAsProcessIdentifier ();
 
       final StopWatch aSWOverall = StopWatch.createdStarted ();
-      for (int i = 575_504; i < 1_000_000; ++i)
+      for (int i = 639276; i < 1_000_000; ++i)
       {
         final StopWatch aSW = StopWatch.createdStarted ();
         final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
