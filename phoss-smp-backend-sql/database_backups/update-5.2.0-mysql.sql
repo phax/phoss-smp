@@ -11,6 +11,6 @@
 
 USE `smp`;
 -- add column
-ALTER TABLE `smp_service_metadata_redirection` ADD COLUMN `certificate` LONGTEXT;
+ALTER TABLE `smp_service_metadata_redirection` ADD COLUMN `certificate` LONGTEXT NULL;
 -- make column nullable
 ALTER TABLE `smp_service_metadata_redirection` MODIFY `certificateUID` VARCHAR(256) NULL;
