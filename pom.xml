@@ -132,7 +132,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.8.0</version>
+        <version>0.8.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -150,7 +150,7 @@
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.16</version>
+        <version>8.0.17</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
@@ -181,7 +181,7 @@
       <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
-        <version>3.10.2</version>
+        <version>3.11.0</version>
       </dependency>
 
       <dependency>
