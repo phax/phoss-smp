@@ -138,6 +138,9 @@
             <exclude>src/main/webapp/*.jsp</exclude>
             <exclude>**/*.min.js</exclude>
             <exclude>**/*.min.css</exclude>
+            <exclude>**/*.p12</exclude>
+            <exclude>**/*.jks</exclude>
+            <exclude>**/*.txt</exclude>
           </excludes>
         </configuration>
       </plugin>

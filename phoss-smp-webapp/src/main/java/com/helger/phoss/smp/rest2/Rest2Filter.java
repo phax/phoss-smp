@@ -165,7 +165,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     final APIPath aAPIPath = APIPath.createForFilter (aRequestScope);
 
     if (aAPIPath.getPath ()
-                .matches ("^/(stream|public|secure|ajax|resbundle|smp-status|error|logout|favicon.ico)(/.*)?$"))
+                .matches ("^/(stream|public|secure|ajax|resbundle|smp-status|error|logout|favicon.ico|robots.txt)(/.*)?$"))
     {
       // Explicitly other servlet
       if (LOGGER.isDebugEnabled ())
