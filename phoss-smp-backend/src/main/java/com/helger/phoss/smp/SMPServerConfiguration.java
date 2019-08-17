@@ -76,6 +76,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_TYPE = "smp.rest.type";
   public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
   public static final String KEY_SMP_REST_LOG_EXCEPTIONS = "smp.rest.log.exceptions";
+  public static final String KEY_SMP_REST_PAYLOAD_ON_ERROR = "smp.rest.payload.on.error";
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   /* legacy name */
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
@@ -100,6 +101,7 @@ public final class SMPServerConfiguration
   public static final ESMPRESTType DEFAULT_SMP_REST_TYPE = ESMPRESTType.PEPPOL;
   public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
   public static final boolean DEFAULT_SMP_REST_LOG_EXCEPTIONS = false;
+  public static final boolean DEFAULT_SMP_REST_PAYLOAD_ON_ERROR = true;
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
   public static final boolean DEFAULT_SML_REQUIRED = true;
   public static final boolean DEFAULT_SML_ENABLED = false;
@@ -326,6 +328,18 @@ public final class SMPServerConfiguration
   public static boolean isRESTLogExceptions ()
   {
     return getConfigFile ().getAsBoolean (KEY_SMP_REST_LOG_EXCEPTIONS, DEFAULT_SMP_REST_LOG_EXCEPTIONS);
+  }
+
+  /**
+   * @return <code>true</code> if in case of an exception in the REST API´,
+   *         payload text should be provided as test, <code>false</code> if not.
+   *         By default it is enabled. For security reasons it should be
+   *         disabled.
+   * @since 5.2.1
+   */
+  public static boolean isRESTPayloadOnError ()
+  {
+    return getConfigFile ().getAsBoolean (KEY_SMP_REST_PAYLOAD_ON_ERROR, DEFAULT_SMP_REST_PAYLOAD_ON_ERROR);
   }
 
   /**

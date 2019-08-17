@@ -64,9 +64,18 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
                                               final int nStatusCode,
                                               @Nullable final String sContent)
   {
-    setSimpleTextResponse (aUnifiedResponse, nStatusCode, sContent);
-    if (StringHelper.hasText (sContent))
-      aUnifiedResponse.disableCaching ();
+    if (SMPServerConfiguration.isRESTPayloadOnError ())
+    {
+      // With payload
+      setSimpleTextResponse (aUnifiedResponse, nStatusCode, sContent);
+      if (StringHelper.hasText (sContent))
+        aUnifiedResponse.disableCaching ();
+    }
+    else
+    {
+      // No payload
+      aUnifiedResponse.setStatus (nStatusCode);
+    }
   }
 
   @Nonnull
