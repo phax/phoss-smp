@@ -150,6 +150,6 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
   {
     if (StringHelper.hasNoText (sAddress))
       return null;
-    return findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ().equals (sAddress));
+    return findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ().toExternalForm ().equals (sAddress));
   }
 }
