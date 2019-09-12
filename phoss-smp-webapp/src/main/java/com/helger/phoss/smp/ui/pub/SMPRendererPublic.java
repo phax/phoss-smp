@@ -287,6 +287,8 @@ public final class SMPRendererPublic
 
     final HCP aBy = new HCP ().addChild ("Created by ")
                               .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"));
+
+    if (false)
     {
       // Twitter
       aBy.addChild (" - ")
