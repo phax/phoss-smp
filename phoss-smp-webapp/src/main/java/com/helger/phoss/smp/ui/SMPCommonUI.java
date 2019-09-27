@@ -50,8 +50,6 @@ import com.helger.html.hc.html.grouping.HCHR;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.textlevel.HCCode;
-import com.helger.html.hc.html.textlevel.HCSpan;
-import com.helger.html.hc.html.textlevel.HCWBR;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.html.jquery.JQuery;
@@ -61,11 +59,7 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.html.jscode.html.JSHtml;
-import com.helger.peppolid.IDocumentTypeIdentifier;
-import com.helger.peppolid.IProcessIdentifier;
-import com.helger.peppolid.peppol.doctype.EPredefinedDocumentTypeIdentifier;
 import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
-import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 import com.helger.phoss.smp.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.phoss.smp.ui.ajax.CAjax;
@@ -253,58 +247,6 @@ public final class SMPCommonUI
                 .addCell ("Signature algorithm:")
                 .addCell (aX509Cert.getSigAlgName () + " (" + aX509Cert.getSigAlgOID () + ")");
     return aCertDetails;
-  }
-
-  @Nonnull
-  private static IHCNode _getWBRList (@Nonnull final String s)
-  {
-    final HCSpan ret = new HCSpan ();
-    String sRest = s;
-    final int nChars = 30;
-    while (sRest.length () > nChars)
-    {
-      ret.addChild (sRest.substring (0, nChars)).addChild (new HCWBR ());
-      sRest = sRest.substring (nChars);
-    }
-    if (sRest.length () > 0)
-      ret.addChild (sRest);
-    return ret.getChildCount () == 1 ? ret.getFirstChild () : ret;
-  }
-
-  @Nonnull
-  public static IHCNode getDocumentTypeID (@Nonnull final IDocumentTypeIdentifier aDocTypeID)
-  {
-    EPredefinedDocumentTypeIdentifier ePredefined = null;
-    for (final EPredefinedDocumentTypeIdentifier e : EPredefinedDocumentTypeIdentifier.values ())
-      if (e.getAsDocumentTypeIdentifier ().hasSameContent (aDocTypeID))
-      {
-        ePredefined = e;
-        break;
-      }
-
-    if (ePredefined != null)
-      return new HCNodeList ().addChild (ePredefined.getCommonName () + " ")
-                              .addChild (new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("predefined"));
-
-    return _getWBRList (aDocTypeID.getURIEncoded ());
-  }
-
-  @Nonnull
-  public static IHCNode getProcessID (@Nonnull final IProcessIdentifier aDocTypeID)
-  {
-    EPredefinedProcessIdentifier ePredefined = null;
-    for (final EPredefinedProcessIdentifier e : EPredefinedProcessIdentifier.values ())
-      if (e.getAsProcessIdentifier ().hasSameContent (aDocTypeID))
-      {
-        ePredefined = e;
-        break;
-      }
-
-    if (ePredefined != null)
-      return new HCNodeList ().addChild (ePredefined.getValue () + " ")
-                              .addChild (new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("predefined"));
-
-    return _getWBRList (aDocTypeID.getURIEncoded ());
   }
 
   @Nonnull

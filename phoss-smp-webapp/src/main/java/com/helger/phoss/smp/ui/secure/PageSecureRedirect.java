@@ -49,6 +49,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.nicename.NiceNameUI;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
@@ -425,7 +426,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-      aRow.addCell (SMPCommonUI.getDocumentTypeID (aCurObject.getDocumentTypeIdentifier ()));
+      aRow.addCell (NiceNameUI.getDocumentTypeID (aCurObject.getDocumentTypeIdentifier ()));
       aRow.addCell (aCurObject.getTargetHref ());
 
       final ISimpleURL aEditURL = createEditURL (aWPEC, aCurObject).addAll (aParams);
