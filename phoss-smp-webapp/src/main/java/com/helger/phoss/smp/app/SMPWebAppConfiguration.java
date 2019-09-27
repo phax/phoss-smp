@@ -77,16 +77,26 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   private SMPWebAppConfiguration ()
   {}
 
+  /**
+   * @return The web application (UI) configuration file for the SMP server.
+   *         Never <code>null</code>.
+   */
+  @Nonnull
+  public static ConfigFile getConfigFile ()
+  {
+    return s_aConfigFile;
+  }
+
   @Nonnull
   public static ISettings getSettingsObject ()
   {
-    return s_aConfigFile.getSettings ();
+    return getConfigFile ().getSettings ();
   }
 
   @Nonnull
   public static IReadableResource getSettingsResource ()
   {
-    return s_aConfigFile.getReadResource ();
+    return getConfigFile ().getReadResource ();
   }
 
   /**
@@ -96,7 +106,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getGlobalDebug ()
   {
-    return s_aConfigFile.getAsString (WEBAPP_KEY_GLOBAL_DEBUG);
+    return getConfigFile ().getAsString (WEBAPP_KEY_GLOBAL_DEBUG);
   }
 
   /**
@@ -106,7 +116,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getGlobalProduction ()
   {
-    return s_aConfigFile.getAsString (WEBAPP_KEY_GLOBAL_PRODUCTION);
+    return getConfigFile ().getAsString (WEBAPP_KEY_GLOBAL_PRODUCTION);
   }
 
   /**
@@ -117,7 +127,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static boolean isGlobalDebugJaxWS ()
   {
-    return s_aConfigFile.getAsBoolean ("global.debugjaxws", false);
+    return getConfigFile ().getAsBoolean ("global.debugjaxws", false);
   }
 
   /**
@@ -127,12 +137,12 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getDataPath ()
   {
-    return s_aConfigFile.getAsString ("webapp.datapath");
+    return getConfigFile ().getAsString ("webapp.datapath");
   }
 
   public static boolean isCheckFileAccess ()
   {
-    return s_aConfigFile.getAsBoolean ("webapp.checkfileaccess", true);
+    return getConfigFile ().getAsBoolean ("webapp.checkfileaccess", true);
   }
 
   /**
@@ -141,7 +151,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isTestVersion ()
   {
-    return s_aConfigFile.getAsBoolean ("webapp.testversion", GlobalDebug.isDebugMode ());
+    return getConfigFile ().getAsBoolean ("webapp.testversion", GlobalDebug.isDebugMode ());
   }
 
   /**
@@ -152,7 +162,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isStartPageDynamicTable ()
   {
-    return s_aConfigFile.getAsBoolean ("webapp.startpage.dynamictable", false);
+    return getConfigFile ().getAsBoolean ("webapp.startpage.dynamictable", false);
   }
 
   /**
@@ -162,7 +172,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isStartPageParticipantsNone ()
   {
-    return s_aConfigFile.getAsBoolean ("webapp.startpage.participants.none", false);
+    return getConfigFile ().getAsBoolean ("webapp.startpage.participants.none", false);
   }
 
   /**
@@ -173,7 +183,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isStartPageExtensionsShow ()
   {
-    return s_aConfigFile.getAsBoolean ("webapp.startpage.extensions.show", false);
+    return getConfigFile ().getAsBoolean ("webapp.startpage.extensions.show", false);
   }
 
   /**
@@ -184,7 +194,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nonnull
   public static String getDirectoryName ()
   {
-    return s_aConfigFile.getAsString ("webapp.directory.name", "PEPPOL Directory");
+    return getConfigFile ().getAsString ("webapp.directory.name", "PEPPOL Directory");
   }
 
   /**
@@ -195,7 +205,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isServiceGroupsExtensionsShow ()
   {
-    return s_aConfigFile.getAsBoolean ("webapp.servicegroups.extensions.show", false);
+    return getConfigFile ().getAsBoolean ("webapp.servicegroups.extensions.show", false);
   }
 
   /**
@@ -208,6 +218,6 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isPublicLoginEnabled ()
   {
-    return s_aConfigFile.getAsBoolean ("webapp.public.login.enabled", true);
+    return getConfigFile ().getAsBoolean ("webapp.public.login.enabled", true);
   }
 }
