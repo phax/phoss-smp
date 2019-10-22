@@ -68,7 +68,7 @@
 
   <properties>
     <log4j.version>2.12.1</log4j.version>
-    <eclipselink.version>2.7.4</eclipselink.version>
+    <eclipselink.version>2.7.5</eclipselink.version>
   </properties>
   
   <dependencyManagement>
