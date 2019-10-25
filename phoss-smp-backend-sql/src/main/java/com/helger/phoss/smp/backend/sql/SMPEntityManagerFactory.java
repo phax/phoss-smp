@@ -17,6 +17,7 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.persistence.PersistenceException;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import org.eclipse.persistence.logging.SessionLog;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.UsedViaReflection;
@@ -63,7 +64,11 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
 
     // Enable this line for SQL debug logging
     if (false)
-      ret.put (PersistenceUnitProperties.LOGGING_LEVEL, "finer");
+    {
+      ret.put (PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.FINE_LABEL);
+      ret.put (PersistenceUnitProperties.CATEGORY_LOGGING_LEVEL_ + SessionLog.SQL, SessionLog.FINE_LABEL);
+      ret.put (PersistenceUnitProperties.LOGGING_LOGGER, "DefaultLogger");
+    }
 
     return ret;
   }
@@ -81,12 +86,11 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
            _createPropertiesMap ());
 
     // Set execution time stuff
-    JPAEnabledManager.setDefaultExecutionWarnTimeEnabled (SMPServerConfiguration.getConfigFile ()
-                                                                                .getAsBoolean (SMPJPAConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
-                                                                                               JPAEnabledManager.DEFAULT_EXECUTION_WARN_ENABLED));
-    JPAEnabledManager.setDefaultExecutionWarnTime (SMPServerConfiguration.getConfigFile ()
-                                                                         .getAsInt (SMPJPAConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
-                                                                                    JPAEnabledManager.DEFAULT_EXECUTION_WARN_TIME_MS));
+    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+    JPAEnabledManager.setDefaultExecutionWarnTimeEnabled (aCF.getAsBoolean (SMPJPAConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
+                                                                            JPAEnabledManager.DEFAULT_EXECUTION_WARN_ENABLED));
+    JPAEnabledManager.setDefaultExecutionWarnTime (aCF.getAsInt (SMPJPAConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
+                                                                 JPAEnabledManager.DEFAULT_EXECUTION_WARN_TIME_MS));
   }
 
   @Nonnull
