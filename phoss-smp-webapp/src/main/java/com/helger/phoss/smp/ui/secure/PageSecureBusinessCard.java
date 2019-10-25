@@ -74,7 +74,6 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
-import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.ajax.decl.AjaxFunctionDeclaration;
@@ -260,8 +259,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
-    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
-    if (!aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ())
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    if (!aSettings.isDirectoryIntegrationEnabled ())
     {
       aNodeList.addChild (new BootstrapWarnBox ().addChild (SMPWebAppConfiguration.getDirectoryName () +
                                                             " integration is disabled hence no Business Cards can be created."));
