@@ -144,9 +144,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
   private static final String PARAM_ENTITY_ID = "entityid";
 
-  private static AjaxFunctionDeclaration s_aAjaxCreateEntity;
-  private static AjaxFunctionDeclaration s_aAjaxCreateContact;
-  private static AjaxFunctionDeclaration s_aAjaxCreateIdentifier;
+  private static final AjaxFunctionDeclaration s_aAjaxCreateEntity;
+  private static final AjaxFunctionDeclaration s_aAjaxCreateContact;
+  private static final AjaxFunctionDeclaration s_aAjaxCreateIdentifier;
 
   static
   {
