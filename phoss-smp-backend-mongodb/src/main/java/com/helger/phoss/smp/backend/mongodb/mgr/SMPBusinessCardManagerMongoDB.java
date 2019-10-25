@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnegative;
@@ -215,12 +216,18 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
       ret.names ().add (toBCName (aItemDoc));
     ret.setCountryCode (aDoc.getString (BSON_COUNTRYCODE));
     ret.setGeographicalInformation (aDoc.getString (BSON_GEOINFO));
-    for (final Document aItemDoc : aDoc.getList (BSON_IDS, Document.class))
-      ret.identifiers ().add (toBCIdentifier (aItemDoc));
-    for (final String sItem : aDoc.getList (BSON_WEBSITES, String.class))
-      ret.websiteURIs ().add (sItem);
-    for (final Document aItemDoc : aDoc.getList (BSON_CONTACTS, Document.class))
-      ret.contacts ().add (toBCContact (aItemDoc));
+    final List <Document> aIDList = aDoc.getList (BSON_IDS, Document.class);
+    if (aIDList != null)
+      for (final Document aItemDoc : aIDList)
+        ret.identifiers ().add (toBCIdentifier (aItemDoc));
+    final List <String> aWebsiteList = aDoc.getList (BSON_WEBSITES, String.class);
+    if (aWebsiteList != null)
+      for (final String sItem : aWebsiteList)
+        ret.websiteURIs ().add (sItem);
+    final List <Document> aContactList = aDoc.getList (BSON_CONTACTS, Document.class);
+    if (aContactList != null)
+      for (final Document aItemDoc : aContactList)
+        ret.contacts ().add (toBCContact (aItemDoc));
     ret.setAdditionalInformation (aDoc.getString (BSON_ADDITIONAL));
     ret.setRegistrationDate (TypeConverter.convert (aDoc.get (BSON_REGDATE, Date.class), LocalDate.class));
     return ret;
