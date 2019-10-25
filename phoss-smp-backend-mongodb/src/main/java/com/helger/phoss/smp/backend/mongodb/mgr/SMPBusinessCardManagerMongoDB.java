@@ -212,8 +212,10 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   public static SMPBusinessCardEntity toBCEntity (@Nonnull final Document aDoc)
   {
     final SMPBusinessCardEntity ret = new SMPBusinessCardEntity (aDoc.getString (BSON_ID));
-    for (final Document aItemDoc : aDoc.getList (BSON_NAMES, Document.class))
-      ret.names ().add (toBCName (aItemDoc));
+    final List <Document> aNames = aDoc.getList (BSON_NAMES, Document.class);
+    if (aNames != null)
+      for (final Document aItemDoc : aNames)
+        ret.names ().add (toBCName (aItemDoc));
     ret.setCountryCode (aDoc.getString (BSON_COUNTRYCODE));
     ret.setGeographicalInformation (aDoc.getString (BSON_GEOINFO));
     final List <Document> aIDList = aDoc.getList (BSON_IDS, Document.class);
@@ -253,8 +255,10 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   {
     final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID)));
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
-    for (final Document aItemDoc : aDoc.getList (BSON_ENTITIES, Document.class))
-      aEntities.add (toBCEntity (aItemDoc));
+    final List <Document> aEntityList = aDoc.getList (BSON_ENTITIES, Document.class);
+    if (aEntityList != null)
+      for (final Document aItemDoc : aEntityList)
+        aEntities.add (toBCEntity (aItemDoc));
     // The ID itself is derived from ServiceGroupID
     return new SMPBusinessCard (aServiceGroup, aEntities);
   }
