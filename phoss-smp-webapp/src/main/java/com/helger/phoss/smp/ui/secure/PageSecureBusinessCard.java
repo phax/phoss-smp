@@ -291,6 +291,76 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     return aBusinessCardMgr.getSMPBusinessCardOfID (sID);
   }
 
+  @Nonnull
+  public static IHCNode showBusinessCardEntity (@Nonnull final SMPBusinessCardEntity aEntity,
+                                                final int nIndex,
+                                                @Nonnull final Locale aDisplayLocale)
+  {
+    final BootstrapCard aPanel = new BootstrapCard ();
+    aPanel.createAndAddHeader ().addChild ("Business Entity " + nIndex);
+
+    final BootstrapViewForm aForm2 = aPanel.createAndAddBody ().addAndReturnChild (new BootstrapViewForm ());
+
+    aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aEntity.names ().getFirst ().getName ()));
+
+    {
+      final Locale aCountry = CountryCache.getInstance ().getCountry (aEntity.getCountryCode ());
+      final HCNodeList aCtrl = new HCNodeList ();
+      final EFamFamFlagIcon eIcon = EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
+      if (eIcon != null)
+      {
+        aCtrl.addChild (eIcon.getAsNode ());
+        aCtrl.addChild (" ");
+      }
+      aCtrl.addChild (aCountry.getDisplayCountry (aDisplayLocale) + " [" + aEntity.getCountryCode () + "]");
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code").setCtrl (aCtrl));
+    }
+    if (aEntity.hasGeographicalInformation ())
+    {
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Geographical information")
+                                                    .setCtrl (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ())));
+    }
+    if (aEntity.identifiers ().isNotEmpty ())
+    {
+      final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star ());
+      aTable.addHeaderRow ().addCells ("Scheme", "Value");
+      for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
+        aTable.addBodyRow ().addCells (aIdentifier.getScheme (), aIdentifier.getValue ());
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aTable));
+    }
+    if (aEntity.websiteURIs ().isNotEmpty ())
+    {
+      final HCNodeList aNL = new HCNodeList ();
+      for (final String sWebsiteURI : aEntity.websiteURIs ())
+        aNL.addChild (new HCDiv ().addChild (HCA.createLinkedWebsite (sWebsiteURI)));
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs").setCtrl (aNL));
+    }
+    if (aEntity.contacts ().isNotEmpty ())
+    {
+      final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star (), HCCol.star (), HCCol.star ());
+      aTable.addHeaderRow ().addCells ("Type", "Name", "Phone number", "Email address");
+      for (final SMPBusinessCardContact aContact : aEntity.contacts ())
+      {
+        final HCRow aBodyRow = aTable.addBodyRow ();
+        aBodyRow.addCells (aContact.getType (), aContact.getName (), aContact.getPhoneNumber ());
+        aBodyRow.addCell (HCA_MailTo.createLinkedEmail (aContact.getEmail ()));
+      }
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Contacts").setCtrl (aTable));
+    }
+    if (aEntity.hasAdditionalInformation ())
+    {
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Additional information")
+                                                    .setCtrl (HCExtHelper.nl2divList (aEntity.getAdditionalInformation ())));
+    }
+    if (aEntity.hasRegistrationDate ())
+    {
+      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Registration date")
+                                                    .setCtrl (PDTToString.getAsString (aEntity.getRegistrationDate (),
+                                                                                       aDisplayLocale)));
+    }
+    return aPanel;
+  }
+
   @Override
   protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                      @Nonnull final ISMPBusinessCard aSelectedObject)
@@ -310,69 +380,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     for (final SMPBusinessCardEntity aEntity : aSelectedObject.getAllEntities ())
     {
       ++nIndex;
-      final BootstrapCard aPanel = aForm.addAndReturnChild (new BootstrapCard ());
-      aPanel.createAndAddHeader ().addChild ("Business Entity " + nIndex);
-
-      final BootstrapViewForm aForm2 = aPanel.createAndAddBody ().addAndReturnChild (new BootstrapViewForm ());
-
-      aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Name")
-                                                    .setCtrl (aEntity.names ().getFirst ().getName ()));
-
-      {
-        final Locale aCountry = CountryCache.getInstance ().getCountry (aEntity.getCountryCode ());
-        final HCNodeList aCtrl = new HCNodeList ();
-        final EFamFamFlagIcon eIcon = EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
-        if (eIcon != null)
-        {
-          aCtrl.addChild (eIcon.getAsNode ());
-          aCtrl.addChild (" ");
-        }
-        aCtrl.addChild (aCountry.getDisplayCountry (aDisplayLocale) + " [" + aEntity.getCountryCode () + "]");
-        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code").setCtrl (aCtrl));
-      }
-      if (aEntity.hasGeographicalInformation ())
-      {
-        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Geographical information")
-                                                      .setCtrl (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ())));
-      }
-      if (aEntity.identifiers ().isNotEmpty ())
-      {
-        final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star ());
-        aTable.addHeaderRow ().addCells ("Scheme", "Value");
-        for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
-          aTable.addBodyRow ().addCells (aIdentifier.getScheme (), aIdentifier.getValue ());
-        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aTable));
-      }
-      if (aEntity.websiteURIs ().isNotEmpty ())
-      {
-        final HCNodeList aNL = new HCNodeList ();
-        for (final String sWebsiteURI : aEntity.websiteURIs ())
-          aNL.addChild (new HCDiv ().addChild (HCA.createLinkedWebsite (sWebsiteURI)));
-        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Website URIs").setCtrl (aNL));
-      }
-      if (aEntity.contacts ().isNotEmpty ())
-      {
-        final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star (), HCCol.star (), HCCol.star ());
-        aTable.addHeaderRow ().addCells ("Type", "Name", "Phone number", "Email address");
-        for (final SMPBusinessCardContact aContact : aEntity.contacts ())
-        {
-          final HCRow aBodyRow = aTable.addBodyRow ();
-          aBodyRow.addCells (aContact.getType (), aContact.getName (), aContact.getPhoneNumber ());
-          aBodyRow.addCell (HCA_MailTo.createLinkedEmail (aContact.getEmail ()));
-        }
-        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Contacts").setCtrl (aTable));
-      }
-      if (aEntity.hasAdditionalInformation ())
-      {
-        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Additional information")
-                                                      .setCtrl (HCExtHelper.nl2divList (aEntity.getAdditionalInformation ())));
-      }
-      if (aEntity.hasRegistrationDate ())
-      {
-        aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Registration date")
-                                                      .setCtrl (PDTToString.getAsString (aEntity.getRegistrationDate (),
-                                                                                         aDisplayLocale)));
-      }
+      aForm.addChild (showBusinessCardEntity (aEntity, nIndex, aDisplayLocale));
     }
 
     if (nIndex == 0)

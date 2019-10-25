@@ -12,6 +12,7 @@ package com.helger.phoss.smp.domain.businesscard;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
@@ -79,15 +80,17 @@ public class SMPBusinessCard implements ISMPBusinessCard
     return m_aEntities;
   }
 
-  /**
-   * @return A mutable list with all {@link SMPBusinessCardEntity} objects.
-   *         Never <code>null</code>.
-   */
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <SMPBusinessCardEntity> getAllEntities ()
   {
     return m_aEntities.getClone ();
+  }
+
+  @Nullable
+  public SMPBusinessCardEntity getEntityAtIndex (@Nonnegative final int nIndex)
+  {
+    return m_aEntities.getAtIndex (nIndex);
   }
 
   @Nonnegative

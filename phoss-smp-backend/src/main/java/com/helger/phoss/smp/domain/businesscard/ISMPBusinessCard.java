@@ -15,6 +15,7 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
 import com.helger.commons.annotation.Nonempty;
@@ -60,6 +61,16 @@ public interface ISMPBusinessCard extends IHasID <String>, Serializable
   @Nonnull
   @ReturnsMutableCopy
   ICommonsList <SMPBusinessCardEntity> getAllEntities ();
+
+  /**
+   * Get the business card entity at the specified index.
+   * 
+   * @param nIndex
+   *        The index to query. Should be &ge; 0.
+   * @return <code>null</code> if no such entity exists.
+   */
+  @Nullable
+  SMPBusinessCardEntity getEntityAtIndex (@Nonnegative int nIndex);
 
   /**
    * @return The number of contained entities. Always &ge; 0.

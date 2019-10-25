@@ -53,8 +53,12 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -404,6 +408,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                      @Nonnull final ISMPServiceGroup aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
     aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of service group '" +
                                                             aSelectedObject.getID () +
@@ -418,6 +423,23 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     if (aSelectedObject.extensions ().isNotEmpty ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
+
+    if (CSMP.ENABLE_ISSUE_56)
+    {
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Business Card Information"));
+
+      final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
+      final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfServiceGroup (aSelectedObject);
+      if (aBC != null)
+      {
+        int nIndex = 0;
+        for (final SMPBusinessCardEntity aEntity : aBC.getAllEntities ())
+        {
+          ++nIndex;
+          aForm.addChild (PageSecureBusinessCard.showBusinessCardEntity (aEntity, nIndex, aDisplayLocale));
+        }
+      }
+    }
 
     aNodeList.addChild (aForm);
   }
@@ -588,6 +610,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
     final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
     final boolean bShowExtensionDetails = SMPWebAppConfiguration.isServiceGroupsExtensionsShow ();
 
@@ -611,6 +634,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
+                                        CSMP.ENABLE_ISSUE_56 ? new DTCol ("Business Card Name") : null,
                                         new DTCol (new HCSpan ().addChild (bShowExtensionDetails ? "Ext" : "Ext?")
                                                                 .setTitle ("Is an Extension present?")),
                                         new DTCol (new HCSpan ().addChild ("Docs")
@@ -640,6 +664,20 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
       aRow.addCell (SMPCommonUI.getOwnerName (aCurObject.getOwnerID ()));
+      if (CSMP.ENABLE_ISSUE_56)
+      {
+        String sName = null;
+        final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfServiceGroup (aCurObject);
+        if (aBC != null)
+        {
+          final SMPBusinessCardEntity aEntity = aBC.getEntityAtIndex (0);
+          if (aEntity != null)
+            sName = aEntity.names ().getFirst ().getName ();
+        }
+        aRow.addCell (sName);
+      }
+      else
+        aRow.addCell ();
       if (bShowExtensionDetails)
       {
         if (aCurObject.extensions ().isNotEmpty ())
