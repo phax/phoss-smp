@@ -187,14 +187,14 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return Name of the Directory. Usually "PEPPOL Directory" but maybe "TOOP
+   * @return Name of the Directory. Usually "Peppol Directory" but maybe "TOOP
    *         Directory" as well.
    * @since 5.0.7
    */
   @Nonnull
   public static String getDirectoryName ()
   {
-    return getConfigFile ().getAsString ("webapp.directory.name", "PEPPOL Directory");
+    return getConfigFile ().getAsString ("webapp.directory.name", "Peppol Directory");
   }
 
   /**
