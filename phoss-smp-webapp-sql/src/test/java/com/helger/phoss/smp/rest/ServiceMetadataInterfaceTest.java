@@ -39,9 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
-import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.EndpointType;
 import com.helger.peppol.smp.ObjectFactory;
@@ -81,15 +79,12 @@ import com.helger.web.scope.mgr.WebScoped;
  *
  * @author Philip Helger
  */
-public final class ServiceMetadataInterfaceTest
+public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (ServiceMetadataInterfaceTest.class);
-  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials ("peppol_user",
-                                                                                                "Test1234");
 
   @Rule
-  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-sql.properties")
-                                                                                           .getAbsolutePath ());
+  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (PROPERTIES_FILE);
 
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
 
