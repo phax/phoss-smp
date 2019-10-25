@@ -33,6 +33,7 @@ import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
+import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCTextArea;
@@ -66,6 +67,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.user.ISMPUser;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
@@ -191,6 +193,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                           final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
                           final HCNodeList aNodeList = aWPEC.getNodeList ();
                           final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+                          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
                           aNodeList.addChild (getUIHandler ().createActionHeader ("Check DNS state of participants"));
 
@@ -213,7 +216,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             aNodeList.addChild (new BootstrapInfoBox ().addChild ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
                           }
 
-                          final String sSMLZoneName = SMPMetaManager.getSettings ().getSMLDNSZone ();
+                          final String sSMLZoneName = aSettings.getSMLDNSZone ();
                           final IPeppolURLProvider aURLProvider = SMPMetaManager.getPeppolURLProvider ();
 
                           final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
@@ -276,8 +279,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                               .add (CPageParam.PARAM_OBJECT,
                                                                                                                     aServiceGroup.getID ()))
                                                                                             .setDisabled (bOffline ||
-                                                                                                          !SMPMetaManager.getSettings ()
-                                                                                                                         .isSMLEnabled ()));
+                                                                                                          !aSettings.isSMLEnabled ()));
                             }
                             else
                             {
@@ -290,8 +292,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                               .add (CPageParam.PARAM_OBJECT,
                                                                                                                     aServiceGroup.getID ()))
                                                                                             .setDisabled (bOffline ||
-                                                                                                          !SMPMetaManager.getSettings ()
-                                                                                                                         .isSMLEnabled ()));
+                                                                                                          !aSettings.isSMLEnabled ()));
                             }
                           }
 
@@ -409,6 +410,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    final boolean bShowBusinessCard = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
 
     aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of service group '" +
                                                             aSelectedObject.getID () +
@@ -424,9 +427,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
 
-    if (CSMP.ENABLE_ISSUE_56)
+    if (bShowBusinessCard)
     {
-      aForm.addChild (getUIHandler ().createDataGroupHeader ("Business Card Information"));
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Business Card Details"));
 
       final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
       final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfServiceGroup (aSelectedObject);
@@ -611,30 +614,32 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
     final boolean bShowExtensionDetails = SMPWebAppConfiguration.isServiceGroupsExtensionsShow ();
+    final boolean bShowBusinessCardName = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
 
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    if (SMPMetaManager.getSettings ().isSMLRequired ())
+    if (aSettings.isSMLRequired ())
     {
       // Disable button if no SML URL is configured
       // Disable button if no service group is present
       aToolbar.addAndReturnButton ("Check DNS state",
                                    aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                    EDefaultIcon.MAGNIFIER)
-              .setDisabled (SMPMetaManager.getSettings ().getSMLDNSZone () == null ||
+              .setDisabled (aSettings.getSMLDNSZone () == null ||
                             aAllServiceGroups.isEmpty () ||
-                            !SMPMetaManager.getSettings ().isSMLEnabled ());
+                            !aSettings.isSMLEnabled ());
     }
     aNodeList.addChild (aToolbar);
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
-                                        CSMP.ENABLE_ISSUE_56 ? new DTCol ("Business Card Name") : null,
+                                        bShowBusinessCardName ? new DTCol ("Business Card Name") : null,
                                         new DTCol (new HCSpan ().addChild (bShowExtensionDetails ? "Ext" : "Ext?")
                                                                 .setTitle ("Is an Extension present?")),
                                         new DTCol (new HCSpan ().addChild ("Docs")
@@ -664,17 +669,17 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
       aRow.addCell (SMPCommonUI.getOwnerName (aCurObject.getOwnerID ()));
-      if (CSMP.ENABLE_ISSUE_56)
+      if (bShowBusinessCardName)
       {
-        String sName = null;
+        IHCNode aName = null;
         final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfServiceGroup (aCurObject);
         if (aBC != null)
         {
           final SMPBusinessCardEntity aEntity = aBC.getEntityAtIndex (0);
-          if (aEntity != null)
-            sName = aEntity.names ().getFirst ().getName ();
+          if (aEntity != null && aEntity.names ().isNotEmpty ())
+            aName = HCTextNode.createOnDemand (aEntity.names ().getFirst ().getName ());
         }
-        aRow.addCell (sName);
+        aRow.addCell (aName);
       }
       else
         aRow.addCell ();
