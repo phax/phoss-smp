@@ -216,8 +216,9 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 
         final BootstrapSuccessBox aBox = new BootstrapSuccessBox ();
         aBox.addChild (new HCDiv ().addChild (sMsg));
-        aBox.addChild (new HCDiv ().addChild ("Issuer: " + aMigrationPublicKey.getIssuerDN ().toString ()));
-        aBox.addChild (new HCDiv ().addChild ("Subject: " + aMigrationPublicKey.getSubjectDN ().toString ()));
+        aBox.addChild (new HCDiv ().addChild ("Issuer: " + aMigrationPublicKey.getIssuerX500Principal ().toString ()));
+        aBox.addChild (new HCDiv ().addChild ("Subject: " +
+                                              aMigrationPublicKey.getSubjectX500Principal ().toString ()));
         aBox.addChild (new HCDiv ().addChild ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
         aBox.addChild (new HCDiv ().addChild ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
         aNodeList.addChild (aBox);

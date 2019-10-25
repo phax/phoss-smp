@@ -143,8 +143,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     }
 
     final HCNodeList ret = new HCNodeList ();
-    ret.addChild (new HCDiv ().addChild ("Issuer: " + aEndpointCert.getIssuerDN ().toString ()));
-    ret.addChild (new HCDiv ().addChild ("Subject: " + aEndpointCert.getSubjectDN ().toString ()));
+    ret.addChild (new HCDiv ().addChild ("Issuer: " + aEndpointCert.getIssuerX500Principal ().toString ()));
+    ret.addChild (new HCDiv ().addChild ("Subject: " + aEndpointCert.getSubjectX500Principal ().toString ()));
     final LocalDate aNotBefore = PDTFactory.createLocalDate (aEndpointCert.getNotBefore ());
     ret.addChild (new HCDiv ().addChild ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
     final LocalDate aNotAfter = PDTFactory.createLocalDate (aEndpointCert.getNotAfter ());
