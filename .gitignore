@@ -16,7 +16,8 @@ target/
 .pmd
 *.iml
 .settings/ 
-.project 
-.classpath 
+.project
+.classpath
+.factorypath
 conf/
 db-*-smp.sql
