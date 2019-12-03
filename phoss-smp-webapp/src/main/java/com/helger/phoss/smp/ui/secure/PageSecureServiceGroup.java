@@ -681,8 +681,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         }
         aRow.addCell (aName);
       }
-      else
-        aRow.addCell ();
       if (bShowExtensionDetails)
       {
         if (aCurObject.extensions ().isNotEmpty ())
