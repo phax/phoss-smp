@@ -151,7 +151,7 @@ public final class SMPRendererPublic
   public static IHCNode createLogo (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
-    return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope, "/image/logo-gradient-223-50-transparent.png"))
+    return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope, "/image/phoss-smp-136-50.png"))
                        .addStyle (CCSSProperties.MARGIN.newValue ("-15px"))
                        .addStyle (CCSSProperties.VERTICAL_ALIGN.newValue (CCSSValue.TOP))
                        .addStyle (CCSSProperties.PADDING.newValue ("0 6px"));
@@ -161,8 +161,7 @@ public final class SMPRendererPublic
   public static IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
-    return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope,
-                                                         "/image/logo-gradient-446-100-transparent.png"));
+    return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope, "/image/phoss-smp-272-100.png"));
   }
 
   @Nonnull
