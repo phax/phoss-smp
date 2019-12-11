@@ -26,7 +26,7 @@ import com.helger.photon.security.usergroup.UserGroupManager;
 
 /**
  * SMP security initialization code.
- * 
+ *
  * @author Philip Helger
  */
 @Immutable
@@ -63,11 +63,12 @@ public final class SMPSecurity
                                      CSMP.ROLE_CONFIG_NAME,
                                      CSMP.ROLE_CONFIG_DESCRIPTION,
                                      CSMP.ROLE_CONFIG_CUSTOMATTRS);
-    if (!aRoleMgr.containsWithID (CSMP.ROLE_VIEW_ID))
-      aRoleMgr.createPredefinedRole (CSMP.ROLE_VIEW_ID,
-                                     CSMP.ROLE_VIEW_NAME,
-                                     CSMP.ROLE_VIEW_DESCRIPTION,
-                                     CSMP.ROLE_VIEW_CUSTOMATTRS);
+
+    if (!aRoleMgr.containsWithID (CSMP.ROLE_WRITABLERESTAPI_ID))
+      aRoleMgr.createPredefinedRole (CSMP.ROLE_WRITABLERESTAPI_ID,
+                                     CSMP.ROLE_WRITABLERESTAPI_NAME,
+                                     CSMP.ROLE_WRITABLERESTAPI_DESCRIPTION,
+                                     CSMP.ROLE_WRITABLERESTAPI_CUSTOMATTRS);
 
     // User group Administrators
     if (!aUserGroupMgr.containsWithID (CSMP.USERGROUP_ADMINISTRATORS_ID))
@@ -80,7 +81,7 @@ public final class SMPSecurity
       aUserGroupMgr.assignUserToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID, CSMP.USER_ADMINISTRATOR_ID);
     }
     aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID, CSMP.ROLE_CONFIG_ID);
-    aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID, CSMP.ROLE_VIEW_ID);
+    aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID, CSMP.ROLE_WRITABLERESTAPI_ID);
 
     // User group for Config users
     if (!aUserGroupMgr.containsWithID (CSMP.USERGROUP_CONFIG_ID))
@@ -90,13 +91,13 @@ public final class SMPSecurity
                                                CSMP.USERGROUP_CONFIG_CUSTOMATTRS);
     aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_CONFIG_ID, CSMP.ROLE_CONFIG_ID);
 
-    // User group for View users
-    if (!aUserGroupMgr.containsWithID (CSMP.USERGROUP_VIEW_ID))
-      aUserGroupMgr.createPredefinedUserGroup (CSMP.USERGROUP_VIEW_ID,
-                                               CSMP.USERGROUP_VIEW_NAME,
-                                               CSMP.USERGROUP_VIEW_DESCRIPTION,
-                                               CSMP.USERGROUP_VIEW_CUSTOMATTRS);
-    aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_VIEW_ID, CSMP.ROLE_VIEW_ID);
+    // User group for Writable REST API users
+    if (!aUserGroupMgr.containsWithID (CSMP.USERGROUP_WRITABLERESTAPI_ID))
+      aUserGroupMgr.createPredefinedUserGroup (CSMP.USERGROUP_WRITABLERESTAPI_ID,
+                                               CSMP.USERGROUP_WRITABLERESTAPI_NAME,
+                                               CSMP.USERGROUP_WRITABLERESTAPI_DESCRIPTION,
+                                               CSMP.USERGROUP_WRITABLERESTAPI_CUSTOMATTRS);
+    aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_WRITABLERESTAPI_ID, CSMP.ROLE_WRITABLERESTAPI_ID);
 
     // New login logs out old user
     LoggedInUserManager.getInstance ().setLogoutAlreadyLoggedInUser (true);

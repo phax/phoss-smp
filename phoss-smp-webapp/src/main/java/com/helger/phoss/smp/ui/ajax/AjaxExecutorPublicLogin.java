@@ -59,7 +59,7 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor
     final ELoginResult eLoginResult = LoggedInUserManager.getInstance ()
                                                          .loginUser (sLoginName,
                                                                      sPassword,
-                                                                     CSMP.REQUIRED_ROLE_IDS_VIEW);
+                                                                     CSMP.REQUIRED_ROLE_IDS_WRITABLERESTAPI);
     if (eLoginResult.isSuccess ())
     {
       aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, true));

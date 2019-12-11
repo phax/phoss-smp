@@ -48,29 +48,32 @@ public final class CSMP
   public static final String ROLE_CONFIG_NAME = "Config user";
   public static final String ROLE_CONFIG_DESCRIPTION = null;
   public static final ICommonsMap <String, String> ROLE_CONFIG_CUSTOMATTRS = null;
-  public static final String ROLE_VIEW_ID = "view";
-  public static final String ROLE_VIEW_NAME = "View user";
-  public static final String ROLE_VIEW_DESCRIPTION = null;
-  public static final ICommonsMap <String, String> ROLE_VIEW_CUSTOMATTRS = null;
+
+  public static final String ROLE_WRITABLERESTAPI_ID = "writablerestapi";
+  public static final String ROLE_WRITABLERESTAPI_NAME = "Writable REST API access";
+  public static final String ROLE_WRITABLERESTAPI_DESCRIPTION = null;
+  public static final ICommonsMap <String, String> ROLE_WRITABLERESTAPI_CUSTOMATTRS = null;
 
   @CodingStyleguideUnaware
   public static final List <String> REQUIRED_ROLE_IDS_CONFIG = new CommonsArrayList <> (ROLE_CONFIG_ID).getAsUnmodifiable ();
   @CodingStyleguideUnaware
-  public static final List <String> REQUIRED_ROLE_IDS_VIEW = new CommonsArrayList <> (ROLE_VIEW_ID).getAsUnmodifiable ();
+  public static final List <String> REQUIRED_ROLE_IDS_WRITABLERESTAPI = new CommonsArrayList <> (ROLE_WRITABLERESTAPI_ID).getAsUnmodifiable ();
 
   // User groups
   public static final String USERGROUP_ADMINISTRATORS_ID = CSecurity.USERGROUP_ADMINISTRATORS_ID;
   public static final String USERGROUP_ADMINISTRATORS_NAME = CSecurity.USERGROUP_ADMINISTRATORS_NAME;
   public static final String USERGROUP_ADMINISTRATORS_DESCRIPTION = null;
   public static final ICommonsMap <String, String> USERGROUP_ADMINISTRATORS_CUSTOMATTRS = null;
+
   public static final String USERGROUP_CONFIG_ID = "ugconfig";
   public static final String USERGROUP_CONFIG_NAME = "Config user";
   public static final String USERGROUP_CONFIG_DESCRIPTION = null;
   public static final ICommonsMap <String, String> USERGROUP_CONFIG_CUSTOMATTRS = null;
-  public static final String USERGROUP_VIEW_ID = "ugview";
-  public static final String USERGROUP_VIEW_NAME = "View user";
-  public static final String USERGROUP_VIEW_DESCRIPTION = null;
-  public static final ICommonsMap <String, String> USERGROUP_VIEW_CUSTOMATTRS = null;
+
+  public static final String USERGROUP_WRITABLERESTAPI_ID = "ugwritablerestapi";
+  public static final String USERGROUP_WRITABLERESTAPI_NAME = "Writable REST API users";
+  public static final String USERGROUP_WRITABLERESTAPI_DESCRIPTION = null;
+  public static final ICommonsMap <String, String> USERGROUP_WRITABLERESTAPI_CUSTOMATTRS = null;
 
   // User ID
   public static final String USER_ADMINISTRATOR_ID = CSecurity.USER_ADMINISTRATOR_ID;
