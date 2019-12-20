@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.mime.CMimeType;
+import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.state.EContinue;
 import com.helger.photon.api.APIDescriptor;
 import com.helger.photon.api.APIPath;
@@ -48,7 +49,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
   public static final String PARAM_USER_ID = "UserId";
   public static final String PARAM_DOCUMENT_TYPE_ID = "DocumentTypeId";
   static final String LOG_PREFIX = "[REST API] ";
-  private static final String PATH_PREFIX_OASIS_BDXR_SMP_2 = "/bdxr-smp-2";
+  private static final String PATH_PREFIX_OASIS_BDXR_SMP_2 = "bdxr-smp-2";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (Rest2Filter.class);
 
@@ -164,8 +165,8 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
   {
     final APIPath aAPIPath = APIPath.createForFilter (aRequestScope);
 
-    if (aAPIPath.getPath ()
-                .matches ("^/(stream|public|secure|ajax|resbundle|smp-status|error|logout|favicon.ico|robots.txt)(/.*)?$"))
+    if (RegExHelper.stringMatchesPattern (aAPIPath.getPath (),
+                                          "^/(stream|public|secure|ajax|resbundle|smp-status|error|logout|favicon.ico|robots.txt)(/.*)?$"))
     {
       // Explicitly other servlet
       if (LOGGER.isDebugEnabled ())
