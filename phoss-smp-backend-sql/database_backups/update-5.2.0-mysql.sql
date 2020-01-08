@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2015-2019 Philip Helger and contributors
+-- Copyright (C) 2015-2020 Philip Helger and contributors
 -- philip[at]helger[dot]com
 --
 -- The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
