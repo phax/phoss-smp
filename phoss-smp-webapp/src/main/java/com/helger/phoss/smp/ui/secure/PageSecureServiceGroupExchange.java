@@ -222,7 +222,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     final ICommonsList <ISMPBusinessCard> aDeleteBusinessCards = new CommonsArrayList <> ();
     if (aSettings.isDirectoryIntegrationEnabled ())
     {
-      // Read them only if the PEPPOL Directory integration is enabled
+      // Read them only if the Peppol Directory integration is enabled
       int nBCIndex = 0;
       for (final IMicroElement eBusinessCard : eRoot.getAllChildElements (CSMPExchange.ELEMENT_BUSINESSCARD))
       {

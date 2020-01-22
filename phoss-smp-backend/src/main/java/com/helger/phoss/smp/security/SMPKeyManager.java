@@ -2,7 +2,7 @@
  * Copyright (C) 2015-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -228,7 +228,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                  (String) null);
 
     // Create the SignedInfo.
-    // should be EXCLUSIVE for PEPPOL and INCLUSIVE for BDXR
+    // should be EXCLUSIVE for Peppol and INCLUSIVE for BDXR
     // CIPA and this server always used INCLUSIVE, but this was changed for
     // 5.0.1 to EXCLUSIVE
     final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (bBDXR ? CanonicalizationMethod.INCLUSIVE

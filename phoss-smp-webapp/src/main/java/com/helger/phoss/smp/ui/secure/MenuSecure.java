@@ -39,7 +39,7 @@ public final class MenuSecure
   public static void init (@Nonnull final IMenuTree aMenuTree)
   {
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID);
-    final IMenuObjectFilter aFilterPEPPOLDirectory = x -> SMPMetaManager.getSettings ()
+    final IMenuObjectFilter aFilterPeppolDirectory = x -> SMPMetaManager.getSettings ()
                                                                         .isDirectoryIntegrationEnabled () &&
                                                           SMPMetaManager.hasBusinessCardMgr ();
     final IMenuObjectFilter aFilterSMLConnectionActive = x -> SMPMetaManager.getSettings ().isSMLEnabled ();
@@ -65,7 +65,7 @@ public final class MenuSecure
     }
     aMenuTree.createRootItem (new PageSecureRedirect (CMenuSecure.MENU_REDIRECTS));
     aMenuTree.createRootItem (new PageSecureBusinessCard (CMenuSecure.MENU_BUSINESS_CARDS))
-             .setDisplayFilter (aFilterPEPPOLDirectory);
+             .setDisplayFilter (aFilterPeppolDirectory);
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
     aMenuTree.createRootItem (new PageSecureTasks (CMenuSecure.MENU_TASKS));
     aMenuTree.createRootSeparator ();

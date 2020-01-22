@@ -21,7 +21,7 @@ import java.io.IOException;
 import com.helger.photon.jetty.JettyStopper;
 
 /**
- * @author PEPPOL.AT, BRZ, Philip Helger
+ * @author Philip Helger
  */
 public final class JettyStopSMPSERVER_XML
 {

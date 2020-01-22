@@ -2,7 +2,7 @@
  * Copyright (C) 2015-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,7 +19,7 @@ import com.helger.commons.lang.EnumHelper;
 import com.helger.commons.name.IHasDisplayName;
 
 /**
- * Defines the type of REST responses to be returned. Either PEPPOL (using
+ * Defines the type of REST responses to be returned. Either Peppol (using
  * objects in namespace http://busdox.org/serviceMetadata/publishing/1.0/) or
  * BDXR (using objects in namespace
  * http://docs.oasis-open.org/bdxr/ns/SMP/2016/05)
@@ -28,7 +28,7 @@ import com.helger.commons.name.IHasDisplayName;
  */
 public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
 {
-  PEPPOL ("peppol", "PEPPOL"),
+  PEPPOL ("peppol", "Peppol"),
   BDXR ("bdxr", "OASIS BDXR");
 
   private final String m_sID;

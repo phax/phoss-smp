@@ -154,16 +154,16 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final String sSMLInfoID = aWPEC.params ().getAsString (FIELD_SML_INFO);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLInfoID);
 
-    final boolean bPEPPOLDirectoryIntegrationEnabled = aWPEC.params ()
+    final boolean bPeppolDirectoryIntegrationEnabled = aWPEC.params ()
                                                             .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_ENABLED,
                                                                                 SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
-    final boolean bPEPPOLDirectoryIntegrationRequired = aWPEC.params ()
+    final boolean bPeppolDirectoryIntegrationRequired = aWPEC.params ()
                                                              .isCheckBoxChecked (FIELD_SML_DIRECTORY_INTEGRATION_REQUIRED,
                                                                                  SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED);
-    final boolean bPEPPOLDirectoryIntegrationAutoUpdate = aWPEC.params ()
+    final boolean bPeppolDirectoryIntegrationAutoUpdate = aWPEC.params ()
                                                                .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                                                                    SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE);
-    final String sPEPPOLDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_DIRECTORY_HOSTNAME);
+    final String sPeppolDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_DIRECTORY_HOSTNAME);
 
     if (bSMLActive && !SMPKeyManager.isCertificateValid ())
       aFormErrors.addFieldError (FIELD_SML_ACTIVE,
@@ -175,9 +175,9 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
         aFormErrors.addFieldError (FIELD_SML_INFO, "An SML configuration must be selected if SML is active.");
     }
 
-    if (StringHelper.hasNoText (sPEPPOLDirectoryHostName))
+    if (StringHelper.hasNoText (sPeppolDirectoryHostName))
     {
-      if (bPEPPOLDirectoryIntegrationEnabled)
+      if (bPeppolDirectoryIntegrationEnabled)
         aFormErrors.addFieldError (FIELD_SMP_DIRECTORY_HOSTNAME,
                                    sDirectoryName +
                                                                  " hostname may not be empty if " +
@@ -185,17 +185,17 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                  " intergration is enabled.");
     }
     else
-      if (!URLValidator.isValid (sPEPPOLDirectoryHostName))
+      if (!URLValidator.isValid (sPeppolDirectoryHostName))
         aFormErrors.addFieldError (FIELD_SMP_DIRECTORY_HOSTNAME, sDirectoryName + " hostname must be a valid URL.");
 
     if (aFormErrors.isEmpty ())
     {
       SMPMetaManager.getSettingsMgr ()
                     .updateSettings (bRESTWritableAPIDisabled,
-                                     bPEPPOLDirectoryIntegrationEnabled,
-                                     bPEPPOLDirectoryIntegrationRequired,
-                                     bPEPPOLDirectoryIntegrationAutoUpdate,
-                                     sPEPPOLDirectoryHostName,
+                                     bPeppolDirectoryIntegrationEnabled,
+                                     bPeppolDirectoryIntegrationRequired,
+                                     bPeppolDirectoryIntegrationAutoUpdate,
+                                     sPeppolDirectoryHostName,
                                      bSMLActive,
                                      bSMLRequired,
                                      aSMLInfo);

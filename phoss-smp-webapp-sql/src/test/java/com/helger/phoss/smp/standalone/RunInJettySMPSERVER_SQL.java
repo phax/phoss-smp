@@ -27,7 +27,7 @@ import com.helger.photon.jetty.JettyStarter;
  * application in this package. It performs a graceful shutdown of the App
  * Server.
  *
- * @author PEPPOL.AT, BRZ, Philip Helger
+ * @author Philip Helger
  */
 public final class RunInJettySMPSERVER_SQL
 {

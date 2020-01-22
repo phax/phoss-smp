@@ -23,11 +23,11 @@ import com.helger.photon.jetty.JettyStarter;
  * Run this as an application and your SMP will be up and running on port 90 (to
  * not interfere with anything already running on port 80) of your local
  * machine. Please ensure that you have adopted the DB configuration file.<br>
- * To stop the running Jetty simply invoke the {@link JettyStopSMPSERVER_MONGODB}
- * application in this package. It performs a graceful shutdown of the App
- * Server.
+ * To stop the running Jetty simply invoke the
+ * {@link JettyStopSMPSERVER_MONGODB} application in this package. It performs a
+ * graceful shutdown of the App Server.
  *
- * @author PEPPOL.AT, BRZ, Philip Helger
+ * @author Philip Helger
  */
 public final class RunInJettySMPSERVER_MONGODB
 {
@@ -35,8 +35,8 @@ public final class RunInJettySMPSERVER_MONGODB
   {
     SMPServerConfiguration.getConfigFile ().applyAllNetworkSystemProperties ();
     new JettyStarter (RunInJettySMPSERVER_MONGODB.class).setPort (90)
-                                                    .setStopPort (8078)
-                                                    .setSessionCookieName ("SMPSESSION")
-                                                    .run ();
+                                                        .setStopPort (8078)
+                                                        .setSessionCookieName ("SMPSESSION")
+                                                        .run ();
   }
 }

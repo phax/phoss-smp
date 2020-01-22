@@ -27,7 +27,7 @@ import com.helger.scope.IScope;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 
 /**
- * A singleton that keeps track of the {@link PDClient} creation (PEPPOL
+ * A singleton that keeps track of the {@link PDClient} creation (Peppol
  * Directory client). It avoid instantiating the object too often and ensures
  * the object is correctly closed upon shutdown.
  *

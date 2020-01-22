@@ -2,7 +2,7 @@
  * Copyright (C) 2015-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -35,10 +35,10 @@ final class MockSMPSettingsManager implements ISMPSettingsManager
 
   @UnsupportedOperation
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
-                                 final boolean bPEPPOLDirectoryIntegrationEnabled,
-                                 final boolean bPEPPOLDirectoryIntegrationRequired,
-                                 final boolean bPEPPOLDirectoryIntegrationAutoUpdate,
-                                 @Nullable final String sPEPPOLDirectoryHostName,
+                                 final boolean bPeppolDirectoryIntegrationEnabled,
+                                 final boolean bPeppolDirectoryIntegrationRequired,
+                                 final boolean bPeppolDirectoryIntegrationAutoUpdate,
+                                 @Nullable final String sPeppolDirectoryHostName,
                                  final boolean bSMLActive,
                                  final boolean bSMLRequired,
                                  @Nullable final ISMLInfo aSMLInfo)

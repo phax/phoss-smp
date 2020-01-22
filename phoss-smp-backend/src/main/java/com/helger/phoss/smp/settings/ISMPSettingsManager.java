@@ -2,7 +2,7 @@
  * Copyright (C) 2015-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -43,15 +43,15 @@ public interface ISMPSettingsManager
    *
    * @param bRESTWritableAPIDisabled
    *        <code>true</code> to enable writable access by REST services
-   * @param bPEPPOLDirectoryIntegrationEnabled
-   *        <code>true</code> to enable PEPPOL Directory integration
-   * @param bPEPPOLDirectoryIntegrationRequired
+   * @param bPeppolDirectoryIntegrationEnabled
+   *        <code>true</code> to enable Peppol Directory integration
+   * @param bPeppolDirectoryIntegrationRequired
    *        <code>true</code> to warn if Directory is disabled
-   * @param bPEPPOLDirectoryIntegrationAutoUpdate
-   *        <code>true</code> to automatically update the PEPPOL Directory if a
+   * @param bPeppolDirectoryIntegrationAutoUpdate
+   *        <code>true</code> to automatically update the Peppol Directory if a
    *        business card changes
-   * @param sPEPPOLDirectoryHostName
-   *        The hostname of the PEPPOL Directory server to use. Must be fully
+   * @param sPeppolDirectoryHostName
+   *        The hostname of the Peppol Directory server to use. Must be fully
    *        qualified including the protocol.
    * @param bSMLActive
    *        <code>true</code> to enable write access to the SML
@@ -63,10 +63,10 @@ public interface ISMPSettingsManager
    */
   @Nonnull
   EChange updateSettings (boolean bRESTWritableAPIDisabled,
-                          boolean bPEPPOLDirectoryIntegrationEnabled,
-                          boolean bPEPPOLDirectoryIntegrationRequired,
-                          boolean bPEPPOLDirectoryIntegrationAutoUpdate,
-                          @Nullable String sPEPPOLDirectoryHostName,
+                          boolean bPeppolDirectoryIntegrationEnabled,
+                          boolean bPeppolDirectoryIntegrationRequired,
+                          boolean bPeppolDirectoryIntegrationAutoUpdate,
+                          @Nullable String sPeppolDirectoryHostName,
                           boolean bSMLActive,
                           boolean bSMLRequired,
                           @Nullable ISMLInfo aSMLInfo);

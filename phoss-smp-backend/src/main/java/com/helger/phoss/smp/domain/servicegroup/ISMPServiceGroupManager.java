@@ -2,7 +2,7 @@
  * Copyright (C) 2015-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -50,7 +50,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *        The underlying participant identifier. May not be <code>null</code>.
    * @param sExtension
    *        The optional extension element that must be either a well-formed XML
-   *        string (for PEPPOL SMP) or a valid JSON string (for BDXR SMP).
+   *        string (for Peppol SMP) or a valid JSON string (for BDXR SMP).
    * @return The created service group object. Never <code>null</code>.
    * @throws SMPServerException
    *         In case of error
@@ -123,7 +123,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   /**
    * Delete the service group, and swallow all exceptions. This is only
    * recommended for unit tests.
-   * 
+   *
    * @param aParticipantIdentifier
    *        The participant identifier to be deleted. May not be
    *        <code>null</code>.

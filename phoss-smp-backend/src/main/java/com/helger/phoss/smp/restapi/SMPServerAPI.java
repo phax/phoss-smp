@@ -2,7 +2,7 @@
  * Copyright (C) 2015-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -64,7 +64,7 @@ import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 
 /**
  * This class implements all the service methods, that must be provided by the
- * PEPPOL REST service.
+ * Peppol REST service.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
@@ -580,7 +580,7 @@ public final class SMPServerAPI
       {
         // Handle redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-        // not available in PEPPOL mode
+        // not available in Peppol mode
         final X509Certificate aCertificate = null;
         if (aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
                                                     aDocTypeID,

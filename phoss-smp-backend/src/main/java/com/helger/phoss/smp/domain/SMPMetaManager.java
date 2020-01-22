@@ -2,7 +2,7 @@
  * Copyright (C) 2015-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -167,7 +167,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
       m_aPeppolURLProvider = s_aManagerProvider.createPeppolURLProvider ();
       if (m_aPeppolURLProvider == null)
-        throw new IllegalStateException ("Failed to create PEPPOL URL Provider!");
+        throw new IllegalStateException ("Failed to create Peppol URL Provider!");
 
       m_aSMLInfoMgr = s_aManagerProvider.createSMLInfoMgr ();
       if (m_aSMLInfoMgr == null)

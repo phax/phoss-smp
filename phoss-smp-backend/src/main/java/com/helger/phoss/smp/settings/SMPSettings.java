@@ -2,7 +2,7 @@
  * Copyright (C) 2015-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -87,10 +87,10 @@ public class SMPSettings implements ISMPSettings
   }
 
   @Nonnull
-  public EChange setDirectoryIntegrationRequired (final boolean bPEPPOLDirectoryIntegrationRequired)
+  public EChange setDirectoryIntegrationRequired (final boolean bPeppolDirectoryIntegrationRequired)
   {
     return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,
-                              bPEPPOLDirectoryIntegrationRequired);
+                              bPeppolDirectoryIntegrationRequired);
   }
 
   public boolean isDirectoryIntegrationEnabled ()
@@ -100,10 +100,10 @@ public class SMPSettings implements ISMPSettings
   }
 
   @Nonnull
-  public EChange setDirectoryIntegrationEnabled (final boolean bPEPPOLDirectoryIntegrationEnabled)
+  public EChange setDirectoryIntegrationEnabled (final boolean bPeppolDirectoryIntegrationEnabled)
   {
     return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_ENABLED,
-                              bPEPPOLDirectoryIntegrationEnabled);
+                              bPeppolDirectoryIntegrationEnabled);
   }
 
   public boolean isDirectoryIntegrationAutoUpdate ()
@@ -113,10 +113,10 @@ public class SMPSettings implements ISMPSettings
   }
 
   @Nonnull
-  public EChange setDirectoryIntegrationAutoUpdate (final boolean bPEPPOLDirectoryIntegrationAutoUpdate)
+  public EChange setDirectoryIntegrationAutoUpdate (final boolean bPeppolDirectoryIntegrationAutoUpdate)
   {
     return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                              bPEPPOLDirectoryIntegrationAutoUpdate);
+                              bPeppolDirectoryIntegrationAutoUpdate);
   }
 
   @Nonnull

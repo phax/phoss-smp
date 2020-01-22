@@ -74,17 +74,17 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
   private enum EPredefinedCert
   {
     // PEPPOL PKI v2
-    PEPPOL_PILOT_V2 ("PEPPOL pilot v2",
+    PEPPOL_PILOT_V2 ("Peppol pilot v2",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK",
                      3),
-    PEPPOL_PRODUCTION_V2 ("PEPPOL production v2",
+    PEPPOL_PRODUCTION_V2 ("Peppol production v2",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK",
                           3),
     // PEPPOL PKI v3
-    PEPPOL_PILOT_V3 ("PEPPOL pilot v3",
+    PEPPOL_PILOT_V3 ("Peppol pilot v3",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
                      3),
-    PEPPOL_PRODUCTION_V3 ("PEPPOL production v3",
+    PEPPOL_PRODUCTION_V3 ("Peppol production v3",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
                           3),
     // TOOP Pilot PKI
@@ -313,7 +313,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       aTabBox.addTab ("truststore", "Truststore", aTab);
     }
 
-    // PEPPOL Directory client certificate
+    // Peppol Directory client certificate
     if (SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
     {
       final HCNodeList aTab = new HCNodeList ();

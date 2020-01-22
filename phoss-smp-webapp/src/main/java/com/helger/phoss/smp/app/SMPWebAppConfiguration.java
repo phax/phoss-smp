@@ -68,8 +68,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
 
     s_aConfigFile = aCFB.build ();
     if (!s_aConfigFile.isRead ())
-      throw new IllegalStateException ("Failed to read PEPPOL SMP UI properties from " + aCFB.getAllPaths ());
-    LOGGER.info ("Read PEPPOL SMP UI properties from " + s_aConfigFile.getReadResource ().getPath ());
+      throw new IllegalStateException ("Failed to read Peppol SMP UI properties from " + aCFB.getAllPaths ());
+    LOGGER.info ("Read Peppol SMP UI properties from " + s_aConfigFile.getReadResource ().getPath ());
   }
 
   @Deprecated

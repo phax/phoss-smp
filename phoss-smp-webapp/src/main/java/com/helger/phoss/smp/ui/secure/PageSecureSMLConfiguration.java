@@ -199,7 +199,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_CLIENT_CERTIFICATE_REQUIRED,
                                                                                                     aSelectedObject != null ? aSelectedObject.isClientCertificateRequired ()
                                                                                                                             : true)))
-                                                 .setHelpText ("Check this if this SML requires a client certificate for access. Both PEPPOL production SML and SMK require a client certificate. Only a locally running SML software may not require a client certificate.")
+                                                 .setHelpText ("Check this if this SML requires a client certificate for access. Both Peppol production SML and SMK require a client certificate. Only a locally running SML software may not require a client certificate.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CLIENT_CERTIFICATE_REQUIRED)));
 
   }

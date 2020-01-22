@@ -2,7 +2,7 @@
  * Copyright (C) 2015-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The PEPPOL project (http://www.peppol.eu)
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -44,7 +44,7 @@ public interface ISMLInfoManager
    * @param bClientCertificateRequired
    *        <code>true</code> if this SML requires a client certificate for
    *        access, <code>false</code> otherwise.<br>
-   *        Both PEPPOL production SML and SMK require a client certificate.
+   *        Both Peppol production SML and SMK require a client certificate.
    *        Only a locally running SML software may not require a client
    *        certificate.
    * @return Never <code>null</code>.
@@ -76,7 +76,7 @@ public interface ISMLInfoManager
    * @param bClientCertificateRequired
    *        <code>true</code> if this SML requires a client certificate for
    *        access, <code>false</code> otherwise.<br>
-   *        Both PEPPOL production SML and SMK require a client certificate.
+   *        Both Peppol production SML and SMK require a client certificate.
    *        Only a locally running SML software may not require a client
    *        certificate.
    * @return {@link EChange#CHANGED} if something was changed.
