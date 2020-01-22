@@ -137,6 +137,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 
   private static final String ACTION_RELOAD_KEYSTORE = "reloadkeystore";
   private static final String ACTION_RELOAD_TRUSTSTORE = "reloadtruststore";
+  private static final String ACTION_RELOAD_DIRECTORY_CONFIGURATION = "reloadpdconfig";
 
   public PageSecureCertificateInformation (@Nonnull @Nonempty final String sID)
   {
@@ -150,6 +151,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ZonedDateTime aNowZDT = PDTFactory.getCurrentZonedDateTime ();
     final LocalDateTime aNowLDT = aNowZDT.toLocalDateTime ();
+    final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 
     if (aWPEC.hasAction (ACTION_RELOAD_KEYSTORE))
     {
@@ -166,7 +168,16 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                          DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
                                                                          ". The changes are reflected below."));
       }
-    // TODO in phoss-directory 0.8.1 add PD Client Configuration reload
+      else
+        if (aWPEC.hasAction (ACTION_RELOAD_DIRECTORY_CONFIGURATION))
+        {
+          PDClientConfiguration.reloadConfiguration ();
+          aWPEC.postRedirectGetInternal (new BootstrapInfoBox ().addChild ("The " +
+                                                                           sDirectoryName +
+                                                                           " configuration was reloaded at " +
+                                                                           DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
+                                                                           ". The changes are reflected below."));
+        }
 
     {
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
@@ -180,6 +191,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                .setOnClick (aWPEC.getSelfHref ()
                                                                  .add (CPageParam.PARAM_ACTION,
                                                                        ACTION_RELOAD_TRUSTSTORE)));
+      aToolbar.addChild (new BootstrapButton ().addChild ("Reload " + sDirectoryName + " configuration")
+                                               .setIcon (EDefaultIcon.REFRESH)
+                                               .setOnClick (aWPEC.getSelfHref ()
+                                                                 .add (CPageParam.PARAM_ACTION,
+                                                                       ACTION_RELOAD_DIRECTORY_CONFIGURATION)));
       aNodeList.addChild (aToolbar);
     }
 
@@ -379,7 +395,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           aTab.addChild (aUL);
         }
       }
-      aTabBox.addTab ("pdkeystore", SMPWebAppConfiguration.getDirectoryName () + " Keystore", aTab);
+      aTabBox.addTab ("pdkeystore", sDirectoryName + " Keystore", aTab);
     }
   }
 }
