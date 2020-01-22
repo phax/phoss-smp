@@ -125,7 +125,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>7.0.5</version>
+        <version>7.0.6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -181,7 +181,7 @@
       <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
-        <version>3.12.0</version>
+        <version>3.12.1</version>
       </dependency>
 
       <dependency>
