@@ -173,6 +173,7 @@ public final class SMPCommonUI
   }
 
   // Based on PeriodFuncTest code
+  // TODO use PDTDisplayHelper in ph-datetime 9.3.10
   @Nonnull
   @Nonempty
   private static String _getPeriodText (@Nonnull final LocalDateTime aNowLDT, @Nonnull final LocalDateTime aNotAfter)
