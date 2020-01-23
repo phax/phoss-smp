@@ -245,7 +245,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             // else: we don't care
           }
 
-          final HCOL aUL = new HCOL ();
+          final HCOL aOL = new HCOL ();
           for (final Certificate aCert : aChain)
           {
             if (aCert instanceof X509Certificate)
@@ -254,13 +254,13 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert,
                                                                                              aNowLDT,
                                                                                              aDisplayLocale);
-              aUL.addItem (aCertDetails.setResponsive (true));
+              aOL.addItem (aCertDetails.setResponsive (true));
             }
             else
-              aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
+              aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
                            ClassHelper.getClassName (aCert));
           }
-          aTab.addChild (aUL);
+          aTab.addChild (aOL);
         }
       }
       aTabBox.addTab ("keystore", "Keystore", aTab);
@@ -275,7 +275,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       }
       else
       {
-        // Successfully loaded private key
+        // Successfully loaded trust store
         final SMPTrustManager aTrustMgr = SMPTrustManager.getInstance ();
         final KeyStore aTrustStore = aTrustMgr.getTrustStore ();
 
@@ -284,7 +284,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                                    SMPServerConfiguration.getTrustStorePath () +
                                                                                    "' and was successfully loaded.")));
 
-        final HCOL aUL = new HCOL ();
+        final HCOL aOL = new HCOL ();
         try
         {
           for (final String sAlias : CollectionHelper.newList (aTrustStore.aliases ()))
@@ -296,19 +296,19 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert,
                                                                                              aNowLDT,
                                                                                              aDisplayLocale);
-              aUL.addItem (aCertDetails.setResponsive (true));
+              aOL.addItem (aCertDetails.setResponsive (true));
             }
             else
-              aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
+              aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
                            ClassHelper.getClassName (aCert));
           }
         }
         catch (final GeneralSecurityException ex)
         {
-          aUL.addItem (new BootstrapErrorBox ().addChild ("Error iterating trust store.")
+          aOL.addItem (new BootstrapErrorBox ().addChild ("Error iterating trust store.")
                                                .addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         }
-        aTab.addChild (aUL);
+        aTab.addChild (aOL);
       }
       aTabBox.addTab ("truststore", "Truststore", aTab);
     }
