@@ -67,12 +67,12 @@ import com.helger.photon.uictrls.datatables.column.DTCol;
  *
  * @author Philip Helger
  */
-public class PageSecureUser extends AbstractSMPWebPageForm <ISMPUserEditable>
+public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
 {
   private static final String FIELD_USERNAME = "username";
   private static final String FIELD_PASSWORD = "password";
 
-  public PageSecureUser (@Nonnull @Nonempty final String sID)
+  public PageSecureDBUsers (@Nonnull @Nonempty final String sID)
   {
     super (sID, "DB users");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPUserEditable, WebPageExecutionContext> ()

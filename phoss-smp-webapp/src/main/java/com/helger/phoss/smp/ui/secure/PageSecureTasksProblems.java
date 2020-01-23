@@ -74,9 +74,9 @@ import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKeyStore;
 
-public class PageSecureTasks extends AbstractSMPWebPage
+public class PageSecureTasksProblems extends AbstractSMPWebPage
 {
-  public PageSecureTasks (@Nonnull @Nonempty final String sID)
+  public PageSecureTasksProblems (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Tasks/problems");
   }

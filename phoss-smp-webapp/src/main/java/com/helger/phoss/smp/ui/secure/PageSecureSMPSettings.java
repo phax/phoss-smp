@@ -65,7 +65,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
 
   public PageSecureSMPSettings (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "SMP Settings");
+    super (sID, "SMP settings");
   }
 
   @Override

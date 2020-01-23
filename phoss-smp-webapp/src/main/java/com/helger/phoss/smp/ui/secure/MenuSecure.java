@@ -49,7 +49,7 @@ public final class MenuSecure
     if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
     {
       // E.g. SQL version requires separate menu item
-      aMenuTree.createRootItem (new PageSecureUser (CMenuSecure.MENU_USERS));
+      aMenuTree.createRootItem (new PageSecureDBUsers (CMenuSecure.MENU_USERS));
     }
 
     {
@@ -67,7 +67,7 @@ public final class MenuSecure
     aMenuTree.createRootItem (new PageSecureBusinessCard (CMenuSecure.MENU_BUSINESS_CARDS))
              .setDisplayFilter (aFilterPeppolDirectory);
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
-    aMenuTree.createRootItem (new PageSecureTasks (CMenuSecure.MENU_TASKS));
+    aMenuTree.createRootItem (new PageSecureTasksProblems (CMenuSecure.MENU_TASKS));
     aMenuTree.createRootSeparator ();
 
     // Administrator
@@ -89,7 +89,7 @@ public final class MenuSecure
                  .setDisplayFilter (aFilterSMLConnectionActive);
       }
       aMenuTree.createItem (aAdmin, new PageSecureSMPSettings (CMenuSecure.MENU_SMP_SETTINGS));
-      aMenuTree.createItem (aAdmin, new PageSecureTransportProfile (CMenuSecure.MENU_TRANSPORT_PROFILES));
+      aMenuTree.createItem (aAdmin, new PageSecureTransportProfiles (CMenuSecure.MENU_TRANSPORT_PROFILES));
       aMenuTree.createItem (aAdmin,
                             new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CSMP.DEFAULT_LOCALE);

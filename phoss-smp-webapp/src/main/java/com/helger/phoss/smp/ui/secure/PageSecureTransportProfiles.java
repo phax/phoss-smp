@@ -70,7 +70,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 
-public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTransportProfile>
+public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTransportProfile>
 {
   private static final String FIELD_ID = "id";
   private static final String FIELD_NAME = "name";
@@ -86,7 +86,7 @@ public class PageSecureTransportProfile extends AbstractSMPWebPageForm <ISMPTran
     DEFAULT_PROFILE_IDS = new CommonsHashSet <> (DEFAULT_PROFILES, ESMPTransportProfile::getID);
   }
 
-  public PageSecureTransportProfile (@Nonnull @Nonempty final String sID)
+  public PageSecureTransportProfiles (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Transport profiles");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPTransportProfile, WebPageExecutionContext> ()
