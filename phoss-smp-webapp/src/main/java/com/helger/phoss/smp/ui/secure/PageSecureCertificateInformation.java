@@ -204,7 +204,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     // key store
     {
       final HCNodeList aTab = new HCNodeList ();
-      if (!SMPKeyManager.isCertificateValid ())
+      if (!SMPKeyManager.isKeyStoreValid ())
       {
         aTab.addChild (new BootstrapErrorBox ().addChild (SMPKeyManager.getInitializationError ()));
       }
@@ -269,7 +269,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     // Trust store
     {
       final HCNodeList aTab = new HCNodeList ();
-      if (!SMPTrustManager.isCertificateValid ())
+      if (!SMPTrustManager.isTrustStoreValid ())
       {
         aTab.addChild (new BootstrapWarnBox ().addChild (SMPTrustManager.getInitializationError ()));
       }

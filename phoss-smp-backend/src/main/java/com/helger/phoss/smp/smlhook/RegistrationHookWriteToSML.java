@@ -74,7 +74,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     if (sLowerURL.startsWith ("https://"))
     {
       // https connection
-      if (!SMPKeyManager.isCertificateValid ())
+      if (!SMPKeyManager.isKeyStoreValid ())
         throw new InitializationException ("Cannot init registration hook to SML, because private key/certificate setup has errors: " +
                                            SMPKeyManager.getInitializationError ());
 

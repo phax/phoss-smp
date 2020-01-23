@@ -165,7 +165,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                                    SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE);
     final String sPeppolDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_DIRECTORY_HOSTNAME);
 
-    if (bSMLActive && !SMPKeyManager.isCertificateValid ())
+    if (bSMLActive && !SMPKeyManager.isKeyStoreValid ())
       aFormErrors.addFieldError (FIELD_SML_ACTIVE,
                                  "SML connection cannot be activated, because the configured keystore is invalid!");
 

@@ -85,7 +85,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
            .addChild (new BootstrapWarnBox ().addChild ("This page cannot be shown because the SML configuration is invalid."));
       return EValidity.INVALID;
     }
-    if (!SMPKeyManager.isCertificateValid ())
+    if (!SMPKeyManager.isKeyStoreValid ())
     {
       aWPEC.getNodeList ()
            .addChild (new BootstrapWarnBox ().addChild ("This page cannot be shown because the overall keystore configuration is invalid."));

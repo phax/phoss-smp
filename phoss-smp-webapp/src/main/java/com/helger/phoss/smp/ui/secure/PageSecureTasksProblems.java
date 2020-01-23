@@ -129,7 +129,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
     // check keystore configuration
     {
-      if (!SMPKeyManager.isCertificateValid ())
+      if (!SMPKeyManager.isKeyStoreValid ())
       {
         // Loading failed - wrong path or wrong password or so
         aOL.addItem (_createError ("Problem with the certificate configuration"),
@@ -185,7 +185,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     }
 
     // check truststore configuration
-    if (!SMPTrustManager.isCertificateValid ())
+    if (!SMPTrustManager.isTrustStoreValid ())
     {
       // Ignore error if no trust store is configured
       if (SMPTrustManager.getInitializationErrorCode () != EKeyStoreLoadError.KEYSTORE_NO_PATH)

@@ -89,12 +89,12 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
 
     // No truststore is okay - that can be handled
     if (false)
-      if (!SMPTrustManager.isCertificateValid ())
+      if (!SMPTrustManager.isTrustStoreValid ())
       {
         aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid truststore is provided, so no connection with the SML can be established!"));
         return false;
       }
-    if (!SMPKeyManager.isCertificateValid ())
+    if (!SMPKeyManager.isKeyStoreValid ())
     {
       aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid keystore/certificate is provided, so no connection with the SML can be established!"));
       return false;

@@ -159,7 +159,7 @@ public final class SMPRendererSecure
     }
 
     // Information on certificate
-    if (!SMPKeyManager.isCertificateValid ())
+    if (!SMPKeyManager.isKeyStoreValid ())
     {
       aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                  .addChild (" Certificate configuration is invalid."));

@@ -111,7 +111,7 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("smp.pd.hostname", aSettings.getDirectoryHostName ());
 
     // Certificate information
-    final boolean bCertConfigOk = SMPKeyManager.isCertificateValid ();
+    final boolean bCertConfigOk = SMPKeyManager.isKeyStoreValid ();
     aStatusData.add ("smp.certificate.configuration-valid", bCertConfigOk);
     if (bCertConfigOk)
     {

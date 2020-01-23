@@ -68,16 +68,16 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPKeyManager.class);
 
-  private static final AtomicBoolean s_aCertificateValid = new AtomicBoolean (false);
+  private static final AtomicBoolean s_aKeyStoreValid = new AtomicBoolean (false);
   private static EKeyStoreLoadError s_eInitError;
   private static String s_sInitError;
 
   private KeyStore m_aKeyStore;
   private KeyStore.PrivateKeyEntry m_aKeyEntry;
 
-  private static void _setCertValid (final boolean bValid)
+  private static void _setKeyStoreValid (final boolean bValid)
   {
-    s_aCertificateValid.set (bValid);
+    s_aKeyStoreValid.set (bValid);
   }
 
   private static void _loadError (@Nullable final EKeyStoreLoadError eInitError, @Nullable final String sInitError)
@@ -86,10 +86,10 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     s_sInitError = sInitError;
   }
 
-  private void _loadCertificates ()
+  private void _loadKeyStore ()
   {
     // Reset every time
-    _setCertValid (false);
+    _setKeyStoreValid (false);
     _loadError (null, null);
     m_aKeyStore = null;
     m_aKeyEntry = null;
@@ -121,14 +121,14 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                  "' and alias '" +
                  SMPServerConfiguration.getKeyStoreKeyAlias () +
                  "'");
-    _setCertValid (true);
+    _setKeyStoreValid (true);
   }
 
   @Deprecated
   @UsedViaReflection
   public SMPKeyManager ()
   {
-    _loadCertificates ();
+    _loadKeyStore ();
   }
 
   @Nonnull
@@ -187,7 +187,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
     // Trust manager
     TrustManager [] aTrustManagers;
-    if (SMPTrustManager.isCertificateValid ())
+    if (SMPTrustManager.isTrustStoreValid ())
     {
       final TrustManagerFactory aTrustManagerFactory = TrustManagerFactory.getInstance (TrustManagerFactory.getDefaultAlgorithm ());
       aTrustManagerFactory.init (SMPTrustManager.getInstance ().getTrustStore ());
@@ -262,14 +262,27 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * @return A shortcut method to determine if the certification configuration
    *         is valid or not. This method can be used, even if
    *         {@link #getInstance()} throws an exception.
+   * @deprecated Use {@link #isKeyStoreValid()} instead. Deprecated as per
+   *             v5.2.1
    */
+  @Deprecated
   public static boolean isCertificateValid ()
   {
-    return s_aCertificateValid.get ();
+    return isKeyStoreValid ();
   }
 
   /**
-   * If the certificate is not valid according to {@link #isCertificateValid()}
+   * @return A shortcut method to determine if the certification configuration
+   *         is valid or not. This method can be used, even if
+   *         {@link #getInstance()} throws an exception.
+   */
+  public static boolean isKeyStoreValid ()
+  {
+    return s_aKeyStoreValid.get ();
+  }
+
+  /**
+   * If the certificate is not valid according to {@link #isKeyStoreValid()}
    * this method can be used to determine the error detail code.
    *
    * @return <code>null</code> if initialization was successful.
@@ -281,7 +294,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   }
 
   /**
-   * If the certificate is not valid according to {@link #isCertificateValid()}
+   * If the certificate is not valid according to {@link #isKeyStoreValid()}
    * this method can be used to determine the error detail message.
    *
    * @return <code>null</code> if initialization was successful.
@@ -298,9 +311,12 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     {
       final SMPKeyManager aInstance = getGlobalSingletonIfInstantiated (SMPKeyManager.class);
       if (aInstance != null)
-        aInstance._loadCertificates ();
+        aInstance._loadKeyStore ();
       else
+      {
+        // _loadKeyStore () is called in the constructor
         getInstance ();
+      }
     }
     catch (final Exception ex)
     {}
