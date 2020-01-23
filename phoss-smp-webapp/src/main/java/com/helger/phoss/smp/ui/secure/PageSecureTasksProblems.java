@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -60,6 +62,7 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
@@ -191,6 +194,66 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       if (SMPTrustManager.getInitializationErrorCode () != EKeyStoreLoadError.KEYSTORE_NO_PATH)
         aOL.addItem (_createWarning ("Problem with the truststore configuration"),
                      new HCDiv ().addChild (SMPTrustManager.getInitializationError ()));
+    }
+    else
+    {
+      // Successfully loaded trust store
+      final SMPTrustManager aTrustMgr = SMPTrustManager.getInstance ();
+      final KeyStore aTrustStore = aTrustMgr.getTrustStore ();
+
+      final HCOL aTrustStoreOL = new HCOL ();
+      boolean bHasError = false;
+      try
+      {
+        for (final String sAlias : CollectionHelper.newList (aTrustStore.aliases ()))
+        {
+          final Certificate aCert = aTrustStore.getCertificate (sAlias);
+          if (aCert instanceof X509Certificate)
+          {
+            final X509Certificate aX509Cert = (X509Certificate) aCert;
+
+            final String sLogPrefix = "The provided certificate with subject '" +
+                                      aX509Cert.getSubjectX500Principal ().getName () +
+                                      "' ";
+
+            final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
+            if (aNowDT.isBefore (aNotBefore))
+            {
+              aTrustStoreOL.addItem (_createError (sLogPrefix + " is not yet valid."),
+                                     new HCDiv ().addChild ("It will be valid from " +
+                                                            PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+              bHasError = true;
+            }
+
+            final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
+            if (aNowDT.isAfter (aNotAfter))
+            {
+              aTrustStoreOL.addItem (_createError (sLogPrefix + " is already expired."),
+                                     new HCDiv ().addChild ("It was valid until " +
+                                                            PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+              bHasError = true;
+            }
+            else
+              if (aNowPlusDT.isAfter (aNotAfter))
+                aTrustStoreOL.addItem (_createWarning (sLogPrefix + " will expire soon."),
+                                       new HCDiv ().addChild ("It is only valid until " +
+                                                              PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+          }
+          else
+            aTrustStoreOL.addItem (_createWarning ("The certificate is not an X.509 certificate! It is internally a " +
+                                                   ClassHelper.getClassName (aCert)));
+        }
+      }
+      catch (final GeneralSecurityException ex)
+      {
+        aTrustStoreOL.addItem (_createError ("Error iterating trust store."),
+                               new HCDiv ().addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+        bHasError = true;
+      }
+
+      if (aTrustStoreOL.hasChildren ())
+        aOL.addItem (bHasError ? _createError ("Trust store issues") : _createWarning ("Trust store issues"),
+                     aTrustStoreOL);
     }
 
     // Check SML configuration
