@@ -60,6 +60,7 @@ import com.helger.html.jscode.JSAnonymousFunction;
 import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
+import com.helger.pd.client.PDClient;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.app.PDClientProvider;
@@ -81,6 +82,7 @@ import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
@@ -140,6 +142,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   private static final String SUFFIX_REG_DATE = "regdate";
   private static final String TMP_ID_PREFIX = "tmp";
   private static final String ACTION_PUBLISH_TO_INDEXER = "publishtoindexer";
+  private static final String ACTION_PUBLISH_ALL_TO_INDEXER = "publishalltoindexer";
 
   private static final String PARAM_ENTITY_ID = "entityid";
 
@@ -248,6 +251,64 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                               aParticipantID.getURIEncoded () +
                                                                                               "'"));
                           }
+                          return EShowList.SHOW_LIST;
+                        }
+                      });
+    addCustomHandler (ACTION_PUBLISH_ALL_TO_INDEXER,
+                      new AbstractBootstrapWebPageActionHandler <ISMPBusinessCard, WebPageExecutionContext> (false)
+                      {
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nullable final ISMPBusinessCard aSelectedObject)
+                        {
+                          final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+                          final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
+                          final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
+
+                          final ICommonsList <String> aSuccess = new CommonsArrayList <> ();
+                          final ICommonsList <String> aFailure = new CommonsArrayList <> ();
+
+                          for (final ISMPBusinessCard aCurObject : aBusinessCardMgr.getAllSMPBusinessCards ())
+                          {
+                            final IParticipantIdentifier aParticipantID = aCurObject.getServiceGroup ()
+                                                                                    .getParticpantIdentifier ();
+                            final ESuccess eSuccess = aPDClient.addServiceGroupToIndex (aParticipantID);
+                            (eSuccess.isSuccess () ? aSuccess : aFailure).add (aParticipantID.getURIEncoded ());
+                          }
+
+                          final HCNodeList aResultNodes = new HCNodeList ();
+                          if (aSuccess.isNotEmpty ())
+                          {
+                            final BootstrapSuccessBox aBox = new BootstrapSuccessBox ();
+                            for (final String sPI : aSuccess)
+                            {
+                              aBox.addChild (new HCDiv ().addChild ("Successfully notified the " +
+                                                                    sDirectoryName +
+                                                                    " to index '" +
+                                                                    sPI +
+                                                                    "'"));
+                            }
+                            aResultNodes.addChild (aBox);
+                          }
+                          if (aFailure.isNotEmpty ())
+                          {
+                            final BootstrapErrorBox aBox = new BootstrapErrorBox ();
+                            for (final String sPI : aFailure)
+                            {
+                              aBox.addChild (new HCDiv ().addChild ("Error notifying the " +
+                                                                    sDirectoryName +
+                                                                    " to index '" +
+                                                                    sPI +
+                                                                    "'"));
+                            }
+                            aResultNodes.addChild (aBox);
+                          }
+                          if (aResultNodes.hasNoChildren ())
+                            aResultNodes.addChild (new BootstrapInfoBox ().addChild ("No participants to be indexed to " +
+                                                                                     sDirectoryName +
+                                                                                     "."));
+
+                          aWPEC.postRedirectGetInternal (aResultNodes);
                           return EShowList.SHOW_LIST;
                         }
                       });
@@ -1053,6 +1114,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                                     SMPWebAppConfiguration.getDirectoryName ())
                                                                                          .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
     }
+
     return ret;
   }
 
@@ -1062,9 +1124,17 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+    final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Business Card", createCreateURL (aWPEC), EDefaultIcon.NEW);
+    aToolbar.addChild (new BootstrapButton ().setOnClick (aWPEC.getSelfHref ()
+                                                               .add (CPageParam.PARAM_ACTION,
+                                                                     ACTION_PUBLISH_ALL_TO_INDEXER))
+                                             .setIcon (EFamFamIcon.ARROW_REDO)
+                                             .addChild ("Update all Business Cards in " +
+                                                        SMPWebAppConfiguration.getDirectoryName ())
+                                             .setDisabled (aAllBusinessCards.isEmpty ()));
     aNodeList.addChild (aToolbar);
 
     final HCTable aTable = new HCTable (new DTCol ("Service Group").setDataSort (0, 1)
@@ -1074,7 +1144,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                         new DTCol ("GeoInfo"),
                                         new DTCol ("Identifiers"),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPBusinessCard aCurObject : aBusinessCardMgr.getAllSMPBusinessCards ())
+    for (final ISMPBusinessCard aCurObject : aAllBusinessCards)
     {
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
       final String sDisplayName = aCurObject.getServiceGroupID ();
