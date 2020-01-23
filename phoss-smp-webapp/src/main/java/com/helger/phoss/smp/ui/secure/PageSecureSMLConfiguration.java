@@ -180,7 +180,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                                                                          aSelectedObject != null ? aSelectedObject.getDNSZone ()
                                                                                                                  : null)))
                                                  .setHelpText (new HCTextNode ("The name of the DNS Zone that this SML is working upon (e.g. "),
-                                                               new HCCode ().addChild ("sml.peppolcentral.org"),
+                                                               new HCCode ().addChild ("acc.edelivery.tech.ec.europa.eu"),
                                                                new HCTextNode ("). The value will automatically converted to all-lowercase!"))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DNS_ZONE)));
 

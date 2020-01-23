@@ -36,7 +36,7 @@ public interface ISMLInfoManager
    *        The DNS zone on which this SML is operating. May not be
    *        <code>null</code>. It must be ensured that the value consists only
    *        of lower case characters for comparability! Example:
-   *        <code>sml.peppolcentral.org</code>
+   *        <code>acc.edelivery.tech.ec.europa.eu</code>
    * @param sManagementServiceURL
    *        The service URL where the management application is running on incl.
    *        the host name. May not be <code>null</code>. The difference to the
@@ -68,7 +68,7 @@ public interface ISMLInfoManager
    *        The DNS zone on which this SML is operating. May not be
    *        <code>null</code>. It must be ensured that the value consists only
    *        of lower case characters for comparability! Example:
-   *        <code>sml.peppolcentral.org</code>
+   *        <code>acc.edelivery.tech.ec.europa.eu</code>
    * @param sManagementServiceURL
    *        The service URL where the management application is running on incl.
    *        the host name. May not be <code>null</code>. The difference to the
