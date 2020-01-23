@@ -22,7 +22,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -35,12 +34,14 @@ import org.w3c.dom.Element;
 
 import com.helger.commons.CGlobal;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.lang.ClassHelper;
+import com.helger.commons.math.MathHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
@@ -124,30 +125,81 @@ public final class SMPCommonUI
     BootstrapSystemMessage.setDefaultUseMarkdown (true);
   }
 
-  private static String _getPeriod (@Nonnull final LocalDateTime aNowLDT, @Nonnull final LocalDateTime aNotAfter)
+  // Based on PeriodFuncTest code
+  @Nonnull
+  @Nonempty
+  private static String _getPeriodString (final int nYears,
+                                          final int nMonths,
+                                          final int nDays,
+                                          final long nHours,
+                                          final long nMinutes,
+                                          final long nSeconds)
+  {
+    // Use "abs" to ensure it is "1 year" and "-1 year"
+    final String sYear = MathHelper.abs (nYears) == 1 ? nYears + " year" : nYears + " years";
+    final String sMonth = MathHelper.abs (nMonths) == 1 ? nMonths + " month" : nMonths + " months";
+    final String sDay = MathHelper.abs (nDays) == 1 ? nDays + " day" : nDays + " days";
+    final String sHour = MathHelper.abs (nHours) == 1 ? nHours + " hour" : nHours + " hours";
+    final String sMinute = MathHelper.abs (nMinutes) == 1 ? nMinutes + " minute" : nMinutes + " minutes";
+    final String sSecond = MathHelper.abs (nSeconds) == 1 ? nSeconds + " second" : nSeconds + " seconds";
+
+    // Skip all "leading 0" parts
+    final ICommonsList <String> aParts = new CommonsArrayList <> (6);
+    if (nYears != 0)
+      aParts.add (sYear);
+    if (nMonths != 0 || aParts.isNotEmpty ())
+      aParts.add (sMonth);
+    if (nDays != 0 || aParts.isNotEmpty ())
+      aParts.add (sDay);
+    if (nHours != 0 || aParts.isNotEmpty ())
+      aParts.add (sHour);
+    if (nMinutes != 0 || aParts.isNotEmpty ())
+      aParts.add (sMinute);
+    aParts.add (sSecond);
+
+    final int nParts = aParts.size ();
+    if (nParts == 1)
+      return aParts.get (0);
+    if (nParts == 2)
+      return aParts.get (0) + " and " + aParts.get (1);
+    final StringBuilder aSB = new StringBuilder ();
+    for (int i = 0; i < nParts - 1; ++i)
+    {
+      if (aSB.length () > 0)
+        aSB.append (", ");
+      aSB.append (aParts.get (i));
+    }
+    return aSB.append (" and ").append (aParts.getLast ()).toString ();
+  }
+
+  // Based on PeriodFuncTest code
+  @Nonnull
+  @Nonempty
+  private static String _getPeriodText (@Nonnull final LocalDateTime aNowLDT, @Nonnull final LocalDateTime aNotAfter)
   {
     final Period aPeriod = Period.between (aNowLDT.toLocalDate (), aNotAfter.toLocalDate ());
-    final Duration aDuration = Duration.between (aNowLDT.toLocalTime (),
-                                                 aNotAfter.plus (1, ChronoUnit.DAYS).toLocalTime ());
-    long nSecs = aDuration.getSeconds ();
-    final long nHours = nSecs / CGlobal.SECONDS_PER_HOUR;
-    nSecs -= nHours * CGlobal.SECONDS_PER_HOUR;
-    final long nMinutes = nSecs / CGlobal.SECONDS_PER_MINUTE;
-    nSecs -= nMinutes * CGlobal.SECONDS_PER_MINUTE;
-    String ret = "";
-    if (aPeriod.getYears () > 0)
-      ret += aPeriod.getYears () + " years, ";
-    return ret +
-           aPeriod.getMonths () +
-           " months, " +
-           aPeriod.getDays () +
-           " days, " +
-           nHours +
-           " hours, " +
-           nMinutes +
-           " minutes and " +
-           nSecs +
-           " seconds";
+    final Duration aDuration = Duration.between (aNowLDT.toLocalTime (), aNotAfter.toLocalTime ());
+
+    final int nYears = aPeriod.getYears ();
+    final int nMonth = aPeriod.getMonths ();
+    int nDays = aPeriod.getDays ();
+
+    long nTotalSecs = aDuration.getSeconds ();
+    if (nTotalSecs < 0)
+    {
+      if (nDays > 0 || nMonth > 0 || nYears > 0)
+      {
+        nTotalSecs += CGlobal.SECONDS_PER_DAY;
+        nDays--;
+      }
+    }
+
+    final long nHours = nTotalSecs / CGlobal.SECONDS_PER_HOUR;
+    nTotalSecs -= nHours * CGlobal.SECONDS_PER_HOUR;
+    final long nMinutes = nTotalSecs / CGlobal.SECONDS_PER_MINUTE;
+    nTotalSecs -= nMinutes * CGlobal.SECONDS_PER_MINUTE;
+
+    return _getPeriodString (nYears, nMonth, nDays, nHours, nMinutes, nTotalSecs);
   }
 
   @Nonnull
@@ -226,7 +278,7 @@ public final class SMPCommonUI
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotAfter, aDisplayLocale) + " "),
                           aNowLDT.isAfter (aNotAfter) ? new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NO LONGER VALID!!!")
                                                       : new HCDiv ().addChild ("Valid for: " +
-                                                                               _getPeriod (aNowLDT, aNotAfter)));
+                                                                               _getPeriodText (aNowLDT, aNotAfter)));
 
     if (aPublicKey instanceof RSAPublicKey)
     {
