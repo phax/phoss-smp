@@ -7,7 +7,7 @@ It was previously based on the official `tomcat:8.5` image.
 Prebuild images are available from:
 * https://hub.docker.com/r/phelger/
 
-Note: the `smp` directory contains current build SNAPSHOTs as well as old XML binary releases. For the most up-to-date versions use phoss-smp-(xml|sql|mongodb) folders.
+**Note:** the `smp` directory contains current build SNAPSHOTs as well as old XML binary releases. For the most up-to-date versions use `phoss-smp-(xml|sql|mongodb)` folders.
 
 **Note:** The SMP comes pretty unconfigured
 
