@@ -4,7 +4,10 @@ This folder contains the Docker configuration files for phoss SMP.
 It is based on the official `tomcat:9-jre11` image since v5.1.2.
 It was previously based on the official `tomcat:8.5` image.
 
-Prebuild images are available from https://hub.docker.com/r/phelger/smp/
+Prebuild images are available from:
+* https://hub.docker.com/r/phelger/
+
+Note: the `smp` directory contains current build SNAPSHOTs as well as old XML binary releases. For the most up-to-date versions use phoss-smp-(xml|sql|mongodb) folders.
 
 **Note:** The SMP comes pretty unconfigured
 
