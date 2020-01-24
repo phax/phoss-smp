@@ -19,6 +19,8 @@ package com.helger.phoss.smp.backend.mongodb;
 import javax.annotation.Nonnull;
 
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.UsedViaReflection;
@@ -33,6 +35,8 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
 {
   public static final String CONFIG_MONGODB_CONNECTION_STRING = "mongodb.connectionstring";
   public static final String CONFIG_MONGODB_DB_NAME = "mongodb.dbname";
+
+  private static final Logger LOGGER = LoggerFactory.getLogger (MongoClientSingleton.class);
 
   private MongoClientProvider m_aProvider;
 
@@ -57,6 +61,8 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
       throw new IllegalStateException ("The MongoDB database name is missing in the configuration. See property '" +
                                        CONFIG_MONGODB_DB_NAME +
                                        "'");
+
+    LOGGER.info ("Using Mongo DB database name '" + sDBName + "'");
 
     m_aProvider = new MongoClientProvider (sConnectionString, sDBName);
   }

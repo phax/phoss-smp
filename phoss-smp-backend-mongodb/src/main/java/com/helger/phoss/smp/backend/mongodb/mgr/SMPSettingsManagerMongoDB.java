@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -40,7 +42,8 @@ import com.helger.phoss.smp.settings.SMPSettings;
 public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements ISMPSettingsManager
 {
   private static final String BSON_ID = "id";
-  private static final String ID_DUMMY = "singleton";
+  // Legacy ID
+  private static final String ID_SETTINGS = "singleton";
   private static final String BSON_SMP_REST_WRITABLE_API_DISABLED = "smp-rest-writable-api-disabled";
   private static final String BSON_DIRECTORY_INTEGRATION_REQUIRED = "directory-required";
   private static final String BSON_DIRECTORY_INTEGRATION_ENABLED = "directory-enabled";
@@ -52,12 +55,13 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
 
   private final SMPSettings m_aSettings = new SMPSettings ();
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
+  private final AtomicBoolean m_aInsertDocument = new AtomicBoolean ();
 
   @Nonnull
   @ReturnsMutableCopy
   public static Document toBson (@Nonnull final ISMPSettings aValue)
   {
-    return new Document ().append (BSON_ID, ID_DUMMY)
+    return new Document ().append (BSON_ID, ID_SETTINGS)
                           .append (BSON_SMP_REST_WRITABLE_API_DISABLED,
                                    Boolean.valueOf (aValue.isRESTWritableAPIDisabled ()))
                           .append (BSON_DIRECTORY_INTEGRATION_REQUIRED,
@@ -91,9 +95,10 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   public SMPSettingsManagerMongoDB ()
   {
     super ("smp-settings");
-    final Document aDoc = getCollection ().find (new Document (BSON_ID, ID_DUMMY)).first ();
+    final Document aDoc = getCollection ().find (new Document (BSON_ID, ID_SETTINGS)).first ();
     if (aDoc != null)
       toDomain (aDoc, m_aSettings);
+    m_aInsertDocument.set (aDoc == null);
   }
 
   @Nonnull
@@ -131,7 +136,14 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
     if (eChange.isChanged ())
     {
       final Document aDoc = toBson (m_aSettings);
-      getCollection ().replaceOne (new Document (BSON_ID, ID_DUMMY), aDoc);
+      if (m_aInsertDocument.getAndSet (false))
+      {
+        getCollection ().insertOne (aDoc);
+      }
+      else
+      {
+        getCollection ().replaceOne (new Document (BSON_ID, ID_SETTINGS), aDoc);
+      }
 
       // Invoke callbacks
       m_aCallbacks.forEach (x -> x.onSMPSettingsChanged (m_aSettings));

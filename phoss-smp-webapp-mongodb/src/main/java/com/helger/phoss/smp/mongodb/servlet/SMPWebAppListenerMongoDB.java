@@ -16,17 +16,44 @@
  */
 package com.helger.phoss.smp.mongodb.servlet;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+
+import com.helger.commons.id.factory.GlobalIDFactory;
+import com.helger.commons.io.file.SimpleFileIO;
+import com.helger.commons.string.StringParser;
 import com.helger.phoss.smp.backend.mongodb.audit.MongoDBAuditor;
+import com.helger.phoss.smp.backend.mongodb.audit.MongoDBIDFactory;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
+import com.helger.photon.app.io.WebFileIO;
 import com.helger.photon.audit.AuditHelper;
 
 /**
  * Special SMP web app listener for MongoDB
- * 
+ *
  * @author Philip Helger
  */
 public class SMPWebAppListenerMongoDB extends SMPWebAppListener
 {
+  @Override
+  protected void initGlobalIDFactory ()
+  {
+    // Check if an old value is present
+    long nInitialCount;
+    final File aOldFile = WebFileIO.getDataIO ().getFile (ID_FILENAME);
+    if (aOldFile.exists ())
+    {
+      final String sContent = SimpleFileIO.getFileAsString (aOldFile, StandardCharsets.ISO_8859_1);
+      nInitialCount = sContent != null ? StringParser.parseLong (sContent.trim (), 0) : 0;
+    }
+    else
+      nInitialCount = 0;
+
+    // Set persistent ID provider: Mongo based based
+    GlobalIDFactory.setPersistentLongIDFactory (new MongoDBIDFactory (nInitialCount));
+    GlobalIDFactory.setPersistentIntIDFactory ( () -> (int) GlobalIDFactory.getNewPersistentLongID ());
+  }
+
   @Override
   protected void initGlobalSettings ()
   {

@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 
 import org.bson.Document;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
@@ -64,6 +65,7 @@ public class MongoDBAuditor implements IAuditor
    */
   public MongoDBAuditor (@Nonnull @Nonempty final String sCollectionName)
   {
+    ValueEnforcer.notEmpty (sCollectionName, "CollectionName");
     m_aCollection = MongoClientSingleton.getInstance ().getCollection (sCollectionName);
   }
 
