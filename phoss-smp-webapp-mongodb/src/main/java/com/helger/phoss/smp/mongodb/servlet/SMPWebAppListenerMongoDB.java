@@ -19,6 +19,9 @@ package com.helger.phoss.smp.mongodb.servlet;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.io.file.SimpleFileIO;
 import com.helger.commons.string.StringParser;
@@ -35,6 +38,8 @@ import com.helger.photon.audit.AuditHelper;
  */
 public class SMPWebAppListenerMongoDB extends SMPWebAppListener
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppListenerMongoDB.class);
+
   @Override
   protected void initGlobalIDFactory ()
   {
@@ -45,6 +50,7 @@ public class SMPWebAppListenerMongoDB extends SMPWebAppListener
     {
       final String sContent = SimpleFileIO.getFileAsString (aOldFile, StandardCharsets.ISO_8859_1);
       nInitialCount = sContent != null ? StringParser.parseLong (sContent.trim (), 0) : 0;
+      LOGGER.info ("Using " + nInitialCount + " as the based ID for MongoDBIDFactory");
     }
     else
       nInitialCount = 0;
