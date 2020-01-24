@@ -36,7 +36,7 @@ RUN rm -r $CATALINA_HOME/webapps/ROOT \
 # Minimum version for this layout is 5.0.1
 ARG SMP_VERSION
 # Set to environment to be persistent
-ENV SMP_VERSION=${SMP_VERSION:-5.2.0}
+ENV SMP_VERSION=${SMP_VERSION:-5.2.1}
 LABEL vendor="Philip Helger"
 LABEL version=$SMP_VERSION
  
