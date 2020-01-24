@@ -104,14 +104,14 @@
     <resources>
       <!-- Hack to filter only properties files -->
       <resource>
-        <directory>${basedir}/src/main/resources</directory>
+        <directory>src/main/resources</directory>
         <filtering>true</filtering>
         <includes>
           <include>**/*.properties</include>
         </includes>
       </resource>
       <resource>
-        <directory>${basedir}/src/main/resources</directory>
+        <directory>src/main/resources</directory>
         <filtering>false</filtering>
         <excludes>
           <exclude>**/*.properties</exclude>
