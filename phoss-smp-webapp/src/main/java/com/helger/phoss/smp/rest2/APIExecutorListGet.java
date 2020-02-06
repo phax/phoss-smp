@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.bdxr.smp1.marshal.BDXR1MarshallerServiceGroupReferenceListType;
-import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupReferenceListType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
@@ -36,6 +34,8 @@ import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
+import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupReferenceListType;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupReferenceListType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public final class APIExecutorListGet implements IAPIExecutor

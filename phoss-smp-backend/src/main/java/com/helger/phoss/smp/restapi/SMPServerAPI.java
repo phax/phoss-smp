@@ -27,19 +27,7 @@ import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.smp.CompleteServiceGroupType;
-import com.helger.peppol.smp.EndpointType;
-import com.helger.peppol.smp.ProcessListType;
-import com.helger.peppol.smp.ProcessType;
 import com.helger.peppol.smp.SMPExtensionConverter;
-import com.helger.peppol.smp.ServiceGroupReferenceListType;
-import com.helger.peppol.smp.ServiceGroupReferenceType;
-import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smp.ServiceInformationType;
-import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
-import com.helger.peppol.smp.ServiceMetadataReferenceType;
-import com.helger.peppol.smp.ServiceMetadataType;
-import com.helger.peppol.smp.SignedServiceMetadataType;
 import com.helger.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -61,6 +49,14 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
+import com.helger.xsds.bdxr.smp1.CompleteServiceGroupType;
+import com.helger.xsds.bdxr.smp1.ProcessListType;
+import com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType;
+import com.helger.xsds.bdxr.smp1.ServiceGroupReferenceType;
+import com.helger.xsds.bdxr.smp1.ServiceInformationType;
+import com.helger.xsds.bdxr.smp1.ServiceMetadataReferenceCollectionType;
+import com.helger.xsds.bdxr.smp1.ServiceMetadataReferenceType;
+import com.helger.xsds.bdxr.smp1.SignedServiceMetadataType;
 
 /**
  * This class implements all the service methods, that must be provided by the

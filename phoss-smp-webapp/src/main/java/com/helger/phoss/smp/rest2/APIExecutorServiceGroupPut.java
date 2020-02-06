@@ -29,8 +29,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.bdxr.smp1.marshal.BDXR1MarshallerServiceGroupType;
-import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
@@ -39,6 +37,8 @@ import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
+import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.read.DOMReader;
 
