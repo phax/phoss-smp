@@ -99,7 +99,7 @@ public interface ISMPRedirect extends IHasID <String>, Serializable, ISMPHasExte
    *         interface. Never <code>null</code>.
    */
   @Nonnull
-  com.helger.peppol.smp.ServiceMetadataType getAsJAXBObjectPeppol ();
+  com.helger.smpclient.peppol.jaxb.ServiceMetadataType getAsJAXBObjectPeppol ();
 
   /**
    * @return This redirect object as a BDXR SMP JAXB object for the REST

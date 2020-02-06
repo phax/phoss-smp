@@ -21,14 +21,14 @@ import org.w3c.dom.Document;
 
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.string.StringHelper;
-import com.helger.peppol.bdxr.smp1.BDXR1ExtensionConverter;
-import com.helger.peppol.bdxr.smp1.marshal.BDXR1MarshallerServiceGroupType;
-import com.helger.peppol.smp.marshal.SMPMarshallerServiceGroupType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
+import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
+import com.helger.smpclient.bdxr1.utils.BDXR1ExtensionConverter;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.xml.serialize.read.DOMReader;
 import com.helger.xsds.bdxr.smp1.ExtensionType;
 
@@ -54,9 +54,9 @@ public final class SMPServiceGroupTest
     assertEquals (aPI, aSG.getParticpantIdentifier ());
     assertEquals ("[{\"Any\":\"<foobar />\"}]", aSG.getExtensionsAsString ());
 
-    final com.helger.peppol.smp.ServiceGroupType aSGPeppol = aSG.getAsJAXBObjectPeppol ();
+    final com.helger.smpclient.peppol.jaxb.ServiceGroupType aSGPeppol = aSG.getAsJAXBObjectPeppol ();
     assertNotNull (aSGPeppol.getExtension ());
-    aSGPeppol.setServiceMetadataReferenceCollection (new com.helger.peppol.smp.ServiceMetadataReferenceCollectionType ());
+    aSGPeppol.setServiceMetadataReferenceCollection (new com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType ());
 
     final Document aDoc = new SMPMarshallerServiceGroupType ().getAsDocument (aSGPeppol);
     assertNotNull (aDoc);

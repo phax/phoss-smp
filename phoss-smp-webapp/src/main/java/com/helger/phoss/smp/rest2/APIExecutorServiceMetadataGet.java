@@ -66,8 +66,8 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
     {
       case PEPPOL:
       {
-        final com.helger.peppol.smp.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
-                                                                                                                             sDocumentTypeID);
+        final com.helger.smpclient.peppol.jaxb.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
+                                                                                                                                        sDocumentTypeID);
 
         // Convert to DOM document
         final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType ();

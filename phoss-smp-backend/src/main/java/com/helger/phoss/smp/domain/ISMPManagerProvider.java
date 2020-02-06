@@ -13,8 +13,6 @@ package com.helger.phoss.smp.domain;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.peppol.url.IPeppolURLProvider;
-import com.helger.peppol.url.PeppolURLProvider;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -24,6 +22,8 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
+import com.helger.smpclient.url.IPeppolURLProvider;
+import com.helger.smpclient.url.PeppolURLProvider;
 
 /**
  * An abstract manager provider interface. This must be implemented for each

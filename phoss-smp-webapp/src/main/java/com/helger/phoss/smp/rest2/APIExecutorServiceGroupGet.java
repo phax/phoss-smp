@@ -56,7 +56,7 @@ public final class APIExecutorServiceGroupGet implements IAPIExecutor
     {
       case PEPPOL:
       {
-        final com.helger.peppol.smp.ServiceGroupType ret = new SMPServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
+        final com.helger.smpclient.peppol.jaxb.ServiceGroupType ret = new SMPServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
         aBytes = new SMPMarshallerServiceGroupType ().getAsBytes (ret);
         break;
       }

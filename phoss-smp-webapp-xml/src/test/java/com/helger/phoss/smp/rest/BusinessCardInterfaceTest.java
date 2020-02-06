@@ -52,9 +52,6 @@ import com.helger.pd.businesscard.v2.PD2BusinessEntityType;
 import com.helger.pd.businesscard.v3.PD3APIHelper;
 import com.helger.pd.businesscard.v3.PD3BusinessCardType;
 import com.helger.pd.businesscard.v3.PD3BusinessEntityType;
-import com.helger.peppol.smp.ObjectFactory;
-import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
@@ -65,6 +62,9 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.phoss.smp.rest2.Rest2Filter;
 import com.helger.photon.security.CSecurity;
+import com.helger.smpclient.peppol.jaxb.ObjectFactory;
+import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
+import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
 
 /**
  * Test class for class {@link Rest2Filter}

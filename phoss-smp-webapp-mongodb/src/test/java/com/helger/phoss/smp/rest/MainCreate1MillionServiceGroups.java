@@ -33,9 +33,6 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppol.smp.ObjectFactory;
-import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.phoss.smp.backend.mongodb.audit.MongoDBAuditor;
@@ -43,6 +40,9 @@ import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
+import com.helger.smpclient.peppol.jaxb.ObjectFactory;
+import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
+import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**

@@ -24,7 +24,7 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.peppol.bdxr.smp1.BDXR1ExtensionConverter;
+import com.helger.smpclient.bdxr1.utils.BDXR1ExtensionConverter;
 import com.helger.xml.serialize.write.XMLWriter;
 
 /**
@@ -93,13 +93,13 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
 
   @Nullable
   @ReturnsMutableCopy
-  public com.helger.peppol.smp.ExtensionType getAsPeppolExtension ()
+  public com.helger.smpclient.peppol.jaxb.ExtensionType getAsPeppolExtension ()
   {
     if (m_aExtensions.isEmpty ())
       return null;
 
     // Use only the XML element of the first extension
-    final com.helger.peppol.smp.ExtensionType ret = new com.helger.peppol.smp.ExtensionType ();
+    final com.helger.smpclient.peppol.jaxb.ExtensionType ret = new com.helger.smpclient.peppol.jaxb.ExtensionType ();
     ret.setAny ((Element) m_aExtensions.getFirst ().getAny ());
     return ret;
   }

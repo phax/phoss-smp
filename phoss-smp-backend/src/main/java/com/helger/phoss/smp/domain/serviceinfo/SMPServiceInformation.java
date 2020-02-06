@@ -28,7 +28,6 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.peppol.smp.SMPExtensionConverter;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.bdxr.smp1.doctype.BDXR1DocumentTypeIdentifier;
@@ -37,6 +36,7 @@ import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
 
 /**
  * Default implementation of the {@link ISMPServiceInformation} interface.
@@ -165,19 +165,19 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   }
 
   @Nonnull
-  public com.helger.peppol.smp.ServiceMetadataType getAsJAXBObjectPeppol ()
+  public com.helger.smpclient.peppol.jaxb.ServiceMetadataType getAsJAXBObjectPeppol ()
   {
-    final com.helger.peppol.smp.ServiceInformationType aSI = new com.helger.peppol.smp.ServiceInformationType ();
+    final com.helger.smpclient.peppol.jaxb.ServiceInformationType aSI = new com.helger.smpclient.peppol.jaxb.ServiceInformationType ();
     // Explicit constructor call is needed here!
     aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
     aSI.setDocumentIdentifier (new SimpleDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
-    final com.helger.peppol.smp.ProcessListType aProcesses = new com.helger.peppol.smp.ProcessListType ();
+    final com.helger.smpclient.peppol.jaxb.ProcessListType aProcesses = new com.helger.smpclient.peppol.jaxb.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
       aProcesses.addProcess (aProcess.getAsJAXBObjectPeppol ());
     aSI.setProcessList (aProcesses);
     aSI.setExtension (getAsPeppolExtension ());
 
-    final com.helger.peppol.smp.ServiceMetadataType ret = new com.helger.peppol.smp.ServiceMetadataType ();
+    final com.helger.smpclient.peppol.jaxb.ServiceMetadataType ret = new com.helger.smpclient.peppol.jaxb.ServiceMetadataType ();
     ret.setServiceInformation (aSI);
     return ret;
   }
@@ -231,10 +231,11 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
 
   @Nonnull
   public static SMPServiceInformation createFromJAXB (@Nonnull final ISMPServiceGroup aServiceGroup,
-                                                      @Nonnull final com.helger.peppol.smp.ServiceInformationType aServiceInformation)
+                                                      @Nonnull final com.helger.smpclient.peppol.jaxb.ServiceInformationType aServiceInformation)
   {
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
-    for (final com.helger.peppol.smp.ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
+    for (final com.helger.smpclient.peppol.jaxb.ProcessType aProcess : aServiceInformation.getProcessList ()
+                                                                                          .getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,
                                       SimpleDocumentTypeIdentifier.wrap (aServiceInformation.getDocumentIdentifier ()),

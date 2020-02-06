@@ -25,15 +25,15 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
 import com.helger.db.jpa.JPAEnabledManager;
-import com.helger.peppol.smp.ServiceGroupType;
-import com.helger.peppol.smp.ServiceMetadataReferenceCollectionType;
-import com.helger.peppol.smpclient.SMPClient;
-import com.helger.peppol.smpclient.exception.SMPClientException;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.mock.MockSMPClient;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
+import com.helger.smpclient.exception.SMPClientException;
+import com.helger.smpclient.peppol.SMPClient;
+import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
+import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
 
 /**
  * Create 2000 service groups

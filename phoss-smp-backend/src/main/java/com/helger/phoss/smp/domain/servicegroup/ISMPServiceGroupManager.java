@@ -54,8 +54,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return The created service group object. Never <code>null</code>.
    * @throws SMPServerException
    *         In case of error
-   * @see com.helger.peppol.smp.SMPExtensionConverter
-   * @see com.helger.peppol.bdxr.smp1.BDXR1ExtensionConverter
+   * @see com.helger.smpclient.peppol.utils.SMPExtensionConverter
+   * @see com.helger.smpclient.bdxr1.utils.BDXR1ExtensionConverter
    */
   @Nonnull
   ISMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty String sOwnerID,

@@ -57,7 +57,7 @@ public final class APIExecutorCompleteServiceGroupGet implements IAPIExecutor
       case PEPPOL:
       {
         // Unspecified extension
-        final com.helger.peppol.smp.CompleteServiceGroupType ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
+        final com.helger.smpclient.peppol.jaxb.CompleteServiceGroupType ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
         aBytes = new SMPMarshallerCompleteServiceGroupType ().getAsBytes (ret);
         break;
       }

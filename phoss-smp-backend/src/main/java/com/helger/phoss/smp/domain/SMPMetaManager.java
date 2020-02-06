@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
-import com.helger.peppol.url.IPeppolURLProvider;
 import com.helger.peppolid.factory.BDXR1IdentifierFactory;
 import com.helger.peppolid.factory.BDXR2IdentifierFactory;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -42,6 +41,7 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
+import com.helger.smpclient.url.IPeppolURLProvider;
 
 /**
  * The central SMP meta manager containing all the singleton manager instances.

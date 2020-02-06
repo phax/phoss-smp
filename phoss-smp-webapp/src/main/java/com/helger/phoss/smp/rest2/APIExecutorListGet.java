@@ -58,8 +58,8 @@ public final class APIExecutorListGet implements IAPIExecutor
       case PEPPOL:
       {
         // Unspecified extension
-        final com.helger.peppol.smp.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
-                                                                                                                                       aBasicAuth);
+        final com.helger.smpclient.peppol.jaxb.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
+                                                                                                                                                  aBasicAuth);
         aBytes = new SMPMarshallerServiceGroupReferenceListType ().getAsBytes (ret);
         break;
       }

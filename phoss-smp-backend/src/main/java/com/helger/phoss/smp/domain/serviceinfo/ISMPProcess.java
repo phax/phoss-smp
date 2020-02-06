@@ -103,7 +103,7 @@ public interface ISMPProcess extends Serializable, ISMPHasExtension
    *         REST interface. Never <code>null</code>.
    */
   @Nonnull
-  com.helger.peppol.smp.ProcessType getAsJAXBObjectPeppol ();
+  com.helger.smpclient.peppol.jaxb.ProcessType getAsJAXBObjectPeppol ();
 
   /**
    * @return This service information object as a BDXR SMP JAXB object for the

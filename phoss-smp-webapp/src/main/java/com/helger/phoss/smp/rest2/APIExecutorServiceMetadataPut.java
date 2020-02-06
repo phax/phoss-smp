@@ -80,7 +80,7 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
         {
           case PEPPOL:
           {
-            final com.helger.peppol.smp.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType ().read (aServiceMetadataDoc);
+            final com.helger.smpclient.peppol.jaxb.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType ().read (aServiceMetadataDoc);
             if (aServiceMetadata != null)
               eSuccess = new SMPServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
                                                                                    sDocumentTypeID,
