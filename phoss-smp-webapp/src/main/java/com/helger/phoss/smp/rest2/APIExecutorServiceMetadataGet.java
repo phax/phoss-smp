@@ -19,6 +19,7 @@ package com.helger.phoss.smp.rest2;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -120,7 +121,8 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
         // for validating the signature!
         try
         {
-          XMLTransformerFactory.newTransformer ().transform (new DOMSource (aDoc), new StreamResult (aBAOS));
+          final Transformer aTransformer = XMLTransformerFactory.newTransformer ();
+          aTransformer.transform (new DOMSource (aDoc), new StreamResult (aBAOS));
         }
         catch (final TransformerException ex)
         {

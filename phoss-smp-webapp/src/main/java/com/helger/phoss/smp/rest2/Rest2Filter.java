@@ -170,7 +170,10 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     {
       // Explicitly other servlet
       if (LOGGER.isDebugEnabled ())
-        LOGGER.debug (LOG_PREFIX + "Ignoring '" + aAPIPath.getPath () + "' because it is an application servlet.");
+        LOGGER.debug (LOG_PREFIX +
+                      "Ignoring '" +
+                      aAPIPath.getPath () +
+                      "' because it is an application internal path.");
       return EContinue.CONTINUE;
     }
 
