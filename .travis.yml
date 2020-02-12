@@ -52,18 +52,18 @@ jobs:
         - docker pull tomcat:9-jre11
 # build XML version
         - docker build -t phoss-smp-snapshot-from-source-xml -f docker/Dockerfile-snapshot-from-source-xml .
-        - docker tag phoss-smp-snapshot-from-source-xml phelger/smp:snapshot
+        - docker tag phoss-smp-snapshot-from-source-xml phelger/phoss-smp-xml:snapshot
 # build SQL version
         - docker build -t phoss-smp-snapshot-from-source-sql -f docker/Dockerfile-snapshot-from-source-sql .
-        - docker tag phoss-smp-snapshot-from-source-sql phelger/smp:snapshot-sql
+        - docker tag phoss-smp-snapshot-from-source-sql phelger/phoss-smp-sql:snapshot
 # build MongoDB version
         - docker build -t phoss-smp-snapshot-from-source-mongodb -f docker/Dockerfile-snapshot-from-source-mongodb .
-        - docker tag phoss-smp-snapshot-from-source-mongodb phelger/smp:snapshot-mongodb
+        - docker tag phoss-smp-snapshot-from-source-mongodb phelger/phoss-smp-mongodb:snapshot
 # push both
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker push phelger/smp:snapshot
-        - docker push phelger/smp:snapshot-sql
-        - docker push phelger/smp:snapshot-mongodb
+        - docker push phelger/phoss-smp-xml:snapshot
+        - docker push phelger/phoss-smp-sql:snapshot
+        - docker push phelger/phoss-smp-mongodb:snapshot
         - docker logout
       after_success:
         - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
