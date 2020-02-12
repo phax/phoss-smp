@@ -198,11 +198,14 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                .setOnClick (aWPEC.getSelfHref ()
                                                                  .add (CPageParam.PARAM_ACTION,
                                                                        ACTION_RELOAD_TRUSTSTORE)));
-      aToolbar.addChild (new BootstrapButton ().addChild ("Reload " + sDirectoryName + " configuration")
-                                               .setIcon (EDefaultIcon.REFRESH)
-                                               .setOnClick (aWPEC.getSelfHref ()
-                                                                 .add (CPageParam.PARAM_ACTION,
-                                                                       ACTION_RELOAD_DIRECTORY_CONFIGURATION)));
+      if (SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
+      {
+        aToolbar.addChild (new BootstrapButton ().addChild ("Reload " + sDirectoryName + " configuration")
+                                                 .setIcon (EDefaultIcon.REFRESH)
+                                                 .setOnClick (aWPEC.getSelfHref ()
+                                                                   .add (CPageParam.PARAM_ACTION,
+                                                                         ACTION_RELOAD_DIRECTORY_CONFIGURATION)));
+      }
       aNodeList.addChild (aToolbar);
     }
 
