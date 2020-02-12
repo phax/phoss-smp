@@ -371,7 +371,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             final EPredefinedCert eCert = EPredefinedCert.getFromIssuerOrNull (sIssuer);
             if (eCert != null)
             {
-              aTab.addChild (info ("You are currently using a " + eCert.getName () + " certificate!"));
+              if (eCert.isDeprecated ())
+                aTab.addChild (warn ("You are currently using a ").addChild (strong ("deprecated"))
+                                                                  .addChild (" " + eCert.getName () + " certificate!"));
+              else
+                aTab.addChild (info ("You are currently using a " + eCert.getName () + " certificate!"));
               if (aChain.length != eCert.getCertificateTreeLength ())
                 aTab.addChild (error ("The private key should be a chain of " +
                                       eCert.getCertificateTreeLength () +
