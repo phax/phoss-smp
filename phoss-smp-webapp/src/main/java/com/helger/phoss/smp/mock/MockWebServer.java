@@ -16,8 +16,13 @@
  */
 package com.helger.phoss.smp.mock;
 
+import java.io.File;
+
 import javax.annotation.Nonnull;
 
+import org.eclipse.jetty.webapp.WebAppContext;
+
+import com.helger.commons.system.SystemProperties;
 import com.helger.photon.jetty.JettyRunner;
 
 /**
@@ -40,7 +45,16 @@ final class MockWebServer
   @Nonnull
   public static JettyRunner startRegularServer ()
   {
-    final JettyRunner ret = new JettyRunner ();
+    final JettyRunner ret = new JettyRunner ()
+    {
+      @Override
+      protected void customizeWebAppCtx (final WebAppContext aWebAppCtx) throws Exception
+      {
+        // Workaround for bug in ph-oton 8.2.2
+        // Overwrite for Travis
+        aWebAppCtx.setTempDirectory (new File (SystemProperties.getTmpDir (), "phoss-smp"));
+      }
+    };
     ret.setContextPath (CONTEXT_PATH).setPort (PORT).setStopPort (STOP_PORT);
     try
     {
