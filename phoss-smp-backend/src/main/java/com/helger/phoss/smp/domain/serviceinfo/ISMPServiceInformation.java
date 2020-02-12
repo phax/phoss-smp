@@ -94,6 +94,16 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
   int getTotalEndpointCount ();
 
   /**
+   * Check if the passed transport profile is used or not.
+   *
+   * @param sTransportProfileID
+   *        The transport profile ID to be checked. May be <code>null</code>.
+   * @return <code>true</code> if at least one endpoint uses the provided
+   *         transport profile ID, <code>false</code> if not.
+   */
+  boolean containsAnyEndpointWithTransportProfile (@Nullable String sTransportProfileID);
+
+  /**
    * Add the passed process.
    *
    * @param aProcess

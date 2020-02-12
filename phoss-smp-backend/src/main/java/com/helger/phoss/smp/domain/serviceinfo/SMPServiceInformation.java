@@ -26,6 +26,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -162,6 +163,14 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     for (final ISMPProcess aProcess : m_aProcesses.values ())
       ret += aProcess.getEndpointCount ();
     return ret;
+  }
+
+  public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
+  {
+    if (StringHelper.hasNoText (sTransportProfileID))
+      return false;
+
+    return m_aProcesses.containsAnyValue (x -> x.containsAnyEndpointWithTransportProfile (sTransportProfileID));
   }
 
   @Nonnull

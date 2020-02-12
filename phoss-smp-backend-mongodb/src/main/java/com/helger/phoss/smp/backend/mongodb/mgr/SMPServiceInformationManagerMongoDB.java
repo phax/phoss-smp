@@ -37,6 +37,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.typeconvert.TypeConverter;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -476,5 +477,17 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                    aDocumentTypeIdentifier.getValue () +
                    "'. This seems to be a bug! Using the first one.");
     return ret.getFirst ();
+  }
+
+  public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
+  {
+    if (StringHelper.hasNoText (sTransportProfileID))
+      return false;
+
+    // As simple as it can be
+    return getCollection ().find (new Document (BSON_PROCESSES + "." + BSON_ENDPOINTS + "." + BSON_TRANSPORT_PROFILE,
+                                                sTransportProfileID))
+                           .iterator ()
+                           .hasNext ();
   }
 }

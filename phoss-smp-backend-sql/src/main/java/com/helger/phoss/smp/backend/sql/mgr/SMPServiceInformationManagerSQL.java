@@ -23,7 +23,6 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
@@ -31,6 +30,7 @@ import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.wrapper.Wrapper;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -96,7 +96,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
 
           // Check for endpoint update
           // Create a copy to avoid concurrent modification
-          for (final DBEndpoint aDBEndpoint : CollectionHelper.newList (aDBProcess.getEndpoints ()))
+          for (final DBEndpoint aDBEndpoint : new CommonsArrayList <> (aDBProcess.getEndpoints ()))
           {
             boolean bEndpointFound = false;
             for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
@@ -528,5 +528,23 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
     if (aDBMetadata == null)
       return null;
     return _convert (aDBMetadata);
+  }
+
+  public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
+  {
+    if (StringHelper.hasNoText (sTransportProfileID))
+      return false;
+
+    JPAExecutionResult <Long> ret;
+    ret = doSelect ( () -> {
+      final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBEndpoint p WHERE p.id.transportProfile = :tp")
+                                                                   .setParameter ("tp", sTransportProfileID));
+      return Long.valueOf (nCount);
+    });
+    if (ret.hasException ())
+      return false;
+
+    // As simple as it can be
+    return ret.get ().longValue () > 0;
   }
 }

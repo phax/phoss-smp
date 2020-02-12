@@ -98,6 +98,11 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return new CommonsArrayList <> (m_aEndpoints.values ());
   }
 
+  public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
+  {
+    return StringHelper.hasText (sTransportProfileID) && m_aEndpoints.containsKey (sTransportProfileID);
+  }
+
   public void addEndpoint (@Nonnull final SMPEndpoint aEndpoint)
   {
     ValueEnforcer.notNull (aEndpoint, "Endpoint");

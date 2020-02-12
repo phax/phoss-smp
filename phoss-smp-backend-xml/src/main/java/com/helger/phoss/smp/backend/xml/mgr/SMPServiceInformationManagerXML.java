@@ -33,6 +33,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -353,5 +354,13 @@ public final class SMPServiceInformationManagerXML extends
                    aDocumentTypeIdentifier.getValue () +
                    "'. This seems to be a bug! Using the first one.");
     return ret.getFirst ();
+  }
+
+  public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
+  {
+    if (StringHelper.hasNoText (sTransportProfileID))
+      return false;
+
+    return containsAny (x -> x.containsAnyEndpointWithTransportProfile (sTransportProfileID));
   }
 }

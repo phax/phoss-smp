@@ -99,4 +99,9 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
   {
     throw new UnsupportedOperationException ();
   }
+
+  public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
+  {
+    return false;
+  }
 }

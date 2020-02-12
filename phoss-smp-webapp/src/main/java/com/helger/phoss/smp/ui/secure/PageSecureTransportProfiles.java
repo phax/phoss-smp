@@ -38,9 +38,6 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
@@ -176,16 +173,14 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
     if (eFormAction.isDelete ())
     {
       // Can only delete non-standard protocol
-      if (ESMPTransportProfile.getFromIDOrNull (aSelectedObject.getID ()) != null)
+      if (DEFAULT_PROFILE_IDS.contains (aSelectedObject.getID ()))
         return false;
 
       // If the transport profile is already used, it cannot be deleted
+      // This might be slow depending on the implementation
       final ISMPServiceInformationManager aServiceInformationMgr = SMPMetaManager.getServiceInformationMgr ();
-      for (final ISMPServiceInformation aServiceInfo : aServiceInformationMgr.getAllSMPServiceInformation ())
-        for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
-          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-            if (aEndpoint.getTransportProfile ().equals (aSelectedObject.getID ()))
-              return false;
+      if (aServiceInformationMgr.containsAnyEndpointWithTransportProfile (aSelectedObject.getID ()))
+        return false;
     }
 
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
