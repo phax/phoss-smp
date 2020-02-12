@@ -39,11 +39,9 @@ import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.IHCNode;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.textlevel.HCA;
-import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.sml.ISMLInfo;
@@ -63,11 +61,6 @@ import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
-import com.helger.photon.bootstrap4.badge.BootstrapBadge;
-import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.uicore.css.CUICoreCSS;
@@ -85,21 +78,21 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
   }
 
   @Nonnull
-  private static IHCNode _createInfo (@Nonnull final String sMsg)
+  private IHCNode _createInfo (@Nonnull final String sMsg)
   {
-    return new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("Information: " + sMsg);
+    return badgeInfo ("Information: " + sMsg);
   }
 
   @Nonnull
-  private static IHCNode _createWarning (@Nonnull final String sMsg)
+  private IHCNode _createWarning (@Nonnull final String sMsg)
   {
-    return new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Warning: " + sMsg);
+    return badgeWarn ("Warning: " + sMsg);
   }
 
   @Nonnull
-  private static IHCNode _createError (@Nonnull final String sMsg)
+  private IHCNode _createError (@Nonnull final String sMsg)
   {
-    return new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("Error: " + sMsg);
+    return badgeDanger ("Error: " + sMsg);
   }
 
   @Override
@@ -115,7 +108,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
 
-    aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page tries to identify upcoming tasks and potential problems in the SMP configuration. It is meant to highlight immediate and upcoming action items as well as potential misconfiguration."));
+    aNodeList.addChild (info ("This page tries to identify upcoming tasks and potential problems in the SMP configuration. It is meant to highlight immediate and upcoming action items as well as potential misconfiguration."));
 
     final HCOL aOL = new HCOL ();
 
@@ -127,7 +120,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       aOL.addItem (_createError ("Please change the password of the default user " +
                                  CSecurity.USER_ADMINISTRATOR_EMAIL +
                                  "!"),
-                   new HCDiv ().addChild ("This is a severe security risk"));
+                   div ("This is a severe security risk"));
     }
 
     // check keystore configuration
@@ -136,7 +129,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       {
         // Loading failed - wrong path or wrong password or so
         aOL.addItem (_createError ("Problem with the certificate configuration"),
-                     new HCDiv ().addChild (SMPKeyManager.getInitializationError ()));
+                     div (SMPKeyManager.getInitializationError ()));
       }
       else
       {
@@ -159,22 +152,19 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
               if (aNowDT.isBefore (aNotBefore))
               {
                 aOL.addItem (_createError (sLogPrefix + " is not yet valid."),
-                             new HCDiv ().addChild ("It will be valid from " +
-                                                    PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+                             div ("It will be valid from " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
               }
 
               final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
               if (aNowDT.isAfter (aNotAfter))
               {
                 aOL.addItem (_createError (sLogPrefix + " is already expired."),
-                             new HCDiv ().addChild ("It was valid until " +
-                                                    PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+                             div ("It was valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
               }
               else
                 if (aNowPlusDT.isAfter (aNotAfter))
                   aOL.addItem (_createWarning (sLogPrefix + " will expire soon."),
-                               new HCDiv ().addChild ("It is only valid until " +
-                                                      PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+                               div ("It is only valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
             }
             else
             {
@@ -193,7 +183,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       // Ignore error if no trust store is configured
       if (SMPTrustManager.getInitializationErrorCode () != EKeyStoreLoadError.KEYSTORE_NO_PATH)
         aOL.addItem (_createWarning ("Problem with the truststore configuration"),
-                     new HCDiv ().addChild (SMPTrustManager.getInitializationError ()));
+                     div (SMPTrustManager.getInitializationError ()));
     }
     else
     {
@@ -220,8 +210,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
             if (aNowDT.isBefore (aNotBefore))
             {
               aTrustStoreOL.addItem (_createError (sLogPrefix + " is not yet valid."),
-                                     new HCDiv ().addChild ("It will be valid from " +
-                                                            PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+                                     div ("It will be valid from " +
+                                          PDTToString.getAsString (aNotBefore, aDisplayLocale)));
               bHasError = true;
             }
 
@@ -229,15 +219,14 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
             if (aNowDT.isAfter (aNotAfter))
             {
               aTrustStoreOL.addItem (_createError (sLogPrefix + " is already expired."),
-                                     new HCDiv ().addChild ("It was valid until " +
-                                                            PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+                                     div ("It was valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
               bHasError = true;
             }
             else
               if (aNowPlusDT.isAfter (aNotAfter))
                 aTrustStoreOL.addItem (_createWarning (sLogPrefix + " will expire soon."),
-                                       new HCDiv ().addChild ("It is only valid until " +
-                                                              PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+                                       div ("It is only valid until " +
+                                            PDTToString.getAsString (aNotAfter, aDisplayLocale)));
           }
           else
             aTrustStoreOL.addItem (_createWarning ("The certificate is not an X.509 certificate! It is internally a " +
@@ -247,7 +236,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       catch (final GeneralSecurityException ex)
       {
         aTrustStoreOL.addItem (_createError ("Error iterating trust store."),
-                               new HCDiv ().addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+                               div (SMPCommonUI.getTechnicalDetailsUI (ex)));
         bHasError = true;
       }
 
@@ -262,14 +251,14 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       if (!aSMPSettings.isSMLEnabled ())
       {
         aOL.addItem (_createWarning ("The connection to the SML is not configured."),
-                     new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+                     div ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
       }
 
       final ISMLInfo aSMLInfo = aSMPSettings.getSMLInfo ();
       if (aSMLInfo == null)
       {
         aOL.addItem (_createError ("No SML is selected."),
-                     new HCDiv ().addChild ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+                     div ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
       }
       else
       {
@@ -284,11 +273,11 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
         {
           // continue
           aOL.addItem (_createWarning ("It seems like this SMP was not yet registered to the SMP."),
-                       new HCDiv ().addChild ("This is a one-time action that should be performed once. It requires a valid SMP certificate to work."),
-                       new HCDiv ().addChild ("The registration check was performed with the URL ")
-                                   .addChild (new HCA ().setHref (new SimpleURL ("http://" + sPublisherDNSName))
-                                                        .setTargetBlank ()
-                                                        .addChild (new HCCode ().addChild (sPublisherDNSName))));
+                       div ("This is a one-time action that should be performed once. It requires a valid SMP certificate to work."),
+                       div ("The registration check was performed with the URL ").addChild (new HCA ().setHref (new SimpleURL ("http://" +
+                                                                                                                               sPublisherDNSName))
+                                                                                                      .setTargetBlank ()
+                                                                                                      .addChild (code (sPublisherDNSName))));
         }
       }
     }
@@ -297,41 +286,38 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     if (StringHelper.hasNoText (SMPServerConfiguration.getPublicServerURL ()))
     {
       aOL.addItem (_createWarning ("The public server URL is not configured"),
-                   new HCDiv ().addChild ("The configuration file property ")
-                               .addChild (new HCCode ().addChild (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
-                               .addChild (" in file " +
-                                          SMPServerConfiguration.PATH_SMP_SERVER_PROPERTIES +
-                                          " is not set. This property is usually required to create valid Internet-URLs."));
+                   div ("The configuration file property ").addChild (code (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
+                                                           .addChild (" in file " +
+                                                                      SMPServerConfiguration.PATH_SMP_SERVER_PROPERTIES +
+                                                                      " is not set. This property is usually required to create valid Internet-URLs."));
     }
 
     // Check that the global debug setting is off
     if (GlobalDebug.isDebugMode ())
     {
       aOL.addItem (_createWarning ("Debug mode is enabled."),
-                   new HCDiv ().addChild ("This mode enables increased debug checks and logging and therefore results in reduced performance.")
-                               .addChild (" This should not be enabled in a production system.")
-                               .addChild (" The configuration file property ")
-                               .addChild (new HCCode ().addChild (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_DEBUG))
-                               .addChild (" in file " +
-                                          SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
-                                          " should be set to ")
-                               .addChild (new HCCode ().addChild ("false"))
-                               .addChild (" to fix this."));
+                   div ("This mode enables increased debug checks and logging and therefore results in reduced performance.").addChild (" This should not be enabled in a production system.")
+                                                                                                                             .addChild (" The configuration file property ")
+                                                                                                                             .addChild (code (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_DEBUG))
+                                                                                                                             .addChild (" in file " +
+                                                                                                                                        SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
+                                                                                                                                        " should be set to ")
+                                                                                                                             .addChild (code ("false"))
+                                                                                                                             .addChild (" to fix this."));
     }
 
     // Check that the global production mode is on
     if (!GlobalDebug.isProductionMode ())
     {
       aOL.addItem (_createWarning ("Production mode is disabled."),
-                   new HCDiv ().addChild ("This mode is required so that all background jobs are enabled and mail sending works (if configured).")
-                               .addChild (" This should be enabled in a production system.")
-                               .addChild (" The configuration file property ")
-                               .addChild (new HCCode ().addChild (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_PRODUCTION))
-                               .addChild (" in file " +
-                                          SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
-                                          " should be set to ")
-                               .addChild (new HCCode ().addChild ("true"))
-                               .addChild (" to fix this."));
+                   div ("This mode is required so that all background jobs are enabled and mail sending works (if configured).").addChild (" This should be enabled in a production system.")
+                                                                                                                                .addChild (" The configuration file property ")
+                                                                                                                                .addChild (code (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_PRODUCTION))
+                                                                                                                                .addChild (" in file " +
+                                                                                                                                           SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
+                                                                                                                                           " should be set to ")
+                                                                                                                                .addChild (code ("true"))
+                                                                                                                                .addChild (" to fix this."));
     }
 
     // Check Directory configuration
@@ -339,14 +325,14 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     {
       if (StringHelper.hasNoText (aSMPSettings.getDirectoryHostName ()))
         aOL.addItem (_createError ("An empty " + sDirectoryName + " hostname is provided"),
-                     new HCDiv ().addChild ("A connection to the " + sDirectoryName + " server cannot be establised!"));
+                     div ("A connection to the " + sDirectoryName + " server cannot be establised!"));
 
       final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (PDClientConfiguration.getKeyStoreType (),
                                                                           PDClientConfiguration.getKeyStorePath (),
                                                                           PDClientConfiguration.getKeyStorePassword ());
       if (aLoadedKeyStore.isFailure ())
         aOL.addItem (_createError ("The " + sDirectoryName + " client certificate configuration is invalid."),
-                     new HCDiv ().addChild (PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore)));
+                     div (PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore)));
     }
     else
     {
@@ -399,27 +385,27 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
                   {
                     if (aEndpoint.getServiceActivationDateTime ().isAfter (aNowDT))
                       aULPerEndpoint.addItem (_createWarning ("The endpoint is not yet active."),
-                                              new HCDiv ().addChild ("It will be active from " +
-                                                                     PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (),
-                                                                                              aDisplayLocale) +
-                                                                     "."));
+                                              div ("It will be active from " +
+                                                   PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (),
+                                                                            aDisplayLocale) +
+                                                   "."));
                   }
 
                   if (aEndpoint.getServiceExpirationDateTime () != null)
                   {
                     if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowDT))
                       aULPerEndpoint.addItem (_createError ("The endpoint is no longer active."),
-                                              new HCDiv ().addChild ("It was valid until " +
-                                                                     PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
-                                                                                              aDisplayLocale) +
-                                                                     "."));
+                                              div ("It was valid until " +
+                                                   PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
+                                                                            aDisplayLocale) +
+                                                   "."));
                     else
                       if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowPlusDT))
                         aULPerEndpoint.addItem (_createWarning ("The endpoint will be inactive soon."),
-                                                new HCDiv ().addChild ("It is only valid until " +
-                                                                       PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
-                                                                                                aDisplayLocale) +
-                                                                       "."));
+                                                div ("It is only valid until " +
+                                                     PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
+                                                                              aDisplayLocale) +
+                                                     "."));
                   }
 
                   X509Certificate aX509Cert = null;
@@ -438,56 +424,47 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
                     final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
                     if (aNowDT.isBefore (aNotBefore))
                       aULPerEndpoint.addItem (_createError ("The endpoint certificate is not yet active."),
-                                              new HCDiv ().addChild ("It will be valid from " +
-                                                                     PDTToString.getAsString (aNotBefore,
-                                                                                              aDisplayLocale) +
-                                                                     "."));
+                                              div ("It will be valid from " +
+                                                   PDTToString.getAsString (aNotBefore, aDisplayLocale) +
+                                                   "."));
 
                     final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
                     if (aNowDT.isAfter (aNotAfter))
                       aULPerEndpoint.addItem (_createError ("The endpoint certificate is already expired."),
-                                              new HCDiv ().addChild ("It was valid until " +
-                                                                     PDTToString.getAsString (aNotAfter,
-                                                                                              aDisplayLocale) +
-                                                                     "."));
+                                              div ("It was valid until " +
+                                                   PDTToString.getAsString (aNotAfter, aDisplayLocale) +
+                                                   "."));
                     else
                       if (aNowPlusDT.isAfter (aNotAfter))
                         aULPerEndpoint.addItem (_createWarning ("The endpoint certificate will expire soon."),
-                                                new HCDiv ().addChild ("It is only valid until " +
-                                                                       PDTToString.getAsString (aNotAfter,
-                                                                                                aDisplayLocale) +
-                                                                       "."));
+                                                div ("It is only valid until " +
+                                                     PDTToString.getAsString (aNotAfter, aDisplayLocale) +
+                                                     "."));
                   }
 
                   // Show per endpoint errors
                   if (aULPerEndpoint.hasChildren ())
-                    aULPerProcess.addItem (new HCDiv ().addChild ("Transport profile ")
-                                                       .addChild (new HCCode ().addChild (aEndpoint.getTransportProfile ())),
+                    aULPerProcess.addItem (div ("Transport profile ").addChild (code (aEndpoint.getTransportProfile ())),
                                            aULPerEndpoint);
                 }
                 // Show per process errors
                 if (aULPerProcess.hasChildren ())
-                  aULPerDocType.addItem (new HCDiv ().addChild ("Process ")
-                                                     .addChild (new HCCode ().addClass (CUICoreCSS.CSS_CLASS_NOWRAP)
-                                                                             .addChild (aProcess.getProcessIdentifier ()
-                                                                                                .getURIEncoded ())),
+                  aULPerDocType.addItem (div ("Process ").addChild (code (aProcess.getProcessIdentifier ()
+                                                                                  .getURIEncoded ()).addClass (CUICoreCSS.CSS_CLASS_NOWRAP)),
                                          aULPerProcess);
               }
               // Show per document type errors
               if (aULPerDocType.hasChildren ())
-                aULPerSG.addItem (new HCDiv ().addChild ("Document type ")
-                                              .addChild (new HCCode ().addClass (CUICoreCSS.CSS_CLASS_NOWRAP)
-                                                                      .addChild (aServiceInfo.getDocumentTypeIdentifier ()
-                                                                                             .getURIEncoded ())),
+                aULPerSG.addItem (div ("Document type ").addChild (code (aServiceInfo.getDocumentTypeIdentifier ()
+                                                                                     .getURIEncoded ()).addClass (CUICoreCSS.CSS_CLASS_NOWRAP)),
                                   aULPerDocType);
             }
           }
 
           // Show per service group errors
           if (aULPerSG.hasChildren ())
-            aOL.addItem (new HCDiv ().addChild ("Service group ")
-                                     .addChild (new HCCode ().addChild (aServiceGroup.getParticpantIdentifier ()
-                                                                                     .getURIEncoded ())),
+            aOL.addItem (div ("Service group ").addChild (code (aServiceGroup.getParticpantIdentifier ()
+                                                                             .getURIEncoded ())),
                          aULPerSG);
         }
       }
@@ -496,10 +473,10 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     // Show results
     if (aOL.hasChildren ())
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("The following list of tasks and problems were identified:"));
+      aNodeList.addChild (warn ("The following list of tasks and problems were identified:"));
       aNodeList.addChild (aOL);
     }
     else
-      aNodeList.addChild (new BootstrapSuccessBox ().addChild ("Great job, no tasks or problems identified!"));
+      aNodeList.addChild (success ("Great job, no tasks or problems identified!"));
   }
 }

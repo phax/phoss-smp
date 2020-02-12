@@ -40,9 +40,7 @@ import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.id.factory.GlobalIDFactory;
-import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.math.MathHelper;
-import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCEditPassword;
@@ -61,6 +59,7 @@ import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.html.jscode.html.JSHtml;
 import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
+import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 import com.helger.phoss.smp.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.phoss.smp.ui.ajax.CAjax;
@@ -73,6 +72,7 @@ import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap4.uictrls.ext.BootstrapTechnicalUI;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.form.RequestField;
@@ -344,12 +344,6 @@ public final class SMPCommonUI
     return aNL;
   }
 
-  @Nonnull
-  private static String _getString (@Nonnull final Throwable t)
-  {
-    return StringHelper.getConcatenatedOnDemand (ClassHelper.getClassLocalName (t.getClass ()), " - ", t.getMessage ());
-  }
-
   @Nullable
   public static HCNodeList getTechnicalDetailsUI (@Nullable final Throwable t)
   {
@@ -357,18 +351,7 @@ public final class SMPCommonUI
       return null;
 
     LOGGER.warn ("Technical details", t);
-
-    final HCNodeList ret = new HCNodeList ();
-    Throwable aCur = t;
-    while (aCur != null)
-    {
-      if (ret.hasNoChildren ())
-        ret.addChild (new HCDiv ().addChild ("Technical details: " + _getString (aCur)));
-      else
-        ret.addChild (new HCDiv ().addChild ("Caused by: " + _getString (aCur)));
-      aCur = aCur.getCause ();
-    }
-    return ret;
+    return BootstrapTechnicalUI.getTechnicalDetailsNode (t, CSMP.DEFAULT_LOCALE);
   }
 
   @Nullable
@@ -378,17 +361,6 @@ public final class SMPCommonUI
       return null;
 
     LOGGER.warn ("Technical details", t);
-
-    final StringBuilder ret = new StringBuilder ();
-    Throwable aCur = t;
-    while (aCur != null)
-    {
-      if (ret.length () == 0)
-        ret.append ("Technical details: ").append (_getString (aCur));
-      else
-        ret.append ("\nCaused by: ").append (_getString (aCur));
-      aCur = aCur.getCause ();
-    }
-    return ret.toString ();
+    return BootstrapTechnicalUI.getTechnicalDetailsString (t, CSMP.DEFAULT_LOCALE);
   }
 }

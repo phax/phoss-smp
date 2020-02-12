@@ -21,6 +21,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -37,7 +38,6 @@ import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.html.forms.HCTextArea;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.BDMSLClient;
@@ -47,10 +47,6 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.audit.AuditHelper;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
@@ -81,14 +77,13 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
   {
     if (SMPMetaManager.getSettings ().getSMLInfo () == null)
     {
-      aWPEC.getNodeList ()
-           .addChild (new BootstrapWarnBox ().addChild ("This page cannot be shown because the SML configuration is invalid."));
+      aWPEC.getNodeList ().addChild (warn ("This page cannot be shown because the SML configuration is invalid."));
       return EValidity.INVALID;
     }
     if (!SMPKeyManager.isKeyStoreValid ())
     {
       aWPEC.getNodeList ()
-           .addChild (new BootstrapWarnBox ().addChild ("This page cannot be shown because the overall keystore configuration is invalid."));
+           .addChild (warn ("This page cannot be shown because the overall keystore configuration is invalid."));
       return EValidity.INVALID;
     }
     return super.isValidToDisplayPage (aWPEC);
@@ -103,8 +98,8 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     return ret;
   }
 
-  private static void _updateSMPCertAtSML (@Nonnull final WebPageExecutionContext aWPEC,
-                                           @Nonnull final FormErrorList aFormErrors)
+  private void _updateSMPCertAtSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -163,6 +158,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 
     if (aMigrationPublicKey != null)
     {
+      // Using the date only is okay here
       final LocalDate aNotBefore = PDTFactory.createLocalDate (aMigrationPublicKey.getNotBefore ());
       final LocalDate aNotAfter = PDTFactory.createLocalDate (aMigrationPublicKey.getNotAfter ());
 
@@ -202,10 +198,10 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
         aCaller.prepareChangeCertificate (sMigrationPublicKey, aMigrationDate);
 
-        final LocalDate aNotBefore = PDTFactory.createLocalDate (aMigrationPublicKey.getNotBefore ());
-        final LocalDate aNotAfter = PDTFactory.createLocalDate (aMigrationPublicKey.getNotAfter ());
+        final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aMigrationPublicKey.getNotBefore ());
+        final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aMigrationPublicKey.getNotAfter ());
 
-        final LocalDate aEffectiveMigrationDate = aMigrationDate != null ? aMigrationDate : aNotBefore;
+        final LocalDate aEffectiveMigrationDate = aMigrationDate != null ? aMigrationDate : aNotBefore.toLocalDate ();
         final String sMsg = "Successfully prepared migration of SMP certificate at SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'" +
@@ -214,14 +210,15 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
                             ".";
         LOGGER.info (sMsg);
 
-        final BootstrapSuccessBox aBox = new BootstrapSuccessBox ();
-        aBox.addChild (new HCDiv ().addChild (sMsg));
-        aBox.addChild (new HCDiv ().addChild ("Issuer: " + aMigrationPublicKey.getIssuerX500Principal ().toString ()));
-        aBox.addChild (new HCDiv ().addChild ("Subject: " +
-                                              aMigrationPublicKey.getSubjectX500Principal ().toString ()));
-        aBox.addChild (new HCDiv ().addChild ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
-        aBox.addChild (new HCDiv ().addChild ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
-        aNodeList.addChild (aBox);
+        aNodeList.addChild (success ().addChild (div (sMsg))
+                                      .addChild (div ("Issuer: " +
+                                                      aMigrationPublicKey.getIssuerX500Principal ().toString ()))
+                                      .addChild (div ("Subject: " +
+                                                      aMigrationPublicKey.getSubjectX500Principal ().toString ()))
+                                      .addChild (div ("Not before: " +
+                                                      PDTToString.getAsString (aNotBefore, aDisplayLocale)))
+                                      .addChild (div ("Not after: " +
+                                                      PDTToString.getAsString (aNotAfter, aDisplayLocale))));
 
         AuditHelper.onAuditExecuteSuccess ("smp-sml-update-cert",
                                            aSMLInfo.getManagementServiceURL (),
@@ -234,7 +231,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
         LOGGER.error (sMsg, ex);
-        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+        aNodeList.addChild (error (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-update-cert",
                                            aSMLInfo.getManagementServiceURL (),
                                            sMigrationPublicKey,
@@ -254,8 +251,8 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final FormErrorList aFormErrors = new FormErrorList ();
 
-    aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("Prepare the update of your SMP certificate in the future."),
-                                                             new HCDiv ().addChild ("Note: this is a custom SML extension that only works with the CEF SML instances!")));
+    aNodeList.addChild (info ().addChildren (div ("Prepare the update of your SMP certificate in the future."),
+                                             div ("Note: this is a custom SML extension that only works with the CEF SML instances!")));
 
     // check for expired certificate
     boolean bShowForm = true;
@@ -266,23 +263,23 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         try
         {
           aEntry.checkValidity ();
-          aNodeList.addChild (new BootstrapInfoBox ().addChild ("Your SMP certificate is still valid until " +
-                                                                PDTToString.getAsString (PDTFactory.createLocalDateTime (aEntry.getNotAfter ()),
-                                                                                         aDisplayLocale) +
-                                                                "."));
+          aNodeList.addChild (info ("Your SMP certificate is still valid until " +
+                                    PDTToString.getAsString (PDTFactory.createLocalDateTime (aEntry.getNotAfter ()),
+                                                             aDisplayLocale) +
+                                    "."));
         }
         catch (final CertificateExpiredException ex)
         {
-          aNodeList.addChild (new BootstrapErrorBox ().addChild ("Your SMP certificate is already expired." +
-                                                                 " This functionality works only if your SMP certificate is NOT expired yet." +
-                                                                 " Please contact CEF-EDELIVERY-SUPPORT@ec.europa.eu with your SMP ID, the new certificate and the requested exchange date!"));
+          aNodeList.addChild (error ("Your SMP certificate is already expired." +
+                                     " This functionality works only if your SMP certificate is NOT expired yet." +
+                                     " Please contact CEF-EDELIVERY-SUPPORT@ec.europa.eu with your SMP ID, the new certificate and the requested exchange date!"));
           bShowForm = false;
         }
         catch (final CertificateNotYetValidException ex)
         {
-          aNodeList.addChild (new BootstrapWarnBox ().addChild ("Your SMP certificate is not valid yet." +
-                                                                " For this page to work you need to have your old certificate (the one that will expire soon) configured." +
-                                                                " Most likely the certificate change will not work."));
+          aNodeList.addChild (warn ("Your SMP certificate is not valid yet." +
+                                    " For this page to work you need to have your old certificate (the one that will expire soon) configured." +
+                                    " Most likely the certificate change will not work."));
         }
       }
     }
@@ -299,7 +296,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
       final int nLeft = 3;
       final BootstrapForm aForm = getUIHandler ().createFormFileUploadSelf (aWPEC);
       aForm.setLeft (nLeft);
-      aForm.addChild (new BootstrapWarnBox ().addChild ("It is your responsibility to actually perform the update of the certificate in this SMP at the specified time! This does NOT happen automatically."));
+      aForm.addChild (warn ("It is your responsibility to actually perform the update of the certificate in this SMP at the specified time! This does NOT happen automatically."));
 
       final BootstrapDateTimePicker aDTP = BootstrapDateTimePicker.create (FIELD_PM_MIGRATION_DATE,
                                                                            (LocalDate) null,

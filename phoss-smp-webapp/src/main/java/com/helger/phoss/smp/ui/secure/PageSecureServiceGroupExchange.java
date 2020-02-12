@@ -64,8 +64,6 @@ import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPUserSelect;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
@@ -515,18 +513,15 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     {
       final HCNodeList aExport = new HCNodeList ();
       if (nServiceGroupCount == 0)
-        aExport.addChild (new BootstrapWarnBox ().addChild ("Since no service group is present, nothing can be exported!"));
+        aExport.addChild (warn ("Since no service group is present, nothing can be exported!"));
       else
       {
-        aExport.addChild (new BootstrapInfoBox ().addChild ("Export " +
-                                                            (nServiceGroupCount == 1 ? "service group"
-                                                                                     : "all " +
-                                                                                       aAllServiceGroups.size () +
-                                                                                       " service groups") +
-                                                            (bHandleBusinessCards ? " and business card" +
-                                                                                    (nServiceGroupCount == 1 ? "" : "s")
-                                                                                  : "") +
-                                                            " to an XML file."));
+        aExport.addChild (info ("Export " +
+                                (nServiceGroupCount == 1 ? "service group"
+                                                         : "all " + aAllServiceGroups.size () + " service groups") +
+                                (bHandleBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s")
+                                                      : "") +
+                                " to an XML file."));
       }
 
       final BootstrapButtonToolbar aToolbar = aExport.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
@@ -549,9 +544,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         aImport.addChild (aPanel);
       }
 
-      aImport.addChild (new BootstrapInfoBox ().addChild ("Import service groups incl. all endpoints" +
-                                                          (bHandleBusinessCards ? " and business cards" : "") +
-                                                          " from a file."));
+      aImport.addChild (info ("Import service groups incl. all endpoints" +
+                              (bHandleBusinessCards ? " and business cards" : "") +
+                              " from a file."));
 
       final BootstrapForm aForm = aImport.addAndReturnChild (getUIHandler ().createFormFileUploadSelf (aWPEC));
 

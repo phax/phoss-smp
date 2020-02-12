@@ -30,7 +30,6 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -46,8 +45,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
@@ -82,6 +79,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
   private static final ICommonsSet <String> DEFAULT_PROFILE_IDS;
   static
   {
+    // Use all non-deprecated ones
     DEFAULT_PROFILES.addAll (ESMPTransportProfile.values (), x -> !x.isDeprecated ());
     DEFAULT_PROFILE_IDS = new CommonsHashSet <> (DEFAULT_PROFILES, ESMPTransportProfile::getID);
   }
@@ -92,28 +90,28 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPTransportProfile, WebPageExecutionContext> ()
     {
       @Override
-      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                      @Nonnull final BootstrapForm aForm,
-                                      @Nonnull final ISMPTransportProfile aSelectedObject)
+      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                @Nonnull final BootstrapForm aForm,
+                                @Nonnull final ISMPTransportProfile aSelectedObject)
       {
-        aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the transport profile '" +
-                                                                                     aSelectedObject.getID () +
-                                                                                     "'?")));
+        aForm.addChild (question ("Are you sure you want to delete the transport profile '" +
+                                  aSelectedObject.getID () +
+                                  "'?"));
       }
 
       @Override
-      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
                                     @Nonnull final ISMPTransportProfile aSelectedObject)
       {
         final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
         if (aTransportProfileMgr.removeSMPTransportProfile (aSelectedObject.getID ()).isChanged ())
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The transport profile '" +
-                                                                              aSelectedObject.getID () +
-                                                                              "' was successfully deleted!"));
+          aWPEC.postRedirectGetInternal (success ("The transport profile '" +
+                                                  aSelectedObject.getID () +
+                                                  "' was successfully deleted!"));
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete transport profile '" +
-                                                                            aSelectedObject.getID () +
-                                                                            "'!"));
+          aWPEC.postRedirectGetInternal (error ("Failed to delete transport profile '" +
+                                                aSelectedObject.getID () +
+                                                "'!"));
       }
     });
     addCustomHandler (ACTION_ENSURE_DEFAULT,
@@ -124,8 +122,8 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
                                                        @Nullable final ISMPTransportProfile aSelectedObject)
                         {
                           final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
-                          final BootstrapSuccessBox aSuccessBox = new BootstrapSuccessBox ();
-                          final BootstrapSuccessBox aErrorBox = new BootstrapSuccessBox ();
+                          final BootstrapSuccessBox aSuccessBox = success ();
+                          final BootstrapErrorBox aErrorBox = error ();
                           for (final ESMPTransportProfile eTP : DEFAULT_PROFILES)
                             if (!aTransportProfileMgr.containsSMPTransportProfileWithID (eTP.getID ()))
                             {
@@ -133,19 +131,19 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
                                                                                   eTP.getName (),
                                                                                   eTP.isDeprecated ()) != null)
                               {
-                                aSuccessBox.addChild (new HCDiv ().addChild ("Successfully created the transport profile '" +
-                                                                             eTP.getName () +
-                                                                             "' with ID '" +
-                                                                             eTP.getID () +
-                                                                             "'"));
+                                aSuccessBox.addChild (div ("Successfully created the transport profile '" +
+                                                           eTP.getName () +
+                                                           "' with ID '" +
+                                                           eTP.getID () +
+                                                           "'"));
                               }
                               else
                               {
-                                aErrorBox.addChild (new HCDiv ().addChild ("Failed to create the transport profile '" +
-                                                                           eTP.getName () +
-                                                                           "' with ID '" +
-                                                                           eTP.getID () +
-                                                                           "'"));
+                                aErrorBox.addChild (div ("Failed to create the transport profile '" +
+                                                         eTP.getName () +
+                                                         "' with ID '" +
+                                                         eTP.getID () +
+                                                         "'"));
                               }
                             }
                           final HCNodeList aSummary = new HCNodeList ().addChild (aSuccessBox.hasChildren () ? aSuccessBox
@@ -156,7 +154,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
                             aWPEC.postRedirectGetInternal (aSummary);
                           else
                             aWPEC.getNodeList ()
-                                 .addChild (new BootstrapInfoBox ().addChild ("All default transport profiles are already registered."));
+                                 .addChild (info ("All default transport profiles are already registered."));
                           return EShowList.SHOW_LIST;
                         }
                       });
@@ -284,24 +282,16 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
       if (bEdit)
       {
         if (aTransportProfileMgr.updateSMPTransportProfile (sID, sName, bIsDeprecated).isChanged ())
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The transport profile '" +
-                                                                              sID +
-                                                                              "' was successfully edited."));
+          aWPEC.postRedirectGetInternal (success ("The transport profile '" + sID + "' was successfully edited."));
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to edit transport profile '" +
-                                                                            sID +
-                                                                            "'."));
+          aWPEC.postRedirectGetInternal (error ("Failed to edit transport profile '" + sID + "'."));
       }
       else
       {
         if (aTransportProfileMgr.createSMPTransportProfile (sID, sName, bIsDeprecated) != null)
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new transport profile '" +
-                                                                              sID +
-                                                                              "' was successfully created."));
+          aWPEC.postRedirectGetInternal (success ("The new transport profile '" + sID + "' was successfully created."));
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to create transport profile '" +
-                                                                            sID +
-                                                                            "'."));
+          aWPEC.postRedirectGetInternal (error ("Failed to create transport profile '" + sID + "'."));
       }
     }
   }
@@ -313,7 +303,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
 
-    aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page lets you create custom transport profiles that can be used in service information endpoints."));
+    aNodeList.addChild (info ("This page lets you create custom transport profiles that can be used in service information endpoints."));
 
     final ICommonsList <ISMPTransportProfile> aList = aTransportProfileMgr.getAllSMPTransportProfiles ();
 

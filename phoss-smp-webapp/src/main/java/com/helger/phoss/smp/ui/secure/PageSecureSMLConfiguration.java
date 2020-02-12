@@ -29,11 +29,9 @@ import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
-import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.CSMLDefault;
@@ -41,10 +39,6 @@ import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
@@ -75,28 +69,28 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMLInfo, WebPageExecutionContext> ()
     {
       @Override
-      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                      @Nonnull final BootstrapForm aForm,
-                                      @Nonnull final ISMLInfo aSelectedObject)
+      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                @Nonnull final BootstrapForm aForm,
+                                @Nonnull final ISMLInfo aSelectedObject)
       {
-        aForm.addChild (new BootstrapQuestionBox ().addChild (new HCDiv ().addChild ("Are you sure you want to delete the SML configuration '" +
-                                                                                     aSelectedObject.getDisplayName () +
-                                                                                     "'?")));
+        aForm.addChild (question ("Are you sure you want to delete the SML configuration '" +
+                                  aSelectedObject.getDisplayName () +
+                                  "'?"));
       }
 
       @Override
-      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
                                     @Nonnull final ISMLInfo aSelectedObject)
       {
         final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
         if (aSMLInfoMgr.deleteSMLInfo (aSelectedObject.getID ()).isChanged ())
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SML configuration '" +
-                                                                              aSelectedObject.getDisplayName () +
-                                                                              "' was successfully deleted!"));
+          aWPEC.postRedirectGetInternal (success ("The SML configuration '" +
+                                                  aSelectedObject.getDisplayName () +
+                                                  "' was successfully deleted!"));
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("The SML configuration '" +
-                                                                            aSelectedObject.getDisplayName () +
-                                                                            "' could not be deleted!"));
+          aWPEC.postRedirectGetInternal (error ("The SML configuration '" +
+                                                aSelectedObject.getDisplayName () +
+                                                "' could not be deleted!"));
       }
     });
   }
@@ -180,7 +174,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                                                                          aSelectedObject != null ? aSelectedObject.getDNSZone ()
                                                                                                                  : null)))
                                                  .setHelpText (new HCTextNode ("The name of the DNS Zone that this SML is working upon (e.g. "),
-                                                               new HCCode ().addChild ("acc.edelivery.tech.ec.europa.eu"),
+                                                               code ("acc.edelivery.tech.ec.europa.eu"),
                                                                new HCTextNode ("). The value will automatically converted to all-lowercase!"))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DNS_ZONE)));
 
@@ -251,16 +245,16 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                    sDNSZoneLC,
                                    sManagementAddressURL,
                                    bClientCertificateRequired);
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SML configuration '" +
-                                                                            sDisplayName +
-                                                                            "' was successfully edited."));
+        aWPEC.postRedirectGetInternal (success ("The SML configuration '" +
+                                                sDisplayName +
+                                                "' was successfully edited."));
       }
       else
       {
         aSMLInfoMgr.createSMLInfo (sDisplayName, sDNSZoneLC, sManagementAddressURL, bClientCertificateRequired);
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The new SML configuration '" +
-                                                                            sDisplayName +
-                                                                            "' was successfully created."));
+        aWPEC.postRedirectGetInternal (success ("The new SML configuration '" +
+                                                sDisplayName +
+                                                "' was successfully created."));
       }
     }
   }
@@ -272,7 +266,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
 
-    aNodeList.addChild (new BootstrapInfoBox ().addChild ("This page lets you create custom SML configurations that can be used for registration."));
+    aNodeList.addChild (info ("This page lets you create custom SML configurations that can be used for registration."));
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new SML configuration", createCreateURL (aWPEC), EDefaultIcon.NEW);

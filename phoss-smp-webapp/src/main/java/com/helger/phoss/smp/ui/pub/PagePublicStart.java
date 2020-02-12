@@ -30,7 +30,6 @@ import com.helger.html.hc.html.tabular.AbstractHCTable;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
-import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -38,7 +37,6 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.app.url.LinkHelper;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
@@ -76,7 +74,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
     if (SMPWebAppConfiguration.isStartPageParticipantsNone ())
     {
       // New in v5.0.4
-      aNodeList.addChild (new BootstrapInfoBox ().addChild ("This SMP has disabled the list of participants."));
+      aNodeList.addChild (info ("This SMP has disabled the list of participants."));
     }
     else
     {
@@ -123,7 +121,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
         if (bShowExtensionDetails)
         {
           if (aServiceGroup.extensions ().isNotEmpty ())
-            aRow.addCell (new HCCode ().addChildren (HCExtHelper.nl2divList (aServiceGroup.getFirstExtensionXML ())));
+            aRow.addCell (code (HCExtHelper.nl2divList (aServiceGroup.getFirstExtensionXML ())));
           else
             aRow.addCell ();
         }
@@ -148,7 +146,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
         }
       }
       else
-        aNodeList.addChild (new BootstrapInfoBox ().addChild ("This SMP does not manage any participant yet."));
+        aNodeList.addChild (info ("This SMP does not manage any participant yet."));
     }
   }
 }

@@ -29,7 +29,7 @@ import com.helger.html.hc.render.HCRenderer;
 import com.helger.json.JsonObject;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.photon.app.PhotonUnifiedResponse;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap4.traits.IHCBootstrap4Trait;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.core.login.CLogin;
@@ -41,7 +41,7 @@ import com.helger.photon.security.login.LoggedInUserManager;
  *
  * @author Philip Helger
  */
-public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor
+public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor implements IHCBootstrap4Trait
 {
   public static final String JSON_LOGGEDIN = "loggedin";
   public static final String JSON_HTML = "html";
@@ -72,9 +72,9 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor
         LOGGER.warn ("Login of '" + sLoginName + "' failed because " + eLoginResult);
 
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
-    final IHCNode aRoot = new BootstrapErrorBox ().addChild (EPhotonCoreText.LOGIN_ERROR_MSG.getDisplayText (aDisplayLocale) +
-                                                             " " +
-                                                             eLoginResult.getDisplayText (aDisplayLocale));
+    final IHCNode aRoot = error (EPhotonCoreText.LOGIN_ERROR_MSG.getDisplayText (aDisplayLocale) +
+                                 " " +
+                                 eLoginResult.getDisplayText (aDisplayLocale));
 
     // Set as result property
     aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, false)

@@ -28,7 +28,6 @@ import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.html.forms.HCEdit;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -40,9 +39,6 @@ import com.helger.phoss.smp.domain.user.ISMPUser;
 import com.helger.phoss.smp.domain.user.ISMPUserEditable;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
@@ -78,28 +74,24 @@ public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPUserEditable, WebPageExecutionContext> ()
     {
       @Override
-      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                      @Nonnull final BootstrapForm aForm,
-                                      @Nonnull final ISMPUserEditable aSelectedObject)
+      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                @Nonnull final BootstrapForm aForm,
+                                @Nonnull final ISMPUserEditable aSelectedObject)
       {
-        aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete user '" +
-                                                              aSelectedObject.getUserName () +
-                                                              "'?"));
+        aForm.addChild (question ("Are you sure you want to delete user '" + aSelectedObject.getUserName () + "'?"));
       }
 
       @Override
-      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
                                     @Nonnull final ISMPUserEditable aSelectedObject)
       {
         final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
         if (aUserManager.deleteUser (aSelectedObject.getID ()).isChanged ())
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The user '" +
-                                                                              aSelectedObject.getUserName () +
-                                                                              "' was successfully deleted."));
+          aWPEC.postRedirectGetInternal (success ("The user '" +
+                                                  aSelectedObject.getUserName () +
+                                                  "' was successfully deleted."));
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete user '" +
-                                                                            aSelectedObject.getUserName () +
-                                                                            "'."));
+          aWPEC.postRedirectGetInternal (error ("Failed to delete user '" + aSelectedObject.getUserName () + "'."));
       }
     });
   }
@@ -112,7 +104,7 @@ public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
     final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
     if (!aUserManager.isSpecialUserManagementNeeded ())
     {
-      final BootstrapWarnBox aWarnBox = new BootstrapWarnBox ().addChild (new HCDiv ().addChild ("No special user management is needed. The integrated user management must be used."));
+      final BootstrapWarnBox aWarnBox = warn (div ("No special user management is needed. The integrated user management must be used."));
       aNodeList.addChild (aWarnBox);
       if (SecurityHelper.isCurrentUserAssignedToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID))
       {
@@ -121,7 +113,7 @@ public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
                                                   .setIcon (EDefaultIcon.YES));
       }
       else
-        aWarnBox.addChild (new HCDiv ().addChild ("You don't have the permissions to manage users. Please contact your administrator."));
+        aWarnBox.addChild (div ("You don't have the permissions to manage users. Please contact your administrator."));
       return EValidity.INVALID;
     }
     return super.isValidToDisplayPage (aWPEC);
@@ -205,24 +197,16 @@ public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
       if (bEdit)
       {
         if (aUserManager.updateUser (sUserName, sPassword).isSuccess ())
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("User '" +
-                                                                              sUserName +
-                                                                              "' was successfully edited."));
+          aWPEC.postRedirectGetInternal (success ("User '" + sUserName + "' was successfully edited."));
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to edit user '" +
-                                                                            sUserName +
-                                                                            "'."));
+          aWPEC.postRedirectGetInternal (error ("Failed to edit user '" + sUserName + "'."));
       }
       else
       {
         if (aUserManager.createUser (sUserName, sPassword).isSuccess ())
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("User '" +
-                                                                              sUserName +
-                                                                              "' was successfully created."));
+          aWPEC.postRedirectGetInternal (success ("User '" + sUserName + "' was successfully created."));
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to create user '" +
-                                                                            sUserName +
-                                                                            "'."));
+          aWPEC.postRedirectGetInternal (error ("Failed to create user '" + sUserName + "'."));
       }
     }
   }

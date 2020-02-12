@@ -26,7 +26,6 @@ import com.helger.commons.url.URLValidator;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.textlevel.HCA;
-import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.ISMLInfo;
@@ -37,7 +36,6 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageSimpleForm;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap4.card.BootstrapCard;
 import com.helger.photon.bootstrap4.card.BootstrapCardBody;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
@@ -109,7 +107,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
 
       final ISMLInfo aSMLInfo = aObject.getSMLInfo ();
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML to be used")
-                                                    .setCtrl (aSMLInfo == null ? new HCEM ().addChild ("none")
+                                                    .setCtrl (aSMLInfo == null ? em ("none")
                                                                                : HCSMLSelect.getDisplayNameNode (aSMLInfo)));
     }
 
@@ -199,7 +197,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                      bSMLActive,
                                      bSMLRequired,
                                      aSMLInfo);
-      aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The SMP settings were successfully saved."));
+      aWPEC.postRedirectGetInternal (success ("The SMP settings were successfully saved."));
     }
   }
 

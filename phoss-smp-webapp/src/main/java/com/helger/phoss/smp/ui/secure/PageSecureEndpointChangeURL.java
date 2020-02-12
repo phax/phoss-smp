@@ -37,9 +37,7 @@ import com.helger.commons.url.URLValidator;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCSelect;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCUL;
-import com.helger.html.hc.html.sections.HCH3;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -55,10 +53,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
@@ -95,7 +89,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     if (aServiceGroupMgr.getSMPServiceGroupCount () == 0)
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to change endpoints."));
+      aNodeList.addChild (warn ("No service group is present! At least one service group must be present to change endpoints."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
                                                 .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC,
                                                                                                   CMenuSecure.MENU_SERVICE_GROUPS))
@@ -210,41 +204,39 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
             for (final String sChangedServiceGroupID : aChangedServiceGroup)
               aUL.addItem (sChangedServiceGroupID);
 
-            final HCNodeList aNodes = new HCNodeList ().addChildren (new HCDiv ().addChild ("The old URL '" +
-                                                                                            sOldURL +
-                                                                                            "' was changed in " +
-                                                                                            nChangedEndpoints +
-                                                                                            " endpoints. Effected service groups are:"),
+            final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old URL '" +
+                                                                          sOldURL +
+                                                                          "' was changed in " +
+                                                                          nChangedEndpoints +
+                                                                          " endpoints. Effected service groups are:"),
                                                                      aUL);
             if (nSaveErrors == 0)
-              aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild (aNodes));
+              aWPEC.postRedirectGetInternal (success (aNodes));
             else
             {
-              aNodes.addChildAt (0, new HCH3 ().addChild ("Some changes could NOT be saved! Please check the logs!"));
-              aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild (aNodes));
+              aNodes.addChildAt (0, h3 ("Some changes could NOT be saved! Please check the logs!"));
+              aWPEC.postRedirectGetInternal (error (aNodes));
             }
           }
           else
-            aWPEC.postRedirectGetInternal (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old URL '" +
-                                                                             sOldURL +
-                                                                             "'"));
+            aWPEC.postRedirectGetInternal (warn ("No endpoint was found that contains the old URL '" + sOldURL + "'"));
         }
       }
 
       final ICommonsSet <ISMPServiceGroup> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldURL);
       final int nSGCount = CollectionHelper.getSize (aServiceGroups);
       final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldURL));
-      aNodeList.addChild (new BootstrapInfoBox ().addChild ("The selected old URL '" +
-                                                            sOldURL +
-                                                            "' is currently used in " +
-                                                            nEPCount +
-                                                            " " +
-                                                            (nEPCount == 1 ? "endpoint" : "endpoints") +
-                                                            " of " +
-                                                            nSGCount +
-                                                            " " +
-                                                            (nSGCount == 1 ? "service group" : "service groups") +
-                                                            "."));
+      aNodeList.addChild (info ("The selected old URL '" +
+                                sOldURL +
+                                "' is currently used in " +
+                                nEPCount +
+                                " " +
+                                (nEPCount == 1 ? "endpoint" : "endpoints") +
+                                " of " +
+                                nSGCount +
+                                " " +
+                                (nSGCount == 1 ? "service group" : "service groups") +
+                                "."));
 
       // Show edit screen
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
@@ -288,17 +280,17 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
     if (bShowList)
     {
-      aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("This page lets you change the URLs of multiple endpoints at once. This is e.g. helpful when the underlying server got a new URL."),
-                                                               new HCDiv ().addChild ("Currently " +
-                                                                                      (nTotalEndpointCount == 1 ? "1 endpoint is"
-                                                                                                                : nTotalEndpointCount +
-                                                                                                                  " endpoints are") +
-                                                                                      " registered" +
-                                                                                      (nTotalEndpointCountWithURL < nTotalEndpointCount ? " of which " +
-                                                                                                                                          nTotalEndpointCountWithURL +
-                                                                                                                                          " have an endpoint reference"
-                                                                                                                                        : "") +
-                                                                                      ".")));
+      aNodeList.addChild (info ().addChildren (div ("This page lets you change the URLs of multiple endpoints at once. This is e.g. helpful when the underlying server got a new URL."),
+                                               div ("Currently " +
+                                                    (nTotalEndpointCount == 1 ? "1 endpoint is"
+                                                                              : nTotalEndpointCount +
+                                                                                " endpoints are") +
+                                                    " registered" +
+                                                    (nTotalEndpointCountWithURL < nTotalEndpointCount ? " of which " +
+                                                                                                        nTotalEndpointCountWithURL +
+                                                                                                        " have an endpoint reference"
+                                                                                                      : "") +
+                                                    ".")));
 
       final HCTable aTable = new HCTable (new DTCol ("Endpoint URL").setInitialSorting (ESortOrder.ASCENDING),
                                           new DTCol ("Service Group Count").setDisplayType (EDTColType.INT,

@@ -35,7 +35,6 @@ import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.string.StringHelper;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
@@ -47,10 +46,6 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
@@ -76,23 +71,28 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     // PEPPOL PKI v2
     PEPPOL_PILOT_V2 ("Peppol pilot v2",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK",
-                     3),
+                     3,
+                     true),
     PEPPOL_PRODUCTION_V2 ("Peppol production v2",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK",
-                          3),
+                          3,
+                          true),
     // PEPPOL PKI v3
     PEPPOL_PILOT_V3 ("Peppol pilot v3",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
-                     3),
+                     3,
+                     false),
     PEPPOL_PRODUCTION_V3 ("Peppol production v3",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
-                          3),
+                          3,
+                          false),
     // TOOP Pilot PKI
-    TOOP_PILOT_SMP ("TOOP pilot", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3);
+    TOOP_PILOT_SMP ("TOOP pilot", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, false);
 
     private final String m_sName;
     private final String m_sIssuer;
     private final int m_nCerts;
+    private boolean m_bDeprecated;
 
     /**
      * @param sName
@@ -104,11 +104,13 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
      */
     private EPredefinedCert (@Nonnull @Nonempty final String sName,
                              @Nonnull @Nonempty final String sIssuer,
-                             @Nonnegative final int nCerts)
+                             @Nonnegative final int nCerts,
+                             final boolean bDeprecated)
     {
       m_sName = sName;
       m_sIssuer = sIssuer;
       m_nCerts = nCerts;
+      m_bDeprecated = bDeprecated;
     }
 
     @Nonnull
@@ -122,6 +124,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     public int getCertificateTreeLength ()
     {
       return m_nCerts;
+    }
+
+    public boolean isDeprecated ()
+    {
+      return m_bDeprecated;
     }
 
     @Nullable
@@ -156,27 +163,27 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     if (aWPEC.hasAction (ACTION_RELOAD_KEYSTORE))
     {
       SMPKeyManager.reloadFromConfiguration ();
-      aWPEC.postRedirectGetInternal (new BootstrapInfoBox ().addChild ("The keystore was updated from the configuration at " +
-                                                                       DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
-                                                                       ". The changes are reflected below."));
+      aWPEC.postRedirectGetInternal (info ("The keystore was updated from the configuration at " +
+                                           DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
+                                           ". The changes are reflected below."));
     }
     else
       if (aWPEC.hasAction (ACTION_RELOAD_TRUSTSTORE))
       {
         SMPTrustManager.reloadFromConfiguration ();
-        aWPEC.postRedirectGetInternal (new BootstrapInfoBox ().addChild ("The truststore was updated from the configuration at " +
-                                                                         DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
-                                                                         ". The changes are reflected below."));
+        aWPEC.postRedirectGetInternal (info ("The truststore was updated from the configuration at " +
+                                             DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
+                                             ". The changes are reflected below."));
       }
       else
         if (aWPEC.hasAction (ACTION_RELOAD_DIRECTORY_CONFIGURATION))
         {
           PDClientConfiguration.reloadConfiguration ();
-          aWPEC.postRedirectGetInternal (new BootstrapInfoBox ().addChild ("The " +
-                                                                           sDirectoryName +
-                                                                           " configuration was reloaded at " +
-                                                                           DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
-                                                                           ". The changes are reflected below."));
+          aWPEC.postRedirectGetInternal (info ("The " +
+                                               sDirectoryName +
+                                               " configuration was reloaded at " +
+                                               DateTimeFormatter.ISO_DATE_TIME.format (aNowZDT) +
+                                               ". The changes are reflected below."));
         }
 
     {
@@ -206,7 +213,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       final HCNodeList aTab = new HCNodeList ();
       if (!SMPKeyManager.isKeyStoreValid ())
       {
-        aTab.addChild (new BootstrapErrorBox ().addChild (SMPKeyManager.getInitializationError ()));
+        aTab.addChild (error (SMPKeyManager.getInitializationError ()));
       }
       else
       {
@@ -218,12 +225,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           final Certificate [] aChain = aKeyEntry.getCertificateChain ();
 
           // Key store path and password are fine
-          aTab.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" +
-                                                                                     SMPServerConfiguration.getKeyStorePath () +
-                                                                                     "' and was successfully loaded."))
-                                                   .addChild (new HCDiv ().addChild ("The private key with the alias '" +
-                                                                                     SMPServerConfiguration.getKeyStoreKeyAlias () +
-                                                                                     "' was successfully loaded.")));
+          aTab.addChild (success (div ("Keystore is located at '" +
+                                       SMPServerConfiguration.getKeyStorePath () +
+                                       "' and was successfully loaded.")).addChild (div ("The private key with the alias '" +
+                                                                                         SMPServerConfiguration.getKeyStoreKeyAlias () +
+                                                                                         "' was successfully loaded.")));
 
           if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
           {
@@ -232,15 +238,17 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             final EPredefinedCert eCert = EPredefinedCert.getFromIssuerOrNull (sIssuer);
             if (eCert != null)
             {
-              aTab.addChild (new BootstrapInfoBox ().addChild ("You are currently using a " +
-                                                               eCert.getName () +
-                                                               " certificate!"));
+              if (eCert.isDeprecated ())
+                aTab.addChild (warn ("You are currently using a ").addChild (strong ("deprecated"))
+                                                                  .addChild (" " + eCert.getName () + " certificate!"));
+              else
+                aTab.addChild (info ("You are currently using a " + eCert.getName () + " certificate!"));
               if (aChain.length != eCert.getCertificateTreeLength ())
-                aTab.addChild (new BootstrapErrorBox ().addChild ("The private key should be a chain of " +
-                                                                  eCert.getCertificateTreeLength () +
-                                                                  " certificates but it has " +
-                                                                  aChain.length +
-                                                                  " certificates. Please ensure that the respective root certificates are contained correctly!"));
+                aTab.addChild (error ("The private key should be a chain of " +
+                                      eCert.getCertificateTreeLength () +
+                                      " certificates but it has " +
+                                      aChain.length +
+                                      " certificates. Please ensure that the respective root certificates are contained correctly!"));
             }
             // else: we don't care
           }
@@ -271,7 +279,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       final HCNodeList aTab = new HCNodeList ();
       if (!SMPTrustManager.isTrustStoreValid ())
       {
-        aTab.addChild (new BootstrapWarnBox ().addChild (SMPTrustManager.getInitializationError ()));
+        aTab.addChild (warn (SMPTrustManager.getInitializationError ()));
       }
       else
       {
@@ -280,9 +288,9 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         final KeyStore aTrustStore = aTrustMgr.getTrustStore ();
 
         // Key store path and password are fine
-        aTab.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Truststore is located at '" +
-                                                                                   SMPServerConfiguration.getTrustStorePath () +
-                                                                                   "' and was successfully loaded.")));
+        aTab.addChild (success (div ("Truststore is located at '" +
+                                     SMPServerConfiguration.getTrustStorePath () +
+                                     "' and was successfully loaded.")));
 
         final HCOL aOL = new HCOL ();
         try
@@ -305,8 +313,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         }
         catch (final GeneralSecurityException ex)
         {
-          aOL.addItem (new BootstrapErrorBox ().addChild ("Error iterating trust store.")
-                                               .addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+          aOL.addItem (error ("Error iterating trust store.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         }
         aTab.addChild (aOL);
       }
@@ -326,7 +333,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                       PDClientConfiguration.getKeyStorePassword ());
       if (aKeyStoreLR.isFailure ())
       {
-        aTab.addChild (new BootstrapErrorBox ().addChild (PeppolKeyStoreHelper.getLoadError (aKeyStoreLR)));
+        aTab.addChild (error (PeppolKeyStoreHelper.getLoadError (aKeyStoreLR)));
       }
       else
       {
@@ -338,10 +345,8 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                                                 PDClientConfiguration.getKeyStoreKeyPassword ());
         if (aKeyLoading.isFailure ())
         {
-          aTab.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" +
-                                                                                     sKeyStorePath +
-                                                                                     "' and was successfully loaded.")));
-          aTab.addChild (new BootstrapErrorBox ().addChild (PeppolKeyStoreHelper.getLoadError (aKeyLoading)));
+          aTab.addChild (success (div ("Keystore is located at '" + sKeyStorePath + "' and was successfully loaded.")));
+          aTab.addChild (error (PeppolKeyStoreHelper.getLoadError (aKeyLoading)));
         }
         else
         {
@@ -350,12 +355,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           final Certificate [] aChain = aKeyEntry.getCertificateChain ();
 
           // Key store path and password are fine
-          aTab.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("Keystore is located at '" +
-                                                                                     sKeyStorePath +
-                                                                                     "' and was successfully loaded."))
-                                                   .addChild (new HCDiv ().addChild ("The private key with the alias '" +
-                                                                                     sKeyStoreAlias +
-                                                                                     "' was successfully loaded.")));
+          aTab.addChild (success (div ("Keystore is located at '" +
+                                       sKeyStorePath +
+                                       "' and was successfully loaded.")).addChild (div ("The private key with the alias '" +
+                                                                                         sKeyStoreAlias +
+                                                                                         "' was successfully loaded.")));
 
           if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
           {
@@ -364,15 +368,13 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             final EPredefinedCert eCert = EPredefinedCert.getFromIssuerOrNull (sIssuer);
             if (eCert != null)
             {
-              aTab.addChild (new BootstrapInfoBox ().addChild ("You are currently using a " +
-                                                               eCert.getName () +
-                                                               " certificate!"));
+              aTab.addChild (info ("You are currently using a " + eCert.getName () + " certificate!"));
               if (aChain.length != eCert.getCertificateTreeLength ())
-                aTab.addChild (new BootstrapErrorBox ().addChild ("The private key should be a chain of " +
-                                                                  eCert.getCertificateTreeLength () +
-                                                                  " certificates but it has " +
-                                                                  aChain.length +
-                                                                  " certificates. Please ensure that the respective root certificates are contained!"));
+                aTab.addChild (error ("The private key should be a chain of " +
+                                      eCert.getCertificateTreeLength () +
+                                      " certificates but it has " +
+                                      aChain.length +
+                                      " certificates. Please ensure that the respective root certificates are contained!"));
             }
             // else: we don't care
           }

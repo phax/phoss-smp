@@ -35,8 +35,6 @@ import com.helger.commons.string.StringParser;
 import com.helger.commons.text.util.TextHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.html.forms.HCEdit;
-import com.helger.html.hc.html.grouping.HCDiv;
-import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.network.dns.IPV4Addr;
 import com.helger.peppol.sml.ISMLInfo;
@@ -49,9 +47,6 @@ import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.audit.AuditHelper;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
@@ -83,7 +78,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     super (sID, "SML registration");
   }
 
-  private static boolean _canShowPage (@Nonnull final WebPageExecutionContext aWPEC)
+  private boolean _canShowPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
@@ -91,12 +86,12 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     if (false)
       if (!SMPTrustManager.isTrustStoreValid ())
       {
-        aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid truststore is provided, so no connection with the SML can be established!"));
+        aNodeList.addChild (error ("No valid truststore is provided, so no connection with the SML can be established!"));
         return false;
       }
     if (!SMPKeyManager.isKeyStoreValid ())
     {
-      aNodeList.addChild (new BootstrapErrorBox ().addChild ("No valid keystore/certificate is provided, so no connection with the SML can be established!"));
+      aNodeList.addChild (error ("No valid keystore/certificate is provided, so no connection with the SML can be established!"));
       return false;
     }
     return true;
@@ -111,8 +106,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
     return ret;
   }
 
-  private static void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC,
-                                         @Nonnull final FormErrorList aFormErrors)
+  private void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                  @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
@@ -197,7 +192,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
         LOGGER.info (sMsg);
-        aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
+        aNodeList.addChild (success (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-create",
                                            sSMPID,
                                            sPhysicalAddress,
@@ -215,7 +210,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' to the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+        aNodeList.addChild (error (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-create",
                                            sSMPID,
                                            sPhysicalAddress,
@@ -229,8 +224,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       aNodeList.addChild (BootstrapWebPageUIHandler.INSTANCE.createIncorrectInputBox (aWPEC));
   }
 
-  private static void _updateSMPatSML (@Nonnull final WebPageExecutionContext aWPEC,
-                                       @Nonnull final FormErrorList aFormErrors)
+  private void _updateSMPatSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
@@ -315,7 +309,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
         LOGGER.info (sMsg);
-        aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
+        aNodeList.addChild (success (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-update",
                                            sSMPID,
                                            sPhysicalAddress,
@@ -333,7 +327,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' to the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+        aNodeList.addChild (error (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-update",
                                            sSMPID,
                                            sPhysicalAddress,
@@ -347,8 +341,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       aNodeList.addChild (BootstrapWebPageUIHandler.INSTANCE.createIncorrectInputBox (aWPEC));
   }
 
-  private static void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC,
-                                         @Nonnull final FormErrorList aFormErrors)
+  private void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                  @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
@@ -372,7 +366,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
         LOGGER.info (sMsg);
-        aNodeList.addChild (new BootstrapSuccessBox ().addChild (sMsg));
+        aNodeList.addChild (success (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, aSMLInfo.getManagementServiceURL ());
       }
       catch (final Exception ex)
@@ -382,7 +376,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                             "' from the SML '" +
                             aSMLInfo.getManagementServiceURL () +
                             "'.";
-        aNodeList.addChild (new BootstrapErrorBox ().addChild (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+        aNodeList.addChild (error (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-delete",
                                            sSMPID,
                                            aSMLInfo.getManagementServiceURL (),
@@ -414,13 +408,12 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       try
       {
         final InetAddress aIA = InetAddress.getByName (sPublisherDNSName);
-        aNodeList.addChild (new BootstrapSuccessBox ().addChild (new HCDiv ().addChild ("An SMP is already registered at the configured SML using the DNS name '" +
-                                                                                        sPublisherDNSName +
-                                                                                        "'. The determined IP address is " +
-                                                                                        aIA.getHostAddress ()))
-                                                      .addChild (new HCDiv ().addChild ("Note: this can be a different machine than this one, if another SMP uses the same ID as this one (" +
-                                                                                        sSMPID +
-                                                                                        ")")));
+        aNodeList.addChild (success (div ("An SMP is already registered at the configured SML using the DNS name '" +
+                                          sPublisherDNSName +
+                                          "'. The determined IP address is " +
+                                          aIA.getHostAddress ())).addChild (div ("Note: this can be a different machine than this one, if another SMP uses the same ID as this one (" +
+                                                                                 sSMPID +
+                                                                                 ")")));
       }
       catch (final UnknownHostException ex)
       {
@@ -466,7 +459,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       {
         final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC);
         aForm.setEncTypeFileUpload ().setLeft (3);
-        aForm.addChild (new BootstrapInfoBox ().addChild ("Register this SMP to the SML. This must only be done once per SMP!"));
+        aForm.addChild (info ("Register this SMP to the SML. This must only be done once per SMP!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
                                                                                                   aDefaultSML != null ? aDefaultSML.getID ()
@@ -475,7 +468,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                                                                 aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
-                                                     .setCtrl (new HCEM ().addChild (sSMPID))
+                                                     .setCtrl (em (sSMPID))
                                                      .setHelpText (HELPTEXT_SMP_ID));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Physical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_PHYSICAL_ADDRESS,
@@ -502,7 +495,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       {
         final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC);
         aForm.setEncTypeFileUpload ().setLeft (3);
-        aForm.addChild (new BootstrapInfoBox ().addChild ("Update this SMP at the SML. This must only be done when either the IP address or the host name of the SMP changed!"));
+        aForm.addChild (info ("Update this SMP at the SML. This must only be done when either the IP address or the host name of the SMP changed!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
                                                                                                   aDefaultSML == null ? null
@@ -511,7 +504,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                                                                 aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
-                                                     .setCtrl (new HCEM ().addChild (sSMPID))
+                                                     .setCtrl (em (sSMPID))
                                                      .setHelpText (HELPTEXT_SMP_ID));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Physical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_PHYSICAL_ADDRESS,
@@ -538,7 +531,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       {
         final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC);
         aForm.setEncTypeFileUpload ().setLeft (3);
-        aForm.addChild (new BootstrapInfoBox ().addChild ("Delete this SMP from the SML."));
+        aForm.addChild (info ("Delete this SMP from the SML."));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
                                                                                                   aDefaultSML == null ? null
@@ -547,7 +540,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                                                                 aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
-                                                     .setCtrl (new HCEM ().addChild (sSMPID))
+                                                     .setCtrl (em (sSMPID))
                                                      .setHelpText (HELPTEXT_SMP_ID));
 
         final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));

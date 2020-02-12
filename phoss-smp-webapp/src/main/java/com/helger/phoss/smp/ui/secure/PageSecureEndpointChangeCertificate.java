@@ -17,7 +17,7 @@
 package com.helger.phoss.smp.ui.secure;
 
 import java.security.cert.X509Certificate;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -41,9 +41,7 @@ import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCTextArea;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCUL;
-import com.helger.html.hc.html.sections.HCH3;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -58,10 +56,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
@@ -97,7 +91,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     if (aServiceGroupMgr.getSMPServiceGroupCount () == 0)
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to change certificates."));
+      aNodeList.addChild (warn ("No service group is present! At least one service group must be present to change certificates."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
                                                 .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC,
                                                                                                   CMenuSecure.MENU_SERVICE_GROUPS))
@@ -123,7 +117,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   }
 
   @Nonnull
-  private static IHCNode _getCertificateDisplay (@Nullable final String sCert, @Nonnull final Locale aDisplayLocale)
+  private IHCNode _getCertificateDisplay (@Nullable final String sCert, @Nonnull final Locale aDisplayLocale)
   {
     X509Certificate aEndpointCert = null;
     try
@@ -138,17 +132,18 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     {
       final int nDisplayLen = 20;
       final String sCertPart = (sCert.length () > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert);
-      return new HCDiv ().addChild ("Invalid certificate" + (sCert.length () > nDisplayLen ? " starting with: " : ": "))
-                         .addChild (new HCCode ().addChild (sCertPart));
+      return div ("Invalid certificate" +
+                  (sCert.length () > nDisplayLen ? " starting with: " : ": "))
+                                                                              .addChild (new HCCode ().addChild (sCertPart));
     }
 
     final HCNodeList ret = new HCNodeList ();
-    ret.addChild (new HCDiv ().addChild ("Issuer: " + aEndpointCert.getIssuerX500Principal ().toString ()));
-    ret.addChild (new HCDiv ().addChild ("Subject: " + aEndpointCert.getSubjectX500Principal ().toString ()));
-    final LocalDate aNotBefore = PDTFactory.createLocalDate (aEndpointCert.getNotBefore ());
-    ret.addChild (new HCDiv ().addChild ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
-    final LocalDate aNotAfter = PDTFactory.createLocalDate (aEndpointCert.getNotAfter ());
-    ret.addChild (new HCDiv ().addChild ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+    ret.addChild (div ("Issuer: " + aEndpointCert.getIssuerX500Principal ().toString ()));
+    ret.addChild (div ("Subject: " + aEndpointCert.getSubjectX500Principal ().toString ()));
+    final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aEndpointCert.getNotBefore ());
+    ret.addChild (div ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+    final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aEndpointCert.getNotAfter ());
+    ret.addChild (div ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
     return ret;
   }
 
@@ -241,37 +236,37 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
             for (final String sChangedServiceGroupID : aChangedServiceGroup)
               aUL.addItem (sChangedServiceGroupID);
 
-            final HCNodeList aNodes = new HCNodeList ().addChildren (new HCDiv ().addChild ("The old certificate was changed in " +
-                                                                                            nChangedEndpoints +
-                                                                                            " endpoints to the new certificate:"),
+            final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old certificate was changed in " +
+                                                                          nChangedEndpoints +
+                                                                          " endpoints to the new certificate:"),
                                                                      _getCertificateDisplay (sNewCert, aDisplayLocale),
-                                                                     new HCDiv ().addChild ("Effected service groups are:"),
+                                                                     div ("Effected service groups are:"),
                                                                      aUL);
             if (nSaveErrors == 0)
-              aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild (aNodes));
+              aWPEC.postRedirectGetInternal (success (aNodes));
             else
             {
-              aNodes.addChildAt (0, new HCH3 ().addChild ("Some changes could NOT be saved! Please check the logs!"));
-              aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild (aNodes));
+              aNodes.addChildAt (0, h3 ("Some changes could NOT be saved! Please check the logs!"));
+              aWPEC.postRedirectGetInternal (error (aNodes));
             }
           }
           else
-            aWPEC.postRedirectGetInternal (new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old certificate"));
+            aWPEC.postRedirectGetInternal (warn ("No endpoint was found that contains the old certificate"));
         }
       }
 
       final ICommonsSet <ISMPServiceGroup> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldCert);
       final int nSGCount = CollectionHelper.getSize (aServiceGroups);
       final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldCert));
-      aNodeList.addChild (new BootstrapInfoBox ().addChild ("The selected old certificate is currently used in " +
-                                                            nEPCount +
-                                                            " " +
-                                                            (nEPCount == 1 ? "endpoint" : "endpoints") +
-                                                            " of " +
-                                                            nSGCount +
-                                                            " " +
-                                                            (nSGCount == 1 ? "service group" : "service groups") +
-                                                            "."));
+      aNodeList.addChild (info ("The selected old certificate is currently used in " +
+                                nEPCount +
+                                " " +
+                                (nEPCount == 1 ? "endpoint" : "endpoints") +
+                                " of " +
+                                nSGCount +
+                                " " +
+                                (nSGCount == 1 ? "service group" : "service groups") +
+                                "."));
 
       // Show edit screen
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
@@ -297,12 +292,12 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
 
     if (bShowList)
     {
-      aNodeList.addChild (new BootstrapInfoBox ().addChildren (new HCDiv ().addChild ("This page lets you change the certificates of multiple endpoints at once. This is e.g. helpful when the old certificate expired."),
-                                                               new HCDiv ().addChild ("Currently " +
-                                                                                      (nTotalEndpointCount == 1 ? "1 endpoint is"
-                                                                                                                : nTotalEndpointCount +
-                                                                                                                  " endpoints are") +
-                                                                                      " registered.")));
+      aNodeList.addChild (info ().addChildren (div ("This page lets you change the certificates of multiple endpoints at once. This is e.g. helpful when the old certificate expired."),
+                                               div ("Currently " +
+                                                    (nTotalEndpointCount == 1 ? "1 endpoint is"
+                                                                              : nTotalEndpointCount +
+                                                                                " endpoints are") +
+                                                    " registered.")));
 
       final HCTable aTable = new HCTable (new DTCol ("Certificate").setInitialSorting (ESortOrder.ASCENDING),
                                           new DTCol ("Service Group Count").setDisplayType (EDTColType.INT,

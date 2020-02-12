@@ -52,8 +52,6 @@ import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
-import com.helger.html.hc.html.textlevel.HCEM;
-import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.smp.ESMPTransportProfile;
@@ -82,9 +80,6 @@ import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPTransportProfileSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.app.url.LinkHelper;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
@@ -158,9 +153,9 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPServiceInformation, WebPageExecutionContext> ()
     {
       @Override
-      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                      @Nonnull final BootstrapForm aForm,
-                                      @Nonnull final ISMPServiceInformation aSelectedObject)
+      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                @Nonnull final BootstrapForm aForm,
+                                @Nonnull final ISMPServiceInformation aSelectedObject)
       {
         final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
         final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
@@ -179,16 +174,15 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                            aSelectedProcess.getProcessIdentifier ().getValue ()));
         aForm.addChild (new HCHiddenField (FIELD_TRANSPORT_PROFILE, aSelectedEndpoint.getTransportProfile ()));
 
-        aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the endpoint for service group '" +
-                                                              aSelectedObject.getServiceGroupID () +
-                                                              "' and document type '" +
-                                                              aSelectedObject.getDocumentTypeIdentifier ()
-                                                                             .getURIEncoded () +
-                                                              "'?"));
+        aForm.addChild (question ("Are you sure you want to delete the endpoint for service group '" +
+                                  aSelectedObject.getServiceGroupID () +
+                                  "' and document type '" +
+                                  aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded () +
+                                  "'?"));
       }
 
       @Override
-      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
                                     @Nonnull final ISMPServiceInformation aSelectedObject)
       {
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -201,10 +195,10 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
             aSelectedProcess.deleteEndpoint (aSelectedEndpoint.getTransportProfile ()).isChanged () &&
             aServiceInfoMgr.mergeSMPServiceInformation (aSelectedObject).isSuccess ())
         {
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected endpoint was successfully deleted!"));
+          aWPEC.postRedirectGetInternal (success ("The selected endpoint was successfully deleted!"));
         }
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error deleting the selected endpoint!"));
+          aWPEC.postRedirectGetInternal (error ("Error deleting the selected endpoint!"));
       }
     });
     addCustomHandler (ACTION_DELETE_DOCUMENT_TYPE,
@@ -222,17 +216,17 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
                           if (aServiceInfoMgr.deleteSMPServiceInformation (aSelectedObject).isChanged ())
                           {
-                            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected document type '" +
-                                                                                                aSelectedObject.getDocumentTypeIdentifier ()
-                                                                                                               .getURIEncoded () +
-                                                                                                "' was successfully deleted!"));
+                            aWPEC.postRedirectGetInternal (success ("The selected document type '" +
+                                                                    aSelectedObject.getDocumentTypeIdentifier ()
+                                                                                   .getURIEncoded () +
+                                                                    "' was successfully deleted!"));
                           }
                           else
                           {
-                            aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error deleting the selected document type '" +
-                                                                                              aSelectedObject.getDocumentTypeIdentifier ()
-                                                                                                             .getURIEncoded () +
-                                                                                              "'!"));
+                            aWPEC.postRedirectGetInternal (error ("Error deleting the selected document type '" +
+                                                                  aSelectedObject.getDocumentTypeIdentifier ()
+                                                                                 .getURIEncoded () +
+                                                                  "'!"));
                           }
                           return EShowList.DONT_SHOW_LIST;
                         }
@@ -259,21 +253,20 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                           final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);
                           if (aProcess != null)
                             if (aServiceInfoMgr.deleteSMPProcess (aSelectedObject, aProcess).isChanged ())
-                              aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected process '" +
-                                                                                                  aProcess.getProcessIdentifier ()
-                                                                                                          .getURIEncoded () +
-                                                                                                  "' from document type '" +
-                                                                                                  aSelectedObject.getDocumentTypeIdentifier ()
-                                                                                                                 .getURIEncoded () +
-                                                                                                  "' was successfully deleted!"));
+                              aWPEC.postRedirectGetInternal (success ("The selected process '" +
+                                                                      aProcess.getProcessIdentifier ()
+                                                                              .getURIEncoded () +
+                                                                      "' from document type '" +
+                                                                      aSelectedObject.getDocumentTypeIdentifier ()
+                                                                                     .getURIEncoded () +
+                                                                      "' was successfully deleted!"));
                             else
-                              aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error deleting the process '" +
-                                                                                                aProcess.getProcessIdentifier ()
-                                                                                                        .getURIEncoded () +
-                                                                                                "' from the selected document type '" +
-                                                                                                aSelectedObject.getDocumentTypeIdentifier ()
-                                                                                                               .getURIEncoded () +
-                                                                                                "'!"));
+                              aWPEC.postRedirectGetInternal (error ("Error deleting the process '" +
+                                                                    aProcess.getProcessIdentifier ().getURIEncoded () +
+                                                                    "' from the selected document type '" +
+                                                                    aSelectedObject.getDocumentTypeIdentifier ()
+                                                                                   .getURIEncoded () +
+                                                                    "'!"));
                           return EShowList.SHOW_LIST;
                         }
                       });
@@ -436,7 +429,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     {
       final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
       final HCNodeList aCtrl = new HCNodeList ();
-      aCtrl.addChild (new HCDiv ().addChild (NiceNameUI.getDocumentTypeID (aDocumentTypeID)));
+      aCtrl.addChild (div (NiceNameUI.getDocumentTypeID (aDocumentTypeID)));
       try
       {
         final IPeppolDocumentTypeIdentifierParts aParts = PeppolDocumentTypeIdentifierParts.extractFromIdentifier (aDocumentTypeID);
@@ -445,8 +438,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
       catch (final IllegalArgumentException ex)
       {
         if (false)
-          aCtrl.addChild (new BootstrapErrorBox ().addChild ("Failed to parse document type identifier: " +
-                                                             ex.getMessage ()));
+          aCtrl.addChild (error ("Failed to parse document type identifier: " + ex.getMessage ()));
       }
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Document type ID").setCtrl (aCtrl));
     }
@@ -462,7 +454,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
                                                  .setCtrl (StringHelper.hasText (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),
                                                                                                                                                        HC_Target.BLANK)
-                                                                                                                            : new HCEM ().addChild ("none")));
+                                                                                                                            : em ("none")));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires business level signature")
                                                  .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedEndpoint.isRequireBusinessLevelSignature (),
@@ -489,7 +481,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     {
       final X509Certificate aEndpointCert = CertificateHelper.convertStringToCertficateOrNull (aSelectedEndpoint.getCertificate ());
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate")
-                                                   .setCtrl (aEndpointCert == null ? new HCStrong ().addChild ("!!!FAILED TO INTERPRETE!!!")
+                                                   .setCtrl (aEndpointCert == null ? strong ("!!!FAILED TO INTERPRETE!!!")
                                                                                    : SMPCommonUI.createCertificateDetailsTable (aEndpointCert,
                                                                                                                                 aNowLDT,
                                                                                                                                 aDisplayLocale)
@@ -698,34 +690,30 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
       {
         if (bEdit)
         {
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("Successfully edited the endpoint for service group '" +
-                                                                              aServiceGroup.getParticpantIdentifier ()
-                                                                                           .getURIEncoded () +
-                                                                              "'."));
+          aWPEC.postRedirectGetInternal (success ("Successfully edited the endpoint for service group '" +
+                                                  aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                                                  "'."));
         }
         else
         {
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("Successfully created a new endpoint for service group '" +
-                                                                              aServiceGroup.getParticpantIdentifier ()
-                                                                                           .getURIEncoded () +
-                                                                              "'."));
+          aWPEC.postRedirectGetInternal (success ("Successfully created a new endpoint for service group '" +
+                                                  aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                                                  "'."));
         }
       }
       else
       {
         if (bEdit)
         {
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error editing the endpoint for service group '" +
-                                                                            aServiceGroup.getParticpantIdentifier ()
-                                                                                         .getURIEncoded () +
-                                                                            "'."));
+          aWPEC.postRedirectGetInternal (error ("Error editing the endpoint for service group '" +
+                                                aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                                                "'."));
         }
         else
         {
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating a new endpoint for service group '" +
-                                                                            aServiceGroup.getParticpantIdentifier ()
-                                                                                         .getURIEncoded () +
-                                                                            "'."));
+          aWPEC.postRedirectGetInternal (error ("Error creating a new endpoint for service group '" +
+                                                aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                                                "'."));
         }
       }
     }
@@ -981,7 +969,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
 
               // Show process + endpoints
               final HCLI aLI = aULP.addItem ();
-              final HCDiv aDiv = new HCDiv ().addChild (NiceNameUI.getProcessID (aProcess.getProcessIdentifier ()));
+              final HCDiv aDiv = div (NiceNameUI.getProcessID (aProcess.getProcessIdentifier ()));
               aLI.addChild (aDiv);
               if (aEndpoints.isEmpty ())
               {
@@ -998,16 +986,16 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
 
             // Show document types + children
             final HCLI aLI = aULDT.addItem ();
-            final HCDiv aDiv = new HCDiv ().addChild (NiceNameUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()))
-                                           .addChild (" ")
-                                           .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aServiceInfo.getServiceGroup ()
-                                                                                                                  .getParticpantIdentifier ()
-                                                                                                                  .getURIPercentEncoded () +
-                                                                                                      "/services/" +
-                                                                                                      aServiceInfo.getDocumentTypeIdentifier ()
-                                                                                                                  .getURIPercentEncoded ())).setTitle ("Perform SMP query on document type ")
-                                                                                                                                            .setTargetBlank ()
-                                                                                                                                            .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+            final HCDiv aDiv = div ().addChild (NiceNameUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()))
+                                     .addChild (" ")
+                                     .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aServiceInfo.getServiceGroup ()
+                                                                                                            .getParticpantIdentifier ()
+                                                                                                            .getURIPercentEncoded () +
+                                                                                                "/services/" +
+                                                                                                aServiceInfo.getDocumentTypeIdentifier ()
+                                                                                                            .getURIPercentEncoded ())).setTitle ("Perform SMP query on document type ")
+                                                                                                                                      .setTargetBlank ()
+                                                                                                                                      .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
             aLI.addChild (aDiv);
             if (aProcesses.isEmpty ())
             {

@@ -51,7 +51,6 @@ import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.tabular.IHCCell;
 import com.helger.html.hc.html.textlevel.HCA;
-import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.html.jquery.JQuery;
@@ -82,8 +81,6 @@ import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapInfoBox;
-import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
 import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
@@ -197,29 +194,29 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPBusinessCard, WebPageExecutionContext> ()
     {
       @Override
-      protected void showDeleteQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                      @Nonnull final BootstrapForm aForm,
-                                      @Nonnull final ISMPBusinessCard aSelectedObject)
+      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                @Nonnull final BootstrapForm aForm,
+                                @Nonnull final ISMPBusinessCard aSelectedObject)
       {
-        aForm.addChild (new BootstrapQuestionBox ().addChild ("Are you sure you want to delete the Business Card for service group '" +
-                                                              aSelectedObject.getServiceGroupID () +
-                                                              "'?"));
+        aForm.addChild (question ("Are you sure you want to delete the Business Card for service group '" +
+                                  aSelectedObject.getServiceGroupID () +
+                                  "'?"));
       }
 
       @Override
-      protected void performDelete (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
                                     @Nonnull final ISMPBusinessCard aSelectedObject)
       {
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
         if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
         {
           final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-          aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The selected Business Card was successfully deleted!" +
-                                                                              (aSettings.isDirectoryIntegrationEnabled () &&
-                                                                               aSettings.isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+          aWPEC.postRedirectGetInternal (success ("The selected Business Card was successfully deleted!" +
+                                                  (aSettings.isDirectoryIntegrationEnabled () &&
+                                                   aSettings.isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
         }
         else
-          aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Failed to delete the selected Business Card!"));
+          aWPEC.postRedirectGetInternal (error ("Failed to delete the selected Business Card!"));
       }
     });
     addCustomHandler (ACTION_PUBLISH_TO_INDEXER,
@@ -237,19 +234,19 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                     .addServiceGroupToIndex (aParticipantID);
                           if (eSuccess.isSuccess ())
                           {
-                            aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("Successfully notified the " +
-                                                                                                sDirectoryName +
-                                                                                                " to index '" +
-                                                                                                aParticipantID.getURIEncoded () +
-                                                                                                "'"));
+                            aWPEC.postRedirectGetInternal (success ("Successfully notified the " +
+                                                                    sDirectoryName +
+                                                                    " to index '" +
+                                                                    aParticipantID.getURIEncoded () +
+                                                                    "'"));
                           }
                           else
                           {
-                            aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error notifying the " +
-                                                                                              sDirectoryName +
-                                                                                              " to index '" +
-                                                                                              aParticipantID.getURIEncoded () +
-                                                                                              "'"));
+                            aWPEC.postRedirectGetInternal (error ("Error notifying the " +
+                                                                  sDirectoryName +
+                                                                  " to index '" +
+                                                                  aParticipantID.getURIEncoded () +
+                                                                  "'"));
                           }
                           return EShowList.SHOW_LIST;
                         }
@@ -279,34 +276,28 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                           final HCNodeList aResultNodes = new HCNodeList ();
                           if (aSuccess.isNotEmpty ())
                           {
-                            final BootstrapSuccessBox aBox = new BootstrapSuccessBox ();
+                            final BootstrapSuccessBox aBox = success ();
                             for (final String sPI : aSuccess)
                             {
-                              aBox.addChild (new HCDiv ().addChild ("Successfully notified the " +
-                                                                    sDirectoryName +
-                                                                    " to index '" +
-                                                                    sPI +
-                                                                    "'"));
+                              aBox.addChild (div ("Successfully notified the " +
+                                                  sDirectoryName +
+                                                  " to index '" +
+                                                  sPI +
+                                                  "'"));
                             }
                             aResultNodes.addChild (aBox);
                           }
                           if (aFailure.isNotEmpty ())
                           {
-                            final BootstrapErrorBox aBox = new BootstrapErrorBox ();
+                            final BootstrapErrorBox aBox = error ();
                             for (final String sPI : aFailure)
                             {
-                              aBox.addChild (new HCDiv ().addChild ("Error notifying the " +
-                                                                    sDirectoryName +
-                                                                    " to index '" +
-                                                                    sPI +
-                                                                    "'"));
+                              aBox.addChild (div ("Error notifying the " + sDirectoryName + " to index '" + sPI + "'"));
                             }
                             aResultNodes.addChild (aBox);
                           }
                           if (aResultNodes.hasNoChildren ())
-                            aResultNodes.addChild (new BootstrapInfoBox ().addChild ("No participants to be indexed to " +
-                                                                                     sDirectoryName +
-                                                                                     "."));
+                            aResultNodes.addChild (info ("No participants to be indexed to " + sDirectoryName + "."));
 
                           aWPEC.postRedirectGetInternal (aResultNodes);
                           return EShowList.SHOW_LIST;
@@ -445,8 +436,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
 
     if (nIndex == 0)
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Entity")
-                                                   .setCtrl (new HCEM ().addChild ("none defined")));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Entity").setCtrl (em ("none defined")));
 
     aNodeList.addChild (aForm);
   }
@@ -665,16 +655,16 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup, aSMPEntities) != null)
       {
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-        aWPEC.postRedirectGetInternal (new BootstrapSuccessBox ().addChild ("The Business Card for Service Group '" +
-                                                                            aServiceGroup.getID () +
-                                                                            "' was successfully saved." +
-                                                                            (aSettings.isDirectoryIntegrationEnabled () &&
-                                                                             aSettings.isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
+        aWPEC.postRedirectGetInternal (success ("The Business Card for Service Group '" +
+                                                aServiceGroup.getID () +
+                                                "' was successfully saved." +
+                                                (aSettings.isDirectoryIntegrationEnabled () &&
+                                                 aSettings.isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
       }
       else
-        aWPEC.postRedirectGetInternal (new BootstrapErrorBox ().addChild ("Error creating the Business Card for Service Group '" +
-                                                                          aServiceGroup.getID () +
-                                                                          "'"));
+        aWPEC.postRedirectGetInternal (error ("Error creating the Business Card for Service Group '" +
+                                              aServiceGroup.getID () +
+                                              "'"));
     }
   }
 
@@ -1169,19 +1159,15 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
           final IHCCell <?> aCountryCell = aRow.addCell ();
           final EFamFamFlagIcon eIcon = EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
           if (eIcon != null)
-          {
-            aCountryCell.addChild (eIcon.getAsNode ());
-            aCountryCell.addChild (" ");
-          }
+            aCountryCell.addChild (eIcon.getAsNode ()).addChild (" ");
           aCountryCell.addChild (aCountry.getDisplayCountry (aDisplayLocale));
 
           aRow.addCell (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ()));
           {
             final HCNodeList aIdentifiers = new HCNodeList ();
             for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
-              aIdentifiers.addChild (new HCDiv ().addChild (aIdentifier.getScheme ())
-                                                 .addChild (" - ")
-                                                 .addChild (aIdentifier.getValue ()));
+              aIdentifiers.addChild (div (aIdentifier.getScheme ()).addChild (" - ")
+                                                                   .addChild (aIdentifier.getValue ()));
             aRow.addCell (aIdentifiers);
           }
           aRow.addCell (_createActionCell (aWPEC, aCurObject));
