@@ -49,6 +49,7 @@ public final class CMenuSecure
   public static final String MENU_SML_CERTIFICATE_UPDATE = "sml_certificate_update";
   public static final String MENU_SMP_SETTINGS = "smp_settings";
   public static final String MENU_CHANGE_PASSWORD = "change_pw";
+  public static final String MENU_HTTP_CLIENT = "http_client";
 
   private CMenuSecure ()
   {}
