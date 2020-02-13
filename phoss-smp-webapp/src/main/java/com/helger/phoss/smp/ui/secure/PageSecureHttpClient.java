@@ -135,6 +135,7 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
   @NotThreadSafe
   public static class HttpClientConfigRegistry
   {
+    public static final String DEFAULT_CONFIG_ID = "systemdefault";
     private static final ICommonsMap <String, IHttpClientConfig> s_aMap = new CommonsHashMap <> ();
 
     private HttpClientConfigRegistry ()
@@ -165,7 +166,7 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
 
     static
     {
-      register (new HttpClientConfig ("systemdefault", "System default settings", x -> new HttpClientFactory ()));
+      register (new HttpClientConfig (DEFAULT_CONFIG_ID, "System default settings", x -> new HttpClientFactory ()));
     }
   }
 
@@ -266,7 +267,13 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
         String sResultContent;
         boolean bSuccess = false;
 
-        LOGGER.info ("http client query '" + sURI + "' using configuration " + aConfig.getID ());
+        LOGGER.info ("http client " +
+                     eHttpMethod.getName () +
+                     " query '" +
+                     sURI +
+                     "' using configuration '" +
+                     aConfig.getID () +
+                     "'");
 
         final StopWatch aSW = StopWatch.createdStarted ();
         final HttpClientFactory aHCP = aConfig.getHttpClientFactory (sURI);
@@ -327,7 +334,8 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
     aForm.setLeft (2);
 
     {
-      final HCExtSelect aSelect = new HCExtSelect (new RequestField (FIELD_CONFIG));
+      final HCExtSelect aSelect = new HCExtSelect (new RequestField (FIELD_CONFIG,
+                                                                     HttpClientConfigRegistry.DEFAULT_CONFIG_ID));
       aSelect.addOptionPleaseSelect (aDisplayLocale);
       for (final IHttpClientConfig aHCC : HttpClientConfigRegistry.iterate ())
         aSelect.addOption (aHCC.getID (), aHCC.getDisplayName ());
