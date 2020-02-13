@@ -43,16 +43,16 @@ public interface ISMPSettingsManager
    *
    * @param bRESTWritableAPIDisabled
    *        <code>true</code> to enable writable access by REST services
-   * @param bPeppolDirectoryIntegrationEnabled
-   *        <code>true</code> to enable Peppol Directory integration
-   * @param bPeppolDirectoryIntegrationRequired
+   * @param bDirectoryIntegrationEnabled
+   *        <code>true</code> to enable Directory integration
+   * @param bDirectoryIntegrationRequired
    *        <code>true</code> to warn if Directory is disabled
-   * @param bPeppolDirectoryIntegrationAutoUpdate
-   *        <code>true</code> to automatically update the Peppol Directory if a
+   * @param bDirectoryIntegrationAutoUpdate
+   *        <code>true</code> to automatically update the Directory if a
    *        business card changes
-   * @param sPeppolDirectoryHostName
-   *        The hostname of the Peppol Directory server to use. Must be fully
-   *        qualified including the protocol.
+   * @param sDirectoryHostName
+   *        The hostname of the Directory server to use. Must be fully qualified
+   *        including the protocol.
    * @param bSMLActive
    *        <code>true</code> to enable write access to the SML
    * @param bSMLRequired
@@ -63,10 +63,10 @@ public interface ISMPSettingsManager
    */
   @Nonnull
   EChange updateSettings (boolean bRESTWritableAPIDisabled,
-                          boolean bPeppolDirectoryIntegrationEnabled,
-                          boolean bPeppolDirectoryIntegrationRequired,
-                          boolean bPeppolDirectoryIntegrationAutoUpdate,
-                          @Nullable String sPeppolDirectoryHostName,
+                          boolean bDirectoryIntegrationEnabled,
+                          boolean bDirectoryIntegrationRequired,
+                          boolean bDirectoryIntegrationAutoUpdate,
+                          @Nullable String sDirectoryHostName,
                           boolean bSMLActive,
                           boolean bSMLRequired,
                           @Nullable ISMLInfo aSMLInfo);

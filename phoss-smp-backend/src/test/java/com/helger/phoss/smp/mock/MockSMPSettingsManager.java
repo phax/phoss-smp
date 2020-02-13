@@ -35,10 +35,10 @@ final class MockSMPSettingsManager implements ISMPSettingsManager
 
   @UnsupportedOperation
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
-                                 final boolean bPeppolDirectoryIntegrationEnabled,
-                                 final boolean bPeppolDirectoryIntegrationRequired,
-                                 final boolean bPeppolDirectoryIntegrationAutoUpdate,
-                                 @Nullable final String sPeppolDirectoryHostName,
+                                 final boolean bDirectoryIntegrationEnabled,
+                                 final boolean bDirectoryIntegrationRequired,
+                                 final boolean bDirectoryIntegrationAutoUpdate,
+                                 @Nullable final String sDirectoryHostName,
                                  final boolean bSMLActive,
                                  final boolean bSMLRequired,
                                  @Nullable final ISMLInfo aSMLInfo)

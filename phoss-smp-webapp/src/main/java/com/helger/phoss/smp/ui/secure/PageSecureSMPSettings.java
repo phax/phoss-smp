@@ -152,16 +152,16 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final String sSMLInfoID = aWPEC.params ().getAsString (FIELD_SML_INFO);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLInfoID);
 
-    final boolean bPeppolDirectoryIntegrationEnabled = aWPEC.params ()
-                                                            .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_ENABLED,
-                                                                                SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
-    final boolean bPeppolDirectoryIntegrationRequired = aWPEC.params ()
-                                                             .isCheckBoxChecked (FIELD_SML_DIRECTORY_INTEGRATION_REQUIRED,
-                                                                                 SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED);
-    final boolean bPeppolDirectoryIntegrationAutoUpdate = aWPEC.params ()
-                                                               .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                                                                   SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE);
-    final String sPeppolDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_DIRECTORY_HOSTNAME);
+    final boolean bDirectoryIntegrationEnabled = aWPEC.params ()
+                                                      .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_ENABLED,
+                                                                          SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
+    final boolean bDirectoryIntegrationRequired = aWPEC.params ()
+                                                       .isCheckBoxChecked (FIELD_SML_DIRECTORY_INTEGRATION_REQUIRED,
+                                                                           SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED);
+    final boolean bDirectoryIntegrationAutoUpdate = aWPEC.params ()
+                                                         .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                                                             SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE);
+    final String sDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_DIRECTORY_HOSTNAME);
 
     if (bSMLActive && !SMPKeyManager.isKeyStoreValid ())
       aFormErrors.addFieldError (FIELD_SML_ACTIVE,
@@ -173,9 +173,9 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
         aFormErrors.addFieldError (FIELD_SML_INFO, "An SML configuration must be selected if SML is active.");
     }
 
-    if (StringHelper.hasNoText (sPeppolDirectoryHostName))
+    if (StringHelper.hasNoText (sDirectoryHostName))
     {
-      if (bPeppolDirectoryIntegrationEnabled)
+      if (bDirectoryIntegrationEnabled)
         aFormErrors.addFieldError (FIELD_SMP_DIRECTORY_HOSTNAME,
                                    sDirectoryName +
                                                                  " hostname may not be empty if " +
@@ -183,17 +183,17 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                  " intergration is enabled.");
     }
     else
-      if (!URLValidator.isValid (sPeppolDirectoryHostName))
+      if (!URLValidator.isValid (sDirectoryHostName))
         aFormErrors.addFieldError (FIELD_SMP_DIRECTORY_HOSTNAME, sDirectoryName + " hostname must be a valid URL.");
 
     if (aFormErrors.isEmpty ())
     {
       SMPMetaManager.getSettingsMgr ()
                     .updateSettings (bRESTWritableAPIDisabled,
-                                     bPeppolDirectoryIntegrationEnabled,
-                                     bPeppolDirectoryIntegrationRequired,
-                                     bPeppolDirectoryIntegrationAutoUpdate,
-                                     sPeppolDirectoryHostName,
+                                     bDirectoryIntegrationEnabled,
+                                     bDirectoryIntegrationRequired,
+                                     bDirectoryIntegrationAutoUpdate,
+                                     sDirectoryHostName,
                                      bSMLActive,
                                      bSMLRequired,
                                      aSMLInfo);
