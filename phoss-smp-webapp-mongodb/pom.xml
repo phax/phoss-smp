@@ -77,11 +77,6 @@
 
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>peppol-smp-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.helger</groupId>
       <artifactId>ph-oton-jetty</artifactId>
       <scope>test</scope>
     </dependency>
