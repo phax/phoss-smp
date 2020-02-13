@@ -23,25 +23,31 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.impl.CommonsHashMap;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.compare.ESortOrder;
+import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.http.HttpHeaderMap;
 import com.helger.commons.id.IHasID;
-import com.helger.commons.lang.EnumHelper;
+import com.helger.commons.name.IHasDisplayName;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
+import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCTextArea;
@@ -70,6 +76,106 @@ import com.helger.photon.uictrls.datatables.column.DTCol;
 
 public class PageSecureHttpClient extends AbstractSMPWebPage
 {
+  public static interface IHttpClientMetaProvider
+  {
+    /**
+     * @param sTargetURI
+     *        The target URL to be accessed. May neither be <code>null</code>
+     *        nor empty.
+     * @return The client factory to use. May not be <code>null</code>.
+     */
+    @Nonnull
+    HttpClientFactory getHttpClientFactory (@Nonnull @Nonempty String sTargetURI);
+  }
+
+  public static interface IHttpClientConfig extends IHasID <String>, IHasDisplayName, IHttpClientMetaProvider
+  {
+    /* empty */
+  }
+
+  public static class HttpClientConfig implements IHttpClientConfig
+  {
+    private final String m_sID;
+    private final String m_sDisplayName;
+    private final IHttpClientMetaProvider m_aHCMP;
+
+    public HttpClientConfig (@Nonnull @Nonempty final String sID,
+                             @Nonnull @Nonempty final String sDisplayName,
+                             @Nonnull final IHttpClientMetaProvider aHCMP)
+    {
+      ValueEnforcer.notEmpty (sID, "ID");
+      ValueEnforcer.notEmpty (sDisplayName, "DisplayName");
+      ValueEnforcer.notNull (aHCMP, "HCMP");
+      m_sID = sID;
+      m_sDisplayName = sDisplayName;
+      m_aHCMP = aHCMP;
+    }
+
+    @Nonnull
+    @Nonempty
+    public String getID ()
+    {
+      return m_sID;
+    }
+
+    @Nonnull
+    @Nonempty
+    public String getDisplayName ()
+    {
+      return m_sDisplayName;
+    }
+
+    @Nonnull
+    public HttpClientFactory getHttpClientFactory (@Nonnull @Nonempty final String sTargetURI)
+    {
+      return m_aHCMP.getHttpClientFactory (sTargetURI);
+    }
+  }
+
+  @NotThreadSafe
+  public static class HttpClientConfigRegistry
+  {
+    private static final ICommonsMap <String, IHttpClientConfig> s_aMap = new CommonsHashMap <> ();
+
+    private HttpClientConfigRegistry ()
+    {}
+
+    public static void register (@Nonnull final IHttpClientConfig aHCC)
+    {
+      ValueEnforcer.notNull (aHCC, "HCC");
+      final String sID = aHCC.getID ();
+      if (s_aMap.containsKey (sID))
+        throw new IllegalArgumentException ("Another configuration with ID '" + sID + "' is already registered");
+      s_aMap.put (sID, aHCC);
+    }
+
+    @Nullable
+    public static IHttpClientConfig getFromID (@Nullable final String sID)
+    {
+      if (StringHelper.hasNoText (sID))
+        return null;
+      return s_aMap.get (sID);
+    }
+
+    @Nonnull
+    public static Iterable <IHttpClientConfig> iterate ()
+    {
+      return s_aMap.values ();
+    }
+
+    static
+    {
+      register (new HttpClientConfig ("systemdefault", "System default settings", x -> new HttpClientFactory ()));
+    }
+  }
+
+  static
+  {
+    HttpClientConfigRegistry.register (new HttpClientConfig ("directoryclient",
+                                                             "Directory client settings",
+                                                             x -> new PDHttpClientFactory (x.startsWith ("https:"))));
+  }
+
   private static final class DebugResponseHandler implements ResponseHandler <String>
   {
     private final Charset m_aDefaultCharset;
@@ -110,61 +216,9 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
     }
   }
 
-  private static interface IHttpClientMetaProvider
-  {
-    @Nonnull
-    HttpClientFactory getProvider (@Nonnull String sTargetURI);
-  }
-
-  private enum EHttpConfig implements IHasID <String>
-  {
-    SYSTEM_DEFAULT ("systemdefault", "System default settings", x -> new HttpClientFactory ()),
-    DIRECTORY_CLIENT ("directoryclient",
-                      "Directory client settings",
-                      x -> new PDHttpClientFactory (x.startsWith ("https:")));
-
-    private final String m_sID;
-    private final String m_sDisplayName;
-    private final IHttpClientMetaProvider m_aHCMP;
-
-    private EHttpConfig (@Nonnull @Nonempty final String sID,
-                         @Nonnull @Nonempty final String sDisplayName,
-                         @Nonnull final IHttpClientMetaProvider aHCMP)
-    {
-      m_sID = sID;
-      m_sDisplayName = sDisplayName;
-      m_aHCMP = aHCMP;
-    }
-
-    @Nonnull
-    @Nonempty
-    public String getID ()
-    {
-      return m_sID;
-    }
-
-    @Nonnull
-    @Nonempty
-    public String getDisplayName ()
-    {
-      return m_sDisplayName;
-    }
-
-    @Nonnull
-    public HttpClientFactory getHttpClientFactory (@Nonnull final String sTargetURI)
-    {
-      return m_aHCMP.getProvider (sTargetURI);
-    }
-
-    @Nullable
-    public static EHttpConfig getFromIDOrNull (@Nullable final String sID)
-    {
-      return EnumHelper.getFromIDOrNull (EHttpConfig.class, sID);
-    }
-  }
-
   private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureHttpClient.class);
   private static final String FIELD_CONFIG = "config";
+  private static final String FIELD_HTTP_METHOD = "http_method";
   private static final String FIELD_URI = "uri";
 
   public PageSecureHttpClient (@Nonnull @Nonempty final String sID)
@@ -184,14 +238,22 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
     if (aWPEC.hasAction (CPageParam.ACTION_PERFORM))
     {
       final String sConfigID = aWPEC.params ().getAsStringTrimmed (FIELD_CONFIG);
-      final EHttpConfig eConfig = EHttpConfig.getFromIDOrNull (sConfigID);
+      final IHttpClientConfig aConfig = HttpClientConfigRegistry.getFromID (sConfigID);
+      final String sHttpMethod = aWPEC.params ().getAsStringTrimmed (FIELD_HTTP_METHOD);
+      final EHttpMethod eHttpMethod = EHttpMethod.getFromNameOrNull (sHttpMethod);
       final String sURI = aWPEC.params ().getAsStringTrimmed (FIELD_URI);
 
       if (StringHelper.hasNoText (sConfigID))
         aFormErrors.addFieldError (FIELD_CONFIG, "A configuration must be selected.");
       else
-        if (eConfig == null)
+        if (aConfig == null)
           aFormErrors.addFieldError (FIELD_CONFIG, "Please select a valid configuration.");
+
+      if (StringHelper.hasNoText (sHttpMethod))
+        aFormErrors.addFieldError (FIELD_HTTP_METHOD, "A HTTP method must be selected.");
+      else
+        if (eHttpMethod == null)
+          aFormErrors.addFieldError (FIELD_HTTP_METHOD, "Please select a valid HTTP method.");
 
       if (StringHelper.hasNoText (sURI))
         aFormErrors.addFieldError (FIELD_URI, "A URI must be provided.");
@@ -204,15 +266,16 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
         String sResultContent;
         boolean bSuccess = false;
 
-        LOGGER.info ("http client query '" + sURI + "' using configuration " + eConfig.getID ());
+        LOGGER.info ("http client query '" + sURI + "' using configuration " + aConfig.getID ());
 
         final StopWatch aSW = StopWatch.createdStarted ();
-        final HttpClientFactory aHCP = eConfig.getHttpClientFactory (sURI);
+        final HttpClientFactory aHCP = aConfig.getHttpClientFactory (sURI);
         final DebugResponseHandler aResponseHdl = new DebugResponseHandler (StandardCharsets.UTF_8);
         try (final HttpClientManager aHCM = new HttpClientManager (aHCP))
         {
-          final HttpGet aGet = new HttpGet (sURI);
-          sResultContent = aHCM.execute (aGet, aResponseHdl);
+          // Create depending on the method
+          final HttpRequestBase aReq = HttpClientHelper.createRequest (eHttpMethod, new SimpleURL (sURI));
+          sResultContent = aHCM.execute (aReq, aResponseHdl);
           bSuccess = true;
         }
         catch (final IOException ex)
@@ -223,7 +286,7 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
 
         aNodeList.addChild (div ("Output of querying ").addChild (code (sURI))
                                                        .addChild (" using ")
-                                                       .addChild (em (eConfig.getDisplayName ()))
+                                                       .addChild (em (aConfig.getDisplayName ()))
                                                        .addChild (": ")
                                                        .addChild (bSuccess ? badgeSuccess ("success")
                                                                            : badgeDanger ("error")));
@@ -249,13 +312,14 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
           aDT.setInfo (false);
           aNodeList.addChild (aTable).addChild (aDT);
         }
-        aNodeList.addChild (new HCTextArea ("dummy").setRows (Math.min (10,
-                                                                        1 +
-                                                                            StringHelper.getCharCount (sResultContent,
-                                                                                                       '\n')))
-                                                    .setValue (sResultContent)
-                                                    .addClass (CBootstrapCSS.FORM_CONTROL)
-                                                    .addClass (CBootstrapCSS.MB_2));
+        aNodeList.addChild (new HCTextArea ("responsepayload").setRows (Math.min (10,
+                                                                                  1 +
+                                                                                      StringHelper.getCharCount (sResultContent,
+                                                                                                                 '\n')))
+                                                              .setValue (sResultContent)
+                                                              .addClass (CBootstrapCSS.FORM_CONTROL)
+                                                              .addClass (CBootstrapCSS.TEXT_MONOSPACE)
+                                                              .addClass (CBootstrapCSS.MB_2));
       }
     }
 
@@ -265,11 +329,21 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
     {
       final HCExtSelect aSelect = new HCExtSelect (new RequestField (FIELD_CONFIG));
       aSelect.addOptionPleaseSelect (aDisplayLocale);
-      for (final EHttpConfig e : EHttpConfig.values ())
-        aSelect.addOption (e.getID (), e.getDisplayName ());
+      for (final IHttpClientConfig aHCC : HttpClientConfigRegistry.iterate ())
+        aSelect.addOption (aHCC.getID (), aHCC.getDisplayName ());
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Configuration to use")
                                                    .setCtrl (aSelect)
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_CONFIG)));
+    }
+    {
+      final HCExtSelect aSelect = new HCExtSelect (new RequestField (FIELD_HTTP_METHOD, EHttpMethod.GET.getName ()));
+      aSelect.addOptionPleaseSelect (aDisplayLocale);
+      for (final EHttpMethod e : EHttpMethod.values ())
+        if (e != EHttpMethod.CONNECT && e != EHttpMethod.PATCH)
+          aSelect.addOption (e.getName ());
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("HTTP method")
+                                                   .setCtrl (aSelect)
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_HTTP_METHOD)));
     }
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("URI to query")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_URI)))
