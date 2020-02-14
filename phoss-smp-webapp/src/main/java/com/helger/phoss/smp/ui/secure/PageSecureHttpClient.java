@@ -57,8 +57,9 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.httpclient.HttpClientFactory;
 import com.helger.httpclient.HttpClientHelper;
 import com.helger.httpclient.HttpClientManager;
+import com.helger.httpclient.HttpClientSettings;
 import com.helger.httpclient.response.ResponseHandlerHttpEntity;
-import com.helger.pd.client.PDHttpClientFactory;
+import com.helger.pd.client.PDHttpClientSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.button.BootstrapSubmitButton;
@@ -82,10 +83,10 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
      * @param sTargetURI
      *        The target URL to be accessed. May neither be <code>null</code>
      *        nor empty.
-     * @return The client factory to use. May not be <code>null</code>.
+     * @return The HTTP client settings to use. May not be <code>null</code>.
      */
     @Nonnull
-    HttpClientFactory getHttpClientFactory (@Nonnull @Nonempty String sTargetURI);
+    HttpClientSettings getHttpClientSettings (@Nonnull @Nonempty String sTargetURI);
   }
 
   public static interface IHttpClientConfig extends IHasID <String>, IHasDisplayName, IHttpClientMetaProvider
@@ -126,9 +127,9 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
     }
 
     @Nonnull
-    public HttpClientFactory getHttpClientFactory (@Nonnull @Nonempty final String sTargetURI)
+    public HttpClientSettings getHttpClientSettings (@Nonnull @Nonempty final String sTargetURI)
     {
-      return m_aHCMP.getHttpClientFactory (sTargetURI);
+      return m_aHCMP.getHttpClientSettings (sTargetURI);
     }
   }
 
@@ -166,7 +167,7 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
 
     static
     {
-      register (new HttpClientConfig (DEFAULT_CONFIG_ID, "System default settings", x -> new HttpClientFactory ()));
+      register (new HttpClientConfig (DEFAULT_CONFIG_ID, "System default settings", x -> new HttpClientSettings ()));
     }
   }
 
@@ -174,7 +175,7 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
   {
     HttpClientConfigRegistry.register (new HttpClientConfig ("directoryclient",
                                                              "Directory client settings",
-                                                             x -> new PDHttpClientFactory (x.startsWith ("https:"))));
+                                                             x -> new PDHttpClientSettings (x.startsWith ("https:"))));
   }
 
   private static final class DebugResponseHandler implements ResponseHandler <String>
@@ -276,9 +277,9 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
                      "'");
 
         final StopWatch aSW = StopWatch.createdStarted ();
-        final HttpClientFactory aHCP = aConfig.getHttpClientFactory (sURI);
+        final HttpClientSettings aHCS = aConfig.getHttpClientSettings (sURI);
         final DebugResponseHandler aResponseHdl = new DebugResponseHandler (StandardCharsets.UTF_8);
-        try (final HttpClientManager aHCM = new HttpClientManager (aHCP))
+        try (final HttpClientManager aHCM = new HttpClientManager (new HttpClientFactory (aHCS)))
         {
           // Create depending on the method
           final HttpRequestBase aReq = HttpClientHelper.createRequest (eHttpMethod, new SimpleURL (sURI));

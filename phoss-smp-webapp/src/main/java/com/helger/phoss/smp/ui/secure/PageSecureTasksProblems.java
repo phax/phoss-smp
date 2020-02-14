@@ -67,7 +67,6 @@ import com.helger.photon.uicore.css.CUICoreCSS;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.security.keystore.EKeyStoreLoadError;
-import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKeyStore;
 
 public class PageSecureTasksProblems extends AbstractSMPWebPage
@@ -95,87 +94,117 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     return badgeDanger ("Error: " + sMsg);
   }
 
-  @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  private void _checkSettings (@Nonnull final HCOL aOL)
   {
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    final LocalDateTime aNowDT = PDTFactory.getCurrentLocalDateTime ();
-    final LocalDateTime aNowPlusDT = aNowDT.plusMonths (3);
-    final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
-    final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
-    final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
-
-    aNodeList.addChild (info ("This page tries to identify upcoming tasks and potential problems in the SMP configuration. It is meant to highlight immediate and upcoming action items as well as potential misconfiguration."));
-
-    final HCOL aOL = new HCOL ();
-
-    // Check for default password
-    if (PhotonSecurityManager.getUserMgr ()
-                             .areUserIDAndPasswordValid (CSecurity.USER_ADMINISTRATOR_ID,
-                                                         CSecurity.USER_ADMINISTRATOR_PASSWORD))
+    // Check that public URL is set
+    if (StringHelper.hasNoText (SMPServerConfiguration.getPublicServerURL ()))
     {
-      aOL.addItem (_createError ("Please change the password of the default user " +
-                                 CSecurity.USER_ADMINISTRATOR_EMAIL +
-                                 "!"),
-                   div ("This is a severe security risk"));
+      aOL.addItem (_createWarning ("The public server URL is not configured"),
+                   div ("The configuration file property ").addChild (code (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
+                                                           .addChild (" in file " +
+                                                                      SMPServerConfiguration.PATH_SMP_SERVER_PROPERTIES +
+                                                                      " is not set. This property is usually required to create valid Internet-URLs."));
     }
 
-    // check keystore configuration
+    // Check that the global debug setting is off
+    if (GlobalDebug.isDebugMode ())
     {
-      if (!SMPKeyManager.isKeyStoreValid ())
+      aOL.addItem (_createWarning ("Debug mode is enabled."),
+                   div ("This mode enables increased debug checks and logging and therefore results in reduced performance.").addChild (" This should not be enabled in a production system.")
+                                                                                                                             .addChild (" The configuration file property ")
+                                                                                                                             .addChild (code (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_DEBUG))
+                                                                                                                             .addChild (" in file " +
+                                                                                                                                        SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
+                                                                                                                                        " should be set to ")
+                                                                                                                             .addChild (code ("false"))
+                                                                                                                             .addChild (" to fix this."));
+    }
+
+    // Check that the global production mode is on
+    if (!GlobalDebug.isProductionMode ())
+    {
+      aOL.addItem (_createWarning ("Production mode is disabled."),
+                   div ("This mode is required so that all background jobs are enabled and mail sending works (if configured).").addChild (" This should be enabled in a production system.")
+                                                                                                                                .addChild (" The configuration file property ")
+                                                                                                                                .addChild (code (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_PRODUCTION))
+                                                                                                                                .addChild (" in file " +
+                                                                                                                                           SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
+                                                                                                                                           " should be set to ")
+                                                                                                                                .addChild (code ("true"))
+                                                                                                                                .addChild (" to fix this."));
+    }
+  }
+
+  private void _checkKeyStore (@Nonnull final WebPageExecutionContext aWPEC,
+                               @Nonnull final HCOL aOL,
+                               @Nonnull final LocalDateTime aNowDT,
+                               @Nonnull final LocalDateTime aNowPlusDT)
+  {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+
+    if (!SMPKeyManager.isKeyStoreValid ())
+    {
+      // Loading failed - wrong path or wrong password or so
+      aOL.addItem (_createError ("Problem with the certificate configuration"),
+                   div (SMPKeyManager.getInitializationError ()));
+    }
+    else
+    {
+      final PrivateKeyEntry aKeyEntry = SMPKeyManager.getInstance ().getPrivateKeyEntry ();
+      if (aKeyEntry != null)
       {
-        // Loading failed - wrong path or wrong password or so
-        aOL.addItem (_createError ("Problem with the certificate configuration"),
-                     div (SMPKeyManager.getInitializationError ()));
-      }
-      else
-      {
-        final PrivateKeyEntry aKeyEntry = SMPKeyManager.getInstance ().getPrivateKeyEntry ();
-        if (aKeyEntry != null)
+        final Certificate [] aChain = aKeyEntry.getCertificateChain ();
+
+        for (final Certificate aCert : aChain)
         {
-          final Certificate [] aChain = aKeyEntry.getCertificateChain ();
-
-          for (final Certificate aCert : aChain)
+          if (aCert instanceof X509Certificate)
           {
-            if (aCert instanceof X509Certificate)
+            final X509Certificate aX509Cert = (X509Certificate) aCert;
+
+            final String sLogPrefix = "The provided certificate with subject '" +
+                                      aX509Cert.getSubjectX500Principal ().getName () +
+                                      "' ";
+
+            final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
+            if (aNowDT.isBefore (aNotBefore))
             {
-              final X509Certificate aX509Cert = (X509Certificate) aCert;
+              aOL.addItem (_createError (sLogPrefix + " is not yet valid."),
+                           div ("It will be valid from " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+            }
 
-              final String sLogPrefix = "The provided certificate with subject '" +
-                                        aX509Cert.getSubjectX500Principal ().getName () +
-                                        "' ";
-
-              final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
-              if (aNowDT.isBefore (aNotBefore))
-              {
-                aOL.addItem (_createError (sLogPrefix + " is not yet valid."),
-                             div ("It will be valid from " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
-              }
-
-              final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
-              if (aNowDT.isAfter (aNotAfter))
-              {
-                aOL.addItem (_createError (sLogPrefix + " is already expired."),
-                             div ("It was valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
-              }
-              else
-                if (aNowPlusDT.isAfter (aNotAfter))
-                  aOL.addItem (_createWarning (sLogPrefix + " will expire soon."),
-                               div ("It is only valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+            final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
+            if (aNowDT.isAfter (aNotAfter))
+            {
+              aOL.addItem (_createError (sLogPrefix + " is already expired."),
+                           div ("It was valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
             }
             else
-            {
-              aOL.addItem (_createError ("At least one of the certificates is not an X.509 certificate! It is internally a " +
-                                         ClassHelper.getClassName (aCert)));
-              break;
-            }
+              if (aNowPlusDT.isAfter (aNotAfter))
+                aOL.addItem (_createWarning (sLogPrefix + " will expire soon."),
+                             div ("It is only valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+          }
+          else
+          {
+            aOL.addItem (_createError ("At least one of the certificates is not an X.509 certificate! It is internally a " +
+                                       ClassHelper.getClassName (aCert)));
+            break;
           }
         }
       }
+      else
+      {
+        aOL.addItem (_createError ("Failed to load the configured private key from the keystore."),
+                     div (SMPKeyManager.getInitializationError ()));
+      }
     }
+  }
+
+  private void _checkTrustStore (@Nonnull final WebPageExecutionContext aWPEC,
+                                 @Nonnull final HCOL aOL,
+                                 @Nonnull final LocalDateTime aNowDT,
+                                 @Nonnull final LocalDateTime aNowPlusDT)
+  {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
     // check truststore configuration
     if (!SMPTrustManager.isTrustStoreValid ())
@@ -244,8 +273,13 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
         aOL.addItem (bHasError ? _createError ("Trust store issues") : _createWarning ("Trust store issues"),
                      aTrustStoreOL);
     }
+  }
 
-    // Check SML configuration
+  private void _checkSMLConfiguration (@Nonnull final HCOL aOL)
+  {
+    final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
+    final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
+
     if (aSMPSettings.isSMLRequired ())
     {
       if (!aSMPSettings.isSMLEnabled ())
@@ -281,65 +315,74 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
         }
       }
     }
+  }
 
-    // Check that public URL is set
-    if (StringHelper.hasNoText (SMPServerConfiguration.getPublicServerURL ()))
-    {
-      aOL.addItem (_createWarning ("The public server URL is not configured"),
-                   div ("The configuration file property ").addChild (code (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
-                                                           .addChild (" in file " +
-                                                                      SMPServerConfiguration.PATH_SMP_SERVER_PROPERTIES +
-                                                                      " is not set. This property is usually required to create valid Internet-URLs."));
-    }
+  private void _checkDirectoryConfig (@Nonnull final HCOL aOL)
+  {
+    final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
+    final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 
-    // Check that the global debug setting is off
-    if (GlobalDebug.isDebugMode ())
-    {
-      aOL.addItem (_createWarning ("Debug mode is enabled."),
-                   div ("This mode enables increased debug checks and logging and therefore results in reduced performance.").addChild (" This should not be enabled in a production system.")
-                                                                                                                             .addChild (" The configuration file property ")
-                                                                                                                             .addChild (code (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_DEBUG))
-                                                                                                                             .addChild (" in file " +
-                                                                                                                                        SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
-                                                                                                                                        " should be set to ")
-                                                                                                                             .addChild (code ("false"))
-                                                                                                                             .addChild (" to fix this."));
-    }
-
-    // Check that the global production mode is on
-    if (!GlobalDebug.isProductionMode ())
-    {
-      aOL.addItem (_createWarning ("Production mode is disabled."),
-                   div ("This mode is required so that all background jobs are enabled and mail sending works (if configured).").addChild (" This should be enabled in a production system.")
-                                                                                                                                .addChild (" The configuration file property ")
-                                                                                                                                .addChild (code (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_PRODUCTION))
-                                                                                                                                .addChild (" in file " +
-                                                                                                                                           SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
-                                                                                                                                           " should be set to ")
-                                                                                                                                .addChild (code ("true"))
-                                                                                                                                .addChild (" to fix this."));
-    }
-
-    // Check Directory configuration
     if (aSMPSettings.isDirectoryIntegrationEnabled ())
     {
       if (StringHelper.hasNoText (aSMPSettings.getDirectoryHostName ()))
         aOL.addItem (_createError ("An empty " + sDirectoryName + " hostname is provided"),
                      div ("A connection to the " + sDirectoryName + " server cannot be establised!"));
 
-      final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (PDClientConfiguration.getKeyStoreType (),
-                                                                          PDClientConfiguration.getKeyStorePath (),
-                                                                          PDClientConfiguration.getKeyStorePassword ());
+      final LoadedKeyStore aLoadedKeyStore = PDClientConfiguration.loadKeyStore ();
       if (aLoadedKeyStore.isFailure ())
-        aOL.addItem (_createError ("The " + sDirectoryName + " client certificate configuration is invalid."),
+      {
+        aOL.addItem (_createError ("The " + sDirectoryName + " client keystore configuration is invalid."),
                      div (PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore)));
+      }
+      else
+      {}
     }
     else
     {
       // Warn only if Directory is required
       if (aSMPSettings.isDirectoryIntegrationRequired ())
-        aOL.addItem (_createWarning ("The connection to " + sDirectoryName + " is not enabled."));
+        aOL.addItem (_createError ("The connection to " + sDirectoryName + " is not enabled."));
     }
+  }
+
+  @Override
+  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final LocalDateTime aNowDT = PDTFactory.getCurrentLocalDateTime ();
+    final LocalDateTime aNowPlusDT = aNowDT.plusMonths (3);
+
+    aNodeList.addChild (info ("This page tries to identify upcoming tasks and potential problems in the SMP configuration. It is meant to highlight immediate and upcoming action items as well as potential misconfiguration."));
+
+    final HCOL aOL = new HCOL ();
+
+    // Check for default password
+    if (PhotonSecurityManager.getUserMgr ()
+                             .areUserIDAndPasswordValid (CSecurity.USER_ADMINISTRATOR_ID,
+                                                         CSecurity.USER_ADMINISTRATOR_PASSWORD))
+    {
+      aOL.addItem (_createError ("Please change the password of the default user " +
+                                 CSecurity.USER_ADMINISTRATOR_EMAIL +
+                                 "!"),
+                   div ("This is a severe security risk"));
+    }
+
+    _checkSettings (aOL);
+
+    // check keystore configuration
+    _checkKeyStore (aWPEC, aOL, aNowDT, aNowPlusDT);
+
+    // Check truststore configuration
+    _checkTrustStore (aWPEC, aOL, aNowDT, aNowPlusDT);
+
+    // Check SML configuration
+    _checkSMLConfiguration (aOL);
+
+    // Check Directory configuration
+    _checkDirectoryConfig (aOL);
 
     // check service groups and redirects
     {

@@ -53,8 +53,6 @@ import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.security.keystore.EKeyStoreType;
-import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
 
@@ -330,24 +328,15 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       {
         final HCNodeList aTab = new HCNodeList ();
 
-        final EKeyStoreType eKeyStoreType = PDClientConfiguration.getKeyStoreType ();
-        final String sKeyStorePath = PDClientConfiguration.getKeyStorePath ();
-
-        final LoadedKeyStore aKeyStoreLR = KeyStoreHelper.loadKeyStore (eKeyStoreType,
-                                                                        sKeyStorePath,
-                                                                        PDClientConfiguration.getKeyStorePassword ());
+        final LoadedKeyStore aKeyStoreLR = PDClientConfiguration.loadKeyStore ();
         if (aKeyStoreLR.isFailure ())
         {
           aTab.addChild (error (PeppolKeyStoreHelper.getLoadError (aKeyStoreLR)));
         }
         else
         {
-          final KeyStore aKeyStore = aKeyStoreLR.getKeyStore ();
-          final String sKeyStoreAlias = PDClientConfiguration.getKeyStoreKeyAlias ();
-          final LoadedKey <KeyStore.PrivateKeyEntry> aKeyLoading = KeyStoreHelper.loadPrivateKey (aKeyStore,
-                                                                                                  sKeyStorePath,
-                                                                                                  sKeyStoreAlias,
-                                                                                                  PDClientConfiguration.getKeyStoreKeyPassword ());
+          final String sKeyStorePath = PDClientConfiguration.getKeyStorePath ();
+          final LoadedKey <KeyStore.PrivateKeyEntry> aKeyLoading = PDClientConfiguration.loadPrivateKey (aKeyStoreLR.getKeyStore ());
           if (aKeyLoading.isFailure ())
           {
             aTab.addChild (success (div ("Keystore is located at '" +
@@ -358,6 +347,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           else
           {
             // Successfully loaded private key
+            final String sAlias = PDClientConfiguration.getKeyStoreKeyAlias ();
             final PrivateKeyEntry aKeyEntry = aKeyLoading.getKeyEntry ();
             final Certificate [] aChain = aKeyEntry.getCertificateChain ();
 
@@ -365,7 +355,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             aTab.addChild (success (div ("Keystore is located at '" +
                                          sKeyStorePath +
                                          "' and was successfully loaded.")).addChild (div ("The private key with the alias '" +
-                                                                                           sKeyStoreAlias +
+                                                                                           sAlias +
                                                                                            "' was successfully loaded.")));
 
             if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
@@ -376,10 +366,12 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               if (eCert != null)
               {
                 if (eCert.isDeprecated ())
+                {
                   aTab.addChild (warn ("You are currently using a ").addChild (strong ("deprecated"))
                                                                     .addChild (" " +
                                                                                eCert.getName () +
                                                                                " certificate!"));
+                }
                 else
                   aTab.addChild (info ("You are currently using a " + eCert.getName () + " certificate!"));
                 if (aChain.length != eCert.getCertificateTreeLength ())
@@ -417,12 +409,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       {
         final HCNodeList aTab = new HCNodeList ();
 
-        final EKeyStoreType eTrustStoreType = PDClientConfiguration.getTrustStoreType ();
-        final String sTrustStorePath = PDClientConfiguration.getTrustStorePath ();
-
-        final LoadedKeyStore aTrustStoreLR = KeyStoreHelper.loadKeyStore (eTrustStoreType,
-                                                                          sTrustStorePath,
-                                                                          PDClientConfiguration.getTrustStorePassword ());
+        final LoadedKeyStore aTrustStoreLR = PDClientConfiguration.loadTrustStore ();
         if (aTrustStoreLR.isFailure ())
         {
           aTab.addChild (error (PeppolKeyStoreHelper.getLoadError (aTrustStoreLR)));
@@ -430,6 +417,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         else
         {
           // Successfully loaded trust store
+          final String sTrustStorePath = PDClientConfiguration.getTrustStorePath ();
           final KeyStore aTrustStore = aTrustStoreLR.getKeyStore ();
 
           // Trust store path and password are fine
