@@ -175,7 +175,7 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
   {
     HttpClientConfigRegistry.register (new HttpClientConfig ("directoryclient",
                                                              "Directory client settings",
-                                                             x -> new PDHttpClientSettings (x.startsWith ("https:"))));
+                                                             x -> new PDHttpClientSettings (x)));
   }
 
   private static final class DebugResponseHandler implements ResponseHandler <String>
