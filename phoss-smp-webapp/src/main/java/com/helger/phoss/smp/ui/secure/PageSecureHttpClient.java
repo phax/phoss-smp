@@ -54,7 +54,6 @@ import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
-import com.helger.httpclient.HttpClientFactory;
 import com.helger.httpclient.HttpClientHelper;
 import com.helger.httpclient.HttpClientManager;
 import com.helger.httpclient.HttpClientSettings;
@@ -279,7 +278,7 @@ public class PageSecureHttpClient extends AbstractSMPWebPage
         final StopWatch aSW = StopWatch.createdStarted ();
         final HttpClientSettings aHCS = aConfig.getHttpClientSettings (sURI);
         final DebugResponseHandler aResponseHdl = new DebugResponseHandler (StandardCharsets.UTF_8);
-        try (final HttpClientManager aHCM = new HttpClientManager (new HttpClientFactory (aHCS)))
+        try (final HttpClientManager aHCM = HttpClientManager.create (aHCS))
         {
           // Create depending on the method
           final HttpRequestBase aReq = HttpClientHelper.createRequest (eHttpMethod, new SimpleURL (sURI));
