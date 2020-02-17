@@ -136,6 +136,8 @@
 osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)",
 osgi.serviceloader; filter:="(osgi.serviceloader=com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI)"; cardinality:=multiple; resolution:=optional</Require-Capability>
             <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI</Provide-Capability>
+            <!-- The latter one has precedence -->
+            <Include-Resource>{maven-resources},smp-server-version.properties=target/classes/smp-server-version.properties</Include-Resource>
           </instructions>
         </configuration>
       </plugin>
