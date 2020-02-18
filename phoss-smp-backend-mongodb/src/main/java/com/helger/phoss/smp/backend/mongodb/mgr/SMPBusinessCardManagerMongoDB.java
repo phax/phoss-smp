@@ -393,7 +393,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     if (StringHelper.hasNoText (sID))
       return null;
 
-    return getCollection ().find (new Document (BSON_ID, sID)).map (x -> toDomain (x)).first ();
+    return getCollection ().find (new Document (BSON_ID, sID)).map (this::toDomain).first ();
   }
 
   @Nonnegative

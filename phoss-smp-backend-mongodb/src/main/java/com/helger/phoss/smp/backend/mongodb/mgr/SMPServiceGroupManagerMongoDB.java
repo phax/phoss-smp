@@ -293,7 +293,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
       return null;
 
     final String sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
-    return getCollection ().find (new Document (BSON_ID, sID)).map (x -> toDomain (x)).first ();
+    return getCollection ().find (new Document (BSON_ID, sID)).map (SMPServiceGroupManagerMongoDB::toDomain).first ();
   }
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantID)

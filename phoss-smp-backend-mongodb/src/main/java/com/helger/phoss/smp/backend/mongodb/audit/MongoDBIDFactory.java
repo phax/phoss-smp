@@ -54,13 +54,13 @@ public class MongoDBIDFactory extends AbstractPersistingLongIDFactory
   private static final String VALUE_ID_LONG_ID = "long-id";
 
   private final String m_sCollectionName;
-  private final MongoCollection <Document> m_aCollection;
+  private final transient MongoCollection <Document> m_aCollection;
   private final long m_nInitialCount;
 
   /**
    * Default constructor using {@link #DEFAULT_COLLECTION_NAME} as the
    * collection name.
-   * 
+   *
    * @param nInitialCount
    *        Initial count to be used, if no MongoDB document exists. Must be
    *        &ge; 0.

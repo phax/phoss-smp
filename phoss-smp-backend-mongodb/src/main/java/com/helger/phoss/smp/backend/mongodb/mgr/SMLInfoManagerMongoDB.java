@@ -154,7 +154,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   @Nullable
   public ISMLInfo getSMLInfoOfID (@Nullable final String sID)
   {
-    return getCollection ().find (new Document (BSON_ID, sID)).map (x -> toDomain (x)).first ();
+    return getCollection ().find (new Document (BSON_ID, sID)).map (SMLInfoManagerMongoDB::toDomain).first ();
   }
 
   public boolean containsSMLInfoWithID (@Nullable final String sID)

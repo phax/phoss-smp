@@ -167,7 +167,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   public static Document toBson (@Nonnull final ISMPProcess aValue)
   {
     final Document ret = new Document ().append (BSON_PROCESS_ID, toBson (aValue.getProcessIdentifier ()));
-    final ICommonsList <Document> aEndpoints = new CommonsArrayList <> (aValue.getAllEndpoints (), x -> toBson (x));
+    final ICommonsList <Document> aEndpoints = new CommonsArrayList <> (aValue.getAllEndpoints (),
+                                                                        SMPServiceInformationManagerMongoDB::toBson);
     if (aEndpoints.isNotEmpty ())
       ret.append (BSON_ENDPOINTS, aEndpoints);
     if (aValue.extensions ().isNotEmpty ())
@@ -194,7 +195,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final Document ret = new Document ().append (BSON_ID, aValue.getID ())
                                         .append (BSON_SERVICE_GROUP_ID, aValue.getServiceGroupID ())
                                         .append (BSON_DOCTYPE_ID, toBson (aValue.getDocumentTypeIdentifier ()));
-    final ICommonsList <Document> aProcs = new CommonsArrayList <> (aValue.getAllProcesses (), x -> toBson (x));
+    final ICommonsList <Document> aProcs = new CommonsArrayList <> (aValue.getAllProcesses (),
+                                                                    SMPServiceInformationManagerMongoDB::toBson);
     if (aProcs.isNotEmpty ())
       ret.append (BSON_PROCESSES, aProcs);
     if (aValue.extensions ().isNotEmpty ())

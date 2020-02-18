@@ -140,7 +140,9 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
   @Nullable
   public ISMPTransportProfile getSMPTransportProfileOfID (@Nullable final String sID)
   {
-    return getCollection ().find (new Document (BSON_ID, sID)).map (x -> toDomain (x)).first ();
+    return getCollection ().find (new Document (BSON_ID, sID))
+                           .map (SMPTransportProfileManagerMongoDB::toDomain)
+                           .first ();
   }
 
   public boolean containsSMPTransportProfileWithID (@Nullable final String sID)
