@@ -93,7 +93,6 @@ public final class MenuSecure
       aMenuTree.createItem (aAdmin,
                             new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CSMP.DEFAULT_LOCALE);
-      aMenuTree.createItem (aAdmin, new PageSecureHttpClient (CMenuSecure.MENU_HTTP_CLIENT));
     }
 
     // Default menu item
