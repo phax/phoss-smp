@@ -27,7 +27,6 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.servlet.StaticServerInfo;
-import com.helger.servlet.request.RequestHelper;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
@@ -61,14 +60,15 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
   @Nonnull
   public URI getCurrentURI ()
   {
-    String sRet;
+    final String sRet;
     if (m_bUseStaticServerInfo && StaticServerInfo.isSet ())
     {
       // Do not decode params - '#' lets URI parser fail!
-      sRet = StaticServerInfo.getInstance ().getFullContextPath () + m_aRequestScope.getRequestURI ();
+      // getRequestURIEncoded contains the context path
+      sRet = StaticServerInfo.getInstance ().getFullServerPath () + m_aRequestScope.getRequestURIEncoded ();
     }
     else
-      sRet = m_aRequestScope.getRequestURL ().toString ();
+      sRet = m_aRequestScope.getRequestURLEncoded ().toString ();
     return URLHelper.getAsURI (sRet);
   }
 
@@ -79,7 +79,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
   @Nonnull
   protected String getBaseUriBuilder ()
   {
-    String ret;
+    final String ret;
     if (m_bUseStaticServerInfo && StaticServerInfo.isSet ())
     {
       if (SMPServerConfiguration.isForceRoot ())
@@ -90,9 +90,9 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
     else
     {
       if (SMPServerConfiguration.isForceRoot ())
-        ret = RequestHelper.getFullServerName (m_aRequestScope.getRequest ()).toString ();
+        ret = m_aRequestScope.getFullServerPath ();
       else
-        ret = m_aRequestScope.getRequestURL ().toString ();
+        ret = m_aRequestScope.getFullContextPath ();
     }
     return ret;
   }

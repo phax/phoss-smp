@@ -32,7 +32,6 @@ import com.helger.photon.bootstrap4.uictrls.ext.BootstrapLoginHTMLProvider;
 import com.helger.photon.bootstrap4.utils.BootstrapPageHeader;
 import com.helger.photon.core.execcontext.ISimpleWebExecutionContext;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
-import com.helger.servlet.request.RequestHelper;
 
 /**
  * The login screen HTML provider.
@@ -52,7 +51,7 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
   protected void onBeforeForm (@Nonnull final ISimpleWebExecutionContext aSWEC, @Nonnull final BootstrapForm aForm)
   {
     // Change the URL to relative (fixed in ph-oton 8.2.1)
-    aForm.setAction (new SimpleURL (RequestHelper.getURI (aSWEC.getRequestScope ().getRequest ())));
+    aForm.setAction (new SimpleURL (aSWEC.getRequestScope ().getURIDecoded ()));
   }
 
   @Override

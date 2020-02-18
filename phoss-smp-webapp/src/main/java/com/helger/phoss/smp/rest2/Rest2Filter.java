@@ -45,11 +45,11 @@ import com.helger.xservlet.AbstractXFilterUnifiedResponse;
  */
 public class Rest2Filter extends AbstractXFilterUnifiedResponse
 {
+  public static final String PATH_PREFIX_OASIS_BDXR_SMP_2 = "bdxr-smp-2";
   public static final String PARAM_SERVICE_GROUP_ID = "ServiceGroupId";
   public static final String PARAM_USER_ID = "UserId";
   public static final String PARAM_DOCUMENT_TYPE_ID = "DocumentTypeId";
   static final String LOG_PREFIX = "[REST API] ";
-  private static final String PATH_PREFIX_OASIS_BDXR_SMP_2 = "bdxr-smp-2";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (Rest2Filter.class);
 
@@ -163,6 +163,15 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                       @Nonnull final UnifiedResponse aUnifiedResponse) throws IOException,
                                                                                        ServletException
   {
+    if (LOGGER.isDebugEnabled ())
+    {
+      LOGGER.debug (aRequestScope.getRequest ().getRequestURI ());
+      LOGGER.debug (aRequestScope.getRequest ().getRequestURL ().toString ());
+      LOGGER.debug (aRequestScope.getRequestURIEncoded ());
+      LOGGER.debug (aRequestScope.getRequestURLEncoded ().toString ());
+      LOGGER.debug (aRequestScope.getRequestURIDecoded ());
+      LOGGER.debug (aRequestScope.getRequestURLDecoded ().toString ());
+    }
     final APIPath aAPIPath = APIPath.createForFilter (aRequestScope);
 
     if (RegExHelper.stringMatchesPattern ("^/(stream|public|secure|ajax|resbundle|smp-status|error|logout|favicon.ico|robots.txt)(/.*)?$",
