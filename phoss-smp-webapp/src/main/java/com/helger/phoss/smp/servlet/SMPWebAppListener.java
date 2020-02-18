@@ -31,6 +31,7 @@ import com.helger.network.proxy.ProxySelectorProxySettingsManager;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettingsManager;
 import com.helger.pd.client.PDClientConfiguration;
+import com.helger.pd.client.PDHttpClientSettings;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.PDClientProvider;
@@ -48,6 +49,8 @@ import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.pub.MenuPublic;
 import com.helger.phoss.smp.ui.secure.MenuSecure;
 import com.helger.photon.ajax.IAjaxRegistry;
+import com.helger.photon.bootstrap4.pages.utils.BasePageUtilsHttpClient;
+import com.helger.photon.bootstrap4.pages.utils.BasePageUtilsHttpClient.HttpClientConfig;
 import com.helger.photon.bootstrap4.servlet.WebAppListenerBootstrap;
 import com.helger.photon.core.appid.CApplicationID;
 import com.helger.photon.core.appid.PhotonGlobalState;
@@ -310,5 +313,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                                sHost,
                                                nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps)
                                                                                     : null);
+
+    // Special http client config
+    BasePageUtilsHttpClient.HttpClientConfigRegistry.register (new HttpClientConfig ("directoryclient",
+                                                                                     "Directory client settings",
+                                                                                     x -> new PDHttpClientSettings (x)));
   }
 }
