@@ -21,7 +21,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
-    <version>5.2.3-SNAPSHOT</version>
+    <version>5.2.4-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-webapp</artifactId>
   <packaging>jar</packaging>
