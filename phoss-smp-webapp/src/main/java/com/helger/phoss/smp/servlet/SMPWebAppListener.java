@@ -319,4 +319,11 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                                                                      "Directory client settings",
                                                                                      x -> new PDHttpClientSettings (x)));
   }
+
+  @Override
+  protected void beforeContextDestroyed (@Nonnull final ServletContext aSC)
+  {
+    BasePageUtilsHttpClient.HttpClientConfigRegistry.setToDefault ();
+    super.beforeContextDestroyed (aSC);
+  }
 }
