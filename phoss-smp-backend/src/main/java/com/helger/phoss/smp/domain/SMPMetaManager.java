@@ -19,12 +19,8 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
-import com.helger.peppolid.factory.BDXR1IdentifierFactory;
-import com.helger.peppolid.factory.BDXR2IdentifierFactory;
 import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.peppolid.factory.PeppolIdentifierFactory;
-import com.helger.peppolid.factory.SimpleIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.backend.SMPBackendRegistry;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -127,24 +123,11 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
     try
     {
+      // Before all
+      s_aManagerProvider.beforeInitManagers ();
+
       final ESMPIdentifierType eIdentifierType = SMPServerConfiguration.getIdentifierType ();
-      switch (eIdentifierType)
-      {
-        case SIMPLE:
-          m_aIdentifierFactory = SimpleIdentifierFactory.INSTANCE;
-          break;
-        case PEPPOL:
-          m_aIdentifierFactory = PeppolIdentifierFactory.INSTANCE;
-          break;
-        case BDXR1:
-          m_aIdentifierFactory = BDXR1IdentifierFactory.INSTANCE;
-          break;
-        case BDXR2:
-          m_aIdentifierFactory = BDXR2IdentifierFactory.INSTANCE;
-          break;
-        default:
-          throw new IllegalStateException ("Unsupported identifier type " + eIdentifierType + "!");
-      }
+      m_aIdentifierFactory = eIdentifierType.getIdentifierFactory ();
 
       // Initialize first because the service group manager initializes the
       // RegistrationHookFactory
@@ -203,6 +186,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
 
       _initCallbacks ();
+
+      // After all
+      s_aManagerProvider.afterInitManagers ();
 
       LOGGER.info (ClassHelper.getClassLocalName (this) + " was initialized");
     }

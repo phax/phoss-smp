@@ -32,6 +32,7 @@ import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettingsManager;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.pd.client.PDHttpClientSettings;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.PDClientProvider;
@@ -144,8 +145,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   public void initLocales (@Nonnull final ILocaleManager aLocaleMgr)
   {
-    aLocaleMgr.registerLocale (CSMP.DEFAULT_LOCALE);
-    aLocaleMgr.setDefaultLocale (CSMP.DEFAULT_LOCALE);
+    aLocaleMgr.registerLocale (CSMPServer.DEFAULT_LOCALE);
+    aLocaleMgr.setDefaultLocale (CSMPServer.DEFAULT_LOCALE);
   }
 
   @Override

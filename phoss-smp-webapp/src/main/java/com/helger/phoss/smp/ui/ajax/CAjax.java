@@ -21,7 +21,7 @@ import javax.annotation.concurrent.Immutable;
 
 import com.helger.commons.functional.IPredicate;
 import com.helger.commons.http.EHttpMethod;
-import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.ajax.IAjaxRegistry;
 import com.helger.photon.ajax.decl.AjaxFunctionDeclaration;
@@ -43,7 +43,7 @@ public final class CAjax
                                                                                    .withExecutor (AjaxExecutorDataTables.class)
                                                                                    .build ();
   public static final IAjaxFunctionDeclaration DATATABLES_I18N = AjaxFunctionDeclaration.builder ("datatables-i18n")
-                                                                                        .withExecutor (new AjaxExecutorDataTablesI18N (CSMP.DEFAULT_LOCALE))
+                                                                                        .withExecutor (new AjaxExecutorDataTablesI18N (CSMPServer.DEFAULT_LOCALE))
                                                                                         .build ();
   private static final IPredicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () == EHttpMethod.POST;
   public static final IAjaxFunctionDeclaration LOGIN = AjaxFunctionDeclaration.builder ("login")

@@ -10,11 +10,14 @@
  */
 package com.helger.phoss.smp;
 
+import java.util.Locale;
+
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.ClassPathResource;
+import com.helger.commons.locale.LocaleCache;
 import com.helger.settings.ISettings;
 import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
 
@@ -26,6 +29,8 @@ import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
 @Immutable
 public final class CSMPServer
 {
+  public static final Locale DEFAULT_LOCALE = LocaleCache.getInstance ().getLocale ("en", "US");
+
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
 
   private static final String VERSION_NUMBER;

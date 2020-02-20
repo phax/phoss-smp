@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.email.EmailAddress;
 import com.helger.commons.string.StringHelper;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.photon.core.interror.InternalErrorBuilder;
 import com.helger.photon.core.interror.InternalErrorSettings;
@@ -44,7 +45,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
   public static InternalErrorBuilder createInternalErrorBuilder ()
   {
     final InternalErrorBuilder ret = new InternalErrorBuilder ();
-    ret.setDisplayLocale (CSMP.DEFAULT_LOCALE);
+    ret.setDisplayLocale (CSMPServer.DEFAULT_LOCALE);
     return ret;
   }
 
@@ -99,7 +100,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
       InternalErrorSettings.setSMTPSenderAddress (new EmailAddress (sSenderAddress, sSenderName));
       InternalErrorSettings.setSMTPReceiverAddresses (new EmailAddress (sReceiverAddress, sReceiverName));
       InternalErrorSettings.setSMTPSettings (aSMTPSettings);
-      InternalErrorSettings.setFallbackLocale (CSMP.DEFAULT_LOCALE);
+      InternalErrorSettings.setFallbackLocale (CSMPServer.DEFAULT_LOCALE);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);

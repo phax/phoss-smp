@@ -59,7 +59,7 @@ import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSVar;
 import com.helger.html.jscode.html.JSHtml;
 import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
-import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 import com.helger.phoss.smp.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.phoss.smp.ui.ajax.CAjax;
@@ -351,7 +351,7 @@ public final class SMPCommonUI
       return null;
 
     LOGGER.warn ("Technical details", t);
-    return BootstrapTechnicalUI.getTechnicalDetailsNode (t, CSMP.DEFAULT_LOCALE);
+    return BootstrapTechnicalUI.getTechnicalDetailsNode (t, CSMPServer.DEFAULT_LOCALE);
   }
 
   @Nullable
@@ -361,6 +361,6 @@ public final class SMPCommonUI
       return null;
 
     LOGGER.warn ("Technical details", t);
-    return BootstrapTechnicalUI.getTechnicalDetailsString (t, CSMP.DEFAULT_LOCALE);
+    return BootstrapTechnicalUI.getTechnicalDetailsString (t, CSMPServer.DEFAULT_LOCALE);
   }
 }

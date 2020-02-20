@@ -26,7 +26,6 @@ import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsMap;
-import com.helger.commons.locale.LocaleCache;
 import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.photon.security.CSecurity;
@@ -39,8 +38,6 @@ import com.helger.photon.security.CSecurity;
 @Immutable
 public final class CSMP
 {
-  public static final Locale DEFAULT_LOCALE = LocaleCache.getInstance ().getLocale ("en", "US");
-
   public static final String APPLICATION_TITLE = "phoss SMP";
 
   // Security roles
@@ -83,7 +80,7 @@ public final class CSMP
   public static final String USER_ADMINISTRATOR_FIRSTNAME = null;
   public static final String USER_ADMINISTRATOR_LASTNAME = CSecurity.USER_ADMINISTRATOR_NAME;
   public static final String USER_ADMINISTRATOR_DESCRIPTION = null;
-  public static final Locale USER_ADMINISTRATOR_LOCALE = CSMP.DEFAULT_LOCALE;
+  public static final Locale USER_ADMINISTRATOR_LOCALE = CSMPServer.DEFAULT_LOCALE;
   public static final ICommonsMap <String, String> USER_ADMINISTRATOR_CUSTOMATTRS = null;
 
   /** A regular expression pattern to validate the SMP ID. */

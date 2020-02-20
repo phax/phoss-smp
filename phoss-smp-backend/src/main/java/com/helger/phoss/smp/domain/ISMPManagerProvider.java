@@ -35,6 +35,23 @@ import com.helger.smpclient.url.PeppolURLProvider;
 public interface ISMPManagerProvider
 {
   /**
+   * Callback to perform actions BEFORE the managers are initialized.
+   *
+   * @see #afterInitManagers()
+   */
+  default void beforeInitManagers ()
+  {}
+
+  /**
+   * Callback to perform actions AFTER the managers were initialized. This
+   * method is only called if initialization was successful.
+   *
+   * @see #beforeInitManagers()
+   */
+  default void afterInitManagers ()
+  {}
+
+  /**
    * @return The Peppol URL provider to be used. May not be <code>null</code>.
    */
   @Nonnull
