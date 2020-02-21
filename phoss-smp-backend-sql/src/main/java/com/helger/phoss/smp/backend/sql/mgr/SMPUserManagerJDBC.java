@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nonnegative;
@@ -19,6 +20,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
@@ -159,5 +161,21 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
                     " is owned by user '" +
                     aCredentials.getUserName () +
                     "'");
+  }
+
+  public void updateOwnerships (@Nonnull final ICommonsMap <String, String> aOldToNewMap)
+  {
+    if (aOldToNewMap.isNotEmpty ())
+    {
+      executor ().performInTransaction ( () -> {
+        for (final Map.Entry <String, String> aEntry : aOldToNewMap.entrySet ())
+        {
+          final String sOld = aEntry.getKey ();
+          final String sNew = aEntry.getValue ();
+          executor ().insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE username=?",
+                                              new ConstantPreparedStatementDataProvider (sNew, sOld));
+        }
+      });
+    }
   }
 }

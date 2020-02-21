@@ -54,7 +54,6 @@ import com.helger.xml.microdom.util.XMLMapHandler;
  *
  * @author Philip Helger
  */
-@SuppressWarnings ("deprecation")
 public final class SMPManagerProviderSQL implements ISMPManagerProvider
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPManagerProviderSQL.class);
@@ -92,7 +91,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
           {
             final String sUserName = aDBUser.getUserName () + (nIndex > 0 ? Integer.toString (nIndex) : "");
             final String sEmailAddress = sUserName + "@example.org";
-            aPhotonUser = aPhotonUserMgr.createNewUser (sUserName,
+            aPhotonUser = aPhotonUserMgr.createNewUser (sEmailAddress,
                                                         sEmailAddress,
                                                         aDBUser.getPassword (),
                                                         null,
@@ -117,6 +116,10 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
           aCreatedMappings.put (aDBUser.getUserName (), aPhotonUser.getID ());
           LOGGER.info ("Mapped DB user '" + aDBUser.getUserName () + "' to ph-oton user " + aPhotonUser.getID ());
         }
+
+        // Update the ownership at the end
+        aSQLUserMgr.updateOwnerships (aCreatedMappings);
+
         if (XMLMapHandler.writeMap (aCreatedMappings,
                                     new FileSystemResource (WebFileIO.getDataIO ()
                                                                      .getFile ("migrations/db-photon-user-mapping.xml")))
@@ -197,7 +200,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                 @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPRedirectManagerSQL (aServiceGroupMgr);
+    return new SMPRedirectManagerJDBC (aServiceGroupMgr);
   }
 
   @Nonnull
