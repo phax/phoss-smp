@@ -15,7 +15,6 @@ import java.util.Optional;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.persistence.EntityManager;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
@@ -27,18 +26,14 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.wrapper.Wrapper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBResultRow;
-import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
-import com.helger.phoss.smp.backend.sql.model.DBOwnership;
-import com.helger.phoss.smp.backend.sql.model.DBOwnershipID;
-import com.helger.phoss.smp.backend.sql.model.DBServiceGroup;
-import com.helger.phoss.smp.backend.sql.model.DBServiceGroupID;
-import com.helger.phoss.smp.backend.sql.model.DBUser;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -47,7 +42,6 @@ import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
-import com.helger.phoss.smp.exception.SMPUnknownUserException;
 import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
@@ -82,28 +76,17 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
     final MutableBoolean aCreatedServiceGroup = new MutableBoolean (false);
+    final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+    final Wrapper <Exception> aCaughtException = new Wrapper <> ();
 
-    executor ().performInTransaction ( () -> {
-
-    });
-
-    JPAExecutionResult <?> ret;
-    ret = doInTransaction ( () -> {
-      final EntityManager aEM = getEntityManager ();
-
+    final ESuccess eSuccess = executor ().performInTransaction ( () -> {
       // Check if the passed service group ID is already in use
-      final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantID);
-      DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
+      final SMPServiceGroup aDBServiceGroup = getSMPServiceGroupOfID (aParticipantID);
       if (aDBServiceGroup != null)
         throw new IllegalStateException ("The service group with ID " +
                                          aParticipantID.getURIEncoded () +
                                          " already exists!");
-
-      final DBUser aDBUser = aEM.find (DBUser.class, sOwnerID);
-      if (aDBUser == null)
-        throw new SMPUnknownUserException (sOwnerID);
 
       {
         // It's a new service group - Create in SML and remember that
@@ -113,14 +96,17 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       }
 
       // Did not exist. Create it.
-      final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sOwnerID, aParticipantID);
-      final DBOwnership aOwnership = new DBOwnership (aDBOwnershipID, aDBUser);
-      aDBServiceGroup = new DBServiceGroup (aDBServiceGroupID, sExtension, aOwnership, null);
-      aEM.persist (aDBServiceGroup);
-      aEM.persist (aOwnership);
-    });
+      executor ().insertOrUpdateOrDelete ("INSERT INTO smp_ownership (businessIdentifierScheme, businessIdentifier, username) VALUES (?, ?, ?)",
+                                          new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                     aParticipantID.getValue (),
+                                                                                     sOwnerID));
+      executor ().insertOrUpdateOrDelete ("INSERT INTO smp_service_group (businessIdentifierScheme, businessIdentifier, extension) VALUES (?, ?, ?)",
+                                          new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                     aParticipantID.getValue (),
+                                                                                     sExtension));
+    }, aCaughtException::set);
 
-    if (ret.isFailure ())
+    if (eSuccess.isFailure ())
     {
       // Error writing to the DB
       if (aCreatedServiceGroup.booleanValue ())
@@ -137,17 +123,16 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       }
     }
 
-    if (ret.hasException ())
+    if (aCaughtException.isSet ())
     {
       // Propagate contained exception
-      final Exception ex = ret.getException ();
+      final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
       if (ex instanceof RegistrationHookException)
         throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML",
                                    (RegistrationHookException) ex);
-      throw new SMPInternalErrorException ("Error creating ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
-                                           ret.getException ());
+      throw new SMPInternalErrorException ("Error creating ServiceGroup '" + aParticipantID.getURIEncoded () + "'", ex);
     }
 
     if (LOGGER.isDebugEnabled ())
@@ -161,7 +146,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   @Nonnull
   public EChange updateSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
                                         @Nonnull @Nonempty final String sNewOwnerID,
-                                        @Nullable final String sExtension) throws SMPServerException
+                                        @Nullable final String sNewExtension) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notEmpty (sNewOwnerID, "NewOwnerID");
@@ -171,56 +156,56 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                     ", " +
                     sNewOwnerID +
                     ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    (StringHelper.hasText (sNewExtension) ? "with extension" : "without extension") +
                     ")");
 
-    JPAExecutionResult <EChange> ret;
-    ret = doInTransaction ( () -> {
-      // Check if the passed service group ID is already in use
-      final EntityManager aEM = getEntityManager ();
-      final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, new DBServiceGroupID (aParticipantID));
-      if (aDBServiceGroup == null)
-        return EChange.UNCHANGED;
+    final Wrapper <EChange> aWrappedChange = new Wrapper <> (EChange.UNCHANGED);
+    final Wrapper <Exception> aCaughtException = new Wrapper <> ();
 
-      EChange eChange = EChange.UNCHANGED;
-      final DBOwnership aOldOwnership = aDBServiceGroup.getOwnership ();
-      if (!aOldOwnership.getId ().getUsername ().equals (sNewOwnerID))
+    final ESuccess eSuccess = executor ().performInTransaction ( () -> {
+      // Check if the passed service group ID is already in use
+      final SMPServiceGroup aDBServiceGroup = getSMPServiceGroupOfID (aParticipantID);
+      if (aDBServiceGroup == null)
+        throw new SMPNotFoundException ("The service group with ID " +
+                                        aParticipantID.getURIEncoded () +
+                                        " does not exist!");
+
+      if (!EqualsHelper.equals (sNewOwnerID, aDBServiceGroup.getOwnerID ()))
       {
         // Update ownership
-
-        // Is new owner existing?
-        final DBUser aNewUser = aEM.find (DBUser.class, sNewOwnerID);
-        if (aNewUser == null)
-          throw new IllegalStateException ("User '" + sNewOwnerID + "' does not exist!");
-
-        aEM.remove (aOldOwnership);
-
-        // The business did exist. So it must be owned by the passed user.
-        final DBOwnershipID aDBOwnershipID = new DBOwnershipID (sNewOwnerID, aParticipantID);
-        aDBServiceGroup.setOwnership (new DBOwnership (aDBOwnershipID, aNewUser));
-
-        eChange = EChange.CHANGED;
+        final long nCount = executor ().insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE username=?",
+                                                                new ConstantPreparedStatementDataProvider (sNewOwnerID,
+                                                                                                           aDBServiceGroup.getOwnerID ()));
+        if (nCount != 1)
+          throw new IllegalStateException ("Failed to update the ownership username to '" + sNewOwnerID + "'");
+        aWrappedChange.set (EChange.CHANGED);
       }
 
-      // Simply update the extension
-      if (!EqualsHelper.equals (aDBServiceGroup.getExtension (), sExtension))
-        eChange = EChange.CHANGED;
-      aDBServiceGroup.setExtension (sExtension);
+      if (!EqualsHelper.equals (sNewExtension, aDBServiceGroup.getExtensionsAsString ()))
+      {
+        // Update extension
+        final long nCount = executor ().insertOrUpdateOrDelete ("UPDATE smp_service_group SET extension=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                                                new ConstantPreparedStatementDataProvider (sNewExtension,
+                                                                                                           aDBServiceGroup.getParticpantIdentifier ()
+                                                                                                                          .getScheme (),
+                                                                                                           aDBServiceGroup.getParticpantIdentifier ()
+                                                                                                                          .getValue ()));
+        if (nCount != 1)
+          throw new IllegalStateException ("Failed to update the service_group extension to '" + sNewExtension + "'");
+        aWrappedChange.set (EChange.CHANGED);
+      }
+    }, aCaughtException::set);
 
-      aEM.merge (aDBServiceGroup);
-      return eChange;
-    });
-
-    if (ret.hasException ())
+    if (eSuccess.isFailure () || aCaughtException.isSet ())
     {
-      final Exception ex = ret.getException ();
+      final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
       throw new SMPInternalErrorException ("Failed to update ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
-                                           ret.getException ());
+                                           ex);
     }
 
-    final EChange eChange = ret.get ();
+    final EChange eChange = aWrappedChange.get ();
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
 
@@ -240,15 +225,16 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
     final MutableBoolean aDeletedServiceGroupInSML = new MutableBoolean (false);
+    final Wrapper <EChange> aWrappedChange = new Wrapper <> (EChange.UNCHANGED);
+    final Wrapper <Exception> aCaughtException = new Wrapper <> ();
 
-    JPAExecutionResult <EChange> ret;
-    ret = doInTransaction ( () -> {
-      // Check if the service group is existing
-      final EntityManager aEM = getEntityManager ();
-      final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantID);
-      final DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
+    final ESuccess eSuccess = executor ().performInTransaction ( () -> {
+      // Check if the passed service group ID is already in use
+      final SMPServiceGroup aDBServiceGroup = getSMPServiceGroupOfID (aParticipantID);
       if (aDBServiceGroup == null)
-        throw new SMPNotFoundException ("No such service group '" + aParticipantID.getURIEncoded () + "'");
+        throw new SMPNotFoundException ("The service group with ID " +
+                                        aParticipantID.getURIEncoded () +
+                                        " does not exist!");
 
       {
         // Delete in SML - and remember that
@@ -257,11 +243,15 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
         aDeletedServiceGroupInSML.set (true);
       }
 
-      aEM.remove (aDBServiceGroup);
-      return EChange.CHANGED;
-    });
+      final int nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_group WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                        aParticipantID.getValue ()));
+      if (nCount != 1)
+        throw new IllegalStateException ("Failed to delete service group");
+      aWrappedChange.set (EChange.CHANGED);
+    }, aCaughtException::set);
 
-    if (ret.isFailure ())
+    if (eSuccess.isFailure ())
     {
       // Error writing to the DB
       if (aDeletedServiceGroupInSML.booleanValue ())
@@ -278,26 +268,24 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       }
     }
 
-    if (ret.hasException ())
+    if (aCaughtException.isSet ())
     {
-      final Exception ex = ret.getException ();
+      final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
       if (ex instanceof RegistrationHookException)
         throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML",
                                    (RegistrationHookException) ex);
       throw new SMPInternalErrorException ("Failed to delete ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
-                                           ret.getException ());
+                                           ex);
     }
 
-    final EChange eChange = ret.get ();
+    final EChange eChange = aWrappedChange.get ();
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
 
     if (eChange.isChanged ())
-    {
       m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
-    }
 
     return eChange;
   }

@@ -190,7 +190,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    return new SMPServiceGroupManagerSQL ();
+    return new SMPServiceGroupManagerJDBC ();
   }
 
   @Nonnull
