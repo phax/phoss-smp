@@ -49,7 +49,7 @@ public interface ISMPUserManager extends ISMPUserProvider
    * @return The number of contained user. Always &ge; 0.
    */
   @Nonnegative
-  int getUserCount ();
+  long getUserCount ();
 
   @Nonnull
   @ReturnsMutableCopy
@@ -73,20 +73,19 @@ public interface ISMPUserManager extends ISMPUserProvider
 
   /**
    * Verify that the passed service group is owned by the user specified in the
-   * credentials.
+   * credentials. This is always called directly after
+   * {@link #validateUserCredentials(BasicAuthClientCredentials)}.
    *
    * @param aServiceGroupID
    *        The service group to be verified
    * @param aCurrentUser
    *        The user to verify.
-   * @return Implementation specific return value.
    * @throws SMPServerException
    *         <code>SMPNotFoundException</code> If the passed service group does
    *         not exist on this SMP. <code>SMPUnauthorizedException</code> If the
    *         participant identifier is not owned by the user specified in the
    *         credentials
    */
-  @Nullable
-  Object verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                          @Nonnull final ISMPUser aCurrentUser) throws SMPServerException;
+  void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
+                        @Nonnull final ISMPUser aCurrentUser) throws SMPServerException;
 }

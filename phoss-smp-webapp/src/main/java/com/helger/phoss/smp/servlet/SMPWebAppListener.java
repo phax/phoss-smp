@@ -324,6 +324,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected void beforeContextDestroyed (@Nonnull final ServletContext aSC)
   {
+    // Reset for unit tests
     BasePageUtilsHttpClient.HttpClientConfigRegistry.setToDefault ();
     super.beforeContextDestroyed (aSC);
   }

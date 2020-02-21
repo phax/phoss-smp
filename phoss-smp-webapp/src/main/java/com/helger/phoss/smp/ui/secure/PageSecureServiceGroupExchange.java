@@ -64,6 +64,7 @@ import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPUserSelect;
+import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
@@ -150,15 +151,24 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     for (final IMicroElement eServiceGroup : eRoot.getAllChildElements (CSMPExchange.ELEMENT_SERVICEGROUP))
     {
       // Read service group and service information
-      final ISMPServiceGroup aServiceGroup = SMPServiceGroupMicroTypeConverter.convertToNative (eServiceGroup, x -> {
-        ISMPUser ret = SMPMetaManager.getUserMgr ().getUserOfID (x);
-        if (ret == null)
-        {
-          // Select the default owner if an unknown user is contained
-          ret = aDefaultOwner;
-        }
-        return ret;
-      });
+      final ISMPServiceGroup aServiceGroup;
+      try
+      {
+        aServiceGroup = SMPServiceGroupMicroTypeConverter.convertToNative (eServiceGroup, x -> {
+          ISMPUser ret = SMPMetaManager.getUserMgr ().getUserOfID (x);
+          if (ret == null)
+          {
+            // Select the default owner if an unknown user is contained
+            ret = aDefaultOwner;
+          }
+          return ret;
+        });
+      }
+      catch (final RuntimeException ex)
+      {
+        aLogger.error ("Error parsing the service group at index " + nSGIndex + ". Ignoring this service group.", ex);
+        continue;
+      }
       final String sServiceGroupID = aServiceGroup.getID ();
       final boolean bIsServiceGroupContained = aAllServiceGroups.containsAny (x -> x.getID ().equals (sServiceGroupID));
       if (!bIsServiceGroupContained || bOverwriteExisting)
@@ -476,7 +486,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             for (final LogMessage aLogMsg : aLogger)
             {
               final IErrorLevel aErrorLevel = aLogMsg.getErrorLevel ();
-              EBootstrapBadgeType eBadgeType;
+              final EBootstrapBadgeType eBadgeType;
               if (aErrorLevel.isGE (EErrorLevel.ERROR))
                 eBadgeType = EBootstrapBadgeType.DANGER;
               else
@@ -488,8 +498,10 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                   else
                     eBadgeType = EBootstrapBadgeType.SUCCESS;
 
+              // By default is is centered
               aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild (aLogMsg.getMessage ().toString ())
-                                                                      .addChild (SMPCommonUI.getTechnicalDetailsUI (aLogMsg.getThrowable ())));
+                                                                      .addChild (SMPCommonUI.getTechnicalDetailsUI (aLogMsg.getThrowable ()))
+                                                                      .addClass (CBootstrapCSS.TEXT_LEFT));
             }
           }
           else

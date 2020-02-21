@@ -77,7 +77,7 @@ public final class SMPUserManagerPhoton implements ISMPUserManager
   }
 
   @Nonnegative
-  public int getUserCount ()
+  public long getUserCount ()
   {
     return PhotonSecurityManager.getUserMgr ().getActiveUserCount ();
   }
@@ -87,6 +87,7 @@ public final class SMPUserManagerPhoton implements ISMPUserManager
   public ICommonsList <ISMPUser> getAllUsers ()
   {
     final ICommonsList <ISMPUser> ret = new CommonsArrayList <> ();
+    // Use only the non-deleted and enabled users
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ().getAllActiveUsers ())
       ret.add (new SMPUserPhoton (aUser));
     return ret;
@@ -126,9 +127,8 @@ public final class SMPUserManagerPhoton implements ISMPUserManager
     return new SMPUserPhoton (aUser);
   }
 
-  @Nonnull
-  public ISMPServiceGroup verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                           @Nonnull final ISMPUser aCurrentUser) throws SMPServerException
+  public void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
+                               @Nonnull final ISMPUser aCurrentUser) throws SMPServerException
   {
     // Resolve service group
     final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
@@ -154,7 +154,5 @@ public final class SMPUserManagerPhoton implements ISMPUserManager
                     " is owned by user '" +
                     aCurrentUser.getUserName () +
                     "'");
-
-    return aServiceGroup;
   }
 }

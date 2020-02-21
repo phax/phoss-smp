@@ -19,7 +19,6 @@ package com.helger.phoss.smp.ui.secure.hc;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.id.IHasID;
 import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -44,9 +43,9 @@ public class HCSMPTransportProfileSelect extends HCSelect
   {
     super (aRF);
 
-    for (final ISMPTransportProfile aTP : CollectionHelper.getSorted (SMPMetaManager.getTransportProfileMgr ()
-                                                                                    .getAllSMPTransportProfiles (),
-                                                                      IHasID.getComparatorID ()))
+    for (final ISMPTransportProfile aTP : SMPMetaManager.getTransportProfileMgr ()
+                                                        .getAllSMPTransportProfiles ()
+                                                        .getSortedInline (IHasID.getComparatorID ()))
       addOption (aTP.getID (), getDisplayName (aTP));
   }
 }

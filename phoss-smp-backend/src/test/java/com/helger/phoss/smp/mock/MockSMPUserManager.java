@@ -60,7 +60,7 @@ final class MockSMPUserManager implements ISMPUserManager
   }
 
   @Nonnegative
-  public int getUserCount ()
+  public long getUserCount ()
   {
     return 0;
   }
@@ -78,8 +78,7 @@ final class MockSMPUserManager implements ISMPUserManager
     throw new UnsupportedOperationException ();
   }
 
-  @Nullable
-  public Object verifyOwnership (final IParticipantIdentifier aServiceGroupID, final ISMPUser aCurrentUser)
+  public void verifyOwnership (final IParticipantIdentifier aServiceGroupID, final ISMPUser aCurrentUser)
   {
     throw new UnsupportedOperationException ();
   }

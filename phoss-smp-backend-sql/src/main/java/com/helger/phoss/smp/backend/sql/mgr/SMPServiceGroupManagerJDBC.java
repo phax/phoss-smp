@@ -11,13 +11,12 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
-
-import org.eclipse.persistence.config.CacheUsage;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
@@ -25,16 +24,16 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
+import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
+import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.phoss.smp.backend.sql.AbstractSMPJPAEnabledManager;
+import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
 import com.helger.phoss.smp.backend.sql.model.DBOwnership;
 import com.helger.phoss.smp.backend.sql.model.DBOwnershipID;
 import com.helger.phoss.smp.backend.sql.model.DBServiceGroup;
@@ -53,15 +52,15 @@ import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 
-public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPServiceGroupManager
+public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager implements ISMPServiceGroupManager
 {
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceGroupManagerSQL ()
+  public SMPServiceGroupManagerJDBC ()
   {}
 
   @Nonnull
-  @ReturnsMutableObject ("by design")
+  @ReturnsMutableObject
   public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {
     return m_aCBs;
@@ -85,6 +84,10 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
 
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
     final MutableBoolean aCreatedServiceGroup = new MutableBoolean (false);
+
+    executor ().performInTransaction ( () -> {
+
+    });
 
     JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
@@ -396,22 +399,16 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (aParticipantID == null)
       return null;
 
-    JPAExecutionResult <SMPServiceGroup> ret;
-    ret = doSelect ( () -> {
-      final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
-                                                                       new DBServiceGroupID (aParticipantID));
-      if (aDBServiceGroup == null)
-        return null;
-
-      return new SMPServiceGroup (aDBServiceGroup.getOwnership ().getId ().getUsername (),
-                                  aDBServiceGroup.getId ().getAsBusinessIdentifier (),
-                                  aDBServiceGroup.getExtension ());
-    });
-    if (ret.hasException ())
-    {
+    final Optional <DBResultRow> aResult = executor ().querySingle ("SELECT (sg.extension, so.username)" +
+                                                                    " FROM smp_service_group sg, smp_ownership so" +
+                                                                    " WHERE sg.businessIdentifierScheme=? AND sg.businessIdentifier=?" +
+                                                                    " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
+                                                                    new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                               aParticipantID.getValue ()));
+    if (!aResult.isPresent ())
       return null;
-    }
-    return ret.get ();
+
+    return new SMPServiceGroup (aResult.get ().getAsString (1), aParticipantID, aResult.get ().getAsString (0));
   }
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantID)
@@ -424,21 +421,9 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (aParticipantID == null)
       return false;
 
-    JPAExecutionResult <Boolean> ret;
-    ret = doSelect ( () -> {
-      // Disable caching here
-      final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
-      aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
-      final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
-                                                                       new DBServiceGroupID (aParticipantID),
-                                                                       aProps);
-      return Boolean.valueOf (aDBServiceGroup != null);
-    });
-    if (ret.hasException ())
-    {
-      return false;
-    }
-    return ret.get ().booleanValue ();
+    return 1 == executor ().queryCount ("SELECT COUNT(*) FROM smp_service_group WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                        new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                   aParticipantID.getValue ()));
   }
 
   @Nonnegative
@@ -447,15 +432,6 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupCount()");
 
-    JPAExecutionResult <Long> ret;
-    ret = doSelect ( () -> {
-      final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceGroup p"));
-      return Long.valueOf (nCount);
-    });
-    if (ret.hasException ())
-    {
-      return 0;
-    }
-    return ret.get ().longValue ();
+    return executor ().queryCount ("SELECT COUNT(*) FROM smp_service_group");
   }
 }
