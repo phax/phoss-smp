@@ -98,10 +98,10 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
   @ReturnsMutableCopy
   public ICommonsList <ISMPUser> getAllUsers ()
   {
-    final Optional <ICommonsList <DBResultRow>> aList = executor ().queryAll ("SELECT (username, password) FROM smp_user");
+    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT (username, password) FROM smp_user");
     final ICommonsList <ISMPUser> ret = new CommonsArrayList <> ();
-    if (aList.isPresent ())
-      for (final DBResultRow aRow : aList.get ())
+    if (aDBResult.isPresent ())
+      for (final DBResultRow aRow : aDBResult.get ())
         ret.add (new DBUser (aRow.getAsString (0), aRow.getAsString (1)));
     return ret;
   }
@@ -112,11 +112,11 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
     if (StringHelper.hasNoText (sUserName))
       return null;
 
-    final Optional <DBResultRow> aOpt = executor ().querySingle ("SELECT (password) FROM smp_user WHERE username=?",
-                                                                 new ConstantPreparedStatementDataProvider (sUserName));
-    if (!aOpt.isPresent ())
+    final Optional <DBResultRow> aDBResult = executor ().querySingle ("SELECT password FROM smp_user WHERE username=?",
+                                                                      new ConstantPreparedStatementDataProvider (sUserName));
+    if (!aDBResult.isPresent ())
       return null;
-    return new DBUser (sUserName, aOpt.get ().getAsString (0));
+    return new DBUser (sUserName, aDBResult.get ().getAsString (0));
   }
 
   @Nonnull

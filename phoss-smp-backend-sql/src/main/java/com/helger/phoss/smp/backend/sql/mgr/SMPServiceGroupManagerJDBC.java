@@ -10,7 +10,6 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnegative;
@@ -33,6 +32,7 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
 import com.helger.phoss.smp.backend.sql.model.DBOwnership;
 import com.helger.phoss.smp.backend.sql.model.DBOwnershipID;
@@ -309,33 +309,17 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroups()");
 
-    JPAExecutionResult <ICommonsList <ISMPServiceGroup>> ret;
-    ret = doSelect ( () -> {
-      final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p",
-                                                                                      DBServiceGroup.class)
-                                                                        .getResultList ();
+    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username" +
+                                                                                  " FROM smp_service_group AS sg, smp_ownership AS so" +
+                                                                                  " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier");
 
-      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
-      for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
-      {
-        final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
-        if (aDBOwnership == null)
-          throw new IllegalStateException ("Service group " +
-                                           aDBServiceGroup.getId ().getAsBusinessIdentifier ().getURIEncoded () +
-                                           " has no owner");
-
-        final SMPServiceGroup aServiceGroup = new SMPServiceGroup (aDBOwnership.getId ().getUsername (),
-                                                                   aDBServiceGroup.getId ().getAsBusinessIdentifier (),
-                                                                   aDBServiceGroup.getExtension ());
-        aList.add (aServiceGroup);
-      }
-      return aList;
-    });
-    if (ret.hasException ())
-    {
-      return new CommonsArrayList <> ();
-    }
-    return ret.get ();
+    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
+    if (aDBResult.isPresent ())
+      for (final DBResultRow aRow : aDBResult.get ())
+        ret.add (new SMPServiceGroup (aRow.getAsString (3),
+                                      new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
+                                      aRow.getAsString (2)));
+    return ret;
   }
 
   @Nonnull
@@ -345,27 +329,19 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
 
-    JPAExecutionResult <ICommonsList <ISMPServiceGroup>> ret;
-    ret = doSelect ( () -> {
-      final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p WHERE p.ownership.user.userName = :user",
-                                                                                      DBServiceGroup.class)
-                                                                        .setParameter ("user", sOwnerID)
-                                                                        .getResultList ();
+    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension" +
+                                                                                  " FROM smp_service_group AS sg, smp_ownership AS so" +
+                                                                                  " WHERE so.username=?" +
+                                                                                  " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
+                                                                                  new ConstantPreparedStatementDataProvider (sOwnerID));
 
-      final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
-      for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
-      {
-        aList.add (new SMPServiceGroup (sOwnerID,
-                                        aDBServiceGroup.getId ().getAsBusinessIdentifier (),
-                                        aDBServiceGroup.getExtension ()));
-      }
-      return aList;
-    });
-    if (ret.hasException ())
-    {
-      return new CommonsArrayList <> ();
-    }
-    return ret.get ();
+    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
+    if (aDBResult.isPresent ())
+      for (final DBResultRow aRow : aDBResult.get ())
+        ret.add (new SMPServiceGroup (sOwnerID,
+                                      new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
+                                      aRow.getAsString (2)));
+    return ret;
   }
 
   @Nonnegative
@@ -374,18 +350,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupCountOfOwner(" + sOwnerID + ")");
 
-    JPAExecutionResult <Long> ret;
-    ret = doSelect ( () -> {
-      final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p) FROM DBOwnership p WHERE p.user.userName = :user",
-                                                                                 DBOwnership.class)
-                                                                   .setParameter ("user", sOwnerID));
-      return Long.valueOf (nCount);
-    });
-    if (ret.hasException ())
-    {
-      return 0;
-    }
-    return ret.get ().longValue ();
+    return executor ().queryCount ("SELECT COUNT(sg.businessIdentifier)" +
+                                   " FROM smp_service_group AS sg, smp_ownership AS so" +
+                                   " WHERE so.username=?" +
+                                   " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
+                                   new ConstantPreparedStatementDataProvider (sOwnerID));
   }
 
   @Nullable
@@ -399,8 +368,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (aParticipantID == null)
       return null;
 
-    final Optional <DBResultRow> aResult = executor ().querySingle ("SELECT (sg.extension, so.username)" +
-                                                                    " FROM smp_service_group sg, smp_ownership so" +
+    final Optional <DBResultRow> aResult = executor ().querySingle ("SELECT sg.extension, so.username" +
+                                                                    " FROM smp_service_group AS sg, smp_ownership AS so" +
                                                                     " WHERE sg.businessIdentifierScheme=? AND sg.businessIdentifier=?" +
                                                                     " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
                                                                     new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
