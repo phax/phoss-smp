@@ -18,18 +18,18 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 
 /**
- * Test class for class {@link SMPBusinessCardManagerSQL}.
+ * Test class for class {@link SMPBusinessCardManagerJDBC}.
  *
  * @author Philip Helger
  */
-public final class SMPBusinessCardManagerSQLTest
+public final class SMPBusinessCardManagerJDBCTest
 {
   @Test
   public void testConvertStringList ()
   {
     final ICommonsList <String> x = new CommonsArrayList <> ("a", "bcd", "http://bla.foo.com");
-    final String sJson = SMPBusinessCardManagerSQL.getStringAsJson (x).getAsJsonString ();
-    final ICommonsList <String> y = SMPBusinessCardManagerSQL.getJsonAsString (sJson);
+    final String sJson = SMPBusinessCardManagerJDBC.getStringAsJson (x).getAsJsonString ();
+    final ICommonsList <String> y = SMPBusinessCardManagerJDBC.getJsonAsString (sJson);
     assertEquals (x, y);
   }
 }

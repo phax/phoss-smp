@@ -18,7 +18,6 @@ import java.util.Optional;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.persistence.EntityManager;
 
 import com.helger.collection.multimap.IMultiMapListBased;
 import com.helger.collection.multimap.MultiHashMapArrayListBased;
@@ -29,10 +28,10 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
+import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBResultRow;
-import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.json.IJson;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
@@ -43,7 +42,6 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.factory.SimpleIdentifierFactory;
 import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
-import com.helger.phoss.smp.backend.sql.model.DBBusinessCardEntity;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
@@ -180,39 +178,34 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
                     " entities" +
                     ")");
 
-    JPAExecutionResult <?> ret;
-    ret = doInTransaction ( () -> {
-      final EntityManager aEM = getEntityManager ();
+    final ESuccess eSucces = executor ().performInTransaction ( () -> {
       // Delete all existing entities
-      final int nDeleted = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id",
-                                            DBBusinessCardEntity.class)
-                              .setParameter ("id", aServiceGroup.getParticpantIdentifier ().getURIEncoded ())
-                              .executeUpdate ();
-
+      final String sPID = aServiceGroup.getParticpantIdentifier ().getURIEncoded ();
+      final int nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
+                                                               new ConstantPreparedStatementDataProvider (sPID));
       if (LOGGER.isDebugEnabled () && nDeleted > 0)
         LOGGER.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
 
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
         // Single name only
-        final DBBusinessCardEntity aDBBCE = new DBBusinessCardEntity (aEntity.getID (),
-                                                                      aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getURIEncoded (),
-                                                                      aEntity.names ().getFirst ().getName (),
-                                                                      aEntity.getCountryCode (),
-                                                                      aEntity.getGeographicalInformation (),
-                                                                      getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
-                                                                      getStringAsJson (aEntity.websiteURIs ()).getAsJsonString (JWS),
-                                                                      getBCCAsJson (aEntity.contacts ()).getAsJsonString (JWS),
-                                                                      aEntity.getAdditionalInformation (),
-                                                                      aEntity.getRegistrationDate ());
-        aEM.persist (aDBBCE);
+        executor ().insertOrUpdateOrDelete ("INSERT INTO smp_bce (id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                            new ConstantPreparedStatementDataProvider (aEntity.getID (),
+                                                                                       sPID,
+                                                                                       aEntity.names ()
+                                                                                              .getFirst ()
+                                                                                              .getName (),
+                                                                                       aEntity.getCountryCode (),
+                                                                                       aEntity.getGeographicalInformation (),
+                                                                                       getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
+                                                                                       getStringAsJson (aEntity.websiteURIs ()).getAsJsonString (JWS),
+                                                                                       getBCCAsJson (aEntity.contacts ()).getAsJsonString (JWS),
+                                                                                       aEntity.getAdditionalInformation (),
+                                                                                       aEntity.getRegistrationDate ()));
       }
     });
-    if (ret.hasException ())
-    {
+    if (eSucces.isFailure ())
       return null;
-    }
 
     final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aServiceGroup, aEntities);
 
