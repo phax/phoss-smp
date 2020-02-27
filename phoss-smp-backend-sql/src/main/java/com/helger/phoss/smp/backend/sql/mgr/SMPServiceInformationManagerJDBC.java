@@ -538,7 +538,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final IParticipantIdentifier aPID = aServiceGroup.getParticpantIdentifier ();
     final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT sm.extension," +
                                                                                   "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
-                                                                                  "   se.certificate, se.endpointReference, se.minimumAuthenticationLevel, se.requireBusinessLevelSignature, se.serviceActivationDate, se.serviceDescription, se.serviceExpirationDate, se.technicalContactUrl, se.technicalInformationUrl, se.transportProfile, se.extension" +
+                                                                                  "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                                                                                  "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
+                                                                                  "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
                                                                                   " FROM smp_service_metadata AS sm" +
                                                                                   " LEFT JOIN smp_process AS sp" +
                                                                                   "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
@@ -564,11 +566,23 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     {
       final IProcessIdentifier aProcID = new SimpleProcessIdentifier (aDBProc.getAsString (0), aDBProc.getAsString (1));
       final String sProcExtension = aDBProc.getAsString (2);
-      final SMPProcess aProcess = new SMPProcess ();
-
+      final SMPProcess aProcess = new SMPProcess (aProcID, null, sProcExtension);
+      final SMPEndpoint aEndpoint = new SMPEndpoint (aDBProc.getAsString (3),
+                                                     aDBProc.getAsString (4),
+                                                     aDBProc.getAsBoolean (5),
+                                                     aDBProc.getAsString (6),
+                                                     aDBProc.getAsLocalDateTime (7),
+                                                     aDBProc.getAsLocalDateTime (8),
+                                                     aDBProc.getAsString (9),
+                                                     aDBProc.getAsString (10),
+                                                     aDBProc.getAsString (11),
+                                                     aDBProc.getAsString (12),
+                                                     aDBProc.getAsString (13));
+      aEndpoints.putSingle (aProcess, aEndpoint);
     }
 
     final ICommonsList <SMPProcess> aProcesses;
+    // TODO
     return new SMPServiceInformation (aServiceGroup, aDocTypeID, aProcesses, aRows.getFirst ().getAsString (0));
   }
 
