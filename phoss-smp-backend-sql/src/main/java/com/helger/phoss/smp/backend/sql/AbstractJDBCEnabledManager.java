@@ -10,7 +10,15 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,5 +39,23 @@ public abstract class AbstractJDBCEnabledManager
   protected final DBExecutor executor ()
   {
     return m_aDBExec;
+  }
+
+  @Nullable
+  public static Time toTime (@Nullable final LocalTime aLT)
+  {
+    return aLT == null ? null : Time.valueOf (aLT);
+  }
+
+  @Nullable
+  public static Date toDate (@Nullable final LocalDate aLD)
+  {
+    return aLD == null ? null : Date.valueOf (aLD);
+  }
+
+  @Nullable
+  public static Timestamp toTimestamp (@Nullable final LocalDateTime aLDT)
+  {
+    return aLDT == null ? null : Timestamp.valueOf (aLDT);
   }
 }
