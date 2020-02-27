@@ -16,6 +16,9 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
@@ -54,6 +57,8 @@ import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
  */
 public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager implements ISMPServiceGroupManager
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerJDBC.class);
+
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
   public SMPServiceGroupManagerJDBC ()

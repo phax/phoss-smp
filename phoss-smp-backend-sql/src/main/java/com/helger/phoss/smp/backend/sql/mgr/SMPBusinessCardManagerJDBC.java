@@ -19,6 +19,9 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.collection.multimap.IMultiMapListBased;
 import com.helger.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.ValueEnforcer;
@@ -62,7 +65,9 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
  */
 public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager implements ISMPBusinessCardManager
 {
-  // Create as minimal as possible
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerJDBC.class);
+
+  // Create with as minimal output as possible
   private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false)
                                                                          .setWriteNewlineAtEnd (false);
 
