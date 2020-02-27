@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
-import com.helger.db.jpa.JPAEnabledManager;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
@@ -51,7 +50,6 @@ public final class ServiceGroupInterfaceFillDBTest extends AbstractSMPWebAppSQLT
   @Test
   public void testCreateAFewServiceGroups () throws SMPClientException
   {
-    JPAEnabledManager.exceptionCallbacks ().removeAll ();
     final SMPClient aSMPClient = new MockSMPClient ();
 
     final StopWatch aSW = StopWatch.createdStarted ();

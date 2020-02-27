@@ -8,30 +8,30 @@ final class SMPDataSourceProvider extends AbstractConnector
   @Override
   protected String getJDBCDriverClassName ()
   {
-    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJPAConfiguration.CONFIG_JDBC_DRIVER);
+    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER);
   }
 
   @Override
   protected String getUserName ()
   {
-    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJPAConfiguration.CONFIG_JDBC_USER);
+    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER);
   }
 
   @Override
   protected String getPassword ()
   {
-    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJPAConfiguration.CONFIG_JDBC_PASSWORD);
+    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD);
   }
 
   @Override
   protected String getDatabaseName ()
   {
-    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJPAConfiguration.CONFIG_TARGET_DATABASE);
+    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE);
   }
 
   @Override
   public String getConnectionUrl ()
   {
-    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJPAConfiguration.CONFIG_JDBC_URL);
+    return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL);
   }
 }

@@ -22,9 +22,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import javax.persistence.PersistenceException;
-
-import org.eclipse.persistence.exceptions.DatabaseException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -67,9 +64,9 @@ public final class ISMPServiceGroupManagerFuncTest
       // May fail
       aUserMgr.createUser (sOwner1ID, "any");
     }
-    catch (final PersistenceException ex)
+    catch (final Exception ex)
     {
-      assertTrue (ex.getCause () instanceof DatabaseException);
+      assertTrue (ex.getCause () instanceof IllegalStateException);
       // MySQL is not configured correctly!
       return;
     }

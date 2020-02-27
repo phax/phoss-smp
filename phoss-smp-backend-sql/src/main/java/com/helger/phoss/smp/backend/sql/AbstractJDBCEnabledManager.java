@@ -33,6 +33,8 @@ public abstract class AbstractJDBCEnabledManager
   public AbstractJDBCEnabledManager ()
   {
     m_aDBExec = new DBExecutor (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
+    m_aDBExec.setDebugConnections (false);
+    m_aDBExec.setDebugSQLStatements (true);
   }
 
   @Nonnull
