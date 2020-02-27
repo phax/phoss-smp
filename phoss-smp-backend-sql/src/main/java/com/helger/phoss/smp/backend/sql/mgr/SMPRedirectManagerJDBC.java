@@ -87,15 +87,15 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       if (aDBRedirect == null)
       {
         // Create new
-        final int nCreated = executor ().insertOrUpdateOrDelete ("INSERT INTO smp_service_metadata_redirection (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                                                                 new ConstantPreparedStatementDataProvider (aParticpantID.getScheme (),
-                                                                                                            aParticpantID.getValue (),
-                                                                                                            aDocTypeID.getScheme (),
-                                                                                                            aDocTypeID.getValue (),
-                                                                                                            sRedirectUrl,
-                                                                                                            sSubjectUniqueIdentifier,
-                                                                                                            sCertificate,
-                                                                                                            sExtension));
+        final long nCreated = executor ().insertOrUpdateOrDelete ("INSERT INTO smp_service_metadata_redirection (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                                                                  new ConstantPreparedStatementDataProvider (aParticpantID.getScheme (),
+                                                                                                             aParticpantID.getValue (),
+                                                                                                             aDocTypeID.getScheme (),
+                                                                                                             aDocTypeID.getValue (),
+                                                                                                             sRedirectUrl,
+                                                                                                             sSubjectUniqueIdentifier,
+                                                                                                             sCertificate,
+                                                                                                             sExtension));
         if (nCreated != 1)
           throw new IllegalStateException ("Failed to create new DB entry");
         aCreatedNew.set (true);
@@ -103,17 +103,17 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       else
       {
         // Update existing
-        final int nCreated = executor ().insertOrUpdateOrDelete ("UPDATE smp_service_metadata_redirection" +
-                                                                 " SET redirectionUrl, certificateUID, certificate, extension" +
-                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
-                                                                 new ConstantPreparedStatementDataProvider (sRedirectUrl,
-                                                                                                            sSubjectUniqueIdentifier,
-                                                                                                            sCertificate,
-                                                                                                            sExtension,
-                                                                                                            aParticpantID.getScheme (),
-                                                                                                            aParticpantID.getValue (),
-                                                                                                            aDocTypeID.getScheme (),
-                                                                                                            aDocTypeID.getValue ()));
+        final long nCreated = executor ().insertOrUpdateOrDelete ("UPDATE smp_service_metadata_redirection" +
+                                                                  " SET redirectionUrl, certificateUID, certificate, extension" +
+                                                                  " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
+                                                                  new ConstantPreparedStatementDataProvider (sRedirectUrl,
+                                                                                                             sSubjectUniqueIdentifier,
+                                                                                                             sCertificate,
+                                                                                                             sExtension,
+                                                                                                             aParticpantID.getScheme (),
+                                                                                                             aParticpantID.getValue (),
+                                                                                                             aDocTypeID.getScheme (),
+                                                                                                             aDocTypeID.getValue ()));
         if (nCreated != 1)
           throw new IllegalStateException ("Failed to update existing DB entry");
         aCreatedNew.set (false);
@@ -148,12 +148,12 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     final IParticipantIdentifier aParticipantID = aSMPRedirect.getServiceGroup ().getParticpantIdentifier ();
     final IDocumentTypeIdentifier aDocTypeID = aSMPRedirect.getDocumentTypeIdentifier ();
-    final int nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_redirection" +
-                                                             " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
-                                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                                        aParticipantID.getValue (),
-                                                                                                        aDocTypeID.getScheme (),
-                                                                                                        aDocTypeID.getValue ()));
+    final long nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_redirection" +
+                                                              " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
+                                                              new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                         aParticipantID.getValue (),
+                                                                                                         aDocTypeID.getScheme (),
+                                                                                                         aDocTypeID.getValue ()));
     if (nDeleted == 0)
       return EChange.UNCHANGED;
 
@@ -172,10 +172,10 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     // Now delete
     final IParticipantIdentifier aParticipantID = aServiceGroup.getParticpantIdentifier ();
-    final int nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_redirection" +
-                                                             " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                                        aParticipantID.getValue ()));
+    final long nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_redirection" +
+                                                              " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                                              new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                         aParticipantID.getValue ()));
     if (nDeleted == 0)
       return EChange.UNCHANGED;
 

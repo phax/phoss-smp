@@ -61,9 +61,9 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
         ret.set (ESuccess.FAILURE);
       else
       {
-        final int nCount = executor ().insertOrUpdateOrDelete ("INSERT INTO smp_user (username, password) VALUES (?,?)",
-                                                               new ConstantPreparedStatementDataProvider (sUserName,
-                                                                                                          sPassword));
+        final long nCount = executor ().insertOrUpdateOrDelete ("INSERT INTO smp_user (username, password) VALUES (?,?)",
+                                                                new ConstantPreparedStatementDataProvider (sUserName,
+                                                                                                           sPassword));
         ret.set (ESuccess.valueOf (nCount == 1));
       }
     });
@@ -73,9 +73,9 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
   @Nonnull
   public ESuccess updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
-    final int nCount = executor ().insertOrUpdateOrDelete ("UPDATE smp_user SET password=? WHERE username=?",
-                                                           new ConstantPreparedStatementDataProvider (sPassword,
-                                                                                                      sUserName));
+    final long nCount = executor ().insertOrUpdateOrDelete ("UPDATE smp_user SET password=? WHERE username=?",
+                                                            new ConstantPreparedStatementDataProvider (sPassword,
+                                                                                                       sUserName));
     return ESuccess.valueOf (nCount == 1);
   }
 
@@ -85,8 +85,8 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
     if (StringHelper.hasNoText (sUserName))
       return EChange.UNCHANGED;
 
-    final int nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_user WHERE username=?",
-                                                           new ConstantPreparedStatementDataProvider (sUserName));
+    final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_user WHERE username=?",
+                                                            new ConstantPreparedStatementDataProvider (sUserName));
     return EChange.valueOf (nCount == 1);
   }
 

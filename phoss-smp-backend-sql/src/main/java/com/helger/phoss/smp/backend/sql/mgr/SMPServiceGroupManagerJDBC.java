@@ -243,9 +243,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
         aDeletedServiceGroupInSML.set (true);
       }
 
-      final int nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_group WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                                        aParticipantID.getValue ()));
+      final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_group WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                                              new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                         aParticipantID.getValue ()));
       if (nCount != 1)
         throw new IllegalStateException ("Failed to delete service group");
       aWrappedChange.set (EChange.CHANGED);

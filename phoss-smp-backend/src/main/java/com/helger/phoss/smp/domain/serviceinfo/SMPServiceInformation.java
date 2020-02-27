@@ -140,6 +140,13 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     m_aProcesses.put (sProcessID, aProcess);
   }
 
+  public void addProcesses (@Nonnull final Iterable <SMPProcess> aProcesses)
+  {
+    ValueEnforcer.notNull (aProcesses, "Processes");
+    for (final SMPProcess aProcess : aProcesses)
+      addProcess (aProcess);
+  }
+
   public void setProcesses (@Nonnull @Nonempty final Map <String, ? extends SMPProcess> aProcesses)
   {
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");

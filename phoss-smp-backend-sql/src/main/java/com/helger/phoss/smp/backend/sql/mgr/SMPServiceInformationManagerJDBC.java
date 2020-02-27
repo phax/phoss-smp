@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nonnegative;
@@ -18,11 +18,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 
-import org.eclipse.persistence.config.CacheUsage;
-
-import com.helger.collection.multimap.IMultiMapListBased;
-import com.helger.collection.multimap.MultiLinkedHashMapArrayListBased;
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
@@ -30,6 +27,8 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsMap;
+import com.helger.commons.equals.EqualsHelper;
+import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
@@ -42,6 +41,8 @@ import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
 import com.helger.phoss.smp.backend.sql.model.DBEndpoint;
@@ -52,7 +53,6 @@ import com.helger.phoss.smp.backend.sql.model.DBServiceGroup;
 import com.helger.phoss.smp.backend.sql.model.DBServiceGroupID;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadata;
 import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataID;
-import com.helger.phoss.smp.backend.sql.model.DBServiceMetadataRedirection;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -72,6 +72,48 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledManager implements
                                                     ISMPServiceInformationManager
 {
+  @MustImplementEqualsAndHashcode
+  private static final class DocTypeAndExtension
+  {
+    final IDocumentTypeIdentifier m_aDocTypeID;
+    final String m_sExt;
+
+    public DocTypeAndExtension (final IDocumentTypeIdentifier aDocTypeID, final String sExt)
+    {
+      m_aDocTypeID = aDocTypeID;
+      m_sExt = sExt;
+    }
+
+    @Override
+    public boolean equals (final Object o)
+    {
+      if (o == this)
+        return true;
+      if (o == null || !getClass ().equals (o.getClass ()))
+        return false;
+      final DocTypeAndExtension rhs = (DocTypeAndExtension) o;
+      return m_aDocTypeID.equals (rhs.m_aDocTypeID) && EqualsHelper.equals (m_sExt, rhs.m_sExt);
+    }
+
+    @Override
+    public int hashCode ()
+    {
+      return new HashCodeGenerator (this).append (m_aDocTypeID).append (m_sExt).getHashCode ();
+    }
+  }
+
+  private static final class ProcessAndEndpoint
+  {
+    final SMPProcess m_aProcess;
+    final SMPEndpoint m_aEndpoint;
+
+    public ProcessAndEndpoint (final SMPProcess aProcess, final SMPEndpoint aEndpoint)
+    {
+      m_aProcess = aProcess;
+      m_aEndpoint = aEndpoint;
+    }
+  }
+
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
@@ -227,6 +269,13 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
 
     final MutableBoolean aUpdated = new MutableBoolean (false);
+
+    executor ().performInTransaction ( () -> {
+      // Simply delete the old one
+      final EChange eDeleted = _deleteSMPServiceInformationNoCallback (aSMPServiceInformation);
+      aUpdated.set (eDeleted.isChanged ());
+    });
+
     JPAExecutionResult <DBServiceMetadata> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
@@ -293,33 +342,43 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   }
 
   @Nonnull
+  private EChange _deleteSMPServiceInformationNoCallback (@Nonnull final ISMPServiceInformation aSMPServiceInformation)
+  {
+    final Wrapper <EChange> ret = new Wrapper <> (EChange.UNCHANGED);
+    executor ().performInTransaction ( () -> {
+      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticpantIdentifier ();
+      final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
+      final long nCountEP = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_endpoint AS se" +
+                                                                " WHERE se.businessIdentifierScheme=? AND se.businessIdentifier=? AND se.documentIdentifierScheme=? AND se.documentIdentifier=?",
+                                                                new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                                                                                           aPID.getValue (),
+                                                                                                           aDocTypeID.getScheme (),
+                                                                                                           aDocTypeID.getValue ()));
+      final long nCountProc = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_process AS sp" +
+                                                                  " WHERE sp.businessIdentifierScheme=? AND sp.businessIdentifier=? AND sp.documentIdentifierScheme=? AND sp.documentIdentifier=?",
+                                                                  new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                                                                                             aPID.getValue (),
+                                                                                                             aDocTypeID.getScheme (),
+                                                                                                             aDocTypeID.getValue ()));
+      ret.set (EChange.valueOf (nCountEP > 0 || nCountProc > 0));
+    });
+    return ret.get ();
+  }
+
+  @Nonnull
   public EChange deleteSMPServiceInformation (@Nullable final ISMPServiceInformation aSMPServiceInformation)
   {
     if (aSMPServiceInformation == null)
       return EChange.UNCHANGED;
 
-    JPAExecutionResult <EChange> ret;
-    ret = doInTransaction ( () -> {
-      final EntityManager aEM = getEntityManager ();
-      final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aSMPServiceInformation.getServiceGroup ()
-                                                                                               .getParticpantIdentifier (),
-                                                                         aSMPServiceInformation.getDocumentTypeIdentifier ());
-      final DBServiceMetadata aDBMetadata = aEM.find (DBServiceMetadata.class, aDBMetadataID);
-      if (aDBMetadata == null)
-        return EChange.UNCHANGED;
-
-      aEM.remove (aDBMetadata);
-      return EChange.CHANGED;
-    });
-
-    if (ret.hasException ())
+    // Main deletion
+    if (_deleteSMPServiceInformationNoCallback (aSMPServiceInformation).isUnchanged ())
       return EChange.UNCHANGED;
 
     // Callback outside of transaction
-    if (ret.get ().isChanged ())
-      m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
+    m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
 
-    return ret.get ();
+    return EChange.CHANGED;
   }
 
   @Nonnull
@@ -328,37 +387,37 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (aServiceGroup == null)
       return EChange.UNCHANGED;
 
-    final Wrapper <ICommonsList <ISMPServiceInformation>> aDeletedInfos = new Wrapper <> ();
-    JPAExecutionResult <EChange> ret;
-    ret = doInTransaction ( () -> {
-      // Remember what will be deleted (never null)
-      aDeletedInfos.set (getAllSMPServiceInformationOfServiceGroup (aServiceGroup));
+    final Wrapper <EChange> ret = new Wrapper <> (EChange.UNCHANGED);
+    final Wrapper <ICommonsList <ISMPServiceInformation>> aAllDeleted = new Wrapper <> ();
+    executor ().performInTransaction ( () -> {
+      // get the old ones first
+      aAllDeleted.set (getAllSMPServiceInformationOfServiceGroup (aServiceGroup));
 
-      final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadata p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
-                                                        DBServiceMetadataRedirection.class)
-                                          .setParameter ("scheme",
-                                                         aServiceGroup.getParticpantIdentifier ().getScheme ())
-                                          .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
-                                          .executeUpdate ();
-
-      if (aDeletedInfos.get ().size () != nCnt)
-        if (LOGGER.isWarnEnabled ())
-          LOGGER.warn ("Retrieved " +
-                       aDeletedInfos.get ().size () +
-                       " ServiceMetadata entries but deleted " +
-                       nCnt +
-                       " - this number should be identical!");
-
-      return EChange.valueOf (nCnt > 0);
+      final IParticipantIdentifier aPID = aServiceGroup.getParticpantIdentifier ();
+      final long nCountEP = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_endpoint AS se" +
+                                                                " WHERE se.businessIdentifierScheme=? AND se.businessIdentifier=?",
+                                                                new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                                                                                           aPID.getValue ()));
+      final long nCountProc = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_process AS sp" +
+                                                                  " WHERE sp.businessIdentifierScheme=? AND sp.businessIdentifier=?",
+                                                                  new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                                                                                             aPID.getValue ()));
+      final long nCountSM = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata AS sm" +
+                                                                " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
+                                                                new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                                                                                           aPID.getValue ()));
+      ret.set (EChange.valueOf (nCountEP > 0 || nCountProc > 0 || nCountSM > 0));
     });
-    if (ret.hasException ())
+
+    if (ret.get ().isUnchanged ())
       return EChange.UNCHANGED;
 
     // Callback outside of transaction
-    for (final ISMPServiceInformation aSMPServiceInformation : aDeletedInfos.get ())
-      m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
+    if (aAllDeleted.isSet ())
+      for (final ISMPServiceInformation aSMPServiceInformation : aAllDeleted.get ())
+        m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
 
-    return ret.get ();
+    return EChange.CHANGED;
   }
 
   @Nonnull
@@ -368,127 +427,197 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (aSMPServiceInformation == null || aProcess == null)
       return EChange.UNCHANGED;
 
-    JPAExecutionResult <EChange> ret;
-    ret = doInTransaction ( () -> {
-      final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBProcess p WHERE" +
-                                                        " p.id.businessIdentifierScheme = :bischeme AND p.id.businessIdentifier = :bivalue AND" +
-                                                        " p.id.documentIdentifierScheme = :discheme AND p.id.documentIdentifier = :divalue AND" +
-                                                        " p.id.processIdentifierScheme = :pischeme AND p.id.processIdentifier = :pivalue",
-                                                        DBServiceMetadataRedirection.class)
-                                          .setParameter ("bischeme",
-                                                         aSMPServiceInformation.getServiceGroup ()
-                                                                               .getParticpantIdentifier ()
-                                                                               .getScheme ())
-                                          .setParameter ("bivalue",
-                                                         aSMPServiceInformation.getServiceGroup ()
-                                                                               .getParticpantIdentifier ()
-                                                                               .getValue ())
-                                          .setParameter ("discheme",
-                                                         aSMPServiceInformation.getDocumentTypeIdentifier ()
-                                                                               .getScheme ())
-                                          .setParameter ("divalue",
-                                                         aSMPServiceInformation.getDocumentTypeIdentifier ()
-                                                                               .getValue ())
-                                          .setParameter ("pischeme", aProcess.getProcessIdentifier ().getScheme ())
-                                          .setParameter ("pivalue", aProcess.getProcessIdentifier ().getValue ())
-                                          .executeUpdate ();
-      return EChange.valueOf (nCnt > 0);
+    final Wrapper <EChange> ret = new Wrapper <> (EChange.UNCHANGED);
+    executor ().performInTransaction ( () -> {
+      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticpantIdentifier ();
+      final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
+      final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
+      final long nCountEP = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_endpoint AS se" +
+                                                                " WHERE se.businessIdentifierScheme=? AND se.businessIdentifier=? AND se.documentIdentifierScheme=? AND se.documentIdentifier=? AND se.processIdentifierType=? AND se.processIdentifier=?",
+                                                                new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                                                                                           aPID.getValue (),
+                                                                                                           aDocTypeID.getScheme (),
+                                                                                                           aDocTypeID.getValue (),
+                                                                                                           aProcessID.getScheme (),
+                                                                                                           aProcessID.getValue ()));
+      final long nCountProc = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_process AS sp" +
+                                                                  " WHERE sp.businessIdentifierScheme=? AND sp.businessIdentifier=? AND sp.documentIdentifierScheme=? AND sp.documentIdentifier=? AND sp.processIdentifierType=? AND sp.processIdentifier=?",
+                                                                  new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                                                                                             aPID.getValue (),
+                                                                                                             aDocTypeID.getScheme (),
+                                                                                                             aDocTypeID.getValue (),
+                                                                                                             aProcessID.getScheme (),
+                                                                                                             aProcessID.getValue ()));
+      ret.set (EChange.valueOf (nCountEP > 0 || nCountProc > 0));
     });
-    if (ret.hasException ())
-      return EChange.UNCHANGED;
 
     return ret.get ();
-  }
-
-  @Nonnull
-  private SMPServiceInformation _convert (@Nonnull final DBServiceMetadata aDBMetadata)
-  {
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
-    for (final DBProcess aDBProcess : aDBMetadata.getProcesses ())
-    {
-      final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
-      for (final DBEndpoint aDBEndpoint : aDBProcess.getEndpoints ())
-      {
-        final SMPEndpoint aEndpoint = new SMPEndpoint (aDBEndpoint.getId ().getTransportProfile (),
-                                                       aDBEndpoint.getEndpointReference (),
-                                                       aDBEndpoint.isRequireBusinessLevelSignature (),
-                                                       aDBEndpoint.getMinimumAuthenticationLevel (),
-                                                       aDBEndpoint.getServiceActivationDate (),
-                                                       aDBEndpoint.getServiceExpirationDate (),
-                                                       aDBEndpoint.getCertificate (),
-                                                       aDBEndpoint.getServiceDescription (),
-                                                       aDBEndpoint.getTechnicalContactUrl (),
-                                                       aDBEndpoint.getTechnicalInformationUrl (),
-                                                       aDBEndpoint.getExtension ());
-        aEndpoints.add (aEndpoint);
-      }
-      final SMPProcess aProcess = new SMPProcess (aDBProcess.getId ().getAsProcessIdentifier (),
-                                                  aEndpoints,
-                                                  aDBProcess.getExtension ());
-      aProcesses.add (aProcess);
-    }
-    return new SMPServiceInformation (m_aServiceGroupMgr.getSMPServiceGroupOfID (aDBMetadata.getId ()
-                                                                                            .getAsBusinessIdentifier ()),
-                                      aDBMetadata.getId ().getAsDocumentTypeIdentifier (),
-                                      aProcesses,
-                                      aDBMetadata.getExtension ());
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
-    JPAExecutionResult <List <DBServiceMetadata>> ret;
-    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p",
-                                                                   DBServiceMetadata.class)
-                                                     .getResultList ());
-    if (ret.hasException ())
-      return new CommonsArrayList <> ();
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
+    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
+                                                                                  "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
+                                                                                  "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                                                                                  "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
+                                                                                  "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
+                                                                                  " FROM smp_service_metadata AS sm" +
+                                                                                  " LEFT JOIN smp_process AS sp" +
+                                                                                  "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
+                                                                                  "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
+                                                                                  " LEFT JOIN smp_endpoint AS se" +
+                                                                                  "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
+                                                                                  "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
+                                                                                  "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier");
 
-    final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
-    for (final DBServiceMetadata aDBMetadata : ret.get ())
-      aServiceInformations.add (_convert (aDBMetadata));
-    return aServiceInformations;
+    final ICommonsMap <IParticipantIdentifier, ICommonsMap <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>>> aGrouping = new CommonsHashMap <> ();
+    for (final DBResultRow aDBRow : aDBResult.get ())
+    {
+      // Participant ID
+      final IParticipantIdentifier aParticipantID = new SimpleParticipantIdentifier (aDBRow.getAsString (0),
+                                                                                     aDBRow.getAsString (1));
+      // Document type ID and extension
+      final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (aDBRow.getAsString (2),
+                                                                                   aDBRow.getAsString (3));
+      final String sServiceInformationExtension = aDBRow.getAsString (4);
+      // Process without endpoints
+      final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (aDBRow.getAsString (5),
+                                                                               aDBRow.getAsString (6)),
+                                                  null,
+                                                  aDBRow.getAsString (7));
+      // Don't add endpoint to process, because that impacts
+      // SMPProcess.equals/hashcode
+      final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (8),
+                                                     aDBRow.getAsString (9),
+                                                     aDBRow.getAsBoolean (10),
+                                                     aDBRow.getAsString (11),
+                                                     aDBRow.getAsLocalDateTime (12),
+                                                     aDBRow.getAsLocalDateTime (13),
+                                                     aDBRow.getAsString (14),
+                                                     aDBRow.getAsString (15),
+                                                     aDBRow.getAsString (16),
+                                                     aDBRow.getAsString (17),
+                                                     aDBRow.getAsString (18));
+      aGrouping.computeIfAbsent (aParticipantID, k -> new CommonsHashMap <> ())
+               .computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
+                                 k -> new CommonsHashMap <> ())
+               .computeIfAbsent (aProcess, k -> new CommonsArrayList <> ())
+               .add (aEndpoint);
+    }
+
+    // Per participant ID
+    for (final Map.Entry <IParticipantIdentifier, ICommonsMap <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>>> aEntry : aGrouping.entrySet ())
+    {
+      final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aEntry.getKey ());
+      if (aServiceGroup == null)
+        throw new IllegalStateException ("Failed to resolve service group for particpant ID '" +
+                                         aEntry.getKey ().getURIEncoded () +
+                                         "'");
+
+      // Per document type ID
+      for (final Map.Entry <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>> aEntry2 : aEntry.getValue ()
+                                                                                                                       .entrySet ())
+      {
+        // Flatten list
+        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
+        for (final Map.Entry <SMPProcess, ICommonsList <SMPEndpoint>> aEntry3 : aEntry2.getValue ().entrySet ())
+        {
+          final SMPProcess aProcess = aEntry3.getKey ();
+          aProcess.addEndpoints (aEntry3.getValue ());
+          aProcesses.add (aProcess);
+        }
+
+        final DocTypeAndExtension aDE = aEntry2.getKey ();
+        ret.add (new SMPServiceInformation (aServiceGroup, aDE.m_aDocTypeID, aProcesses, aDE.m_sExt));
+      }
+    }
+
+    return ret;
   }
 
   @Nonnegative
   public long getSMPServiceInformationCount ()
   {
-    JPAExecutionResult <Long> ret;
-    ret = doSelect ( () -> {
-      final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadata p"));
-      return Long.valueOf (nCount);
-    });
-    if (ret.hasException ())
-      return 0;
-
-    return ret.get ().longValue ();
+    return executor ().queryCount ("SELECT COUNT(*) FROM smp_service_metadata");
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    final ICommonsList <ISMPServiceInformation> aServiceInformations = new CommonsArrayList <> ();
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
-      JPAExecutionResult <List <DBServiceMetadata>> ret;
-      ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
-                                                                     DBServiceMetadata.class)
-                                                       .setParameter ("scheme",
-                                                                      aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getScheme ())
-                                                       .setParameter ("value",
-                                                                      aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getValue ())
-                                                       .getResultList ());
-      if (!ret.hasException ())
+      final IParticipantIdentifier aPID = aServiceGroup.getParticpantIdentifier ();
+      final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
+                                                                                    "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
+                                                                                    "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                                                                                    "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
+                                                                                    "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
+                                                                                    " FROM smp_service_metadata AS sm" +
+                                                                                    " LEFT JOIN smp_process AS sp" +
+                                                                                    "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
+                                                                                    "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
+                                                                                    " LEFT JOIN smp_endpoint AS se" +
+                                                                                    "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
+                                                                                    "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
+                                                                                    "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier" +
+                                                                                    " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
+                                                                                    new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                                                                                                               aPID.getValue ()));
+      if (aDBResult.isPresent ())
       {
-        for (final DBServiceMetadata aDBMetadata : ret.get ())
-          aServiceInformations.add (_convert (aDBMetadata));
+        final ICommonsMap <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>> aGrouping = new CommonsHashMap <> ();
+        for (final DBResultRow aDBRow : aDBResult.get ())
+        {
+          // Document type ID and extension
+          final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (aDBRow.getAsString (0),
+                                                                                       aDBRow.getAsString (1));
+          final String sServiceInformationExtension = aDBRow.getAsString (2);
+          // Process without endpoints
+          final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (aDBRow.getAsString (3),
+                                                                                   aDBRow.getAsString (4)),
+                                                      null,
+                                                      aDBRow.getAsString (5));
+          // Don't add endpoint to process, because that impacts
+          // SMPProcess.equals/hashcode
+          final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (6),
+                                                         aDBRow.getAsString (7),
+                                                         aDBRow.getAsBoolean (8),
+                                                         aDBRow.getAsString (9),
+                                                         aDBRow.getAsLocalDateTime (10),
+                                                         aDBRow.getAsLocalDateTime (11),
+                                                         aDBRow.getAsString (12),
+                                                         aDBRow.getAsString (13),
+                                                         aDBRow.getAsString (14),
+                                                         aDBRow.getAsString (15),
+                                                         aDBRow.getAsString (16));
+          aGrouping.computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
+                                     k -> new CommonsHashMap <> ())
+                   .computeIfAbsent (aProcess, k -> new CommonsArrayList <> ())
+                   .add (aEndpoint);
+        }
+
+        for (final Map.Entry <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>> aEntry : aGrouping.entrySet ())
+        {
+          // Flatten list
+          final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
+          for (final Map.Entry <SMPProcess, ICommonsList <SMPEndpoint>> aEntry2 : aEntry.getValue ().entrySet ())
+          {
+            final SMPProcess aProcess = aEntry2.getKey ();
+            aProcess.addEndpoints (aEntry2.getValue ());
+            aProcesses.add (aProcess);
+          }
+
+          final DocTypeAndExtension aDE = aEntry.getKey ();
+          ret.add (new SMPServiceInformation (aServiceGroup, aDE.m_aDocTypeID, aProcesses, aDE.m_sExt));
+        }
       }
     }
-    return aServiceInformations;
+    return ret;
   }
 
   @Nonnull
@@ -498,32 +627,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
-      for (final ISMPServiceInformation aServiceInformation : getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
-        ret.add (aServiceInformation.getDocumentTypeIdentifier ());
+      final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier" +
+                                                                                    " FROM smp_service_metadata AS sm" +
+                                                                                    " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?");
+      if (aDBResult.isPresent ())
+      {
+        final ICommonsList <DBResultRow> aRows = aDBResult.get ();
+        for (final DBResultRow aRow : aRows)
+          ret.add (new SimpleDocumentTypeIdentifier (aRow.getAsString (0), aRow.getAsString (1)));
+      }
     }
     return ret;
-  }
-
-  @Nullable
-  private DBServiceMetadata _getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
-                                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
-  {
-    if (aServiceGroup == null || aDocTypeID == null)
-      return null;
-
-    JPAExecutionResult <DBServiceMetadata> ret;
-    ret = doInTransaction ( () -> {
-      // Disable caching here
-      final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
-      aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
-      final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceGroup.getParticpantIdentifier (),
-                                                                         aDocTypeID);
-      return getEntityManager ().find (DBServiceMetadata.class, aDBMetadataID, aProps);
-    });
-    if (ret.hasException ())
-      return null;
-
-    return ret.get ();
   }
 
   @Nullable
@@ -554,36 +668,47 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                                                              aPID.getValue (),
                                                                                                                              aDocTypeID.getScheme (),
                                                                                                                              aDocTypeID.getValue ()));
-    if (!aDBResult.isPresent ())
-      return null;
-
-    final ICommonsList <DBResultRow> aRows = aDBResult.get ();
-    if (aRows.isEmpty ())
-      return null;
-
-    final IMultiMapListBased <SMPProcess, SMPEndpoint> aEndpoints = new MultiLinkedHashMapArrayListBased <> ();
-    for (final DBResultRow aDBProc : aDBResult.get ())
+    if (aDBResult.isPresent ())
     {
-      final IProcessIdentifier aProcID = new SimpleProcessIdentifier (aDBProc.getAsString (0), aDBProc.getAsString (1));
-      final String sProcExtension = aDBProc.getAsString (2);
-      final SMPProcess aProcess = new SMPProcess (aProcID, null, sProcExtension);
-      final SMPEndpoint aEndpoint = new SMPEndpoint (aDBProc.getAsString (3),
-                                                     aDBProc.getAsString (4),
-                                                     aDBProc.getAsBoolean (5),
-                                                     aDBProc.getAsString (6),
-                                                     aDBProc.getAsLocalDateTime (7),
-                                                     aDBProc.getAsLocalDateTime (8),
-                                                     aDBProc.getAsString (9),
-                                                     aDBProc.getAsString (10),
-                                                     aDBProc.getAsString (11),
-                                                     aDBProc.getAsString (12),
-                                                     aDBProc.getAsString (13));
-      aEndpoints.putSingle (aProcess, aEndpoint);
-    }
+      final ICommonsList <DBResultRow> aRows = aDBResult.get ();
+      if (aRows.isNotEmpty ())
+      {
+        final String sServiceInformationExtension = aRows.getFirst ().getAsString (0);
 
-    final ICommonsList <SMPProcess> aProcesses;
-    // TODO
-    return new SMPServiceInformation (aServiceGroup, aDocTypeID, aProcesses, aRows.getFirst ().getAsString (0));
+        final ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>> aEndpoints = new CommonsHashMap <> ();
+        for (final DBResultRow aDBRow : aRows)
+        {
+          // Process without endpoints as key
+          final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (aDBRow.getAsString (1),
+                                                                                   aDBRow.getAsString (2)),
+                                                      null,
+                                                      aDBRow.getAsString (3));
+          final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (4),
+                                                         aDBRow.getAsString (5),
+                                                         aDBRow.getAsBoolean (6),
+                                                         aDBRow.getAsString (7),
+                                                         aDBRow.getAsLocalDateTime (8),
+                                                         aDBRow.getAsLocalDateTime (9),
+                                                         aDBRow.getAsString (10),
+                                                         aDBRow.getAsString (11),
+                                                         aDBRow.getAsString (12),
+                                                         aDBRow.getAsString (13),
+                                                         aDBRow.getAsString (14));
+          aEndpoints.computeIfAbsent (aProcess, k -> new CommonsArrayList <> ()).add (aEndpoint);
+        }
+
+        // Flatten list
+        final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
+        for (final Map.Entry <SMPProcess, ICommonsList <SMPEndpoint>> aEntry : aEndpoints.entrySet ())
+        {
+          final SMPProcess aProcess = aEntry.getKey ();
+          aProcess.addEndpoints (aEntry.getValue ());
+          aProcesses.add (aProcess);
+        }
+        return new SMPServiceInformation (aServiceGroup, aDocTypeID, aProcesses, sServiceInformationExtension);
+      }
+    }
+    return null;
   }
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)

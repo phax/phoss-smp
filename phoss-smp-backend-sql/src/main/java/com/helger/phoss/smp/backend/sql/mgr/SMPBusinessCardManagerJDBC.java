@@ -181,8 +181,8 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     final ESuccess eSucces = executor ().performInTransaction ( () -> {
       // Delete all existing entities
       final String sPID = aServiceGroup.getParticpantIdentifier ().getURIEncoded ();
-      final int nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
-                                                               new ConstantPreparedStatementDataProvider (sPID));
+      final long nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
+                                                                new ConstantPreparedStatementDataProvider (sPID));
       if (LOGGER.isDebugEnabled () && nDeleted > 0)
         LOGGER.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
 
@@ -227,10 +227,10 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
-    final int nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
-                                                           new ConstantPreparedStatementDataProvider (aSMPBusinessCard.getServiceGroup ()
-                                                                                                                      .getParticpantIdentifier ()
-                                                                                                                      .getURIEncoded ()));
+    final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
+                                                            new ConstantPreparedStatementDataProvider (aSMPBusinessCard.getServiceGroup ()
+                                                                                                                       .getParticpantIdentifier ()
+                                                                                                                       .getURIEncoded ()));
     final EChange eChange = EChange.valueOf (nCount > 0);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Finished deleteSMPBusinessCard. Change=" + eChange.isChanged ());
