@@ -43,9 +43,10 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.security.certificate.CertificateHelper;
 
 /**
- * Manager for all {@link SMPRedirect} objects.
+ * A JDBC based implementation of the {@link ISMPRedirectManager} interface.
  *
  * @author Philip Helger
+ * @since 9.2.4
  */
 public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager implements ISMPRedirectManager
 {

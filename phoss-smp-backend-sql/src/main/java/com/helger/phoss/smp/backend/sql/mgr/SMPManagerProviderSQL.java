@@ -50,9 +50,10 @@ import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xml.microdom.util.XMLMapHandler;
 
 /**
- * {@link ISMPManagerProvider} implementation for this backend.
+ * A JDBC based implementation of the {@link ISMPManagerProvider} interface.
  *
  * @author Philip Helger
+ * @since 9.2.4
  */
 public final class SMPManagerProviderSQL implements ISMPManagerProvider
 {

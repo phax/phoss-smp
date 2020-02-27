@@ -38,9 +38,10 @@ import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exception.SMPUnknownUserException;
 
 /**
- * A EclipseLink based implementation of the {@link ISMPUserManager} interface.
+ * A JDBC based implementation of the {@link ISMPUserManager} interface.
  *
- * @author PEPPOL.AT, BRZ, Philip Helger
+ * @author Philip Helger
+ * @since 9.2.4
  */
 public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager implements ISMPUserManager
 {

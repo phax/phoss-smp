@@ -55,9 +55,10 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 
 /**
- * Manager for all {@link SMPBusinessCard} objects.
+ * A JDBC based implementation of the {@link ISMPBusinessCardManager} interface.
  *
  * @author Philip Helger
+ * @since 9.2.4
  */
 public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager implements ISMPBusinessCardManager
 {

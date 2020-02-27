@@ -46,6 +46,12 @@ import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 
+/**
+ * A JDBC based implementation of the {@link ISMPServiceGroupManager} interface.
+ *
+ * @author Philip Helger
+ * @since 9.2.4
+ */
 public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager implements ISMPServiceGroupManager
 {
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
@@ -299,7 +305,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username" +
                                                                                   " FROM smp_service_group AS sg, smp_ownership AS so" +
-                                                                                  " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier");
+                                                                                  " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier");
 
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     if (aDBResult.isPresent ())

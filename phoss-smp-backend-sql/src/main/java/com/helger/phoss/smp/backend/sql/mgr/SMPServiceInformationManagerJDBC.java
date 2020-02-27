@@ -55,9 +55,11 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 
 /**
- * Manager for all {@link SMPServiceInformation} objects.
+ * A JDBC based implementation of the {@link ISMPServiceInformationManager}
+ * interface.
  *
  * @author Philip Helger
+ * @since 9.2.4
  */
 public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledManager implements
                                                     ISMPServiceInformationManager
