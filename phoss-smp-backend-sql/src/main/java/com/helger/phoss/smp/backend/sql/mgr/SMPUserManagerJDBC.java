@@ -30,6 +30,7 @@ import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
+import com.helger.phoss.smp.backend.sql.model.DBUser;
 import com.helger.phoss.smp.domain.user.ISMPUser;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
