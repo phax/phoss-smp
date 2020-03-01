@@ -18,7 +18,7 @@ import com.helger.commons.annotation.Since;
 /**
  * Default JPA configuration file properties
  *
- * @author PEPPOL.AT, BRZ, Philip Helger
+ * @author Philip Helger
  */
 @Immutable
 public final class SMPJDBCConfiguration

@@ -43,7 +43,6 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.peppolid.factory.SimpleIdentifierFactory;
 import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
@@ -257,6 +256,8 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
                                                                                   " FROM smp_bce");
     if (aDBResult.isPresent ())
     {
+      final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
+
       // Group by ID
       final IMultiMapListBased <IParticipantIdentifier, SMPBusinessCardEntity> aEntityMap = new MultiHashMapArrayListBased <> ();
       for (final DBResultRow aRow : aDBResult.get ())
@@ -271,8 +272,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
         aEntity.contacts ().setAll (getJsonAsBCC (aRow.getAsString (7)));
         aEntity.setAdditionalInformation (aRow.getAsString (8));
         aEntity.setRegistrationDate (aRow.get (9).getAsLocalDate ());
-        aEntityMap.putSingle (SimpleIdentifierFactory.INSTANCE.parseParticipantIdentifier (aRow.getAsString (1)),
-                              aEntity);
+        aEntityMap.putSingle (aIF.parseParticipantIdentifier (aRow.getAsString (1)), aEntity);
       }
 
       // Convert
@@ -285,9 +285,9 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
           // Can happen if there is an inconsistency between BCE and SG tables
           if (LOGGER.isWarnEnabled ())
             LOGGER.warn ("Failed to resolve service group " + aPID.getURIEncoded ());
-          return null;
         }
-        ret.add (new SMPBusinessCard (aServiceGroup, aEntry.getValue ()));
+        else
+          ret.add (new SMPBusinessCard (aServiceGroup, aEntry.getValue ()));
       }
     }
     return ret;

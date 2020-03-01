@@ -11,6 +11,7 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -49,6 +50,9 @@ import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
+
 /**
  * A JDBC based implementation of the {@link ISMPServiceGroupManager} interface.
  *
@@ -61,8 +65,15 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
+  private final ExpiringMap <IParticipantIdentifier, SMPServiceGroup> m_aCache;
+
   public SMPServiceGroupManagerJDBC ()
-  {}
+  {
+    m_aCache = ExpiringMap.builder ()
+                          .expiration (60, TimeUnit.SECONDS)
+                          .expirationPolicy (ExpirationPolicy.CREATED)
+                          .build ();
+  }
 
   @Nonnull
   @ReturnsMutableObject
@@ -150,6 +161,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("createSMPServiceGroup succeeded");
 
     final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
+    m_aCache.put (aParticipantID, aServiceGroup);
+
     m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aServiceGroup));
     return aServiceGroup;
   }
@@ -296,7 +309,10 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("deleteSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
 
     if (eChange.isChanged ())
+    {
+      m_aCache.remove (aParticipantID);
       m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
+    }
 
     return eChange;
   }
@@ -367,6 +383,12 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (aParticipantID == null)
       return null;
 
+    // Use cache
+    SMPServiceGroup ret = m_aCache.get (aParticipantID);
+    if (ret != null)
+      return ret;
+
+    // Not in cache
     final Optional <DBResultRow> aResult = executor ().querySingle ("SELECT sg.extension, so.username" +
                                                                     " FROM smp_service_group AS sg, smp_ownership AS so" +
                                                                     " WHERE sg.businessIdentifierScheme=? AND sg.businessIdentifier=?" +
@@ -376,7 +398,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (!aResult.isPresent ())
       return null;
 
-    return new SMPServiceGroup (aResult.get ().getAsString (1), aParticipantID, aResult.get ().getAsString (0));
+    ret = new SMPServiceGroup (aResult.get ().getAsString (1), aParticipantID, aResult.get ().getAsString (0));
+    m_aCache.put (aParticipantID, ret);
+    return ret;
   }
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantID)
@@ -388,6 +412,10 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     if (aParticipantID == null)
       return false;
+
+    // Cache check first
+    if (m_aCache.containsKey (aParticipantID))
+      return true;
 
     return 1 == executor ().queryCount ("SELECT COUNT(*) FROM smp_service_group WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                         new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
