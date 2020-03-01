@@ -62,7 +62,6 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPRedirectManager m_aRedirectMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
   private ISMPBusinessCardManager m_aBusinessCardMgr;
-
   private ETriState m_eBackendConnectionEstablished = ETriState.UNDEFINED;
 
   /**
@@ -80,7 +79,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     if (s_aManagerProvider != null && aManagerProvider != null)
       throw new IllegalStateException ("A manager provider is already set. You cannot set this twice! Call it with null before setting a new one");
 
-    if (isGlobalSingletonInstantiated (SMPMetaManager.class))
+    if (aManagerProvider != null && isGlobalSingletonInstantiated (SMPMetaManager.class))
       LOGGER.warn ("Setting the manager provider after singleton instantiation may not have the desired effect.");
 
     s_aManagerProvider = aManagerProvider;
@@ -151,6 +150,10 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       {
         // fall through. Certificate stays invalid, no SML access possible.
       }
+
+      m_eBackendConnectionEstablished = s_aManagerProvider.getBackendConnectionEstablishedDefaultState ();
+      if (m_eBackendConnectionEstablished == null)
+        throw new IllegalStateException ("Failed to get default backend connection state!");
 
       m_aPeppolURLProvider = s_aManagerProvider.createPeppolURLProvider ();
       if (m_aPeppolURLProvider == null)

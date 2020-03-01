@@ -21,9 +21,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import javax.persistence.PersistenceException;
-
-import org.eclipse.persistence.exceptions.DatabaseException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -53,17 +50,14 @@ public final class ISMPRedirectManagerFuncTest
   {
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final String sUserID = "junitredir";
-    try
+    // May fail
+    aUserMgr.createUser (sUserID, "dummy");
+    if (SMPMetaManager.getInstance ().getBackendConnectionEstablished ().isFalse ())
     {
-      // May fail
-      aUserMgr.createUser (sUserID, "dummy");
-    }
-    catch (final PersistenceException ex)
-    {
-      assertTrue (ex.getCause () instanceof DatabaseException);
-      // MySQL is not configured correctly!
+      // Failed to get DB connection. E.g. MySQL down or misconfigured.
       return;
     }
+
     try
     {
       final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");

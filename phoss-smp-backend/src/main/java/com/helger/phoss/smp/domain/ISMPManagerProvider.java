@@ -13,6 +13,7 @@ package com.helger.phoss.smp.domain;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -59,6 +60,14 @@ public interface ISMPManagerProvider
   {
     return PeppolURLProvider.INSTANCE;
   }
+
+  /**
+   * @return The default backend connection state (e.g. to a database). For XML
+   *         this should be TRUE for databases it should be UNDEFINED.
+   * @since 5.2.4
+   */
+  @Nonnull
+  ETriState getBackendConnectionEstablishedDefaultState ();
 
   /**
    * @return A new SML information manager. May not be <code>null</code>.

@@ -20,6 +20,7 @@ import com.helger.commons.collection.impl.CommonsLinkedHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.io.resource.FileSystemResource;
+import com.helger.commons.state.ETriState;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -137,6 +138,12 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
       // Migration was already performed
       m_bUseDBUserMgr = false;
     }
+  }
+
+  @Nonnull
+  public ETriState getBackendConnectionEstablishedDefaultState ()
+  {
+    return ETriState.UNDEFINED;
   }
 
   // TODO currently also file based
