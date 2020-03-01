@@ -16,9 +16,11 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
+import com.helger.commons.state.ETriState;
 import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
@@ -60,6 +62,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPRedirectManager m_aRedirectMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
   private ISMPBusinessCardManager m_aBusinessCardMgr;
+
+  private ETriState m_eBackendConnectionEstablished = ETriState.UNDEFINED;
 
   /**
    * Set the manager provider to be used. This must be called exactly once
@@ -273,6 +277,18 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static boolean hasBusinessCardMgr ()
   {
     return getBusinessCardMgr () != null;
+  }
+
+  @Nonnull
+  public ETriState getBackendConnectionEstablished ()
+  {
+    return m_aRWLock.readLocked ( () -> m_eBackendConnectionEstablished);
+  }
+
+  public void setBackendConnectionEstablished (@Nonnull final ETriState eConnectionEstablished)
+  {
+    ValueEnforcer.notNull (eConnectionEstablished, "ConnectionEstablished");
+    m_aRWLock.writeLocked ( () -> m_eBackendConnectionEstablished = eConnectionEstablished);
   }
 
   /**

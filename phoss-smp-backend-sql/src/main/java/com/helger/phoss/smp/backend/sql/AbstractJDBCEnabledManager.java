@@ -21,23 +21,30 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.db.jdbc.executor.DBExecutor;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 
 public abstract class AbstractJDBCEnabledManager
 {
-  private final DBExecutor m_aDBExec;
+  private static final DBExecutor s_aDBExec;
+
+  static
+  {
+    s_aDBExec = new DBExecutor (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
+    s_aDBExec.setDebugConnections (false);
+    s_aDBExec.setDebugTransactions (false);
+    s_aDBExec.setDebugSQLStatements (true);
+    s_aDBExec.setConnectionEstablishedChangeCallback ( (eOld, eNew) -> {
+      SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew);
+    });
+  }
 
   public AbstractJDBCEnabledManager ()
-  {
-    m_aDBExec = new DBExecutor (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
-    m_aDBExec.setDebugConnections (false);
-    m_aDBExec.setDebugTransactions (false);
-    m_aDBExec.setDebugSQLStatements (true);
-  }
+  {}
 
   @Nonnull
   protected final DBExecutor executor ()
   {
-    return m_aDBExec;
+    return s_aDBExec;
   }
 
   @Nullable
