@@ -153,35 +153,14 @@
         <version>8.0.19</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>jakarta.persistence</artifactId>
-        <version>2.2.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.core</artifactId>
-        <version>${eclipselink.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.jpa</artifactId>
-        <version>${eclipselink.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.antlr</artifactId>
-        <version>${eclipselink.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.asm</artifactId>
-        <version>${eclipselink.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
         <version>3.12.1</version>
+      </dependency>
+      <dependency>
+        <groupId>net.jodah</groupId>
+        <artifactId>expiringmap</artifactId>
+        <version>0.5.9</version>
       </dependency>
 
       <dependency>

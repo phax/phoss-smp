@@ -20,11 +20,17 @@ import java.time.LocalTime;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.db.jdbc.executor.DBExecutor;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 
 public abstract class AbstractJDBCEnabledManager
 {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractJDBCEnabledManager.class);
   private static final DBExecutor s_aDBExec;
 
   static
@@ -33,9 +39,28 @@ public abstract class AbstractJDBCEnabledManager
     s_aDBExec.setDebugConnections (false);
     s_aDBExec.setDebugTransactions (false);
     s_aDBExec.setDebugSQLStatements (true);
-    s_aDBExec.setConnectionEstablishedChangeCallback ( (eOld, eNew) -> {
+    s_aDBExec.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
       SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew);
     });
+
+    if (SMPServerConfiguration.getConfigFile ()
+                              .getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE))
+    {
+      final long nMillis = SMPServerConfiguration.getConfigFile ()
+                                                 .getAsLong (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
+                                                             DBExecutor.DEFAULT_EXECUTION_DURATION_WARN_MS);
+      if (nMillis > 0)
+        s_aDBExec.setExecutionDurationWarnMS (nMillis);
+      else
+        LOGGER.warn ("Ignoring setting '" +
+                     SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS +
+                     "' because it is invalid.");
+    }
+    else
+    {
+      // Zero means none
+      s_aDBExec.setExecutionDurationWarnMS (0);
+    }
   }
 
   public AbstractJDBCEnabledManager ()
