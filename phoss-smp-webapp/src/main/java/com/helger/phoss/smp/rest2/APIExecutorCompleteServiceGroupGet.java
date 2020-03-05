@@ -19,12 +19,12 @@ package com.helger.phoss.smp.rest2;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
@@ -76,7 +76,7 @@ public final class APIExecutorCompleteServiceGroupGet implements IAPIExecutor
     {
       // Internal error serializing the payload
       LOGGER.warn ("Failed to convert the returned CompleteServiceGroup to XML");
-      aUnifiedResponse.setStatus (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      aUnifiedResponse.setStatus (CHttp.HTTP_INTERNAL_SERVER_ERROR);
     }
     else
     {

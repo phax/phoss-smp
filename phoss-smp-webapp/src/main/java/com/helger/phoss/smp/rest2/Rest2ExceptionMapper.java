@@ -18,12 +18,12 @@ package com.helger.phoss.smp.rest2;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.debug.GlobalDebug;
+import com.helger.commons.http.CHttp;
 import com.helger.commons.state.EHandled;
 import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.SMPServerConfiguration;
@@ -88,24 +88,20 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     if (aThrowable instanceof SMPUnauthorizedException)
     {
       _logRestException ("Unauthorized", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_FORBIDDEN,
-                              getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_FORBIDDEN, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPUnknownUserException)
     {
       _logRestException ("Unknown user", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_FORBIDDEN,
-                              getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_FORBIDDEN, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPSMLException)
     {
       _logRestException ("SMP SML error", aThrowable);
       _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                              CHttp.HTTP_INTERNAL_SERVER_ERROR,
                               GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
                                                          : getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
@@ -113,16 +109,14 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     if (aThrowable instanceof SMPNotFoundException)
     {
       _logRestException ("Not found", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_NOT_FOUND,
-                              getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_NOT_FOUND, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPInternalErrorException)
     {
       _logRestException ("Internal error", aThrowable);
       _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                              CHttp.HTTP_INTERNAL_SERVER_ERROR,
                               GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
                                                          : getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
@@ -131,7 +125,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     {
       _logRestException ("Bad request", aThrowable);
       _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_BAD_REQUEST,
+                              CHttp.HTTP_BAD_REQUEST,
                               getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
@@ -140,7 +134,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
       // Generic fallback only
       _logRestException ("Generic SMP error", aThrowable);
       _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                              CHttp.HTTP_INTERNAL_SERVER_ERROR,
                               getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
@@ -148,7 +142,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     {
       _logRestException ("Runtime exception - " + aThrowable.getClass ().getName (), aThrowable);
       _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                              CHttp.HTTP_INTERNAL_SERVER_ERROR,
                               GlobalDebug.isDebugMode () ? getResponseEntityWithStackTrace (aThrowable)
                                                          : getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;

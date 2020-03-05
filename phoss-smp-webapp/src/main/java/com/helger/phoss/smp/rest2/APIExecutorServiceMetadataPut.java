@@ -19,13 +19,13 @@ package com.helger.phoss.smp.rest2;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.http.CHttp;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.state.ESuccess;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
@@ -56,7 +56,7 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       LOGGER.warn ("The writable REST API is disabled. saveServiceRegistration will not be executed.");
-      aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
+      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
     }
     else
     {
@@ -66,7 +66,7 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
       if (aServiceMetadataDoc == null)
       {
         LOGGER.warn ("Failed to parse provided payload as XML.");
-        aUnifiedResponse.setStatus (HttpServletResponse.SC_BAD_REQUEST);
+        aUnifiedResponse.setStatus (CHttp.HTTP_BAD_REQUEST);
       }
       else
       {
@@ -103,9 +103,9 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
         }
 
         if (eSuccess.isFailure ())
-          aUnifiedResponse.setStatus (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          aUnifiedResponse.setStatus (CHttp.HTTP_INTERNAL_SERVER_ERROR);
         else
-          aUnifiedResponse.setStatus (HttpServletResponse.SC_OK);
+          aUnifiedResponse.setStatus (CHttp.HTTP_OK);
       }
     }
   }
