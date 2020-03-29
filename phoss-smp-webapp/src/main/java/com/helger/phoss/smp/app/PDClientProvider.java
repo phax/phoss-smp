@@ -63,7 +63,7 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
    */
   public void resetPDClient ()
   {
-    m_aRWLock.writeLocked ( () -> m_aPDClient = null);
+    m_aRWLock.writeLockedGet ( () -> m_aPDClient = null);
   }
 
   /**
@@ -73,7 +73,7 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   @Nonnull
   public PDClient getPDClient ()
   {
-    PDClient ret = m_aRWLock.readLocked ( () -> m_aPDClient);
+    PDClient ret = m_aRWLock.readLockedGet ( () -> m_aPDClient);
     if (ret == null)
     {
       m_aRWLock.writeLock ().lock ();

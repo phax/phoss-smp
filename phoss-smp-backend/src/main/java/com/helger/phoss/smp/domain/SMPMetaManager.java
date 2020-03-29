@@ -285,13 +285,13 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   @Nonnull
   public ETriState getBackendConnectionEstablished ()
   {
-    return m_aRWLock.readLocked ( () -> m_eBackendConnectionEstablished);
+    return m_aRWLock.readLockedGet ( () -> m_eBackendConnectionEstablished);
   }
 
   public void setBackendConnectionEstablished (@Nonnull final ETriState eConnectionEstablished)
   {
     ValueEnforcer.notNull (eConnectionEstablished, "ConnectionEstablished");
-    m_aRWLock.writeLocked ( () -> m_eBackendConnectionEstablished = eConnectionEstablished);
+    m_aRWLock.writeLockedGet ( () -> m_eBackendConnectionEstablished = eConnectionEstablished);
   }
 
   /**
