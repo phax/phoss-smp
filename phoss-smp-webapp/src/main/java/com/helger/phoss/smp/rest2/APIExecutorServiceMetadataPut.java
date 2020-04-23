@@ -35,14 +35,13 @@ import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceMetadataType;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.read.DOMReader;
 
-public final class APIExecutorServiceMetadataPut implements IAPIExecutor
+public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceMetadataPut.class);
 
@@ -80,22 +79,26 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
         {
           case PEPPOL:
           {
-            final com.helger.smpclient.peppol.jaxb.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType ().read (aServiceMetadataDoc);
+            final com.helger.smpclient.peppol.jaxb.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
             if (aServiceMetadata != null)
+            {
               eSuccess = new SMPServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
                                                                                    sDocumentTypeID,
                                                                                    aServiceMetadata,
                                                                                    aBasicAuth);
+            }
             break;
           }
           case BDXR:
           {
-            final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType ().read (aServiceMetadataDoc);
+            final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
             if (aServiceMetadata != null)
+            {
               eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
                                                                                      sDocumentTypeID,
                                                                                      aServiceMetadata,
                                                                                      aBasicAuth);
+            }
             break;
           }
           default:

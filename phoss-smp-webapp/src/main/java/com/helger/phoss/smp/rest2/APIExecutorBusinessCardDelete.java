@@ -31,11 +31,10 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.restapi.BusinessCardServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-public final class APIExecutorBusinessCardDelete implements IAPIExecutor
+public final class APIExecutorBusinessCardDelete extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardDelete.class);
 

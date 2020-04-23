@@ -31,14 +31,13 @@ import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 
-public final class APIExecutorServiceGroupGet implements IAPIExecutor
+public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceGroupGet.class);
 
@@ -57,13 +56,13 @@ public final class APIExecutorServiceGroupGet implements IAPIExecutor
       case PEPPOL:
       {
         final com.helger.smpclient.peppol.jaxb.ServiceGroupType ret = new SMPServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
-        aBytes = new SMPMarshallerServiceGroupType ().getAsBytes (ret);
+        aBytes = new SMPMarshallerServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       case BDXR:
       {
         final com.helger.xsds.bdxr.smp1.ServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
-        aBytes = new BDXR1MarshallerServiceGroupType ().getAsBytes (ret);
+        aBytes = new BDXR1MarshallerServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       default:

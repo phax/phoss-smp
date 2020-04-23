@@ -32,13 +32,12 @@ import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupReferenceListType;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupReferenceListType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-public final class APIExecutorListGet implements IAPIExecutor
+public final class APIExecutorListGet extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorListGet.class);
 
@@ -60,7 +59,7 @@ public final class APIExecutorListGet implements IAPIExecutor
         // Unspecified extension
         final com.helger.smpclient.peppol.jaxb.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
                                                                                                                                                   aBasicAuth);
-        aBytes = new SMPMarshallerServiceGroupReferenceListType ().getAsBytes (ret);
+        aBytes = new SMPMarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       case BDXR:
@@ -68,7 +67,7 @@ public final class APIExecutorListGet implements IAPIExecutor
         // Unspecified extension
         final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
                                                                                                                                              aBasicAuth);
-        aBytes = new BDXR1MarshallerServiceGroupReferenceListType ().getAsBytes (ret);
+        aBytes = new BDXR1MarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       default:
