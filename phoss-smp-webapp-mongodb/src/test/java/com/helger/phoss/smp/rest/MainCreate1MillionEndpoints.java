@@ -68,8 +68,7 @@ public final class MainCreate1MillionEndpoints
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
-                                                 @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
@@ -87,9 +86,9 @@ public final class MainCreate1MillionEndpoints
     {
       AuditHelper.setAuditor (new MongoDBAuditor ());
       final ObjectFactory aObjFactory = new ObjectFactory ();
-      final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_T010_BIS4A_V20.getAsDocumentTypeIdentifier ();
+      final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30.getAsDocumentTypeIdentifier ();
       final String sDT = aDT.getURIEncoded ();
-      final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS4A_V2.getAsProcessIdentifier ();
+      final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
 
       final StopWatch aSWOverall = StopWatch.createdStarted ();
       for (int i = 639276; i < 1_000_000; ++i)
@@ -152,11 +151,7 @@ public final class MainCreate1MillionEndpoints
         LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
       }
       aSWOverall.stop ();
-      LOGGER.info ("Overall process took " +
-                   aSWOverall.getMillis () +
-                   " ms or " +
-                   aSWOverall.getSeconds () +
-                   " seconds");
+      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getSeconds () + " seconds");
     }
     finally
     {

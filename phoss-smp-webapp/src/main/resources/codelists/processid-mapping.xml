@@ -1,51 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (C) 2014-2020 Philip Helger and contributors
-    philip[at]helger[dot]com
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-            http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
 <root type="processid">
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" name="Peppol BIS 5A" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p001:01:1.0" name="Peppol P001" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p002:01:1.0" name="Peppol P002" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p003:01:1.0" name="Peppol P003" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:catalogue_only:3" name="Peppol Default urn:fdc:peppol.eu:poacc:bis:catalogue_only:3" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:catalogue_wo_response:3" name="Peppol Default urn:fdc:peppol.eu:poacc:bis:catalogue_wo_response:3" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:despatch_advice:3" name="Peppol Default urn:fdc:peppol.eu:poacc:bis:despatch_advice:3" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:invoice_response:3" name="Peppol Default urn:fdc:peppol.eu:poacc:bis:invoice_response:3" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:mlr:3" name="Peppol Default urn:fdc:peppol.eu:poacc:bis:mlr:3" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:order_agreement:3" name="Peppol Default urn:fdc:peppol.eu:poacc:bis:order_agreement:3" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:order_only:3" name="Peppol Default urn:fdc:peppol.eu:poacc:bis:order_only:3" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:ordering:3" name="Peppol Default urn:fdc:peppol.eu:poacc:bis:ordering:3" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:punch_out:3" name="Peppol Default urn:fdc:peppol.eu:poacc:bis:punch_out:3" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii01:ver1.0" name="Peppol BIS 1A" deprecated="true" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii01:ver2.0" name="Peppol BIS 1A" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii03:ver1.0" name="Peppol BIS 3A" deprecated="true" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii03:ver2.0" name="Peppol BIS 3A" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii04:ver1.0" name="Peppol BIS 4A" deprecated="true" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii04:ver2.0" name="Peppol BIS 4A" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii05:ver1.0" name="Peppol BIS 5A" deprecated="true" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii05:ver2.0" name="Peppol BIS 5A" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii06:ver1.0" name="Peppol BIS 6A" deprecated="true" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii28:ver2.0" name="Peppol BIS 28A" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii30:ver2.0" name="Peppol BIS 30A" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii36:ver2.0" name="Peppol BIS 36A" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:www.peppol.eu:profile:bis63a:ver1.0" name="Peppol BIS 63A" deprecated="false" />
-  <item id="oioubl-procid-ubl::Procurement-ReminderOnly-1.0" name="Peppol Default Procurement-ReminderOnly-1.0" deprecated="false" />
-  <item id="oioubl-procid-ubl::Reference-Utility-1.0" name="Peppol Default Reference-Utility-1.0" deprecated="false" />
   <item id="toop-procid-agreement::urn:eu.toop.process.datarequestresponse" name="TOOP Request Response for Data" deprecated="false" />
   <item id="toop-procid-agreement::urn:eu.toop.process.documentrequestresponse" name="TOOP Request Response for Documents" deprecated="false" />
   <item id="toop-procid-agreement::urn:eu.toop.process.twophasedrequestresponse" name="TOOP Two Phased Request Response for Documents" deprecated="false" />
