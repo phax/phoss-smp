@@ -70,6 +70,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
@@ -95,11 +96,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                 @Nonnull final ISMPRedirect aSelectedObject)
       {
         aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
-                                           aSelectedObject.getServiceGroup ()
-                                                          .getParticpantIdentifier ()
-                                                          .getURIEncoded ()));
-        aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID,
-                                           aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
+                                           aSelectedObject.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ()));
+        aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID, aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
 
         aForm.addChild (question ("Are you sure you want to delete the Redirect for Service Group '" +
                                   aSelectedObject.getServiceGroupID () +
@@ -109,8 +107,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                    @Nonnull final ISMPRedirect aSelectedObject)
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPRedirect aSelectedObject)
       {
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         if (aRedirectMgr.deleteSMPRedirect (aSelectedObject).isChanged ())
@@ -145,8 +142,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
-                                                         .getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup != null)
     {
       final String sDocTypeID = aWPEC.params ().getAsString (FIELD_DOCTYPE_ID);
@@ -173,8 +169,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
       final String sServiceGroupID = aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
       final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
-                                                           .getSMPServiceGroupOfID (aServiceGroupID);
+      final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
       if (aServiceGroup != null)
       {
         final String sDocTypeID = aWPEC.params ().getAsString (FIELD_DOCTYPE_ID);
@@ -209,12 +204,9 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     {
       // Edit object
       aToolbar.addButtonEdit (aDisplayLocale,
-                              createEditURL (aWPEC, aSelectedObject)
-                                                                    .add (FIELD_SERVICE_GROUP_ID,
-                                                                          aSelectedObject.getServiceGroupID ())
+                              createEditURL (aWPEC, aSelectedObject).add (FIELD_SERVICE_GROUP_ID, aSelectedObject.getServiceGroupID ())
                                                                     .add (FIELD_DOCTYPE_ID,
-                                                                          aSelectedObject.getDocumentTypeIdentifier ()
-                                                                                         .getURIEncoded ()));
+                                                                          aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
     }
 
     // Callback
@@ -223,8 +215,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMPRedirect aSelectedObject)
+  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPRedirect aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
@@ -236,16 +227,13 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                                                    CMenuSecure.MENU_SERVICE_GROUPS,
                                                                                    aSelectedObject.getServiceGroup ())).addChild (aSelectedObject.getServiceGroupID ())));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Document type ID")
-                                                 .setCtrl (aSelectedObject.getDocumentTypeIdentifier ()
-                                                                          .getURIEncoded ()));
+                                                 .setCtrl (aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Target URL")
-                                                 .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getTargetHref (),
-                                                                                    HC_Target.BLANK)));
+                                                 .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getTargetHref (), HC_Target.BLANK)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Subject unique identifier")
                                                  .setCtrl (aSelectedObject.getSubjectUniqueIdentifier ()));
     if (aSelectedObject.extensions ().isNotEmpty ())
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension").setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
 
     aNodeList.addChild (aForm);
   }
@@ -262,8 +250,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-    final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
-                                         : aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
+    final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID () : aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
     final String sDocTypeID = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()
                                     : aWPEC.params ().getAsString (FIELD_DOCTYPE_ID);
@@ -330,13 +317,9 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                   sSubjectUniqueIdentifier,
                                                   aCertificate,
                                                   sExtension) == null)
-        aWPEC.postRedirectGetInternal (error ("Error creating the Redirect for Service Group '" +
-                                              sServiceGroupID +
-                                              "'."));
+        aWPEC.postRedirectGetInternal (error ("Error creating the Redirect for Service Group '" + sServiceGroupID + "'."));
       else
-        aWPEC.postRedirectGetInternal (success ("The Redirect for Service Group '" +
-                                                sServiceGroupID +
-                                                "' was successfully saved."));
+        aWPEC.postRedirectGetInternal (success ("The Redirect for Service Group '" + sServiceGroupID + "' was successfully saved."));
     }
   }
 
@@ -406,8 +389,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     aToolbar.addButton ("Create new Redirect", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aNodeList.addChild (aToolbar);
 
-    final HCTable aTable = new HCTable (new DTCol ("Service Group").setDataSort (0, 1)
-                                                                   .setInitialSorting (ESortOrder.ASCENDING),
+    final HCTable aTable = new HCTable (new DTCol ("Service Group").setDataSort (0, 1).setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Document type ID").setDataSort (1, 0),
                                         new DTCol ("Target URL"),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
@@ -430,16 +412,14 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aCurObject.getServiceGroup ()
                                                                                       .getParticpantIdentifier ()
                                                                                       .getURIPercentEncoded () +
-                                                                            "/services/" +
+                                                                            SMPClientReadOnly.URL_PART_SERVICES +
                                                                             aCurObject.getDocumentTypeIdentifier ()
                                                                                       .getURIPercentEncoded ());
       aRow.addCell (new HCA (aEditURL).setTitle ("Edit " + sDisplayName).addChild (EDefaultIcon.EDIT.getAsNode ()),
                     new HCTextNode (" "),
-                    new HCA (aCopyURL).setTitle ("Create a copy of " + sDisplayName)
-                                      .addChild (EDefaultIcon.COPY.getAsNode ()),
+                    new HCA (aCopyURL).setTitle ("Create a copy of " + sDisplayName).addChild (EDefaultIcon.COPY.getAsNode ()),
                     new HCTextNode (" "),
-                    new HCA (aDeleteURL).setTitle ("Delete " + sDisplayName)
-                                        .addChild (EDefaultIcon.DELETE.getAsNode ()),
+                    new HCA (aDeleteURL).setTitle ("Delete " + sDisplayName).addChild (EDefaultIcon.DELETE.getAsNode ()),
                     new HCTextNode (" "),
                     new HCA (aPreviewURL).setTitle ("Perform SMP query on " + sDisplayName)
                                          .setTargetBlank ()

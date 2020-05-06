@@ -24,13 +24,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsLinkedHashMap;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.peppolid.IProcessIdentifier;
+import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
@@ -55,7 +59,7 @@ public final class NiceNameHandler
 
   @Nonnull
   @ReturnsMutableCopy
-  public static ICommonsOrderedMap <String, NiceNameEntry> readEntries (@Nonnull final IReadableResource aRes)
+  public static ICommonsOrderedMap <String, NiceNameEntry> readEntries (@Nonnull final IReadableResource aRes, final boolean bReadProcIDs)
   {
     if (LOGGER.isInfoEnabled ())
       LOGGER.info ("Trying to read nice name entries from " + aRes.getPath ());
@@ -69,7 +73,15 @@ public final class NiceNameHandler
         final String sID = eChild.getAttributeValue ("id");
         final String sName = eChild.getAttributeValue ("name");
         final boolean bDeprecated = eChild.getAttributeValueAsBool ("deprecated", false);
-        ret.put (sID, new NiceNameEntry (sName, bDeprecated));
+        ICommonsList <IProcessIdentifier> aProcIDs = null;
+        if (bReadProcIDs)
+        {
+          aProcIDs = new CommonsArrayList <> ();
+          for (final IMicroElement eItem : eChild.getAllChildElements ("procid"))
+            aProcIDs.add (new SimpleProcessIdentifier (eItem.getAttributeValue ("scheme"), eItem.getAttributeValue ("value")));
+        }
+
+        ret.put (sID, new NiceNameEntry (sName, bDeprecated, aProcIDs));
       }
     }
     return ret;
@@ -89,7 +101,7 @@ public final class NiceNameHandler
       }
       if (aDocTypeIDRes == null)
         aDocTypeIDRes = new ClassPathResource ("codelists/doctypeid-mapping.xml");
-      final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes);
+      final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes, true);
       RWLOCK.writeLockedGet ( () -> DOCTYPE_IDS = aDocTypeIDs);
     }
 
@@ -105,7 +117,7 @@ public final class NiceNameHandler
       }
       if (aProcessIDRes == null)
         aProcessIDRes = new ClassPathResource ("codelists/processid-mapping.xml");
-      final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes);
+      final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes, false);
       RWLOCK.writeLockedGet ( () -> PROCESS_IDS = aProcessIDs);
     }
   }

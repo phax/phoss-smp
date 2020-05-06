@@ -112,6 +112,7 @@ import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.security.certificate.CertificateHelper;
+import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
@@ -414,6 +415,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
     final LocalDateTime aNowLDT = PDTFactory.getCurrentLocalDateTime ();
@@ -428,7 +430,6 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
 
     // Document type identifier
     {
-      final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
       final HCNodeList aCtrl = new HCNodeList ();
       aCtrl.addChild (div (NiceNameUI.getDocumentTypeID (aDocumentTypeID)));
       try
@@ -445,7 +446,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     }
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Process ID")
-                                                 .setCtrl (NiceNameUI.getProcessID (aSelectedProcess.getProcessIdentifier ())));
+                                                 .setCtrl (NiceNameUI.getProcessID (aDocumentTypeID,
+                                                                                    aSelectedProcess.getProcessIdentifier ())));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Transport profile")
                                                  .setCtrl (new HCA (createViewURL (aWPEC,
@@ -934,7 +936,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                 final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aServiceInfo.getServiceGroup ()
                                                                                                   .getParticpantIdentifier ()
                                                                                                   .getURIPercentEncoded () +
-                                                                                      "/services/" +
+                                                                                      SMPClientReadOnly.URL_PART_SERVICES +
                                                                                       aServiceInfo.getDocumentTypeIdentifier ()
                                                                                                   .getURIPercentEncoded ());
                 aBodyRow.addCell (new HCTextNode (" "),
@@ -951,7 +953,8 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
 
               // Show process + endpoints
               final HCLI aLI = aULP.addItem ();
-              final HCDiv aDiv = div (NiceNameUI.getProcessID (aProcess.getProcessIdentifier ()));
+              final HCDiv aDiv = div (NiceNameUI.getProcessID (aServiceInfo.getDocumentTypeIdentifier (),
+                                                               aProcess.getProcessIdentifier ()));
               aLI.addChild (aDiv);
               if (aEndpoints.isEmpty ())
               {
@@ -972,7 +975,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                      .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aServiceInfo.getServiceGroup ()
                                                                                                             .getParticpantIdentifier ()
                                                                                                             .getURIPercentEncoded () +
-                                                                                                "/services/" +
+                                                                                                SMPClientReadOnly.URL_PART_SERVICES +
                                                                                                 aServiceInfo.getDocumentTypeIdentifier ()
                                                                                                             .getURIPercentEncoded ())).setTitle ("Perform SMP query on document type ")
                                                                                                                                       .setTargetBlank ()
@@ -1012,7 +1015,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
             final HCRow aRow = aTable.addBodyRow ();
             aRow.addCell (new HCA (createViewURL (aWPEC, aServiceInfo, aParams)).addChild (aServiceInfo.getServiceGroupID ()));
             aRow.addCell (NiceNameUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()));
-            aRow.addCell (NiceNameUI.getProcessID (aProcess.getProcessIdentifier ()));
+            aRow.addCell (NiceNameUI.getProcessID (aServiceInfo.getDocumentTypeIdentifier (), aProcess.getProcessIdentifier ()));
             aRow.addCell (new HCA (createViewURL (aWPEC,
                                                   CMenuSecure.MENU_TRANSPORT_PROFILES,
                                                   aEndpoint.getTransportProfile ())).addChild (aEndpoint.getTransportProfile ()));
@@ -1023,7 +1026,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
             final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aServiceInfo.getServiceGroup ()
                                                                                               .getParticpantIdentifier ()
                                                                                               .getURIPercentEncoded () +
-                                                                                  "/services/" +
+                                                                                  SMPClientReadOnly.URL_PART_SERVICES +
                                                                                   aServiceInfo.getDocumentTypeIdentifier ()
                                                                                               .getURIPercentEncoded ());
             aRow.addCell (new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),

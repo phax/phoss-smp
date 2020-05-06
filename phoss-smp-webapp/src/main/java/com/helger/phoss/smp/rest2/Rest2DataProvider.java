@@ -27,6 +27,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.servlet.StaticServerInfo;
+import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
@@ -45,8 +46,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
     this (aRequestScope, true);
   }
 
-  public Rest2DataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            final boolean bUseStaticServerInfo)
+  public Rest2DataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope, final boolean bUseStaticServerInfo)
   {
     m_aRequestScope = ValueEnforcer.notNull (aRequestScope, "UriInfo");
     m_bUseStaticServerInfo = bUseStaticServerInfo;
@@ -110,7 +110,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
     return getBaseUriBuilder () +
            "/" +
            aServiceGroupID.getURIPercentEncoded () +
-           "/services/" +
+           SMPClientReadOnly.URL_PART_SERVICES +
            aDocTypeID.getURIPercentEncoded ();
   }
 }
