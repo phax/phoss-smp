@@ -67,7 +67,7 @@
   </developers>
 
   <properties>
-    <log4j.version>2.13.2</log4j.version>
+    <log4j.version>2.13.3</log4j.version>
   </properties>
   
   <dependencyManagement>
@@ -75,7 +75,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>9.4.2</version>
+        <version>9.4.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
