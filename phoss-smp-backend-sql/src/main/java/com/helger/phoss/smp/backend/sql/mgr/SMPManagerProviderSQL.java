@@ -46,7 +46,7 @@ import com.helger.photon.core.mgr.PhotonBasicManager;
 import com.helger.photon.core.sysmigration.SystemMigrationManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
-import com.helger.photon.security.user.UserManager;
+import com.helger.photon.security.user.IUserManager;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xml.microdom.util.XMLMapHandler;
 
@@ -83,7 +83,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
 
         final ICommonsOrderedMap <String, String> aCreatedMappings = new CommonsLinkedHashMap <> ();
 
-        final UserManager aPhotonUserMgr = PhotonSecurityManager.getUserMgr ();
+        final IUserManager aPhotonUserMgr = PhotonSecurityManager.getUserMgr ();
         for (final ISMPUser aSQLUser : aSQLUsers)
         {
           final DBUser aDBUser = (DBUser) aSQLUser;
@@ -123,15 +123,13 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
         aSQLUserMgr.updateOwnerships (aCreatedMappings);
 
         if (XMLMapHandler.writeMap (aCreatedMappings,
-                                    new FileSystemResource (WebFileIO.getDataIO ()
-                                                                     .getFile ("migrations/db-photon-user-mapping.xml")))
+                                    new FileSystemResource (WebFileIO.getDataIO ().getFile ("migrations/db-photon-user-mapping.xml")))
                          .isFailure ())
           LOGGER.error ("Failed to store mapping of DB users to ph-oton users as XML");
         LOGGER.info ("Finished migrating all DB users to ph-oton users");
       }
     };
-    aSysMigMgr.performMigrationIfNecessary (CSMPServerMigrations.MIGRATION_ID_SQL_DBUSER_TO_REGULAR_USERS,
-                                            aMigrationAction);
+    aSysMigMgr.performMigrationIfNecessary (CSMPServerMigrations.MIGRATION_ID_SQL_DBUSER_TO_REGULAR_USERS, aMigrationAction);
 
     if (aSysMigMgr.wasMigrationExecutedSuccessfully (CSMPServerMigrations.MIGRATION_ID_SQL_DBUSER_TO_REGULAR_USERS))
     {

@@ -20,9 +20,9 @@ import javax.annotation.concurrent.Immutable;
 
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
-import com.helger.photon.security.role.RoleManager;
-import com.helger.photon.security.user.UserManager;
-import com.helger.photon.security.usergroup.UserGroupManager;
+import com.helger.photon.security.role.IRoleManager;
+import com.helger.photon.security.user.IUserManager;
+import com.helger.photon.security.usergroup.IUserGroupManager;
 
 /**
  * SMP security initialization code.
@@ -37,9 +37,9 @@ public final class SMPSecurity
 
   public static void init ()
   {
-    final UserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
-    final UserGroupManager aUserGroupMgr = PhotonSecurityManager.getUserGroupMgr ();
-    final RoleManager aRoleMgr = PhotonSecurityManager.getRoleMgr ();
+    final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
+    final IUserGroupManager aUserGroupMgr = PhotonSecurityManager.getUserGroupMgr ();
+    final IRoleManager aRoleMgr = PhotonSecurityManager.getRoleMgr ();
 
     // Standard users
     if (!aUserMgr.containsWithID (CSMP.USER_ADMINISTRATOR_ID))
