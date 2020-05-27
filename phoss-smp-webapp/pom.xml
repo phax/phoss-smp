@@ -72,15 +72,15 @@
       <artifactId>ph-jaxb</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.peppol</groupId>
       <artifactId>peppol-commons</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.peppol</groupId>
       <artifactId>peppol-sml-client</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.photon</groupId>
       <artifactId>ph-oton-bootstrap4-stub</artifactId>
     </dependency>
     <dependency>
@@ -93,7 +93,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.photon</groupId>
       <artifactId>ph-oton-jetty</artifactId>
       <optional>true</optional>
     </dependency>

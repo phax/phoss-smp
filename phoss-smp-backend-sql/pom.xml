@@ -57,7 +57,7 @@
       <artifactId>ph-db-jdbc</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.photon</groupId>
       <artifactId>ph-oton-core</artifactId>
     </dependency>
 
