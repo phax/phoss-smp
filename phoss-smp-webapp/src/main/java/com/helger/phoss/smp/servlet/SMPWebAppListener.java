@@ -28,6 +28,7 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.lang.priviledged.IPrivilegedAction;
 import com.helger.commons.regex.RegExHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.network.proxy.ProxySelectorProxySettingsManager;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettingsManager;
@@ -133,6 +134,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     // Check SMP ID
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
+    if (StringHelper.hasNoText (sSMPID))
+      throw new IllegalArgumentException ("The SMP ID is missing. It must match the regular expression '" + CSMP.PATTERN_SMP_ID + "'!");
     if (!RegExHelper.stringMatchesPattern (CSMP.PATTERN_SMP_ID, sSMPID))
       throw new IllegalArgumentException ("The provided SMP ID '" +
                                           sSMPID +
