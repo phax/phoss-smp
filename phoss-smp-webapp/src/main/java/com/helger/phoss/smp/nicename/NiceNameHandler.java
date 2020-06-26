@@ -99,7 +99,7 @@ public final class NiceNameHandler
         aDocTypeIDRes = new FileSystemResource (sPath);
         if (!aDocTypeIDRes.exists ())
         {
-          LOGGER.warn ("The configured document types nice name file '" + sPath + "' does not exist");
+          LOGGER.warn ("The configured document type nice name file '" + sPath + "' does not exist");
           // Enforce defaults
           aDocTypeIDRes = null;
         }
@@ -111,7 +111,7 @@ public final class NiceNameHandler
 
       final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes, true);
       RWLOCK.writeLockedGet ( () -> DOCTYPE_IDS = aDocTypeIDs);
-      LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document types nice name entries");
+      LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document type nice name entries");
     }
 
     // Processes
