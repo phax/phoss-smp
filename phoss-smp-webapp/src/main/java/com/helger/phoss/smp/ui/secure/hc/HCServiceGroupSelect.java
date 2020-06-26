@@ -22,6 +22,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.ui.SMPCommonUI;
@@ -35,6 +36,14 @@ import com.helger.photon.uicore.html.select.HCExtSelect;
  */
 public class HCServiceGroupSelect extends HCExtSelect
 {
+  @Nonnull
+  @Nonempty
+  public static String getDisplayName (@Nonnull final ISMPServiceGroup aServiceGroup)
+  {
+    final String sOwnerName = SMPCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
+    return aServiceGroup.getParticpantIdentifier ().getURIEncoded () + " [" + sOwnerName + "]";
+  }
+
   public HCServiceGroupSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
   {
     this (aRF, aDisplayLocale, null);
@@ -50,11 +59,7 @@ public class HCServiceGroupSelect extends HCExtSelect
                                                               .getAllSMPServiceGroups ()
                                                               .getSortedInline (ISMPServiceGroup.comparator ()))
       if (aFilter == null || aFilter.test (aServiceGroup))
-      {
-        final String sOwnerName = SMPCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
-        addOption (aServiceGroup.getID (),
-                   aServiceGroup.getParticpantIdentifier ().getURIEncoded () + " [" + sOwnerName + "]");
-      }
+        addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup));
 
     if (!hasSelectedOption ())
       addOptionPleaseSelect (aDisplayLocale);

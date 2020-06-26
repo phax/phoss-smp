@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.user.ISMPUser;
 import com.helger.photon.core.form.RequestField;
@@ -32,12 +33,19 @@ import com.helger.photon.uicore.html.select.HCExtSelect;
  */
 public class HCSMPUserSelect extends HCExtSelect
 {
+  @Nonnull
+  @Nonempty
+  public static String getDisplayName (@Nonnull final ISMPUser aUser)
+  {
+    return aUser.getUserName ();
+  }
+
   public HCSMPUserSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
   {
     super (aRF);
 
     for (final ISMPUser aUser : SMPMetaManager.getUserMgr ().getAllUsers ().getSortedInline (ISMPUser.comparator (aDisplayLocale)))
-      addOption (aUser.getID (), aUser.getUserName ());
+      addOption (aUser.getID (), getDisplayName (aUser));
 
     if (!hasSelectedOption ())
       addOptionPleaseSelect (aDisplayLocale);

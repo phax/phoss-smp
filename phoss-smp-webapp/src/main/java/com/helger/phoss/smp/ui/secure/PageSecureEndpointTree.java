@@ -115,9 +115,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
               final HCRow aBodyRow = aEPTable.addBodyRow ();
 
               final String sTransportProfile = aEndpoint.getTransportProfile ();
-              aBodyRow.addCell (new HCA (createViewURL (aWPEC,
-                                                        aServiceInfo,
-                                                        aParams)).addChild (NiceNameUI.getTransportProfile (sTransportProfile, false)));
+              final ISimpleURL aViewURL = createViewURL (aWPEC, aServiceInfo, aParams);
+              aBodyRow.addCell (new HCA (aViewURL).addChild (NiceNameUI.getTransportProfile (sTransportProfile, false)));
 
               aBodyRow.addCell (aEndpoint.getEndpointReference ());
 
@@ -127,16 +126,18 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
               final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
                                                                                     Rest2Filter.PATH_SERVICES +
                                                                                     aDocTypeID.getURIPercentEncoded ());
-              aBodyRow.addCell (new HCTextNode (" "),
-                                new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
-                                new HCTextNode (" "),
-                                new HCA (aCopyURL).setTitle ("Copy endpoint").addChild (EDefaultIcon.COPY.getAsNode ()),
-                                new HCTextNode (" "),
-                                new HCA (aDeleteURL).setTitle ("Delete endpoint").addChild (EDefaultIcon.DELETE.getAsNode ()),
-                                new HCTextNode (" "),
-                                new HCA (aPreviewURL).setTitle ("Perform SMP query on endpoint")
-                                                     .setTargetBlank ()
-                                                     .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+              aBodyRow.addAndReturnCell (new HCA (aViewURL).setTitle ("View endpoint").addChild (EDefaultIcon.MAGNIFIER.getAsNode ()),
+                                         new HCTextNode (" "),
+                                         new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
+                                         new HCTextNode (" "),
+                                         new HCA (aCopyURL).setTitle ("Copy endpoint").addChild (EDefaultIcon.COPY.getAsNode ()),
+                                         new HCTextNode (" "),
+                                         new HCA (aDeleteURL).setTitle ("Delete endpoint").addChild (EDefaultIcon.DELETE.getAsNode ()),
+                                         new HCTextNode (" "),
+                                         new HCA (aPreviewURL).setTitle ("Perform SMP query on endpoint")
+                                                              .setTargetBlank ()
+                                                              .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()))
+                      .addClass (CSS_CLASS_RIGHT);
             }
 
             // Show process + endpoints

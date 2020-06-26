@@ -38,7 +38,7 @@ public class HCSMPTransportProfileSelect extends HCSelect
   @Nonempty
   public static String getDisplayName (@Nonnull final ISMPTransportProfile aTP)
   {
-    return aTP.getName () + " (" + aTP.getID () + ")";
+    return aTP.getName () + " (" + aTP.getID () + ")" + (aTP.isDeprecated () ? " [deprecated]" : "");
   }
 
   public HCSMPTransportProfileSelect (@Nonnull final RequestField aRF)

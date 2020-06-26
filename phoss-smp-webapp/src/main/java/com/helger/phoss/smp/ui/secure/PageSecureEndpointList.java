@@ -94,7 +94,8 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
           final StringMap aParams = createParamMap (aServiceInfo, aProcess, aEndpoint);
 
           final HCRow aRow = aTable.addBodyRow ();
-          aRow.addCell (new HCA (createViewURL (aWPEC, aServiceInfo, aParams)).addChild (aServiceGroup.getID ()));
+          final ISimpleURL aViewURL = createViewURL (aWPEC, aServiceInfo, aParams);
+          aRow.addCell (new HCA (aViewURL).addChild (aServiceGroup.getID ()));
           aRow.addCell (NiceNameUI.getDocumentTypeID (aDocTypeID, false));
           aRow.addCell (NiceNameUI.getProcessID (aDocTypeID, aProcessID, false));
 
@@ -109,7 +110,9 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
           final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
                                                                                 Rest2Filter.PATH_SERVICES +
                                                                                 aDocTypeID.getURIPercentEncoded ());
-          aRow.addCell (new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
+          aRow.addCell (new HCA (aViewURL).setTitle ("View endpoint").addChild (EDefaultIcon.MAGNIFIER.getAsNode ()),
+                        new HCTextNode (" "),
+                        new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
                         new HCTextNode (" "),
                         new HCA (aCopyURL).setTitle ("Copy endpoint").addChild (EDefaultIcon.COPY.getAsNode ()),
                         new HCTextNode (" "),
