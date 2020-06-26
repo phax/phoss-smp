@@ -44,8 +44,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.nicename.NiceNameUI;
 import com.helger.phoss.smp.rest2.Rest2Filter;
 import com.helger.photon.app.url.LinkHelper;
-import com.helger.photon.bootstrap4.badge.BootstrapBadge;
-import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.uicore.css.CPageParam;
@@ -179,7 +177,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
         }
       }
       if (aServiceInfos == null || aServiceInfos.isEmpty () || aULDT.hasNoChildren ())
-        aLISG.addChild (new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("This service group has no assigned endpoints!"));
+        aLISG.addChild (" ").addChild (badgeInfo ("This service group has no assigned endpoints!"));
       else
         aLISG.addChild (aULDT);
     }
