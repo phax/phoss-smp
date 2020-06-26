@@ -48,7 +48,7 @@ final class Rest2RequestHelper
    *         If no BasicAuth HTTP header is present
    */
   @Nonnull
-  public static BasicAuthClientCredentials getAuth (@Nonnull final HttpHeaderMap aHttpHeaders) throws SMPUnauthorizedException
+  public static BasicAuthClientCredentials getMandatoryAuth (@Nonnull final HttpHeaderMap aHttpHeaders) throws SMPUnauthorizedException
   {
     final ICommonsList <String> aHeaders = aHttpHeaders.getAllHeaderValues (CHttpHeader.AUTHORIZATION);
     if (aHeaders.isEmpty ())

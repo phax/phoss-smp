@@ -50,9 +50,9 @@ public final class APIExecutorListGet implements IAPIExecutor
   {
     final String sUserID = aPathVariables.get (Rest2Filter.PARAM_USER_ID);
     final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
-    final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
-    byte [] aBytes;
+    final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:

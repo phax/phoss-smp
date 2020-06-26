@@ -82,14 +82,11 @@ public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                    @Nonnull final ISMPUserEditable aSelectedObject)
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPUserEditable aSelectedObject)
       {
         final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
         if (aUserManager.deleteUser (aSelectedObject.getID ()).isChanged ())
-          aWPEC.postRedirectGetInternal (success ("The user '" +
-                                                  aSelectedObject.getUserName () +
-                                                  "' was successfully deleted."));
+          aWPEC.postRedirectGetInternal (success ("The user '" + aSelectedObject.getUserName () + "' was successfully deleted."));
         else
           aWPEC.postRedirectGetInternal (error ("Failed to delete user '" + aSelectedObject.getUserName () + "'."));
       }
@@ -120,8 +117,7 @@ public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
   }
 
   @Override
-  protected ISMPUserEditable getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                                @Nullable final String sID)
+  protected ISMPUserEditable getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
   {
     final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
     final ISMPUser aUser = aUserManager.getUserOfID (sID);
@@ -139,8 +135,7 @@ public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMPUserEditable aSelectedObject)
+  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPUserEditable aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final BootstrapViewForm aTable = aNodeList.addAndReturnChild (new BootstrapViewForm ());
@@ -157,8 +152,7 @@ public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
                                 @Nonnull final FormErrorList aFormErrors)
   {
     final boolean bEdit = eFormAction.isEdit ();
-    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit user '" + aSelectedObject.getUserName () + "'"
-                                                              : "Create new user"));
+    aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit user '" + aSelectedObject.getUserName () + "'" : "Create new user"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("User name")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_USERNAME,

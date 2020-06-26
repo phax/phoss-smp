@@ -51,7 +51,7 @@ public final class APIExecutorCompleteServiceGroupGet implements IAPIExecutor
     final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
     final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
 
-    byte [] aBytes;
+    final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:

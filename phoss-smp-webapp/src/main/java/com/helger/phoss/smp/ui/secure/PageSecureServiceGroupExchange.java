@@ -64,6 +64,7 @@ import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPUserSelect;
+import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
@@ -150,15 +151,24 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     for (final IMicroElement eServiceGroup : eRoot.getAllChildElements (CSMPExchange.ELEMENT_SERVICEGROUP))
     {
       // Read service group and service information
-      final ISMPServiceGroup aServiceGroup = SMPServiceGroupMicroTypeConverter.convertToNative (eServiceGroup, x -> {
-        ISMPUser ret = SMPMetaManager.getUserMgr ().getUserOfID (x);
-        if (ret == null)
-        {
-          // Select the default owner if an unknown user is contained
-          ret = aDefaultOwner;
-        }
-        return ret;
-      });
+      final ISMPServiceGroup aServiceGroup;
+      try
+      {
+        aServiceGroup = SMPServiceGroupMicroTypeConverter.convertToNative (eServiceGroup, x -> {
+          ISMPUser ret = SMPMetaManager.getUserMgr ().getUserOfID (x);
+          if (ret == null)
+          {
+            // Select the default owner if an unknown user is contained
+            ret = aDefaultOwner;
+          }
+          return ret;
+        });
+      }
+      catch (final RuntimeException ex)
+      {
+        aLogger.error ("Error parsing the service group at index " + nSGIndex + ". Ignoring this service group.", ex);
+        continue;
+      }
       final String sServiceGroupID = aServiceGroup.getID ();
       final boolean bIsServiceGroupContained = aAllServiceGroups.containsAny (x -> x.getID ().equals (sServiceGroupID));
       if (!bIsServiceGroupContained || bOverwriteExisting)
@@ -177,10 +187,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         aImportServiceGroups.put (aServiceGroup, aSGInfo);
         if (bIsServiceGroupContained)
           aDeleteServiceGroups.add (aServiceGroup);
-        aLogger.success ("Will " +
-                         (bIsServiceGroupContained ? "overwrite" : "import") +
-                         " service group " +
-                         sServiceGroupID);
+        aLogger.success ("Will " + (bIsServiceGroupContained ? "overwrite" : "import") + " service group " + sServiceGroupID);
 
         // read all contained service information
         {
@@ -200,8 +207,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           int nRDCount = 0;
           for (final IMicroElement eRedirect : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_REDIRECT))
           {
-            final ISMPRedirect aRedirect = SMPRedirectMicroTypeConverter.convertToNative (eRedirect,
-                                                                                          x -> aServiceGroup);
+            final ISMPRedirect aRedirect = SMPRedirectMicroTypeConverter.convertToNative (eRedirect, x -> aServiceGroup);
             aSGInfo.addRedirect (aRedirect);
             ++nRDCount;
           }
@@ -230,8 +236,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         {
           final ISMPServiceGroupProvider aSGProvider = x -> {
             // First look in service groups to import
-            ISMPServiceGroup aSG = aImportServiceGroups.findFirstKey (y -> x.hasSameContent (y.getKey ()
-                                                                                              .getParticpantIdentifier ()));
+            ISMPServiceGroup aSG = aImportServiceGroups.findFirstKey (y -> x.hasSameContent (y.getKey ().getParticpantIdentifier ()));
             if (aSG == null)
             {
               // Lookup in all existing service group
@@ -253,8 +258,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         else
         {
           final String sBusinessCardID = aBusinessCard.getID ();
-          final boolean bIsBusinessCardContained = aAllBusinessCards.containsAny (x -> x.getID ()
-                                                                                        .equals (sBusinessCardID));
+          final boolean bIsBusinessCardContained = aAllBusinessCards.containsAny (x -> x.getID ().equals (sBusinessCardID));
           if (!bIsBusinessCardContained || bOverwriteExisting)
           {
             final ISMPServiceGroup aBCSG = aBusinessCard.getServiceGroup ();
@@ -267,10 +271,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             aImportBusinessCards.add (aBusinessCard);
             if (bIsBusinessCardContained)
               aDeleteBusinessCards.add (aBusinessCard);
-            aLogger.success ("Will " +
-                             (bIsBusinessCardContained ? "overwrite" : "import") +
-                             " business card for " +
-                             sBusinessCardID);
+            aLogger.success ("Will " + (bIsBusinessCardContained ? "overwrite" : "import") + " business card for " + sBusinessCardID);
           }
           else
           {
@@ -439,8 +440,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
 
       // Start import
       final IFileItem aImportFile = aWPEC.params ().getAsFileItem (FIELD_IMPORT_FILE);
-      final boolean bOverwriteExisting = aWPEC.params ()
-                                              .isCheckBoxChecked (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
+      final boolean bOverwriteExisting = aWPEC.params ().isCheckBoxChecked (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
       final String sDefaultOwnerID = aWPEC.params ().getAsString (FIELD_DEFAULT_OWNER);
       final ISMPUser aDefaultOwner = aUserMgr.getUserOfID (sDefaultOwnerID);
 
@@ -467,16 +467,11 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           {
             // Version 1.0
             final InMemoryLogger aLogger = new InMemoryLogger ();
-            importXMLVer10 (aDoc.getDocumentElement (),
-                            bOverwriteExisting,
-                            aDefaultOwner,
-                            aAllServiceGroups,
-                            aAllBusinessCards,
-                            aLogger);
+            importXMLVer10 (aDoc.getDocumentElement (), bOverwriteExisting, aDefaultOwner, aAllServiceGroups, aAllBusinessCards, aLogger);
             for (final LogMessage aLogMsg : aLogger)
             {
               final IErrorLevel aErrorLevel = aLogMsg.getErrorLevel ();
-              EBootstrapBadgeType eBadgeType;
+              final EBootstrapBadgeType eBadgeType;
               if (aErrorLevel.isGE (EErrorLevel.ERROR))
                 eBadgeType = EBootstrapBadgeType.DANGER;
               else
@@ -489,18 +484,17 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                     eBadgeType = EBootstrapBadgeType.SUCCESS;
 
               aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild (aLogMsg.getMessage ().toString ())
-                                                                      .addChild (SMPCommonUI.getTechnicalDetailsUI (aLogMsg.getThrowable ())));
+                                                                      .addChild (SMPCommonUI.getTechnicalDetailsUI (aLogMsg.getThrowable ()))
+                                                                      .addClass (CBootstrapCSS.TEXT_LEFT));
             }
           }
           else
           {
             // Unsupported or no version present
             if (sVersion == null)
-              aFormErrors.addFieldError (FIELD_IMPORT_FILE,
-                                         "The provided file cannot be imported because it has the wrong layout.");
+              aFormErrors.addFieldError (FIELD_IMPORT_FILE, "The provided file cannot be imported because it has the wrong layout.");
             else
-              aFormErrors.addFieldError (FIELD_IMPORT_FILE,
-                                         "The provided file contains the unsupported version '" + sVersion + "'.");
+              aFormErrors.addFieldError (FIELD_IMPORT_FILE, "The provided file contains the unsupported version '" + sVersion + "'.");
           }
         }
       }
@@ -517,10 +511,8 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       else
       {
         aExport.addChild (info ("Export " +
-                                (nServiceGroupCount == 1 ? "service group"
-                                                         : "all " + aAllServiceGroups.size () + " service groups") +
-                                (bHandleBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s")
-                                                      : "") +
+                                (nServiceGroupCount == 1 ? "service group" : "all " + aAllServiceGroups.size () + " service groups") +
+                                (bHandleBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s") : "") +
                                 " to an XML file."));
       }
 
@@ -551,8 +543,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       final BootstrapForm aForm = aImport.addAndReturnChild (getUIHandler ().createFormFileUploadSelf (aWPEC));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("File to import")
-                                                   .setCtrl (new BootstrapFileUpload (FIELD_IMPORT_FILE,
-                                                                                      aDisplayLocale))
+                                                   .setCtrl (new BootstrapFileUpload (FIELD_IMPORT_FILE, aDisplayLocale))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_IMPORT_FILE)));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Overwrite existing elements")
                                                    .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_OVERWRITE_EXISTING,
@@ -562,8 +553,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
                                                                  " integration is enabled, existing business cards contained in the import are also overwritten!")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_OVERWRITE_EXISTING)));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owner of the new service groups")
-                                                   .setCtrl (new HCSMPUserSelect (new RequestField (FIELD_DEFAULT_OWNER),
-                                                                                  aDisplayLocale))
+                                                   .setCtrl (new HCSMPUserSelect (new RequestField (FIELD_DEFAULT_OWNER), aDisplayLocale))
                                                    .setHelpText ("This owner is only selected, if the owner contained in the import file is unknown.")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_DEFAULT_OWNER)));
 

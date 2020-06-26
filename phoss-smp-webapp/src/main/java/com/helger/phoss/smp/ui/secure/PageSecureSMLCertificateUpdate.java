@@ -82,24 +82,21 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     }
     if (!SMPKeyManager.isKeyStoreValid ())
     {
-      aWPEC.getNodeList ()
-           .addChild (warn ("This page cannot be shown because the overall keystore configuration is invalid."));
+      aWPEC.getNodeList ().addChild (warn ("This page cannot be shown because the overall keystore configuration is invalid."));
       return EValidity.INVALID;
     }
     return super.isValidToDisplayPage (aWPEC);
   }
 
   @Nonnull
-  private static ManageServiceMetadataServiceCaller _create (@Nonnull final ISMLInfo aSML,
-                                                             @Nonnull final SSLSocketFactory aSocketFactory)
+  private static ManageServiceMetadataServiceCaller _create (@Nonnull final ISMLInfo aSML, @Nonnull final SSLSocketFactory aSocketFactory)
   {
     final ManageServiceMetadataServiceCaller ret = new ManageServiceMetadataServiceCaller (aSML);
     ret.setSSLSocketFactory (aSocketFactory);
     return ret;
   }
 
-  private void _updateSMPCertAtSML (@Nonnull final WebPageExecutionContext aWPEC,
-                                    @Nonnull final FormErrorList aFormErrors)
+  private void _updateSMPCertAtSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -113,8 +110,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     if (StringHelper.hasText (sMigrationDate))
     {
       if (aMigrationDate == null)
-        aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE,
-                                   "The provided certificate migration date '" + sMigrationDate + "' is invalid!");
+        aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE, "The provided certificate migration date '" + sMigrationDate + "' is invalid!");
       else
         if (aMigrationDate.compareTo (aNow) <= 0)
           aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE, "The certificate migration date must be in the future!");
@@ -136,8 +132,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
       }
 
       if (aMigrationPublicKey == null)
-        aFormErrors.addFieldError (FIELD_PM_PUBLIC_KEY,
-                                   "The provided public key cannot be parsed as a X.509 certificate.");
+        aFormErrors.addFieldError (FIELD_PM_PUBLIC_KEY, "The provided public key cannot be parsed as a X.509 certificate.");
       else
       {
         try
@@ -211,25 +206,16 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         LOGGER.info (sMsg);
 
         aNodeList.addChild (success ().addChild (div (sMsg))
-                                      .addChild (div ("Issuer: " +
-                                                      aMigrationPublicKey.getIssuerX500Principal ().toString ()))
-                                      .addChild (div ("Subject: " +
-                                                      aMigrationPublicKey.getSubjectX500Principal ().toString ()))
-                                      .addChild (div ("Not before: " +
-                                                      PDTToString.getAsString (aNotBefore, aDisplayLocale)))
-                                      .addChild (div ("Not after: " +
-                                                      PDTToString.getAsString (aNotAfter, aDisplayLocale))));
+                                      .addChild (div ("Issuer: " + aMigrationPublicKey.getIssuerX500Principal ().toString ()))
+                                      .addChild (div ("Subject: " + aMigrationPublicKey.getSubjectX500Principal ().toString ()))
+                                      .addChild (div ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)))
+                                      .addChild (div ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale))));
 
-        AuditHelper.onAuditExecuteSuccess ("smp-sml-update-cert",
-                                           aSMLInfo.getManagementServiceURL (),
-                                           sMigrationPublicKey,
-                                           aMigrationDate);
+        AuditHelper.onAuditExecuteSuccess ("smp-sml-update-cert", aSMLInfo.getManagementServiceURL (), sMigrationPublicKey, aMigrationDate);
       }
       catch (final Exception ex)
       {
-        final String sMsg = "Error preparing migration of SMP certificate at SML '" +
-                            aSMLInfo.getManagementServiceURL () +
-                            "'.";
+        final String sMsg = "Error preparing migration of SMP certificate at SML '" + aSMLInfo.getManagementServiceURL () + "'.";
         LOGGER.error (sMsg, ex);
         aNodeList.addChild (error (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-update-cert",
@@ -264,8 +250,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         {
           aEntry.checkValidity ();
           aNodeList.addChild (info ("Your SMP certificate is still valid until " +
-                                    PDTToString.getAsString (PDTFactory.createLocalDateTime (aEntry.getNotAfter ()),
-                                                             aDisplayLocale) +
+                                    PDTToString.getAsString (PDTFactory.createLocalDateTime (aEntry.getNotAfter ()), aDisplayLocale) +
                                     "."));
         }
         catch (final CertificateExpiredException ex)
@@ -298,9 +283,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
       aForm.setLeft (nLeft);
       aForm.addChild (warn ("It is your responsibility to actually perform the update of the certificate in this SMP at the specified time! This does NOT happen automatically."));
 
-      final BootstrapDateTimePicker aDTP = BootstrapDateTimePicker.create (FIELD_PM_MIGRATION_DATE,
-                                                                           (LocalDate) null,
-                                                                           aDisplayLocale);
+      final BootstrapDateTimePicker aDTP = BootstrapDateTimePicker.create (FIELD_PM_MIGRATION_DATE, (LocalDate) null, aDisplayLocale);
       aDTP.setMinDate (PDTFactory.getCurrentLocalDate ().plusDays (1));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate migration date")
                                                    .setCtrl (aDTP)

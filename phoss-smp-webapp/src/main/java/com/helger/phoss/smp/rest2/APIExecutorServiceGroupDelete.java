@@ -56,7 +56,7 @@ public final class APIExecutorServiceGroupDelete implements IAPIExecutor
     {
       final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
       final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
-      final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
+      final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
       switch (SMPServerConfiguration.getRESTType ())
       {

@@ -62,7 +62,7 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
     final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
 
     // Create the unsigned response document
-    Document aDoc;
+    final Document aDoc;
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:

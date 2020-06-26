@@ -73,7 +73,7 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
         final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
         final String sDocumentTypeID = aPathVariables.get (Rest2Filter.PARAM_DOCUMENT_TYPE_ID);
         final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
-        final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
+        final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
         ESuccess eSuccess = ESuccess.FAILURE;
         switch (SMPServerConfiguration.getRESTType ())

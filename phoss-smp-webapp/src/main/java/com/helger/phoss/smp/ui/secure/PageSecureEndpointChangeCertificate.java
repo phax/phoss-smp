@@ -93,8 +93,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     {
       aNodeList.addChild (warn ("No service group is present! At least one service group must be present to change certificates."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
-                                                .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC,
-                                                                                                  CMenuSecure.MENU_SERVICE_GROUPS))
+                                                .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC, CMenuSecure.MENU_SERVICE_GROUPS))
                                                 .setIcon (EDefaultIcon.YES));
       return EValidity.INVALID;
     }
@@ -133,8 +132,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       final int nDisplayLen = 20;
       final String sCertPart = (sCert.length () > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert);
       return div ("Invalid certificate" +
-                  (sCert.length () > nDisplayLen ? " starting with: " : ": "))
-                                                                              .addChild (new HCCode ().addChild (sCertPart));
+                  (sCert.length () > nDisplayLen ? " starting with: " : ": ")).addChild (new HCCode ().addChild (sCertPart));
     }
 
     final HCNodeList ret = new HCNodeList ();
@@ -200,8 +198,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
             aFormErrors.addFieldInfo (FIELD_NEW_CERTIFICATE, "The new certificate is invalid: " + sErrorDetails);
           else
             if (sNewCert.equals (sOldCert))
-              aFormErrors.addFieldInfo (FIELD_NEW_CERTIFICATE,
-                                        "The new certificate is identical to the old certificate");
+              aFormErrors.addFieldInfo (FIELD_NEW_CERTIFICATE, "The new certificate is identical to the old certificate");
         }
 
         // Validate parameters
@@ -280,8 +277,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_OLD_CERTIFICATE)));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New certificate")
-                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_NEW_CERTIFICATE,
-                                                                                               sOldCert)))
+                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_NEW_CERTIFICATE, sOldCert)))
                                                    .setHelpText ("The new certificate that is used instead")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_NEW_CERTIFICATE)));
 
@@ -294,14 +290,11 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     {
       aNodeList.addChild (info ().addChildren (div ("This page lets you change the certificates of multiple endpoints at once. This is e.g. helpful when the old certificate expired."),
                                                div ("Currently " +
-                                                    (nTotalEndpointCount == 1 ? "1 endpoint is"
-                                                                              : nTotalEndpointCount +
-                                                                                " endpoints are") +
+                                                    (nTotalEndpointCount == 1 ? "1 endpoint is" : nTotalEndpointCount + " endpoints are") +
                                                     " registered.")));
 
       final HCTable aTable = new HCTable (new DTCol ("Certificate").setInitialSorting (ESortOrder.ASCENDING),
-                                          new DTCol ("Service Group Count").setDisplayType (EDTColType.INT,
-                                                                                            aDisplayLocale),
+                                          new DTCol ("Service Group Count").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new DTCol ("Endpoint Count").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
       aEndpointsGroupedPerURL.forEach ( (sCert, aEndpoints) -> {
