@@ -22,6 +22,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.id.IHasID;
+import com.helger.commons.lang.EnumHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -43,14 +46,34 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  */
 public class Rest2DataProvider implements ISMPServerAPIDataProvider
 {
-  enum EServerNameMode
+  enum EServerNameMode implements IHasID <String>
   {
-    STATIC_SERVER_INFO,
-    REQUEST_SCOPE,
-    DYNAMIC_PARTICIPANT_URL;
+    STATIC_SERVER_INFO ("default"),
+    REQUEST_SCOPE ("request"),
+    DYNAMIC_PARTICIPANT_URL ("dynamic-participant");
 
     public static final EServerNameMode DEFAULT = STATIC_SERVER_INFO;
     public static final EServerNameMode FALLBACK = REQUEST_SCOPE;
+    
+    private final String m_sID;
+
+    EServerNameMode (@Nonnull @Nonempty final String sID)
+    {
+      m_sID = sID;
+    }
+
+    @Nonnull
+    @Nonempty
+    public String getID ()
+    {
+      return m_sID;
+    }
+
+    @Nonnull
+    public static EServerNameMode getFromIDOrDefault (@Nullable final String sID)
+    {
+      return EnumHelper.getFromIDOrDefault (EServerNameMode.class, sID, DEFAULT);
+    }
   }
 
   private final EServerNameMode m_eServerNameMode;
@@ -61,7 +84,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
   public Rest2DataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope, @Nullable final String sServiceGroupID)
   {
     ValueEnforcer.notNull (aRequestScope, "RequestScope");
-    m_eServerNameMode = EServerNameMode.DEFAULT;
+    m_eServerNameMode = EServerNameMode.getFromIDOrDefault (SMPServerConfiguration.getPublicServerURLMode ());
     m_aRequestScope = aRequestScope;
     m_aParticipantID = SMPMetaManager.getIdentifierFactory ().parseParticipantIdentifier (sServiceGroupID);
     m_sSMLZoneName = SMPMetaManager.getSettings ().getSMLDNSZone ();
