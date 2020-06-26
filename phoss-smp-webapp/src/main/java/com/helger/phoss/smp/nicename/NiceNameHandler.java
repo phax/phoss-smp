@@ -90,7 +90,7 @@ public final class NiceNameHandler
       if (aDocTypeIDRes == null)
         aDocTypeIDRes = new ClassPathResource ("codelists/doctypeid-mapping.xml");
       final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes);
-      RWLOCK.writeLocked ( () -> DOCTYPE_IDS = aDocTypeIDs);
+      RWLOCK.writeLockedGet ( () -> DOCTYPE_IDS = aDocTypeIDs);
     }
 
     // Processes
@@ -106,7 +106,7 @@ public final class NiceNameHandler
       if (aProcessIDRes == null)
         aProcessIDRes = new ClassPathResource ("codelists/processid-mapping.xml");
       final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes);
-      RWLOCK.writeLocked ( () -> PROCESS_IDS = aProcessIDs);
+      RWLOCK.writeLockedGet ( () -> PROCESS_IDS = aProcessIDs);
     }
   }
 

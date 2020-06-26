@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>1.11.0</version>
+    <version>1.11.1</version>
   </parent>
   <artifactId>phoss-smp-parent-pom</artifactId>
   <version>5.2.4-SNAPSHOT</version>
@@ -67,8 +67,8 @@
   </developers>
 
   <properties>
-    <log4j.version>2.13.0</log4j.version>
-    <eclipselink.version>2.7.6</eclipselink.version>
+    <log4j.version>2.13.3</log4j.version>
+    <eclipselink.version>2.7.7</eclipselink.version>
   </properties>
   
   <dependencyManagement>
@@ -76,63 +76,63 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>9.3.9</version>
+        <version>9.4.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-schedule-parent-pom</artifactId>
-        <version>4.0.1</version>
+        <version>4.1.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>6.1.3</version>
+        <version>6.1.7</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css-parent-pom</artifactId>
-        <version>6.2.1</version>
+        <version>6.2.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-db-parent-pom</artifactId>
-        <version>6.1.5</version>
+        <version>6.2.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>com.helger</groupId>
+        <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>9.1.10</version>
+        <version>9.3.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>com.helger</groupId>
+        <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>8.2.3</version>
+        <version>8.2.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>com.helger</groupId>
+        <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>8.0.2-SNAPSHOT</version>
+        <version>8.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.8.6</version>
+        <version>0.8.7</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -150,7 +150,7 @@
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.19</version>
+        <version>8.0.20</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
@@ -181,7 +181,7 @@
       <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
-        <version>3.12.1</version>
+        <version>4.0.4</version>
       </dependency>
 
       <dependency>
@@ -241,7 +241,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-jscompress-maven-plugin</artifactId>
-          <version>2.2.2</version><!--$NO-MVN-MAN-VER$-->
+          <version>2.2.3</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>
@@ -257,7 +257,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>6.2.1</version><!--$NO-MVN-MAN-VER$-->
+          <version>6.2.3</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>

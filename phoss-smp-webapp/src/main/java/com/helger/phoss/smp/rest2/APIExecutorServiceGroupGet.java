@@ -57,13 +57,13 @@ public final class APIExecutorServiceGroupGet implements IAPIExecutor
       case PEPPOL:
       {
         final com.helger.smpclient.peppol.jaxb.ServiceGroupType ret = new SMPServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
-        aBytes = new SMPMarshallerServiceGroupType ().getAsBytes (ret);
+        aBytes = new SMPMarshallerServiceGroupType (true).getAsBytes (ret);
         break;
       }
       case BDXR:
       {
         final com.helger.xsds.bdxr.smp1.ServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
-        aBytes = new BDXR1MarshallerServiceGroupType ().getAsBytes (ret);
+        aBytes = new BDXR1MarshallerServiceGroupType (true).getAsBytes (ret);
         break;
       }
       default:
@@ -78,9 +78,7 @@ public final class APIExecutorServiceGroupGet implements IAPIExecutor
     }
     else
     {
-      aUnifiedResponse.setContent (aBytes)
-                      .setMimeType (CMimeType.TEXT_XML)
-                      .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
     }
   }
 }

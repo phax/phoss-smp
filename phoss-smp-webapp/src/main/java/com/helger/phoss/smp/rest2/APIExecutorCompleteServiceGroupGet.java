@@ -58,14 +58,14 @@ public final class APIExecutorCompleteServiceGroupGet implements IAPIExecutor
       {
         // Unspecified extension
         final com.helger.smpclient.peppol.jaxb.CompleteServiceGroupType ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
-        aBytes = new SMPMarshallerCompleteServiceGroupType ().getAsBytes (ret);
+        aBytes = new SMPMarshallerCompleteServiceGroupType (true).getAsBytes (ret);
         break;
       }
       case BDXR:
       {
         // Unspecified extension
         final com.helger.xsds.bdxr.smp1.CompleteServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
-        aBytes = new BDXR1MarshallerCompleteServiceGroupType ().getAsBytes (ret);
+        aBytes = new BDXR1MarshallerCompleteServiceGroupType (true).getAsBytes (ret);
         break;
       }
       default:
@@ -80,9 +80,7 @@ public final class APIExecutorCompleteServiceGroupGet implements IAPIExecutor
     }
     else
     {
-      aUnifiedResponse.setContent (aBytes)
-                      .setMimeType (CMimeType.TEXT_XML)
-                      .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
     }
   }
 }

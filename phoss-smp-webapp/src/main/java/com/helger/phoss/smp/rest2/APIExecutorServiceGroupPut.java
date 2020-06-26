@@ -79,7 +79,7 @@ public final class APIExecutorServiceGroupPut implements IAPIExecutor
         {
           case PEPPOL:
           {
-            final com.helger.smpclient.peppol.jaxb.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType ().read (aServiceGroupDoc);
+            final com.helger.smpclient.peppol.jaxb.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType (true).read (aServiceGroupDoc);
             if (aServiceGroup != null)
             {
               new SMPServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, aBasicAuth);
@@ -89,7 +89,7 @@ public final class APIExecutorServiceGroupPut implements IAPIExecutor
           }
           case BDXR:
           {
-            final com.helger.xsds.bdxr.smp1.ServiceGroupType aServiceGroup = new BDXR1MarshallerServiceGroupType ().read (aServiceGroupDoc);
+            final com.helger.xsds.bdxr.smp1.ServiceGroupType aServiceGroup = new BDXR1MarshallerServiceGroupType (true).read (aServiceGroupDoc);
             if (aServiceGroup != null)
             {
               new BDXR1ServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, aBasicAuth);

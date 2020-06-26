@@ -80,7 +80,7 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
         {
           case PEPPOL:
           {
-            final com.helger.smpclient.peppol.jaxb.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType ().read (aServiceMetadataDoc);
+            final com.helger.smpclient.peppol.jaxb.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType (true).read (aServiceMetadataDoc);
             if (aServiceMetadata != null)
               eSuccess = new SMPServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
                                                                                    sDocumentTypeID,
@@ -90,7 +90,7 @@ public final class APIExecutorServiceMetadataPut implements IAPIExecutor
           }
           case BDXR:
           {
-            final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType ().read (aServiceMetadataDoc);
+            final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType (true).read (aServiceMetadataDoc);
             if (aServiceMetadata != null)
               eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
                                                                                      sDocumentTypeID,

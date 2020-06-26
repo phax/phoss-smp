@@ -71,7 +71,7 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
                                                                                                                                         sDocumentTypeID);
 
         // Convert to DOM document
-        final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType ();
+        final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType (true);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
@@ -81,7 +81,7 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
                                                                                                                                    sDocumentTypeID);
 
         // Convert to DOM document
-        final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType ();
+        final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType (true);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
@@ -94,8 +94,7 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
     // Sign the document
     try
     {
-      SMPKeyManager.getInstance ()
-                   .signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
+      SMPKeyManager.getInstance ().signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
       LOGGER.info ("Successfully signed response XML");
     }
     catch (final Exception ex)

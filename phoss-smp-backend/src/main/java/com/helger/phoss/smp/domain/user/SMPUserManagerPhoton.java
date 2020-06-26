@@ -33,7 +33,7 @@ import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exception.SMPUnknownUserException;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
-import com.helger.photon.security.user.UserManager;
+import com.helger.photon.security.user.IUserManager;
 
 /**
  * Implementation {@link ISMPUserManager} using the build-in ph-oton user
@@ -102,7 +102,7 @@ public final class SMPUserManagerPhoton implements ISMPUserManager
   @Nonnull
   public SMPUserPhoton validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final UserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
+    final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final IUser aUser = aUserMgr.getUserOfLoginName (aCredentials.getUserName ());
     if (aUser == null)
     {
@@ -131,8 +131,7 @@ public final class SMPUserManagerPhoton implements ISMPUserManager
                                            @Nonnull final ISMPUser aCurrentUser) throws SMPServerException
   {
     // Resolve service group
-    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
-                                                         .getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
       throw new SMPNotFoundException ("Service group " + aServiceGroupID.getURIEncoded () + " does not exist");
@@ -142,18 +141,11 @@ public final class SMPUserManagerPhoton implements ISMPUserManager
     final String sOwnerID = aServiceGroup.getOwnerID ();
     if (!sOwnerID.equals (aCurrentUser.getID ()))
     {
-      throw new SMPUnauthorizedException ("User '" +
-                                          aCurrentUser.getUserName () +
-                                          "' does not own " +
-                                          aServiceGroupID.getURIEncoded ());
+      throw new SMPUnauthorizedException ("User '" + aCurrentUser.getUserName () + "' does not own " + aServiceGroupID.getURIEncoded ());
     }
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Verified service group " +
-                    aServiceGroup.getID () +
-                    " is owned by user '" +
-                    aCurrentUser.getUserName () +
-                    "'");
+      LOGGER.debug ("Verified service group " + aServiceGroup.getID () + " is owned by user '" + aCurrentUser.getUserName () + "'");
 
     return aServiceGroup;
   }

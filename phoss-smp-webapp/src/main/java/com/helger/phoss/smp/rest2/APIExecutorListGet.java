@@ -60,7 +60,7 @@ public final class APIExecutorListGet implements IAPIExecutor
         // Unspecified extension
         final com.helger.smpclient.peppol.jaxb.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
                                                                                                                                                   aBasicAuth);
-        aBytes = new SMPMarshallerServiceGroupReferenceListType ().getAsBytes (ret);
+        aBytes = new SMPMarshallerServiceGroupReferenceListType (true).getAsBytes (ret);
         break;
       }
       case BDXR:
@@ -68,7 +68,7 @@ public final class APIExecutorListGet implements IAPIExecutor
         // Unspecified extension
         final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
                                                                                                                                              aBasicAuth);
-        aBytes = new BDXR1MarshallerServiceGroupReferenceListType ().getAsBytes (ret);
+        aBytes = new BDXR1MarshallerServiceGroupReferenceListType (true).getAsBytes (ret);
         break;
       }
       default:

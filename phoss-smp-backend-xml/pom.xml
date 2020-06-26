@@ -59,7 +59,7 @@
       <artifactId>phoss-smp-backend</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.photon</groupId>
       <artifactId>ph-oton-security</artifactId>
     </dependency>
     

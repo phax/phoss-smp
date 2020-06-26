@@ -10,8 +10,6 @@
  */
 package com.helger.phoss.smp.backend;
 
-import java.util.function.Supplier;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -75,8 +73,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     return ret;
   }
 
-  public void registerSMPBackend (@Nonnull @Nonempty final String sID,
-                                  @Nonnull final ISupplier <? extends ISMPManagerProvider> aFactory)
+  public void registerSMPBackend (@Nonnull @Nonempty final String sID, @Nonnull final ISupplier <? extends ISMPManagerProvider> aFactory)
   {
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (aFactory, "Factory");
@@ -103,7 +100,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     if (StringHelper.hasNoText (sBackendID))
       return null;
 
-    final ISupplier <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLocked ( () -> m_aMap.get (sBackendID));
+    final ISupplier <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLockedGet ( () -> m_aMap.get (sBackendID));
     return aFactory == null ? null : aFactory.get ();
   }
 
@@ -115,7 +112,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   @ReturnsMutableCopy
   public ICommonsSet <String> getAllBackendIDs ()
   {
-    return m_aRWLock.readLocked ((Supplier <ICommonsSet <String>>) m_aMap::copyOfKeySet);
+    return m_aRWLock.readLockedGet (m_aMap::copyOfKeySet);
   }
 
   /**

@@ -76,7 +76,7 @@ public final class ServiceMetadataInterfaceFillDBTest extends AbstractSMPWebAppS
 
         final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30.getAsDocumentTypeIdentifier ();
 
-        final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS5A_V3.getAsProcessIdentifier ();
+        final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
 
         for (final ESMPTransportProfile eTP : new ESMPTransportProfile [] { ESMPTransportProfile.TRANSPORT_PROFILE_AS2,
                                                                             ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2 })
@@ -90,8 +90,7 @@ public final class ServiceMetadataInterfaceFillDBTest extends AbstractSMPWebAppS
             aProcess.setProcessIdentifier (aProcID);
             final ServiceEndpointList aSEL = new ServiceEndpointList ();
             final EndpointType aEndpoint = new EndpointType ();
-            aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/" +
-                                                                                                eTP.getID ()));
+            aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/" + eTP.getID ()));
             aEndpoint.setRequireBusinessLevelSignature (false);
             aEndpoint.setCertificate ("blacert");
             aEndpoint.setServiceDescription ("Unit test service");
