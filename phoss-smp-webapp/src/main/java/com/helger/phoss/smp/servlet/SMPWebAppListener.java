@@ -27,6 +27,7 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.regex.RegExHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.network.proxy.ProxySelectorProxySettingsManager;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettingsManager;
@@ -141,6 +142,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                           "'!");
     if (LOGGER.isInfoEnabled ())
       LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
+
+    if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.hasNoText (SMPWebAppConfiguration.getImprintText ()))
+      LOGGER.warn ("The custom Imprint is enabled in the configuration file, but no imprint text is configured. Therefore no imprint will be shown.");
   }
 
   @Override

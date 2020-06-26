@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.app;
 
+import java.net.URL;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -25,6 +27,10 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.io.resource.IReadableResource;
+import com.helger.commons.string.StringHelper;
+import com.helger.commons.url.ISimpleURL;
+import com.helger.commons.url.SimpleURL;
+import com.helger.commons.url.URLHelper;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.settings.ISettings;
 import com.helger.settings.exchange.configfile.ConfigFile;
@@ -69,7 +75,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
     s_aConfigFile = aCFB.build ();
     if (!s_aConfigFile.isRead ())
       throw new IllegalStateException ("Failed to read Peppol SMP UI properties from " + aCFB.getAllPaths ());
-    LOGGER.info ("Read Peppol SMP UI properties from " + s_aConfigFile.getReadResource ().getPath ());
+    LOGGER.info ("Read " + CSMP.APPLICATION_TITLE + " UI properties from " + s_aConfigFile.getReadResource ().getPath ());
   }
 
   @Deprecated
@@ -219,5 +225,78 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static boolean isPublicLoginEnabled ()
   {
     return getConfigFile ().getAsBoolean ("webapp.public.login.enabled", true);
+  }
+
+  /**
+   * Setting for issue #132
+   *
+   * @return <code>true</code> if a custom imprint should be shown in the
+   *         footer, <code>false</code> if not.
+   * @since 5.2.4
+   */
+  public static boolean isImprintEnabled ()
+  {
+    return getConfigFile ().getAsBoolean ("webapp.imprint.enabled", false);
+  }
+
+  /**
+   * This method is only called if {@link #isImprintEnabled()} returns
+   * <code>true</code>.
+   *
+   * @return The text used to reference the Imprint. May be <code>null</code>.
+   * @since 5.2.4
+   */
+  @Nullable
+  public static String getImprintText ()
+  {
+    return getConfigFile ().getAsString ("webapp.imprint.text");
+  }
+
+  /**
+   * This method is only called if {@link #isImprintEnabled()} returns
+   * <code>true</code>.
+   *
+   * @return The HRef the Imprint should link to. May be <code>null</code> in
+   *         which case only the text is rendered.
+   * @since 5.2.4
+   */
+  @Nullable
+  public static ISimpleURL getImprintHref ()
+  {
+    // Take only valid URLs
+    final URL aHref = URLHelper.getAsURL (getConfigFile ().getAsString ("webapp.imprint.href"), false);
+    return aHref == null ? null : new SimpleURL (aHref);
+  }
+
+  /**
+   * This method is only called if {@link #isImprintEnabled()} returns
+   * <code>true</code> and if a imprint link is returned by
+   * {@link #getImprintHref()}.
+   *
+   * @return The HTML link target to be used for the Imprint link. May be
+   *         <code>null</code> in which case the link opens in the current
+   *         window.
+   * @since 5.2.4
+   */
+  @Nullable
+  public static String getImprintTarget ()
+  {
+    return getConfigFile ().getAsString ("webapp.imprint.target");
+  }
+
+  /**
+   * This method is only called if {@link #isImprintEnabled()} returns
+   * <code>true</code>.
+   *
+   * @return A String of whitespace separated CSS classes that should be applied
+   *         on the Imprint HTML node (text or link). The supported classes
+   *         depend on the user interface framework that is in use (currently
+   *         Bootstrap 4).
+   * @since 5.2.4
+   */
+  @Nullable
+  public static String getImprintCSSClasses ()
+  {
+    return StringHelper.trim (getConfigFile ().getAsString ("webapp.imprint.cssclasses"));
   }
 }
