@@ -97,22 +97,34 @@ public final class NiceNameUI
   @Nonnull
   public static IHCNode getDocumentTypeID (@Nonnull final IDocumentTypeIdentifier aDocTypeID)
   {
-    final String sURI = aDocTypeID.getURIEncoded ();
-    return _createID (sURI, NiceNameHandler.getDocTypeNiceName (sURI), true);
+    return getDocumentTypeID (aDocTypeID, true);
+  }
+
+  @Nonnull
+  public static IHCNode getDocumentTypeID (@Nonnull final IDocumentTypeIdentifier aDocTypeID, final boolean bInDetails)
+  {
+    return _createID (aDocTypeID.getURIEncoded (), NiceNameHandler.getDocTypeNiceName (aDocTypeID), bInDetails);
   }
 
   @Nonnull
   public static IHCNode getProcessID (@Nonnull final IDocumentTypeIdentifier aDocTypeID, @Nonnull final IProcessIdentifier aProcessID)
   {
+    return getProcessID (aDocTypeID, aProcessID, true);
+  }
+
+  @Nonnull
+  public static IHCNode getProcessID (@Nonnull final IDocumentTypeIdentifier aDocTypeID,
+                                      @Nonnull final IProcessIdentifier aProcessID,
+                                      final boolean bInDetails)
+  {
     final String sURI = aProcessID.getURIEncoded ();
-    final boolean bInDetails = true;
 
     // Check direct match first
     NiceNameEntry aNN = NiceNameHandler.getProcessNiceName (sURI);
     if (aNN != null)
       return _createID (sURI, aNN, bInDetails);
 
-    aNN = NiceNameHandler.getDocTypeNiceName (aDocTypeID.getURIEncoded ());
+    aNN = NiceNameHandler.getDocTypeNiceName (aDocTypeID);
     if (aNN != null)
     {
       if (aNN.containsProcessID (aProcessID))

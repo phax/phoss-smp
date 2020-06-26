@@ -57,7 +57,11 @@ public final class MenuSecure
       aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupExchange (CMenuSecure.MENU_SERVICE_GROUPS_EXCHANGE));
     }
     {
-      final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new PageSecureEndpoint (CMenuSecure.MENU_ENDPOINTS));
+      final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new BasePageShowChildren <WebPageExecutionContext> (CMenuSecure.MENU_ENDPOINTS,
+                                                                                                                     "Endpoints",
+                                                                                                                     aMenuTree));
+      aMenuTree.createItem (aEndpoints, new PageSecureEndpointList (CMenuSecure.MENU_ENDPOINT_LIST));
+      aMenuTree.createItem (aEndpoints, new PageSecureEndpointTree (CMenuSecure.MENU_ENDPOINT_TREE));
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointChangeURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_URL));
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointChangeCertificate (CMenuSecure.MENU_ENDPOINTS_CHANGE_CERTIFICATE));
     }

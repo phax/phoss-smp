@@ -25,19 +25,14 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.helger.collection.multimap.IMultiMapListBased;
-import com.helger.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.attr.StringMap;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTFromString;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
@@ -45,15 +40,8 @@ import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCTextArea;
-import com.helger.html.hc.html.grouping.HCDiv;
-import com.helger.html.hc.html.grouping.HCLI;
-import com.helger.html.hc.html.grouping.HCUL;
-import com.helger.html.hc.html.tabular.HCCol;
-import com.helger.html.hc.html.tabular.HCRow;
-import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -75,15 +63,10 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.nicename.NiceNameUI;
-import com.helger.phoss.smp.rest2.Rest2Filter;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPTransportProfileSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
-import com.helger.photon.app.url.LinkHelper;
-import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
-import com.helger.photon.bootstrap4.badge.BootstrapBadge;
-import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
@@ -91,24 +74,16 @@ import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
 import com.helger.photon.bootstrap4.grid.BootstrapRow;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
-import com.helger.photon.bootstrap4.table.BootstrapTable;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap4.uictrls.datetimepicker.BootstrapDateTimePicker;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
-import com.helger.photon.core.form.SessionBackedRequestField;
-import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uicore.page.handler.IWebPageActionHandler;
-import com.helger.photon.uictrls.datatables.DataTables;
-import com.helger.photon.uictrls.datatables.column.DTCol;
-import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
@@ -119,7 +94,7 @@ import com.helger.xml.microdom.serialize.MicroReader;
  *
  * @author Philip Helger
  */
-public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServiceInformation>
+public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServiceInformation>
 {
   private static final String FIELD_SERVICE_GROUP_ID = "sgid";
   private static final String FIELD_DOCTYPE_ID_SCHEME = "doctypeidscheme";
@@ -141,16 +116,12 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   private static final String REQUEST_ATTR_PROCESS = "$process";
   private static final String REQUEST_ATTR_ENDPOINT = "$endpoint";
 
-  private static final String ACTION_DELETE_DOCUMENT_TYPE = "del.doctype";
-  private static final String ACTION_DELETE_PROCESS = "del.process";
+  protected static final String ACTION_DELETE_DOCUMENT_TYPE = "del.doctype";
+  protected static final String ACTION_DELETE_PROCESS = "del.process";
 
-  private static final String FIELD_VIEW_TYPE = "smp.endpoint.view";
-  private static final String VIEW_FLAT = "flat";
-  private static final String VIEW_TREE = "tree";
-
-  public PageSecureEndpoint (@Nonnull @Nonempty final String sID)
+  public AbstractPageSecureEndpoint (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
   {
-    super (sID, "Endpoints");
+    super (sID, sName);
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPServiceInformation, WebPageExecutionContext> ()
     {
       @Override
@@ -239,6 +210,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
         final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (sProcessIDScheme, sProcessIDValue);
         final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);
         if (aProcess != null)
+        {
           if (aServiceInfoMgr.deleteSMPProcess (aSelectedObject, aProcess).isChanged ())
             aWPEC.postRedirectGetInternal (success ("The selected process '" +
                                                     aProcess.getProcessIdentifier ().getURIEncoded () +
@@ -251,6 +223,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                   "' from the selected document type '" +
                                                   aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded () +
                                                   "'!"));
+        }
         return EShowList.SHOW_LIST;
       }
     });
@@ -264,7 +237,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     if (aServiceGroupMgr.getSMPServiceGroupCount () == 0)
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No service group is present! At least one service group must be present to create an endpoint for it."));
+      aNodeList.addChild (warn ("No service group is present! At least one service group must be present to create an endpoint for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
                                                 .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SERVICE_GROUPS))
                                                 .setIcon (EDefaultIcon.YES));
@@ -274,7 +247,7 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     if (aTransportProfileMgr.getSMPTransportProfileCount () == 0)
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No transport profile is present! At least one transport profile must be present to create an endpoint for it."));
+      aNodeList.addChild (warn ("No transport profile is present! At least one transport profile must be present to create an endpoint for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new transport profile")
                                                 .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_TRANSPORT_PROFILES))
                                                 .setIcon (EDefaultIcon.YES));
@@ -337,9 +310,9 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
   }
 
   @Nonnull
-  private static StringMap _createParamMap (@Nonnull final ISMPServiceInformation aServiceInfo,
-                                            @Nullable final ISMPProcess aProcess,
-                                            @Nullable final ISMPEndpoint aEndpoint)
+  protected static StringMap _createParamMap (@Nonnull final ISMPServiceInformation aServiceInfo,
+                                              @Nullable final ISMPProcess aProcess,
+                                              @Nullable final ISMPEndpoint aEndpoint)
   {
     final StringMap ret = new StringMap ();
     ret.putIn (FIELD_SERVICE_GROUP_ID, aServiceInfo.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ());
@@ -847,178 +820,5 @@ public final class PageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServic
                                                                                                                        : null)))
                                                  .setHelpText ("Optional extension to the endpoint. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
-  }
-
-  @Override
-  protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
-  {
-    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-
-    // Default view is now tree view
-    final SessionBackedRequestField aSBRF = new SessionBackedRequestField (FIELD_VIEW_TYPE, VIEW_TREE);
-    final boolean bTreeView = VIEW_TREE.equals (aSBRF.getRequestValue ());
-
-    final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-    aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
-    aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    if (bTreeView)
-      aToolbar.addButton ("Flat view", aWPEC.getSelfHref ().add (FIELD_VIEW_TYPE, VIEW_FLAT), EDefaultIcon.MAGNIFIER);
-    else
-      aToolbar.addButton ("Tree view", aWPEC.getSelfHref ().add (FIELD_VIEW_TYPE, VIEW_TREE), EDefaultIcon.MAGNIFIER);
-    aNodeList.addChild (aToolbar);
-
-    if (bTreeView)
-    {
-      // Create sorted list of service groups
-      final IMultiMapListBased <ISMPServiceGroup, ISMPServiceInformation> aMap = new MultiHashMapArrayListBased <> ();
-      aServiceInfoMgr.getAllSMPServiceInformation ().forEach (x -> aMap.putSingle (x.getServiceGroup (), x));
-
-      final HCUL aULSG = new HCUL ();
-      final ICommonsList <ISMPServiceGroup> aServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ()
-                                                                             .getSortedInline (ISMPServiceGroup.comparator ());
-      for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
-      {
-        // Print service group
-        final IParticipantIdentifier aParticipantID = aServiceGroup.getParticpantIdentifier ();
-        final HCLI aLISG = aULSG.addAndReturnItem (new HCA (createViewURL (aWPEC,
-                                                                           CMenuSecure.MENU_SERVICE_GROUPS,
-                                                                           aServiceGroup)).addChild (aParticipantID.getURIEncoded ()));
-        final HCUL aULDT = new HCUL ();
-
-        final ICommonsList <ISMPServiceInformation> aServiceInfos = aMap.get (aServiceGroup);
-        if (aServiceInfos != null)
-        {
-          for (final ISMPServiceInformation aServiceInfo : aServiceInfos.getSortedInline (ISMPServiceInformation.comparator ()))
-          {
-            final HCUL aULP = new HCUL ();
-            final IDocumentTypeIdentifier aDocTypeID = aServiceInfo.getDocumentTypeIdentifier ();
-            final ICommonsList <ISMPProcess> aProcesses = aServiceInfo.getAllProcesses ().getSortedInline (ISMPProcess.comparator ());
-            for (final ISMPProcess aProcess : aProcesses)
-            {
-              final BootstrapTable aEPTable = new BootstrapTable (HCCol.perc (40), HCCol.perc (40), HCCol.perc (20)).setBordered (true);
-              final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ().getSortedInline (ISMPEndpoint.comparator ());
-              for (final ISMPEndpoint aEndpoint : aEndpoints)
-              {
-                final StringMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
-
-                final HCRow aBodyRow = aEPTable.addBodyRow ();
-                aBodyRow.addCell (new HCA (createViewURL (aWPEC, aServiceInfo, aParams)).addChild (aEndpoint.getTransportProfile ()));
-
-                aBodyRow.addCell (aEndpoint.getEndpointReference ());
-
-                final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
-                final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);
-                final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
-                final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
-                                                                                      Rest2Filter.PATH_SERVICES +
-                                                                                      aDocTypeID.getURIPercentEncoded ());
-                aBodyRow.addCell (new HCTextNode (" "),
-                                  new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
-                                  new HCTextNode (" "),
-                                  new HCA (aCopyURL).setTitle ("Copy endpoint").addChild (EDefaultIcon.COPY.getAsNode ()),
-                                  new HCTextNode (" "),
-                                  new HCA (aDeleteURL).setTitle ("Delete endpoint").addChild (EDefaultIcon.DELETE.getAsNode ()),
-                                  new HCTextNode (" "),
-                                  new HCA (aPreviewURL).setTitle ("Perform SMP query on endpoint")
-                                                       .setTargetBlank ()
-                                                       .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
-              }
-
-              // Show process + endpoints
-              final HCLI aLI = aULP.addItem ();
-              final HCDiv aDiv = div (NiceNameUI.getProcessID (aDocTypeID, aProcess.getProcessIdentifier ()));
-              aLI.addChild (aDiv);
-              if (aEndpoints.isEmpty ())
-              {
-                aDiv.addChild (" ")
-                    .addChild (new HCA (aWPEC.getSelfHref ()
-                                             .addAll (_createParamMap (aServiceInfo, aProcess, (ISMPEndpoint) null))
-                                             .add (CPageParam.PARAM_ACTION, ACTION_DELETE_PROCESS)).setTitle ("Delete process")
-                                                                                                   .addChild (EDefaultIcon.DELETE.getAsNode ()));
-              }
-              else
-                aLI.addChild (aEPTable);
-            }
-
-            // Show document types + children
-            final HCLI aLI = aULDT.addItem ();
-            final HCDiv aDiv = div ().addChild (NiceNameUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()))
-                                     .addChild (" ")
-                                     .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
-                                                                                                Rest2Filter.PATH_SERVICES +
-                                                                                                aDocTypeID.getURIPercentEncoded ())).setTitle ("Perform SMP query on document type ")
-                                                                                                                                    .setTargetBlank ()
-                                                                                                                                    .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
-            aLI.addChild (aDiv);
-            if (aProcesses.isEmpty ())
-            {
-              aDiv.addChild (" ")
-                  .addChild (new HCA (aWPEC.getSelfHref ()
-                                           .addAll (_createParamMap (aServiceInfo, (ISMPProcess) null, (ISMPEndpoint) null))
-                                           .add (CPageParam.PARAM_ACTION, ACTION_DELETE_DOCUMENT_TYPE)).setTitle ("Delete document type")
-                                                                                                       .addChild (EDefaultIcon.DELETE.getAsNode ()));
-            }
-            else
-              aLI.addChild (aULP);
-          }
-        }
-        if (aServiceInfos == null || aServiceInfos.isEmpty () || aULDT.hasNoChildren ())
-          aLISG.addChild (new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("This service group has no assigned endpoints!"));
-        else
-          aLISG.addChild (aULDT);
-      }
-      aNodeList.addChild (aULSG);
-    }
-    else
-    {
-      final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING).setDataSort (0, 1, 2, 3),
-                                          new DTCol ("Document type ID").setDataSort (1, 0, 2, 3),
-                                          new DTCol ("Process ID").setDataSort (2, 0, 1, 3),
-                                          new DTCol ("Transport profile").setDataSort (3, 0, 1, 2),
-                                          new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-      for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformation ())
-      {
-        final ISMPServiceGroup aServiceGroup = aServiceInfo.getServiceGroup ();
-        final IParticipantIdentifier aParticipantID = aServiceGroup.getParticpantIdentifier ();
-        final IDocumentTypeIdentifier aDocTypeID = aServiceInfo.getDocumentTypeIdentifier ();
-        for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
-        {
-          final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
-          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-          {
-            final StringMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
-
-            final HCRow aRow = aTable.addBodyRow ();
-            aRow.addCell (new HCA (createViewURL (aWPEC, aServiceInfo, aParams)).addChild (aServiceGroup.getID ()));
-            aRow.addCell (NiceNameUI.getDocumentTypeID (aDocTypeID));
-            aRow.addCell (NiceNameUI.getProcessID (aDocTypeID, aProcessID));
-            aRow.addCell (new HCA (createViewURL (aWPEC,
-                                                  CMenuSecure.MENU_TRANSPORT_PROFILES,
-                                                  aEndpoint.getTransportProfile ())).addChild (aEndpoint.getTransportProfile ()));
-
-            final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
-            final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);
-            final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
-            final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
-                                                                                  Rest2Filter.PATH_SERVICES +
-                                                                                  aDocTypeID.getURIPercentEncoded ());
-            aRow.addCell (new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
-                          new HCTextNode (" "),
-                          new HCA (aCopyURL).setTitle ("Copy endpoint").addChild (EDefaultIcon.COPY.getAsNode ()),
-                          new HCTextNode (" "),
-                          new HCA (aDeleteURL).setTitle ("Delete endpoint").addChild (EDefaultIcon.DELETE.getAsNode ()),
-                          new HCTextNode (" "),
-                          new HCA (aPreviewURL).setTitle ("Perform SMP query on endpoint")
-                                               .setTargetBlank ()
-                                               .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
-          }
-        }
-      }
-      final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-      aNodeList.addChild (aTable).addChild (aDataTables);
-    }
   }
 }

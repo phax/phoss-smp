@@ -33,6 +33,7 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -123,6 +124,12 @@ public final class NiceNameHandler
   }
 
   @Nullable
+  public static NiceNameEntry getDocTypeNiceName (@Nullable final IDocumentTypeIdentifier aDocTypeID)
+  {
+    return aDocTypeID == null ? null : getDocTypeNiceName (aDocTypeID.getURIEncoded ());
+  }
+
+  @Nullable
   public static NiceNameEntry getDocTypeNiceName (@Nullable final String sID)
   {
     if (StringHelper.hasNoText (sID))
@@ -136,6 +143,12 @@ public final class NiceNameHandler
     {
       RWLOCK.readLock ().unlock ();
     }
+  }
+
+  @Nullable
+  public static NiceNameEntry getProcessNiceName (@Nullable final IProcessIdentifier aProcessID)
+  {
+    return aProcessID == null ? null : getProcessNiceName (aProcessID.getURIEncoded ());
   }
 
   @Nullable
