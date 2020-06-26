@@ -190,19 +190,19 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         }
 
         if (StringHelper.hasNoText (sNewCert))
-          aFormErrors.addFieldInfo (FIELD_NEW_CERTIFICATE, "A new certificate must be provided");
+          aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE, "A new certificate must be provided");
         else
         {
           final String sErrorDetails = _getCertificateParsingError (sNewCert);
           if (sErrorDetails != null)
-            aFormErrors.addFieldInfo (FIELD_NEW_CERTIFICATE, "The new certificate is invalid: " + sErrorDetails);
+            aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE, "The new certificate is invalid: " + sErrorDetails);
           else
             if (sNewCert.equals (sOldCert))
-              aFormErrors.addFieldInfo (FIELD_NEW_CERTIFICATE, "The new certificate is identical to the old certificate");
+              aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE, "The new certificate is identical to the old certificate");
         }
 
         // Validate parameters
-        if (aFormErrors.isEmpty ())
+        if (aFormErrors.containsNoError ())
         {
           // Modify all endpoints
           int nChangedEndpoints = 0;
