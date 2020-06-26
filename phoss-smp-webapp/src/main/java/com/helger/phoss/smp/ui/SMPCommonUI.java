@@ -19,9 +19,7 @@ package com.helger.phoss.smp.ui;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -32,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import com.helger.commons.CGlobal;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
@@ -41,6 +38,7 @@ import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.math.MathHelper;
+import com.helger.datetime.util.PDTDisplayHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCEditPassword;
@@ -98,10 +96,7 @@ import com.helger.xml.serialize.write.XMLWriter;
 public final class SMPCommonUI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPCommonUI.class);
-  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25)
-                                                                                     .addItem (50)
-                                                                                     .addItem (100)
-                                                                                     .addItemAll ();
+  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25).addItem (50).addItem (100).addItemAll ();
 
   private SMPCommonUI ()
   {}
@@ -116,8 +111,7 @@ public final class SMPCommonUI
                                                           .data (new JSAssocArray ().add (AjaxExecutorDataTables.OBJECT_ID,
                                                                                           aTable.getID ())))
                  .setServerFilterType (EDataTablesFilterType.ALL_TERMS_PER_ROW)
-                 .setTextLoadingURL (CAjax.DATATABLES_I18N.getInvocationURL (aRequestScope),
-                                     AjaxExecutorDataTablesI18N.LANGUAGE_ID)
+                 .setTextLoadingURL (CAjax.DATATABLES_I18N.getInvocationURL (aRequestScope), AjaxExecutorDataTablesI18N.LANGUAGE_ID)
                  .addPlugin (new DataTablesPluginSearchHighlight ());
     });
 
@@ -172,40 +166,8 @@ public final class SMPCommonUI
     return aSB.append (" and ").append (aParts.getLast ()).toString ();
   }
 
-  // Based on PeriodFuncTest code
-  // TODO use PDTDisplayHelper in ph-datetime 9.3.10
   @Nonnull
-  @Nonempty
-  private static String _getPeriodText (@Nonnull final LocalDateTime aNowLDT, @Nonnull final LocalDateTime aNotAfter)
-  {
-    final Period aPeriod = Period.between (aNowLDT.toLocalDate (), aNotAfter.toLocalDate ());
-    final Duration aDuration = Duration.between (aNowLDT.toLocalTime (), aNotAfter.toLocalTime ());
-
-    final int nYears = aPeriod.getYears ();
-    final int nMonth = aPeriod.getMonths ();
-    int nDays = aPeriod.getDays ();
-
-    long nTotalSecs = aDuration.getSeconds ();
-    if (nTotalSecs < 0)
-    {
-      if (nDays > 0 || nMonth > 0 || nYears > 0)
-      {
-        nTotalSecs += CGlobal.SECONDS_PER_DAY;
-        nDays--;
-      }
-    }
-
-    final long nHours = nTotalSecs / CGlobal.SECONDS_PER_HOUR;
-    nTotalSecs -= nHours * CGlobal.SECONDS_PER_HOUR;
-    final long nMinutes = nTotalSecs / CGlobal.SECONDS_PER_MINUTE;
-    nTotalSecs -= nMinutes * CGlobal.SECONDS_PER_MINUTE;
-
-    return _getPeriodString (nYears, nMonth, nDays, nHours, nMinutes, nTotalSecs);
-  }
-
-  @Nonnull
-  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC,
-                                                   @Nullable final String sPreselectedUserName)
+  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC, @Nullable final String sPreselectedUserName)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -243,8 +205,7 @@ public final class SMPCommonUI
                       JQuery.idRef (sIDErrorField).empty ().append (aJSData.ref (AjaxExecutorPublicLogin.JSON_HTML)));
       aOnClick.add (new JQueryAjaxBuilder ().url (CAjax.LOGIN.getInvocationURI (aRequestScope))
                                             .method (EHttpMethod.POST)
-                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID,
-                                                                            JQuery.idRef (sIDUserName).val ())
+                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID, JQuery.idRef (sIDUserName).val ())
                                                                       .add (CLogin.REQUEST_ATTR_PASSWORD,
                                                                             JQuery.idRef (sIDPassword).val ()))
                                             .success (aJSSuccess)
@@ -279,7 +240,7 @@ public final class SMPCommonUI
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotAfter, aDisplayLocale) + " "),
                           aNowLDT.isAfter (aNotAfter) ? new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NO LONGER VALID!!!")
                                                       : new HCDiv ().addChild ("Valid for: " +
-                                                                               _getPeriodText (aNowLDT, aNotAfter)));
+                                                                               PDTDisplayHelper.getPeriodTextEN (aNowLDT, aNotAfter)));
 
     if (aPublicKey instanceof RSAPublicKey)
     {
