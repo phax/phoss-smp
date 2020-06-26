@@ -310,9 +310,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   }
 
   @Nonnull
-  protected static StringMap _createParamMap (@Nonnull final ISMPServiceInformation aServiceInfo,
-                                              @Nullable final ISMPProcess aProcess,
-                                              @Nullable final ISMPEndpoint aEndpoint)
+  protected static StringMap createParamMap (@Nonnull final ISMPServiceInformation aServiceInfo,
+                                             @Nullable final ISMPProcess aProcess,
+                                             @Nullable final ISMPEndpoint aEndpoint)
   {
     final StringMap ret = new StringMap ();
     ret.putIn (FIELD_SERVICE_GROUP_ID, aServiceInfo.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ());
@@ -350,9 +350,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     {
       // Edit object
       aToolbar.addButtonEdit (aDisplayLocale,
-                              createEditURL (aWPEC, aSelectedObject).addAll (_createParamMap (aSelectedObject,
-                                                                                              aSelectedProcess,
-                                                                                              aSelectedEndpoint)));
+                              createEditURL (aWPEC, aSelectedObject).addAll (createParamMap (aSelectedObject,
+                                                                                             aSelectedProcess,
+                                                                                             aSelectedEndpoint)));
     }
 
     // Callback
@@ -381,7 +381,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     {
       final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
       final HCNodeList aCtrl = new HCNodeList ();
-      aCtrl.addChild (div (NiceNameUI.getDocumentTypeID (aDocumentTypeID)));
+      aCtrl.addChild (div (NiceNameUI.getDocumentTypeID (aDocumentTypeID, true)));
       try
       {
         final IPeppolDocumentTypeIdentifierParts aParts = PeppolDocumentTypeIdentifierParts.extractFromIdentifier (aDocumentTypeID);
@@ -397,12 +397,14 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Process ID")
                                                  .setCtrl (NiceNameUI.getProcessID (aSelectedObject.getDocumentTypeIdentifier (),
-                                                                                    aSelectedProcess.getProcessIdentifier ())));
+                                                                                    aSelectedProcess.getProcessIdentifier (),
+                                                                                    true)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Transport profile")
                                                  .setCtrl (new HCA (createViewURL (aWPEC,
                                                                                    CMenuSecure.MENU_TRANSPORT_PROFILES,
-                                                                                   aSelectedEndpoint.getTransportProfile ())).addChild (aSelectedEndpoint.getTransportProfile ())));
+                                                                                   aSelectedEndpoint.getTransportProfile ())).addChild (NiceNameUI.getTransportProfile (aSelectedEndpoint.getTransportProfile (),
+                                                                                                                                                                        true))));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
                                                  .setCtrl (StringHelper.hasText (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),

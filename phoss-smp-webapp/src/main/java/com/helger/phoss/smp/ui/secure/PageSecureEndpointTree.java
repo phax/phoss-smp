@@ -79,7 +79,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
     aToolbar.addButton ("List view", aWPEC.getLinkToMenuItem (CMenuSecure.MENU_ENDPOINT_LIST), EDefaultIcon.MAGNIFIER);
     aNodeList.addChild (aToolbar);
 
-    // Create sorted list of service groups
+    // Create list of service groups
     final IMultiMapListBased <ISMPServiceGroup, ISMPServiceInformation> aMap = new MultiHashMapArrayListBased <> ();
     aServiceInfoMgr.getAllSMPServiceInformation ().forEach (x -> aMap.putSingle (x.getServiceGroup (), x));
 
@@ -102,6 +102,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
         {
           final HCUL aULP = new HCUL ();
           final IDocumentTypeIdentifier aDocTypeID = aServiceInfo.getDocumentTypeIdentifier ();
+
           final ICommonsList <ISMPProcess> aProcesses = aServiceInfo.getAllProcesses ().getSortedInline (ISMPProcess.comparator ());
           for (final ISMPProcess aProcess : aProcesses)
           {
@@ -109,10 +110,14 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
             final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ().getSortedInline (ISMPEndpoint.comparator ());
             for (final ISMPEndpoint aEndpoint : aEndpoints)
             {
-              final StringMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
+              final StringMap aParams = createParamMap (aServiceInfo, aProcess, aEndpoint);
 
               final HCRow aBodyRow = aEPTable.addBodyRow ();
-              aBodyRow.addCell (new HCA (createViewURL (aWPEC, aServiceInfo, aParams)).addChild (aEndpoint.getTransportProfile ()));
+
+              final String sTransportProfile = aEndpoint.getTransportProfile ();
+              aBodyRow.addCell (new HCA (createViewURL (aWPEC,
+                                                        aServiceInfo,
+                                                        aParams)).addChild (NiceNameUI.getTransportProfile (sTransportProfile, false)));
 
               aBodyRow.addCell (aEndpoint.getEndpointReference ());
 
@@ -136,13 +141,13 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
 
             // Show process + endpoints
             final HCLI aLI = aULP.addItem ();
-            final HCDiv aDiv = div (NiceNameUI.getProcessID (aDocTypeID, aProcess.getProcessIdentifier ()));
+            final HCDiv aDiv = div (NiceNameUI.getProcessID (aDocTypeID, aProcess.getProcessIdentifier (), false));
             aLI.addChild (aDiv);
             if (aEndpoints.isEmpty ())
             {
               aDiv.addChild (" ")
                   .addChild (new HCA (aWPEC.getSelfHref ()
-                                           .addAll (_createParamMap (aServiceInfo, aProcess, (ISMPEndpoint) null))
+                                           .addAll (createParamMap (aServiceInfo, aProcess, (ISMPEndpoint) null))
                                            .add (CPageParam.PARAM_ACTION, ACTION_DELETE_PROCESS)).setTitle ("Delete process")
                                                                                                  .addChild (EDefaultIcon.DELETE.getAsNode ()));
             }
@@ -152,7 +157,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
 
           // Show document types + children
           final HCLI aLI = aULDT.addItem ();
-          final HCDiv aDiv = div ().addChild (NiceNameUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier ()))
+          final HCDiv aDiv = div ().addChild (NiceNameUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier (), false))
                                    .addChild (" ")
                                    .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
                                                                                               Rest2Filter.PATH_SERVICES +
@@ -164,7 +169,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
           {
             aDiv.addChild (" ")
                 .addChild (new HCA (aWPEC.getSelfHref ()
-                                         .addAll (_createParamMap (aServiceInfo, (ISMPProcess) null, (ISMPEndpoint) null))
+                                         .addAll (createParamMap (aServiceInfo, (ISMPProcess) null, (ISMPEndpoint) null))
                                          .add (CPageParam.PARAM_ACTION, ACTION_DELETE_DOCUMENT_TYPE)).setTitle ("Delete document type")
                                                                                                      .addChild (EDefaultIcon.DELETE.getAsNode ()));
           }

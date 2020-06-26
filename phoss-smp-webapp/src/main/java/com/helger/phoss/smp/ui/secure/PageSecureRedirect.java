@@ -227,7 +227,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                                                    CMenuSecure.MENU_SERVICE_GROUPS,
                                                                                    aSelectedObject.getServiceGroup ())).addChild (aSelectedObject.getServiceGroupID ())));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Document type ID")
-                                                 .setCtrl (aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
+                                                 .setCtrl (NiceNameUI.getDocumentTypeID (aSelectedObject.getDocumentTypeIdentifier (),
+                                                                                         true)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Target URL")
                                                  .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getTargetHref (), HC_Target.BLANK)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Subject unique identifier")
@@ -403,7 +404,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-      aRow.addCell (NiceNameUI.getDocumentTypeID (aCurObject.getDocumentTypeIdentifier ()));
+      aRow.addCell (NiceNameUI.getDocumentTypeID (aCurObject.getDocumentTypeIdentifier (), false));
       aRow.addCell (aCurObject.getTargetHref ());
 
       final ISimpleURL aEditURL = createEditURL (aWPEC, aCurObject).addAll (aParams);

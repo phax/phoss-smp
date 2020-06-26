@@ -29,7 +29,6 @@ import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
-import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -39,7 +38,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.nicename.NiceNameUI;
 import com.helger.phoss.smp.rest2.Rest2Filter;
 import com.helger.photon.app.url.LinkHelper;
@@ -71,7 +69,6 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
@@ -94,7 +91,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
         final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
-          final StringMap aParams = _createParamMap (aServiceInfo, aProcess, aEndpoint);
+          final StringMap aParams = createParamMap (aServiceInfo, aProcess, aEndpoint);
 
           final HCRow aRow = aTable.addBodyRow ();
           aRow.addCell (new HCA (createViewURL (aWPEC, aServiceInfo, aParams)).addChild (aServiceGroup.getID ()));
@@ -102,11 +99,9 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
           aRow.addCell (NiceNameUI.getProcessID (aDocTypeID, aProcessID, false));
 
           final String sTransportProfile = aEndpoint.getTransportProfile ();
-          final ISMPTransportProfile aTP = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfile);
           aRow.addCell (new HCA (createViewURL (aWPEC,
                                                 CMenuSecure.MENU_TRANSPORT_PROFILES,
-                                                sTransportProfile)).addChild (aTP != null ? badgeSuccess (aTP.getName ())
-                                                                                          : code (sTransportProfile)));
+                                                sTransportProfile)).addChild (NiceNameUI.getTransportProfile (sTransportProfile, false)));
 
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);

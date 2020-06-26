@@ -26,8 +26,11 @@ import com.helger.html.hc.html.textlevel.HCSmall;
 import com.helger.html.hc.html.textlevel.HCWBR;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
+import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
 
@@ -59,11 +62,11 @@ public final class NiceNameUI
   }
 
   @Nonnull
-  private static IHCNode _createFormattedID (@Nonnull final String sID,
-                                             @Nullable final String sName,
-                                             @Nullable final EBootstrapBadgeType eType,
-                                             final boolean bIsDeprecated,
-                                             final boolean bInDetails)
+  private static IHCNode createFormattedID (@Nonnull final String sID,
+                                            @Nullable final String sName,
+                                            @Nullable final EBootstrapBadgeType eType,
+                                            final boolean bIsDeprecated,
+                                            final boolean bInDetails)
   {
     if (sName == null)
     {
@@ -74,7 +77,13 @@ public final class NiceNameUI
     }
 
     final HCNodeList ret = new HCNodeList ();
-    ret.addChild (new BootstrapBadge (eType).addChild (sName));
+    final BootstrapBadge aBadge = new BootstrapBadge (eType).addChild (sName);
+    if (!bInDetails)
+    {
+      // Just as a tooltip
+      aBadge.setTitle (sID);
+    }
+    ret.addChild (aBadge);
     if (bIsDeprecated)
     {
       ret.addChild (" ").addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Identifier is deprecated"));
@@ -90,26 +99,14 @@ public final class NiceNameUI
   private static IHCNode _createID (@Nonnull final String sID, @Nullable final NiceNameEntry aNiceName, final boolean bInDetails)
   {
     if (aNiceName == null)
-      return _createFormattedID (sID, null, null, false, bInDetails);
-    return _createFormattedID (sID, aNiceName.getName (), EBootstrapBadgeType.SUCCESS, aNiceName.isDeprecated (), bInDetails);
-  }
-
-  @Nonnull
-  public static IHCNode getDocumentTypeID (@Nonnull final IDocumentTypeIdentifier aDocTypeID)
-  {
-    return getDocumentTypeID (aDocTypeID, true);
+      return createFormattedID (sID, null, null, false, bInDetails);
+    return createFormattedID (sID, aNiceName.getName (), EBootstrapBadgeType.SUCCESS, aNiceName.isDeprecated (), bInDetails);
   }
 
   @Nonnull
   public static IHCNode getDocumentTypeID (@Nonnull final IDocumentTypeIdentifier aDocTypeID, final boolean bInDetails)
   {
     return _createID (aDocTypeID.getURIEncoded (), NiceNameHandler.getDocTypeNiceName (aDocTypeID), bInDetails);
-  }
-
-  @Nonnull
-  public static IHCNode getProcessID (@Nonnull final IDocumentTypeIdentifier aDocTypeID, @Nonnull final IProcessIdentifier aProcessID)
-  {
-    return getProcessID (aDocTypeID, aProcessID, true);
   }
 
   @Nonnull
@@ -128,9 +125,19 @@ public final class NiceNameUI
     if (aNN != null)
     {
       if (aNN.containsProcessID (aProcessID))
-        return _createFormattedID (sURI, "Matching Process Identifier", EBootstrapBadgeType.SUCCESS, false, bInDetails);
-      return _createFormattedID (sURI, "Unexpected Process Identifier", EBootstrapBadgeType.WARNING, false, bInDetails);
+        return createFormattedID (sURI, "Matching Process Identifier", EBootstrapBadgeType.SUCCESS, false, bInDetails);
+      return createFormattedID (sURI, "Unexpected Process Identifier", EBootstrapBadgeType.WARNING, false, bInDetails);
     }
-    return _createFormattedID (sURI, null, null, false, bInDetails);
+    return createFormattedID (sURI, null, null, false, bInDetails);
+  }
+
+  @Nonnull
+  public static IHCNode getTransportProfile (@Nullable final String sTransportProfile, final boolean bInDetails)
+  {
+    final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
+    final ISMPTransportProfile aTP = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfile);
+    if (aTP == null)
+      return createFormattedID (sTransportProfile, null, null, false, bInDetails);
+    return createFormattedID (sTransportProfile, aTP.getName (), EBootstrapBadgeType.SUCCESS, aTP.isDeprecated (), bInDetails);
   }
 }
