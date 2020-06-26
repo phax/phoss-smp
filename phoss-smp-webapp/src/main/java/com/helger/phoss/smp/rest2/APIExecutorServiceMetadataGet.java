@@ -71,7 +71,8 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
                                                                                                                                         sDocumentTypeID);
 
         // Convert to DOM document
-        final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType (true);
+        // Disable XSD check, because Signature is added later
+        final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType (false);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
@@ -81,7 +82,8 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
                                                                                                                                    sDocumentTypeID);
 
         // Convert to DOM document
-        final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType (true);
+        // Disable XSD check, because Signature is added later
+        final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType (false);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
