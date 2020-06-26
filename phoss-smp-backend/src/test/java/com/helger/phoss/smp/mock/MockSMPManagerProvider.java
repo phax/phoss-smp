@@ -12,6 +12,7 @@ package com.helger.phoss.smp.mock;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -33,6 +34,12 @@ import com.helger.phoss.smp.settings.ISMPSettingsManager;
  */
 public final class MockSMPManagerProvider implements ISMPManagerProvider
 {
+  @Nonnull
+  public ETriState getBackendConnectionEstablishedDefaultState ()
+  {
+    return ETriState.TRUE;
+  }
+
   @Nonnull
   public ISMLInfoManager createSMLInfoMgr ()
   {

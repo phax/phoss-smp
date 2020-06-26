@@ -113,7 +113,7 @@ public final class SMPUserManagerSQL extends AbstractSMPJPAEnabledManager implem
   }
 
   @Nonnegative
-  public int getUserCount ()
+  public long getUserCount ()
   {
     JPAExecutionResult <Long> ret;
     ret = doSelect ( () -> {
@@ -124,7 +124,7 @@ public final class SMPUserManagerSQL extends AbstractSMPJPAEnabledManager implem
     {
       return 0;
     }
-    return ret.get ().intValue ();
+    return ret.get ().longValue ();
   }
 
   @Nonnull
@@ -186,14 +186,12 @@ public final class SMPUserManagerSQL extends AbstractSMPJPAEnabledManager implem
     return ret.get ();
   }
 
-  @Nonnull
-  public DBOwnership verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                      @Nonnull final ISMPUser aCredentials) throws SMPServerException
+  public void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
+                               @Nonnull final ISMPUser aCredentials) throws SMPServerException
   {
     // Resolve service group
     // to throw a 404 if a service group does not exist
-    final DBServiceGroup aServiceGroup = getEntityManager ().find (DBServiceGroup.class,
-                                                                   new DBServiceGroupID (aServiceGroupID));
+    final DBServiceGroup aServiceGroup = getEntityManager ().find (DBServiceGroup.class, new DBServiceGroupID (aServiceGroupID));
     if (aServiceGroup == null)
     {
       throw new SMPNotFoundException ("Service group " + aServiceGroupID.getURIEncoded () + " does not exist");
@@ -203,10 +201,7 @@ public final class SMPUserManagerSQL extends AbstractSMPJPAEnabledManager implem
     final DBOwnership aOwnership = getEntityManager ().find (DBOwnership.class, aOwnershipID);
     if (aOwnership == null)
     {
-      throw new SMPUnauthorizedException ("User '" +
-                                          aCredentials.getUserName () +
-                                          "' does not own " +
-                                          aServiceGroupID.getURIEncoded ());
+      throw new SMPUnauthorizedException ("User '" + aCredentials.getUserName () + "' does not own " + aServiceGroupID.getURIEncoded ());
     }
 
     if (LOGGER.isDebugEnabled ())
@@ -215,6 +210,5 @@ public final class SMPUserManagerSQL extends AbstractSMPJPAEnabledManager implem
                     " is owned by user '" +
                     aCredentials.getUserName () +
                     "'");
-    return aOwnership;
   }
 }

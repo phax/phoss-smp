@@ -13,6 +13,7 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.state.ETriState;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -42,6 +43,12 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
 
   public SMPManagerProviderSQL ()
   {}
+
+  @Nonnull
+  public ETriState getBackendConnectionEstablishedDefaultState ()
+  {
+    return ETriState.UNDEFINED;
+  }
 
   // TODO currently also file based
   @Nonnull

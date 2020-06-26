@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.xml.mgr;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.state.ETriState;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -53,6 +54,12 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
 
   public SMPManagerProviderXML ()
   {}
+
+  @Nonnull
+  public ETriState getBackendConnectionEstablishedDefaultState ()
+  {
+    return ETriState.TRUE;
+  }
 
   @Nonnull
   public ISMLInfoManager createSMLInfoMgr ()

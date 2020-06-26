@@ -16,9 +16,11 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.lang.ClassHelper;
+import com.helger.commons.state.ETriState;
 import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
@@ -60,6 +62,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPRedirectManager m_aRedirectMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
   private ISMPBusinessCardManager m_aBusinessCardMgr;
+  private ETriState m_eBackendConnectionEstablished = ETriState.UNDEFINED;
 
   /**
    * Set the manager provider to be used. This must be called exactly once
@@ -76,7 +79,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     if (s_aManagerProvider != null && aManagerProvider != null)
       throw new IllegalStateException ("A manager provider is already set. You cannot set this twice! Call it with null before setting a new one");
 
-    if (isGlobalSingletonInstantiated (SMPMetaManager.class))
+    if (aManagerProvider != null && isGlobalSingletonInstantiated (SMPMetaManager.class))
       LOGGER.warn ("Setting the manager provider after singleton instantiation may not have the desired effect.");
 
     s_aManagerProvider = aManagerProvider;
@@ -148,6 +151,10 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         // fall through. Certificate stays invalid, no SML access possible.
       }
 
+      m_eBackendConnectionEstablished = s_aManagerProvider.getBackendConnectionEstablishedDefaultState ();
+      if (m_eBackendConnectionEstablished == null)
+        throw new IllegalStateException ("Failed to get default backend connection state!");
+
       m_aPeppolURLProvider = s_aManagerProvider.createPeppolURLProvider ();
       if (m_aPeppolURLProvider == null)
         throw new IllegalStateException ("Failed to create Peppol URL Provider!");
@@ -177,8 +184,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_aRedirectMgr == null)
         throw new IllegalStateException ("Failed to create Redirect manager!");
 
-      m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr (m_aIdentifierFactory,
-                                                                                 m_aServiceGroupMgr);
+      m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
       if (m_aServiceInformationMgr == null)
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 
@@ -273,6 +279,18 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static boolean hasBusinessCardMgr ()
   {
     return getBusinessCardMgr () != null;
+  }
+
+  @Nonnull
+  public ETriState getBackendConnectionEstablished ()
+  {
+    return m_aRWLock.readLockedGet ( () -> m_eBackendConnectionEstablished);
+  }
+
+  public void setBackendConnectionEstablished (@Nonnull final ETriState eConnectionEstablished)
+  {
+    ValueEnforcer.notNull (eConnectionEstablished, "ConnectionEstablished");
+    m_aRWLock.writeLockedGet ( () -> m_eBackendConnectionEstablished = eConnectionEstablished);
   }
 
   /**

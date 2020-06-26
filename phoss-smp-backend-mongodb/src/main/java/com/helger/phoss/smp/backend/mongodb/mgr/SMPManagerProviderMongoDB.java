@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.state.ETriState;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
@@ -41,6 +42,12 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
 {
   public SMPManagerProviderMongoDB ()
   {}
+
+  @Nonnull
+  public ETriState getBackendConnectionEstablishedDefaultState ()
+  {
+    return ETriState.UNDEFINED;
+  }
 
   @Nonnull
   public ISMLInfoManager createSMLInfoMgr ()
