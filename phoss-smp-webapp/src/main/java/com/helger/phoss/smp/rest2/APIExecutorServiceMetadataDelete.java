@@ -56,7 +56,7 @@ public final class APIExecutorServiceMetadataDelete implements IAPIExecutor
     {
       final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
       final String sDocumentTypeID = aPathVariables.get (Rest2Filter.PARAM_DOCUMENT_TYPE_ID);
-      final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+      final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
       final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
       switch (SMPServerConfiguration.getRESTType ())

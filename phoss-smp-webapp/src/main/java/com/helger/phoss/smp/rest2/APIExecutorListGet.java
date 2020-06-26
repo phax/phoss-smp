@@ -49,7 +49,8 @@ public final class APIExecutorListGet implements IAPIExecutor
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sUserID = aPathVariables.get (Rest2Filter.PARAM_USER_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+    // No service group available
+    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, null);
     final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
     final byte [] aBytes;

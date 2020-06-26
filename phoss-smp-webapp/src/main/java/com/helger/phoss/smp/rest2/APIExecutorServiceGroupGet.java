@@ -49,7 +49,7 @@ public final class APIExecutorServiceGroupGet implements IAPIExecutor
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
 
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())

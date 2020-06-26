@@ -71,7 +71,7 @@ public final class APIExecutorServiceGroupPut implements IAPIExecutor
       else
       {
         final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-        final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+        final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
         final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
         ESuccess eSuccess = ESuccess.FAILURE;

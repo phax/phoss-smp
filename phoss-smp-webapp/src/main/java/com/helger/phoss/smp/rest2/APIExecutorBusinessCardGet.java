@@ -51,24 +51,20 @@ public final class APIExecutorBusinessCardGet implements IAPIExecutor
     if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
     {
       // PD integration is disabled
-      LOGGER.warn ("The " +
-                   SMPWebAppConfiguration.getDirectoryName () +
-                   " integration is disabled. getBusinessCard will not be executed.");
+      LOGGER.warn ("The " + SMPWebAppConfiguration.getDirectoryName () + " integration is disabled. getBusinessCard will not be executed.");
       aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
     }
     else
     {
       final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-      final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+      final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
       /*
        * getBusinessCard throws an exception if non is found
        */
       final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
       final byte [] aBytes = new PD3BusinessCardMarshaller ().getAsBytes (ret);
 
-      aUnifiedResponse.setContent (aBytes)
-                      .setMimeType (CMimeType.TEXT_XML)
-                      .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
     }
   }
 }

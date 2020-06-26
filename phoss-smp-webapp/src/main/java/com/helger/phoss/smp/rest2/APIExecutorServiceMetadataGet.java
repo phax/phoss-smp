@@ -59,7 +59,7 @@ public final class APIExecutorServiceMetadataGet implements IAPIExecutor
   {
     final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
     final String sDocumentTypeID = aPathVariables.get (Rest2Filter.PARAM_DOCUMENT_TYPE_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
 
     // Create the unsigned response document
     final Document aDoc;

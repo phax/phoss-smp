@@ -79,12 +79,10 @@ public final class APIExecutorBusinessCardPut implements IAPIExecutor
         else
         {
           final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-          final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+          final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
           final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
-          final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
-                                                                                                  aBC,
-                                                                                                  aBasicAuth);
+          final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID, aBC, aBasicAuth);
           if (eSuccess.isFailure ())
             aUnifiedResponse.setStatus (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           else
