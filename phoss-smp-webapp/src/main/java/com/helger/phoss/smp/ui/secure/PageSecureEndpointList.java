@@ -22,6 +22,9 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.attr.StringMap;
+import com.helger.commons.collection.impl.CommonsHashSet;
+import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.html.tabular.HCRow;
@@ -70,10 +73,18 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
+    final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformation ();
+
+    // Count unique service groups
+    final ICommonsSet <String> aServiceGroupIDs = new CommonsHashSet <> ();
+    aAllServiceInfos.findAllMapped (x -> x.getServiceGroupID (), aServiceGroupIDs::add);
+    final boolean bHideDetails = aServiceGroupIDs.size () > 1000;
+
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    aToolbar.addButton ("Tree view", aWPEC.getLinkToMenuItem (CMenuSecure.MENU_ENDPOINT_TREE), EDefaultIcon.MAGNIFIER);
+    if (!bHideDetails)
+      aToolbar.addButton ("Tree view", aWPEC.getLinkToMenuItem (CMenuSecure.MENU_ENDPOINT_TREE), EDefaultIcon.MAGNIFIER);
     aNodeList.addChild (aToolbar);
 
     final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING).setDataSort (0, 1, 2, 3),
@@ -81,7 +92,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
                                         new DTCol ("Process ID").setDataSort (2, 0, 1, 3),
                                         new DTCol ("Transport profile").setDataSort (3, 0, 1, 2),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformation ())
+    for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos)
     {
       final ISMPServiceGroup aServiceGroup = aServiceInfo.getServiceGroup ();
       final IParticipantIdentifier aParticipantID = aServiceGroup.getParticpantIdentifier ();
