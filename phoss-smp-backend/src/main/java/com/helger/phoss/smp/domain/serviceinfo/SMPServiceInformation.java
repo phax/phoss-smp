@@ -140,6 +140,13 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     m_aProcesses.put (sProcessID, aProcess);
   }
 
+  public void addProcesses (@Nonnull final Iterable <? extends SMPProcess> aProcesses)
+  {
+    ValueEnforcer.notNull (aProcesses, "Processes");
+    for (final SMPProcess aProcess : aProcesses)
+      addProcess (aProcess);
+  }
+
   public void setProcesses (@Nonnull @Nonempty final Map <String, ? extends SMPProcess> aProcesses)
   {
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
@@ -243,8 +250,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
                                                       @Nonnull final com.helger.smpclient.peppol.jaxb.ServiceInformationType aServiceInformation)
   {
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
-    for (final com.helger.smpclient.peppol.jaxb.ProcessType aProcess : aServiceInformation.getProcessList ()
-                                                                                          .getProcess ())
+    for (final com.helger.smpclient.peppol.jaxb.ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,
                                       SimpleDocumentTypeIdentifier.wrap (aServiceInformation.getDocumentIdentifier ()),

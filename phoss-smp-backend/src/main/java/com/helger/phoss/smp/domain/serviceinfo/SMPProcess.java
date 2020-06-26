@@ -108,10 +108,15 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();
     if (m_aEndpoints.containsKey (sTransportProfile))
-      throw new IllegalStateException ("Another endpoint with transport profile '" +
-                                       sTransportProfile +
-                                       "' is already present");
+      throw new IllegalStateException ("Another endpoint with transport profile '" + sTransportProfile + "' is already present");
     m_aEndpoints.put (sTransportProfile, aEndpoint);
+  }
+
+  public void addEndpoints (@Nonnull final Iterable <? extends SMPEndpoint> aEndpoints)
+  {
+    ValueEnforcer.notNull (aEndpoints, "Endpoints");
+    for (final SMPEndpoint aEndpoint : aEndpoints)
+      addEndpoint (aEndpoint);
   }
 
   public void setEndpoint (@Nonnull final SMPEndpoint aEndpoint)
@@ -166,17 +171,13 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
       return false;
 
     final SMPProcess rhs = (SMPProcess) o;
-    return EqualsHelper.equals (m_aProcessIdentifier, rhs.m_aProcessIdentifier) &&
-           EqualsHelper.equals (m_aEndpoints, rhs.m_aEndpoints);
+    return EqualsHelper.equals (m_aProcessIdentifier, rhs.m_aProcessIdentifier) && EqualsHelper.equals (m_aEndpoints, rhs.m_aEndpoints);
   }
 
   @Override
   public int hashCode ()
   {
-    return HashCodeGenerator.getDerived (super.hashCode ())
-                            .append (m_aProcessIdentifier)
-                            .append (m_aEndpoints)
-                            .getHashCode ();
+    return HashCodeGenerator.getDerived (super.hashCode ()).append (m_aProcessIdentifier).append (m_aEndpoints).getHashCode ();
   }
 
   @Override
