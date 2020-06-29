@@ -94,9 +94,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
       final DBServiceGroupID aDBServiceGroupID = new DBServiceGroupID (aParticipantID);
       DBServiceGroup aDBServiceGroup = aEM.find (DBServiceGroup.class, aDBServiceGroupID);
       if (aDBServiceGroup != null)
-        throw new IllegalStateException ("The service group with ID " +
-                                         aParticipantID.getURIEncoded () +
-                                         " already exists!");
+        throw new IllegalStateException ("The service group with ID " + aParticipantID.getURIEncoded () + " already exists!");
 
       final DBUser aDBUser = aEM.find (DBUser.class, sOwnerID);
       if (aDBUser == null)
@@ -141,10 +139,8 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
       if (ex instanceof RegistrationHookException)
-        throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML",
-                                   (RegistrationHookException) ex);
-      throw new SMPInternalErrorException ("Error creating ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
-                                           ret.getException ());
+        throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML", (RegistrationHookException) ex);
+      throw new SMPInternalErrorException ("Error creating ServiceGroup '" + aParticipantID.getURIEncoded () + "'", ret.getException ());
     }
 
     if (LOGGER.isDebugEnabled ())
@@ -213,8 +209,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
       final Exception ex = ret.getException ();
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
-      throw new SMPInternalErrorException ("Failed to update ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
-                                           ret.getException ());
+      throw new SMPInternalErrorException ("Failed to update ServiceGroup '" + aParticipantID.getURIEncoded () + "'", ret.getException ());
     }
 
     final EChange eChange = ret.get ();
@@ -281,10 +276,8 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
       if (ex instanceof RegistrationHookException)
-        throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML",
-                                   (RegistrationHookException) ex);
-      throw new SMPInternalErrorException ("Failed to delete ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
-                                           ret.getException ());
+        throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", (RegistrationHookException) ex);
+      throw new SMPInternalErrorException ("Failed to delete ServiceGroup '" + aParticipantID.getURIEncoded () + "'", ret.getException ());
     }
 
     final EChange eChange = ret.get ();
@@ -317,14 +310,14 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
       {
         final DBOwnership aDBOwnership = aDBServiceGroup.getOwnership ();
         if (aDBOwnership == null)
-          throw new IllegalStateException ("Service group " +
-                                           aDBServiceGroup.getId ().getAsBusinessIdentifier ().getURIEncoded () +
-                                           " has no owner");
-
-        final SMPServiceGroup aServiceGroup = new SMPServiceGroup (aDBOwnership.getId ().getUsername (),
-                                                                   aDBServiceGroup.getId ().getAsBusinessIdentifier (),
-                                                                   aDBServiceGroup.getExtension ());
-        aList.add (aServiceGroup);
+          LOGGER.error ("Service group " + aDBServiceGroup.getId ().getAsBusinessIdentifier ().getURIEncoded () + " has no owner");
+        else
+        {
+          final SMPServiceGroup aServiceGroup = new SMPServiceGroup (aDBOwnership.getId ().getUsername (),
+                                                                     aDBServiceGroup.getId ().getAsBusinessIdentifier (),
+                                                                     aDBServiceGroup.getExtension ());
+          aList.add (aServiceGroup);
+        }
       }
       return aList;
     });
@@ -352,9 +345,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
       final ICommonsList <ISMPServiceGroup> aList = new CommonsArrayList <> ();
       for (final DBServiceGroup aDBServiceGroup : aDBServiceGroups)
       {
-        aList.add (new SMPServiceGroup (sOwnerID,
-                                        aDBServiceGroup.getId ().getAsBusinessIdentifier (),
-                                        aDBServiceGroup.getExtension ()));
+        aList.add (new SMPServiceGroup (sOwnerID, aDBServiceGroup.getId ().getAsBusinessIdentifier (), aDBServiceGroup.getExtension ()));
       }
       return aList;
     });
@@ -389,17 +380,14 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
   public SMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantID)
   {
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("getSMPServiceGroupOfID(" +
-                    (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) +
-                    ")");
+      LOGGER.debug ("getSMPServiceGroupOfID(" + (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) + ")");
 
     if (aParticipantID == null)
       return null;
 
     JPAExecutionResult <SMPServiceGroup> ret;
     ret = doSelect ( () -> {
-      final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
-                                                                       new DBServiceGroupID (aParticipantID));
+      final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class, new DBServiceGroupID (aParticipantID));
       if (aDBServiceGroup == null)
         return null;
 
@@ -417,9 +405,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantID)
   {
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("containsSMPServiceGroupWithID(" +
-                    (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) +
-                    ")");
+      LOGGER.debug ("containsSMPServiceGroupWithID(" + (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) + ")");
 
     if (aParticipantID == null)
       return false;
@@ -429,9 +415,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
       // Disable caching here
       final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
-      final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class,
-                                                                       new DBServiceGroupID (aParticipantID),
-                                                                       aProps);
+      final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class, new DBServiceGroupID (aParticipantID), aProps);
       return Boolean.valueOf (aDBServiceGroup != null);
     });
     if (ret.hasException ())
