@@ -154,6 +154,12 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
       aDeleteServiceMetadata.setExceptionMapper (aExceptionMapper);
       aRegistry.registerAPI (aDeleteServiceMetadata);
     }
+    {
+      final APIDescriptor aDeleteServiceMetadata = new APIDescriptor (APIPath.delete ("/{" + PARAM_SERVICE_GROUP_ID + "}" + PATH_SERVICES),
+                                                                      new APIExecutorServiceMetadataDeleteAll ());
+      aDeleteServiceMetadata.setExceptionMapper (aExceptionMapper);
+      aRegistry.registerAPI (aDeleteServiceMetadata);
+    }
   }
 
   @Override

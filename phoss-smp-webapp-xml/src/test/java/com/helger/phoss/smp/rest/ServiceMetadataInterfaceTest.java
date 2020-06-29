@@ -99,6 +99,15 @@ public final class ServiceMetadataInterfaceTest
     return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
+  @Nonnull
+  private static RedirectType _createRedirect ()
+  {
+    final RedirectType aRedir = new RedirectType ();
+    aRedir.setHref ("http://other-smp.domain.xyz");
+    aRedir.setCertificateUID ("APP_0000000000000");
+    return aRedir;
+  }
+
   private static int _testResponseJerseyClient (final Response aResponseMsg, final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
@@ -355,10 +364,7 @@ public final class ServiceMetadataInterfaceTest
     aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
     final ServiceMetadataType aSM = new ServiceMetadataType ();
-    final RedirectType aRedir = new RedirectType ();
-    aRedir.setHref ("http://other-smp.domain.xyz");
-    aRedir.setCertificateUID ("APP_0000000000000");
-    aSM.setRedirect (aRedir);
+    aSM.setRedirect (_createRedirect ());
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPRedirectManager aSRMgr = SMPMetaManager.getRedirectMgr ();
@@ -441,9 +447,7 @@ public final class ServiceMetadataInterfaceTest
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
     aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
-    final RedirectType aRedir = new RedirectType ();
-    aRedir.setHref ("http://other-smp.domain.xyz");
-    aRedir.setCertificateUID ("APP_0000000000000");
+    final RedirectType aRedir = _createRedirect ();
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPRedirectManager aSRMgr = SMPMetaManager.getRedirectMgr ();
@@ -515,6 +519,77 @@ public final class ServiceMetadataInterfaceTest
       assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
+    }
+  }
+
+  @Test
+  public void testRemoveAllContentOfServiceGroup ()
+  {
+    // Lower case
+    final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
+    final String sPI_LC = aPI_LC.getURIEncoded ();
+
+    final IDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30.getAsDocumentTypeIdentifier ();
+    final String sDT = aDT.getURIEncoded ();
+
+    final ServiceGroupType aSG = new ServiceGroupType ();
+    aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+    aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
+
+    final ServiceMetadataType aSM = new ServiceMetadataType ();
+    aSM.setRedirect (_createRedirect ());
+
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPRedirectManager aSRMgr = SMPMetaManager.getRedirectMgr ();
+    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
+    Response aResponseMsg;
+
+    _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+
+    try
+    {
+      // PUT ServiceGroup
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      _testResponseJerseyClient (aResponseMsg, 200);
+
+      // GET ServiceGroup
+      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+      final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (aPI_LC);
+      assertNotNull (aServiceGroup);
+
+      try
+      {
+        // PUT 1 ServiceInformation
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .path ("services")
+                                               .path (sDT)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
+        _testResponseJerseyClient (aResponseMsg, 200);
+        assertNotNull (aSRMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+
+        // DELETE 1 Redirect
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").request ()).delete ();
+        _testResponseJerseyClient (aResponseMsg, 200);
+        assertNull (aSRMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+      }
+      finally
+      {
+        // DELETE 2 Redirect
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").request ()).delete ();
+        _testResponseJerseyClient (aResponseMsg, 200, 404);
+        assertNull (aSRMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+      }
+
+      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+    }
+    finally
+    {
+      // DELETE ServiceGroup
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
+      _testResponseJerseyClient (aResponseMsg, 200, 404);
+
+      _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
     }
   }
 }
