@@ -29,6 +29,9 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.LoggingSMPServiceGroupCallback;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
@@ -37,9 +40,11 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
+import com.helger.photon.core.mgr.PhotonBasicManager;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.smpclient.url.IPeppolURLProvider;
+import com.helger.web.scope.mgr.WebScoped;
 
 /**
  * The central SMP meta manager containing all the singleton manager instances.
@@ -118,6 +123,29 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     }
   }
 
+  private void _performMigrations ()
+  {
+    // Required for SQL version
+    try (final WebScoped aWS = new WebScoped ())
+    {
+      // See issue #128
+      PhotonBasicManager.getSystemMigrationMgr ().performMigrationIfNecessary ("ensure-transport-profiles-128", () -> {
+        LOGGER.info ("Started running migration to ensure all used transport profiles are automatically created");
+        for (final ISMPServiceInformation aSI : m_aServiceInformationMgr.getAllSMPServiceInformation ())
+          for (final ISMPProcess aProc : aSI.getAllProcesses ())
+            for (final ISMPEndpoint aEP : aProc.getAllEndpoints ())
+            {
+              final String sTransportProfile = aEP.getTransportProfile ();
+              if (!m_aTransportProfileMgr.containsSMPTransportProfileWithID (sTransportProfile))
+              {
+                m_aTransportProfileMgr.createSMPTransportProfile (sTransportProfile, sTransportProfile + " (automatically created)", false);
+                LOGGER.info ("Created missing transport profile '" + sTransportProfile + "'");
+              }
+            }
+      });
+    }
+  }
+
   @Override
   protected void onAfterInstantiation (@Nonnull final IScope aScope)
   {
@@ -192,6 +220,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
 
       _initCallbacks ();
+
+      _performMigrations ();
 
       // After all
       s_aManagerProvider.afterInitManagers ();

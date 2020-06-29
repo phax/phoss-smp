@@ -74,7 +74,7 @@
     </dependency>
     <dependency>
       <groupId>com.helger.photon</groupId>
-      <artifactId>ph-oton-app</artifactId>
+      <artifactId>ph-oton-core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
