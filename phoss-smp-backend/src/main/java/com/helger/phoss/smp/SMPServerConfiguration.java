@@ -73,6 +73,7 @@ public final class SMPServerConfiguration
 
   public static final String KEY_SMP_FORCE_ROOT = "smp.forceroot";
   public static final String KEY_SMP_PUBLIC_URL = "smp.publicurl";
+  public static final String KEY_SMP_PUBLIC_URL_MODE = "smp.publicurl.mode";
   public static final String KEY_SMP_IDENTIFIER_TYPE = "smp.identifiertype";
   public static final String KEY_SMP_REST_TYPE = "smp.rest.type";
   public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
@@ -296,6 +297,17 @@ public final class SMPServerConfiguration
   public static String getPublicServerURL ()
   {
     return getConfigFile ().getAsString (KEY_SMP_PUBLIC_URL);
+  }
+
+  /**
+   * @return The public server URL mode to use. This was introduced for issue
+   *         #131. May be <code>null</code>.
+   * @since 5.2.4
+   */
+  @Nullable
+  public static String getPublicServerURLMode ()
+  {
+    return getConfigFile ().getAsString (KEY_SMP_PUBLIC_URL_MODE);
   }
 
   /**

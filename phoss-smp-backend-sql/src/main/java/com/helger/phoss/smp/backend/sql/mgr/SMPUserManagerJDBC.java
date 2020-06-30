@@ -44,7 +44,7 @@ import com.helger.phoss.smp.exception.SMPUnknownUserException;
  * A JDBC based implementation of the {@link ISMPUserManager} interface.
  *
  * @author Philip Helger
- * @since 9.2.4
+ * @since 5.3.0
  */
 public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager implements ISMPUserManager
 {
@@ -68,8 +68,7 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
       else
       {
         final long nCount = executor ().insertOrUpdateOrDelete ("INSERT INTO smp_user (username, password) VALUES (?,?)",
-                                                                new ConstantPreparedStatementDataProvider (sUserName,
-                                                                                                           sPassword));
+                                                                new ConstantPreparedStatementDataProvider (sUserName, sPassword));
         ret.set (ESuccess.valueOf (nCount == 1));
       }
     });
@@ -80,8 +79,7 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
   public ESuccess updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
   {
     final long nCount = executor ().insertOrUpdateOrDelete ("UPDATE smp_user SET password=? WHERE username=?",
-                                                            new ConstantPreparedStatementDataProvider (sPassword,
-                                                                                                       sUserName));
+                                                            new ConstantPreparedStatementDataProvider (sPassword, sUserName));
     return ESuccess.valueOf (nCount == 1);
   }
 
@@ -155,10 +153,7 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
                                                                                            aCredentials.getUserName ()));
     if (nCount == 0)
     {
-      throw new SMPUnauthorizedException ("User '" +
-                                          aCredentials.getUserName () +
-                                          "' does not own " +
-                                          aServiceGroupID.getURIEncoded ());
+      throw new SMPUnauthorizedException ("User '" + aCredentials.getUserName () + "' does not own " + aServiceGroupID.getURIEncoded ());
     }
 
     if (LOGGER.isDebugEnabled ())

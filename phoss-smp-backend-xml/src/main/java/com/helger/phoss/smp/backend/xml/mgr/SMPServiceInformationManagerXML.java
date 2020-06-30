@@ -53,8 +53,7 @@ import com.helger.photon.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManagerXML extends
-                                                   AbstractPhotonMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
+public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
                                                    implements
                                                    ISMPServiceInformationManager
 {
@@ -80,8 +79,7 @@ public final class SMPServiceInformationManagerXML extends
                                                         @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                       aDocTypeID);
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
     if (aServiceInfo != null)
     {
       final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
@@ -105,7 +103,7 @@ public final class SMPServiceInformationManagerXML extends
       LOGGER.debug ("mergeSMPServiceInformation (" + aSMPServiceInformationObj + ")");
 
     // Check for an update
-    boolean bChangedExisting = false;
+    boolean bChangeExisting = false;
     final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroup (),
                                                                                                                                  aSMPServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
@@ -113,10 +111,10 @@ public final class SMPServiceInformationManagerXML extends
       // If a service information is present, it must be the provided object!
       // This is not true for the REST API
       if (EqualsHelper.identityEqual (aOldInformation, aSMPServiceInformation))
-        bChangedExisting = true;
+        bChangeExisting = true;
     }
 
-    if (bChangedExisting)
+    if (bChangeExisting)
     {
       // Edit existing
       m_aRWLock.writeLocked ( () -> {
@@ -239,8 +237,7 @@ public final class SMPServiceInformationManagerXML extends
   }
 
   @Nonnull
-  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
-                                   @Nullable final ISMPProcess aProcess)
+  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation, @Nullable final ISMPProcess aProcess)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPProcess (" + aSMPServiceInformation + ", " + aProcess + ")");
@@ -313,7 +310,10 @@ public final class SMPServiceInformationManagerXML extends
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
-      findAll (x -> x.getServiceGroupID ().equals (aServiceGroup.getID ()), ret::add);
+    {
+      final String sServiceGroupID = aServiceGroup.getID ();
+      findAll (x -> x.getServiceGroupID ().equals (sServiceGroupID), ret::add);
+    }
     return ret;
   }
 
@@ -324,9 +324,8 @@ public final class SMPServiceInformationManagerXML extends
     final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
-      findAllMapped (aSI -> aSI.getServiceGroupID ().equals (aServiceGroup.getID ()),
-                     ISMPServiceInformation::getDocumentTypeIdentifier,
-                     ret::add);
+      final String sServiceGroupID = aServiceGroup.getID ();
+      findAllMapped (aSI -> aSI.getServiceGroupID ().equals (sServiceGroupID), ISMPServiceInformation::getDocumentTypeIdentifier, ret::add);
     }
     return ret;
   }
@@ -340,8 +339,8 @@ public final class SMPServiceInformationManagerXML extends
     if (aDocumentTypeIdentifier == null)
       return null;
 
-    final ICommonsList <ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ()
-                                                                        .equals (aServiceGroup.getID ()) &&
+    final String sServiceGroupID = aServiceGroup.getID ();
+    final ICommonsList <ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ().equals (sServiceGroupID) &&
                                                                      aSI.getDocumentTypeIdentifier ()
                                                                         .hasSameContent (aDocumentTypeIdentifier));
 
@@ -349,7 +348,7 @@ public final class SMPServiceInformationManagerXML extends
       return null;
     if (ret.size () > 1)
       LOGGER.warn ("Found more than one entry for service group '" +
-                   aServiceGroup.getID () +
+                   sServiceGroupID +
                    "' and document type '" +
                    aDocumentTypeIdentifier.getValue () +
                    "'. This seems to be a bug! Using the first one.");

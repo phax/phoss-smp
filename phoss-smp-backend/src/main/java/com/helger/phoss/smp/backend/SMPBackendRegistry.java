@@ -73,8 +73,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     return ret;
   }
 
-  public void registerSMPBackend (@Nonnull @Nonempty final String sID,
-                                  @Nonnull final ISupplier <? extends ISMPManagerProvider> aFactory)
+  public void registerSMPBackend (@Nonnull @Nonempty final String sID, @Nonnull final ISupplier <? extends ISMPManagerProvider> aFactory)
   {
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (aFactory, "Factory");

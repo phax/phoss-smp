@@ -48,9 +48,9 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
 
-    byte [] aBytes;
+    final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:
@@ -77,9 +77,7 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
     }
     else
     {
-      aUnifiedResponse.setContent (aBytes)
-                      .setMimeType (CMimeType.TEXT_XML)
-                      .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
     }
   }
 }

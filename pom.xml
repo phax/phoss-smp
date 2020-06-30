@@ -25,7 +25,7 @@
     <version>1.11.1</version>
   </parent>
   <artifactId>phoss-smp-parent-pom</artifactId>
-  <version>5.2.4-SNAPSHOT</version>
+  <version>5.2.5-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>phoss-smp-parent-pom</name>
   <description>Base POM to build the phoss SMP projects</description>
@@ -75,7 +75,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>9.4.4</version>
+        <version>9.4.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -235,7 +235,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>6.2.3</version>
+          <version>6.2.3</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>

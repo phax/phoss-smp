@@ -105,6 +105,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected String getInitParameterServerURL (@Nonnull final ServletContext aSC, final boolean bProductionMode)
   {
+    // This is internally set in "StaticServerInfo" class
     return SMPServerConfiguration.getPublicServerURL ();
   }
 
@@ -132,6 +133,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // SMP is http only
     UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
 
+    // Avoid writing unnecessary stuff
+    setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
+
     // Check SMP ID
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
     if (StringHelper.hasNoText (sSMPID))
@@ -144,6 +148,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                           "'!");
     if (LOGGER.isInfoEnabled ())
       LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
+
+    if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.hasNoText (SMPWebAppConfiguration.getImprintText ()))
+      LOGGER.warn ("The custom Imprint is enabled in the configuration file, but no imprint text is configured. Therefore no imprint will be shown.");
+
   }
 
   @Override

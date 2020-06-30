@@ -594,31 +594,28 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     }
     aNodeList.addChild (aToolbar);
 
+    final boolean bHideDetails = aAllServiceGroups.size () > 1000;
+
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
                                         bShowBusinessCardName ? new DTCol ("Business Card Name") : null,
                                         new DTCol (new HCSpan ().addChild (bShowExtensionDetails ? "Ext" : "Ext?")
                                                                 .setTitle ("Is an Extension present?")),
-                                        new DTCol (new HCSpan ().addChild ("Docs")
-                                                                .setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
-                                                                                                                                 aDisplayLocale),
-                                        new DTCol (new HCSpan ().addChild ("Procs")
-                                                                .setTitle ("Number of assigned processes")).setDisplayType (EDTColType.INT,
-                                                                                                                            aDisplayLocale),
-                                        new DTCol (new HCSpan ().addChild ("EPs")
-                                                                .setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
-                                                                                                                            aDisplayLocale),
+                                        bHideDetails ? null
+                                                     : new DTCol (new HCSpan ().addChild ("Docs")
+                                                                               .setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
+                                                                                                                                                aDisplayLocale),
+                                        bHideDetails ? null
+                                                     : new DTCol (new HCSpan ().addChild ("Procs")
+                                                                               .setTitle ("Number of assigned processes")).setDisplayType (EDTColType.INT,
+                                                                                                                                           aDisplayLocale),
+                                        bHideDetails ? null
+                                                     : new DTCol (new HCSpan ().addChild ("EPs")
+                                                                               .setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
+                                                                                                                                           aDisplayLocale),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceGroup aCurObject : aAllServiceGroups)
     {
-      final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurObject);
-      int nProcesses = 0;
-      int nEndpoints = 0;
-      for (final ISMPServiceInformation aSI : aSIs)
-      {
-        nProcesses += aSI.getProcessCount ();
-        nEndpoints += aSI.getTotalEndpointCount ();
-      }
 
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
       final String sDisplayName = aCurObject.getParticpantIdentifier ().getURIEncoded ();
@@ -649,9 +646,22 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       {
         aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.extensions ().isNotEmpty (), aDisplayLocale));
       }
-      aRow.addCell (Integer.toString (aSIs.size ()));
-      aRow.addCell (Integer.toString (nProcesses));
-      aRow.addCell (Integer.toString (nEndpoints));
+
+      if (!bHideDetails)
+      {
+        int nProcesses = 0;
+        int nEndpoints = 0;
+        final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurObject);
+        for (final ISMPServiceInformation aSI : aSIs)
+        {
+          nProcesses += aSI.getProcessCount ();
+          nEndpoints += aSI.getTotalEndpointCount ();
+        }
+
+        aRow.addCell (Integer.toString (aSIs.size ()));
+        aRow.addCell (Integer.toString (nProcesses));
+        aRow.addCell (Integer.toString (nEndpoints));
+      }
 
       final HCNodeList aActions = new HCNodeList ();
       aActions.addChildren (createEditLink (aWPEC, aCurObject, "Edit " + sDisplayName),

@@ -16,10 +16,12 @@
  */
 package com.helger.phoss.smp.ui.secure.hc;
 
+import java.util.Comparator;
+
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.id.IHasID;
+import com.helger.commons.name.IHasName;
 import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -36,7 +38,7 @@ public class HCSMPTransportProfileSelect extends HCSelect
   @Nonempty
   public static String getDisplayName (@Nonnull final ISMPTransportProfile aTP)
   {
-    return aTP.getID () + " [" + aTP.getName () + "]";
+    return aTP.getName () + " (" + aTP.getID () + ")" + (aTP.isDeprecated () ? " [deprecated]" : "");
   }
 
   public HCSMPTransportProfileSelect (@Nonnull final RequestField aRF)
@@ -45,7 +47,7 @@ public class HCSMPTransportProfileSelect extends HCSelect
 
     for (final ISMPTransportProfile aTP : SMPMetaManager.getTransportProfileMgr ()
                                                         .getAllSMPTransportProfiles ()
-                                                        .getSortedInline (IHasID.getComparatorID ()))
+                                                        .getSortedInline (Comparator.comparing (IHasName::getName)))
       addOption (aTP.getID (), getDisplayName (aTP));
   }
 }

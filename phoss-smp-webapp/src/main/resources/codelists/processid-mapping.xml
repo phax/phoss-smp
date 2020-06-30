@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<root type="processid">
-  <item id="toop-procid-agreement::urn:eu.toop.process.datarequestresponse" name="TOOP Request Response for Data" deprecated="false" />
-  <item id="toop-procid-agreement::urn:eu.toop.process.documentrequestresponse" name="TOOP Request Response for Documents" deprecated="false" />
-  <item id="toop-procid-agreement::urn:eu.toop.process.twophasedrequestresponse" name="TOOP Two Phased Request Response for Documents" deprecated="false" />
-</root>

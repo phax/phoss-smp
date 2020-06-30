@@ -152,11 +152,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
       throw ex;
     }
 
-    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
-                                      aSMPServiceGroup.getID (),
-                                      sOwnerID,
-                                      aParticipantID.getURIEncoded (),
-                                      sExtension);
+    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID (), sOwnerID, aParticipantID.getURIEncoded (), sExtension);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup - success");
 
@@ -183,10 +179,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sServiceGroupID),
-                                                                Updates.combine (Updates.set (BSON_OWNER_ID,
-                                                                                              sNewOwnerID),
-                                                                                 Updates.set (BSON_EXTENSION,
-                                                                                              sExtension)));
+                                                                Updates.combine (Updates.set (BSON_OWNER_ID, sNewOwnerID),
+                                                                                 Updates.set (BSON_EXTENSION, sExtension)));
     if (aOldDoc == null)
       return EChange.UNCHANGED;
 
@@ -228,8 +222,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
 
     // Delete all service information (must be done before the SG is deleted)
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    if (aServiceInfoMgr != null)
-      aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup);
+    aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup);
 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sServiceGroupID));
@@ -276,8 +269,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
-    getCollection ().find (new Document (BSON_OWNER_ID, sOwnerID))
-                    .forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
+    getCollection ().find (new Document (BSON_OWNER_ID, sOwnerID)).forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
     return ret;
   }
 

@@ -91,6 +91,9 @@ public final class NiceNameEntry implements Serializable
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("Name", m_sName).append ("Deprecated", m_bDeprecated).getToString ();
+    return new ToStringGenerator (this).append ("Name", m_sName)
+                                       .append ("Deprecated", m_bDeprecated)
+                                       .append ("ProcessIDs", m_aProcIDs)
+                                       .getToString ();
   }
 }

@@ -33,6 +33,7 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -97,12 +98,20 @@ public final class NiceNameHandler
       {
         aDocTypeIDRes = new FileSystemResource (sPath);
         if (!aDocTypeIDRes.exists ())
-          LOGGER.warn ("The configured nice name file '" + sPath + "' does not exist");
+        {
+          LOGGER.warn ("The configured document type nice name file '" + sPath + "' does not exist");
+          // Enforce defaults
+          aDocTypeIDRes = null;
+        }
       }
+
+      // Use defaults
       if (aDocTypeIDRes == null)
-        aDocTypeIDRes = new ClassPathResource ("codelists/doctypeid-mapping.xml");
+        aDocTypeIDRes = new ClassPathResource ("codelists/smp/doctypeid-mapping.xml");
+
       final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes, true);
       RWLOCK.writeLockedGet ( () -> DOCTYPE_IDS = aDocTypeIDs);
+      LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document type nice name entries");
     }
 
     // Processes
@@ -113,13 +122,27 @@ public final class NiceNameHandler
       {
         aProcessIDRes = new FileSystemResource (sPath);
         if (!aProcessIDRes.exists ())
-          LOGGER.warn ("The configured nice name file '" + sPath + "' does not exist");
+        {
+          LOGGER.warn ("The configured process nice name file '" + sPath + "' does not exist");
+          // Enforce defaults
+          aProcessIDRes = null;
+        }
       }
+
+      // Use defaults
       if (aProcessIDRes == null)
-        aProcessIDRes = new ClassPathResource ("codelists/processid-mapping.xml");
+        aProcessIDRes = new ClassPathResource ("codelists/smp/processid-mapping.xml");
+
       final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes, false);
       RWLOCK.writeLockedGet ( () -> PROCESS_IDS = aProcessIDs);
+      LOGGER.info ("Loaded " + aProcessIDs.size () + " process nice name entries");
     }
+  }
+
+  @Nullable
+  public static NiceNameEntry getDocTypeNiceName (@Nullable final IDocumentTypeIdentifier aDocTypeID)
+  {
+    return aDocTypeID == null ? null : getDocTypeNiceName (aDocTypeID.getURIEncoded ());
   }
 
   @Nullable
@@ -127,6 +150,7 @@ public final class NiceNameHandler
   {
     if (StringHelper.hasNoText (sID))
       return null;
+
     RWLOCK.readLock ().lock ();
     try
     {
@@ -139,10 +163,17 @@ public final class NiceNameHandler
   }
 
   @Nullable
+  public static NiceNameEntry getProcessNiceName (@Nullable final IProcessIdentifier aProcessID)
+  {
+    return aProcessID == null ? null : getProcessNiceName (aProcessID.getURIEncoded ());
+  }
+
+  @Nullable
   public static NiceNameEntry getProcessNiceName (@Nullable final String sID)
   {
     if (StringHelper.hasNoText (sID))
       return null;
+
     RWLOCK.readLock ().lock ();
     try
     {

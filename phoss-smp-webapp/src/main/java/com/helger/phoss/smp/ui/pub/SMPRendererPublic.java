@@ -21,7 +21,10 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
+import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
@@ -31,6 +34,8 @@ import com.helger.html.css.DefaultCSSClassProvider;
 import com.helger.html.css.ICSSClassProvider;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCA_MailTo;
+import com.helger.html.hc.html.HC_Target;
+import com.helger.html.hc.html.IHCElementWithChildren;
 import com.helger.html.hc.html.embedded.HCImg;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCP;
@@ -104,8 +109,7 @@ public final class SMPRendererPublic
   private SMPRendererPublic ()
   {}
 
-  private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC,
-                                             @Nonnull final BootstrapNavbar aNavbar)
+  private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC, @Nonnull final BootstrapNavbar aNavbar)
   {
     if (!SMPWebAppConfiguration.isPublicLoginEnabled ())
       return;
@@ -138,8 +142,7 @@ public final class SMPRendererPublic
       final BootstrapNavbarNav aNav = aToggleable.addAndReturnNav ();
       final BootstrapDropdownMenu aDropDown = new BootstrapDropdownMenu ();
       {
-        final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.P_2)
-                                       .addStyle (CCSSProperties.MIN_WIDTH.newValue ("400px"));
+        final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.P_2).addStyle (CCSSProperties.MIN_WIDTH.newValue ("400px"));
         aDiv.addChild (SMPCommonUI.createViewLoginForm (aLEC, null));
         aDropDown.addChild (aDiv);
       }
@@ -182,8 +185,7 @@ public final class SMPRendererPublic
   {
     // Main menu
     final IMenuTree aMenuTree = aLEC.getMenuTree ();
-    final MenuItemDeterminatorCallback aCallback = new MenuItemDeterminatorCallback (aMenuTree,
-                                                                                     aLEC.getSelectedMenuItemID ())
+    final MenuItemDeterminatorCallback aCallback = new MenuItemDeterminatorCallback (aMenuTree, aLEC.getSelectedMenuItemID ())
     {
       @Override
       protected boolean isMenuItemValidToBeDisplayed (@Nonnull final IMenuObject aMenuObj)
@@ -275,33 +277,72 @@ public final class SMPRendererPublic
     return aPageContainer;
   }
 
+  /**
+   * @return The footer to be used for /public and /secure
+   */
   @Nonnull
   public static BootstrapContainer createDefaultFooter ()
   {
-    final BootstrapContainer aDiv = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
-    aDiv.addChild (new HCP ().addChild (CSMP.getApplicationTitleAndVersion () +
-                                        " with " +
-                                        SMPServerConfiguration.getRESTType ().getDisplayName () +
-                                        " API"));
+    final BootstrapContainer aContainer = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
+    aContainer.addChild (new HCP ().addChild (CSMP.getApplicationTitleAndVersion () +
+                                              " with " +
+                                              SMPServerConfiguration.getRESTType ().getDisplayName () +
+                                              " API"));
 
-    final HCP aBy = new HCP ().addChild ("Created by ")
-                              .addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"));
-
-    if (false)
+    // By
     {
-      // Twitter
+      final HCP aBy = new HCP ().addChild ("Created by ").addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"));
+
+      if (false)
+      {
+        // Twitter
+        aBy.addChild (" - ")
+           .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ().addChild ("@philiphelger"));
+      }
+
+      // Source
       aBy.addChild (" - ")
-         .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ()
-                                                                                .addChild ("@philiphelger"));
+         .addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
+                                                                                 .addChild (CSMP.APPLICATION_TITLE + " on GitHub"));
+
+      aContainer.addChild (aBy);
     }
 
-    // Source
-    aBy.addChild (" - ")
-       .addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
-                                                                               .addChild (CSMP.APPLICATION_TITLE +
-                                                                                          " on GitHub"));
-    aDiv.addChild (aBy);
-    return aDiv;
+    // Imprint
+    if (SMPWebAppConfiguration.isImprintEnabled ())
+    {
+      final String sImprintText = SMPWebAppConfiguration.getImprintText ();
+      if (StringHelper.hasText (sImprintText))
+      {
+        final ISimpleURL aImprintHref = SMPWebAppConfiguration.getImprintHref ();
+        final IHCElementWithChildren <?> aNode;
+        if (aImprintHref != null)
+        {
+          // Link and text
+          final String sImprintTarget = SMPWebAppConfiguration.getImprintTarget ();
+          final HC_Target aTarget = StringHelper.hasText (sImprintTarget) ? new HC_Target (sImprintTarget) : null;
+          aNode = new HCA (aImprintHref).addChild (sImprintText).setTarget (aTarget);
+        }
+        else
+        {
+          // Text only
+          aNode = new HCSpan ().addChild (sImprintText);
+        }
+
+        // Already trimmed
+        final String sImprintCSSClasses = SMPWebAppConfiguration.getImprintCSSClasses ();
+        if (StringHelper.hasText (sImprintCSSClasses))
+        {
+          final ICommonsSet <String> aUniqueNames = new CommonsHashSet <> (RegExHelper.getSplitToList (sImprintCSSClasses, "\\s+"));
+          for (final String sCSSClass : aUniqueNames)
+            aNode.addClass (DefaultCSSClassProvider.create (sCSSClass));
+        }
+
+        aContainer.addChild (new HCP ().addChild ("Imprint ").addChild (aNode));
+      }
+    }
+
+    return aContainer;
   }
 
   @Nonnull

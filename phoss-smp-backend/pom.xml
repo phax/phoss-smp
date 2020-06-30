@@ -16,7 +16,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
-    <version>5.2.4-SNAPSHOT</version>
+    <version>5.2.5-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-backend</artifactId>
   <packaging>bundle</packaging>
@@ -74,7 +74,7 @@
     </dependency>
     <dependency>
       <groupId>com.helger.photon</groupId>
-      <artifactId>ph-oton-app</artifactId>
+      <artifactId>ph-oton-core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>

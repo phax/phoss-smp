@@ -96,10 +96,7 @@ import com.helger.xml.serialize.write.XMLWriter;
 public final class SMPCommonUI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPCommonUI.class);
-  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25)
-                                                                                     .addItem (50)
-                                                                                     .addItem (100)
-                                                                                     .addItemAll ();
+  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25).addItem (50).addItem (100).addItemAll ();
 
   private SMPCommonUI ()
   {}
@@ -114,8 +111,7 @@ public final class SMPCommonUI
                                                           .data (new JSAssocArray ().add (AjaxExecutorDataTables.OBJECT_ID,
                                                                                           aTable.getID ())))
                  .setServerFilterType (EDataTablesFilterType.ALL_TERMS_PER_ROW)
-                 .setTextLoadingURL (CAjax.DATATABLES_I18N.getInvocationURL (aRequestScope),
-                                     AjaxExecutorDataTablesI18N.LANGUAGE_ID)
+                 .setTextLoadingURL (CAjax.DATATABLES_I18N.getInvocationURL (aRequestScope), AjaxExecutorDataTablesI18N.LANGUAGE_ID)
                  .addPlugin (new DataTablesPluginSearchHighlight ());
     });
 
@@ -171,8 +167,7 @@ public final class SMPCommonUI
   }
 
   @Nonnull
-  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC,
-                                                   @Nullable final String sPreselectedUserName)
+  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC, @Nullable final String sPreselectedUserName)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -210,8 +205,7 @@ public final class SMPCommonUI
                       JQuery.idRef (sIDErrorField).empty ().append (aJSData.ref (AjaxExecutorPublicLogin.JSON_HTML)));
       aOnClick.add (new JQueryAjaxBuilder ().url (CAjax.LOGIN.getInvocationURI (aRequestScope))
                                             .method (EHttpMethod.POST)
-                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID,
-                                                                            JQuery.idRef (sIDUserName).val ())
+                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID, JQuery.idRef (sIDUserName).val ())
                                                                       .add (CLogin.REQUEST_ATTR_PASSWORD,
                                                                             JQuery.idRef (sIDPassword).val ()))
                                             .success (aJSSuccess)
@@ -246,8 +240,7 @@ public final class SMPCommonUI
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotAfter, aDisplayLocale) + " "),
                           aNowLDT.isAfter (aNotAfter) ? new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NO LONGER VALID!!!")
                                                       : new HCDiv ().addChild ("Valid for: " +
-                                                                               PDTDisplayHelper.getPeriodTextEN (aNowLDT,
-                                                                                                                 aNotAfter)));
+                                                                               PDTDisplayHelper.getPeriodTextEN (aNowLDT, aNotAfter)));
 
     if (aPublicKey instanceof RSAPublicKey)
     {

@@ -58,10 +58,10 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
   {
     final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
     final String sDocumentTypeID = aPathVariables.get (Rest2Filter.PARAM_DOCUMENT_TYPE_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
 
     // Create the unsigned response document
-    Document aDoc;
+    final Document aDoc;
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:
@@ -70,7 +70,8 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
                                                                                                                                         sDocumentTypeID);
 
         // Convert to DOM document
-        final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType (XML_SCHEMA_VALIDATION);
+        // Disable XSD check, because Signature is added later
+        final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType (false);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
@@ -80,7 +81,8 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
                                                                                                                                    sDocumentTypeID);
 
         // Convert to DOM document
-        final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType (XML_SCHEMA_VALIDATION);
+        // Disable XSD check, because Signature is added later
+        final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType (false);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
@@ -93,8 +95,7 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     // Sign the document
     try
     {
-      SMPKeyManager.getInstance ()
-                   .signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
+      SMPKeyManager.getInstance ().signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
       LOGGER.info ("Successfully signed response XML");
     }
     catch (final Exception ex)

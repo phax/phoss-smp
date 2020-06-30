@@ -57,7 +57,7 @@ import net.jodah.expiringmap.ExpiringMap;
  * A JDBC based implementation of the {@link ISMPServiceGroupManager} interface.
  *
  * @author Philip Helger
- * @since 9.2.4
+ * @since 5.3.0
  */
 public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager implements ISMPServiceGroupManager
 {

@@ -19,12 +19,12 @@ package com.helger.phoss.smp.rest2;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
 import com.helger.pd.businesscard.v3.PD3BusinessCardMarshaller;
 import com.helger.pd.businesscard.v3.PD3BusinessCardType;
@@ -50,24 +50,20 @@ public final class APIExecutorBusinessCardGet extends AbstractSMPAPIExecutor
     if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
     {
       // PD integration is disabled
-      LOGGER.warn ("The " +
-                   SMPWebAppConfiguration.getDirectoryName () +
-                   " integration is disabled. getBusinessCard will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      LOGGER.warn ("The " + SMPWebAppConfiguration.getDirectoryName () + " integration is disabled. getBusinessCard will not be executed.");
+      aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
     }
     else
     {
       final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-      final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
+      final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
       /*
        * getBusinessCard throws an exception if non is found
        */
       final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
       final byte [] aBytes = new PD3BusinessCardMarshaller ().getAsBytes (ret);
 
-      aUnifiedResponse.setContent (aBytes)
-                      .setMimeType (CMimeType.TEXT_XML)
-                      .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
     }
   }
 }

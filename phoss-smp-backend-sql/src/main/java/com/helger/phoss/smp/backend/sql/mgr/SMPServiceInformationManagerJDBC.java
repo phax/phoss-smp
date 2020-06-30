@@ -59,10 +59,9 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
  * interface.
  *
  * @author Philip Helger
- * @since 9.2.4
+ * @since 5.3.0
  */
-public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledManager implements
-                                                    ISMPServiceInformationManager
+public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledManager implements ISMPServiceInformationManager
 {
   @MustImplementEqualsAndHashcode
   private static final class DocTypeAndExtension
@@ -180,8 +179,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                         @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                       aDocTypeID);
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
     if (aServiceInfo != null)
     {
       final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
@@ -276,8 +274,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   }
 
   @Nonnull
-  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
-                                   @Nullable final ISMPProcess aProcess)
+  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation, @Nullable final ISMPProcess aProcess)
   {
     if (aSMPServiceInformation == null || aProcess == null)
       return EChange.UNCHANGED;
@@ -334,15 +331,12 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     for (final DBResultRow aDBRow : aDBResult.get ())
     {
       // Participant ID
-      final IParticipantIdentifier aParticipantID = new SimpleParticipantIdentifier (aDBRow.getAsString (0),
-                                                                                     aDBRow.getAsString (1));
+      final IParticipantIdentifier aParticipantID = new SimpleParticipantIdentifier (aDBRow.getAsString (0), aDBRow.getAsString (1));
       // Document type ID and extension
-      final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (aDBRow.getAsString (2),
-                                                                                   aDBRow.getAsString (3));
+      final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (aDBRow.getAsString (2), aDBRow.getAsString (3));
       final String sServiceInformationExtension = aDBRow.getAsString (4);
       // Process without endpoints
-      final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (aDBRow.getAsString (5),
-                                                                               aDBRow.getAsString (6)),
+      final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (aDBRow.getAsString (5), aDBRow.getAsString (6)),
                                                   null,
                                                   aDBRow.getAsString (7));
       // Don't add endpoint to process, because that impacts
@@ -359,8 +353,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                      aDBRow.getAsString (17),
                                                      aDBRow.getAsString (18));
       aGrouping.computeIfAbsent (aParticipantID, k -> new CommonsHashMap <> ())
-               .computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
-                                 k -> new CommonsHashMap <> ())
+               .computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension), k -> new CommonsHashMap <> ())
                .computeIfAbsent (aProcess, k -> new CommonsArrayList <> ())
                .add (aEndpoint);
     }
@@ -370,9 +363,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     {
       final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aEntry.getKey ());
       if (aServiceGroup == null)
-        throw new IllegalStateException ("Failed to resolve service group for particpant ID '" +
-                                         aEntry.getKey ().getURIEncoded () +
-                                         "'");
+        throw new IllegalStateException ("Failed to resolve service group for particpant ID '" + aEntry.getKey ().getURIEncoded () + "'");
 
       // Per document type ID
       for (final Map.Entry <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>> aEntry2 : aEntry.getValue ()
@@ -431,12 +422,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         for (final DBResultRow aDBRow : aDBResult.get ())
         {
           // Document type ID and extension
-          final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (aDBRow.getAsString (0),
-                                                                                       aDBRow.getAsString (1));
+          final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (aDBRow.getAsString (0), aDBRow.getAsString (1));
           final String sServiceInformationExtension = aDBRow.getAsString (2);
           // Process without endpoints
-          final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (aDBRow.getAsString (3),
-                                                                                   aDBRow.getAsString (4)),
+          final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (aDBRow.getAsString (3), aDBRow.getAsString (4)),
                                                       null,
                                                       aDBRow.getAsString (5));
           // Don't add endpoint to process, because that impacts
@@ -452,8 +441,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                          aDBRow.getAsString (14),
                                                          aDBRow.getAsString (15),
                                                          aDBRow.getAsString (16));
-          aGrouping.computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
-                                     k -> new CommonsHashMap <> ())
+          aGrouping.computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension), k -> new CommonsHashMap <> ())
                    .computeIfAbsent (aProcess, k -> new CommonsArrayList <> ())
                    .add (aEndpoint);
         }
@@ -536,8 +524,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         for (final DBResultRow aDBRow : aRows)
         {
           // Process without endpoints as key
-          final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (aDBRow.getAsString (1),
-                                                                                   aDBRow.getAsString (2)),
+          final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (aDBRow.getAsString (1), aDBRow.getAsString (2)),
                                                       null,
                                                       aDBRow.getAsString (3));
           final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (4),

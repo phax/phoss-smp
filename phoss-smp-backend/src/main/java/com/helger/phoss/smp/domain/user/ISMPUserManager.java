@@ -86,6 +86,5 @@ public interface ISMPUserManager extends ISMPUserProvider
    *         participant identifier is not owned by the user specified in the
    *         credentials
    */
-  void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                        @Nonnull final ISMPUser aCurrentUser) throws SMPServerException;
+  void verifyOwnership (@Nonnull IParticipantIdentifier aServiceGroupID, @Nonnull ISMPUser aCurrentUser) throws SMPServerException;
 }

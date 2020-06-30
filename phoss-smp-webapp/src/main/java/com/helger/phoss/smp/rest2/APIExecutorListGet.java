@@ -48,10 +48,11 @@ public final class APIExecutorListGet extends AbstractSMPAPIExecutor
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sUserID = aPathVariables.get (Rest2Filter.PARAM_USER_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope);
-    final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getAuth (aRequestScope.headers ());
+    // No service group available
+    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, null);
+    final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
-    byte [] aBytes;
+    final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:
