@@ -161,6 +161,16 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> to persist statistics on end, <code>false</code>
+   *         to not do it. Default is <code>true</code>.
+   * @since 5.2.4
+   */
+  public static boolean isPersistStatisticsOnEnd ()
+  {
+    return getConfigFile ().getAsBoolean ("webapp.statistics.persist", true);
+  }
+
+  /**
    * This method has only effect, if participants are shown on the start page.
    *
    * @return <code>true</code> if the start page should show a dynamic table

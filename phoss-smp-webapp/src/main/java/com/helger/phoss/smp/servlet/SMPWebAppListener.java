@@ -132,6 +132,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // SMP is http only
     UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
 
+    // Avoid writing unnecessary stuff
+    setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
+
     // Check SMP ID
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
     if (!RegExHelper.stringMatchesPattern (CSMP.PATTERN_SMP_ID, sSMPID))
@@ -145,6 +148,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.hasNoText (SMPWebAppConfiguration.getImprintText ()))
       LOGGER.warn ("The custom Imprint is enabled in the configuration file, but no imprint text is configured. Therefore no imprint will be shown.");
+
   }
 
   @Override
