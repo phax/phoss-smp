@@ -10,7 +10,11 @@ Latest version: **[5.2.5](https://github.com/phax/phoss-smp/releases/tag/phoss-s
 
 **!! Users with SQL backend need to change the DB layout for 5.2.x !!**
 
-A Docker container can be found at [https://hub.docker.com/r/phelger/smp/tags/](https://hub.docker.com/r/phelger/smp/tags/).
+Docker containers can be found, depending on the backend you want to use:
+* https://hub.docker.com/r/phelger/phoss-smp-xml/tags (same as https://hub.docker.com/r/phelger/smp/tags)
+* https://hub.docker.com/r/phelger/phoss-smp-sql/tags
+* https://hub.docker.com/r/phelger/phoss-smp-mongodb/tags
+
 See the special [Migrations guide](https://github.com/phax/phoss-smp/wiki/Migrations) for actions necessary on updates/version changes.
 
 Please read the **[Wiki](https://github.com/phax/phoss-smp/wiki)** for a detailed description, configuration reference and setup hints. It contains an introduction with screenshots, configuration, building and running instructions as well as [News and noteworthy](https://github.com/phax/phoss-smp/wiki/News-and-noteworthy).
