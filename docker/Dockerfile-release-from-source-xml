@@ -15,16 +15,42 @@
 # limitations under the License.
 #
 
+FROM adoptopenjdk:11-hotspot as build
+
+ARG SMP_VERSION
+ENV SMP_VERSION=${SMP_VERSION:-5.2.5}
+
+# Install git and maven
+RUN apt-get update \
+  && apt-get install -y git maven \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /build
+WORKDIR /build
+
+# Checkout from git and build
+# Note: Up to and including v5.1.2 the tag was called "peppol-smp-server-*" instead of "phoss-smp-*"
+RUN echo Building phoss SMP $SMP_VERSION \
+  && git clone https://github.com/phax/phoss-smp.git . \
+  && git checkout tags/phoss-smp-parent-pom-$SMP_VERSION -b work \
+  && mvn clean install -DskipTests
+
+
 # Use an official Tomcat runtime as a base image
 FROM tomcat:9-jre11
+
+ARG SMP_VERSION
+ENV SMP_VERSION=${SMP_VERSION:-5.2.5}
+LABEL vendor="Philip Helger"
+LABEL version=$SMP_VERSION
 
 # Special encoded slash handling for SMP
 # Use non-blocking random
 ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.security.egd=file:/dev/urandom"
 
-# Install vim, Java 11 JDK, Maven and Git
+# Install vim
 RUN apt-get update \
-  && apt-get install -y vim openjdk-11-jdk-headless git maven \
+  && apt-get install -y vim \
   && rm -rf /var/lib/apt/lists/*
 
 # Remove predefined Tomcat webapps
@@ -32,22 +58,4 @@ RUN rm -r $CATALINA_HOME/webapps/ROOT \
   && rm -r $CATALINA_HOME/webapps/docs \
   && rm -r $CATALINA_HOME/webapps/examples
 
-# Set arguments and labels after initial cleanup was performed :)
-# Minimum version for this layout is 5.0.1
-ARG SMP_VERSION
-# Set to environment to be persistent
-ENV SMP_VERSION=${SMP_VERSION:-5.2.5}
-LABEL vendor="Philip Helger"
-LABEL version=$SMP_VERSION
- 
-# Checkout from git and build
-# Note: Up to and including v5.1.2 the tag was called "peppol-smp-server-*" instead of "phoss-smp-*"
-WORKDIR /home/git
-RUN echo Building phoss SMP $SMP_VERSION \
-  && git clone https://github.com/phax/phoss-smp.git . \
-  && git checkout tags/phoss-smp-parent-pom-$SMP_VERSION -b work \
-  && mvn clean install -DskipTests
-
-# Copy result to Tomcat webapps dir
-# Note: Up to and including v5.1.2 the folders were called "peppol-smp-server-*" instead of "phoss-smp-*"
-RUN cp -r phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT
+COPY --from=build /build/phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT
