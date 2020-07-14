@@ -391,6 +391,9 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
       if (aDBServiceGroup == null)
         return null;
 
+      if (aDBServiceGroup.getOwnership () == null)
+        return null;
+
       return new SMPServiceGroup (aDBServiceGroup.getOwnership ().getId ().getUsername (),
                                   aDBServiceGroup.getId ().getAsBusinessIdentifier (),
                                   aDBServiceGroup.getExtension ());
