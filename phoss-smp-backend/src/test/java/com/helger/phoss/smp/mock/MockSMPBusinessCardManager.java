@@ -18,6 +18,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -43,7 +44,7 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
     throw new UnsupportedOperationException ();
   }
 
-  public ISMPBusinessCard getSMPBusinessCardOfID (final String sID)
+  public ISMPBusinessCard getSMPBusinessCardOfID (final IParticipantIdentifier aID)
   {
     throw new UnsupportedOperationException ();
   }
@@ -63,7 +64,7 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
     throw new UnsupportedOperationException ();
   }
 
-  public ISMPBusinessCard createOrUpdateSMPBusinessCard (final ISMPServiceGroup aServiceGroup,
+  public ISMPBusinessCard createOrUpdateSMPBusinessCard (final IParticipantIdentifier aParticipantID,
                                                          final Collection <SMPBusinessCardEntity> aEntities)
   {
     throw new UnsupportedOperationException ();

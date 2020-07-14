@@ -220,7 +220,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                         @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPBusinessCardManagerJDBC (aServiceGroupMgr);
+    return new SMPBusinessCardManagerJDBC ();
   }
 
   @Override

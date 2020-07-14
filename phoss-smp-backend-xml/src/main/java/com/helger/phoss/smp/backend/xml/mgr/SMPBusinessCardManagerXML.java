@@ -35,6 +35,7 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.dao.DAOException;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -49,8 +50,7 @@ import com.helger.photon.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard>
-                                             implements
+public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard> implements
                                              ISMPBusinessCardManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerXML.class);
@@ -76,10 +76,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     m_aRWLock.writeLocked ( () -> {
       internalCreateItem (aSMPBusinessCard);
     });
-    AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
-                                      aSMPBusinessCard.getID (),
-                                      aSMPBusinessCard.getServiceGroupID (),
-                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     return aSMPBusinessCard;
   }
 
@@ -90,39 +87,22 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     m_aRWLock.writeLocked ( () -> {
       internalUpdateItem (aSMPBusinessCard);
     });
-    AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
-                                      aSMPBusinessCard.getID (),
-                                      aSMPBusinessCard.getServiceGroupID (),
-                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     return aSMPBusinessCard;
   }
 
-  /**
-   * Create or update a business card for a service group.
-   *
-   * @param aServiceGroup
-   *        Service group
-   * @param aEntities
-   *        The entities of the business card. May not be <code>null</code>.
-   * @return The new or updated {@link ISMPBusinessCard}. Never
-   *         <code>null</code>.
-   */
   @Nonnull
-  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
                                                          @Nonnull final Collection <SMPBusinessCardEntity> aEntities)
   {
-    ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
-                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                    ", " +
-                    aEntities.size () +
-                    " entities)");
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities)");
 
-    final ISMPBusinessCard aOldBusinessCard = getSMPBusinessCardOfServiceGroup (aServiceGroup);
-    final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aServiceGroup, aEntities);
+    final ISMPBusinessCard aOldBusinessCard = getSMPBusinessCardOfID (aParticipantID);
+    final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aParticipantID, aEntities);
     if (aOldBusinessCard != null)
     {
       // Reuse old ID
@@ -141,7 +121,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     }
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onCreateOrUpdateSMPBusinessCard (aNewBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
 
     return aNewBusinessCard;
   }
@@ -171,12 +151,9 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     }
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onDeleteSMPBusinessCard (aSMPBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
 
-    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
-                                      aSMPBusinessCard.getID (),
-                                      aSMPBusinessCard.getServiceGroupID (),
-                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard successful");
@@ -198,13 +175,16 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     if (aServiceGroup == null)
       return null;
 
-    return getSMPBusinessCardOfID (aServiceGroup.getID ());
+    return getSMPBusinessCardOfID (aServiceGroup.getParticpantIdentifier ());
   }
 
   @Nullable
-  public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final String sID)
+  public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
   {
-    return getOfID (sID);
+    if (aID == null)
+      return null;
+
+    return getOfID (aID.getURIEncoded ());
   }
 
   @Nonnegative

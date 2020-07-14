@@ -93,8 +93,7 @@ public final class BusinessCardInterfaceTest
     return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
-  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
-                                                @Nonempty final int... aStatusCodes)
+  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
@@ -130,8 +129,7 @@ public final class BusinessCardInterfaceTest
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get SG - must work
@@ -166,7 +164,7 @@ public final class BusinessCardInterfaceTest
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
 
-      ISMPBusinessCard aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI.getURIEncoded ());
+      ISMPBusinessCard aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI);
       assertNotNull (aGetBC);
 
       // Update BC - add entity
@@ -185,7 +183,7 @@ public final class BusinessCardInterfaceTest
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
 
-      aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI.getURIEncoded ());
+      aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI);
       assertNotNull (aGetBC);
     }
     finally
@@ -196,7 +194,7 @@ public final class BusinessCardInterfaceTest
 
       // must be deleted
       _testResponseJerseyClient (aTarget.path ("businesscard").path (sPI).request ().get (), 404);
-      assertNull (aBCMgr.getSMPBusinessCardOfID (aPI.getURIEncoded ()));
+      assertNull (aBCMgr.getSMPBusinessCardOfID (aPI));
 
       // Delete service Group
       aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
@@ -229,8 +227,7 @@ public final class BusinessCardInterfaceTest
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get SG - must work
@@ -265,7 +262,7 @@ public final class BusinessCardInterfaceTest
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
 
-      ISMPBusinessCard aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI.getURIEncoded ());
+      ISMPBusinessCard aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI);
       assertNotNull (aGetBC);
 
       // Update BC - add entity
@@ -284,7 +281,7 @@ public final class BusinessCardInterfaceTest
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
 
-      aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI.getURIEncoded ());
+      aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI);
       assertNotNull (aGetBC);
     }
     finally
@@ -295,7 +292,7 @@ public final class BusinessCardInterfaceTest
 
       // must be deleted
       _testResponseJerseyClient (aTarget.path ("businesscard").path (sPI).request ().get (), 404);
-      assertNull (aBCMgr.getSMPBusinessCardOfID (aPI.getURIEncoded ()));
+      assertNull (aBCMgr.getSMPBusinessCardOfID (aPI));
 
       // Delete service Group
       aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
@@ -328,8 +325,7 @@ public final class BusinessCardInterfaceTest
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get SG - must work
@@ -364,7 +360,7 @@ public final class BusinessCardInterfaceTest
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
 
-      ISMPBusinessCard aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI.getURIEncoded ());
+      ISMPBusinessCard aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI);
       assertNotNull (aGetBC);
 
       // Update BC - add entity
@@ -383,7 +379,7 @@ public final class BusinessCardInterfaceTest
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
 
-      aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI.getURIEncoded ());
+      aGetBC = aBCMgr.getSMPBusinessCardOfID (aPI);
       assertNotNull (aGetBC);
     }
     finally
@@ -394,7 +390,7 @@ public final class BusinessCardInterfaceTest
 
       // must be deleted
       _testResponseJerseyClient (aTarget.path ("businesscard").path (sPI).request ().get (), 404);
-      assertNull (aBCMgr.getSMPBusinessCardOfID (aPI.getURIEncoded ()));
+      assertNull (aBCMgr.getSMPBusinessCardOfID (aPI));
 
       // Delete service Group
       aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();

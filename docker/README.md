@@ -32,7 +32,7 @@ Use an existing binary release, with the XML backend.
 To build, run and stop the SMP image with XML backend use the following command:
 
 ```
-docker build -t phoss-smp-release-binary-xml -f Dockerfile-release-binary-xml .
+docker build --pull -t phoss-smp-release-binary-xml -f Dockerfile-release-binary-xml .
 docker run -d --name phoss-smp-release-binary-xml -p 8888:8080 phoss-smp-release-binary-xml
 docker stop phoss-smp-release-binary-xml
 docker rm phoss-smp-release-binary-xml
@@ -48,7 +48,7 @@ Use an existing binary release, with the SQL backend.
 To build the SMP image with SQL backend use the following command:
 
 ```
-docker build -t phoss-smp-release-binary-sql -f Dockerfile-release-binary-sql .
+docker build --pull -t phoss-smp-release-binary-sql -f Dockerfile-release-binary-sql .
 docker run -d --name phoss-smp-release-binary-sql -p 8888:8080 phoss-smp-release-binary-sql
 docker stop phoss-smp-release-binary-sql
 docker rm phoss-smp-release-binary-sql
@@ -65,7 +65,7 @@ Use an existing binary release, with the MongoDB backend.
 To build the SMP image with MongoDB backend use the following command:
 
 ```
-docker build -t phoss-smp-release-binary-mongodb -f Dockerfile-release-binary-mongodb .
+docker build --pull -t phoss-smp-release-binary-mongodb -f Dockerfile-release-binary-mongodb .
 docker run -d --name phoss-smp-release-binary-mongodb -p 8888:8080 phoss-smp-release-binary-mongodb
 docker stop phoss-smp-release-binary-mongodb
 docker rm phoss-smp-release-binary-mongodb
@@ -79,7 +79,7 @@ Open `http://localhost:8888` in your browser.
 Build the SMP from source with the XML backend using the tag of the last release.
 
 ```
-docker build -t phoss-smp-release-from-source-xml -f Dockerfile-release-from-source-xml .
+docker build --pull -t phoss-smp-release-from-source-xml -f Dockerfile-release-from-source-xml .
 docker run -d --name phoss-smp-release-from-source-xml -p 8888:8080 phoss-smp-release-from-source-xml
 docker stop phoss-smp-release-from-source-xml
 docker rm phoss-smp-release-from-source-xml
@@ -93,7 +93,7 @@ Open `http://localhost:8888` in your browser.
 Build the SMP from source with the XML backend using the HEAD version of the master branch (SNAPSHOT version).
 
 ```
-docker build -t phoss-smp-snapshot-from-source-xml -f Dockerfile-snapshot-from-source-xml .
+docker build --pull -t phoss-smp-snapshot-from-source-xml -f Dockerfile-snapshot-from-source-xml .
 docker run -d --name phoss-smp-snapshot-from-source-xml -p 8888:8080 phoss-smp-snapshot-from-source-xml
 docker stop phoss-smp-snapshot-from-source-xml
 docker rm phoss-smp-snapshot-from-source-xml
@@ -109,7 +109,7 @@ Open `http://localhost:8888` in your browser.
 To change the version build of binary release versions you can specify the version on the commandline when building:
 
 ```
-docker build --build-arg SMP_VERSION=5.2.4 -t phoss-smp-release-binary-xml-5.2.4 -f Dockerfile-release-binary-xml .
+docker build --build-arg SMP_VERSION=5.2.5 -t phoss-smp-release-binary-xml-5.2.5 -f Dockerfile-release-binary-xml .
 ```
 
 Note: since the file system layout changed between 5.0.0 and 5.0.1, the current version is only applicable to versions &ge; 5.0.1
@@ -121,9 +121,9 @@ Note: up to and including v5.1.1 the variable `SMP_VERSION` was called `VERSION`
 Running a pre-build image (XML backend only):
 
 ```
-docker run -d --name phoss-smp-release-binary-xml-5.2.4 -p 8888:8080 phelger/smp:5.2.4
-docker stop phoss-smp-release-binary-xml-5.2.4
-docker rm phoss-smp-release-binary-xml-5.2.4
+docker run -d --name phoss-smp-release-binary-xml-5.2.5 -p 8888:8080 phelger/smp:5.2.5
+docker stop phoss-smp-release-binary-xml-5.2.5
+docker rm phoss-smp-release-binary-xml-5.2.5
 ```
 
 It exposes port 8888 where Tomcat is running successfully.
@@ -173,7 +173,7 @@ See https://docs.docker.com/storage/volumes/ for the Docker configuration on vol
 The main change is the `-v` parameter that mounts a local directory into the running image. `/host-directory/config` in the example down below must be changed to an existing directory containing the files `smp-server.properties`, `webapp.properties` and `pd-client.properties` (as named in the example dockerfile).
 
 ```
-docker build -t phoss-smp-with-config -f Example-Dockerfile-with-configuration .
+docker build --pull -t phoss-smp-with-config -f Example-Dockerfile-with-configuration .
 docker run -d --name phoss-smp-with-config -p 8888:8080 -v /host-directory/config:/config phoss-smp-with-config
 docker stop phoss-smp-with-config
 docker rm phoss-smp-with-config

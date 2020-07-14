@@ -94,7 +94,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                         @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPBusinessCardManagerMongoDB (aIdentifierFactory, aServiceGroupMgr);
+    return new SMPBusinessCardManagerMongoDB (aIdentifierFactory);
   }
 
   @Override

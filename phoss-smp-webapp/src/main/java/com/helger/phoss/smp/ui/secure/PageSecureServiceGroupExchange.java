@@ -51,7 +51,6 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirectMicroTypeConverter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupProvider;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroupMicroTypeConverter;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -234,17 +233,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         ISMPBusinessCard aBusinessCard = null;
         try
         {
-          final ISMPServiceGroupProvider aSGProvider = x -> {
-            // First look in service groups to import
-            ISMPServiceGroup aSG = aImportServiceGroups.findFirstKey (y -> x.hasSameContent (y.getKey ().getParticpantIdentifier ()));
-            if (aSG == null)
-            {
-              // Lookup in all existing service group
-              aSG = aAllServiceGroups.findFirst (y -> x.hasSameContent (y.getParticpantIdentifier ()));
-            }
-            return aSG;
-          };
-          aBusinessCard = SMPBusinessCardMicroTypeConverter.convertToNative (eBusinessCard, aSGProvider);
+          aBusinessCard = new SMPBusinessCardMicroTypeConverter ().convertToNative (eBusinessCard);
         }
         catch (final IllegalStateException ex)
         {
@@ -261,8 +250,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
           final boolean bIsBusinessCardContained = aAllBusinessCards.containsAny (x -> x.getID ().equals (sBusinessCardID));
           if (!bIsBusinessCardContained || bOverwriteExisting)
           {
-            final ISMPServiceGroup aBCSG = aBusinessCard.getServiceGroup ();
-            if (aImportBusinessCards.removeIf (x -> x.getServiceGroup ().equals (aBCSG)))
+            if (aImportBusinessCards.removeIf (x -> x.getID ().equals (sBusinessCardID)))
             {
               aLogger.error ("The business card for " +
                              sBusinessCardID +
@@ -344,7 +332,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
             aLogger.error ("Error creating the new service group " + aImportServiceGroup.getID (), ex);
 
             // Delete Business Card again, if already present
-            aImportBusinessCards.removeIf (x -> x.getServiceGroupID ().equals (aImportServiceGroup.getID ()));
+            aImportBusinessCards.removeIf (x -> x.getID ().equals (aImportServiceGroup.getID ()));
           }
           if (aNewServiceGroup != null)
           {
@@ -391,7 +379,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
               // If the service group to which the business card belongs was
               // already deleted, don't display an error, as the business card
               // was automatically deleted afterwards
-              if (!aDeletedServiceGroups.contains (aDeleteBusinessCard.getServiceGroup ().getParticpantIdentifier ()))
+              if (!aDeletedServiceGroups.contains (aDeleteBusinessCard.getParticpantIdentifier ()))
                 aLogger.error ("Failed to delete business card " + aDeleteBusinessCard.getID ());
             }
           }
@@ -405,7 +393,7 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
         for (final ISMPBusinessCard aImportBusinessCard : aImportBusinessCards)
           try
           {
-            if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getServiceGroup (),
+            if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getParticpantIdentifier (),
                                                                 aImportBusinessCard.getAllEntities ()) != null)
               aLogger.success ("Successfully created business card " + aImportBusinessCard.getID ());
           }

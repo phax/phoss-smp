@@ -15,6 +15,8 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.peppolid.IParticipantIdentifier;
+
 /**
  * Logging implementation of {@link ISMPServiceGroupCallback}
  *
@@ -26,18 +28,16 @@ public class LoggingSMPServiceGroupCallback implements ISMPServiceGroupCallback
 
   public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup)
   {
-    LOGGER.info ("Successfully Created ServiceGroup '" +
-                 aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                 "'");
+    LOGGER.info ("Successfully Created ServiceGroup with ID '" + aServiceGroup.getParticpantIdentifier ().getURIEncoded () + "'");
   }
 
-  public void onSMPServiceGroupUpdated (@Nonnull final String sServiceGroupID)
+  public void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
   {
-    LOGGER.info ("Successfully Updated ServiceGroup with ID '" + sServiceGroupID + "'");
+    LOGGER.info ("Successfully Updated ServiceGroup with ID '" + aParticipantID.getURIEncoded () + "'");
   }
 
-  public void onSMPServiceGroupDeleted (@Nonnull final String sServiceGroupID)
+  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID)
   {
-    LOGGER.info ("Successfully Deleted ServiceGroup with ID '" + sServiceGroupID + "'");
+    LOGGER.info ("Successfully Deleted ServiceGroup with ID '" + aParticipantID.getURIEncoded () + "'");
   }
 }

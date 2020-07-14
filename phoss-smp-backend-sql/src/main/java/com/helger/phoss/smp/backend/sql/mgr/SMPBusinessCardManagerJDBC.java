@@ -32,7 +32,6 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
-import com.helger.commons.string.StringHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.json.IJson;
@@ -54,7 +53,6 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 
 /**
  * A JDBC based implementation of the {@link ISMPBusinessCardManager} interface.
@@ -67,17 +65,12 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerJDBC.class);
 
   // Create with as minimal output as possible
-  private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false)
-                                                                         .setWriteNewlineAtEnd (false);
+  private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false).setWriteNewlineAtEnd (false);
 
-  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPBusinessCardManagerJDBC (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
-  {
-    ValueEnforcer.notNull (aServiceGroupMgr, "ServiceGroupMgr");
-    m_aServiceGroupMgr = aServiceGroupMgr;
-  }
+  public SMPBusinessCardManagerJDBC ()
+  {}
 
   @Nonnull
   @ReturnsMutableObject
@@ -92,9 +85,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     final JsonArray ret = new JsonArray ();
     if (aIDs != null)
       for (final SMPBusinessCardIdentifier aID : aIDs)
-        ret.add (new JsonObject ().add ("id", aID.getID ())
-                                  .add ("scheme", aID.getScheme ())
-                                  .add ("value", aID.getValue ()));
+        ret.add (new JsonObject ().add ("id", aID.getID ()).add ("scheme", aID.getScheme ()).add ("value", aID.getValue ()));
     return ret;
   }
 
@@ -169,23 +160,18 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   }
 
   @Nullable
-  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
                                                          @Nonnull final Collection <SMPBusinessCardEntity> aEntities)
   {
-    ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
-                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                    ", " +
-                    aEntities.size () +
-                    " entities" +
-                    ")");
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities" + ")");
 
     final ESuccess eSucces = executor ().performInTransaction ( () -> {
       // Delete all existing entities
-      final String sPID = aServiceGroup.getParticpantIdentifier ().getURIEncoded ();
+      final String sPID = aParticipantID.getURIEncoded ();
       final long nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
                                                                 new ConstantPreparedStatementDataProvider (sPID));
       if (LOGGER.isDebugEnabled () && nDeleted > 0)
@@ -197,9 +183,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
         executor ().insertOrUpdateOrDelete ("INSERT INTO smp_bce (id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                             new ConstantPreparedStatementDataProvider (aEntity.getID (),
                                                                                        sPID,
-                                                                                       aEntity.names ()
-                                                                                              .getFirst ()
-                                                                                              .getName (),
+                                                                                       aEntity.names ().getFirst ().getName (),
                                                                                        aEntity.getCountryCode (),
                                                                                        aEntity.getGeographicalInformation (),
                                                                                        getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
@@ -212,10 +196,10 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (eSucces.isFailure ())
       return null;
 
-    final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aServiceGroup, aEntities);
+    final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aParticipantID, aEntities);
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onCreateOrUpdateSMPBusinessCard (aNewBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Finished createOrUpdateSMPBusinessCard");
@@ -233,16 +217,19 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
     final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
-                                                            new ConstantPreparedStatementDataProvider (aSMPBusinessCard.getServiceGroup ()
-                                                                                                                       .getParticpantIdentifier ()
-                                                                                                                       .getURIEncoded ()));
+                                                            new ConstantPreparedStatementDataProvider (aSMPBusinessCard.getID ()));
     final EChange eChange = EChange.valueOf (nCount > 0);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Finished deleteSMPBusinessCard. Change=" + eChange.isChanged ());
 
     if (eChange.isChanged ())
+    {
       // Invoke generic callbacks
-      m_aCBs.forEach (x -> x.onDeleteSMPBusinessCard (aSMPBusinessCard));
+      m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
+    }
+
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Finished deleteSMPBusinessCard. Change=" + eChange.isChanged ());
 
     return eChange;
   }
@@ -279,15 +266,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       for (final Map.Entry <IParticipantIdentifier, ICommonsList <SMPBusinessCardEntity>> aEntry : aEntityMap.entrySet ())
       {
         final IParticipantIdentifier aPID = aEntry.getKey ();
-        final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aPID);
-        if (aServiceGroup == null)
-        {
-          // Can happen if there is an inconsistency between BCE and SG tables
-          if (LOGGER.isWarnEnabled ())
-            LOGGER.warn ("Failed to resolve service group " + aPID.getURIEncoded ());
-        }
-        else
-          ret.add (new SMPBusinessCard (aServiceGroup, aEntry.getValue ()));
+        ret.add (new SMPBusinessCard (aPID, aEntry.getValue ()));
       }
     }
     return ret;
@@ -299,11 +278,19 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (aServiceGroup == null)
       return null;
 
-    final IParticipantIdentifier aParticipantID = aServiceGroup.getParticpantIdentifier ();
+    return getSMPBusinessCardOfID (aServiceGroup.getParticpantIdentifier ());
+  }
+
+  @Nullable
+  public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
+  {
+    if (aID == null)
+      return null;
+
     final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT id, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
                                                                                   " FROM smp_bce" +
                                                                                   " WHERE pid=?",
-                                                                                  new ConstantPreparedStatementDataProvider (aParticipantID.getURIEncoded ()));
+                                                                                  new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
     if (!aDBResult.isPresent ())
     {
       return null;
@@ -327,20 +314,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       aEntity.setRegistrationDate (aRow.get (8).getAsLocalDate ());
       aEntities.add (aEntity);
     }
-    return new SMPBusinessCard (aServiceGroup, aEntities);
-  }
-
-  @Nullable
-  public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final String sID)
-  {
-    if (StringHelper.hasText (sID))
-    {
-      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aPI = aIdentifierFactory.parseParticipantIdentifier (sID);
-      if (aPI != null)
-        return getSMPBusinessCardOfServiceGroup (m_aServiceGroupMgr.getSMPServiceGroupOfID (aPI));
-    }
-    return null;
+    return new SMPBusinessCard (aID, aEntities);
   }
 
   @Nonnegative

@@ -26,6 +26,7 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.backend.SMPBackendRegistry;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.businesscard.LoggingSMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.LoggingSMPServiceGroupCallback;
@@ -120,6 +121,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     {
       // If service group is deleted, also delete respective business card
       m_aServiceGroupMgr.serviceGroupCallbacks ().add (new BusinessCardSMPServiceGroupCallback (m_aBusinessCardMgr));
+      m_aBusinessCardMgr.bcCallbacks ().add (new LoggingSMPBusinessCardCallback ());
     }
   }
 
