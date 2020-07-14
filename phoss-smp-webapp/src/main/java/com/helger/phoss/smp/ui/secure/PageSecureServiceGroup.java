@@ -43,7 +43,6 @@ import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.html.textlevel.HCEM;
-import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.network.port.NetworkOnlineStatusDeterminator;
@@ -594,25 +593,21 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     }
     aNodeList.addChild (aToolbar);
 
-    final boolean bHideDetails = aAllServiceGroups.size () > 1000;
+    final boolean bShowDetails = aAllServiceGroups.size () <= 1000;
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
                                         bShowBusinessCardName ? new DTCol ("Business Card Name") : null,
-                                        new DTCol (new HCSpan ().addChild (bShowExtensionDetails ? "Ext" : "Ext?")
-                                                                .setTitle ("Is an Extension present?")),
-                                        bHideDetails ? null
-                                                     : new DTCol (new HCSpan ().addChild ("Docs")
-                                                                               .setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
-                                                                                                                                                aDisplayLocale),
-                                        bHideDetails ? null
-                                                     : new DTCol (new HCSpan ().addChild ("Procs")
-                                                                               .setTitle ("Number of assigned processes")).setDisplayType (EDTColType.INT,
-                                                                                                                                           aDisplayLocale),
-                                        bHideDetails ? null
-                                                     : new DTCol (new HCSpan ().addChild ("EPs")
-                                                                               .setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
-                                                                                                                                           aDisplayLocale),
+                                        new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle ("Is an Extension present?")),
+                                        bShowDetails ? new DTCol (span ("Docs").setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
+                                                                                                                                                aDisplayLocale)
+                                                     : null,
+                                        bShowDetails ? new DTCol (span ("Procs").setTitle ("Number of assigned processes")).setDisplayType (EDTColType.INT,
+                                                                                                                                            aDisplayLocale)
+                                                     : null,
+                                        bShowDetails ? new DTCol (span ("EPs").setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
+                                                                                                                                          aDisplayLocale)
+                                                     : null,
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceGroup aCurObject : aAllServiceGroups)
     {
@@ -647,7 +642,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.extensions ().isNotEmpty (), aDisplayLocale));
       }
 
-      if (!bHideDetails)
+      if (bShowDetails)
       {
         int nProcesses = 0;
         int nEndpoints = 0;

@@ -18,12 +18,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
-import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.id.IHasID;
 import com.helger.pd.businesscard.v3.PD3BusinessCardType;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppolid.IParticipantIdentifier;
 
 /**
  * This interface represents a single SMP business card for a certain service
@@ -38,21 +37,11 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 public interface ISMPBusinessCard extends IHasID <String>, Serializable
 {
   /**
-   * @return The service group which this business card should handle.
+   * @return The participant ID of the service group to which this business card
+   *         belongs. Never <code>null</code>.
    */
   @Nonnull
-  ISMPServiceGroup getServiceGroup ();
-
-  /**
-   * @return The ID of the service group to which this business card belongs.
-   *         Never <code>null</code>.
-   */
-  @Nonnull
-  @Nonempty
-  default String getServiceGroupID ()
-  {
-    return getServiceGroup ().getID ();
-  }
+  IParticipantIdentifier getParticpantIdentifier ();
 
   /**
    * @return A copy of all {@link SMPBusinessCardEntity} objects. Never
@@ -64,7 +53,7 @@ public interface ISMPBusinessCard extends IHasID <String>, Serializable
 
   /**
    * Get the business card entity at the specified index.
-   * 
+   *
    * @param nIndex
    *        The index to query. Should be &ge; 0.
    * @return <code>null</code> if no such entity exists.
@@ -88,6 +77,6 @@ public interface ISMPBusinessCard extends IHasID <String>, Serializable
   @Nonnull
   static Comparator <ISMPBusinessCard> comparator ()
   {
-    return Comparator.comparing (ISMPBusinessCard::getServiceGroupID);
+    return Comparator.comparing (ISMPBusinessCard::getID);
   }
 }

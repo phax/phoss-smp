@@ -54,28 +54,32 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
    * @return The new participant identifier with a lower cased value.
    */
   @Nonnull
-  public static IParticipantIdentifier createUnifiedParticipantIdentifier (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  private static IParticipantIdentifier _createUnifiedParticipantIdentifier (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
   {
     ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier ret = aIdentifierFactory.getClone (aParticipantIdentifier);
     if (ret == null)
-      throw new IllegalStateException ("Failed to clone " +
-                                       aParticipantIdentifier +
-                                       " with identifier factory " +
-                                       aIdentifierFactory);
+      throw new IllegalStateException ("Failed to clone " + aParticipantIdentifier + " with identifier factory " + aIdentifierFactory);
     return ret;
+  }
+
+  @Nonnull
+  @Nonempty
+  public static String createSMPServiceGroupID (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  {
+    return _createUnifiedParticipantIdentifier (aParticipantIdentifier).getURIEncoded ();
   }
 
   public SMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
                           @Nonnull final IParticipantIdentifier aParticipantIdentifier,
                           @Nullable final String sExtension)
   {
-    m_sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantIdentifier);
+    m_sID = createSMPServiceGroupID (aParticipantIdentifier);
     setOwnerID (sOwnerID);
     setExtensionAsString (sExtension);
     // Make a copy to avoid unwanted changes
-    m_aParticipantIdentifier = createUnifiedParticipantIdentifier (aParticipantIdentifier);
+    m_aParticipantIdentifier = _createUnifiedParticipantIdentifier (aParticipantIdentifier);
   }
 
   @Nonnull
@@ -179,12 +183,5 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
                             .append ("OwnerID", m_sOwnerID)
                             .append ("ParticipantIdentifier", m_aParticipantIdentifier)
                             .getToString ();
-  }
-
-  @Nonnull
-  @Nonempty
-  public static String createSMPServiceGroupID (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
-  {
-    return createUnifiedParticipantIdentifier (aParticipantIdentifier).getURIEncoded ();
   }
 }

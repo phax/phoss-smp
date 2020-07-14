@@ -21,6 +21,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -46,15 +47,16 @@ public interface ISMPBusinessCardManager
   /**
    * Create or update a business card for a service group.
    *
-   * @param aServiceGroup
-   *        Service group the redirect belongs to. May not be <code>null</code>.
+   * @param aParticipantID
+   *        Participant ID the business card belongs to. May not be
+   *        <code>null</code>.
    * @param aEntities
    *        The entities for this business card. May not be <code>null</code>.
    * @return The new or updated {@link ISMPBusinessCard}. <code>null</code> if
    *         persistence failed.
    */
   @Nullable
-  ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull ISMPServiceGroup aServiceGroup,
+  ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
                                                   @Nonnull Collection <SMPBusinessCardEntity> aEntities);
 
   /**
@@ -103,13 +105,13 @@ public interface ISMPBusinessCardManager
   /**
    * Get the business card of the passed ID (= Service group ID).
    *
-   * @param sID
+   * @param aID
    *        The ID to use. May be <code>null</code>.
    * @return The contained business card or <code>null</code> if none is
    *         assigned.
    */
   @Nullable
-  ISMPBusinessCard getSMPBusinessCardOfID (@Nullable String sID);
+  ISMPBusinessCard getSMPBusinessCardOfID (@Nullable IParticipantIdentifier aID);
 
   /**
    * @return The count of all contained business cards. Always &ge; 0.

@@ -31,7 +31,7 @@ public interface ISMPBusinessCardCallback extends ICallback
    * @param aBusinessCard
    *        The new business card. May not be <code>null</code>.
    */
-  void onCreateOrUpdateSMPBusinessCard (@Nonnull ISMPBusinessCard aBusinessCard);
+  void onSMPBusinessCardCreatedOrUpdated (@Nonnull ISMPBusinessCard aBusinessCard);
 
   /**
    * Invoked after a business card was deleted.
@@ -39,5 +39,5 @@ public interface ISMPBusinessCardCallback extends ICallback
    * @param aBusinessCard
    *        The deleted business card. May not be <code>null</code>.
    */
-  void onDeleteSMPBusinessCard (@Nonnull ISMPBusinessCard aBusinessCard);
+  void onSMPBusinessCardDeleted (@Nonnull ISMPBusinessCard aBusinessCard);
 }

@@ -28,7 +28,6 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.commons.string.StringHelper;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.json.IJson;
 import com.helger.json.IJsonObject;
@@ -37,10 +36,8 @@ import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.backend.sql.AbstractSMPJPAEnabledManager;
 import com.helger.phoss.smp.backend.sql.model.DBBusinessCardEntity;
-import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -50,7 +47,6 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 
 /**
  * Manager for all {@link SMPBusinessCard} objects.
@@ -60,17 +56,12 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPBusinessCardManager
 {
   // Create as minimal as possible
-  private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false)
-                                                                         .setWriteNewlineAtEnd (false);
+  private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false).setWriteNewlineAtEnd (false);
 
-  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPBusinessCardManagerSQL (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
-  {
-    ValueEnforcer.notNull (aServiceGroupMgr, "ServiceGroupMgr");
-    m_aServiceGroupMgr = aServiceGroupMgr;
-  }
+  public SMPBusinessCardManagerSQL ()
+  {}
 
   @Nonnull
   @ReturnsMutableObject
@@ -85,9 +76,7 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
     final JsonArray ret = new JsonArray ();
     if (aIDs != null)
       for (final SMPBusinessCardIdentifier aID : aIDs)
-        ret.add (new JsonObject ().add ("id", aID.getID ())
-                                  .add ("scheme", aID.getScheme ())
-                                  .add ("value", aID.getValue ()));
+        ret.add (new JsonObject ().add ("id", aID.getID ()).add ("scheme", aID.getScheme ()).add ("value", aID.getValue ()));
     return ret;
   }
 
@@ -162,27 +151,21 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
   }
 
   @Nullable
-  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
                                                          @Nonnull final Collection <SMPBusinessCardEntity> aEntities)
   {
-    ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
-                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                    ", " +
-                    aEntities.size () +
-                    " entities" +
-                    ")");
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities" + ")");
 
     JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
       // Delete all existing entities
-      final int nDeleted = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id",
-                                            DBBusinessCardEntity.class)
-                              .setParameter ("id", aServiceGroup.getParticpantIdentifier ().getURIEncoded ())
+      final int nDeleted = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id", DBBusinessCardEntity.class)
+                              .setParameter ("id", aParticipantID.getURIEncoded ())
                               .executeUpdate ();
 
       if (LOGGER.isDebugEnabled () && nDeleted > 0)
@@ -192,8 +175,7 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
       {
         // Single name only
         final DBBusinessCardEntity aDBBCE = new DBBusinessCardEntity (aEntity.getID (),
-                                                                      aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getURIEncoded (),
+                                                                      aParticipantID.getURIEncoded (),
                                                                       aEntity.names ().getFirst ().getName (),
                                                                       aEntity.getCountryCode (),
                                                                       aEntity.getGeographicalInformation (),
@@ -210,10 +192,10 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
       return null;
     }
 
-    final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aServiceGroup, aEntities);
+    final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aParticipantID, aEntities);
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onCreateOrUpdateSMPBusinessCard (aNewBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Finished createOrUpdateSMPBusinessCard");
@@ -232,11 +214,9 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
 
     JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
-      final ISMPServiceGroup aServiceGroup = aSMPBusinessCard.getServiceGroup ();
       final EntityManager aEM = getEntityManager ();
-      final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id",
-                                          DBBusinessCardEntity.class)
-                            .setParameter ("id", aServiceGroup.getParticpantIdentifier ().getURIEncoded ())
+      final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id", DBBusinessCardEntity.class)
+                            .setParameter ("id", aSMPBusinessCard.getID ())
                             .executeUpdate ();
 
       return EChange.valueOf (nCount > 0);
@@ -251,7 +231,7 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
     if (eChange.isChanged ())
     {
       // Invoke generic callbacks
-      m_aCBs.forEach (x -> x.onDeleteSMPBusinessCard (aSMPBusinessCard));
+      m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
     }
 
     if (LOGGER.isDebugEnabled ())
@@ -261,18 +241,8 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
   }
 
   @Nullable
-  private SMPBusinessCard _convert (@Nonnull final IParticipantIdentifier aID,
-                                    @Nonnull final List <DBBusinessCardEntity> aDBEntities)
+  private SMPBusinessCard _convert (@Nonnull final IParticipantIdentifier aID, @Nonnull final List <DBBusinessCardEntity> aDBEntities)
   {
-    final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aID);
-    if (aServiceGroup == null)
-    {
-      // Can happen if there is an inconsistency between BCE and SG tables
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn ("Failed to resolve service group " + aID);
-      return null;
-    }
-
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
     for (final DBBusinessCardEntity aDBEntity : aDBEntities)
     {
@@ -288,7 +258,7 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
       aEntity.setRegistrationDate (aDBEntity.getRegistrationDate ());
       aEntities.add (aEntity);
     }
-    return new SMPBusinessCard (aServiceGroup, aEntities);
+    return new SMPBusinessCard (aID, aEntities);
   }
 
   @Nonnull
@@ -296,8 +266,7 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     JPAExecutionResult <List <DBBusinessCardEntity>> ret;
-    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p",
-                                                                   DBBusinessCardEntity.class)
+    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p", DBBusinessCardEntity.class)
                                                      .getResultList ());
     if (ret.hasException ())
     {
@@ -326,12 +295,19 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
     if (aServiceGroup == null)
       return null;
 
+    return getSMPBusinessCardOfID (aServiceGroup.getParticpantIdentifier ());
+  }
+
+  @Nullable
+  public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
+  {
+    if (aID == null)
+      return null;
+
     JPAExecutionResult <List <DBBusinessCardEntity>> ret;
     ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p WHERE p.participantId = :id",
                                                                    DBBusinessCardEntity.class)
-                                                     .setParameter ("id",
-                                                                    aServiceGroup.getParticpantIdentifier ()
-                                                                                 .getURIEncoded ())
+                                                     .setParameter ("id", aID.getURIEncoded ())
                                                      .getResultList ());
     if (ret.hasException ())
     {
@@ -341,20 +317,7 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
     if (ret.get ().isEmpty ())
       return null;
 
-    return _convert (aServiceGroup.getParticpantIdentifier (), ret.get ());
-  }
-
-  @Nullable
-  public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final String sID)
-  {
-    if (StringHelper.hasText (sID))
-    {
-      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aPI = aIdentifierFactory.parseParticipantIdentifier (sID);
-      if (aPI != null)
-        return getSMPBusinessCardOfServiceGroup (m_aServiceGroupMgr.getSMPServiceGroupOfID (aPI));
-    }
-    return null;
+    return _convert (aID, ret.get ());
   }
 
   @Nonnegative

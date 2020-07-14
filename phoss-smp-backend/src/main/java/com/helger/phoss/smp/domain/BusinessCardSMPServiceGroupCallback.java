@@ -12,12 +12,15 @@ package com.helger.phoss.smp.domain;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 
 /**
  * Special {@link ISMPServiceGroupCallback} to delete the business card, if the
@@ -27,6 +30,8 @@ import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
  */
 public class BusinessCardSMPServiceGroupCallback implements ISMPServiceGroupCallback
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (BusinessCardSMPServiceGroupCallback.class);
+
   private final ISMPBusinessCardManager m_aBusinessCardMgr;
 
   public BusinessCardSMPServiceGroupCallback (@Nonnull final ISMPBusinessCardManager aBusinessCardMgr)
@@ -35,13 +40,21 @@ public class BusinessCardSMPServiceGroupCallback implements ISMPServiceGroupCall
     m_aBusinessCardMgr = aBusinessCardMgr;
   }
 
+  public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup)
+  {}
+
+  public void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
+  {}
+
   @Override
   public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID)
   {
     // If service group is deleted, also delete respective business card
-    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
-    final ISMPBusinessCard aBusinessCard = m_aBusinessCardMgr.getSMPBusinessCardOfID (sServiceGroupID);
+    final ISMPBusinessCard aBusinessCard = m_aBusinessCardMgr.getSMPBusinessCardOfID (aParticipantID);
     if (aBusinessCard != null)
       m_aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
+    else
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.warn ("Found no BusinessCard for participant ID '" + aParticipantID.getURIEncoded () + "'");
   }
 }

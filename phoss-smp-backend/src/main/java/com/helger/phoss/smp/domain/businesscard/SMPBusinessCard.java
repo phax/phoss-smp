@@ -26,7 +26,8 @@ import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.pd.businesscard.v3.PD3APIHelper;
 import com.helger.pd.businesscard.v3.PD3BusinessCardType;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 
 /**
  * A single business card.
@@ -42,17 +43,17 @@ public class SMPBusinessCard implements ISMPBusinessCard
   public static final ObjectType OT = new ObjectType ("smpbusinesscard");
 
   private final String m_sID;
-  private final ISMPServiceGroup m_aServiceGroup;
+  private final IParticipantIdentifier m_aParticipantID;
   private final ICommonsList <SMPBusinessCardEntity> m_aEntities;
 
-  public SMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public SMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
                           @Nonnull final Iterable <? extends SMPBusinessCardEntity> aEntities)
   {
-    ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
 
-    m_sID = aServiceGroup.getID ();
-    m_aServiceGroup = aServiceGroup;
+    m_sID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+    m_aParticipantID = aParticipantID;
     m_aEntities = new CommonsArrayList <> (aEntities);
   }
 
@@ -64,9 +65,9 @@ public class SMPBusinessCard implements ISMPBusinessCard
   }
 
   @Nonnull
-  public ISMPServiceGroup getServiceGroup ()
+  public IParticipantIdentifier getParticpantIdentifier ()
   {
-    return m_aServiceGroup;
+    return m_aParticipantID;
   }
 
   /**
@@ -103,10 +104,7 @@ public class SMPBusinessCard implements ISMPBusinessCard
   public PD3BusinessCardType getAsJAXBObject ()
   {
     final PD3BusinessCardType ret = new PD3BusinessCardType ();
-    ret.setParticipantIdentifier (PD3APIHelper.createIdentifier (m_aServiceGroup.getParticpantIdentifier ()
-                                                                                .getScheme (),
-                                                                 m_aServiceGroup.getParticpantIdentifier ()
-                                                                                .getValue ()));
+    ret.setParticipantIdentifier (PD3APIHelper.createIdentifier (m_aParticipantID.getScheme (), m_aParticipantID.getValue ()));
     for (final SMPBusinessCardEntity aItem : m_aEntities)
       ret.addBusinessEntity (aItem.getAsJAXBObject ());
     return ret;
@@ -120,20 +118,18 @@ public class SMPBusinessCard implements ISMPBusinessCard
     if (o == null || !getClass ().equals (o.getClass ()))
       return false;
     final SMPBusinessCard rhs = (SMPBusinessCard) o;
-    return m_aServiceGroup.equals (rhs.m_aServiceGroup) && m_aEntities.equals (rhs.m_aEntities);
+    return m_aParticipantID.hasSameContent (rhs.m_aParticipantID) && m_aEntities.equals (rhs.m_aEntities);
   }
 
   @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_aServiceGroup).append (m_aEntities).getHashCode ();
+    return new HashCodeGenerator (this).append (m_aParticipantID).append (m_aEntities).getHashCode ();
   }
 
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("serviceGroup", m_aServiceGroup)
-                                       .append ("entities", m_aEntities)
-                                       .getToString ();
+    return new ToStringGenerator (this).append ("ParticipantID", m_aParticipantID).append ("Entities", m_aEntities).getToString ();
   }
 }

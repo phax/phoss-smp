@@ -247,27 +247,23 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     {
       aBusinessCardMgr.bcCallbacks ().add (new ISMPBusinessCardCallback ()
       {
-        public void onCreateOrUpdateSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
+        public void onSMPBusinessCardCreatedOrUpdated (@Nonnull final ISMPBusinessCard aBusinessCard)
         {
           final ISMPSettings aSettings = SMPMetaManager.getSettings ();
           if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
           {
             // Notify PD server: add
-            PDClientProvider.getInstance ()
-                            .getPDClient ()
-                            .addServiceGroupToIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ());
+            PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aBusinessCard.getParticpantIdentifier ());
           }
         }
 
-        public void onDeleteSMPBusinessCard (@Nonnull final ISMPBusinessCard aBusinessCard)
+        public void onSMPBusinessCardDeleted (@Nonnull final ISMPBusinessCard aBusinessCard)
         {
           final ISMPSettings aSettings = SMPMetaManager.getSettings ();
           if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
           {
             // Notify PD server: delete
-            PDClientProvider.getInstance ()
-                            .getPDClient ()
-                            .deleteServiceGroupFromIndex (aBusinessCard.getServiceGroup ().getParticpantIdentifier ());
+            PDClientProvider.getInstance ().getPDClient ().deleteServiceGroupFromIndex (aBusinessCard.getParticpantIdentifier ());
           }
         }
       });

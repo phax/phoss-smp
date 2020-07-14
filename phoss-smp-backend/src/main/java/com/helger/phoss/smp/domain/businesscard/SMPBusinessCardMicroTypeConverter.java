@@ -19,10 +19,9 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.id.factory.GlobalIDFactory;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupProvider;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.IMicroQName;
 import com.helger.xml.microdom.MicroElement;
@@ -67,7 +66,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
                                                      final boolean bManualExport)
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
-    aElement.setAttribute (ATTR_SERVICE_GROUP_ID, aValue.getServiceGroupID ());
+    aElement.setAttribute (ATTR_SERVICE_GROUP_ID, aValue.getID ());
     for (final SMPBusinessCardEntity aEntity : aValue.getAllEntities ())
     {
       final IMicroElement eEntity = aElement.appendElement (sNamespaceURI, ELEMENT_ENTITY);
@@ -82,8 +81,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       eEntity.setAttribute (ATTR_COUNTRY_CODE, aEntity.getCountryCode ());
       if (aEntity.hasGeographicalInformation ())
       {
-        eEntity.appendElement (sNamespaceURI, ELEMENT_GEOGRAPHICAL_INFORMATION)
-               .appendText (aEntity.getGeographicalInformation ());
+        eEntity.appendElement (sNamespaceURI, ELEMENT_GEOGRAPHICAL_INFORMATION).appendText (aEntity.getGeographicalInformation ());
       }
       for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
       {
@@ -107,8 +105,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       }
       if (aEntity.hasAdditionalInformation ())
       {
-        eEntity.appendElement (sNamespaceURI, ELEMENT_ADDITIONAL_INFORMATION)
-               .appendText (aEntity.getAdditionalInformation ());
+        eEntity.appendElement (sNamespaceURI, ELEMENT_ADDITIONAL_INFORMATION).appendText (aEntity.getAdditionalInformation ());
       }
       eEntity.setAttributeWithConversion (ATTR_REGISTRATION_DATE, aEntity.getRegistrationDate ());
     }
@@ -124,15 +121,14 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
   }
 
   @Nonnull
-  public static SMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement,
-                                                 @Nonnull final ISMPServiceGroupProvider aSGProvider)
+  public SMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);
 
-    final ISMPServiceGroup aServiceGroup = aSGProvider.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
-    if (aServiceGroup == null)
-      throw new IllegalStateException ("Failed to resolve service group with ID '" + sServiceGroupID + "'");
+    final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+    if (aParticipantID == null)
+      throw new IllegalStateException ("Failed to parse participant ID '" + sServiceGroupID + "'");
 
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
     for (final IMicroElement eEntity : aElement.getAllChildElements (ELEMENT_ENTITY))
@@ -162,8 +158,7 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
         }
       }
       aEntity.setCountryCode (eEntity.getAttributeValue (ATTR_COUNTRY_CODE));
-      aEntity.setGeographicalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
-                                                                                  ELEMENT_GEOGRAPHICAL_INFORMATION));
+      aEntity.setGeographicalInformation (MicroHelper.getChildTextContentTrimmed (eEntity, ELEMENT_GEOGRAPHICAL_INFORMATION));
       for (final IMicroElement eIdentifier : eEntity.getAllChildElements (ELEMENT_IDENTIFIER))
       {
         aEntity.identifiers ()
@@ -184,18 +179,11 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
                                                  eContact.getAttributeValue (ATTR_PHONE),
                                                  eContact.getAttributeValue (ATTR_EMAIL)));
       }
-      aEntity.setAdditionalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
-                                                                                ELEMENT_ADDITIONAL_INFORMATION));
+      aEntity.setAdditionalInformation (MicroHelper.getChildTextContentTrimmed (eEntity, ELEMENT_ADDITIONAL_INFORMATION));
       aEntity.setRegistrationDate (eEntity.getAttributeValueWithConversion (ATTR_REGISTRATION_DATE, LocalDate.class));
       aEntities.add (aEntity);
     }
 
-    return new SMPBusinessCard (aServiceGroup, aEntities);
-  }
-
-  @Nonnull
-  public SMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement)
-  {
-    return convertToNative (aElement, SMPMetaManager.getServiceGroupMgr ());
+    return new SMPBusinessCard (aParticipantID, aEntities);
   }
 }

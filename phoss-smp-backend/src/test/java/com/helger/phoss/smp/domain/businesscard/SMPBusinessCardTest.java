@@ -12,7 +12,6 @@ package com.helger.phoss.smp.domain.businesscard;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import javax.annotation.Nonnull;
@@ -52,7 +51,7 @@ public final class SMPBusinessCardTest
 
     // Read from XML
     // Special resolver needed here!!
-    final SMPBusinessCard aObj2 = SMPBusinessCardMicroTypeConverter.convertToNative (e, x -> aBC.getServiceGroup ());
+    final SMPBusinessCard aObj2 = new SMPBusinessCardMicroTypeConverter ().convertToNative (e);
     assertNotNull (aObj2);
 
     // Write to XML again
@@ -71,17 +70,15 @@ public final class SMPBusinessCardTest
   @Test
   public void testBasic ()
   {
-    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
-                                                                        "0088:dummy");
+    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME, "0088:dummy");
 
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     // Test empty
     {
-      final SMPBusinessCard aBC = new SMPBusinessCard (aSG, new CommonsArrayList <> ());
-      assertSame (aSG, aBC.getServiceGroup ());
+      final SMPBusinessCard aBC = new SMPBusinessCard (aPI, new CommonsArrayList <> ());
+      assertEquals (aPI, aBC.getParticpantIdentifier ());
       assertEquals (aSG.getID (), aBC.getID ());
-      assertEquals (aSG.getID (), aBC.getServiceGroupID ());
       assertNotNull (aBC.getAllEntities ());
       assertTrue (aBC.getAllEntities ().isEmpty ());
       CommonsTestHelper.testDefaultSerialization (aBC);
@@ -100,8 +97,7 @@ public final class SMPBusinessCardTest
       aEntity1.websiteURIs ().add ("http://www.helger.com");
       aEntity1.websiteURIs ().add ("https://github.com/phax/phoss-smp");
       aEntity1.contacts ().add (new SMPBusinessCardContact ("type 1", "Whoever", "with a phone", "and@an.email.org"));
-      aEntity1.contacts ()
-              .add (new SMPBusinessCardContact ("type 2", "Whoever else", "without a phone", "but@an.email.org"));
+      aEntity1.contacts ().add (new SMPBusinessCardContact ("type 2", "Whoever else", "without a phone", "but@an.email.org"));
       aEntity1.setAdditionalInformation ("this is line1\nfollowed by line 2\r\nand now eoai");
       aEntity1.setRegistrationDate (PDTFactory.getCurrentLocalDate ());
 
@@ -115,8 +111,7 @@ public final class SMPBusinessCardTest
       aEntity2.websiteURIs ().add ("http://www.helger.com");
       aEntity2.websiteURIs ().add ("https://github.com/phax/phoss-smp");
       aEntity2.contacts ().add (new SMPBusinessCardContact ("type 1", "Whoever", "with a phone", "and@an.email.org"));
-      aEntity2.contacts ()
-              .add (new SMPBusinessCardContact ("type 2", "Whoever else", "without a phone", "but@an.email.org"));
+      aEntity2.contacts ().add (new SMPBusinessCardContact ("type 2", "Whoever else", "without a phone", "but@an.email.org"));
       aEntity2.setAdditionalInformation ("this is line1\nfollowed by line 2\r\nand now eoai");
       aEntity2.setRegistrationDate (PDTFactory.getCurrentLocalDate ());
 
@@ -124,10 +119,9 @@ public final class SMPBusinessCardTest
       aEntity3.names ().add (new SMPBusinessCardName ("Shorty", null));
       aEntity3.setCountryCode ("US");
 
-      final SMPBusinessCard aBC = new SMPBusinessCard (aSG, new CommonsArrayList <> (aEntity1, aEntity2, aEntity3));
-      assertSame (aSG, aBC.getServiceGroup ());
+      final SMPBusinessCard aBC = new SMPBusinessCard (aPI, new CommonsArrayList <> (aEntity1, aEntity2, aEntity3));
+      assertEquals (aPI, aBC.getParticpantIdentifier ());
       assertEquals (aSG.getID (), aBC.getID ());
-      assertEquals (aSG.getID (), aBC.getServiceGroupID ());
       assertNotNull (aBC.getAllEntities ());
       assertEquals (3, aBC.getAllEntities ().size ());
       CommonsTestHelper.testDefaultSerialization (aBC);

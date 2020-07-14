@@ -28,8 +28,7 @@ public interface ISMPServiceGroupCallback extends ICallback
    * @param aServiceGroup
    *        The created object. Never <code>null</code>.
    */
-  default void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup)
-  {}
+  void onSMPServiceGroupCreated (@Nonnull ISMPServiceGroup aServiceGroup);
 
   /**
    * Invoked after an SMP service group was updated.
@@ -37,8 +36,7 @@ public interface ISMPServiceGroupCallback extends ICallback
    * @param aParticipantID
    *        The ID of the updated object. Never <code>null</code>.
    */
-  default void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
-  {}
+  void onSMPServiceGroupUpdated (@Nonnull IParticipantIdentifier aParticipantID);
 
   /**
    * Invoked after an SMP service group was deleted.
@@ -46,6 +44,5 @@ public interface ISMPServiceGroupCallback extends ICallback
    * @param aParticipantID
    *        The ID of the deleted object. Never <code>null</code>.
    */
-  default void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID)
-  {}
+  void onSMPServiceGroupDeleted (@Nonnull IParticipantIdentifier aParticipantID);
 }

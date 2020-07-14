@@ -39,8 +39,8 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
-import com.helger.commons.string.StringHelper;
 import com.helger.commons.typeconvert.TypeConverter;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
@@ -51,7 +51,6 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.photon.audit.AuditHelper;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
@@ -85,15 +84,12 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   private static final String BSON_LANGUAGE = "language";
 
   private final IIdentifierFactory m_aIdentifierFactory;
-  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPBusinessCardManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                        @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public SMPBusinessCardManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory)
   {
     super ("smp-businesscard");
     m_aIdentifierFactory = aIdentifierFactory;
-    m_aServiceGroupMgr = aServiceGroupMgr;
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
@@ -134,9 +130,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   @ReturnsMutableCopy
   public static SMPBusinessCardIdentifier toBCIdentifier (@Nonnull final Document aDoc)
   {
-    return new SMPBusinessCardIdentifier (aDoc.getString (BSON_ID),
-                                          aDoc.getString (BSON_SCHEME),
-                                          aDoc.getString (BSON_VALUE));
+    return new SMPBusinessCardIdentifier (aDoc.getString (BSON_ID), aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
   }
 
   @Nonnull
@@ -239,8 +233,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   @ReturnsMutableCopy
   public static Document toBson (@Nonnull final ISMPBusinessCard aValue)
   {
-    final Document ret = new Document ().append (BSON_ID, aValue.getID ())
-                                        .append (BSON_SERVICE_GROUP_ID, aValue.getServiceGroupID ());
+    final Document ret = new Document ().append (BSON_ID, aValue.getID ()).append (BSON_SERVICE_GROUP_ID, aValue.getID ());
     final ICommonsList <Document> aEntities = new CommonsArrayList <> ();
     for (final SMPBusinessCardEntity aEntity : aValue.getAllEntities ())
       aEntities.add (toBson (aEntity));
@@ -253,14 +246,13 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   @ReturnsMutableCopy
   public SMPBusinessCard toDomain (@Nonnull final Document aDoc)
   {
-    final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID)));
+    final IParticipantIdentifier aParticipantID = m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID));
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
     final List <Document> aEntityList = aDoc.getList (BSON_ENTITIES, Document.class);
     if (aEntityList != null)
       for (final Document aItemDoc : aEntityList)
         aEntities.add (toBCEntity (aItemDoc));
-    // The ID itself is derived from ServiceGroupID
-    return new SMPBusinessCard (aServiceGroup, aEntities);
+    return new SMPBusinessCard (aParticipantID, aEntities);
   }
 
   @Nonnull
@@ -269,10 +261,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   {
     getCollection ().insertOne (toBson (aSMPBusinessCard));
 
-    AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
-                                      aSMPBusinessCard.getID (),
-                                      aSMPBusinessCard.getServiceGroupID (),
-                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     return aSMPBusinessCard;
   }
 
@@ -285,37 +274,22 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     if (aOldDoc != null)
       AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
                                         aSMPBusinessCard.getID (),
-                                        aSMPBusinessCard.getServiceGroupID (),
                                         Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     return aSMPBusinessCard;
   }
 
-  /**
-   * Create or update a business card for a service group.
-   *
-   * @param aServiceGroup
-   *        Service group
-   * @param aEntities
-   *        The entities of the business card. May not be <code>null</code>.
-   * @return The new or updated {@link ISMPBusinessCard}. Never
-   *         <code>null</code>.
-   */
   @Nonnull
-  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
                                                          @Nonnull final Collection <SMPBusinessCardEntity> aEntities)
   {
-    ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
-                    aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
-                    ", " +
-                    aEntities.size () +
-                    " entities)");
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities)");
 
-    final ISMPBusinessCard aOldBusinessCard = getSMPBusinessCardOfServiceGroup (aServiceGroup);
-    final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aServiceGroup, aEntities);
+    final ISMPBusinessCard aOldBusinessCard = getSMPBusinessCardOfID (aParticipantID);
+    final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aParticipantID, aEntities);
     if (aOldBusinessCard != null)
     {
       // Reuse old ID
@@ -334,7 +308,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     }
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onCreateOrUpdateSMPBusinessCard (aNewBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
 
     return aNewBusinessCard;
   }
@@ -356,12 +330,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     }
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onDeleteSMPBusinessCard (aSMPBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
 
-    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
-                                      aSMPBusinessCard.getID (),
-                                      aSMPBusinessCard.getServiceGroupID (),
-                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard successful");
 
@@ -384,16 +355,16 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     if (aServiceGroup == null)
       return null;
 
-    return getSMPBusinessCardOfID (aServiceGroup.getID ());
+    return getSMPBusinessCardOfID (aServiceGroup.getParticpantIdentifier ());
   }
 
   @Nullable
-  public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final String sID)
+  public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
   {
-    if (StringHelper.hasNoText (sID))
+    if (aID == null)
       return null;
 
-    return getCollection ().find (new Document (BSON_ID, sID)).map (this::toDomain).first ();
+    return getCollection ().find (new Document (BSON_ID, aID.getURIEncoded ())).map (this::toDomain).first ();
   }
 
   @Nonnegative
