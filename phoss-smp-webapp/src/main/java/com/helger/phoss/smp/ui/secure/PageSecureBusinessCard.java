@@ -613,6 +613,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         }
       }
 
+    if (aSMPEntities.isEmpty ())
+      if (aFormErrors.isEmpty ())
+        aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "At least one entity must be provided.");
+
     if (aFormErrors.isEmpty ())
     {
       // Store in a consistent manner
