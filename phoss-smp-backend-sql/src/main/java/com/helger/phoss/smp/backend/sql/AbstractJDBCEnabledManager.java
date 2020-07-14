@@ -29,7 +29,6 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 
 public abstract class AbstractJDBCEnabledManager
 {
-
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractJDBCEnabledManager.class);
   private static final DBExecutor s_aDBExec;
 
@@ -43,8 +42,7 @@ public abstract class AbstractJDBCEnabledManager
       SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew);
     });
 
-    if (SMPServerConfiguration.getConfigFile ()
-                              .getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE))
+    if (SMPServerConfiguration.getConfigFile ().getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE))
     {
       final long nMillis = SMPServerConfiguration.getConfigFile ()
                                                  .getAsLong (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
@@ -52,9 +50,7 @@ public abstract class AbstractJDBCEnabledManager
       if (nMillis > 0)
         s_aDBExec.setExecutionDurationWarnMS (nMillis);
       else
-        LOGGER.warn ("Ignoring setting '" +
-                     SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS +
-                     "' because it is invalid.");
+        LOGGER.warn ("Ignoring setting '" + SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS + "' because it is invalid.");
     }
     else
     {
