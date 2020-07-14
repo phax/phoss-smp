@@ -48,7 +48,8 @@ public class SMPServerRESTTestRule extends ExternalResource
   {
     super.before ();
 
-    ClassPathHelper.forAllClassPathEntries (LOGGER::info);
+    if (false)
+      ClassPathHelper.forAllClassPathEntries (LOGGER::info);
 
     // http only
     m_aServer = MockWebServer.startRegularServer ();
