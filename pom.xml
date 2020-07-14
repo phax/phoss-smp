@@ -230,8 +230,8 @@
     <module>phoss-smp-backend-xml</module>
     <module>phoss-smp-backend-mongodb</module>
     <module>phoss-smp-webapp</module>
-    <module>phoss-smp-webapp-sql</module>
     <module>phoss-smp-webapp-xml</module>
+    <module>phoss-smp-webapp-sql</module>
     <module>phoss-smp-webapp-mongodb</module>
   </modules>
   
