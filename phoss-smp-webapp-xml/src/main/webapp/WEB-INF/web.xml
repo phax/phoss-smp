@@ -28,9 +28,6 @@
   <listener>
     <listener-class>com.helger.phoss.smp.servlet.SMPWebAppListener</listener-class>
   </listener>
-  <listener>
-    <listener-class>com.helger.phoss.smp.servlet.TimeZoneCorrectorListener</listener-class>
-  </listener>
 
   <filter>
     <filter-name>RestFilter</filter-name>

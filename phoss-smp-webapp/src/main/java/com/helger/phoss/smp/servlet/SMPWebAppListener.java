@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.servlet;
 
+import java.util.TimeZone;
+
 import javax.annotation.Nonnull;
 import javax.servlet.ServletContext;
 
@@ -23,7 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.datetime.PDTConfig;
+import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.regex.RegExHelper;
@@ -111,6 +116,23 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected void initGlobalSettings ()
   {
+    // Check if the timezone is supported
+    if (!ArrayHelper.contains (TimeZone.getAvailableIDs (), CSMP.DEFAULT_TIMEZONE))
+    {
+      final String sErrorMsg = "The default time zone '" + CSMP.DEFAULT_TIMEZONE + "' is not supported!";
+      LOGGER.error (sErrorMsg);
+      throw new InitializationException (sErrorMsg);
+    }
+
+    // Set the default timezone
+    if (PDTConfig.setDefaultDateTimeZoneID (CSMP.DEFAULT_TIMEZONE).isFailure ())
+    {
+      final String sErrorMsg = "Failed to set default time zone to '" + CSMP.DEFAULT_TIMEZONE + "'!";
+      LOGGER.error (sErrorMsg);
+      throw new InitializationException (sErrorMsg);
+    }
+    LOGGER.info ("Set default timezone to '" + CSMP.DEFAULT_TIMEZONE + "'");
+
     // Enable JaxWS debugging?
     if (SMPWebAppConfiguration.isGlobalDebugJaxWS ())
       WSHelper.setMetroDebugSystemProperties (true);
