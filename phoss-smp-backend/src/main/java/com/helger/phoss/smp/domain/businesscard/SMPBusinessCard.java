@@ -118,13 +118,13 @@ public class SMPBusinessCard implements ISMPBusinessCard
     if (o == null || !getClass ().equals (o.getClass ()))
       return false;
     final SMPBusinessCard rhs = (SMPBusinessCard) o;
-    return m_aParticipantID.hasSameContent (rhs.m_aParticipantID) && m_aEntities.equals (rhs.m_aEntities);
+    return m_sID.equals (rhs.m_sID) && m_aEntities.equals (rhs.m_aEntities);
   }
 
   @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_aParticipantID).append (m_aEntities).getHashCode ();
+    return new HashCodeGenerator (this).append (m_sID).append (m_aEntities).getHashCode ();
   }
 
   @Override

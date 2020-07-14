@@ -32,11 +32,13 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
  */
 final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
 {
+  private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
+
   @Nonnull
   @ReturnsMutableObject
   public CallbackList <ISMPBusinessCardCallback> bcCallbacks ()
   {
-    throw new UnsupportedOperationException ();
+    return m_aCBs;
   }
 
   public ISMPBusinessCard getSMPBusinessCardOfServiceGroup (final ISMPServiceGroup aServiceGroup)

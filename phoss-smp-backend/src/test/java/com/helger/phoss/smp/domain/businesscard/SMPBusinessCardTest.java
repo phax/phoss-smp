@@ -51,7 +51,7 @@ public final class SMPBusinessCardTest
 
     // Read from XML
     // Special resolver needed here!!
-    final SMPBusinessCard aObj2 = new SMPBusinessCardMicroTypeConverter ().convertToNative (e);
+    final SMPBusinessCard aObj2 = MicroTypeConverter.convertToNative (e, SMPBusinessCard.class);
     assertNotNull (aObj2);
 
     // Write to XML again
