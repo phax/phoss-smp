@@ -49,6 +49,9 @@ jobs:
       jdk: openjdk8
       script:
         - mvn test -B -P coverage sonar:sonar
+      after_success:
+        - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
+        - bash <(curl -s https://codecov.io/bash)
 # build XML version
         - docker build --pull -t phoss-smp-snapshot-from-source-xml -f docker/Dockerfile-snapshot-from-source-xml .
         - docker tag phoss-smp-snapshot-from-source-xml phelger/phoss-smp-xml:snapshot
@@ -64,9 +67,6 @@ jobs:
         - docker push phelger/phoss-smp-sql:snapshot
         - docker push phelger/phoss-smp-mongodb:snapshot
         - docker logout
-      after_success:
-        - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
-        - bash <(curl -s https://codecov.io/bash)
     - stage: test
       jdk: openjdk11
       script:
