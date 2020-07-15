@@ -85,16 +85,11 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
                                                                                                aDocumentTypeIdentifier);
       DBServiceMetadataRedirection aDBRedirect = aEM.find (DBServiceMetadataRedirection.class, aDBRedirectID);
 
-      final String sCertificate = aCertificate == null ? null
-                                                       : CertificateHelper.getPEMEncodedCertificate (aCertificate);
+      final String sCertificate = aCertificate == null ? null : CertificateHelper.getPEMEncodedCertificate (aCertificate);
       if (aDBRedirect == null)
       {
         // Create a new one
-        aDBRedirect = new DBServiceMetadataRedirection (aDBRedirectID,
-                                                        sTargetHref,
-                                                        sSubjectUniqueIdentifier,
-                                                        sCertificate,
-                                                        sExtension);
+        aDBRedirect = new DBServiceMetadataRedirection (aDBRedirectID, sTargetHref, sSubjectUniqueIdentifier, sCertificate, sExtension);
         aEM.persist (aDBRedirect);
         aCreatedNew.set (true);
       }
@@ -169,8 +164,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     ret = doInTransaction ( () -> {
       final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
                                                         DBServiceMetadataRedirection.class)
-                                          .setParameter ("scheme",
-                                                         aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                          .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
                                           .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
                                           .executeUpdate ();
       return Integer.valueOf (nCnt);
@@ -238,12 +232,8 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
       JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
       ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
                                                                      DBServiceMetadataRedirection.class)
-                                                       .setParameter ("scheme",
-                                                                      aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getScheme ())
-                                                       .setParameter ("value",
-                                                                      aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getValue ())
+                                                       .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                                       .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
                                                        .getResultList ());
       if (ret.hasException ())
       {

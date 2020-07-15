@@ -119,10 +119,7 @@ public class SMPBusinessCardIdentifier implements IHasID <String>, Serializable
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("ID", m_sID)
-                                       .append ("value", m_sValue)
-                                       .append ("scheme", m_sScheme)
-                                       .getToString ();
+    return new ToStringGenerator (this).append ("ID", m_sID).append ("value", m_sValue).append ("scheme", m_sScheme).getToString ();
   }
 
   @Nonnull

@@ -41,8 +41,7 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
   {
     if (StringHelper.hasText (sSMPServerPropertiesPath))
     {
-      SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH,
-                                         sSMPServerPropertiesPath);
+      SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH, sSMPServerPropertiesPath);
       SMPServerConfiguration.reloadConfiguration ();
     }
   }
@@ -54,9 +53,7 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
     SMPMetaManager.initBackendFromConfiguration ();
     // Add some logging
     if (false)
-      SMPMetaManager.getServiceInformationMgr ()
-                    .serviceInformationCallbacks ()
-                    .add (new LoggingSMPServiceInformationCallback ());
+      SMPMetaManager.getServiceInformationMgr ().serviceInformationCallbacks ().add (new LoggingSMPServiceInformationCallback ());
     SMPMetaManager.getRedirectMgr ().redirectCallbacks ().add (new LoggingSMPRedirectCallback ());
 
     PhotonSecurityManager.getUserMgr ()

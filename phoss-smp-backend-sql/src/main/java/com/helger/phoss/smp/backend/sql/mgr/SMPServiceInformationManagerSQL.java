@@ -62,8 +62,7 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabledManager implements
-                                                   ISMPServiceInformationManager
+public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPServiceInformationManager
 {
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
@@ -139,8 +138,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
             if (!bEndpointFound)
             {
               // Create a new endpoint
-              final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (),
-                                                                               aEndpoint.getTransportProfile ()),
+              final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (), aEndpoint.getTransportProfile ()),
                                                              aDBProcess,
                                                              aEndpoint.getEndpointReference (),
                                                              aEndpoint.isRequireBusinessLevelSignature (),
@@ -184,14 +182,12 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
       if (!bProcessFound)
       {
         // Create a new process with new endpoints
-        final DBProcess aDBProcess = new DBProcess (new DBProcessID (aDBMetadata.getId (),
-                                                                     aProcess.getProcessIdentifier ()),
+        final DBProcess aDBProcess = new DBProcess (new DBProcessID (aDBMetadata.getId (), aProcess.getProcessIdentifier ()),
                                                     aDBMetadata,
                                                     aProcess.getExtensionsAsString ());
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
-          final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (),
-                                                                           aEndpoint.getTransportProfile ()),
+          final DBEndpoint aDBEndpoint = new DBEndpoint (new DBEndpointID (aDBProcess.getId (), aEndpoint.getTransportProfile ()),
                                                          aDBProcess,
                                                          aEndpoint.getEndpointReference (),
                                                          aEndpoint.isRequireBusinessLevelSignature (),
@@ -243,9 +239,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
         if (aDBServiceGroup == null)
           throw new IllegalStateException ("Failed to resolve service group for " + aSMPServiceInformation);
 
-        aDBMetadata = new DBServiceMetadata (aDBMetadataID,
-                                             aDBServiceGroup,
-                                             aSMPServiceInformation.getExtensionsAsString ());
+        aDBMetadata = new DBServiceMetadata (aDBMetadataID, aDBServiceGroup, aSMPServiceInformation.getExtensionsAsString ());
         _update (aEM, aDBMetadata, aSMPServiceInformation);
         aEM.persist (aDBMetadata);
       }
@@ -270,8 +264,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
                                                         @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                       aDocTypeID);
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
     if (aServiceInfo != null)
     {
       final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
@@ -329,8 +322,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
 
       final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadata p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
                                                         DBServiceMetadataRedirection.class)
-                                          .setParameter ("scheme",
-                                                         aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                          .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
                                           .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
                                           .executeUpdate ();
 
@@ -355,8 +347,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
   }
 
   @Nonnull
-  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
-                                   @Nullable final ISMPProcess aProcess)
+  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation, @Nullable final ISMPProcess aProcess)
   {
     if (aSMPServiceInformation == null || aProcess == null)
       return EChange.UNCHANGED;
@@ -369,19 +360,11 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
                                                         " p.id.processIdentifierScheme = :pischeme AND p.id.processIdentifier = :pivalue",
                                                         DBServiceMetadataRedirection.class)
                                           .setParameter ("bischeme",
-                                                         aSMPServiceInformation.getServiceGroup ()
-                                                                               .getParticpantIdentifier ()
-                                                                               .getScheme ())
+                                                         aSMPServiceInformation.getServiceGroup ().getParticpantIdentifier ().getScheme ())
                                           .setParameter ("bivalue",
-                                                         aSMPServiceInformation.getServiceGroup ()
-                                                                               .getParticpantIdentifier ()
-                                                                               .getValue ())
-                                          .setParameter ("discheme",
-                                                         aSMPServiceInformation.getDocumentTypeIdentifier ()
-                                                                               .getScheme ())
-                                          .setParameter ("divalue",
-                                                         aSMPServiceInformation.getDocumentTypeIdentifier ()
-                                                                               .getValue ())
+                                                         aSMPServiceInformation.getServiceGroup ().getParticpantIdentifier ().getValue ())
+                                          .setParameter ("discheme", aSMPServiceInformation.getDocumentTypeIdentifier ().getScheme ())
+                                          .setParameter ("divalue", aSMPServiceInformation.getDocumentTypeIdentifier ().getValue ())
                                           .setParameter ("pischeme", aProcess.getProcessIdentifier ().getScheme ())
                                           .setParameter ("pivalue", aProcess.getProcessIdentifier ().getValue ())
                                           .executeUpdate ();
@@ -415,13 +398,10 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
                                                        aDBEndpoint.getExtension ());
         aEndpoints.add (aEndpoint);
       }
-      final SMPProcess aProcess = new SMPProcess (aDBProcess.getId ().getAsProcessIdentifier (),
-                                                  aEndpoints,
-                                                  aDBProcess.getExtension ());
+      final SMPProcess aProcess = new SMPProcess (aDBProcess.getId ().getAsProcessIdentifier (), aEndpoints, aDBProcess.getExtension ());
       aProcesses.add (aProcess);
     }
-    return new SMPServiceInformation (m_aServiceGroupMgr.getSMPServiceGroupOfID (aDBMetadata.getId ()
-                                                                                            .getAsBusinessIdentifier ()),
+    return new SMPServiceInformation (m_aServiceGroupMgr.getSMPServiceGroupOfID (aDBMetadata.getId ().getAsBusinessIdentifier ()),
                                       aDBMetadata.getId ().getAsDocumentTypeIdentifier (),
                                       aProcesses,
                                       aDBMetadata.getExtension ());
@@ -432,8 +412,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     JPAExecutionResult <List <DBServiceMetadata>> ret;
-    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p",
-                                                                   DBServiceMetadata.class)
+    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p", DBServiceMetadata.class)
                                                      .getResultList ());
     if (ret.hasException ())
       return new CommonsArrayList <> ();
@@ -468,12 +447,8 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
       JPAExecutionResult <List <DBServiceMetadata>> ret;
       ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadata p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
                                                                      DBServiceMetadata.class)
-                                                       .setParameter ("scheme",
-                                                                      aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getScheme ())
-                                                       .setParameter ("value",
-                                                                      aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getValue ())
+                                                       .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
+                                                       .setParameter ("value", aServiceGroup.getParticpantIdentifier ().getValue ())
                                                        .getResultList ());
       if (!ret.hasException ())
       {
@@ -509,8 +484,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
       // Disable caching here
       final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
       aProps.put ("eclipselink.cache-usage", CacheUsage.DoNotCheckCache);
-      final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceGroup.getParticpantIdentifier (),
-                                                                         aDocTypeID);
+      final DBServiceMetadataID aDBMetadataID = new DBServiceMetadataID (aServiceGroup.getParticpantIdentifier (), aDocTypeID);
       return getEntityManager ().find (DBServiceMetadata.class, aDBMetadataID, aProps);
     });
     if (ret.hasException ())
@@ -523,8 +497,7 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
   public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
                                                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
-    final DBServiceMetadata aDBMetadata = _getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                  aDocTypeID);
+    final DBServiceMetadata aDBMetadata = _getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
     if (aDBMetadata == null)
       return null;
     return _convert (aDBMetadata);

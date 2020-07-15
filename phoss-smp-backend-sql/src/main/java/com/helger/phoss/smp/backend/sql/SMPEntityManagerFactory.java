@@ -46,15 +46,13 @@ public final class SMPEntityManagerFactory extends AbstractGlobalEntityManagerFa
     final ICommonsMap <String, Object> ret = new CommonsHashMap <> ();
     // Read all properties from the standard configuration file
     // Connection pooling
-    ret.put (PersistenceUnitProperties.CONNECTION_POOL_MAX,
-             aConfigFile.getAsString (SMPJPAConfiguration.CONFIG_JDBC_READ_CONNECTIONS_MAX));
+    ret.put (PersistenceUnitProperties.CONNECTION_POOL_MAX, aConfigFile.getAsString (SMPJPAConfiguration.CONFIG_JDBC_READ_CONNECTIONS_MAX));
 
     // EclipseLink should create the database schema automatically
     // Values: Values: none/create-tables/drop-and-create-tables
     ret.put (PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
     ret.put (PersistenceUnitProperties.DDL_GENERATION_MODE,
-             aConfigFile.getAsString (SMPJPAConfiguration.CONFIG_DDL_GENERATION_MODE,
-                                      SMPJPAConfiguration.getDefaultDDLGenerationMode ()));
+             aConfigFile.getAsString (SMPJPAConfiguration.CONFIG_DDL_GENERATION_MODE, SMPJPAConfiguration.getDefaultDDLGenerationMode ()));
     ret.put (PersistenceUnitProperties.CREATE_JDBC_DDL_FILE, "db-create-smp.sql");
     ret.put (PersistenceUnitProperties.DROP_JDBC_DDL_FILE, "db-drop-smp.sql");
 

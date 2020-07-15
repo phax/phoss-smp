@@ -82,8 +82,7 @@ public final class ServiceGroupInterfaceTest
     return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
-  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
-                                                @Nonempty final int... aStatusCodes)
+  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
@@ -129,8 +128,7 @@ public final class ServiceGroupInterfaceTest
       try
       {
         // PUT 1 - create
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
 
         // Both regular and upper case must work
@@ -140,11 +138,9 @@ public final class ServiceGroupInterfaceTest
         assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
 
         // PUT 2 - overwrite
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
-        aResponseMsg = _addCredentials (aTarget.path (sPI_UC)
-                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_UC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
 
         // Both regular and upper case must work

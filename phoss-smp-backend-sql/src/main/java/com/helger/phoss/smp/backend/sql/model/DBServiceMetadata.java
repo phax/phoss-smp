@@ -43,7 +43,7 @@ public class DBServiceMetadata implements Serializable
 {
   private DBServiceMetadataID m_aID;
   private DBServiceGroup m_aServiceGroup;
-  private Set <DBProcess> m_aProcesses = new CommonsHashSet<> ();
+  private Set <DBProcess> m_aProcesses = new CommonsHashSet <> ();
   private String m_sExtension;
 
   @Deprecated

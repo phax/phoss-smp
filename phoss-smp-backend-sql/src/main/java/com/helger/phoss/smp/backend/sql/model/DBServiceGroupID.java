@@ -47,9 +47,7 @@ public class DBServiceGroupID implements Serializable
     setBusinessIdentifier (aBusinessID.getValue ());
   }
 
-  @Column (name = "businessIdentifierScheme",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;
@@ -93,9 +91,7 @@ public class DBServiceGroupID implements Serializable
   @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_sParticipantIdentifierScheme)
-                                       .append (m_sParticipantIdentifier)
-                                       .getHashCode ();
+    return new HashCodeGenerator (this).append (m_sParticipantIdentifierScheme).append (m_sParticipantIdentifier).getHashCode ();
   }
 
   @Override

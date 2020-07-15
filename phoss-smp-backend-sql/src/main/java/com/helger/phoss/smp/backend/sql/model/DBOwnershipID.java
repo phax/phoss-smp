@@ -58,9 +58,7 @@ public class DBOwnershipID implements Serializable
     m_sUsername = sUserName;
   }
 
-  @Column (name = "businessIdentifierScheme",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;

@@ -51,8 +51,7 @@ import com.helger.photon.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements
-                                         ISMPRedirectManager
+public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements ISMPRedirectManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRedirectManagerXML.class);
 
@@ -132,8 +131,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                   aDocumentTypeIdentifier);
+    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocumentTypeIdentifier);
     SMPRedirect aNewRedirect;
     if (aOldRedirect == null)
     {

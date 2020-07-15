@@ -54,7 +54,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
 
     public static final EServerNameMode DEFAULT = STATIC_SERVER_INFO;
     public static final EServerNameMode FALLBACK = REQUEST_SCOPE;
-    
+
     private final String m_sID;
 
     EServerNameMode (@Nonnull @Nonempty final String sID)

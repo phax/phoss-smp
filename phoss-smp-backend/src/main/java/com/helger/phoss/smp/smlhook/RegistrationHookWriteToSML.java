@@ -145,11 +145,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     if (LOGGER.isWarnEnabled ())
-      LOGGER.warn ("CREATE failed in SMP backend, so deleting again business " +
-                   sParticipantID +
-                   " for " +
-                   SMP_ID +
-                   " from SML.");
+      LOGGER.warn ("CREATE failed in SMP backend, so deleting again business " + sParticipantID + " for " + SMP_ID + " from SML.");
 
     try
     {
@@ -182,9 +178,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     }
     catch (final NotFoundFault ex)
     {
-      final String sMsg = "The business " +
-                          sParticipantID +
-                          " was not present in the SML and hence could not be deleted.";
+      final String sMsg = "The business " + sParticipantID + " was not present in the SML and hence could not be deleted.";
       throw new RegistrationHookException (sMsg, ex);
     }
     catch (final Exception ex)
@@ -198,11 +192,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   {
     final String sParticipantID = aBusinessIdentifier.getURIEncoded ();
     if (LOGGER.isWarnEnabled ())
-      LOGGER.warn ("DELETE failed in SMP backend, so creating again business " +
-                   sParticipantID +
-                   " for " +
-                   SMP_ID +
-                   " in SML.");
+      LOGGER.warn ("DELETE failed in SMP backend, so creating again business " + sParticipantID + " for " + SMP_ID + " in SML.");
 
     try
     {

@@ -55,9 +55,7 @@ public class DBEndpointID implements Serializable
     setTransportProfile (sTransportProfile);
   }
 
-  @Column (name = "businessIdentifierScheme",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;
@@ -86,9 +84,7 @@ public class DBEndpointID implements Serializable
     setBusinessIdentifier (aBusinessIdentifier.getValue ());
   }
 
-  @Column (name = "processIdentifierType",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "processIdentifierType", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getProcessIdentifierScheme ()
   {
     return m_sProcessIdentifierScheme;
@@ -117,9 +113,7 @@ public class DBEndpointID implements Serializable
     setProcessIdentifier (aProcessID.getValue ());
   }
 
-  @Column (name = "documentIdentifierScheme",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "documentIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getDocumentIdentifierScheme ()
   {
     return m_sDocumentTypeIdentifierScheme;
@@ -130,9 +124,7 @@ public class DBEndpointID implements Serializable
     m_sDocumentTypeIdentifierScheme = sDocumentIdentifierScheme;
   }
 
-  @Column (name = "documentIdentifier",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_DOCUEMNT_TYPE_VALUE_LENGTH)
+  @Column (name = "documentIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_DOCUEMNT_TYPE_VALUE_LENGTH)
   public String getDocumentIdentifier ()
   {
     return m_sDocumentTypeIdentifier;

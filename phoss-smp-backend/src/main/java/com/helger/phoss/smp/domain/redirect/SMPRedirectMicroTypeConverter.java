@@ -63,8 +63,7 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
   }
 
   @Nonnull
-  public static SMPRedirect convertToNative (@Nonnull final IMicroElement aElement,
-                                             @Nonnull final ISMPServiceGroupProvider aSGProvider)
+  public static SMPRedirect convertToNative (@Nonnull final IMicroElement aElement, @Nonnull final ISMPServiceGroupProvider aSGProvider)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUPD_ID);
@@ -80,12 +79,7 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
                                                                                                                                     ELEMENT_CERTIFICATE));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPRedirect (aServiceGroup,
-                            aDocTypeIdentifier,
-                            sTargetHref,
-                            sSubjectUniqueIdentifier,
-                            aCertificate,
-                            sExtension);
+    return new SMPRedirect (aServiceGroup, aDocTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, aCertificate, sExtension);
   }
 
   @Nonnull

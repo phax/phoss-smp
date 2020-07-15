@@ -56,8 +56,7 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
 
   @Override
   @Nonnull
-  protected IHCNode createPageHeader (@Nonnull final ISimpleWebExecutionContext aSWEC,
-                                      @Nullable final IHCNode aPageTitle)
+  protected IHCNode createPageHeader (@Nonnull final ISimpleWebExecutionContext aSWEC, @Nullable final IHCNode aPageTitle)
   {
     final HCNodeList ret = new HCNodeList ();
     ret.addChild (new HCDiv ().addClass (CBootstrapCSS.MB_3).addChild (SMPRendererPublic.createLogoBig (aSWEC)));

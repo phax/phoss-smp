@@ -78,12 +78,7 @@ public final class ISMPRedirectManagerFuncTest
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
         // Create new one
-        ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
-                                                                         aDocTypeID,
-                                                                         "target",
-                                                                         "suid",
-                                                                         null,
-                                                                         "<extredirect />");
+        ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target", "suid", null, "<extredirect />");
         assertNotNull (aRedirect);
         assertSame (aSG, aRedirect.getServiceGroup ());
         assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
@@ -93,12 +88,7 @@ public final class ISMPRedirectManagerFuncTest
         final long nCount = aRedirectMgr.getSMPRedirectCount ();
 
         // Update existing
-        aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
-                                                            aDocTypeID,
-                                                            "target2",
-                                                            "suid2",
-                                                            null,
-                                                            "<extredirect2 />");
+        aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target2", "suid2", null, "<extredirect2 />");
         assertNotNull (aRedirect);
         assertSame (aSG, aRedirect.getServiceGroup ());
         assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
@@ -112,12 +102,7 @@ public final class ISMPRedirectManagerFuncTest
         assertNotNull (aSG2);
         try
         {
-          aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG2,
-                                                              aDocTypeID,
-                                                              "target2",
-                                                              "suid2",
-                                                              null,
-                                                              "<extredirect2 />");
+          aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", null, "<extredirect2 />");
           assertNotNull (aRedirect);
           assertSame (aSG2, aRedirect.getServiceGroup ());
           assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));

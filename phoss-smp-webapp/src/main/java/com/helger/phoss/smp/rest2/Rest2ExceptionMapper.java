@@ -88,17 +88,13 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     if (aThrowable instanceof SMPUnauthorizedException)
     {
       _logRestException ("Unauthorized", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_FORBIDDEN,
-                              getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse, HttpServletResponse.SC_FORBIDDEN, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPUnknownUserException)
     {
       _logRestException ("Unknown user", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_FORBIDDEN,
-                              getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse, HttpServletResponse.SC_FORBIDDEN, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPSMLException)
@@ -113,9 +109,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     if (aThrowable instanceof SMPNotFoundException)
     {
       _logRestException ("Not found", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_NOT_FOUND,
-                              getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse, HttpServletResponse.SC_NOT_FOUND, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPInternalErrorException)
@@ -130,9 +124,7 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     if (aThrowable instanceof SMPBadRequestException)
     {
       _logRestException ("Bad request", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse,
-                              HttpServletResponse.SC_BAD_REQUEST,
-                              getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse, HttpServletResponse.SC_BAD_REQUEST, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPServerException)

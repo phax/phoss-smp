@@ -50,8 +50,7 @@ public final class MongoClientProviderTest
                                           .append ("count", Integer.valueOf (1))
                                           .append ("versions", new CommonsArrayList <> ("v3.2", "v3.0", "v2.6"))
                                           .append ("info",
-                                                   new Document ().append ("x", Integer.valueOf (203))
-                                                                  .append ("y", Integer.valueOf (102)));
+                                                   new Document ().append ("x", Integer.valueOf (203)).append ("y", Integer.valueOf (102)));
       final MongoCollection <Document> aCollection = aCP.getCollection ("coll1");
 
       final String sIndexName = aCollection.createIndex (new Document ("name", MongoClientProvider.INDEX_ASCENDING));

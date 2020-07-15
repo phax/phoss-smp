@@ -45,8 +45,7 @@ public class DBServiceMetadataRedirectionID implements Serializable
   public DBServiceMetadataRedirectionID ()
   {}
 
-  public DBServiceMetadataRedirectionID (@Nonnull final IParticipantIdentifier aPartID,
-                                         @Nonnull final IDocumentTypeIdentifier aDocTypeID)
+  public DBServiceMetadataRedirectionID (@Nonnull final IParticipantIdentifier aPartID, @Nonnull final IDocumentTypeIdentifier aDocTypeID)
   {
     setBusinessIdentifierScheme (aPartID.getScheme ());
     setBusinessIdentifier (aPartID.getValue ());
@@ -54,9 +53,7 @@ public class DBServiceMetadataRedirectionID implements Serializable
     setDocumentTypeIdentifier (aDocTypeID.getValue ());
   }
 
-  @Column (name = "businessIdentifierScheme",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "businessIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getBusinessIdentifierScheme ()
   {
     return m_sParticipantIdentifierScheme;
@@ -85,9 +82,7 @@ public class DBServiceMetadataRedirectionID implements Serializable
     return new SimpleParticipantIdentifier (m_sParticipantIdentifierScheme, m_sParticipantIdentifier);
   }
 
-  @Column (name = "documentIdentifierScheme",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
+  @Column (name = "documentIdentifierScheme", nullable = false, length = PeppolIdentifierHelper.MAX_IDENTIFIER_SCHEME_LENGTH)
   public String getDocumentTypeIdentifierScheme ()
   {
     return m_sDocumentTypeIdentifierScheme;
@@ -98,9 +93,7 @@ public class DBServiceMetadataRedirectionID implements Serializable
     m_sDocumentTypeIdentifierScheme = sDocumentIdentifierScheme;
   }
 
-  @Column (name = "documentIdentifier",
-           nullable = false,
-           length = PeppolIdentifierHelper.MAX_DOCUEMNT_TYPE_VALUE_LENGTH)
+  @Column (name = "documentIdentifier", nullable = false, length = PeppolIdentifierHelper.MAX_DOCUEMNT_TYPE_VALUE_LENGTH)
   public String getDocumentTypeIdentifier ()
   {
     return m_sDocumentTypeIdentifier;

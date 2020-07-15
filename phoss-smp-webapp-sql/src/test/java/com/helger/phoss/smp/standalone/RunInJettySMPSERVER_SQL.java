@@ -34,9 +34,6 @@ public final class RunInJettySMPSERVER_SQL
   public static void main (final String... args) throws Exception
   {
     SMPServerConfiguration.getConfigFile ().applyAllNetworkSystemProperties ();
-    new JettyStarter (RunInJettySMPSERVER_SQL.class).setPort (90)
-                                                    .setStopPort (8078)
-                                                    .setSessionCookieName ("SMPSESSION")
-                                                    .run ();
+    new JettyStarter (RunInJettySMPSERVER_SQL.class).setPort (90).setStopPort (8078).setSessionCookieName ("SMPSESSION").run ();
   }
 }

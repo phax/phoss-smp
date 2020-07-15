@@ -242,9 +242,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
     final X509Certificate aCert = (X509Certificate) m_aKeyEntry.getCertificate ();
-    final X509Data aX509Data = aKeyInfoFactory.newX509Data (new CommonsArrayList <> (aCert.getSubjectX500Principal ()
-                                                                                          .getName (),
-                                                                                     aCert));
+    final X509Data aX509Data = aKeyInfoFactory.newX509Data (new CommonsArrayList <> (aCert.getSubjectX500Principal ().getName (), aCert));
     final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList <> (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and
