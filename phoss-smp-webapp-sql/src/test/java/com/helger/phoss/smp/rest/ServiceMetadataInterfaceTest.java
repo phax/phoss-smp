@@ -71,6 +71,7 @@ import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
 import com.helger.smpclient.peppol.jaxb.ServiceInformationType;
 import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
 import com.helger.smpclient.peppol.jaxb.ServiceMetadataType;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
 
@@ -153,6 +154,9 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
         aSI.setProcessList (aPL);
       }
       aSM.setServiceInformation (aSI);
+
+      if (false)
+        LOGGER.info (new SMPMarshallerServiceMetadataType (true).getAsString (aSM));
 
       final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
       Response aResponseMsg;
