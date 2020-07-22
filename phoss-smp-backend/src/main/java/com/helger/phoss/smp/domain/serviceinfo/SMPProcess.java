@@ -134,9 +134,15 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return EChange.valueOf (m_aEndpoints.remove (sTransportProfile) != null);
   }
 
-  @Nonnull
+  @Nullable
   public com.helger.smpclient.peppol.jaxb.ProcessType getAsJAXBObjectPeppol ()
   {
+    if (m_aEndpoints.isEmpty ())
+    {
+      // Empty ServiceEndpointList is not allowed
+      return null;
+    }
+
     final com.helger.smpclient.peppol.jaxb.ProcessType ret = new com.helger.smpclient.peppol.jaxb.ProcessType ();
     // Explicit constructor call is needed here!
     ret.setProcessIdentifier (new SimpleProcessIdentifier (m_aProcessIdentifier));
@@ -148,9 +154,15 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return ret;
   }
 
-  @Nonnull
+  @Nullable
   public com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR1 ()
   {
+    if (m_aEndpoints.isEmpty ())
+    {
+      // Empty ServiceEndpointList is not allowed
+      return null;
+    }
+
     final com.helger.xsds.bdxr.smp1.ProcessType ret = new com.helger.xsds.bdxr.smp1.ProcessType ();
     // Explicit constructor call is needed here!
     ret.setProcessIdentifier (new BDXR1ProcessIdentifier (m_aProcessIdentifier));
