@@ -54,8 +54,6 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Remove predefined Tomcat webapps
-RUN rm -r $CATALINA_HOME/webapps/ROOT \
-  && rm -r $CATALINA_HOME/webapps/docs \
-  && rm -r $CATALINA_HOME/webapps/examples
+RUN rm -r $CATALINA_HOME/webapps/*
 
 COPY --from=build /build/phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT
