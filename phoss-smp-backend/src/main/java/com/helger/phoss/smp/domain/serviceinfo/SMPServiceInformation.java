@@ -62,9 +62,9 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
    * @param aDocumentTypeIdentifier
    *        Document type ID
    * @param aProcesses
-   *        processes list. May be <code>null</code>.
+   *        Processes list. May be <code>null</code>.
    * @param sExtension
-   *        Optional extension
+   *        Optional extension. May be <code>null</code>.
    */
   public SMPServiceInformation (@Nonnull final ISMPServiceGroup aServiceGroup,
                                 @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
@@ -281,7 +281,8 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
                                                       @Nonnull final com.helger.smpclient.peppol.jaxb.ServiceInformationType aServiceInformation)
   {
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
-    for (final com.helger.smpclient.peppol.jaxb.ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
+    for (final com.helger.smpclient.peppol.jaxb.ProcessType aProcess : aServiceInformation.getProcessList ()
+                                                                                          .getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,
                                       SimpleDocumentTypeIdentifier.wrap (aServiceInformation.getDocumentIdentifier ()),
