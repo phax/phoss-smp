@@ -204,7 +204,7 @@ public final class SMPRendererSecure
       aCol2.addChild (SMPRendererPublic.getPageContent (aLEC));
     }
 
-    aOuterContainer.addChild (SMPRendererPublic.createDefaultFooter ());
+    aOuterContainer.addChild (SMPRendererPublic.createDefaultFooter (true));
 
     return ret;
   }

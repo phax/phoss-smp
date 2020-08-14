@@ -238,6 +238,16 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> to show the author in the public area,
+   *         <code>false</code> to not show it.
+   * @since 5.2.6
+   */
+  public static boolean isPublicShowAuthor ()
+  {
+    return getConfigFile ().getAsBoolean ("webapp.public.showauthor", true);
+  }
+
+  /**
    * Setting for issue #132
    *
    * @return <code>true</code> if a custom imprint should be shown in the
