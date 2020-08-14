@@ -321,16 +321,33 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
     return getConfigFile ().getAsBoolean ("http.method.options.disabled", false);
   }
 
+  /**
+   * @return <code>true</code> to enable CSP in general, <code>false</code> to
+   *         disable it.
+   * @since 5.2.6
+   */
   public static boolean isCSPEnabled ()
   {
     return getConfigFile ().getAsBoolean ("csp.enabled", true);
   }
 
+  /**
+   * @return <code>true</code> if CSP is enabled, errors should only be reported
+   *         but the content should not be blocked, <code>false</code> to also
+   *         block payload.
+   * @since 5.2.6
+   */
   public static boolean isCSPReportingOnly ()
   {
     return getConfigFile ().getAsBoolean ("csp.reporting.only", false);
   }
 
+  /**
+   * @return <code>true</code> if CSP is enabled and it's not "reporting only"
+   *         mode, errors should be reported , <code>false</code> to silently
+   *         ignore them.
+   * @since 5.2.6
+   */
   public static boolean isCSPReportingEnabled ()
   {
     return getConfigFile ().getAsBoolean ("csp.reporting.enabled", false);
