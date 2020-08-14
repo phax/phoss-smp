@@ -22,6 +22,11 @@ import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 import com.helger.photon.core.servlet.RootXServletHandler;
 import com.helger.xservlet.AbstractXServlet;
 
+/**
+ * The servlet handling the "/" URL to redirect to "/public"
+ *
+ * @author Philip Helger
+ */
 public class SMPRootServlet extends AbstractXServlet
 {
   public SMPRootServlet ()
