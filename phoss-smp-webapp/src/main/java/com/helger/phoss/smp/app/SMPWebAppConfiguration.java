@@ -309,4 +309,15 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   {
     return StringHelper.trim (getConfigFile ().getAsString ("webapp.imprint.cssclasses"));
   }
+
+  /**
+   * @return <code>true</code> if support for the HTTP "OPTIONS" verb should not
+   *         be provided.
+   * @since 5.2.6
+   */
+  public static boolean isHttpOptionsDisabled ()
+  {
+    // Enable by default
+    return getConfigFile ().getAsBoolean ("http.method.options.disabled", false);
+  }
 }

@@ -17,7 +17,7 @@
 package com.helger.phoss.smp.servlet;
 
 import com.helger.commons.http.EHttpMethod;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.ui.SMPLayoutHTMLProvider;
 import com.helger.phoss.smp.ui.secure.SMPRendererSecure;
 import com.helger.photon.app.html.IHTMLProvider;
@@ -42,7 +42,7 @@ public class SecureApplicationServlet extends AbstractSecureApplicationServlet
         return new SMPLayoutHTMLProvider (SMPRendererSecure::getContent);
       }
     });
-    if (SMPServerConfiguration.isHttpOptionsDisabled ())
+    if (SMPWebAppConfiguration.isHttpOptionsDisabled ())
       handlerRegistry ().unregisterHandler (EHttpMethod.OPTIONS);
   }
 }
