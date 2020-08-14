@@ -21,7 +21,6 @@ import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.ui.SMPLayoutHTMLProvider;
 import com.helger.phoss.smp.ui.pub.SMPRendererPublic;
 import com.helger.photon.app.html.IHTMLProvider;
-import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
@@ -34,7 +33,7 @@ public class PublicApplicationServlet extends AbstractPublicApplicationServlet
 {
   public PublicApplicationServlet ()
   {
-    super (new AbstractApplicationXServletHandler ()
+    super (new SMPApplicationXServletHandler ()
     {
       @Override
       protected IHTMLProvider createHTMLProvider (final IRequestWebScopeWithoutResponse aRequestScope)

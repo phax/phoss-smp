@@ -179,7 +179,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
     final APIPath aAPIPath = APIPath.createForFilter (aRequestScope);
 
     // Hard coded path with white listed requests
-    if (RegExHelper.stringMatchesPattern ("^/(stream|public|secure|ajax|resbundle|smp-status|error|logout|favicon.ico|robots.txt)(/.*)?$",
+    if (RegExHelper.stringMatchesPattern ("^/(ajax|error|favicon.ico|logout|public|resbundle|robots.txt|secure|smp-cspreporting|smp-status|stream)(/.*)?$",
                                           aAPIPath.getPath ()))
     {
       // Explicitly other servlet

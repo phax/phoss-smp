@@ -138,6 +138,11 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("proxy.https.configured", SMPServerConfiguration.getAsHttpsProxySettings () != null);
     aStatusData.add ("proxy.username.configured", StringHelper.hasText (SMPServerConfiguration.getProxyUsername ()));
 
+    // CSP configuration (since 5.2.6)
+    aStatusData.add ("csp.enabled", SMPWebAppConfiguration.isCSPEnabled ());
+    aStatusData.add ("csp.reporting.only", SMPWebAppConfiguration.isCSPReportingOnly ());
+    aStatusData.add ("csp.reporting.enabled", SMPWebAppConfiguration.isCSPReportingEnabled ());
+
     return aStatusData;
   }
 

@@ -320,4 +320,19 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
     // Enable by default
     return getConfigFile ().getAsBoolean ("http.method.options.disabled", false);
   }
+
+  public static boolean isCSPEnabled ()
+  {
+    return getConfigFile ().getAsBoolean ("csp.enabled", true);
+  }
+
+  public static boolean isCSPReportingOnly ()
+  {
+    return getConfigFile ().getAsBoolean ("csp.reporting.only", false);
+  }
+
+  public static boolean isCSPReportingEnabled ()
+  {
+    return getConfigFile ().getAsBoolean ("csp.reporting.enabled", false);
+  }
 }
