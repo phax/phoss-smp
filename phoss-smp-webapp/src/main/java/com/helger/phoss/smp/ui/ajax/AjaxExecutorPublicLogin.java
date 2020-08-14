@@ -57,9 +57,7 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor imple
 
     // Main login
     final ELoginResult eLoginResult = LoggedInUserManager.getInstance ()
-                                                         .loginUser (sLoginName,
-                                                                     sPassword,
-                                                                     CSMP.REQUIRED_ROLE_IDS_WRITABLERESTAPI);
+                                                         .loginUser (sLoginName, sPassword, CSMP.REQUIRED_ROLE_IDS_WRITABLERESTAPI);
     if (eLoginResult.isSuccess ())
     {
       aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, true));
@@ -77,7 +75,6 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor imple
                                  eLoginResult.getDisplayText (aDisplayLocale));
 
     // Set as result property
-    aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, false)
-                                         .add (JSON_HTML, HCRenderer.getAsHTMLStringWithoutNamespaces (aRoot)));
+    aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, false).add (JSON_HTML, HCRenderer.getAsHTMLStringWithoutNamespaces (aRoot)));
   }
 }

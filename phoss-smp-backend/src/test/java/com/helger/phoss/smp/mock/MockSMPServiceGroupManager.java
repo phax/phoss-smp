@@ -44,9 +44,7 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
     throw new UnsupportedOperationException ();
   }
 
-  public EChange updateSMPServiceGroup (final IParticipantIdentifier aParticipantID,
-                                        final String sOwnerID,
-                                        final String sExtension)
+  public EChange updateSMPServiceGroup (final IParticipantIdentifier aParticipantID, final String sOwnerID, final String sExtension)
   {
     throw new UnsupportedOperationException ();
   }

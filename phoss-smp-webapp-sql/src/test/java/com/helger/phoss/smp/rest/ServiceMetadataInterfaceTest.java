@@ -71,6 +71,7 @@ import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
 import com.helger.smpclient.peppol.jaxb.ServiceInformationType;
 import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
 import com.helger.smpclient.peppol.jaxb.ServiceMetadataType;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
 
@@ -141,18 +142,21 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
         aProcess.setProcessIdentifier (aProcID);
         final ServiceEndpointList aSEL = new ServiceEndpointList ();
         final EndpointType aEndpoint = new EndpointType ();
-        aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as2"));
+        aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as4"));
         aEndpoint.setRequireBusinessLevelSignature (false);
         aEndpoint.setCertificate ("blacert");
         aEndpoint.setServiceDescription ("Unit test service");
         aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
-        aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ());
+        aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID ());
         aSEL.addEndpoint (aEndpoint);
         aProcess.setServiceEndpointList (aSEL);
         aPL.addProcess (aProcess);
         aSI.setProcessList (aPL);
       }
       aSM.setServiceInformation (aSI);
+
+      if (false)
+        LOGGER.info (new SMPMarshallerServiceMetadataType (true).getAsString (aSM));
 
       final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
       Response aResponseMsg;

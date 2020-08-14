@@ -46,8 +46,7 @@ public class MongoClientProvider implements AutoCloseable
   private final MongoClient m_aMongoClient;
   private final MongoDatabase m_aDatabase;
 
-  public MongoClientProvider (@Nonnull @Nonempty final String sConnectionString,
-                              @Nonnull @Nonempty final String sDBName)
+  public MongoClientProvider (@Nonnull @Nonempty final String sConnectionString, @Nonnull @Nonempty final String sDBName)
   {
     ValueEnforcer.notEmpty (sConnectionString, "ConnectionString");
     ValueEnforcer.notEmpty (sDBName, "DBName");

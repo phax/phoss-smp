@@ -94,8 +94,7 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
   }
 
   @Nonnull
-  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
-                                   @Nullable final ISMPProcess aProcess)
+  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation, @Nullable final ISMPProcess aProcess)
   {
     throw new UnsupportedOperationException ();
   }

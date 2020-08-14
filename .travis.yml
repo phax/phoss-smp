@@ -48,16 +48,17 @@ jobs:
     - stage: test
       jdk: openjdk8
       script:
-        - mvn test -B -P coverage sonar:sonar
-        - docker pull tomcat:9-jre11
+        - mvn test -B
+      after_success:
+        - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
 # build XML version
-        - docker build -t phoss-smp-snapshot-from-source-xml -f docker/Dockerfile-snapshot-from-source-xml .
+        - docker build --pull -t phoss-smp-snapshot-from-source-xml -f docker/Dockerfile-snapshot-from-source-xml .
         - docker tag phoss-smp-snapshot-from-source-xml phelger/phoss-smp-xml:snapshot
 # build SQL version
-        - docker build -t phoss-smp-snapshot-from-source-sql -f docker/Dockerfile-snapshot-from-source-sql .
+        - docker build --pull -t phoss-smp-snapshot-from-source-sql -f docker/Dockerfile-snapshot-from-source-sql .
         - docker tag phoss-smp-snapshot-from-source-sql phelger/phoss-smp-sql:snapshot
 # build MongoDB version
-        - docker build -t phoss-smp-snapshot-from-source-mongodb -f docker/Dockerfile-snapshot-from-source-mongodb .
+        - docker build --pull -t phoss-smp-snapshot-from-source-mongodb -f docker/Dockerfile-snapshot-from-source-mongodb .
         - docker tag phoss-smp-snapshot-from-source-mongodb phelger/phoss-smp-mongodb:snapshot
 # push both
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
@@ -65,13 +66,12 @@ jobs:
         - docker push phelger/phoss-smp-sql:snapshot
         - docker push phelger/phoss-smp-mongodb:snapshot
         - docker logout
-      after_success:
-        - mvn deploy --settings travis-settings.xml -DskipTests=true -B -P travis-deploy
-        - bash <(curl -s https://codecov.io/bash)
     - stage: test
       jdk: openjdk11
       script:
-        - mvn test -B
+        - mvn test -B -P coverage sonar:sonar
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
     - stage: test
       jdk: openjdk14
       script:

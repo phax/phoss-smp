@@ -71,16 +71,14 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
       final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
       for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos.getSortedInline (ISMPServiceInformation.comparator ()))
       {
-        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
-                                                                             CSMPExchange.ELEMENT_SERVICEINFO));
+        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo, CSMPExchange.ELEMENT_SERVICEINFO));
       }
 
       // Add all redirects
       final ICommonsList <ISMPRedirect> aAllRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aServiceGroup);
       for (final ISMPRedirect aServiceInfo : aAllRedirects.getSortedInline (ISMPRedirect.comparator ()))
       {
-        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
-                                                                             CSMPExchange.ELEMENT_REDIRECT));
+        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo, CSMPExchange.ELEMENT_REDIRECT));
       }
     }
 

@@ -56,8 +56,7 @@ import com.helger.photon.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPServiceGroup, SMPServiceGroup>
-                                             implements
+public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPServiceGroup, SMPServiceGroup> implements
                                              ISMPServiceGroupManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerXML.class);
@@ -131,11 +130,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       m_aRWLock.writeLock ().unlock ();
     }
 
-    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
-                                      aSMPServiceGroup.getID (),
-                                      sOwnerID,
-                                      aParticipantID.getURIEncoded (),
-                                      sExtension);
+    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID (), sOwnerID, aParticipantID.getURIEncoded (), sExtension);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup - success");
 

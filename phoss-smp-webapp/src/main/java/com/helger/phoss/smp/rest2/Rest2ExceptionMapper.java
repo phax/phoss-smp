@@ -124,18 +124,14 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     if (aThrowable instanceof SMPBadRequestException)
     {
       _logRestException ("Bad request", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse,
-                              CHttp.HTTP_BAD_REQUEST,
-                              getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_BAD_REQUEST, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPServerException)
     {
       // Generic fallback only
       _logRestException ("Generic SMP error", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse,
-                              CHttp.HTTP_INTERNAL_SERVER_ERROR,
-                              getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_INTERNAL_SERVER_ERROR, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof RuntimeException)

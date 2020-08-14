@@ -52,9 +52,7 @@ final class Rest2RequestHelper
   {
     final ICommonsList <String> aHeaders = aHttpHeaders.getAllHeaderValues (CHttpHeader.AUTHORIZATION);
     if (aHeaders.isEmpty ())
-      throw new SMPUnauthorizedException ("Missing required HTTP header '" +
-                                          CHttpHeader.AUTHORIZATION +
-                                          "' for user authentication");
+      throw new SMPUnauthorizedException ("Missing required HTTP header '" + CHttpHeader.AUTHORIZATION + "' for user authentication");
 
     return HttpBasicAuth.getBasicAuthClientCredentials (aHeaders.getFirst ());
   }

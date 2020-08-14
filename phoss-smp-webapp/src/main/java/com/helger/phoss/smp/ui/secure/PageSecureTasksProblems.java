@@ -305,7 +305,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
         catch (final UnknownHostException ex)
         {
           // continue
-          aOL.addItem (_createWarning ("It seems like this SMP was not yet registered to the SMP."),
+          aOL.addItem (_createWarning ("It seems like this SMP was not yet registered to the SML."),
                        div ("This is a one-time action that should be performed once. It requires a valid SMP certificate to work."),
                        div ("The registration check was performed with the URL ").addChild (new HCA ().setHref (new SimpleURL ("http://" +
                                                                                                                                sPublisherDNSName))

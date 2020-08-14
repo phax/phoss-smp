@@ -11,7 +11,6 @@
 package com.helger.phoss.smp.restapi;
 
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -116,34 +115,34 @@ public final class SMPServerAPI
         throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
-      /*
-       * Then add the service metadata references
-       */
+      // Then add the service metadata references
       final ServiceMetadataReferenceCollectionType aRefCollection = new ServiceMetadataReferenceCollectionType ();
-      final List <ServiceMetadataReferenceType> aMetadataReferences = aRefCollection.getServiceMetadataReference ();
 
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
       {
         // Ignore all service information without endpoints
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                            aDocTypeID);
-        if (aServiceInfo == null)
-          continue;
-
-        final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
-        aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
-        aMetadataReferences.add (aMetadataReference);
+        if (aServiceInfo != null && aServiceInfo.getTotalEndpointCount () > 0)
+        {
+          final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
+          aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
+          aRefCollection.addServiceMetadataReference (aMetadataReference);
+        }
       }
 
       final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectPeppol ();
       aSG.setServiceMetadataReferenceCollection (aRefCollection);
 
+      // a CompleteSG may be empty
       final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
       aCompleteServiceGroup.setServiceGroup (aSG);
 
       for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
       {
-        aCompleteServiceGroup.addServiceMetadata (aServiceInfo.getAsJAXBObjectPeppol ());
+        final ServiceMetadataType aSM = aServiceInfo.getAsJAXBObjectPeppol ();
+        if (aSM != null)
+          aCompleteServiceGroup.addServiceMetadata (aSM);
       }
 
       if (LOGGER.isInfoEnabled ())
@@ -245,18 +244,17 @@ public final class SMPServerAPI
       // Then add the service metadata references
       final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectPeppol ();
       final ServiceMetadataReferenceCollectionType aCollectionType = new ServiceMetadataReferenceCollectionType ();
-      final List <ServiceMetadataReferenceType> aMetadataReferences = aCollectionType.getServiceMetadataReference ();
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
       {
         // Ignore all service information without endpoints
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                            aDocTypeID);
-        if (aServiceInfo == null)
-          continue;
-
-        final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
-        aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
-        aMetadataReferences.add (aMetadataReference);
+        if (aServiceInfo != null && aServiceInfo.getTotalEndpointCount () > 0)
+        {
+          final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
+          aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
+          aCollectionType.addServiceMetadataReference (aMetadataReference);
+        }
       }
       aSG.setServiceMetadataReferenceCollection (aCollectionType);
 
@@ -413,7 +411,7 @@ public final class SMPServerAPI
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocumentTypeID);
       if (aDocTypeID == null)
       {
-        throw new SMPBadRequestException ("Failed to parse documentTypeID '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse documentTypeID '" + sDocumentTypeID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
       // First check for redirection, then for actual service
@@ -431,13 +429,14 @@ public final class SMPServerAPI
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                            aDocTypeID);
-        if (aServiceInfo != null)
+        final ServiceMetadataType aSM = aServiceInfo == null ? null : aServiceInfo.getAsJAXBObjectPeppol ();
+        if (aSM != null)
         {
-          aSignedServiceMetadata.setServiceMetadata (aServiceInfo.getAsJAXBObjectPeppol ());
+          aSignedServiceMetadata.setServiceMetadata (aSM);
         }
         else
         {
-          // Neither nor is present
+          // Neither nor is present, or no endpoint is available
           throw new SMPNotFoundException ("service(" + sServiceGroupID + "," + sDocumentTypeID + ")", m_aAPIProvider.getCurrentURI ());
         }
       }

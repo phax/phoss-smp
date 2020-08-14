@@ -185,9 +185,6 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
   @Nonnull
   public static SMPBusinessCardContact createFromGenericObject (@Nonnull final PDContact aEntity)
   {
-    return new SMPBusinessCardContact (aEntity.getType (),
-                                       aEntity.getName (),
-                                       aEntity.getPhoneNumber (),
-                                       aEntity.getEmail ());
+    return new SMPBusinessCardContact (aEntity.getType (), aEntity.getName (), aEntity.getPhoneNumber (), aEntity.getEmail ());
   }
 }

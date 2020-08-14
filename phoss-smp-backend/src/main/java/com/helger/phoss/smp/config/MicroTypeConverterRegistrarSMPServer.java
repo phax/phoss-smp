@@ -43,7 +43,6 @@ public final class MicroTypeConverterRegistrarSMPServer implements IMicroTypeCon
     aRegistry.registerMicroElementTypeConverter (SMPProcess.class, new SMPProcessMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPRedirect.class, new SMPRedirectMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPServiceGroup.class, new SMPServiceGroupMicroTypeConverter ());
-    aRegistry.registerMicroElementTypeConverter (SMPServiceInformation.class,
-                                                 new SMPServiceInformationMicroTypeConverter ());
+    aRegistry.registerMicroElementTypeConverter (SMPServiceInformation.class, new SMPServiceInformationMicroTypeConverter ());
   }
 }

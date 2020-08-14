@@ -24,6 +24,7 @@ import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.lang.ClassPathHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.peppol.sml.ESML;
 import com.helger.phoss.smp.SMPServerConfiguration;
@@ -38,8 +39,7 @@ public class SMPServerRESTTestRule extends ExternalResource
 
   public SMPServerRESTTestRule (@Nullable final String sSMPServerPropertiesPath)
   {
-    SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH,
-                                       sSMPServerPropertiesPath);
+    SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH, sSMPServerPropertiesPath);
     SMPServerConfiguration.reloadConfiguration ();
   }
 
@@ -48,14 +48,16 @@ public class SMPServerRESTTestRule extends ExternalResource
   {
     super.before ();
 
+    if (false)
+      ClassPathHelper.forAllClassPathEntries (LOGGER::info);
+
     // http only
     m_aServer = MockWebServer.startRegularServer ();
 
     // Ensure non-invasive setup
     // PD enabled but no auto-update
     // SML disabled
-    SMPMetaManager.getSettingsMgr ()
-                  .updateSettings (false, true, false, false, "dummy", false, false, ESML.DEVELOPMENT_LOCAL);
+    SMPMetaManager.getSettingsMgr ().updateSettings (false, true, false, false, "dummy", false, false, ESML.DEVELOPMENT_LOCAL);
 
     LOGGER.info ("Finished before");
   }

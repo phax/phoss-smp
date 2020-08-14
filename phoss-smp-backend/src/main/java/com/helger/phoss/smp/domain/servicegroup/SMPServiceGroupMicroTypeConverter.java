@@ -52,8 +52,7 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   }
 
   @Nonnull
-  public static SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement,
-                                                 @Nonnull final ISMPUserProvider aUserProvider)
+  public static SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement, @Nonnull final ISMPUserProvider aUserProvider)
   {
     final String sOwnerID = aElement.getAttributeValue (ATTR_OWNER_ID);
     final ISMPUser aOwner = aUserProvider.getUserOfID (sOwnerID);

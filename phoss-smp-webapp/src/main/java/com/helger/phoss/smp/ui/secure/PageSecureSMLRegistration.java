@@ -438,8 +438,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
 
       // Register SMP at SML
       {
-        final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC);
-        aForm.setEncTypeFileUpload ().setLeft (3);
+        final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3);
         aForm.addChild (info ("Register this SMP to the SML. This must only be done once per SMP!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
@@ -472,8 +471,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
 
       // Update SMP at SML
       {
-        final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC);
-        aForm.setEncTypeFileUpload ().setLeft (3);
+        final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3);
         aForm.addChild (info ("Update this SMP at the SML. This must only be done when either the IP address or the host name of the SMP changed!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
@@ -506,8 +504,7 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
 
       // Delete SMP from SML
       {
-        final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC);
-        aForm.setEncTypeFileUpload ().setLeft (3);
+        final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3);
         aForm.addChild (info ("Delete this SMP from the SML."));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,

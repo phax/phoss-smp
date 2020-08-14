@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2020 Philip Helger and contributors
+ * Copyright (C) 2014-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,6 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -29,31 +28,25 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
-import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
-import com.helger.phoss.smp.backend.mongodb.audit.MongoDBAuditor;
-import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
-import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
-import com.helger.smpclient.peppol.jaxb.ObjectFactory;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
 import com.helger.web.scope.mgr.WebScoped;
+import com.helger.web.scope.mock.WebScopeTestRule;
 
 /**
- * Create one million service groups - please make sure the SML connection is
- * not enabled.
+ * Create many service groups - please make sure the SML connection is not
+ * enabled.
  *
  * @author Philip Helger
  */
-public final class MainCreate1MillionServiceGroups
+public final class MainDeleteManyServiceGroups
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (MainCreate1MillionServiceGroups.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (MainDeleteManyServiceGroups.class);
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
@@ -68,15 +61,13 @@ public final class MainCreate1MillionServiceGroups
 
   public static void main (final String [] args) throws Throwable
   {
-    final SMPServerRESTTestRule aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-mongodb.properties")
-                                                                                    .getAbsolutePath ());
+    final String sServerBasePath = "http://localhost:90";
+    final WebScopeTestRule aRule = new WebScopeTestRule ();
     aRule.before ();
     try
     {
-      AuditHelper.setAuditor (new MongoDBAuditor ());
-      final ObjectFactory aObjFactory = new ObjectFactory ();
       final StopWatch aSWOverall = StopWatch.createdStarted ();
-      for (int i = 0; i < 1_000_000; ++i)
+      for (int i = 0; i < 10_000; ++i)
       {
         final StopWatch aSW = StopWatch.createdStarted ();
         final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
@@ -84,28 +75,15 @@ public final class MainCreate1MillionServiceGroups
                                                                                                                                                             7));
         final String sPI = aPI.getURIEncoded ();
 
-        final ServiceGroupType aSG = new ServiceGroupType ();
-        aSG.setParticipantIdentifier (aPI);
-        aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
-
         try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
         {
-          // Delete old - don't care about the result
-          if (false)
-            ClientBuilder.newClient ()
-                         .target (aRule.getFullURL ())
-                         .path (sPI)
-                         .request ()
-                         .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                         .delete ();
-
-          // Create a new
+          // Delete old
           final Response aResponseMsg = ClientBuilder.newClient ()
-                                                     .target (aRule.getFullURL ())
+                                                     .target (sServerBasePath)
                                                      .path (sPI)
                                                      .request ()
                                                      .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                                                     .put (Entity.xml (aObjFactory.createServiceGroup (aSG)));
+                                                     .delete ();
           _testResponseJerseyClient (aResponseMsg, 200);
         }
 

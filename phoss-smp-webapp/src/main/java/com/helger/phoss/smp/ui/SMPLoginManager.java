@@ -37,8 +37,7 @@ public final class SMPLoginManager extends BootstrapLoginManager
   }
 
   @Override
-  protected IHTMLProvider createLoginScreen (final boolean bLoginError,
-                                             @Nonnull final ICredentialValidationResult aLoginResult)
+  protected IHTMLProvider createLoginScreen (final boolean bLoginError, @Nonnull final ICredentialValidationResult aLoginResult)
   {
     return new SMPLoginHTMLProvider (bLoginError, aLoginResult, getPageTitle ());
   }

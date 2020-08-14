@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<smp:ServiceMetadata xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:smp="http://busdox.org/serviceMetadata/publishing/1.0/" xmlns:id="http://busdox.org/transport/identifiers/1.0/">
+  <smp:ServiceInformation>
+    <id:ParticipantIdentifier scheme="iso6523-actorid-upis">9915:xxx</id:ParticipantIdentifier>
+    <id:DocumentIdentifier scheme="busdox-docid-qns">urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0::2.1</id:DocumentIdentifier>
+    <smp:ProcessList>
+      <smp:Process>
+        <id:ProcessIdentifier scheme="cenbii-procid-ubl">urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</id:ProcessIdentifier>
+        <smp:ServiceEndpointList>
+          <smp:Endpoint transportProfile="peppol-transport-as4-v2_0">
+            <wsa:EndpointReference>
+              <wsa:Address>http://test.smpserver/as4</wsa:Address>
+            </wsa:EndpointReference>
+            <smp:RequireBusinessLevelSignature>false</smp:RequireBusinessLevelSignature>
+            <smp:Certificate>blacert</smp:Certificate>
+            <smp:ServiceDescription>Unit test service</smp:ServiceDescription>
+            <smp:TechnicalContactUrl>https://github.com/phax/phoss-smp</smp:TechnicalContactUrl>
+          </smp:Endpoint>
+        </smp:ServiceEndpointList>
+      </smp:Process>
+    </smp:ProcessList>
+  </smp:ServiceInformation>
+</smp:ServiceMetadata>

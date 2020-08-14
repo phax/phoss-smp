@@ -90,8 +90,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
       {
         // Dynamic
         final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                            new DTCol (bShowExtensionDetails ? "Extension"
-                                                                             : "Extension?").setDataSort (1, 0),
+                                            new DTCol (bShowExtensionDetails ? "Extension" : "Extension?").setDataSort (1, 0),
                                             new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
         aFinalTable = aTable;
       }

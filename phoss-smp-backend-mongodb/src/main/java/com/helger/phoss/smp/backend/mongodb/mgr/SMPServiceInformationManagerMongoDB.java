@@ -18,6 +18,7 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnegative;
@@ -176,13 +177,17 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return ret;
   }
 
-  @Nonnull
+  @Nullable
   @ReturnsMutableCopy
   public static SMPProcess toProcess (@Nonnull final Document aDoc)
   {
     final IProcessIdentifier aProcessID = toProcessID ((Document) aDoc.get (BSON_PROCESS_ID));
+    final List <Document> aEndpointDocs = aDoc.getList (BSON_ENDPOINTS, Document.class);
+    if (aEndpointDocs == null)
+      return null;
+
     final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
-    for (final Document aDocEP : aDoc.getList (BSON_ENDPOINTS, Document.class))
+    for (final Document aDocEP : aEndpointDocs)
       aEndpoints.add (toEndpoint (aDocEP));
     final String sExtension = aDoc.getString (BSON_EXTENSIONS);
     return new SMPProcess (aProcessID, aEndpoints, sExtension);
@@ -213,7 +218,11 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     if (bNeedProcesses)
       for (final Document aDocP : aDoc.getList (BSON_PROCESSES, Document.class))
-        aProcesses.add (toProcess (aDocP));
+      {
+        final SMPProcess aProcess = toProcess (aDocP);
+        if (aProcess == null)
+          aProcesses.add (aProcess);
+      }
     final String sExtension = aDoc.getString (BSON_EXTENSIONS);
 
     // The ID itself is derived from ServiceGroupID and DocTypeID

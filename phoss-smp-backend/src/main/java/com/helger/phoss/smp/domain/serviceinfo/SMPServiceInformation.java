@@ -62,9 +62,9 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
    * @param aDocumentTypeIdentifier
    *        Document type ID
    * @param aProcesses
-   *        processes list. May be <code>null</code>.
+   *        Processes list. May be <code>null</code>.
    * @param sExtension
-   *        Optional extension
+   *        Optional extension. May be <code>null</code>.
    */
   public SMPServiceInformation (@Nonnull final ISMPServiceGroup aServiceGroup,
                                 @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
@@ -180,16 +180,31 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     return m_aProcesses.containsAnyValue (x -> x.containsAnyEndpointWithTransportProfile (sTransportProfileID));
   }
 
-  @Nonnull
+  @Nullable
   public com.helger.smpclient.peppol.jaxb.ServiceMetadataType getAsJAXBObjectPeppol ()
   {
+    if (m_aProcesses.isEmpty ())
+    {
+      // "ProcessList" is mandatory and MUST contain at least 1 value
+      return null;
+    }
+
     final com.helger.smpclient.peppol.jaxb.ServiceInformationType aSI = new com.helger.smpclient.peppol.jaxb.ServiceInformationType ();
     // Explicit constructor call is needed here!
     aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
     aSI.setDocumentIdentifier (new SimpleDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.smpclient.peppol.jaxb.ProcessListType aProcesses = new com.helger.smpclient.peppol.jaxb.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
-      aProcesses.addProcess (aProcess.getAsJAXBObjectPeppol ());
+    {
+      final com.helger.smpclient.peppol.jaxb.ProcessType aJAXBProcess = aProcess.getAsJAXBObjectPeppol ();
+      if (aJAXBProcess != null)
+        aProcesses.addProcess (aJAXBProcess);
+    }
+    if (aProcesses.hasNoProcessEntries ())
+    {
+      // "ProcessList" is mandatory and MUST contain at least 1 value
+      return null;
+    }
     aSI.setProcessList (aProcesses);
     aSI.setExtension (getAsPeppolExtension ());
 
@@ -198,16 +213,32 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     return ret;
   }
 
-  @Nonnull
+  @Nullable
   public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ()
   {
+    if (m_aProcesses.isEmpty ())
+    {
+      // "ProcessList" is mandatory and MUST contain at least 1 value
+      return null;
+    }
+
     final com.helger.xsds.bdxr.smp1.ServiceInformationType aSI = new com.helger.xsds.bdxr.smp1.ServiceInformationType ();
     // Explicit constructor call is needed here!
     aSI.setParticipantIdentifier (new BDXR1ParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
     aSI.setDocumentIdentifier (new BDXR1DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.xsds.bdxr.smp1.ProcessListType aProcesses = new com.helger.xsds.bdxr.smp1.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
-      aProcesses.addProcess (aProcess.getAsJAXBObjectBDXR1 ());
+    {
+      final com.helger.xsds.bdxr.smp1.ProcessType aJAXBProcess = aProcess.getAsJAXBObjectBDXR1 ();
+      if (aJAXBProcess != null)
+        aProcesses.addProcess (aJAXBProcess);
+    }
+    if (aProcesses.hasNoProcessEntries ())
+    {
+      // "ProcessList" is mandatory and MUST contain at least 1 value
+      return null;
+    }
+
     aSI.setProcessList (aProcesses);
     aSI.setExtension (getAsBDXRExtension ());
 
@@ -250,7 +281,8 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
                                                       @Nonnull final com.helger.smpclient.peppol.jaxb.ServiceInformationType aServiceInformation)
   {
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
-    for (final com.helger.smpclient.peppol.jaxb.ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
+    for (final com.helger.smpclient.peppol.jaxb.ProcessType aProcess : aServiceInformation.getProcessList ()
+                                                                                          .getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,
                                       SimpleDocumentTypeIdentifier.wrap (aServiceInformation.getDocumentIdentifier ()),
