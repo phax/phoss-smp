@@ -526,4 +526,14 @@ public final class SMPServerConfiguration
       return new ProxySettings (Proxy.Type.HTTP, sHostname, nPort, getProxyUsername (), getProxyPassword ());
     return null;
   }
+
+  /**
+   * @return <code>true</code> if support for the HTTP "OPTIONS" verb should not
+   *         be provided.
+   */
+  public static boolean isHttpOptionsDisabled ()
+  {
+    // Enable by default
+    return getConfigFile ().getAsBoolean ("http.method.options.disabled", false);
+  }
 }

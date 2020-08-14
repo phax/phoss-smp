@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.servlet;
 
 import com.helger.commons.http.EHttpMethod;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.xservlet.AbstractXServlet;
 
 /**
@@ -34,5 +35,7 @@ public class SMPStatusServlet extends AbstractXServlet
   public SMPStatusServlet ()
   {
     handlerRegistry ().registerHandler (EHttpMethod.GET, new SMPStatusXServletHandler ());
+    if (SMPServerConfiguration.isHttpOptionsDisabled ())
+      handlerRegistry ().unregisterHandler (EHttpMethod.OPTIONS);
   }
 }

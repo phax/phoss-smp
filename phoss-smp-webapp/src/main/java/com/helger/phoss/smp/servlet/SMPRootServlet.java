@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.servlet;
 
 import com.helger.commons.http.EHttpMethod;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 import com.helger.photon.core.servlet.RootXServletHandler;
 import com.helger.xservlet.AbstractXServlet;
@@ -27,5 +28,7 @@ public class SMPRootServlet extends AbstractXServlet
   {
     handlerRegistry ().registerHandler (EHttpMethod.GET, new RootXServletHandler (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH));
     handlerRegistry ().copyHandlerToAll (EHttpMethod.GET);
+    if (SMPServerConfiguration.isHttpOptionsDisabled ())
+      handlerRegistry ().unregisterHandler (EHttpMethod.OPTIONS);
   }
 }

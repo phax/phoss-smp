@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.servlet;
 
+import com.helger.commons.http.EHttpMethod;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.ui.SMPLayoutHTMLProvider;
 import com.helger.phoss.smp.ui.pub.SMPRendererPublic;
 import com.helger.photon.app.html.IHTMLProvider;
@@ -40,5 +42,7 @@ public class PublicApplicationServlet extends AbstractPublicApplicationServlet
         return new SMPLayoutHTMLProvider (SMPRendererPublic::getContent);
       }
     });
+    if (SMPServerConfiguration.isHttpOptionsDisabled ())
+      handlerRegistry ().unregisterHandler (EHttpMethod.OPTIONS);
   }
 }
