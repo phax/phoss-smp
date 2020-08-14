@@ -27,6 +27,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.db.jpa.JPAExecutionResult;
 import com.helger.json.IJson;
@@ -47,6 +48,7 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.photon.audit.AuditHelper;
 
 /**
  * Manager for all {@link SMPBusinessCard} objects.
@@ -160,7 +162,8 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities" + ")");
 
-    JPAExecutionResult <?> ret;
+    final MutableBoolean aIsCreate = new MutableBoolean (true);
+    final JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
       // Delete all existing entities
@@ -168,8 +171,12 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
                               .setParameter ("id", aParticipantID.getURIEncoded ())
                               .executeUpdate ();
 
-      if (LOGGER.isDebugEnabled () && nDeleted > 0)
-        LOGGER.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
+      if (nDeleted > 0)
+      {
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
+        aIsCreate.set (false);
+      }
 
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
@@ -194,6 +201,15 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
 
     final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aParticipantID, aEntities);
 
+    if (aIsCreate.booleanValue ())
+      AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
+                                        aNewBusinessCard.getID (),
+                                        Integer.valueOf (aNewBusinessCard.getEntityCount ()));
+    else
+      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
+                                        aNewBusinessCard.getID (),
+                                        Integer.valueOf (aNewBusinessCard.getEntityCount ()));
+
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
 
@@ -212,7 +228,7 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
-    JPAExecutionResult <EChange> ret;
+    final JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
       final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id", DBBusinessCardEntity.class)
@@ -230,8 +246,16 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
 
     if (eChange.isChanged ())
     {
+      AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
+                                        aSMPBusinessCard.getID (),
+                                        Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+
       // Invoke generic callbacks
       m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
+    }
+    else
+    {
+      AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, "no-such-id", aSMPBusinessCard.getID ());
     }
 
     if (LOGGER.isDebugEnabled ())

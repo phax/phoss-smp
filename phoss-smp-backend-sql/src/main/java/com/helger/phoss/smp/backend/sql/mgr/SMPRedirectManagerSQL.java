@@ -42,6 +42,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.photon.audit.AuditHelper;
 import com.helger.security.certificate.CertificateHelper;
 
 /**
@@ -78,7 +79,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
 
     final MutableBoolean aCreatedNew = new MutableBoolean (true);
-    JPAExecutionResult <?> ret;
+    final JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
       final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aServiceGroup.getParticpantIdentifier (),
@@ -108,19 +109,41 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     {
       return null;
     }
-    final SMPRedirect aRedirect = new SMPRedirect (aServiceGroup,
-                                                   aDocumentTypeIdentifier,
-                                                   sTargetHref,
-                                                   sSubjectUniqueIdentifier,
-                                                   aCertificate,
-                                                   sExtension);
+    final SMPRedirect aSMPRedirect = new SMPRedirect (aServiceGroup,
+                                                      aDocumentTypeIdentifier,
+                                                      sTargetHref,
+                                                      sSubjectUniqueIdentifier,
+                                                      aCertificate,
+                                                      sExtension);
 
     if (aCreatedNew.booleanValue ())
-      m_aCallbacks.forEach (x -> x.onSMPRedirectCreated (aRedirect));
-    else
-      m_aCallbacks.forEach (x -> x.onSMPRedirectUpdated (aRedirect));
+    {
+      AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
+                                        aSMPRedirect.getID (),
+                                        aSMPRedirect.getServiceGroupID (),
+                                        aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPRedirect.getTargetHref (),
+                                        aSMPRedirect.getSubjectUniqueIdentifier (),
+                                        aSMPRedirect.getCertificate (),
+                                        aSMPRedirect.getExtensionsAsString ());
 
-    return aRedirect;
+      m_aCallbacks.forEach (x -> x.onSMPRedirectCreated (aSMPRedirect));
+    }
+    else
+    {
+      AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
+                                        aSMPRedirect.getID (),
+                                        aSMPRedirect.getServiceGroupID (),
+                                        aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPRedirect.getTargetHref (),
+                                        aSMPRedirect.getSubjectUniqueIdentifier (),
+                                        aSMPRedirect.getCertificate (),
+                                        aSMPRedirect.getExtensionsAsString ());
+
+      m_aCallbacks.forEach (x -> x.onSMPRedirectUpdated (aSMPRedirect));
+    }
+
+    return aSMPRedirect;
   }
 
   @Nonnull
@@ -129,7 +152,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     if (aSMPRedirect == null)
       return EChange.UNCHANGED;
 
-    JPAExecutionResult <EChange> ret;
+    final JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
       final DBServiceMetadataRedirectionID aDBRedirectID = new DBServiceMetadataRedirectionID (aSMPRedirect.getServiceGroup ()
@@ -144,9 +167,17 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     });
     if (ret.hasException ())
       return EChange.UNCHANGED;
-    if (ret.get ().isUnchanged ())
-      return EChange.UNCHANGED;
 
+    if (ret.get ().isUnchanged ())
+    {
+      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
+      return EChange.UNCHANGED;
+    }
+
+    AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT,
+                                      aSMPRedirect.getID (),
+                                      aSMPRedirect.getServiceGroupID (),
+                                      aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded ());
     m_aCallbacks.forEach (x -> x.onSMPRedirectDeleted (aSMPRedirect));
     return EChange.CHANGED;
   }
@@ -160,7 +191,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     // Remember all existing
     final ICommonsList <ISMPRedirect> aDeletedRedirects = getAllSMPRedirectsOfServiceGroup (aServiceGroup);
 
-    JPAExecutionResult <Integer> ret;
+    final JPAExecutionResult <Integer> ret;
     ret = doInTransaction ( () -> {
       final int nCnt = getEntityManager ().createQuery ("DELETE FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
                                                         DBServiceMetadataRedirection.class)
@@ -179,14 +210,23 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     // Callback only, if all were deleted
     if (nDeleted == aDeletedRedirects.size ())
     {
-      for (final ISMPRedirect aRedirect : aDeletedRedirects)
-        m_aCallbacks.forEach (x -> x.onSMPRedirectDeleted (aRedirect));
+      for (final ISMPRedirect aSMPRedirect : aDeletedRedirects)
+      {
+        AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT,
+                                          aSMPRedirect.getID (),
+                                          aSMPRedirect.getServiceGroupID (),
+                                          aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded ());
+
+        m_aCallbacks.forEach (x -> x.onSMPRedirectDeleted (aSMPRedirect));
+      }
     }
     else
+    {
       LOGGER.warn (nDeleted +
                    " SMP redirects were deleted, but " +
                    aDeletedRedirects.size () +
                    " were found previously. Because of this inconsistency, no callbacks are triggered");
+    }
 
     return EChange.CHANGED;
   }
@@ -207,14 +247,12 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
-    JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
+    final JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
     ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p",
                                                                    DBServiceMetadataRedirection.class)
                                                      .getResultList ());
     if (ret.hasException ())
-    {
       return new CommonsArrayList <> ();
-    }
 
     final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList <> ();
     for (final DBServiceMetadataRedirection aDBRedirect : ret.get ())
@@ -229,7 +267,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     final ICommonsList <ISMPRedirect> aRedirects = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
-      JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
+      final JPAExecutionResult <List <DBServiceMetadataRedirection>> ret;
       ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBServiceMetadataRedirection p WHERE p.id.businessIdentifierScheme = :scheme AND p.id.businessIdentifier = :value",
                                                                      DBServiceMetadataRedirection.class)
                                                        .setParameter ("scheme", aServiceGroup.getParticpantIdentifier ().getScheme ())
@@ -249,7 +287,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
   @Nonnegative
   public long getSMPRedirectCount ()
   {
-    JPAExecutionResult <Long> ret;
+    final JPAExecutionResult <Long> ret;
     ret = doSelect ( () -> {
       final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceMetadataRedirection p"));
       return Long.valueOf (nCount);
@@ -270,7 +308,7 @@ public final class SMPRedirectManagerSQL extends AbstractSMPJPAEnabledManager im
     if (aDocTypeID == null)
       return null;
 
-    JPAExecutionResult <DBServiceMetadataRedirection> ret;
+    final JPAExecutionResult <DBServiceMetadataRedirection> ret;
     ret = doInTransaction ( () -> {
       // Disable caching here
       final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();

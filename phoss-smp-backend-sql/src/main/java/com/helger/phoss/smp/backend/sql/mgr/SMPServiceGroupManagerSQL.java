@@ -52,6 +52,7 @@ import com.helger.phoss.smp.exception.SMPUnknownUserException;
 import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
+import com.helger.photon.audit.AuditHelper;
 
 public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPServiceGroupManager
 {
@@ -86,7 +87,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
     final MutableBoolean aCreatedServiceGroup = new MutableBoolean (false);
 
-    JPAExecutionResult <?> ret;
+    final JPAExecutionResult <?> ret;
     ret = doInTransaction ( () -> {
       final EntityManager aEM = getEntityManager ();
 
@@ -146,9 +147,11 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup succeeded");
 
-    final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
-    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aServiceGroup));
-    return aServiceGroup;
+    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
+    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID (), sOwnerID, aParticipantID.getURIEncoded (), sExtension);
+
+    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aSMPServiceGroup));
+    return aSMPServiceGroup;
   }
 
   @Nonnull
@@ -167,7 +170,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    JPAExecutionResult <EChange> ret;
+    final JPAExecutionResult <EChange> ret;
     ret = doInTransaction ( () -> {
       // Check if the passed service group ID is already in use
       final EntityManager aEM = getEntityManager ();
@@ -216,9 +219,16 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
 
+    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+
     // Callback only if something changed
     if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sServiceGroupID, sNewOwnerID, sExtension);
       m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (aParticipantID));
+    }
+    else
+      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "no-such-id", sServiceGroupID);
 
     return eChange;
   }
@@ -286,8 +296,11 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
 
     if (eChange.isChanged ())
     {
+      AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aParticipantID);
       m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
     }
+    else
+      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
 
     return eChange;
   }
@@ -335,7 +348,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
 
-    JPAExecutionResult <ICommonsList <ISMPServiceGroup>> ret;
+    final JPAExecutionResult <ICommonsList <ISMPServiceGroup>> ret;
     ret = doSelect ( () -> {
       final List <DBServiceGroup> aDBServiceGroups = getEntityManager ().createQuery ("SELECT p FROM DBServiceGroup p WHERE p.ownership.user.userName = :user",
                                                                                       DBServiceGroup.class)
@@ -362,7 +375,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupCountOfOwner(" + sOwnerID + ")");
 
-    JPAExecutionResult <Long> ret;
+    final JPAExecutionResult <Long> ret;
     ret = doSelect ( () -> {
       final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p) FROM DBOwnership p WHERE p.user.userName = :user",
                                                                                  DBOwnership.class)
@@ -385,7 +398,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (aParticipantID == null)
       return null;
 
-    JPAExecutionResult <SMPServiceGroup> ret;
+    final JPAExecutionResult <SMPServiceGroup> ret;
     ret = doSelect ( () -> {
       final DBServiceGroup aDBServiceGroup = getEntityManager ().find (DBServiceGroup.class, new DBServiceGroupID (aParticipantID));
       if (aDBServiceGroup == null)
@@ -413,7 +426,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (aParticipantID == null)
       return false;
 
-    JPAExecutionResult <Boolean> ret;
+    final JPAExecutionResult <Boolean> ret;
     ret = doSelect ( () -> {
       // Disable caching here
       final ICommonsMap <String, Object> aProps = new CommonsHashMap <> ();
@@ -434,7 +447,7 @@ public final class SMPServiceGroupManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupCount()");
 
-    JPAExecutionResult <Long> ret;
+    final JPAExecutionResult <Long> ret;
     ret = doSelect ( () -> {
       final long nCount = getSelectCountResult (getEntityManager ().createQuery ("SELECT COUNT(p.id) FROM DBServiceGroup p"));
       return Long.valueOf (nCount);

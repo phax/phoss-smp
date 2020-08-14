@@ -56,6 +56,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.photon.audit.AuditHelper;
 
 /**
  * Manager for all {@link SMPServiceInformation} objects.
@@ -251,9 +252,26 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
 
     // Callback outside of transaction
     if (aUpdated.booleanValue ())
+    {
+      AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
+                                        aSMPServiceInformation.getID (),
+                                        aSMPServiceInformation.getServiceGroupID (),
+                                        aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPServiceInformation.getAllProcesses (),
+                                        aSMPServiceInformation.getExtensionsAsString ());
+
       m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aSMPServiceInformation));
+    }
     else
+    {
+      AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
+                                        aSMPServiceInformation.getID (),
+                                        aSMPServiceInformation.getServiceGroupID (),
+                                        aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPServiceInformation.getAllProcesses (),
+                                        aSMPServiceInformation.getExtensionsAsString ());
       m_aCBs.forEach (x -> x.onSMPServiceInformationCreated (aSMPServiceInformation));
+    }
 
     return ESuccess.SUCCESS;
   }
@@ -303,7 +321,12 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
 
     // Callback outside of transaction
     if (ret.get ().isChanged ())
+    {
+      AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
       m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
+    }
+    else
+      AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
 
     return ret.get ();
   }
@@ -341,7 +364,10 @@ public final class SMPServiceInformationManagerSQL extends AbstractSMPJPAEnabled
 
     // Callback outside of transaction
     for (final ISMPServiceInformation aSMPServiceInformation : aDeletedInfos.get ())
+    {
+      AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
       m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
+    }
 
     return ret.get ();
   }

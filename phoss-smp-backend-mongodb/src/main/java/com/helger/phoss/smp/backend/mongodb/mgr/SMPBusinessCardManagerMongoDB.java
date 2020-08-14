@@ -351,7 +351,6 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   @Nullable
   public ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-
     if (aServiceGroup == null)
       return null;
 

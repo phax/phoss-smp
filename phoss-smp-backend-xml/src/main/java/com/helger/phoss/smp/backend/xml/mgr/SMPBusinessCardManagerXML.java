@@ -150,10 +150,10 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
       m_aRWLock.writeLock ().unlock ();
     }
 
+    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
-
-    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard successful");
