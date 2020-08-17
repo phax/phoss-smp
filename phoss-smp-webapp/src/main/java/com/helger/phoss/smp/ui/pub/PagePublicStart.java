@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.ESortOrder;
+import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.tabular.AbstractHCTable;
 import com.helger.html.hc.html.tabular.HCRow;
@@ -35,8 +36,8 @@ import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.rest2.Rest2DataProvider;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
@@ -44,6 +45,7 @@ import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
  * This is the start page of the public application. It lists all available
@@ -70,6 +72,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
 
     if (SMPWebAppConfiguration.isStartPageParticipantsNone ())
     {
@@ -128,11 +131,11 @@ public final class PagePublicStart extends AbstractSMPWebPage
         {
           aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.extensions ().isNotEmpty (), aDisplayLocale));
         }
-        aRow.addCell (new HCA (LinkHelper.getURLWithServerAndContext (aServiceGroup.getParticpantIdentifier ()
-                                                                                   .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
-                                                                                                                        sDisplayName)
-                                                                                                             .setTargetBlank ()
-                                                                                                             .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+        final Rest2DataProvider aDP = new Rest2DataProvider (aRequestScope, aServiceGroup.getParticpantIdentifier ().getURIEncoded ());
+        aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticpantIdentifier ()))).setTitle ("Perform SMP query on " +
+                                                                                                                             sDisplayName)
+                                                                                                                  .setTargetBlank ()
+                                                                                                                  .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
       }
       if (aFinalTable.hasBodyRows ())
       {
