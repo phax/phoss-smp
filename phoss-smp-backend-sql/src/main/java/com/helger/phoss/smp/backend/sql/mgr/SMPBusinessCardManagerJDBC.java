@@ -30,6 +30,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
@@ -53,6 +54,7 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.photon.audit.AuditHelper;
 
 /**
  * A JDBC based implementation of the {@link ISMPBusinessCardManager} interface.
@@ -169,13 +171,18 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities" + ")");
 
+    final MutableBoolean aUpdated = new MutableBoolean (false);
     final ESuccess eSucces = executor ().performInTransaction ( () -> {
       // Delete all existing entities
       final String sPID = aParticipantID.getURIEncoded ();
       final long nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
                                                                 new ConstantPreparedStatementDataProvider (sPID));
-      if (LOGGER.isDebugEnabled () && nDeleted > 0)
-        LOGGER.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
+      if (nDeleted > 0)
+      {
+        aUpdated.set (true);
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
+      }
 
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
@@ -194,15 +201,27 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       }
     });
     if (eSucces.isFailure ())
+    {
+      if (aUpdated.booleanValue ())
+        AuditHelper.onAuditModifyFailure (SMPBusinessCard.OT, "all", aParticipantID.getURIEncoded ());
+      else
+        AuditHelper.onAuditCreateFailure (SMPBusinessCard.OT, aParticipantID.getURIEncoded ());
+
       return null;
+    }
 
     final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aParticipantID, aEntities);
 
-    // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
-
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Finished createOrUpdateSMPBusinessCard");
+
+    if (aUpdated.booleanValue ())
+      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT, "all", aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
+    else
+      AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
+
+    // Invoke generic callbacks
+    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
 
     return aNewBusinessCard;
   }
@@ -218,20 +237,23 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
 
     final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
                                                             new ConstantPreparedStatementDataProvider (aSMPBusinessCard.getID ()));
-    final EChange eChange = EChange.valueOf (nCount > 0);
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Finished deleteSMPBusinessCard. Change=" + eChange.isChanged ());
-
-    if (eChange.isChanged ())
+    if (nCount <= 0)
     {
-      // Invoke generic callbacks
-      m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Finished deleteSMPBusinessCard. Change=false");
+
+      AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, "no-such-id", aSMPBusinessCard.getID ());
+      return EChange.UNCHANGED;
     }
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Finished deleteSMPBusinessCard. Change=" + eChange.isChanged ());
+      LOGGER.debug ("Finished deleteSMPBusinessCard. Change=true");
 
-    return eChange;
+    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+
+    // Invoke generic callbacks
+    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
+    return EChange.CHANGED;
   }
 
   @Nonnull
