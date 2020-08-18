@@ -27,6 +27,7 @@ import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.type.ObjectType;
 import com.helger.commons.wrapper.Wrapper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBResultRow;
@@ -39,6 +40,7 @@ import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exception.SMPUnknownUserException;
+import com.helger.photon.audit.AuditHelper;
 
 /**
  * A JDBC based implementation of the {@link ISMPUserManager} interface.
@@ -48,6 +50,7 @@ import com.helger.phoss.smp.exception.SMPUnknownUserException;
  */
 public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager implements ISMPUserManager
 {
+  public static final ObjectType OT = new ObjectType ("smpuser");
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerJDBC.class);
 
   public SMPUserManagerJDBC ()
@@ -72,7 +75,15 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
         ret.set (ESuccess.valueOf (nCount == 1));
       }
     });
-    return ret.get ();
+
+    if (ret.get ().isFailure ())
+    {
+      AuditHelper.onAuditCreateFailure (OT, sUserName);
+      return ESuccess.FAILURE;
+    }
+
+    AuditHelper.onAuditCreateSuccess (OT, sUserName);
+    return ESuccess.SUCCESS;
   }
 
   @Nonnull

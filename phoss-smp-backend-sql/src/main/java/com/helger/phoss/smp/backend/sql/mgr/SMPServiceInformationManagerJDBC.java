@@ -53,6 +53,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.photon.audit.AuditHelper;
 
 /**
  * A JDBC based implementation of the {@link ISMPServiceInformationManager}
@@ -166,9 +167,26 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     // Callback outside of transaction
     if (aUpdated.booleanValue ())
+    {
+      AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
+                                        aSMPServiceInformation.getID (),
+                                        aSMPServiceInformation.getServiceGroupID (),
+                                        aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPServiceInformation.getAllProcesses (),
+                                        aSMPServiceInformation.getExtensionsAsString ());
+
       m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aSMPServiceInformation));
+    }
     else
+    {
+      AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
+                                        aSMPServiceInformation.getID (),
+                                        aSMPServiceInformation.getServiceGroupID (),
+                                        aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPServiceInformation.getAllProcesses (),
+                                        aSMPServiceInformation.getExtensionsAsString ());
       m_aCBs.forEach (x -> x.onSMPServiceInformationCreated (aSMPServiceInformation));
+    }
 
     return ESuccess.SUCCESS;
   }
@@ -196,7 +214,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   @Nonnull
   private EChange _deleteSMPServiceInformationNoCallback (@Nonnull final ISMPServiceInformation aSMPServiceInformation)
   {
-    final Wrapper <EChange> ret = new Wrapper <> (EChange.UNCHANGED);
+    final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (-1));
     final ESuccess eSuccess = executor ().performInTransaction ( () -> {
       final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticpantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
@@ -212,11 +230,11 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                                              aPID.getValue (),
                                                                                                              aDocTypeID.getScheme (),
                                                                                                              aDocTypeID.getValue ()));
-      ret.set (EChange.valueOf (nCountEP > 0 || nCountProc > 0));
+      ret.set (Long.valueOf (nCountEP + nCountProc));
     });
     if (eSuccess.isFailure ())
       return EChange.UNCHANGED;
-    return ret.get ();
+    return EChange.valueOf (ret.get ().longValue () > 0);
   }
 
   @Nonnull
@@ -227,7 +245,12 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     // Main deletion
     if (_deleteSMPServiceInformationNoCallback (aSMPServiceInformation).isUnchanged ())
+    {
+      AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
       return EChange.UNCHANGED;
+    }
+
+    AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
 
     // Callback outside of transaction
     m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
@@ -241,7 +264,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (aServiceGroup == null)
       return EChange.UNCHANGED;
 
-    final Wrapper <EChange> ret = new Wrapper <> (EChange.UNCHANGED);
+    final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (0));
     final Wrapper <ICommonsList <ISMPServiceInformation>> aAllDeleted = new Wrapper <> ();
     final ESuccess eSuccess = executor ().performInTransaction ( () -> {
       // get the old ones first
@@ -260,15 +283,21 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                 " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
                                                                 new ConstantPreparedStatementDataProvider (aPID.getScheme (),
                                                                                                            aPID.getValue ()));
-      ret.set (EChange.valueOf (nCountEP > 0 || nCountProc > 0 || nCountSM > 0));
+      ret.set (Long.valueOf (nCountEP + nCountProc + nCountSM));
     });
-    if (eSuccess.isFailure () || ret.get ().isUnchanged ())
+    if (eSuccess.isFailure () || ret.get ().longValue () <= 0)
+    {
+      AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aServiceGroup.getID ());
       return EChange.UNCHANGED;
+    }
 
     // Callback outside of transaction
     if (aAllDeleted.isSet ())
       for (final ISMPServiceInformation aSMPServiceInformation : aAllDeleted.get ())
+      {
+        AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
         m_aCBs.forEach (x -> x.onSMPServiceInformationDeleted (aSMPServiceInformation));
+      }
 
     return EChange.CHANGED;
   }
@@ -279,7 +308,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (aSMPServiceInformation == null || aProcess == null)
       return EChange.UNCHANGED;
 
-    final Wrapper <EChange> ret = new Wrapper <> (EChange.UNCHANGED);
+    final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (0));
     final ESuccess eSuccess = executor ().performInTransaction ( () -> {
       final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticpantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
@@ -300,12 +329,12 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                                              aDocTypeID.getValue (),
                                                                                                              aProcessID.getScheme (),
                                                                                                              aProcessID.getValue ()));
-      ret.set (EChange.valueOf (nCountEP > 0 || nCountProc > 0));
+      ret.set (Long.valueOf (nCountEP + nCountProc));
     });
     if (eSuccess.isFailure ())
       return EChange.UNCHANGED;
 
-    return ret.get ();
+    return EChange.valueOf (ret.get ().longValue () > 0);
   }
 
   @Nonnull

@@ -238,6 +238,16 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> to show the author in the public area,
+   *         <code>false</code> to not show it.
+   * @since 5.2.6
+   */
+  public static boolean isPublicShowAuthor ()
+  {
+    return getConfigFile ().getAsBoolean ("webapp.public.showauthor", true);
+  }
+
+  /**
    * Setting for issue #132
    *
    * @return <code>true</code> if a custom imprint should be shown in the
@@ -308,5 +318,48 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static String getImprintCSSClasses ()
   {
     return StringHelper.trim (getConfigFile ().getAsString ("webapp.imprint.cssclasses"));
+  }
+
+  /**
+   * @return <code>true</code> if support for the HTTP "OPTIONS" verb should not
+   *         be provided.
+   * @since 5.2.6
+   */
+  public static boolean isHttpOptionsDisabled ()
+  {
+    // Enable by default
+    return getConfigFile ().getAsBoolean ("http.method.options.disabled", false);
+  }
+
+  /**
+   * @return <code>true</code> to enable CSP in general, <code>false</code> to
+   *         disable it.
+   * @since 5.2.6
+   */
+  public static boolean isCSPEnabled ()
+  {
+    return getConfigFile ().getAsBoolean ("csp.enabled", true);
+  }
+
+  /**
+   * @return <code>true</code> if CSP is enabled, errors should only be reported
+   *         but the content should not be blocked, <code>false</code> to also
+   *         block payload.
+   * @since 5.2.6
+   */
+  public static boolean isCSPReportingOnly ()
+  {
+    return getConfigFile ().getAsBoolean ("csp.reporting.only", false);
+  }
+
+  /**
+   * @return <code>true</code> if CSP is enabled and it's not "reporting only"
+   *         mode, errors should be reported , <code>false</code> to silently
+   *         ignore them.
+   * @since 5.2.6
+   */
+  public static boolean isCSPReportingEnabled ()
+  {
+    return getConfigFile ().getAsBoolean ("csp.reporting.enabled", false);
   }
 }

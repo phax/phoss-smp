@@ -49,6 +49,7 @@ import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
+import com.helger.photon.audit.AuditHelper;
 
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
@@ -106,12 +107,10 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       if (aDBServiceGroup != null)
         throw new IllegalStateException ("The service group with ID " + aParticipantID.getURIEncoded () + " already exists!");
 
-      {
-        // It's a new service group - Create in SML and remember that
-        // Throws exception in case of an error
-        aHook.createServiceGroup (aParticipantID);
-        aCreatedSGHook.set (true);
-      }
+      // It's a new service group - Create in SML and remember that
+      // Throws exception in case of an error
+      aHook.createServiceGroup (aParticipantID);
+      aCreatedSGHook.set (true);
 
       // Did not exist. Create it.
       if (executor ().insertOrUpdateOrDelete ("INSERT INTO smp_service_group (businessIdentifierScheme, businessIdentifier, extension) VALUES (?, ?, ?)",
@@ -143,6 +142,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     if (aCaughtException.isSet () || !aCreatedSGDB.booleanValue ())
     {
+      AuditHelper.onAuditCreateFailure (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), sOwnerID, sExtension);
+
       // Propagate contained exception
       final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)
@@ -154,6 +155,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup succeeded");
+
+    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), sOwnerID, sExtension);
 
     final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
     m_aCache.put (aParticipantID, aServiceGroup);
@@ -215,6 +218,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     if (eSuccess.isFailure () || aCaughtException.isSet ())
     {
+      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), sNewOwnerID, sNewExtension);
+
       final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
@@ -224,6 +229,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final EChange eChange = aWrappedChange.get ();
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
+
+    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), sNewOwnerID, sNewExtension);
 
     // Callback only if something changed
     if (eChange.isChanged ())
@@ -284,6 +291,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     if (aCaughtException.isSet ())
     {
+      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, aParticipantID.getURIEncoded ());
+
       final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
@@ -298,6 +307,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     if (eChange.isChanged ())
     {
+      AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aParticipantID.getURIEncoded ());
+
       m_aCache.remove (aParticipantID);
       m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
     }

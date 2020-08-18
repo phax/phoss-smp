@@ -63,8 +63,7 @@ import com.mongodb.client.result.DeleteResult;
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMongoDB implements
-                                                       ISMPServiceInformationManager
+public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMongoDB implements ISMPServiceInformationManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceInformationManagerMongoDB.class);
 
@@ -141,10 +140,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final boolean bRequireBusinessLevelSignature = aDoc.getBoolean (BSON_BUSINESSLEVELSIG,
                                                                     SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aDoc.getString (BSON_MINIMUM_AUTHENTICATION_LEVEL);
-    final LocalDateTime aServiceActivationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEACTIVATION),
-                                                                      LocalDateTime.class);
-    final LocalDateTime aServiceExpirationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEEXPIRATION),
-                                                                      LocalDateTime.class);
+    final LocalDateTime aServiceActivationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEACTIVATION), LocalDateTime.class);
+    final LocalDateTime aServiceExpirationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEEXPIRATION), LocalDateTime.class);
     final String sCertificate = aDoc.getString (BSON_CERTIFICATE);
     final String sServiceDescription = aDoc.getString (BSON_SERVICE_DESCRIPTION);
     final String sTechnicalContactUrl = aDoc.getString (BSON_TECHCONTACTURL);
@@ -200,8 +197,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final Document ret = new Document ().append (BSON_ID, aValue.getID ())
                                         .append (BSON_SERVICE_GROUP_ID, aValue.getServiceGroupID ())
                                         .append (BSON_DOCTYPE_ID, toBson (aValue.getDocumentTypeIdentifier ()));
-    final ICommonsList <Document> aProcs = new CommonsArrayList <> (aValue.getAllProcesses (),
-                                                                    SMPServiceInformationManagerMongoDB::toBson);
+    final ICommonsList <Document> aProcs = new CommonsArrayList <> (aValue.getAllProcesses (), SMPServiceInformationManagerMongoDB::toBson);
     if (aProcs.isNotEmpty ())
       ret.append (BSON_PROCESSES, aProcs);
     if (aValue.extensions ().isNotEmpty ())
@@ -235,8 +231,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                                                         @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                       aDocTypeID);
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
     if (aServiceInfo != null)
     {
       final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
@@ -261,8 +256,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
     // Check for an update
     boolean bChangedExisting = false;
-    final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroup (),
-                                                                                                                                 aSMPServiceInformation.getDocumentTypeIdentifier ());
+    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroup (),
+                                                                                                          aSMPServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
     {
       // If a service information is present, it must be the provided object!
@@ -375,8 +370,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   }
 
   @Nonnull
-  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
-                                   @Nullable final ISMPProcess aProcess)
+  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation, @Nullable final ISMPProcess aProcess)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPProcess (" + aSMPServiceInformation + ", " + aProcess + ")");
@@ -389,8 +383,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     }
 
     // Find implementation object
-    final SMPServiceInformation aRealServiceInformation = getCollection ().find (new Document (BSON_ID,
-                                                                                               aSMPServiceInformation.getID ()))
+    final SMPServiceInformation aRealServiceInformation = getCollection ().find (new Document (BSON_ID, aSMPServiceInformation.getID ()))
                                                                           .map (x -> toServiceInformation (x, true))
                                                                           .first ();
     if (aRealServiceInformation == null)
@@ -414,8 +407,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     }
 
     // Save new one
-    getCollection ().replaceOne (new Document (BSON_ID, aSMPServiceInformation.getID ()),
-                                 toBson (aRealServiceInformation));
+    getCollection ().replaceOne (new Document (BSON_ID, aSMPServiceInformation.getID ()), toBson (aRealServiceInformation));
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
                                       aSMPServiceInformation.getID (),
@@ -459,8 +451,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     if (aServiceGroup != null)
     {
       getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()))
-                      .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x,
-                                                                                          false).getDocumentTypeIdentifier ()));
+                      .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, false).getDocumentTypeIdentifier ()));
     }
     return ret;
   }
@@ -496,8 +487,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       return false;
 
     // As simple as it can be
-    return getCollection ().find (new Document (BSON_PROCESSES + "." + BSON_ENDPOINTS + "." + BSON_TRANSPORT_PROFILE,
-                                                sTransportProfileID))
+    return getCollection ().find (new Document (BSON_PROCESSES + "." + BSON_ENDPOINTS + "." + BSON_TRANSPORT_PROFILE, sTransportProfileID))
                            .iterator ()
                            .hasNext ();
   }

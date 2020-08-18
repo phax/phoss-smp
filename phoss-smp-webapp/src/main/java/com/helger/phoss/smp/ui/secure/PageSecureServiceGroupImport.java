@@ -61,18 +61,15 @@ import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPUserSelect;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
-import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.button.BootstrapSubmitButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.card.BootstrapCard;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapFileUpload;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
@@ -81,18 +78,17 @@ import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.fileupload.IFileItem;
-import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.serialize.MicroReader;
 import com.helger.xml.serialize.read.SAXReaderSettings;
 
 /**
- * Class to import and export service groups with all contents
+ * Class to import service groups with all contents
  *
  * @author Philip Helger
  */
-public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
+public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
 {
   private static final String FIELD_IMPORT_FILE = "importfile";
   private static final String FIELD_OVERWRITE_EXISTING = "overwriteexisting";
@@ -127,9 +123,9 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
     }
   }
 
-  public PageSecureServiceGroupExchange (@Nonnull @Nonempty final String sID)
+  public PageSecureServiceGroupImport (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "Import/Export");
+    super (sID, "Import");
   }
 
   public static void importXMLVer10 (@Nonnull final IMicroElement eRoot,
@@ -409,23 +405,18 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
     final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
-    final int nServiceGroupCount = aAllServiceGroups.size ();
     final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
     final FormErrorList aFormErrors = new FormErrorList ();
 
-    boolean bSelectImportTab = false;
     final HCUL aImportResultUL = new HCUL ();
 
     if (aWPEC.hasAction (CPageParam.ACTION_PERFORM))
     {
-      bSelectImportTab = true;
-
       // Start import
       final IFileItem aImportFile = aWPEC.params ().getAsFileItem (FIELD_IMPORT_FILE);
       final boolean bOverwriteExisting = aWPEC.params ().isCheckBoxChecked (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
@@ -489,67 +480,39 @@ public final class PageSecureServiceGroupExchange extends AbstractSMPWebPage
       }
     }
 
-    final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
     final boolean bHandleBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
 
-    // Export tab
+    if (aImportResultUL.hasChildren ())
     {
-      final HCNodeList aExport = new HCNodeList ();
-      if (nServiceGroupCount == 0)
-        aExport.addChild (warn ("Since no service group is present, nothing can be exported!"));
-      else
-      {
-        aExport.addChild (info ("Export " +
-                                (nServiceGroupCount == 1 ? "service group" : "all " + aAllServiceGroups.size () + " service groups") +
-                                (bHandleBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s") : "") +
-                                " to an XML file."));
-      }
-
-      final BootstrapButtonToolbar aToolbar = aExport.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
-      aToolbar.addChild (new BootstrapButton ().addChild ("Export all Service Groups")
-                                               .setIcon (EDefaultIcon.SAVE_ALL)
-                                               .setOnClick (CAjax.FUNCTION_EXPORT_ALL_SERVICE_GROUPS.getInvocationURL (aRequestScope))
-                                               .setDisabled (aAllServiceGroups.isEmpty ()));
-      aTabBox.addTab ("export", "Export", aExport, !bSelectImportTab);
+      final BootstrapCard aPanel = new BootstrapCard ();
+      aPanel.createAndAddHeader ().addChild ("Import results");
+      aPanel.createAndAddBody ().addChild (aImportResultUL);
+      aNodeList.addChild (aPanel);
     }
 
-    // Import tab
-    {
-      final HCNodeList aImport = new HCNodeList ();
-
-      if (aImportResultUL.hasChildren ())
-      {
-        final BootstrapCard aPanel = new BootstrapCard ();
-        aPanel.createAndAddHeader ().addChild ("Import results");
-        aPanel.createAndAddBody ().addChild (aImportResultUL);
-        aImport.addChild (aPanel);
-      }
-
-      aImport.addChild (info ("Import service groups incl. all endpoints" +
+    aNodeList.addChild (info ("Import service groups incl. all endpoints" +
                               (bHandleBusinessCards ? " and business cards" : "") +
                               " from a file."));
 
-      final BootstrapForm aForm = aImport.addAndReturnChild (getUIHandler ().createFormFileUploadSelf (aWPEC));
+    final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormFileUploadSelf (aWPEC));
 
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("File to import")
-                                                   .setCtrl (new BootstrapFileUpload (FIELD_IMPORT_FILE, aDisplayLocale))
-                                                   .setErrorList (aFormErrors.getListOfField (FIELD_IMPORT_FILE)));
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Overwrite existing elements")
-                                                   .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_OVERWRITE_EXISTING,
-                                                                                                      DEFAULT_OVERWRITE_EXISTING)))
-                                                   .setHelpText ("If this box is checked, all existing endpoints etc. of a service group are deleted and new endpoints are created! If the " +
-                                                                 SMPWebAppConfiguration.getDirectoryName () +
-                                                                 " integration is enabled, existing business cards contained in the import are also overwritten!")
-                                                   .setErrorList (aFormErrors.getListOfField (FIELD_OVERWRITE_EXISTING)));
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owner of the new service groups")
-                                                   .setCtrl (new HCSMPUserSelect (new RequestField (FIELD_DEFAULT_OWNER), aDisplayLocale))
-                                                   .setHelpText ("This owner is only selected, if the owner contained in the import file is unknown.")
-                                                   .setErrorList (aFormErrors.getListOfField (FIELD_DEFAULT_OWNER)));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("File to import")
+                                                 .setCtrl (new BootstrapFileUpload (FIELD_IMPORT_FILE, aDisplayLocale))
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_IMPORT_FILE)));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Overwrite existing elements")
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_OVERWRITE_EXISTING,
+                                                                                                    DEFAULT_OVERWRITE_EXISTING)))
+                                                 .setHelpText ("If this box is checked, all existing endpoints etc. of a service group are deleted and new endpoints are created! If the " +
+                                                               SMPWebAppConfiguration.getDirectoryName () +
+                                                               " integration is enabled, existing business cards contained in the import are also overwritten!")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_OVERWRITE_EXISTING)));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owner of the new service groups")
+                                                 .setCtrl (new HCSMPUserSelect (new RequestField (FIELD_DEFAULT_OWNER), aDisplayLocale))
+                                                 .setHelpText ("This owner is only selected, if the owner contained in the import file is unknown.")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_DEFAULT_OWNER)));
 
-      final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
-      aToolbar.addHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM);
-      aToolbar.addChild (new BootstrapSubmitButton ().addChild ("Import Service Groups").setIcon (EDefaultIcon.ADD));
-      aTabBox.addTab ("import", "Import", aImport, bSelectImportTab);
-    }
+    final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
+    aToolbar.addHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM);
+    aToolbar.addChild (new BootstrapSubmitButton ().addChild ("Import Service Groups").setIcon (EDefaultIcon.ADD));
   }
 }

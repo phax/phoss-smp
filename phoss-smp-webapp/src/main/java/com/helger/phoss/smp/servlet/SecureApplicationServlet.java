@@ -16,10 +16,11 @@
  */
 package com.helger.phoss.smp.servlet;
 
+import com.helger.commons.http.EHttpMethod;
+import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.ui.SMPLayoutHTMLProvider;
 import com.helger.phoss.smp.ui.secure.SMPRendererSecure;
 import com.helger.photon.app.html.IHTMLProvider;
-import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
@@ -32,7 +33,7 @@ public class SecureApplicationServlet extends AbstractSecureApplicationServlet
 {
   public SecureApplicationServlet ()
   {
-    super (new AbstractApplicationXServletHandler ()
+    super (new SMPApplicationXServletHandler ()
     {
       @Override
       protected IHTMLProvider createHTMLProvider (final IRequestWebScopeWithoutResponse aRequestScope)
@@ -40,5 +41,7 @@ public class SecureApplicationServlet extends AbstractSecureApplicationServlet
         return new SMPLayoutHTMLProvider (SMPRendererSecure::getContent);
       }
     });
+    if (SMPWebAppConfiguration.isHttpOptionsDisabled ())
+      handlerRegistry ().unregisterHandler (EHttpMethod.OPTIONS);
   }
 }

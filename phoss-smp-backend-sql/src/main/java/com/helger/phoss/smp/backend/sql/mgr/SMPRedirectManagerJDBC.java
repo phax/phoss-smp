@@ -43,6 +43,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.photon.audit.AuditHelper;
 import com.helger.security.certificate.CertificateHelper;
 
 /**
@@ -87,8 +88,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       final ISMPRedirect aDBRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
 
       final IParticipantIdentifier aParticpantID = aServiceGroup.getParticpantIdentifier ();
-      final String sCertificate = aCertificate == null ? null
-                                                       : CertificateHelper.getPEMEncodedCertificate (aCertificate);
+      final String sCertificate = aCertificate == null ? null : CertificateHelper.getPEMEncodedCertificate (aCertificate);
 
       if (aDBRedirect == null)
       {
@@ -131,19 +131,40 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       return null;
     }
 
-    final SMPRedirect aRedirect = new SMPRedirect (aServiceGroup,
-                                                   aDocTypeID,
-                                                   sRedirectUrl,
-                                                   sSubjectUniqueIdentifier,
-                                                   aCertificate,
-                                                   sExtension);
+    final SMPRedirect aSMPRedirect = new SMPRedirect (aServiceGroup,
+                                                      aDocTypeID,
+                                                      sRedirectUrl,
+                                                      sSubjectUniqueIdentifier,
+                                                      aCertificate,
+                                                      sExtension);
 
     if (aCreatedNew.booleanValue ())
-      m_aCallbacks.forEach (x -> x.onSMPRedirectCreated (aRedirect));
-    else
-      m_aCallbacks.forEach (x -> x.onSMPRedirectUpdated (aRedirect));
+    {
+      AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
+                                        aSMPRedirect.getID (),
+                                        aSMPRedirect.getServiceGroupID (),
+                                        aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPRedirect.getTargetHref (),
+                                        aSMPRedirect.getSubjectUniqueIdentifier (),
+                                        aSMPRedirect.getCertificate (),
+                                        aSMPRedirect.getExtensionsAsString ());
 
-    return aRedirect;
+      m_aCallbacks.forEach (x -> x.onSMPRedirectCreated (aSMPRedirect));
+    }
+    else
+    {
+      AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
+                                        aSMPRedirect.getID (),
+                                        aSMPRedirect.getServiceGroupID (),
+                                        aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPRedirect.getTargetHref (),
+                                        aSMPRedirect.getSubjectUniqueIdentifier (),
+                                        aSMPRedirect.getCertificate (),
+                                        aSMPRedirect.getExtensionsAsString ());
+
+      m_aCallbacks.forEach (x -> x.onSMPRedirectUpdated (aSMPRedirect));
+    }
+    return aSMPRedirect;
   }
 
   @Nonnull
@@ -161,8 +182,15 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                                                                                                          aDocTypeID.getScheme (),
                                                                                                          aDocTypeID.getValue ()));
     if (nDeleted == 0)
+    {
+      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
       return EChange.UNCHANGED;
+    }
 
+    AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT,
+                                      aSMPRedirect.getID (),
+                                      aSMPRedirect.getServiceGroupID (),
+                                      aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded ());
     m_aCallbacks.forEach (x -> x.onSMPRedirectDeleted (aSMPRedirect));
     return EChange.CHANGED;
   }
@@ -183,13 +211,21 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                                                               new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                          aParticipantID.getValue ()));
     if (nDeleted == 0)
+    {
       return EChange.UNCHANGED;
+    }
 
     // Callback only, if all were deleted
     if (nDeleted == aDeletedRedirects.size ())
     {
-      for (final ISMPRedirect aRedirect : aDeletedRedirects)
-        m_aCallbacks.forEach (x -> x.onSMPRedirectDeleted (aRedirect));
+      for (final ISMPRedirect aSMPRedirect : aDeletedRedirects)
+      {
+        AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT,
+                                          aSMPRedirect.getID (),
+                                          aSMPRedirect.getServiceGroupID (),
+                                          aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded ());
+        m_aCallbacks.forEach (x -> x.onSMPRedirectDeleted (aSMPRedirect));
+      }
     }
     else
     {
@@ -280,11 +316,6 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     final DBResultRow aRow = aDBResult.get ();
     final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (aRow.getAsString (2));
-    return new SMPRedirect (aServiceGroup,
-                            aDocTypeID,
-                            aRow.getAsString (0),
-                            aRow.getAsString (1),
-                            aCertificate,
-                            aRow.getAsString (3));
+    return new SMPRedirect (aServiceGroup, aDocTypeID, aRow.getAsString (0), aRow.getAsString (1), aCertificate, aRow.getAsString (3));
   }
 }

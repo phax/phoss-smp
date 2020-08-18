@@ -278,10 +278,12 @@ public final class SMPRendererPublic
   }
 
   /**
+   * @param bShowAuthor
+   *        <code>true</code> to show the author, <code>false</code> to hide it.
    * @return The footer to be used for /public and /secure
    */
   @Nonnull
-  public static BootstrapContainer createDefaultFooter ()
+  public static BootstrapContainer createDefaultFooter (final boolean bShowAuthor)
   {
     final BootstrapContainer aContainer = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
     aContainer.addChild (new HCP ().addChild (CSMP.getApplicationTitleAndVersion () +
@@ -291,18 +293,23 @@ public final class SMPRendererPublic
 
     // By
     {
-      final HCP aBy = new HCP ().addChild ("Created by ").addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"));
+      final HCP aBy = new HCP ();
+
+      if (bShowAuthor)
+        aBy.addChild ("Created by ").addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"));
 
       if (false)
       {
         // Twitter
-        aBy.addChild (" - ")
-           .addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ().addChild ("@philiphelger"));
+        if (aBy.hasChildren ())
+          aBy.addChild (" - ");
+        aBy.addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ().addChild ("@philiphelger"));
       }
 
       // Source
-      aBy.addChild (" - ")
-         .addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
+      if (aBy.hasChildren ())
+        aBy.addChild (" - ");
+      aBy.addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
                                                                                  .addChild (CSMP.APPLICATION_TITLE + " on GitHub"));
 
       aContainer.addChild (aBy);
@@ -384,7 +391,7 @@ public final class SMPRendererPublic
 
     // Footer
     {
-      final BootstrapContainer aDiv = createDefaultFooter ();
+      final BootstrapContainer aDiv = createDefaultFooter (SMPWebAppConfiguration.isPublicShowAuthor ());
 
       final BootstrapMenuItemRendererHorz aRenderer = new BootstrapMenuItemRendererHorz (aDisplayLocale);
       final HCUL aUL = aDiv.addAndReturnChild (new HCUL ().addClass (CSS_CLASS_FOOTER_LINKS));

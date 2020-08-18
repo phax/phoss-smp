@@ -182,7 +182,10 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                                                                 Updates.combine (Updates.set (BSON_OWNER_ID, sNewOwnerID),
                                                                                  Updates.set (BSON_EXTENSION, sExtension)));
     if (aOldDoc == null)
+    {
+      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "no-such-id", sServiceGroupID);
       return EChange.UNCHANGED;
+    }
 
     AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sServiceGroupID, sNewOwnerID, sExtension);
     if (LOGGER.isDebugEnabled ())

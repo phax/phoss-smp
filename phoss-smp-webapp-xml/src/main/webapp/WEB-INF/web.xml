@@ -86,4 +86,13 @@
     <servlet-name>RootServlet</servlet-name>
     <url-pattern></url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>CSPReportingServlet</servlet-name>
+    <servlet-class>com.helger.phoss.smp.servlet.SMPCSPReportingServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CSPReportingServlet</servlet-name>
+    <url-pattern>/smp-cspreporting/*</url-pattern>
+  </servlet-mapping>
 </web-app>
