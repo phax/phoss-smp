@@ -145,6 +145,16 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     return ret;
   }
 
+  @Nonnull
+  private static String _getUnifiedCert (@Nullable final String s)
+  {
+    if (StringHelper.hasNoText (s))
+      return "";
+
+    // Trims, removes PEM header, removes spaces
+    return CertificateHelper.getWithoutPEMHeader (s);
+  }
+
   @Override
   protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
   {
@@ -163,8 +173,9 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       for (final ISMPProcess aProcess : aSI.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
-          aEndpointsGroupedPerURL.putSingle (aEndpoint.getCertificate (), aEndpoint);
-          aServiceGroupsGroupedPerURL.putSingle (aEndpoint.getCertificate (), aSG);
+          final String sUnifiedCertificate = _getUnifiedCert (aEndpoint.getCertificate ());
+          aEndpointsGroupedPerURL.putSingle (sUnifiedCertificate, aEndpoint);
+          aServiceGroupsGroupedPerURL.putSingle (sUnifiedCertificate, aSG);
           ++nTotalEndpointCount;
         }
     }
@@ -174,11 +185,11 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       bShowList = false;
       final FormErrorList aFormErrors = new FormErrorList ();
 
-      final String sOldCert = aWPEC.params ().getAsString (FIELD_OLD_CERTIFICATE);
+      final String sOldCert = _getUnifiedCert (aWPEC.params ().getAsString (FIELD_OLD_CERTIFICATE));
 
       if (aWPEC.hasSubAction (CPageParam.ACTION_SAVE))
       {
-        final String sNewCert = aWPEC.params ().getAsString (FIELD_NEW_CERTIFICATE);
+        final String sNewCert = _getUnifiedCert (aWPEC.params ().getAsString (FIELD_NEW_CERTIFICATE));
 
         if (StringHelper.hasNoText (sOldCert))
           aFormErrors.addFieldInfo (FIELD_OLD_CERTIFICATE, "An old certificate must be provided");
