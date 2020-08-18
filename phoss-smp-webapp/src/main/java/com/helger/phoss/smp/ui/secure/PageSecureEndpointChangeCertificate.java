@@ -180,6 +180,12 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         }
     }
 
+    {
+      final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+      aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
+      aNodeList.addChild (aToolbar);
+    }
+
     if (aWPEC.hasAction (CPageParam.ACTION_EDIT))
     {
       bShowList = false;

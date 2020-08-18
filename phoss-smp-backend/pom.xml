@@ -50,11 +50,19 @@
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-settings</artifactId>
+      <artifactId>ph-jaxb</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-jaxb</artifactId>
+      <artifactId>ph-settings</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.web</groupId>
+      <artifactId>ph-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.web</groupId>
+      <artifactId>ph-xservlet</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger.peppol</groupId>
@@ -67,10 +75,6 @@
     <dependency>
       <groupId>com.helger.peppol</groupId>
       <artifactId>peppol-sml-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger.web</groupId>
-      <artifactId>ph-web</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger.photon</groupId>
