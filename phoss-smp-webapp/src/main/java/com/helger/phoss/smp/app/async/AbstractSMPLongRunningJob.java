@@ -1,4 +1,4 @@
-package com.helger.phoss.smp.app;
+package com.helger.phoss.smp.app.async;
 
 import javax.annotation.Nonnull;
 

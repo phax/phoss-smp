@@ -1,9 +1,14 @@
-package com.helger.phoss.smp.app;
+package com.helger.phoss.smp.app.async;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.callback.IThrowingRunnable;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.text.IMultilingualText;
+import com.helger.commons.text.ReadOnlyMultilingualText;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.photon.core.longrun.ILongRunningJob;
 import com.helger.photon.core.longrun.LongRunningJobManager;
 import com.helger.photon.core.longrun.LongRunningJobResult;
@@ -12,6 +17,20 @@ import com.helger.photon.security.login.LoggedInUserManager;
 
 public abstract class AbstractSMPLongRunningRunnable implements IThrowingRunnable <Exception>, ILongRunningJob
 {
+  private final IMultilingualText m_aDesc;
+
+  public AbstractSMPLongRunningRunnable (@Nonnull @Nonempty final String sJobDesc)
+  {
+    ValueEnforcer.notEmpty (sJobDesc, "JobDesc");
+    m_aDesc = new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, sJobDesc);
+  }
+
+  @Nonnull
+  public IMultilingualText getJobDescription ()
+  {
+    return m_aDesc;
+  }
+
   @Nonnull
   protected String getCurrentUserID ()
   {

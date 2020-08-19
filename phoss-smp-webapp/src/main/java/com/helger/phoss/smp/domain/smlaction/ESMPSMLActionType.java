@@ -31,7 +31,7 @@ public enum ESMPSMLActionType implements IHasID <String>
 
   private final String m_sID;
 
-  private ESMPSMLActionType (@Nonnull @Nonempty final String sID)
+  ESMPSMLActionType (@Nonnull @Nonempty final String sID)
   {
     m_sID = sID;
   }
