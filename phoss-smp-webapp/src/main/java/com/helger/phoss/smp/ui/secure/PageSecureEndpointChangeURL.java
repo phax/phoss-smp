@@ -21,39 +21,34 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 import com.helger.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.collection.multimap.MultiHashMapHashSetBased;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.CommonsTreeSet;
 import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.collection.impl.ICommonsSortedSet;
 import com.helger.commons.compare.ESortOrder;
-import com.helger.commons.state.ESuccess;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.text.ReadOnlyMultilingualText;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.URLValidator;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCSelect;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCUL;
-import com.helger.html.hc.html.sections.HCH3;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.app.async.AbstractSMPLongRunningJob;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -63,17 +58,17 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
+import com.helger.photon.app.PhotonWorkerPool;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.traits.IHCBootstrap4Trait;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
+import com.helger.photon.core.longrun.AbstractLongRunningJobRunnable;
 import com.helger.photon.core.longrun.LongRunningJobResult;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
@@ -82,14 +77,111 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
-import com.helger.quartz.IJobExecutionContext;
-import com.helger.quartz.JobDataMap;
-import com.helger.quartz.JobExecutionException;
-import com.helger.quartz.utils.Key;
-import com.helger.schedule.quartz.GlobalQuartzScheduler;
 
 public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 {
+  /**
+   * The async logic
+   *
+   * @author Philip Helger
+   */
+  private static final class BulkChangeEndpointURL extends AbstractLongRunningJobRunnable implements IHCBootstrap4Trait
+  {
+    private static final AtomicInteger s_aRunningJobs = new AtomicInteger (0);
+
+    private final ICommonsList <ISMPServiceInformation> m_aAllSIs;
+    private final ISMPServiceGroup m_aServiceGroup;
+    private final String m_sOldURL;
+    private final String m_sNewURL;
+
+    public BulkChangeEndpointURL (final ICommonsList <ISMPServiceInformation> aAllSIs,
+                                  final ISMPServiceGroup aServiceGroup,
+                                  final String sOldURL,
+                                  final String sNewURL)
+    {
+      super ("BulkChangeEndpointURL", new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"));
+      m_aAllSIs = aAllSIs;
+      m_aServiceGroup = aServiceGroup;
+      m_sOldURL = sOldURL;
+      m_sNewURL = sNewURL;
+    }
+
+    @Nonnull
+    public LongRunningJobResult createLongRunningJobResult ()
+    {
+      s_aRunningJobs.incrementAndGet ();
+      try
+      {
+        final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+
+        // Modify all endpoints
+        int nChangedEndpoints = 0;
+        int nSaveErrors = 0;
+        final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
+        for (final ISMPServiceInformation aSI : m_aAllSIs)
+        {
+          if (m_aServiceGroup != null && !aSI.getServiceGroup ().equals (m_aServiceGroup))
+          {
+            // Wrong service group
+            continue;
+          }
+
+          boolean bChanged = false;
+          for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+            for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+              if (m_sOldURL.equals (aEndpoint.getEndpointReference ()))
+              {
+                ((SMPEndpoint) aEndpoint).setEndpointReference (m_sNewURL);
+                bChanged = true;
+                ++nChangedEndpoints;
+              }
+          if (bChanged)
+          {
+            if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
+              nSaveErrors++;
+            aChangedServiceGroup.add (aSI.getServiceGroupID ());
+          }
+        }
+
+        final IHCNode aRes;
+        if (nChangedEndpoints > 0)
+        {
+          final HCUL aUL = new HCUL ();
+          for (final String sChangedServiceGroupID : aChangedServiceGroup)
+            aUL.addItem (sChangedServiceGroupID);
+
+          final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old URL '" +
+                                                                        m_sOldURL +
+                                                                        "' was changed in " +
+                                                                        nChangedEndpoints +
+                                                                        " endpoints. Effected service groups are:"),
+                                                                   aUL);
+          if (nSaveErrors == 0)
+            aRes = success (aNodes);
+          else
+          {
+            aNodes.addChildAt (0, h3 ("Some changes could NOT be saved! Please check the logs!"));
+            aRes = error (aNodes);
+          }
+        }
+        else
+          aRes = warn ("No endpoint was found that contains the old URL '" + m_sOldURL + "'");
+
+        return LongRunningJobResult.createXML (aRes);
+      }
+      finally
+      {
+        s_aRunningJobs.decrementAndGet ();
+      }
+    }
+
+    @Nonnegative
+    public static int getRunningJobCount ()
+    {
+      return s_aRunningJobs.get ();
+    }
+  }
+
   private static final String SERVICE_GROUP_ALL = "all";
   private static final String FIELD_SERVICE_GROUP = "servicegroup";
   private static final String FIELD_OLD_URL = "oldurl";
@@ -115,118 +207,6 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       return EValidity.INVALID;
     }
     return super.isValidToDisplayPage (aWPEC);
-  }
-
-  /**
-   * The job. Must be public.
-   *
-   * @author Philip Helger
-   */
-  public static final class BulkChangeEndpointURLJob extends AbstractSMPLongRunningJob
-  {
-    private static final AtomicInteger s_aRunningJobs = new AtomicInteger (0);
-
-    private ICommonsList <ISMPServiceInformation> m_aAllSIs;
-    private ISMPServiceGroup m_aServiceGroup;
-    private String m_sOldURL;
-    private String m_sNewURL;
-
-    public BulkChangeEndpointURLJob ()
-    {
-      super ("Bulk change endpoint URL");
-    }
-
-    @Override
-    protected void beforeExecuteInScope (final JobDataMap aJobDataMap, final IJobExecutionContext aContext)
-    {
-      s_aRunningJobs.incrementAndGet ();
-      super.beforeExecuteInScope (aJobDataMap, aContext);
-    }
-
-    @Override
-    @OverridingMethodsMustInvokeSuper
-    protected void onExecute (@Nonnull final JobDataMap aJobDataMap,
-                              @Nonnull final IJobExecutionContext aContext) throws JobExecutionException
-    {
-      m_aAllSIs = aJobDataMap.getCastedValue ("allsis");
-      m_aServiceGroup = aJobDataMap.getCastedValue ("sg");
-      m_sOldURL = aJobDataMap.getCastedValue ("oldurl");
-      m_sNewURL = aJobDataMap.getCastedValue ("newurl");
-    }
-
-    @Nonnull
-    public LongRunningJobResult createLongRunningJobResult ()
-    {
-      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-
-      // Modify all endpoints
-      int nChangedEndpoints = 0;
-      int nSaveErrors = 0;
-      final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
-      for (final ISMPServiceInformation aSI : m_aAllSIs)
-      {
-        if (m_aServiceGroup != null && !aSI.getServiceGroup ().equals (m_aServiceGroup))
-        {
-          // Wrong service group
-          continue;
-        }
-
-        boolean bChanged = false;
-        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-            if (m_sOldURL.equals (aEndpoint.getEndpointReference ()))
-            {
-              ((SMPEndpoint) aEndpoint).setEndpointReference (m_sNewURL);
-              bChanged = true;
-              ++nChangedEndpoints;
-            }
-        if (bChanged)
-        {
-          if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
-            nSaveErrors++;
-          aChangedServiceGroup.add (aSI.getServiceGroupID ());
-        }
-      }
-
-      final IHCNode aRes;
-      if (nChangedEndpoints > 0)
-      {
-        final HCUL aUL = new HCUL ();
-        for (final String sChangedServiceGroupID : aChangedServiceGroup)
-          aUL.addItem (sChangedServiceGroupID);
-
-        final HCNodeList aNodes = new HCNodeList ().addChildren (new HCDiv ().addChild ("The old URL '" +
-                                                                                        m_sOldURL +
-                                                                                        "' was changed in " +
-                                                                                        nChangedEndpoints +
-                                                                                        " endpoints. Effected service groups are:"),
-                                                                 aUL);
-        if (nSaveErrors == 0)
-          aRes = new BootstrapSuccessBox ().addChild (aNodes);
-        else
-        {
-          aNodes.addChildAt (0, new HCH3 ().addChild ("Some changes could NOT be saved! Please check the logs!"));
-          aRes = new BootstrapErrorBox ().addChild (aNodes);
-        }
-      }
-      else
-        aRes = new BootstrapWarnBox ().addChild ("No endpoint was found that contains the old URL '" + m_sOldURL + "'");
-
-      return LongRunningJobResult.createXML (aRes);
-    }
-
-    @Override
-    protected void afterExecuteInScope (final JobDataMap aJobDataMap, final IJobExecutionContext aContext, final ESuccess eExecSuccess)
-    {
-      super.afterExecuteInScope (aJobDataMap, aContext, eExecSuccess);
-      s_aRunningJobs.decrementAndGet ();
-    }
-
-    @Nonnegative
-    public static int getRunningJobCount ()
-    {
-      return s_aRunningJobs.get ();
-    }
   }
 
   @Override
@@ -265,10 +245,10 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
       aNodeList.addChild (aToolbar);
 
-      final int nCount = BulkChangeEndpointURLJob.getRunningJobCount ();
+      final int nCount = BulkChangeEndpointURL.getRunningJobCount ();
       if (nCount > 0)
       {
-        aNodeList.addChild (info ((nCount == 1 ? "1 bulk change is" : nCount + " bulk changes are") +
+        aNodeList.addChild (warn ((nCount == 1 ? "1 bulk change is" : nCount + " bulk changes are") +
                                   " currently running in the background"));
       }
     }
@@ -312,12 +292,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         // Validate parameters
         if (aFormErrors.isEmpty ())
         {
-          final ICommonsMap <String, Object> aJobData = new CommonsHashMap <> ();
-          aJobData.put ("allsis", aAllSIs);
-          aJobData.put ("sg", aServiceGroup);
-          aJobData.put ("oldurl", sOldURL);
-          aJobData.put ("newurl", sNewURL);
-          GlobalQuartzScheduler.getInstance ().scheduleJobNowOnce (Key.createUniqueName (null), BulkChangeEndpointURLJob.class, aJobData);
+          PhotonWorkerPool.getInstance ()
+                          .run ("BulkChangeEndpointURL", new BulkChangeEndpointURL (aAllSIs, aServiceGroup, sOldURL, sNewURL));
 
           aWPEC.postRedirectGetInternal (success ("The bulk change of the endpoint URL from '" +
                                                   sOldURL +
