@@ -515,9 +515,12 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
+      final IParticipantIdentifier aPID = aServiceGroup.getParticpantIdentifier ();
       final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier" +
                                                                                     " FROM smp_service_metadata AS sm" +
-                                                                                    " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?");
+                                                                                    " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
+                                                                                    new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                                                                                                               aPID.getValue ()));
       if (aDBResult.isPresent ())
       {
         final ICommonsList <DBResultRow> aRows = aDBResult.get ();

@@ -66,7 +66,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
-  private ExpiringMap <IParticipantIdentifier, SMPServiceGroup> m_aCache;
+  private ExpiringMap <String, SMPServiceGroup> m_aCache;
 
   public SMPServiceGroupManagerJDBC ()
   {}
@@ -171,7 +171,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
     if (m_aCache != null)
-      m_aCache.put (aParticipantID, aServiceGroup);
+      m_aCache.put (aParticipantID.getURIEncoded (), aServiceGroup);
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aServiceGroup));
     return aServiceGroup;
@@ -322,7 +322,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aParticipantID.getURIEncoded ());
 
       if (m_aCache != null)
-        m_aCache.remove (aParticipantID);
+        m_aCache.remove (aParticipantID.getURIEncoded ());
       m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
     }
 
@@ -394,7 +394,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       return null;
 
     // Use cache
-    SMPServiceGroup ret = m_aCache == null ? null : m_aCache.get (aParticipantID);
+    SMPServiceGroup ret = m_aCache == null ? null : m_aCache.get (aParticipantID.getURIEncoded ());
     if (ret != null)
       return ret;
 
@@ -410,7 +410,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     ret = new SMPServiceGroup (aResult.get ().getAsString (1), aParticipantID, aResult.get ().getAsString (0));
     if (m_aCache != null)
-      m_aCache.put (aParticipantID, ret);
+      m_aCache.put (aParticipantID.getURIEncoded (), ret);
     return ret;
   }
 
@@ -423,7 +423,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       return false;
 
     // Cache check first
-    if (m_aCache != null && m_aCache.containsKey (aParticipantID))
+    if (m_aCache != null && m_aCache.containsKey (aParticipantID.getURIEncoded ()))
       return true;
 
     return 1 == executor ().queryCount ("SELECT COUNT(*) FROM smp_service_group" +

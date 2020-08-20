@@ -31,19 +31,19 @@ import com.helger.settings.exchange.configfile.ConfigFile;
 public abstract class AbstractJDBCEnabledManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractJDBCEnabledManager.class);
-  private static final DBExecutor s_aDBExec;
+  private final DBExecutor m_aDBExec;
 
-  static
+  public AbstractJDBCEnabledManager ()
   {
     // Create executor once for all manages
-    s_aDBExec = new DBExecutor (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
+    m_aDBExec = new DBExecutor (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
 
     // This is ONLY for debugging
-    s_aDBExec.setDebugConnections (false);
-    s_aDBExec.setDebugTransactions (false);
-    s_aDBExec.setDebugSQLStatements (false);
+    m_aDBExec.setDebugConnections (false);
+    m_aDBExec.setDebugTransactions (false);
+    m_aDBExec.setDebugSQLStatements (false);
 
-    s_aDBExec.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
+    m_aDBExec.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
       SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew);
     });
 
@@ -54,24 +54,21 @@ public abstract class AbstractJDBCEnabledManager
       final long nMillis = aCF.getAsLong (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
                                           DBExecutor.DEFAULT_EXECUTION_DURATION_WARN_MS);
       if (nMillis > 0)
-        s_aDBExec.setExecutionDurationWarnMS (nMillis);
+        m_aDBExec.setExecutionDurationWarnMS (nMillis);
       else
         LOGGER.warn ("Ignoring setting '" + SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS + "' because it is invalid.");
     }
     else
     {
       // Zero means none
-      s_aDBExec.setExecutionDurationWarnMS (0);
+      m_aDBExec.setExecutionDurationWarnMS (0);
     }
   }
-
-  public AbstractJDBCEnabledManager ()
-  {}
 
   @Nonnull
   protected final DBExecutor executor ()
   {
-    return s_aDBExec;
+    return m_aDBExec;
   }
 
   @Nullable

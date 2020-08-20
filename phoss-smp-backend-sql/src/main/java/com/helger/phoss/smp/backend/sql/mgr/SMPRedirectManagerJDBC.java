@@ -110,7 +110,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       {
         // Update existing
         final long nCreated = executor ().insertOrUpdateOrDelete ("UPDATE smp_service_metadata_redirection" +
-                                                                  " SET redirectionUrl, certificateUID, certificate, extension" +
+                                                                  " SET redirectionUrl=?, certificateUID=?, certificate=?, extension=?" +
                                                                   " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
                                                                   new ConstantPreparedStatementDataProvider (sRedirectUrl,
                                                                                                              sSubjectUniqueIdentifier,

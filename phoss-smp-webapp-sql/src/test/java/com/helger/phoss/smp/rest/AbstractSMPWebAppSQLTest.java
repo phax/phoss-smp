@@ -18,10 +18,13 @@ package com.helger.phoss.smp.rest;
 
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.photon.security.CSecurity;
 
 abstract class AbstractSMPWebAppSQLTest
 {
-  protected static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials ("peppol_user", "Test1234");
+  protected static final BasicAuthClientCredentials CREDENTIALS = true ? new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
+                                                                                                         CSecurity.USER_ADMINISTRATOR_PASSWORD)
+                                                                       : new BasicAuthClientCredentials ("peppol_user", "Test1234");
 
   protected static final String PID_PREFIX_9999_PHOSS = "9999:phoss";
 
