@@ -33,12 +33,11 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.restapi.BusinessCardServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 
-public final class APIExecutorBusinessCardGet implements IAPIExecutor
+public final class APIExecutorBusinessCardGet extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardGet.class);
 

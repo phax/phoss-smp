@@ -40,7 +40,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.string.StringHelper;
-import com.helger.db.jpa.JPAEnabledManager;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
@@ -183,7 +182,6 @@ public final class ServiceGroupInterfaceTest extends AbstractSMPWebAppSQLTest
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
     aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
-    JPAEnabledManager.exceptionCallbacks ().removeAll ();
     final SMPClient aSMPClient = new MockSMPClient ();
 
     // GET

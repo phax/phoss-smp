@@ -77,13 +77,7 @@ public final class NiceNameUI
     }
 
     final HCNodeList ret = new HCNodeList ();
-    final BootstrapBadge aBadge = new BootstrapBadge (eType).addChild (sName);
-    if (!bInDetails)
-    {
-      // Just as a tooltip
-      aBadge.setTitle (sID);
-    }
-    ret.addChild (aBadge);
+    ret.addChild (new BootstrapBadge (eType).addChild (sName));
     if (bIsDeprecated)
     {
       ret.addChild (" ").addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Identifier is deprecated"));

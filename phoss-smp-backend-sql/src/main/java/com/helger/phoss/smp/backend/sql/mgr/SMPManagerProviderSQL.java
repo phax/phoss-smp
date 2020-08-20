@@ -13,10 +13,16 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.internal.jdbc.DriverDataSource;
+
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
+import com.helger.phoss.smp.backend.sql.migration.V002__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -27,13 +33,16 @@ import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
+import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
+import com.helger.settings.exchange.configfile.ConfigFile;
 
 /**
- * {@link ISMPManagerProvider} implementation for this backend.
+ * A JDBC based implementation of the {@link ISMPManagerProvider} interface.
  *
  * @author Philip Helger
+ * @since 5.3.0
  */
 public final class SMPManagerProviderSQL implements ISMPManagerProvider
 {
@@ -43,6 +52,28 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
 
   public SMPManagerProviderSQL ()
   {}
+
+  public void beforeInitManagers ()
+  {
+    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+    final Flyway aFlyway = Flyway.configure ()
+                                 .dataSource (new DriverDataSource (getClass ().getClassLoader (),
+                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),
+                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL),
+                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER),
+                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD)))
+                                 // Required for creating DB table
+                                 .baselineOnMigrate (true)
+                                 .baselineVersion ("1")
+                                 .baselineDescription ("SMP 5.2.x database layout, MySQL only")
+                                 /*
+                                  * Avoid scanning the ClassPath by enumerating
+                                  * them explicitly
+                                  */
+                                 .javaMigrations (new V002__MigrateDBUsersToPhotonUsers ())
+                                 .load ();
+    aFlyway.migrate ();
+  }
 
   @Nonnull
   public ETriState getBackendConnectionEstablishedDefaultState ()
@@ -95,34 +126,38 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Nonnull
   public ISMPUserManager createUserMgr ()
   {
-    return new SMPUserManagerSQL ();
+    // Use ph-oton
+    return new SMPUserManagerPhoton ();
   }
 
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    return new SMPServiceGroupManagerSQL ();
+    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC ();
+    // Enable cache by default
+    ret.setCacheEnabled (SMPServerConfiguration.getConfigFile ().getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
+    return ret;
   }
 
   @Nonnull
   public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                 @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPRedirectManagerSQL (aServiceGroupMgr);
+    return new SMPRedirectManagerJDBC (aServiceGroupMgr);
   }
 
   @Nonnull
   public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPServiceInformationManagerSQL (aServiceGroupMgr);
+    return new SMPServiceInformationManagerJDBC (aServiceGroupMgr);
   }
 
   @Nullable
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                         @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPBusinessCardManagerSQL ();
+    return new SMPBusinessCardManagerJDBC ();
   }
 
   @Override

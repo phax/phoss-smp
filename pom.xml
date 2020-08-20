@@ -68,7 +68,6 @@
 
   <properties>
     <log4j.version>2.13.3</log4j.version>
-    <eclipselink.version>2.7.7</eclipselink.version>
   </properties>
   
   <dependencyManagement>
@@ -104,7 +103,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-db-parent-pom</artifactId>
-        <version>6.2.0</version>
+        <version>6.2.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -153,35 +152,24 @@
         <version>8.0.21</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>jakarta.persistence</artifactId>
-        <version>2.2.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.core</artifactId>
-        <version>${eclipselink.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.jpa</artifactId>
-        <version>${eclipselink.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.antlr</artifactId>
-        <version>${eclipselink.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.asm</artifactId>
-        <version>${eclipselink.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
         <version>4.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.2.15</version>
+      </dependency>
+      <dependency>
+        <groupId>net.jodah</groupId>
+        <artifactId>expiringmap</artifactId>
+        <version>0.5.9</version>
+      </dependency>
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>6.5.5</version>
       </dependency>
 
       <dependency>

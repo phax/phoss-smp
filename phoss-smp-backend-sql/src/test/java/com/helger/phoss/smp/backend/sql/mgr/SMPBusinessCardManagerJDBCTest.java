@@ -12,24 +12,29 @@ package com.helger.phoss.smp.backend.sql.mgr;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.photon.core.mock.PhotonCoreTestRule;
 
 /**
- * Test class for class {@link SMPBusinessCardManagerSQL}.
+ * Test class for class {@link SMPBusinessCardManagerJDBC}.
  *
  * @author Philip Helger
  */
-public final class SMPBusinessCardManagerSQLTest
+public final class SMPBusinessCardManagerJDBCTest
 {
+  @Rule
+  public final PhotonCoreTestRule m_aRule = new PhotonCoreTestRule ();
+
   @Test
   public void testConvertStringList ()
   {
     final ICommonsList <String> x = new CommonsArrayList <> ("a", "bcd", "http://bla.foo.com");
-    final String sJson = SMPBusinessCardManagerSQL.getStringAsJson (x).getAsJsonString ();
-    final ICommonsList <String> y = SMPBusinessCardManagerSQL.getJsonAsString (sJson);
+    final String sJson = SMPBusinessCardManagerJDBC.getStringAsJson (x).getAsJsonString ();
+    final ICommonsList <String> y = SMPBusinessCardManagerJDBC.getJsonAsString (sJson);
     assertEquals (x, y);
   }
 }

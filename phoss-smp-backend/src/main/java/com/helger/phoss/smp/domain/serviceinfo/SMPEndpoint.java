@@ -80,7 +80,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_sTransportProfile;
   }
 
-  public void setTransportProfile (@Nonnull @Nonempty final String sTransportProfile)
+  public final void setTransportProfile (@Nonnull @Nonempty final String sTransportProfile)
   {
     ValueEnforcer.notEmpty (sTransportProfile, "TransportProfile");
     m_sTransportProfile = sTransportProfile;
@@ -92,7 +92,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_sEndpointReference;
   }
 
-  public void setEndpointReference (@Nullable final String sEndpointReference)
+  public final void setEndpointReference (@Nullable final String sEndpointReference)
   {
     m_sEndpointReference = sEndpointReference;
   }
@@ -102,7 +102,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_bRequireBusinessLevelSignature;
   }
 
-  public void setRequireBusinessLevelSignature (final boolean bRequireBusinessLevelSignature)
+  public final void setRequireBusinessLevelSignature (final boolean bRequireBusinessLevelSignature)
   {
     m_bRequireBusinessLevelSignature = bRequireBusinessLevelSignature;
   }
@@ -113,7 +113,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_sMinimumAuthenticationLevel;
   }
 
-  public void setMinimumAuthenticationLevel (@Nullable final String sMinimumAuthenticationLevel)
+  public final void setMinimumAuthenticationLevel (@Nullable final String sMinimumAuthenticationLevel)
   {
     m_sMinimumAuthenticationLevel = sMinimumAuthenticationLevel;
   }
@@ -124,7 +124,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_aServiceActivationDT;
   }
 
-  public void setServiceActivationDateTime (@Nullable final LocalDateTime aServiceActivationDate)
+  public final void setServiceActivationDateTime (@Nullable final LocalDateTime aServiceActivationDate)
   {
     m_aServiceActivationDT = aServiceActivationDate;
   }
@@ -135,7 +135,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_aServiceExpirationDT;
   }
 
-  public void setServiceExpirationDateTime (@Nullable final LocalDateTime aServiceExpirationDate)
+  public final void setServiceExpirationDateTime (@Nullable final LocalDateTime aServiceExpirationDate)
   {
     m_aServiceExpirationDT = aServiceExpirationDate;
   }
@@ -146,7 +146,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_sCertificate;
   }
 
-  public void setCertificate (@Nullable final String sCertificate)
+  public final void setCertificate (@Nullable final String sCertificate)
   {
     m_sCertificate = sCertificate;
   }
@@ -157,7 +157,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_sServiceDescription;
   }
 
-  public void setServiceDescription (@Nullable final String sServiceDescription)
+  public final void setServiceDescription (@Nullable final String sServiceDescription)
   {
     m_sServiceDescription = sServiceDescription;
   }
@@ -168,7 +168,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_sTechnicalContactUrl;
   }
 
-  public void setTechnicalContactUrl (@Nullable final String sTechnicalContactUrl)
+  public final void setTechnicalContactUrl (@Nullable final String sTechnicalContactUrl)
   {
     m_sTechnicalContactUrl = sTechnicalContactUrl;
   }
@@ -179,7 +179,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return m_sTechnicalInformationUrl;
   }
 
-  public void setTechnicalInformationUrl (@Nullable final String sTechnicalInformationUrl)
+  public final void setTechnicalInformationUrl (@Nullable final String sTechnicalInformationUrl)
   {
     m_sTechnicalInformationUrl = sTechnicalInformationUrl;
   }

@@ -38,6 +38,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.user.ISMPUser;
 import com.helger.phoss.smp.domain.user.ISMPUserEditable;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
+import com.helger.phoss.smp.migration.CSMPServerMigrations;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
@@ -51,6 +52,7 @@ import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
+import com.helger.photon.core.mgr.PhotonBasicManager;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EWebPageFormAction;
@@ -113,6 +115,19 @@ public class PageSecureDBUsers extends AbstractSMPWebPageForm <ISMPUserEditable>
         aWarnBox.addChild (div ("You don't have the permissions to manage users. Please contact your administrator."));
       return EValidity.INVALID;
     }
+
+    if (PhotonBasicManager.getSystemMigrationMgr ()
+                          .wasMigrationExecutedSuccessfully (CSMPServerMigrations.MIGRATION_ID_SQL_DBUSER_TO_REGULAR_USERS))
+    {
+      aWPEC.getNodeList ()
+           .addChild (warn ().addChild (div ("The special SQL user management was dropped."))
+                             .addChild (div ("All SQL users were migrated to regular ").addChild (new HCA (aWPEC.getLinkToMenuItem (BootstrapPagesMenuConfigurator.MENU_ADMIN_SECURITY_USER)).addChild ("users"))
+                                                                                       .addChild (" and the ")
+                                                                                       .addChild (code ("smp_user"))
+                                                                                       .addChild (" table can safely be dropped.")));
+      return EValidity.INVALID;
+    }
+
     return super.isValidToDisplayPage (aWPEC);
   }
 

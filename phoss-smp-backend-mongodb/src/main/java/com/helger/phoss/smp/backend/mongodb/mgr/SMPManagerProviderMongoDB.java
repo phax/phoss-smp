@@ -40,9 +40,6 @@ import com.helger.phoss.smp.settings.ISMPSettingsManager;
  */
 public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
 {
-  public SMPManagerProviderMongoDB ()
-  {}
-
   @Nonnull
   public ETriState getBackendConnectionEstablishedDefaultState ()
   {

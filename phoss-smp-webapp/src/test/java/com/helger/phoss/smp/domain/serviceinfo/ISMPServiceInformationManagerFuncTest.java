@@ -21,9 +21,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.PersistenceException;
-
-import org.eclipse.persistence.exceptions.DatabaseException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -61,15 +58,11 @@ public final class ISMPServiceInformationManagerFuncTest
     final IProcessIdentifier aProcessID = PeppolIdentifierFactory.INSTANCE.createProcessIdentifierWithDefaultScheme ("junit-proc");
 
     final String sUserID = "junitserviceinfo";
-    try
+    // May fail
+    aUserMgr.createUser (sUserID, "bla");
+    if (SMPMetaManager.getInstance ().getBackendConnectionEstablished ().isFalse ())
     {
-      // May fail
-      aUserMgr.createUser (sUserID, "bla");
-    }
-    catch (final PersistenceException ex)
-    {
-      assertTrue (ex.getCause () instanceof DatabaseException);
-      // MySQL is not configured correctly!
+      // Failed to get DB connection. E.g. MySQL down or misconfigured.
       return;
     }
 

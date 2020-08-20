@@ -18,8 +18,8 @@ package com.helger.phoss.smp.servlet;
 
 import javax.annotation.Nonnull;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 
+import com.helger.commons.http.CHttp;
 import com.helger.commons.state.EContinue;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.ui.SMPLoginManager;
@@ -62,7 +62,7 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
     final String sCurrentUserID = LoggedInUserManager.getInstance ().getCurrentUserID ();
     if (!SecurityHelper.hasUserAllRoles (sCurrentUserID, CSMP.REQUIRED_ROLE_IDS_CONFIG))
     {
-      aUnifiedResponse.setStatus (HttpServletResponse.SC_FORBIDDEN);
+      aUnifiedResponse.setStatus (CHttp.HTTP_FORBIDDEN);
       return EContinue.BREAK;
     }
 

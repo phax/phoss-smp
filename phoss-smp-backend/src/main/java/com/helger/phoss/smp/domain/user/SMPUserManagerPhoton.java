@@ -87,6 +87,7 @@ public final class SMPUserManagerPhoton implements ISMPUserManager
   public ICommonsList <ISMPUser> getAllUsers ()
   {
     final ICommonsList <ISMPUser> ret = new CommonsArrayList <> ();
+    // Use only the non-deleted and enabled users
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ().getAllActiveUsers ())
       ret.add (new SMPUserPhoton (aUser));
     return ret;

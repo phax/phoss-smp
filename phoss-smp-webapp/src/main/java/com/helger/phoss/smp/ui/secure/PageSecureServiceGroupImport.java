@@ -462,6 +462,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
                   else
                     eBadgeType = EBootstrapBadgeType.SUCCESS;
 
+              // By default is is centered
               aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild (aLogMsg.getMessage ().toString ())
                                                                       .addChild (SMPCommonUI.getTechnicalDetailsUI (aLogMsg.getThrowable ()))
                                                                       .addClass (CBootstrapCSS.TEXT_LEFT));

@@ -37,7 +37,6 @@ import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerSignedServiceMetadataType;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerSignedServiceMetadataType;
@@ -47,7 +46,7 @@ import com.helger.xml.serialize.write.XMLWriter;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 import com.helger.xml.transform.XMLTransformerFactory;
 
-public final class APIExecutorServiceMetadataGet implements IAPIExecutor
+public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceMetadataGet.class);
 

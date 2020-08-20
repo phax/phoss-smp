@@ -25,6 +25,9 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.attr.StringMap;
 import com.helger.commons.datetime.PDTFactory;
@@ -96,6 +99,8 @@ import com.helger.xml.microdom.serialize.MicroReader;
  */
 public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm <ISMPServiceInformation>
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractPageSecureEndpoint.class);
+
   private static final String FIELD_SERVICE_GROUP_ID = "sgid";
   private static final String FIELD_DOCTYPE_ID_SCHEME = "doctypeidscheme";
   private static final String FIELD_DOCTYPE_ID_VALUE = "doctypeidvalue";
@@ -303,7 +308,25 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
           aWPEC.getRequestScope ().attrs ().putIn (REQUEST_ATTR_ENDPOINT, aEndpoint);
           return true;
         }
+        if (LOGGER.isWarnEnabled ())
+          LOGGER.warn ("Action " +
+                       eFormAction.getID () +
+                       " is not allowed, because endpoint with transport profile is missing ('" +
+                       sTransportProfile +
+                       "')");
       }
+      else
+      {
+        if (LOGGER.isWarnEnabled ())
+          LOGGER.warn ("Action " +
+                       eFormAction.getID () +
+                       " is not allowed, because process ID fields are missing ('" +
+                       sProcessIDScheme +
+                       "', '" +
+                       sProcessIDValue +
+                       "')");
+      }
+
       return false;
     }
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
@@ -365,6 +388,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
     final LocalDateTime aNowLDT = PDTFactory.getCurrentLocalDateTime ();
@@ -379,7 +403,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     // Document type identifier
     {
-      final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
       final HCNodeList aCtrl = new HCNodeList ();
       aCtrl.addChild (div (NiceNameUI.getDocumentTypeID (aDocumentTypeID, true)));
       try

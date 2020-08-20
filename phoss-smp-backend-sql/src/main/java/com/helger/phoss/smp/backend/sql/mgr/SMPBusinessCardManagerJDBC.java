@@ -13,11 +13,14 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.persistence.EntityManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.collection.multimap.IMultiMapListBased;
 import com.helger.collection.multimap.MultiHashMapArrayListBased;
@@ -29,7 +32,9 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
-import com.helger.db.jpa.JPAExecutionResult;
+import com.helger.commons.state.ESuccess;
+import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
+import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.json.IJson;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
@@ -37,8 +42,9 @@ import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.phoss.smp.backend.sql.AbstractSMPJPAEnabledManager;
-import com.helger.phoss.smp.backend.sql.model.DBBusinessCardEntity;
+import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -51,18 +57,21 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.photon.audit.AuditHelper;
 
 /**
- * Manager for all {@link SMPBusinessCard} objects.
+ * A JDBC based implementation of the {@link ISMPBusinessCardManager} interface.
  *
  * @author Philip Helger
+ * @since 9.2.4
  */
-public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManager implements ISMPBusinessCardManager
+public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager implements ISMPBusinessCardManager
 {
-  // Create as minimal as possible
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerJDBC.class);
+
+  // Create with as minimal output as possible
   private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false).setWriteNewlineAtEnd (false);
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPBusinessCardManagerSQL ()
+  public SMPBusinessCardManagerJDBC ()
   {}
 
   @Nonnull
@@ -162,59 +171,57 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities" + ")");
 
-    final MutableBoolean aIsCreate = new MutableBoolean (true);
-    final JPAExecutionResult <?> ret;
-    ret = doInTransaction ( () -> {
-      final EntityManager aEM = getEntityManager ();
+    final MutableBoolean aUpdated = new MutableBoolean (false);
+    final ESuccess eSucces = executor ().performInTransaction ( () -> {
       // Delete all existing entities
-      final int nDeleted = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id", DBBusinessCardEntity.class)
-                              .setParameter ("id", aParticipantID.getURIEncoded ())
-                              .executeUpdate ();
-
+      final String sPID = aParticipantID.getURIEncoded ();
+      final long nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
+                                                                new ConstantPreparedStatementDataProvider (sPID));
       if (nDeleted > 0)
       {
+        aUpdated.set (true);
         if (LOGGER.isDebugEnabled ())
           LOGGER.info ("Deleted " + nDeleted + " existing DBBusinessCardEntity rows");
-        aIsCreate.set (false);
       }
 
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
         // Single name only
-        final DBBusinessCardEntity aDBBCE = new DBBusinessCardEntity (aEntity.getID (),
-                                                                      aParticipantID.getURIEncoded (),
-                                                                      aEntity.names ().getFirst ().getName (),
-                                                                      aEntity.getCountryCode (),
-                                                                      aEntity.getGeographicalInformation (),
-                                                                      getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
-                                                                      getStringAsJson (aEntity.websiteURIs ()).getAsJsonString (JWS),
-                                                                      getBCCAsJson (aEntity.contacts ()).getAsJsonString (JWS),
-                                                                      aEntity.getAdditionalInformation (),
-                                                                      aEntity.getRegistrationDate ());
-        aEM.persist (aDBBCE);
+        executor ().insertOrUpdateOrDelete ("INSERT INTO smp_bce (id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                            new ConstantPreparedStatementDataProvider (aEntity.getID (),
+                                                                                       sPID,
+                                                                                       aEntity.names ().getFirst ().getName (),
+                                                                                       aEntity.getCountryCode (),
+                                                                                       aEntity.getGeographicalInformation (),
+                                                                                       getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
+                                                                                       getStringAsJson (aEntity.websiteURIs ()).getAsJsonString (JWS),
+                                                                                       getBCCAsJson (aEntity.contacts ()).getAsJsonString (JWS),
+                                                                                       aEntity.getAdditionalInformation (),
+                                                                                       aEntity.getRegistrationDate ()));
       }
     });
-    if (ret.hasException ())
+    if (eSucces.isFailure ())
     {
+      if (aUpdated.booleanValue ())
+        AuditHelper.onAuditModifyFailure (SMPBusinessCard.OT, "all", aParticipantID.getURIEncoded ());
+      else
+        AuditHelper.onAuditCreateFailure (SMPBusinessCard.OT, aParticipantID.getURIEncoded ());
+
       return null;
     }
 
     final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aParticipantID, aEntities);
 
-    if (aIsCreate.booleanValue ())
-      AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
-                                        aNewBusinessCard.getID (),
-                                        Integer.valueOf (aNewBusinessCard.getEntityCount ()));
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Finished createOrUpdateSMPBusinessCard");
+
+    if (aUpdated.booleanValue ())
+      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT, "all", aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
     else
-      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
-                                        aNewBusinessCard.getID (),
-                                        Integer.valueOf (aNewBusinessCard.getEntityCount ()));
+      AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
-
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Finished createOrUpdateSMPBusinessCard");
 
     return aNewBusinessCard;
   }
@@ -228,89 +235,63 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
-    final JPAExecutionResult <EChange> ret;
-    ret = doInTransaction ( () -> {
-      final EntityManager aEM = getEntityManager ();
-      final int nCount = aEM.createQuery ("DELETE FROM DBBusinessCardEntity p WHERE p.participantId = :id", DBBusinessCardEntity.class)
-                            .setParameter ("id", aSMPBusinessCard.getID ())
-                            .executeUpdate ();
-
-      return EChange.valueOf (nCount > 0);
-    });
-    if (ret.hasException ())
+    final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
+                                                            new ConstantPreparedStatementDataProvider (aSMPBusinessCard.getID ()));
+    if (nCount <= 0)
     {
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Finished deleteSMPBusinessCard. Change=false");
+
+      AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, "no-such-id", aSMPBusinessCard.getID ());
       return EChange.UNCHANGED;
     }
 
-    final EChange eChange = ret.get ();
-
-    if (eChange.isChanged ())
-    {
-      AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
-                                        aSMPBusinessCard.getID (),
-                                        Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
-
-      // Invoke generic callbacks
-      m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
-    }
-    else
-    {
-      AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, "no-such-id", aSMPBusinessCard.getID ());
-    }
-
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Finished deleteSMPBusinessCard. Change=" + eChange.isChanged ());
+      LOGGER.debug ("Finished deleteSMPBusinessCard. Change=true");
 
-    return eChange;
-  }
+    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
-  @Nullable
-  private SMPBusinessCard _convert (@Nonnull final IParticipantIdentifier aID, @Nonnull final List <DBBusinessCardEntity> aDBEntities)
-  {
-    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
-    for (final DBBusinessCardEntity aDBEntity : aDBEntities)
-    {
-      final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aDBEntity.getId ());
-      // Single name only
-      aEntity.names ().add (new SMPBusinessCardName (aDBEntity.getName (), null));
-      aEntity.setCountryCode (aDBEntity.getCountryCode ());
-      aEntity.setGeographicalInformation (aDBEntity.getGeographicalInformation ());
-      aEntity.identifiers ().setAll (getJsonAsBCI (aDBEntity.getIdentifiers ()));
-      aEntity.websiteURIs ().setAll (getJsonAsString (aDBEntity.getWebsiteURIs ()));
-      aEntity.contacts ().setAll (getJsonAsBCC (aDBEntity.getContacts ()));
-      aEntity.setAdditionalInformation (aDBEntity.getAdditionalInformation ());
-      aEntity.setRegistrationDate (aDBEntity.getRegistrationDate ());
-      aEntities.add (aEntity);
-    }
-    return new SMPBusinessCard (aID, aEntities);
+    // Invoke generic callbacks
+    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
+    return EChange.CHANGED;
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
-    JPAExecutionResult <List <DBBusinessCardEntity>> ret;
-    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p", DBBusinessCardEntity.class)
-                                                     .getResultList ());
-    if (ret.hasException ())
+    final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
+    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
+                                                                                  " FROM smp_bce");
+    if (aDBResult.isPresent ())
     {
-      return new CommonsArrayList <> ();
-    }
+      final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
 
-    /// Group by ID
-    final IMultiMapListBased <IParticipantIdentifier, DBBusinessCardEntity> aGrouped = new MultiHashMapArrayListBased <> ();
-    for (final DBBusinessCardEntity aDBItem : ret.get ())
-      aGrouped.putSingle (aDBItem.getAsBusinessIdentifier (), aDBItem);
+      // Group by ID
+      final IMultiMapListBased <IParticipantIdentifier, SMPBusinessCardEntity> aEntityMap = new MultiHashMapArrayListBased <> ();
+      for (final DBResultRow aRow : aDBResult.get ())
+      {
+        final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aRow.getAsString (0));
+        // Single name only
+        aEntity.names ().add (new SMPBusinessCardName (aRow.getAsString (2), null));
+        aEntity.setCountryCode (aRow.getAsString (3));
+        aEntity.setGeographicalInformation (aRow.getAsString (4));
+        aEntity.identifiers ().setAll (getJsonAsBCI (aRow.getAsString (5)));
+        aEntity.websiteURIs ().setAll (getJsonAsString (aRow.getAsString (6)));
+        aEntity.contacts ().setAll (getJsonAsBCC (aRow.getAsString (7)));
+        aEntity.setAdditionalInformation (aRow.getAsString (8));
+        aEntity.setRegistrationDate (aRow.get (9).getAsLocalDate ());
+        aEntityMap.putSingle (aIF.parseParticipantIdentifier (aRow.getAsString (1)), aEntity);
+      }
 
-    // Convert
-    final ICommonsList <ISMPBusinessCard> aBCs = new CommonsArrayList <> ();
-    for (final Map.Entry <IParticipantIdentifier, ICommonsList <DBBusinessCardEntity>> aEntry : aGrouped.entrySet ())
-    {
-      final ISMPBusinessCard aBC = _convert (aEntry.getKey (), aEntry.getValue ());
-      if (aBC != null)
-        aBCs.add (aBC);
+      // Convert
+      for (final Map.Entry <IParticipantIdentifier, ICommonsList <SMPBusinessCardEntity>> aEntry : aEntityMap.entrySet ())
+      {
+        final IParticipantIdentifier aPID = aEntry.getKey ();
+        ret.add (new SMPBusinessCard (aPID, aEntry.getValue ()));
+      }
     }
-    return aBCs;
+    return ret;
   }
 
   @Nullable
@@ -328,37 +309,37 @@ public final class SMPBusinessCardManagerSQL extends AbstractSMPJPAEnabledManage
     if (aID == null)
       return null;
 
-    JPAExecutionResult <List <DBBusinessCardEntity>> ret;
-    ret = doInTransaction ( () -> getEntityManager ().createQuery ("SELECT p FROM DBBusinessCardEntity p WHERE p.participantId = :id",
-                                                                   DBBusinessCardEntity.class)
-                                                     .setParameter ("id", aID.getURIEncoded ())
-                                                     .getResultList ());
-    if (ret.hasException ())
+    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT id, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
+                                                                                  " FROM smp_bce" +
+                                                                                  " WHERE pid=?",
+                                                                                  new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
+    if (!aDBResult.isPresent ())
+      return null;
+
+    if (aDBResult.get ().isEmpty ())
+      return null;
+
+    final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
+    for (final DBResultRow aRow : aDBResult.get ())
     {
-      return null;
+      final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aRow.getAsString (0));
+      // Single name only
+      aEntity.names ().add (new SMPBusinessCardName (aRow.getAsString (1), null));
+      aEntity.setCountryCode (aRow.getAsString (2));
+      aEntity.setGeographicalInformation (aRow.getAsString (3));
+      aEntity.identifiers ().setAll (getJsonAsBCI (aRow.getAsString (4)));
+      aEntity.websiteURIs ().setAll (getJsonAsString (aRow.getAsString (5)));
+      aEntity.contacts ().setAll (getJsonAsBCC (aRow.getAsString (6)));
+      aEntity.setAdditionalInformation (aRow.getAsString (7));
+      aEntity.setRegistrationDate (aRow.get (8).getAsLocalDate ());
+      aEntities.add (aEntity);
     }
-
-    if (ret.get ().isEmpty ())
-      return null;
-
-    return _convert (aID, ret.get ());
+    return new SMPBusinessCard (aID, aEntities);
   }
 
   @Nonnegative
   public long getSMPBusinessCardCount ()
   {
-    JPAExecutionResult <Number> ret;
-    ret = doInTransaction ( () -> {
-      final EntityManager em = getEntityManager ();
-      return getSelectCountResultObj (em.createQuery ("SELECT COUNT(DISTINCT p.participantId) FROM DBBusinessCardEntity p"));
-    });
-    if (ret.hasException ())
-    {
-      return 0;
-    }
-
-    if (ret.get () == null)
-      return 0;
-    return ret.get ().intValue ();
+    return executor ().queryCount ("SELECT COUNT (DISTINCT pid) FROM smp_bce");
   }
 }
