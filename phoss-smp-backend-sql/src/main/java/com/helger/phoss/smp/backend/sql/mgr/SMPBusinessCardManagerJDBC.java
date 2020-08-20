@@ -314,9 +314,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
                                                                                   " WHERE pid=?",
                                                                                   new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
     if (!aDBResult.isPresent ())
-    {
       return null;
-    }
 
     if (aDBResult.get ().isEmpty ())
       return null;

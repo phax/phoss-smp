@@ -36,9 +36,12 @@ public abstract class AbstractJDBCEnabledManager
   {
     // Create executor once for all manages
     s_aDBExec = new DBExecutor (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
+
+    // This is ONLY for debugging
     s_aDBExec.setDebugConnections (false);
     s_aDBExec.setDebugTransactions (false);
-    s_aDBExec.setDebugSQLStatements (true);
+    s_aDBExec.setDebugSQLStatements (false);
+
     s_aDBExec.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
       SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew);
     });

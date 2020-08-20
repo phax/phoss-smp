@@ -412,7 +412,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (m_aCache.containsKey (aParticipantID))
       return true;
 
-    return 1 == executor ().queryCount ("SELECT COUNT(*) FROM smp_service_group WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+    return 1 == executor ().queryCount ("SELECT COUNT(*) FROM smp_service_group" +
+                                        " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                         new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                    aParticipantID.getValue ()));
   }
