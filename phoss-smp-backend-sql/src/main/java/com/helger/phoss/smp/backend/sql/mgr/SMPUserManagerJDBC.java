@@ -180,10 +180,19 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
   {
     executor ().performInTransaction ( () -> {
       // Drop the Foreign Key Constraint - do this all the time
-      // This is only needed for MySQL so can be ignored for others
       try
       {
-        executor ().executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;", null, ex -> {});
+        // MySQL
+        executor ().executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
+      }
+      catch (final RuntimeException ex)
+      {
+        // Ignore
+      }
+      try
+      {
+        // PostgreSQL
+        executor ().executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
       }
       catch (final RuntimeException ex)
       {
