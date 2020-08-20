@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.internal.jdbc.DriverDataSource;
 
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.ToStringGenerator;
@@ -56,9 +57,11 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   {
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
     final Flyway aFlyway = Flyway.configure ()
-                                 .dataSource (aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL),
-                                              aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER),
-                                              aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD))
+                                 .dataSource (new DriverDataSource (getClass ().getClassLoader (),
+                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),
+                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL),
+                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER),
+                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD)))
                                  // Required for creating DB table
                                  .baselineOnMigrate (true)
                                  .baselineVersion ("1")

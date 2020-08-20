@@ -157,6 +157,11 @@
         <version>4.1.0</version>
       </dependency>
       <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.2.15</version>
+      </dependency>
+      <dependency>
         <groupId>net.jodah</groupId>
         <artifactId>expiringmap</artifactId>
         <version>0.5.9</version>
