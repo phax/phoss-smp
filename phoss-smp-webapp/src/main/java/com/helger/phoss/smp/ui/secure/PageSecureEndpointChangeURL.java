@@ -17,7 +17,9 @@
 package com.helger.phoss.smp.ui.secure;
 
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import com.helger.collection.multimap.MultiHashMapArrayListBased;
@@ -32,8 +34,10 @@ import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.text.ReadOnlyMultilingualText;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.URLValidator;
+import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCSelect;
@@ -44,6 +48,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -53,14 +58,18 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.photon.app.PhotonWorkerPool;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.traits.IHCBootstrap4Trait;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
+import com.helger.photon.core.longrun.AbstractLongRunningJobRunnable;
+import com.helger.photon.core.longrun.LongRunningJobResult;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
@@ -71,6 +80,108 @@ import com.helger.photon.uictrls.datatables.column.EDTColType;
 
 public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 {
+  /**
+   * The async logic
+   *
+   * @author Philip Helger
+   */
+  private static final class BulkChangeEndpointURL extends AbstractLongRunningJobRunnable implements IHCBootstrap4Trait
+  {
+    private static final AtomicInteger s_aRunningJobs = new AtomicInteger (0);
+
+    private final ICommonsList <ISMPServiceInformation> m_aAllSIs;
+    private final ISMPServiceGroup m_aServiceGroup;
+    private final String m_sOldURL;
+    private final String m_sNewURL;
+
+    public BulkChangeEndpointURL (final ICommonsList <ISMPServiceInformation> aAllSIs,
+                                  final ISMPServiceGroup aServiceGroup,
+                                  final String sOldURL,
+                                  final String sNewURL)
+    {
+      super ("BulkChangeEndpointURL", new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"));
+      m_aAllSIs = aAllSIs;
+      m_aServiceGroup = aServiceGroup;
+      m_sOldURL = sOldURL;
+      m_sNewURL = sNewURL;
+    }
+
+    @Nonnull
+    public LongRunningJobResult createLongRunningJobResult ()
+    {
+      s_aRunningJobs.incrementAndGet ();
+      try
+      {
+        final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+
+        // Modify all endpoints
+        int nChangedEndpoints = 0;
+        int nSaveErrors = 0;
+        final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
+        for (final ISMPServiceInformation aSI : m_aAllSIs)
+        {
+          if (m_aServiceGroup != null && !aSI.getServiceGroup ().equals (m_aServiceGroup))
+          {
+            // Wrong service group
+            continue;
+          }
+
+          boolean bChanged = false;
+          for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+            for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+              if (m_sOldURL.equals (aEndpoint.getEndpointReference ()))
+              {
+                ((SMPEndpoint) aEndpoint).setEndpointReference (m_sNewURL);
+                bChanged = true;
+                ++nChangedEndpoints;
+              }
+          if (bChanged)
+          {
+            if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
+              nSaveErrors++;
+            aChangedServiceGroup.add (aSI.getServiceGroupID ());
+          }
+        }
+
+        final IHCNode aRes;
+        if (nChangedEndpoints > 0)
+        {
+          final HCUL aUL = new HCUL ();
+          for (final String sChangedServiceGroupID : aChangedServiceGroup)
+            aUL.addItem (sChangedServiceGroupID);
+
+          final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old URL '" +
+                                                                        m_sOldURL +
+                                                                        "' was changed in " +
+                                                                        nChangedEndpoints +
+                                                                        " endpoints. Effected service groups are:"),
+                                                                   aUL);
+          if (nSaveErrors == 0)
+            aRes = success (aNodes);
+          else
+          {
+            aNodes.addChildAt (0, h3 ("Some changes could NOT be saved! Please check the logs!"));
+            aRes = error (aNodes);
+          }
+        }
+        else
+          aRes = warn ("No endpoint was found that contains the old URL '" + m_sOldURL + "'");
+
+        return LongRunningJobResult.createXML (aRes);
+      }
+      finally
+      {
+        s_aRunningJobs.decrementAndGet ();
+      }
+    }
+
+    @Nonnegative
+    public static int getRunningJobCount ()
+    {
+      return s_aRunningJobs.get ();
+    }
+  }
+
   private static final String SERVICE_GROUP_ALL = "all";
   private static final String FIELD_SERVICE_GROUP = "servicegroup";
   private static final String FIELD_OLD_URL = "oldurl";
@@ -129,6 +240,19 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         }
     }
 
+    {
+      final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+      aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
+      aNodeList.addChild (aToolbar);
+
+      final int nCount = BulkChangeEndpointURL.getRunningJobCount ();
+      if (nCount > 0)
+      {
+        aNodeList.addChild (warn ((nCount == 1 ? "1 bulk change is" : nCount + " bulk changes are") +
+                                  " currently running in the background"));
+      }
+    }
+
     if (aWPEC.hasAction (CPageParam.ACTION_EDIT))
     {
       bShowList = false;
@@ -168,57 +292,14 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         // Validate parameters
         if (aFormErrors.isEmpty ())
         {
-          // Modify all endpoints
-          int nChangedEndpoints = 0;
-          int nSaveErrors = 0;
-          final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
-          for (final ISMPServiceInformation aSI : aAllSIs)
-          {
-            if (aServiceGroup != null && !aSI.getServiceGroup ().equals (aServiceGroup))
-            {
-              // Wrong service group
-              continue;
-            }
+          PhotonWorkerPool.getInstance ()
+                          .run ("BulkChangeEndpointURL", new BulkChangeEndpointURL (aAllSIs, aServiceGroup, sOldURL, sNewURL));
 
-            boolean bChanged = false;
-            for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-              for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-                if (sOldURL.equals (aEndpoint.getEndpointReference ()))
-                {
-                  ((SMPEndpoint) aEndpoint).setEndpointReference (sNewURL);
-                  bChanged = true;
-                  ++nChangedEndpoints;
-                }
-            if (bChanged)
-            {
-              if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
-                nSaveErrors++;
-              aChangedServiceGroup.add (aSI.getServiceGroupID ());
-            }
-          }
-
-          if (nChangedEndpoints > 0)
-          {
-            final HCUL aUL = new HCUL ();
-            for (final String sChangedServiceGroupID : aChangedServiceGroup)
-              aUL.addItem (sChangedServiceGroupID);
-
-            final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old URL '" +
-                                                                          sOldURL +
-                                                                          "' was changed in " +
-                                                                          nChangedEndpoints +
-                                                                          " endpoints. Effected service groups are:"),
-                                                                     aUL);
-            if (nSaveErrors == 0)
-              aWPEC.postRedirectGetInternal (success (aNodes));
-            else
-            {
-              aNodes.addChildAt (0, h3 ("Some changes could NOT be saved! Please check the logs!"));
-              aWPEC.postRedirectGetInternal (error (aNodes));
-            }
-          }
-          else
-            aWPEC.postRedirectGetInternal (warn ("No endpoint was found that contains the old URL '" + sOldURL + "'"));
+          aWPEC.postRedirectGetInternal (success ("The bulk change of the endpoint URL from '" +
+                                                  sOldURL +
+                                                  "' to '" +
+                                                  sNewURL +
+                                                  "' is now running in the background."));
         }
       }
 

@@ -19,7 +19,9 @@ package com.helger.phoss.smp.ui.secure;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -37,16 +39,19 @@ import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.text.ReadOnlyMultilingualText;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCTextArea;
+import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -56,14 +61,18 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.photon.app.PhotonWorkerPool;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.traits.IHCBootstrap4Trait;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
+import com.helger.photon.core.longrun.AbstractLongRunningJobRunnable;
+import com.helger.photon.core.longrun.LongRunningJobResult;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
@@ -75,6 +84,102 @@ import com.helger.security.certificate.CertificateHelper;
 
 public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPage
 {
+  /**
+   * The async logic
+   *
+   * @author Philip Helger
+   */
+  private static final class BulkChangeCertificate extends AbstractLongRunningJobRunnable implements IHCBootstrap4Trait
+  {
+    private static final AtomicInteger s_aRunningJobs = new AtomicInteger (0);
+
+    private final ICommonsList <ISMPServiceInformation> m_aAllSIs;
+    private final Locale m_aDisplayLocale;
+    private final String m_sOldCert;
+    private final String m_sNewCert;
+
+    public BulkChangeCertificate (final ICommonsList <ISMPServiceInformation> aAllSIs,
+                                  final Locale aDisplayLocale,
+                                  final String sOldCert,
+                                  final String sNewCert)
+    {
+      super ("BulkChangeCertificate", new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change certificate"));
+      m_aAllSIs = aAllSIs;
+      m_aDisplayLocale = aDisplayLocale;
+      m_sOldCert = sOldCert;
+      m_sNewCert = sNewCert;
+    }
+
+    @Nonnull
+    public LongRunningJobResult createLongRunningJobResult ()
+    {
+      s_aRunningJobs.incrementAndGet ();
+      try
+      {
+        final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+
+        // Modify all endpoints
+        int nChangedEndpoints = 0;
+        int nSaveErrors = 0;
+        final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
+        for (final ISMPServiceInformation aSI : m_aAllSIs)
+        {
+          boolean bChanged = false;
+          for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+            for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+              if (m_sOldCert.equals (aEndpoint.getCertificate ()))
+              {
+                ((SMPEndpoint) aEndpoint).setCertificate (m_sNewCert);
+                bChanged = true;
+                ++nChangedEndpoints;
+              }
+          if (bChanged)
+          {
+            if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
+              nSaveErrors++;
+            aChangedServiceGroup.add (aSI.getServiceGroupID ());
+          }
+        }
+
+        final IHCNode aRes;
+        if (nChangedEndpoints > 0)
+        {
+          final HCUL aUL = new HCUL ();
+          for (final String sChangedServiceGroupID : aChangedServiceGroup)
+            aUL.addItem (sChangedServiceGroupID);
+
+          final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old certificate was changed in " +
+                                                                        nChangedEndpoints +
+                                                                        " endpoints to the new certificate:"),
+                                                                   _getCertificateDisplay (m_sNewCert, m_aDisplayLocale),
+                                                                   div ("Effected service groups are:"),
+                                                                   aUL);
+          if (nSaveErrors == 0)
+            aRes = success (aNodes);
+          else
+          {
+            aNodes.addChildAt (0, h3 ("Some changes could NOT be saved! Please check the logs!"));
+            aRes = error (aNodes);
+          }
+        }
+        else
+          aRes = warn ("No endpoint was found that contains the old certificate");
+
+        return LongRunningJobResult.createXML (aRes);
+      }
+      finally
+      {
+        s_aRunningJobs.decrementAndGet ();
+      }
+    }
+
+    @Nonnegative
+    public static int getRunningJobCount ()
+    {
+      return s_aRunningJobs.get ();
+    }
+  }
+
   private static final String FIELD_OLD_CERTIFICATE = "oldcert";
   private static final String FIELD_NEW_CERTIFICATE = "newcert";
 
@@ -116,7 +221,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   }
 
   @Nonnull
-  private IHCNode _getCertificateDisplay (@Nullable final String sCert, @Nonnull final Locale aDisplayLocale)
+  private static IHCNode _getCertificateDisplay (@Nullable final String sCert, @Nonnull final Locale aDisplayLocale)
   {
     X509Certificate aEndpointCert = null;
     try
@@ -131,17 +236,20 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     {
       final int nDisplayLen = 20;
       final String sCertPart = (sCert.length () > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert);
-      return div ("Invalid certificate" +
-                  (sCert.length () > nDisplayLen ? " starting with: " : ": ")).addChild (new HCCode ().addChild (sCertPart));
+      return new HCDiv ().addChild ("Invalid certificate" + (sCert.length () > nDisplayLen ? " starting with: " : ": "))
+                         .addChild (new HCCode ().addChild (sCertPart));
     }
 
     final HCNodeList ret = new HCNodeList ();
-    ret.addChild (div ("Issuer: " + aEndpointCert.getIssuerX500Principal ().toString ()));
-    ret.addChild (div ("Subject: " + aEndpointCert.getSubjectX500Principal ().toString ()));
+    ret.addChild (new HCDiv ().addChild ("Issuer: " + aEndpointCert.getIssuerX500Principal ().toString ()));
+    ret.addChild (new HCDiv ().addChild ("Subject: " + aEndpointCert.getSubjectX500Principal ().toString ()));
+
     final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aEndpointCert.getNotBefore ());
-    ret.addChild (div ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+    ret.addChild (new HCDiv ().addChild ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+
     final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aEndpointCert.getNotAfter ());
-    ret.addChild (div ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+    ret.addChild (new HCDiv ().addChild ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+
     return ret;
   }
 
@@ -180,6 +288,19 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         }
     }
 
+    {
+      final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+      aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
+      aNodeList.addChild (aToolbar);
+
+      final int nCount = BulkChangeCertificate.getRunningJobCount ();
+      if (nCount > 0)
+      {
+        aNodeList.addChild (warn ((nCount == 1 ? "1 bulk change is" : nCount + " bulk changes are") +
+                                  " currently running in the background"));
+      }
+    }
+
     if (aWPEC.hasAction (CPageParam.ACTION_EDIT))
     {
       bShowList = false;
@@ -215,51 +336,12 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         // Validate parameters
         if (aFormErrors.containsNoError ())
         {
-          // Modify all endpoints
-          int nChangedEndpoints = 0;
-          int nSaveErrors = 0;
-          final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
-          for (final ISMPServiceInformation aSI : aAllSIs)
-          {
-            boolean bChanged = false;
-            for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-              for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-                if (sOldCert.equals (aEndpoint.getCertificate ()))
-                {
-                  ((SMPEndpoint) aEndpoint).setCertificate (sNewCert);
-                  bChanged = true;
-                  ++nChangedEndpoints;
-                }
-            if (bChanged)
-            {
-              if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
-                nSaveErrors++;
-              aChangedServiceGroup.add (aSI.getServiceGroupID ());
-            }
-          }
+          PhotonWorkerPool.getInstance ()
+                          .run ("BulkChangeCertificate", new BulkChangeCertificate (aAllSIs, aDisplayLocale, sOldCert, sNewCert));
 
-          if (nChangedEndpoints > 0)
-          {
-            final HCUL aUL = new HCUL ();
-            for (final String sChangedServiceGroupID : aChangedServiceGroup)
-              aUL.addItem (sChangedServiceGroupID);
-
-            final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old certificate was changed in " +
-                                                                          nChangedEndpoints +
-                                                                          " endpoints to the new certificate:"),
-                                                                     _getCertificateDisplay (sNewCert, aDisplayLocale),
-                                                                     div ("Effected service groups are:"),
-                                                                     aUL);
-            if (nSaveErrors == 0)
-              aWPEC.postRedirectGetInternal (success (aNodes));
-            else
-            {
-              aNodes.addChildAt (0, h3 ("Some changes could NOT be saved! Please check the logs!"));
-              aWPEC.postRedirectGetInternal (error (aNodes));
-            }
-          }
-          else
-            aWPEC.postRedirectGetInternal (warn ("No endpoint was found that contains the old certificate"));
+          aWPEC.postRedirectGetInternal (success ().addChildren (div ("The bulk change of the endpoint certificate to"),
+                                                                 _getCertificateDisplay (sNewCert, aDisplayLocale),
+                                                                 div ("is now running in the background.")));
         }
       }
 
