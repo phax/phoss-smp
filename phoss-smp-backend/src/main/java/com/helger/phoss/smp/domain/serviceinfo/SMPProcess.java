@@ -103,7 +103,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return StringHelper.hasText (sTransportProfileID) && m_aEndpoints.containsKey (sTransportProfileID);
   }
 
-  public void addEndpoint (@Nonnull final SMPEndpoint aEndpoint)
+  public final void addEndpoint (@Nonnull final SMPEndpoint aEndpoint)
   {
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();
@@ -112,14 +112,14 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     m_aEndpoints.put (sTransportProfile, aEndpoint);
   }
 
-  public void addEndpoints (@Nonnull final Iterable <? extends SMPEndpoint> aEndpoints)
+  public final void addEndpoints (@Nonnull final Iterable <? extends SMPEndpoint> aEndpoints)
   {
     ValueEnforcer.notNull (aEndpoints, "Endpoints");
     for (final SMPEndpoint aEndpoint : aEndpoints)
       addEndpoint (aEndpoint);
   }
 
-  public void setEndpoint (@Nonnull final SMPEndpoint aEndpoint)
+  public final void setEndpoint (@Nonnull final SMPEndpoint aEndpoint)
   {
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();

@@ -99,7 +99,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     return m_aDocumentTypeIdentifier;
   }
 
-  public void setDocumentTypeIdentifier (@Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
+  public final void setDocumentTypeIdentifier (@Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
     m_aDocumentTypeIdentifier = aDocumentTypeIdentifier;
@@ -131,7 +131,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     return new CommonsArrayList <> (m_aProcesses.values ());
   }
 
-  public void addProcess (@Nonnull final SMPProcess aProcess)
+  public final void addProcess (@Nonnull final SMPProcess aProcess)
   {
     ValueEnforcer.notNull (aProcess, "Process");
     final String sProcessID = _getKey (aProcess.getProcessIdentifier ());
@@ -140,14 +140,14 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     m_aProcesses.put (sProcessID, aProcess);
   }
 
-  public void addProcesses (@Nonnull final Iterable <? extends SMPProcess> aProcesses)
+  public final void addProcesses (@Nonnull final Iterable <? extends SMPProcess> aProcesses)
   {
     ValueEnforcer.notNull (aProcesses, "Processes");
     for (final SMPProcess aProcess : aProcesses)
       addProcess (aProcess);
   }
 
-  public void setProcesses (@Nonnull @Nonempty final Map <String, ? extends SMPProcess> aProcesses)
+  public final void setProcesses (@Nonnull @Nonempty final Map <String, ? extends SMPProcess> aProcesses)
   {
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
     m_aProcesses.setAll (aProcesses);
@@ -281,8 +281,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
                                                       @Nonnull final com.helger.smpclient.peppol.jaxb.ServiceInformationType aServiceInformation)
   {
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
-    for (final com.helger.smpclient.peppol.jaxb.ProcessType aProcess : aServiceInformation.getProcessList ()
-                                                                                          .getProcess ())
+    for (final com.helger.smpclient.peppol.jaxb.ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
       aProcesses.add (SMPProcess.createFromJAXB (aProcess));
     return new SMPServiceInformation (aServiceGroup,
                                       SimpleDocumentTypeIdentifier.wrap (aServiceInformation.getDocumentIdentifier ()),
