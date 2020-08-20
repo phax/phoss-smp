@@ -66,11 +66,22 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
-  private final ExpiringMap <IParticipantIdentifier, SMPServiceGroup> m_aCache;
+  private ExpiringMap <IParticipantIdentifier, SMPServiceGroup> m_aCache;
 
   public SMPServiceGroupManagerJDBC ()
+  {}
+
+  public final boolean isCacheEnabled ()
   {
-    m_aCache = ExpiringMap.builder ().expiration (60, TimeUnit.SECONDS).expirationPolicy (ExpirationPolicy.CREATED).build ();
+    return false;
+  }
+
+  public final void setCacheEnabled (final boolean bEnabled)
+  {
+    if (bEnabled)
+      m_aCache = ExpiringMap.builder ().expiration (60, TimeUnit.SECONDS).expirationPolicy (ExpirationPolicy.CREATED).build ();
+    else
+      m_aCache = null;
   }
 
   @Nonnull
@@ -159,7 +170,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), sOwnerID, sExtension);
 
     final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
-    m_aCache.put (aParticipantID, aServiceGroup);
+    if (m_aCache != null)
+      m_aCache.put (aParticipantID, aServiceGroup);
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aServiceGroup));
     return aServiceGroup;
@@ -309,7 +321,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     {
       AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aParticipantID.getURIEncoded ());
 
-      m_aCache.remove (aParticipantID);
+      if (m_aCache != null)
+        m_aCache.remove (aParticipantID);
       m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
     }
 
@@ -381,7 +394,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       return null;
 
     // Use cache
-    SMPServiceGroup ret = m_aCache.get (aParticipantID);
+    SMPServiceGroup ret = m_aCache == null ? null : m_aCache.get (aParticipantID);
     if (ret != null)
       return ret;
 
@@ -396,7 +409,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       return null;
 
     ret = new SMPServiceGroup (aResult.get ().getAsString (1), aParticipantID, aResult.get ().getAsString (0));
-    m_aCache.put (aParticipantID, ret);
+    if (m_aCache != null)
+      m_aCache.put (aParticipantID, ret);
     return ret;
   }
 
@@ -409,7 +423,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       return false;
 
     // Cache check first
-    if (m_aCache.containsKey (aParticipantID))
+    if (m_aCache != null && m_aCache.containsKey (aParticipantID))
       return true;
 
     return 1 == executor ().queryCount ("SELECT COUNT(*) FROM smp_service_group" +

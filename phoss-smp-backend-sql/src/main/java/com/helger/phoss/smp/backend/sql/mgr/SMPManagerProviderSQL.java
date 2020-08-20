@@ -130,7 +130,10 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    return new SMPServiceGroupManagerJDBC ();
+    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC ();
+    // Enable cache by default
+    ret.setCacheEnabled (SMPServerConfiguration.getConfigFile ().getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
+    return ret;
   }
 
   @Nonnull

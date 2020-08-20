@@ -43,7 +43,8 @@ import com.helger.phoss.smp.exception.SMPUnknownUserException;
 import com.helger.photon.audit.AuditHelper;
 
 /**
- * A JDBC based implementation of the {@link ISMPUserManager} interface.
+ * A JDBC based implementation of the {@link ISMPUserManager} interface. This is
+ * only used in the migration.
  *
  * @author Philip Helger
  * @since 5.3.0

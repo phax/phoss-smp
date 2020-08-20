@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.settings.exchange.configfile.ConfigFile;
 
 public abstract class AbstractJDBCEnabledManager
 {
@@ -46,13 +47,12 @@ public abstract class AbstractJDBCEnabledManager
       SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew);
     });
 
-    if (SMPServerConfiguration.getConfigFile ()
-                              .getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
-                                             SMPJDBCConfiguration.DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE))
+    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+    if (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
+                          SMPJDBCConfiguration.DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE))
     {
-      final long nMillis = SMPServerConfiguration.getConfigFile ()
-                                                 .getAsLong (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
-                                                             DBExecutor.DEFAULT_EXECUTION_DURATION_WARN_MS);
+      final long nMillis = aCF.getAsLong (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
+                                          DBExecutor.DEFAULT_EXECUTION_DURATION_WARN_MS);
       if (nMillis > 0)
         s_aDBExec.setExecutionDurationWarnMS (nMillis);
       else

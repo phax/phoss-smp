@@ -40,6 +40,10 @@ public final class SMPJDBCConfiguration
   @Since ("5.0.6")
   public static final String CONFIG_JDBC_EXECUTION_TIME_WARNING_MS = "jdbc.execution-time-warning.ms";
 
+  // Experimental
+  @Since ("5.3.0")
+  public static final String CONFIG_JDBC_CACHE_SG_ENABLED = "jdbc.cache.sg.enabled";
+
   @PresentForCodeCoverage
   private static final SMPJDBCConfiguration s_aInstance = new SMPJDBCConfiguration ();
 
