@@ -109,7 +109,7 @@ Open `http://localhost:8888` in your browser.
 To change the version build of binary release versions you can specify the version on the commandline when building:
 
 ```
-docker build --build-arg SMP_VERSION=5.2.5 -t phoss-smp-release-binary-xml-5.2.5 -f Dockerfile-release-binary-xml .
+docker build --build-arg SMP_VERSION=5.2.6 -t phoss-smp-release-binary-xml-5.2.6 -f Dockerfile-release-binary-xml .
 ```
 
 Note: since the file system layout changed between 5.0.0 and 5.0.1, the current version is only applicable to versions &ge; 5.0.1
@@ -121,9 +121,9 @@ Note: up to and including v5.1.1 the variable `SMP_VERSION` was called `VERSION`
 Running a pre-build image (XML backend only):
 
 ```
-docker run -d --name phoss-smp-release-binary-xml-5.2.5 -p 8888:8080 phelger/smp:5.2.5
-docker stop phoss-smp-release-binary-xml-5.2.5
-docker rm phoss-smp-release-binary-xml-5.2.5
+docker run -d --name phoss-smp-release-binary-xml-5.2.6 -p 8888:8080 phelger/smp:5.2.6
+docker stop phoss-smp-release-binary-xml-5.2.6
+docker rm phoss-smp-release-binary-xml-5.2.6
 ```
 
 It exposes port 8888 where Tomcat is running successfully.
