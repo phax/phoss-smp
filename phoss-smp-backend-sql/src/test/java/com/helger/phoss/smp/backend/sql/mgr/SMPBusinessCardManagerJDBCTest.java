@@ -12,10 +12,12 @@ package com.helger.phoss.smp.backend.sql.mgr;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.photon.core.mock.PhotonCoreTestRule;
 
 /**
  * Test class for class {@link SMPBusinessCardManagerJDBC}.
@@ -24,6 +26,9 @@ import com.helger.commons.collection.impl.ICommonsList;
  */
 public final class SMPBusinessCardManagerJDBCTest
 {
+  @Rule
+  public final PhotonCoreTestRule m_aRule = new PhotonCoreTestRule ();
+
   @Test
   public void testConvertStringList ()
   {

@@ -67,6 +67,13 @@
       <groupId>com.helger</groupId>
       <artifactId>phoss-smp-backend-sql</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>

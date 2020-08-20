@@ -60,14 +60,20 @@
       <groupId>com.helger.photon</groupId>
       <artifactId>ph-oton-core</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-    </dependency>
+        
     <dependency>
       <groupId>net.jodah</groupId>
       <artifactId>expiringmap</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

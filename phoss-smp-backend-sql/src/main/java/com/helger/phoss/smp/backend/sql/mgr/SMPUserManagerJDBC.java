@@ -115,7 +115,7 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
   @ReturnsMutableCopy
   public ICommonsList <ISMPUser> getAllUsers ()
   {
-    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT (username, password) FROM smp_user");
+    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT username, password FROM smp_user");
     final ICommonsList <ISMPUser> ret = new CommonsArrayList <> ();
     if (aDBResult.isPresent ())
       for (final DBResultRow aRow : aDBResult.get ())
@@ -175,19 +175,29 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
                     "'");
   }
 
-  public void updateOwnerships (@Nonnull final ICommonsMap <String, String> aOldToNewMap)
+  public void onMigrationUpdateOwnershipsAndKillUsers (@Nonnull final ICommonsMap <String, String> aOldToNewMap)
   {
-    if (aOldToNewMap.isNotEmpty ())
-    {
-      executor ().performInTransaction ( () -> {
-        for (final Map.Entry <String, String> aEntry : aOldToNewMap.entrySet ())
-        {
-          final String sOld = aEntry.getKey ();
-          final String sNew = aEntry.getValue ();
-          executor ().insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE username=?",
-                                              new ConstantPreparedStatementDataProvider (sNew, sOld));
-        }
-      });
-    }
+    executor ().performInTransaction ( () -> {
+      // Drop the Foreign Key Constraint - do this all the time
+      try
+      {
+        executor ().executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
+      }
+      catch (final RuntimeException ex)
+      {
+        // Ignore
+      }
+
+      // Update user names
+      for (final Map.Entry <String, String> aEntry : aOldToNewMap.entrySet ())
+      {
+        final String sOld = aEntry.getKey ();
+        final String sNew = aEntry.getValue ();
+        executor ().insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE username=?",
+                                            new ConstantPreparedStatementDataProvider (sNew, sOld));
+      }
+
+      executor ().executeStatement ("DROP TABLE smp_user;");
+    });
   }
 }

@@ -161,6 +161,11 @@
         <artifactId>expiringmap</artifactId>
         <version>0.5.9</version>
       </dependency>
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>6.5.5</version>
+      </dependency>
 
       <dependency>
         <groupId>com.helger</groupId>

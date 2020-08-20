@@ -28,11 +28,15 @@ public final class SMPJDBCConfiguration
   public static final String CONFIG_JDBC_USER = "jdbc.user";
   public static final String CONFIG_JDBC_PASSWORD = "jdbc.password";
   public static final String CONFIG_TARGET_DATABASE = "target-database";
+
   @Deprecated
   // Since ("5.2.4")
   public static final String CONFIG_JDBC_READ_CONNECTIONS_MAX = "jdbc.read-connections.max";
+
   @Since ("5.0.6")
   public static final String CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE = "jdbc.execution-time-warning.enabled";
+  public static final boolean DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE = true;
+
   @Since ("5.0.6")
   public static final String CONFIG_JDBC_EXECUTION_TIME_WARNING_MS = "jdbc.execution-time-warning.ms";
 

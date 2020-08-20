@@ -34,6 +34,7 @@ public abstract class AbstractJDBCEnabledManager
 
   static
   {
+    // Create executor once for all manages
     s_aDBExec = new DBExecutor (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
     s_aDBExec.setDebugConnections (false);
     s_aDBExec.setDebugTransactions (false);
@@ -42,7 +43,9 @@ public abstract class AbstractJDBCEnabledManager
       SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew);
     });
 
-    if (SMPServerConfiguration.getConfigFile ().getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE))
+    if (SMPServerConfiguration.getConfigFile ()
+                              .getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
+                                             SMPJDBCConfiguration.DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE))
     {
       final long nMillis = SMPServerConfiguration.getConfigFile ()
                                                  .getAsLong (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
