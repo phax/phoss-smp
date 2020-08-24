@@ -43,7 +43,7 @@ public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
     try (final WebScoped aWS = new WebScoped ())
     {
       LOGGER.info ("Migrating all DB users to ph-oton users");
-      final EDatabaseType eDBType = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ().getDatabaseType ();
+      final EDatabaseType eDBType = SMPDataSourceSingleton.getDatabaseType ();
 
       final SMPUserManagerJDBC aSQLUserMgr = new SMPUserManagerJDBC (eDBType);
       final ICommonsList <ISMPUser> aSQLUsers = aSQLUserMgr.getAllUsers ();

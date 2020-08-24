@@ -16,8 +16,7 @@ import com.helger.commons.name.IHasDisplayName;
 public enum EDatabaseType implements IHasID <String>, IHasDisplayName
 {
   MYSQL ("mysql", "MySQL"),
-  POSTGRESQL ("postgresql", "PostgreSQL"),
-  GENERIC ("generic", "Generic SQL");
+  POSTGRESQL ("postgresql", "PostgreSQL");
 
   private final String m_sID;
   private final String m_sDisplayName;
@@ -43,8 +42,8 @@ public enum EDatabaseType implements IHasID <String>, IHasDisplayName
   }
 
   @Nullable
-  public static EDatabaseType getFromIDOrDefault (@Nullable final String sID)
+  public static EDatabaseType getFromIDOrNull (@Nullable final String sID)
   {
-    return EnumHelper.getFromIDCaseInsensitiveOrDefault (EDatabaseType.class, sID, EDatabaseType.GENERIC);
+    return EnumHelper.getFromIDCaseInsensitiveOrNull (EDatabaseType.class, sID);
   }
 }

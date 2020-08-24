@@ -15,7 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
-import com.helger.db.jdbc.AbstractConnector;
+import com.helger.db.jdbc.AbstractDBConnector;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
@@ -28,14 +28,21 @@ import com.helger.scope.singleton.AbstractGlobalSingleton;
 @ThreadSafe
 public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
 {
-  public static final class SMPDataSourceProvider extends AbstractConnector
+  public static final class SMPDataSourceProvider extends AbstractDBConnector
   {
-    private EDatabaseType m_eDBType;
+    private SMPDataSourceProvider ()
+    {}
 
     @Override
     protected String getJDBCDriverClassName ()
     {
       return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER);
+    }
+
+    @Override
+    public String getConnectionUrl ()
+    {
+      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL);
     }
 
     @Override
@@ -49,30 +56,20 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
     {
       return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD);
     }
+  }
 
-    @Override
-    protected String getDatabaseName ()
-    {
-      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE);
-    }
+  private static final EDatabaseType s_eDBType;
 
-    @Nonnull
-    public EDatabaseType getDatabaseType ()
-    {
-      EDatabaseType ret = m_eDBType;
-      if (ret == null)
-      {
-        // Resolve lazy
-        m_eDBType = ret = EDatabaseType.getFromIDOrDefault (getDatabaseName ());
-      }
-      return ret;
-    }
-
-    @Override
-    public String getConnectionUrl ()
-    {
-      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL);
-    }
+  static
+  {
+    final String sDBType = SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE);
+    s_eDBType = EDatabaseType.getFromIDOrNull (sDBType);
+    if (s_eDBType == null)
+      throw new IllegalStateException ("The database type MUST be provided and MUST be one of " +
+                                       EDatabaseType.values () +
+                                       " - provided value is '" +
+                                       sDBType +
+                                       "'");
   }
 
   private final SMPDataSourceProvider m_aDSP = new SMPDataSourceProvider ();
@@ -98,5 +95,11 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   public SMPDataSourceProvider getDataSourceProvider ()
   {
     return m_aDSP;
+  }
+
+  @Nonnull
+  public static EDatabaseType getDatabaseType ()
+  {
+    return s_eDBType;
   }
 }

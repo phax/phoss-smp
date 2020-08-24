@@ -57,7 +57,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
 
   public SMPManagerProviderSQL ()
   {
-    m_eDBType = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ().getDatabaseType ();
+    m_eDBType = SMPDataSourceSingleton.getDatabaseType ();
   }
 
   public void beforeInitManagers ()
