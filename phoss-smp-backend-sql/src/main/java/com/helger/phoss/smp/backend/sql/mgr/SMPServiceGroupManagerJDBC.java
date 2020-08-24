@@ -37,7 +37,7 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
+import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -68,8 +68,10 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
   private ExpiringMap <String, SMPServiceGroup> m_aCache;
 
-  public SMPServiceGroupManagerJDBC ()
-  {}
+  public SMPServiceGroupManagerJDBC (@Nonnull final EDatabaseType eDBType)
+  {
+    super (eDBType);
+  }
 
   public final boolean isCacheEnabled ()
   {

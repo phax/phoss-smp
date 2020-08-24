@@ -43,7 +43,7 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
+import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
@@ -71,8 +71,10 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPBusinessCardManagerJDBC ()
-  {}
+  public SMPBusinessCardManagerJDBC (@Nonnull final EDatabaseType eDBType)
+  {
+    super (eDBType);
+  }
 
   @Nonnull
   @ReturnsMutableObject

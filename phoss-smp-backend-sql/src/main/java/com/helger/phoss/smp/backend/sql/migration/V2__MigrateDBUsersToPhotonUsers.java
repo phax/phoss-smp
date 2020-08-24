@@ -22,6 +22,8 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.backend.sql.EDatabaseType;
+import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.mgr.SMPUserManagerJDBC;
 import com.helger.phoss.smp.backend.sql.model.DBUser;
 import com.helger.phoss.smp.domain.user.ISMPUser;
@@ -41,8 +43,9 @@ public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
     try (final WebScoped aWS = new WebScoped ())
     {
       LOGGER.info ("Migrating all DB users to ph-oton users");
+      final EDatabaseType eDBType = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ().getDatabaseType ();
 
-      final SMPUserManagerJDBC aSQLUserMgr = new SMPUserManagerJDBC ();
+      final SMPUserManagerJDBC aSQLUserMgr = new SMPUserManagerJDBC (eDBType);
       final ICommonsList <ISMPUser> aSQLUsers = aSQLUserMgr.getAllUsers ();
       LOGGER.info ("Found " + aSQLUsers.size () + " DB user to migrate");
 
@@ -68,7 +71,10 @@ public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
                                                       null,
                                                       false);
           if (aPhotonUser != null)
+          {
+            // New user was successfully created
             break;
+          }
 
           // User name already taken
           ++nIndex;
@@ -87,7 +93,10 @@ public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
       aSQLUserMgr.onMigrationUpdateOwnershipsAndKillUsers (aCreatedMappings);
 
       if (XMLMapHandler.writeMap (aCreatedMappings,
-                                  new FileSystemResource (WebFileIO.getDataIO ().getFile ("migrations/db-photon-user-mapping.xml")))
+                                  new FileSystemResource (WebFileIO.getDataIO ()
+                                                                   .getFile ("migrations/db-photon-user-mapping-" +
+                                                                             eDBType.getID () +
+                                                                             ".xml")))
                        .isFailure ())
         LOGGER.error ("Failed to store mapping of DB users to ph-oton users as XML");
       LOGGER.info ("Finished migrating all DB users to ph-oton users");

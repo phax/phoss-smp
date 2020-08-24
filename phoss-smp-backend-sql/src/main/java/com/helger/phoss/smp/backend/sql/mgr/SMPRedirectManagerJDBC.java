@@ -36,7 +36,7 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
+import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -59,8 +59,9 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
-  public SMPRedirectManagerJDBC (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public SMPRedirectManagerJDBC (@Nonnull final EDatabaseType eDBType, @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
+    super (eDBType);
     m_aServiceGroupMgr = aServiceGroupMgr;
   }
 

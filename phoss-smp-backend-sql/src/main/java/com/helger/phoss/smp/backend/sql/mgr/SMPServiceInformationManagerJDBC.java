@@ -42,7 +42,7 @@ import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
-import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
+import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -97,8 +97,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceInformationManagerJDBC (@Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public SMPServiceInformationManagerJDBC (@Nonnull final EDatabaseType eDBType, @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
+    super (eDBType);
     m_aServiceGroupMgr = aServiceGroupMgr;
   }
 

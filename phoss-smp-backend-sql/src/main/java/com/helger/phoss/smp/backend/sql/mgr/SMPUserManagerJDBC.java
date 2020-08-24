@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
@@ -33,7 +34,7 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.phoss.smp.backend.sql.AbstractJDBCEnabledManager;
+import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.model.DBUser;
 import com.helger.phoss.smp.domain.user.ISMPUser;
 import com.helger.phoss.smp.domain.user.ISMPUserManager;
@@ -54,8 +55,10 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
   public static final ObjectType OT = new ObjectType ("smpuser");
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerJDBC.class);
 
-  public SMPUserManagerJDBC ()
-  {}
+  public SMPUserManagerJDBC (@Nonnull final EDatabaseType eDBType)
+  {
+    super (eDBType);
+  }
 
   public boolean isSpecialUserManagementNeeded ()
   {
@@ -159,7 +162,8 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
   public void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
                                @Nonnull final ISMPUser aCredentials) throws SMPServerException
   {
-    final long nCount = executor ().queryCount ("SELECT COUNT(*) FROM smp_ownership WHERE businessIdentifierScheme=? AND businessIdentifier=? AND username=?",
+    final long nCount = executor ().queryCount ("SELECT COUNT(*) FROM smp_ownership" +
+                                                " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND username=?",
                                                 new ConstantPreparedStatementDataProvider (aServiceGroupID.getScheme (),
                                                                                            aServiceGroupID.getValue (),
                                                                                            aCredentials.getUserName ()));
@@ -178,21 +182,23 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
 
   public void onMigrationUpdateOwnershipsAndKillUsers (@Nonnull final ICommonsMap <String, String> aOldToNewMap)
   {
+    ValueEnforcer.notNull (aOldToNewMap, "OldToNewMap");
+
     executor ().performInTransaction ( () -> {
       // Drop the Foreign Key Constraint - do this all the time
       try
       {
-        // MySQL
-        executor ().executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
-      }
-      catch (final RuntimeException ex)
-      {
-        // Ignore
-      }
-      try
-      {
-        // PostgreSQL
-        executor ().executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
+        switch (m_eDBType)
+        {
+          case MYSQL:
+            executor ().executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
+            break;
+          case POSTGRESQL:
+            executor ().executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
+            break;
+          default:
+            throw new IllegalStateException ("The migration code for DB type " + m_eDBType + " is missing");
+        }
       }
       catch (final RuntimeException ex)
       {
@@ -210,7 +216,7 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
 
       try
       {
-        executor ().executeStatement ("DROP TABLE smp_user;", null, ex -> {});
+        executor ().executeStatement ("DROP TABLE smp_user;");
       }
       catch (final RuntimeException ex)
       {

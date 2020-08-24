@@ -53,13 +53,16 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   private static final String SMP_SETTINGS_XML = "smp-settings.xml";
   private static final String SMP_TRANSPORT_PROFILES_XML = "transportprofiles.xml";
 
+  private final EDatabaseType m_eDBType;
+
   public SMPManagerProviderSQL ()
-  {}
+  {
+    m_eDBType = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ().getDatabaseType ();
+  }
 
   public void beforeInitManagers ()
   {
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
-    final EDatabaseType eDBType = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ().getDatabaseType ();
     final FluentConfiguration aConfig = Flyway.configure ()
                                               .dataSource (new DriverDataSource (getClass ().getClassLoader (),
                                                                                  aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),
@@ -68,9 +71,10 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
                                                                                  aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD)))
                                               // Required for creating DB table
                                               .baselineOnMigrate (true)
-                                              .baselineVersion ("0")
+                                              // Version 1 is the baseline
+                                              .baselineVersion ("1")
                                               .baselineDescription ("SMP 5.2.x database layout, MySQL only")
-                                              .locations ("classpath:db/migrate-" + eDBType.getID ())
+                                              .locations ("db/migrate-" + m_eDBType.getID ())
                                               .schemas ("smp")
                                               /*
                                                * Avoid scanning the ClassPath by
@@ -141,7 +145,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC ();
+    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (m_eDBType);
     // Enable cache by default
     ret.setCacheEnabled (SMPServerConfiguration.getConfigFile ().getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
     return ret;
@@ -151,21 +155,21 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                 @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPRedirectManagerJDBC (aServiceGroupMgr);
+    return new SMPRedirectManagerJDBC (m_eDBType, aServiceGroupMgr);
   }
 
   @Nonnull
   public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPServiceInformationManagerJDBC (aServiceGroupMgr);
+    return new SMPServiceInformationManagerJDBC (m_eDBType, aServiceGroupMgr);
   }
 
   @Nullable
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                         @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPBusinessCardManagerJDBC ();
+    return new SMPBusinessCardManagerJDBC (m_eDBType);
   }
 
   @Override

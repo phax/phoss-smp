@@ -61,7 +61,10 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
     {
       EDatabaseType ret = m_eDBType;
       if (ret == null)
+      {
+        // Resolve lazy
         m_eDBType = ret = EDatabaseType.getFromIDOrDefault (getDatabaseName ());
+      }
       return ret;
     }
 
