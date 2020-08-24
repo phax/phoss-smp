@@ -11,6 +11,7 @@
 package com.helger.phoss.smp.backend.sql;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
@@ -19,6 +20,12 @@ import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 
+/**
+ * DataSource provider singleton
+ *
+ * @author Philip Helger
+ */
+@ThreadSafe
 public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
 {
   public static final class SMPDataSourceProvider extends AbstractConnector
