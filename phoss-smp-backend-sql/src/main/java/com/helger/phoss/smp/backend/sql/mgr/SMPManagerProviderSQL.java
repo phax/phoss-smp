@@ -25,7 +25,7 @@ import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
-import com.helger.phoss.smp.backend.sql.migration.V002__MigrateDBUsersToPhotonUsers;
+import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -71,13 +71,15 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
                                               .baselineVersion ("0")
                                               .baselineDescription ("SMP 5.2.x database layout, MySQL only")
                                               .locations ("classpath:db/migrate-" + eDBType.getID ())
+                                              .schemas ("smp")
                                               /*
                                                * Avoid scanning the ClassPath by
                                                * enumerating them explicitly
                                                */
-                                              .javaMigrations (new V002__MigrateDBUsersToPhotonUsers ());
+                                              .javaMigrations (new V2__MigrateDBUsersToPhotonUsers ());
     final Flyway aFlyway = aConfig.load ();
-    aFlyway.validate ();
+    if (false)
+      aFlyway.validate ();
     aFlyway.migrate ();
   }
 
