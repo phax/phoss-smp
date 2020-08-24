@@ -35,19 +35,20 @@ public abstract class AbstractJDBCEnabledManager
 
   public AbstractJDBCEnabledManager ()
   {
+    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+
     // Create executor once for all manages
     m_aDBExec = new DBExecutor (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
 
     // This is ONLY for debugging
-    m_aDBExec.setDebugConnections (false);
-    m_aDBExec.setDebugTransactions (false);
-    m_aDBExec.setDebugSQLStatements (false);
+    m_aDBExec.setDebugConnections (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_CONNECTIONS, false));
+    m_aDBExec.setDebugTransactions (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_TRANSACTIONS, false));
+    m_aDBExec.setDebugSQLStatements (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_SQL, false));
 
     m_aDBExec.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
       SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew);
     });
 
-    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
     if (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
                           SMPJDBCConfiguration.DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE))
     {

@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
 
 import com.helger.commons.state.ETriState;
@@ -21,6 +22,8 @@ import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.backend.sql.EDatabaseType;
+import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V002__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
@@ -56,22 +59,25 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public void beforeInitManagers ()
   {
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
-    final Flyway aFlyway = Flyway.configure ()
-                                 .dataSource (new DriverDataSource (getClass ().getClassLoader (),
-                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),
-                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL),
-                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER),
-                                                                    aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD)))
-                                 // Required for creating DB table
-                                 .baselineOnMigrate (true)
-                                 .baselineVersion ("1")
-                                 .baselineDescription ("SMP 5.2.x database layout, MySQL only")
-                                 /*
-                                  * Avoid scanning the ClassPath by enumerating
-                                  * them explicitly
-                                  */
-                                 .javaMigrations (new V002__MigrateDBUsersToPhotonUsers ())
-                                 .load ();
+    final EDatabaseType eDBType = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ().getDatabaseType ();
+    final FluentConfiguration aConfig = Flyway.configure ()
+                                              .dataSource (new DriverDataSource (getClass ().getClassLoader (),
+                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),
+                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL),
+                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER),
+                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD)))
+                                              // Required for creating DB table
+                                              .baselineOnMigrate (true)
+                                              .baselineVersion ("0")
+                                              .baselineDescription ("SMP 5.2.x database layout, MySQL only")
+                                              .locations ("classpath:db/migrate-" + eDBType.getID ())
+                                              /*
+                                               * Avoid scanning the ClassPath by
+                                               * enumerating them explicitly
+                                               */
+                                              .javaMigrations (new V002__MigrateDBUsersToPhotonUsers ());
+    final Flyway aFlyway = aConfig.load ();
+    aFlyway.validate ();
     aFlyway.migrate ();
   }
 

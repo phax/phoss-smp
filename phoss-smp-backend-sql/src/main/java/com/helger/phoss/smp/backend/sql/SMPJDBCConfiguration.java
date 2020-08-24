@@ -29,10 +29,6 @@ public final class SMPJDBCConfiguration
   public static final String CONFIG_JDBC_PASSWORD = "jdbc.password";
   public static final String CONFIG_TARGET_DATABASE = "target-database";
 
-  @Deprecated
-  // Since ("5.2.4")
-  public static final String CONFIG_JDBC_READ_CONNECTIONS_MAX = "jdbc.read-connections.max";
-
   @Since ("5.0.6")
   public static final String CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE = "jdbc.execution-time-warning.enabled";
   public static final boolean DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE = true;
@@ -43,6 +39,12 @@ public final class SMPJDBCConfiguration
   // Experimental
   @Since ("5.3.0")
   public static final String CONFIG_JDBC_CACHE_SG_ENABLED = "jdbc.cache.sg.enabled";
+  @Since ("5.3.0")
+  public static final String CONFIG_JDBC_DEBUG_CONNECTIONS = "jdbc.cache.debug.connections";
+  @Since ("5.3.0")
+  public static final String CONFIG_JDBC_DEBUG_TRANSACTIONS = "jdbc.cache.debug.transactions";
+  @Since ("5.3.0")
+  public static final String CONFIG_JDBC_DEBUG_SQL = "jdbc.cache.debug.sql";
 
   @PresentForCodeCoverage
   private static final SMPJDBCConfiguration s_aInstance = new SMPJDBCConfiguration ();

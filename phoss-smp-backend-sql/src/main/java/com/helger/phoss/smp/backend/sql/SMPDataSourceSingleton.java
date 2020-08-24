@@ -14,11 +14,57 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
+import com.helger.db.jdbc.AbstractConnector;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 
 public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
 {
+  public static final class SMPDataSourceProvider extends AbstractConnector
+  {
+    private EDatabaseType m_eDBType;
+
+    @Override
+    protected String getJDBCDriverClassName ()
+    {
+      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER);
+    }
+
+    @Override
+    protected String getUserName ()
+    {
+      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER);
+    }
+
+    @Override
+    protected String getPassword ()
+    {
+      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD);
+    }
+
+    @Override
+    protected String getDatabaseName ()
+    {
+      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE);
+    }
+
+    @Nonnull
+    public EDatabaseType getDatabaseType ()
+    {
+      EDatabaseType ret = m_eDBType;
+      if (ret == null)
+        m_eDBType = ret = EDatabaseType.getFromIDOrDefault (getDatabaseName ());
+      return ret;
+    }
+
+    @Override
+    public String getConnectionUrl ()
+    {
+      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL);
+    }
+  }
+
   private final SMPDataSourceProvider m_aDSP = new SMPDataSourceProvider ();
 
   @Deprecated

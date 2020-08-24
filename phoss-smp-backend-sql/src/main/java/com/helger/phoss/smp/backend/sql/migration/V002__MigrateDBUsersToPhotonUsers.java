@@ -32,7 +32,7 @@ import com.helger.photon.security.user.IUserManager;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xml.microdom.util.XMLMapHandler;
 
-public class V002__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
+public final class V002__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (V002__MigrateDBUsersToPhotonUsers.class);
 
