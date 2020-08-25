@@ -4,6 +4,8 @@ language: java
 services:
   - docker
   - mongodb
+  - mysql
+  - postgresql
 
 env:
   global:
