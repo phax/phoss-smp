@@ -187,7 +187,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                                "}/{" +
                                                                                PARAM_DOCUMENT_TYPE_ID +
                                                                                "}"),
-                                                                  new APIExecutorQueryGetServiceInformation ());
+                                                                  new APIExecutorQueryGetServiceMetadata ());
       aSMPQueryEndpoints.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPQueryEndpoints);
     }

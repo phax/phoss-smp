@@ -50,9 +50,9 @@ import com.helger.smpclient.json.SMPJsonResponse;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-public final class APIExecutorQueryGetServiceInformation extends AbstractSMPAPIExecutor
+public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetServiceInformation.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetServiceMetadata.class);
   private static final IJsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (true);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
