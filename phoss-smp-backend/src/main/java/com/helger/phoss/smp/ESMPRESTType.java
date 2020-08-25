@@ -17,6 +17,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
 import com.helger.commons.lang.EnumHelper;
 import com.helger.commons.name.IHasDisplayName;
+import com.helger.peppol.sml.ESMPAPIType;
 
 /**
  * Defines the type of REST responses to be returned. Either Peppol (using
@@ -28,16 +29,18 @@ import com.helger.commons.name.IHasDisplayName;
  */
 public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
 {
-  PEPPOL ("peppol", "Peppol"),
-  BDXR ("bdxr", "OASIS BDXR");
+  PEPPOL ("peppol", "Peppol", ESMPAPIType.PEPPOL),
+  BDXR ("bdxr", "OASIS BDXR", ESMPAPIType.OASIS_BDXR_V1);
 
   private final String m_sID;
   private final String m_sDisplayName;
+  private final ESMPAPIType m_eAPIType;
 
-  private ESMPRESTType (@Nonnull @Nonempty final String sID, @Nonnull @Nonempty final String sDisplayName)
+  ESMPRESTType (@Nonnull @Nonempty final String sID, @Nonnull @Nonempty final String sDisplayName, @Nonnull final ESMPAPIType eAPIType)
   {
     m_sID = sID;
     m_sDisplayName = sDisplayName;
+    m_eAPIType = eAPIType;
   }
 
   @Nonnull
@@ -54,6 +57,12 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
     return m_sDisplayName;
   }
 
+  @Nonnull
+  public ESMPAPIType getAPIType ()
+  {
+    return m_eAPIType;
+  }
+
   /**
    * @return <code>true</code> if this REST type supports retrieving the
    *         complete service group
@@ -68,7 +77,7 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
     return this == BDXR;
   }
 
-  public boolean isPEPPOL ()
+  public boolean isPeppol ()
   {
     return this == PEPPOL;
   }

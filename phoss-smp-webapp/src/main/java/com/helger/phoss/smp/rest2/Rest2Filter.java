@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014-2020 Philip Helger and contributors
+smpquery/iso6523-actori * Copyright (C) 2014-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +49,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
   public static final String PATH_COMPLETE = "/complete/";
   public static final String PATH_LIST = "/list/";
   public static final String PATH_SERVICES = "/services/";
+  public static final String PATH_QUERY = "/query/";
 
   public static final String PATH_PREFIX_OASIS_BDXR_SMP_2 = "bdxr-smp-2";
   public static final String PARAM_SERVICE_GROUP_ID = "ServiceGroupId";
@@ -61,60 +62,60 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
   public Rest2Filter ()
   {
     final IAPIExceptionMapper aExceptionMapper = new Rest2ExceptionMapper ();
-    final IAPIRegistry aRegistry = GlobalAPIInvoker.getInstance ().getRegistry ();
+    final IAPIRegistry aAPIRegistry = GlobalAPIInvoker.getInstance ().getRegistry ();
 
     // BusinessCard
     {
       final APIDescriptor aGetBusinessCard = new APIDescriptor (APIPath.get (PATH_BUSINESSCARD + "{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                 new APIExecutorBusinessCardGet ());
       aGetBusinessCard.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aGetBusinessCard);
+      aAPIRegistry.registerAPI (aGetBusinessCard);
     }
     {
       final APIDescriptor aPutBusinessCard = new APIDescriptor (APIPath.put (PATH_BUSINESSCARD + "{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                 new APIExecutorBusinessCardPut ());
       aPutBusinessCard.allowedMimeTypes ().addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
       aPutBusinessCard.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aPutBusinessCard);
+      aAPIRegistry.registerAPI (aPutBusinessCard);
     }
     {
       final APIDescriptor aDeleteBusinessCard = new APIDescriptor (APIPath.delete (PATH_BUSINESSCARD + "{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                    new APIExecutorBusinessCardDelete ());
       aDeleteBusinessCard.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aDeleteBusinessCard);
+      aAPIRegistry.registerAPI (aDeleteBusinessCard);
     }
     // CompleteServiceGroup
     {
       final APIDescriptor aGetCompleteServiceGroup = new APIDescriptor (APIPath.get (PATH_COMPLETE + "{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                         new APIExecutorCompleteServiceGroupGet ());
       aGetCompleteServiceGroup.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aGetCompleteServiceGroup);
+      aAPIRegistry.registerAPI (aGetCompleteServiceGroup);
     }
     // List
     {
       final APIDescriptor aGetList = new APIDescriptor (APIPath.get (PATH_LIST + "{" + PARAM_USER_ID + "}"), new APIExecutorListGet ());
       aGetList.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aGetList);
+      aAPIRegistry.registerAPI (aGetList);
     }
     // ServiceGroup
     {
       final APIDescriptor aGetServiceGroup = new APIDescriptor (APIPath.get ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                 new APIExecutorServiceGroupGet ());
       aGetServiceGroup.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aGetServiceGroup);
+      aAPIRegistry.registerAPI (aGetServiceGroup);
     }
     {
       final APIDescriptor aPutServiceGroup = new APIDescriptor (APIPath.put ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                 new APIExecutorServiceGroupPut ());
       aPutServiceGroup.allowedMimeTypes ().addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
       aPutServiceGroup.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aPutServiceGroup);
+      aAPIRegistry.registerAPI (aPutServiceGroup);
     }
     {
       final APIDescriptor aDeleteServiceGroup = new APIDescriptor (APIPath.delete ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                    new APIExecutorServiceGroupDelete ());
       aDeleteServiceGroup.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aDeleteServiceGroup);
+      aAPIRegistry.registerAPI (aDeleteServiceGroup);
     }
     // ServiceMetadata
     {
@@ -127,7 +128,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                                 "}"),
                                                                    new APIExecutorServiceMetadataGet ());
       aGetServiceMetadata.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aGetServiceMetadata);
+      aAPIRegistry.registerAPI (aGetServiceMetadata);
     }
     {
       final APIDescriptor aPutServiceMetadata = new APIDescriptor (APIPath.put ("/{" +
@@ -140,7 +141,7 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                    new APIExecutorServiceMetadataPut ());
       aPutServiceMetadata.allowedMimeTypes ().addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
       aPutServiceMetadata.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aPutServiceMetadata);
+      aAPIRegistry.registerAPI (aPutServiceMetadata);
     }
     {
       final APIDescriptor aDeleteServiceMetadata = new APIDescriptor (APIPath.delete ("/{" +
@@ -152,13 +153,39 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
                                                                                       "}"),
                                                                       new APIExecutorServiceMetadataDelete ());
       aDeleteServiceMetadata.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aDeleteServiceMetadata);
+      aAPIRegistry.registerAPI (aDeleteServiceMetadata);
     }
     {
       final APIDescriptor aDeleteServiceMetadata = new APIDescriptor (APIPath.delete ("/{" + PARAM_SERVICE_GROUP_ID + "}" + PATH_SERVICES),
                                                                       new APIExecutorServiceMetadataDeleteAll ());
       aDeleteServiceMetadata.setExceptionMapper (aExceptionMapper);
-      aRegistry.registerAPI (aDeleteServiceMetadata);
+      aAPIRegistry.registerAPI (aDeleteServiceMetadata);
+    }
+
+    // Extended Query APIs since 5.3.0
+    {
+      final APIDescriptor aSMPQueryEndpoints = new APIDescriptor (APIPath.get ("/smpquery/{" +
+                                                                               PARAM_SERVICE_GROUP_ID +
+                                                                               "}/{" +
+                                                                               PARAM_DOCUMENT_TYPE_ID +
+                                                                               "}"),
+                                                                  new APIExecutorQueryGetServiceInformation ());
+      aSMPQueryEndpoints.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPQueryEndpoints);
+    }
+
+    {
+      final APIDescriptor aSMPQueryDocTypes = new APIDescriptor (APIPath.get ("/smpquery/{" + PARAM_SERVICE_GROUP_ID + "}"),
+                                                                 new APIExecutorQueryGetDocTypes ());
+      aSMPQueryDocTypes.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPQueryDocTypes);
+    }
+
+    {
+      final APIDescriptor aSMPQueryBusinessCard = new APIDescriptor (APIPath.get ("/businesscardquery/{" + PARAM_SERVICE_GROUP_ID + "}"),
+                                                                     new APIExecutorQueryGetBusinessCard ());
+      aSMPQueryBusinessCard.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPQueryBusinessCard);
     }
   }
 
