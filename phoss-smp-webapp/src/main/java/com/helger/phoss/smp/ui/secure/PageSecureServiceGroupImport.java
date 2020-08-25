@@ -21,6 +21,9 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsHashSet;
@@ -55,8 +58,6 @@ import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroupMicroTypeConverte
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformationMicroTypeConverter;
-import com.helger.phoss.smp.domain.user.ISMPUser;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
@@ -74,6 +75,9 @@ import com.helger.photon.bootstrap4.uictrls.ext.BootstrapFileUpload;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.user.IUser;
+import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
@@ -90,6 +94,7 @@ import com.helger.xml.serialize.read.SAXReaderSettings;
  */
 public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureServiceGroupImport.class);
   private static final String FIELD_IMPORT_FILE = "importfile";
   private static final String FIELD_OVERWRITE_EXISTING = "overwriteexisting";
   private static final String FIELD_DEFAULT_OWNER = "defaultowner";
@@ -130,12 +135,13 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
 
   public static void importXMLVer10 (@Nonnull final IMicroElement eRoot,
                                      final boolean bOverwriteExisting,
-                                     @Nonnull final ISMPUser aDefaultOwner,
+                                     @Nonnull final IUser aDefaultOwner,
                                      @Nonnull final ICommonsList <ISMPServiceGroup> aAllServiceGroups,
                                      @Nonnull final ICommonsList <ISMPBusinessCard> aAllBusinessCards,
                                      @Nonnull final InMemoryLogger aLogger)
   {
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
 
     final ICommonsOrderedMap <ISMPServiceGroup, SGImportData> aImportServiceGroups = new CommonsLinkedHashMap <> ();
     final ICommonsList <ISMPServiceGroup> aDeleteServiceGroups = new CommonsArrayList <> ();
@@ -150,11 +156,12 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
       try
       {
         aServiceGroup = SMPServiceGroupMicroTypeConverter.convertToNative (eServiceGroup, x -> {
-          ISMPUser ret = SMPMetaManager.getUserMgr ().getUserOfID (x);
+          IUser ret = aUserMgr.getUserOfID (x);
           if (ret == null)
           {
             // Select the default owner if an unknown user is contained
             ret = aDefaultOwner;
+            LOGGER.warn ("Failed to resolve stored owner '" + x + "' - using default owner '" + aDefaultOwner.getID () + "'");
           }
           return ret;
         });
@@ -408,7 +415,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+    final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
     final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
     final FormErrorList aFormErrors = new FormErrorList ();
@@ -421,7 +428,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
       final IFileItem aImportFile = aWPEC.params ().getAsFileItem (FIELD_IMPORT_FILE);
       final boolean bOverwriteExisting = aWPEC.params ().isCheckBoxChecked (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
       final String sDefaultOwnerID = aWPEC.params ().getAsString (FIELD_DEFAULT_OWNER);
-      final ISMPUser aDefaultOwner = aUserMgr.getUserOfID (sDefaultOwnerID);
+      final IUser aDefaultOwner = aUserMgr.getActiveUserOfID (sDefaultOwnerID);
 
       if (aImportFile == null || aImportFile.getSize () == 0)
         aFormErrors.addFieldError (FIELD_IMPORT_FILE, "A file to import must be selected!");

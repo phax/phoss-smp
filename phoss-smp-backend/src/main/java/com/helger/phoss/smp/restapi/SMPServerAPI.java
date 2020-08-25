@@ -40,12 +40,12 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
-import com.helger.phoss.smp.domain.user.ISMPUser;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
+import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
+import com.helger.photon.security.user.IUser;
 import com.helger.smpclient.peppol.jaxb.CompleteServiceGroupType;
 import com.helger.smpclient.peppol.jaxb.EndpointType;
 import com.helger.smpclient.peppol.jaxb.ProcessListType;
@@ -181,10 +181,9 @@ public final class SMPServerAPI
                                             "'");
       }
 
-      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-      final ICommonsList <ISMPServiceGroup> aServiceGroups = SMPMetaManager.getServiceGroupMgr ()
-                                                                           .getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+      final ICommonsList <ISMPServiceGroup> aServiceGroups = aSGMgr.getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
 
       final ServiceGroupReferenceListType aRefList = new ServiceGroupReferenceListType ();
       for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
@@ -317,8 +316,7 @@ public final class SMPServerAPI
                                           m_aAPIProvider.getCurrentURI ());
       }
 
-      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final String sExtension = SMPExtensionConverter.convertToString (aServiceGroup.getExtension ());
@@ -360,12 +358,10 @@ public final class SMPServerAPI
         throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
-      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
+
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-
-      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-      aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
-
       aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
 
       if (LOGGER.isInfoEnabled ())
@@ -546,9 +542,8 @@ public final class SMPServerAPI
       }
 
       // Main save
-      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-      final ISMPUser aDataUser = aUserMgr.validateUserCredentials (aCredentials);
-      aUserMgr.verifyOwnership (aServiceGroupID, aDataUser);
+      final IUser aDataUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aDataUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
@@ -671,9 +666,8 @@ public final class SMPServerAPI
                                           m_aAPIProvider.getCurrentURI ());
       }
 
-      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-      aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
@@ -759,9 +753,8 @@ public final class SMPServerAPI
                                           m_aAPIProvider.getCurrentURI ());
       }
 
-      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-      aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);

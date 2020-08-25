@@ -30,9 +30,7 @@ import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
-import com.helger.phoss.smp.backend.sql.mgr.SMPUserManagerJDBC;
-import com.helger.phoss.smp.backend.sql.model.DBUser;
-import com.helger.phoss.smp.domain.user.ISMPUser;
+import com.helger.phoss.smp.backend.sql.domain.DBUser;
 import com.helger.photon.app.io.WebFileIO;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -52,15 +50,15 @@ public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
       final EDatabaseType eDBType = SMPDataSourceSingleton.getDatabaseType ();
 
       final SMPUserManagerJDBC aSQLUserMgr = new SMPUserManagerJDBC (eDBType);
-      final ICommonsList <ISMPUser> aSQLUsers = aSQLUserMgr.getAllUsers ();
+      final ICommonsList <DBUser> aSQLUsers = aSQLUserMgr.getAllUsers ();
       LOGGER.info ("Found " + aSQLUsers.size () + " DB user to migrate");
 
       final ICommonsOrderedMap <String, String> aCreatedMappings = new CommonsLinkedHashMap <> ();
 
       final IUserManager aPhotonUserMgr = PhotonSecurityManager.getUserMgr ();
-      for (final ISMPUser aSQLUser : aSQLUsers)
+      for (final DBUser aSQLUser : aSQLUsers)
       {
-        final DBUser aDBUser = (DBUser) aSQLUser;
+        final DBUser aDBUser = aSQLUser;
         IUser aPhotonUser = null;
         int nIndex = 0;
         while (true)

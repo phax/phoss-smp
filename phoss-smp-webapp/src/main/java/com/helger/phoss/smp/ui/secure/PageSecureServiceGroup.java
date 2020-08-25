@@ -60,8 +60,6 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.phoss.smp.domain.user.ISMPUser;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.smlhook.IRegistrationHook;
@@ -82,6 +80,7 @@ import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
 import com.helger.photon.bootstrap4.grid.BootstrapRow;
+import com.helger.photon.bootstrap4.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
@@ -90,6 +89,9 @@ import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.security.login.LoggedInUserManager;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.user.IUser;
+import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EShowList;
@@ -350,12 +352,13 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPUserManager aUserManager = SMPMetaManager.getUserMgr ();
-    if (aUserManager.getUserCount () == 0)
+    final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
+    if (aUserMgr.getActiveUserCount () == 0)
     {
       aNodeList.addChild (warn ("No user is present! At least one user must be present to create a service group."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new user")
-                                                .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_USERS))
+                                                .setOnClick (createCreateURL (aWPEC,
+                                                                              BootstrapPagesMenuConfigurator.MENU_ADMIN_SECURITY_USER))
                                                 .setIcon (EDefaultIcon.YES));
       return EValidity.INVALID;
     }
@@ -482,7 +485,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final String sParticipantIDValue = aWPEC.params ().getAsString (FIELD_PARTICIPANT_ID_VALUE);
     IParticipantIdentifier aParticipantID = null;
     final String sOwningUserID = aWPEC.params ().getAsString (FIELD_OWNING_USER_ID);
-    final ISMPUser aOwningUser = SMPMetaManager.getUserMgr ().getUserOfID (sOwningUserID);
+    final IUser aOwningUser = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwningUserID);
     final String sExtension = aWPEC.params ().getAsString (FIELD_EXTENSION);
 
     // validations

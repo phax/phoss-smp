@@ -36,7 +36,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
@@ -63,7 +62,6 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMLInfoManager m_aSMLInfoMgr;
   private ISMPSettingsManager m_aSettingsMgr;
   private ISMPTransportProfileManager m_aTransportProfileMgr;
-  private ISMPUserManager m_aUserMgr;
   private ISMPServiceGroupManager m_aServiceGroupMgr;
   private ISMPRedirectManager m_aRedirectMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
@@ -201,10 +199,6 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_aTransportProfileMgr == null)
         throw new IllegalStateException ("Failed to create TransportProfile manager!");
 
-      m_aUserMgr = s_aManagerProvider.createUserMgr ();
-      if (m_aUserMgr == null)
-        throw new IllegalStateException ("Failed to create User manager!");
-
       // Service group manager must be before redirect and service information!
       m_aServiceGroupMgr = s_aManagerProvider.createServiceGroupMgr ();
       if (m_aServiceGroupMgr == null)
@@ -276,12 +270,6 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static ISMPTransportProfileManager getTransportProfileMgr ()
   {
     return getInstance ().m_aTransportProfileMgr;
-  }
-
-  @Nonnull
-  public static ISMPUserManager getUserMgr ()
-  {
-    return getInstance ().m_aUserMgr;
   }
 
   @Nonnull

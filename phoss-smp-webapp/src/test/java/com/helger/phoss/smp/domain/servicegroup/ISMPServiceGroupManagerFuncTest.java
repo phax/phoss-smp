@@ -30,9 +30,9 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.photon.security.CSecurity;
 
 /**
  * Test class for class {@link ISMPServiceGroupManager}.
@@ -54,24 +54,10 @@ public final class ISMPServiceGroupManagerFuncTest
                                                                                 "9999:junittest2");
     final String sSG1 = SMPServiceGroup.createSMPServiceGroupID (aPI1);
     final String sSG2 = SMPServiceGroup.createSMPServiceGroupID (aPI2);
-    final String sOwner1ID = "junitsg1";
-    final String sOwner2ID = "junitsg2";
+    final String sOwner1ID = CSecurity.USER_ADMINISTRATOR_ID;
+    final String sOwner2ID = CSecurity.USER_ADMINISTRATOR_ID + "2";
     final String sExtension = "<ext val=\"a\" />";
 
-    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-    try
-    {
-      // May fail
-      aUserMgr.createUser (sOwner1ID, "any");
-    }
-    catch (final Exception ex)
-    {
-      assertTrue (ex.getCause () instanceof IllegalStateException);
-      // MySQL is not configured correctly!
-      return;
-    }
-
-    assertTrue (aUserMgr.createUser (sOwner2ID, "any").isSuccess ());
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     assertNotNull (aSGMgr);
     try
@@ -185,8 +171,6 @@ public final class ISMPServiceGroupManagerFuncTest
       // Don't care about the result
       aSGMgr.deleteSMPServiceGroupNoEx (aPI1);
       aSGMgr.deleteSMPServiceGroupNoEx (aPI2);
-      aUserMgr.deleteUser (sOwner1ID);
-      aUserMgr.deleteUser (sOwner2ID);
     }
   }
 }

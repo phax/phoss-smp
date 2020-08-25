@@ -46,12 +46,6 @@ public final class MenuSecure
     final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> SMPMetaManager.getSettings ().isSMLEnabled () ||
                                                                       SMPMetaManager.getSettings ().isSMLRequired ();
 
-    if (SMPMetaManager.getUserMgr ().isSpecialUserManagementNeeded ())
-    {
-      // E.g. SQL version requires separate menu item
-      aMenuTree.createRootItem (new PageSecureDBUsers (CMenuSecure.MENU_USERS));
-    }
-
     {
       final IMenuItemPage aServiceGroups = aMenuTree.createRootItem (new PageSecureServiceGroup (CMenuSecure.MENU_SERVICE_GROUPS));
       aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupExport (CMenuSecure.MENU_SERVICE_GROUPS_EXPORT));

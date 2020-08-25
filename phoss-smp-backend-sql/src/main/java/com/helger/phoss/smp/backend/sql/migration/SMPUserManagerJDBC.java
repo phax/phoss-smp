@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.backend.sql.mgr;
+package com.helger.phoss.smp.backend.sql.migration;
 
 import java.util.Map;
 import java.util.Optional;
@@ -22,9 +22,6 @@ import java.util.Optional;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
@@ -38,28 +35,20 @@ import com.helger.commons.type.ObjectType;
 import com.helger.commons.wrapper.Wrapper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBResultRow;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
-import com.helger.phoss.smp.backend.sql.model.DBUser;
-import com.helger.phoss.smp.domain.user.ISMPUser;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
-import com.helger.phoss.smp.exception.SMPServerException;
-import com.helger.phoss.smp.exception.SMPUnauthorizedException;
-import com.helger.phoss.smp.exception.SMPUnknownUserException;
+import com.helger.phoss.smp.backend.sql.domain.DBUser;
+import com.helger.phoss.smp.backend.sql.mgr.AbstractJDBCEnabledManager;
 import com.helger.photon.audit.AuditHelper;
 
 /**
- * A JDBC based implementation of the {@link ISMPUserManager} interface. This is
- * only used in the migration.
+ * This is only used in the migration.
  *
  * @author Philip Helger
  * @since 5.3.0
  */
-public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
+final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
 {
   public static final ObjectType OT = new ObjectType ("smpuser");
-  private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerJDBC.class);
 
   public SMPUserManagerJDBC (@Nonnull final EDatabaseType eDBType)
   {
@@ -118,10 +107,10 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPUser> getAllUsers ()
+  public ICommonsList <DBUser> getAllUsers ()
   {
     final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT username, password FROM smp_user");
-    final ICommonsList <ISMPUser> ret = new CommonsArrayList <> ();
+    final ICommonsList <DBUser> ret = new CommonsArrayList <> ();
     if (aDBResult.isPresent ())
       for (final DBResultRow aRow : aDBResult.get ())
         ret.add (new DBUser (aRow.getAsString (0), aRow.getAsString (1)));
@@ -139,46 +128,6 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
     if (!aDBResult.isPresent ())
       return null;
     return new DBUser (sUserName, aDBResult.get ().getAsString (0));
-  }
-
-  @Nonnull
-  public DBUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
-  {
-    final String sUserName = aCredentials.getUserName ();
-    final DBUser aDBUser = getUserOfID (sUserName);
-
-    // Check that the user exists
-    if (aDBUser == null)
-      throw new SMPUnknownUserException (sUserName);
-
-    // Check that the password is correct
-    if (!aDBUser.getPassword ().equals (aCredentials.getPassword ()))
-      throw new SMPUnauthorizedException ("Illegal password for user '" + sUserName + "'");
-
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Verified credentials of user '" + sUserName + "' successfully");
-    return aDBUser;
-  }
-
-  public void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                               @Nonnull final ISMPUser aCredentials) throws SMPServerException
-  {
-    final long nCount = executor ().queryCount ("SELECT COUNT(*) FROM smp_ownership" +
-                                                " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND username=?",
-                                                new ConstantPreparedStatementDataProvider (aServiceGroupID.getScheme (),
-                                                                                           aServiceGroupID.getValue (),
-                                                                                           aCredentials.getUserName ()));
-    if (nCount == 0)
-    {
-      throw new SMPUnauthorizedException ("User '" + aCredentials.getUserName () + "' does not own " + aServiceGroupID.getURIEncoded ());
-    }
-
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Verified service group ID " +
-                    aServiceGroupID.getURIEncoded () +
-                    " is owned by user '" +
-                    aCredentials.getUserName () +
-                    "'");
   }
 
   public void onMigrationUpdateOwnershipsAndKillUsers (@Nonnull final ICommonsMap <String, String> aOldToNewMap)

@@ -21,7 +21,6 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.smpclient.url.IPeppolURLProvider;
 import com.helger.smpclient.url.PeppolURLProvider;
@@ -86,12 +85,6 @@ public interface ISMPManagerProvider
    */
   @Nonnull
   ISMPTransportProfileManager createTransportProfileMgr ();
-
-  /**
-   * @return A new SMP user manager. May not be <code>null</code>.
-   */
-  @Nonnull
-  ISMPUserManager createUserMgr ();
 
   /**
    * @return A new SMP service group manager. May not be <code>null</code>.

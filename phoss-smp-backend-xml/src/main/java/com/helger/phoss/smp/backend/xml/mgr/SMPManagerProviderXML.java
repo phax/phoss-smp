@@ -32,8 +32,6 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
-import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
 
@@ -98,12 +96,6 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     {
       throw new RuntimeException (ex.getMessage (), ex);
     }
-  }
-
-  @Nonnull
-  public ISMPUserManager createUserMgr ()
-  {
-    return new SMPUserManagerPhoton ();
   }
 
   @Nonnull

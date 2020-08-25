@@ -33,9 +33,9 @@ import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.photon.security.CSecurity;
 
 /**
  * Test class for class {@link ISMPServiceInformationManager}.
@@ -50,61 +50,50 @@ public final class ISMPServiceInformationManagerFuncTest
   @Test
   public void testAll () throws SMPServerException
   {
-    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
     final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc#ext:1.0");
     final IProcessIdentifier aProcessID = PeppolIdentifierFactory.INSTANCE.createProcessIdentifierWithDefaultScheme ("junit-proc");
 
-    final String sUserID = "junitserviceinfo";
-    // May fail
-    aUserMgr.createUser (sUserID, "bla");
+    final String sUserID = CSecurity.USER_ADMINISTRATOR_ID;
     if (SMPMetaManager.getInstance ().getBackendConnectionEstablished ().isFalse ())
     {
       // Failed to get DB connection. E.g. MySQL down or misconfigured.
       return;
     }
 
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (sUserID, aPI1, null);
+    assertNotNull (aSG);
     try
     {
-      aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1);
-      final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (sUserID, aPI1, null);
-      assertNotNull (aSG);
-      try
-      {
-        final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
-        final LocalDateTime aEndDT = aStartDT.plusYears (1);
-        final SMPEndpoint aEP = new SMPEndpoint ("tp",
-                                                 "http://localhost/as2",
-                                                 false,
-                                                 "minauth",
-                                                 aStartDT,
-                                                 aEndDT,
-                                                 "cert",
-                                                 "sd",
-                                                 "tc",
-                                                 "ti",
-                                                 "<extep />");
+      final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
+      final LocalDateTime aEndDT = aStartDT.plusYears (1);
+      final SMPEndpoint aEP = new SMPEndpoint ("tp",
+                                               "http://localhost/as2",
+                                               false,
+                                               "minauth",
+                                               aStartDT,
+                                               aEndDT,
+                                               "cert",
+                                               "sd",
+                                               "tc",
+                                               "ti",
+                                               "<extep />");
 
-        final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP), "<extproc/>");
+      final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP), "<extproc/>");
 
-        final SMPServiceInformation aServiceInformation = new SMPServiceInformation (aSG,
-                                                                                     aDocTypeID,
-                                                                                     new CommonsArrayList <> (aProcess),
-                                                                                     "<extsi/>");
-        assertTrue (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInformation).isSuccess ());
-      }
-      finally
-      {
-        // Don't care about the result
-        aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1);
-      }
+      final SMPServiceInformation aServiceInformation = new SMPServiceInformation (aSG,
+                                                                                   aDocTypeID,
+                                                                                   new CommonsArrayList <> (aProcess),
+                                                                                   "<extsi/>");
+      assertTrue (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInformation).isSuccess ());
     }
     finally
     {
       // Don't care about the result
-      aUserMgr.deleteUser (sUserID);
+      aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1);
     }
   }
 }

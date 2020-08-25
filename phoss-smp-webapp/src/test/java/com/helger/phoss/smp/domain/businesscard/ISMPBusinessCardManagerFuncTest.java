@@ -31,9 +31,9 @@ import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.photon.security.CSecurity;
 
 /**
  * Test class for class {@link ISMPBusinessCardManager}.
@@ -48,12 +48,9 @@ public final class ISMPBusinessCardManagerFuncTest
   @Test
   public void testBusinessCard () throws SMPServerException
   {
-    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
 
-    final String sUserID = "junitredir";
-    // May fail
-    aUserMgr.createUser (sUserID, "dummy");
+    final String sUserID = CSecurity.USER_ADMINISTRATOR_ID;
     if (SMPMetaManager.getInstance ().getBackendConnectionEstablished ().isFalse ())
     {
       // Failed to get DB connection. E.g. MySQL down or misconfigured.
@@ -77,78 +74,70 @@ public final class ISMPBusinessCardManagerFuncTest
     aEntity3.setCountryCode ("AT");
     aEntity3.setAdditionalInformation ("Entity 3");
 
+    final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
+    final IParticipantIdentifier aPI2 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest2");
+
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
+    assertNotNull (aSG);
+    ISMPBusinessCard aBusinessCard = null;
     try
     {
-      final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
-      final IParticipantIdentifier aPI2 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest2");
+      final long nBCCount = aBusinessCardMgr.getSMPBusinessCardCount ();
 
-      final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
-      assertNotNull (aSG);
-      ISMPBusinessCard aBusinessCard = null;
+      // Create new one
+      aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI1, new CommonsArrayList <> (aEntity1));
+      assertEquals (aPI1, aBusinessCard.getParticpantIdentifier ());
+      assertEquals (1, aBusinessCard.getEntityCount ());
+
+      assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
+      assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSG));
+      assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticpantIdentifier ()));
+
+      // Update existing
+      aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI1, new CommonsArrayList <> (aEntity1, aEntity2));
+      assertEquals (aPI1, aBusinessCard.getParticpantIdentifier ());
+      assertEquals (2, aBusinessCard.getEntityCount ());
+
+      // Must not have changed
+      assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
+      assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSG));
+      assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticpantIdentifier ()));
+
+      // Add second one
+      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
+      assertNotNull (aSG2);
+      ISMPBusinessCard aBusinessCard2 = null;
       try
       {
-        final long nBCCount = aBusinessCardMgr.getSMPBusinessCardCount ();
+        aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI2, new CommonsArrayList <> (aEntity3));
+        assertEquals (aPI2, aBusinessCard2.getParticpantIdentifier ());
+        assertEquals (1, aBusinessCard2.getEntityCount ());
+        assertEquals (nBCCount + 2, aBusinessCardMgr.getSMPBusinessCardCount ());
 
-        // Create new one
-        aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI1, new CommonsArrayList <> (aEntity1));
-        assertEquals (aPI1, aBusinessCard.getParticpantIdentifier ());
-        assertEquals (1, aBusinessCard.getEntityCount ());
+        assertEquals (aBusinessCard2, aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSG2));
+        assertEquals (aBusinessCard2, aBusinessCardMgr.getSMPBusinessCardOfID (aSG2.getParticpantIdentifier ()));
 
+        // Cleanup
+        assertTrue (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard2).isChanged ());
         assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
-        assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSG));
-        assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticpantIdentifier ()));
-
-        // Update existing
-        aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI1, new CommonsArrayList <> (aEntity1, aEntity2));
-        assertEquals (aPI1, aBusinessCard.getParticpantIdentifier ());
-        assertEquals (2, aBusinessCard.getEntityCount ());
-
-        // Must not have changed
-        assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
-        assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSG));
-        assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticpantIdentifier ()));
-
-        // Add second one
-        final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
-        assertNotNull (aSG2);
-        ISMPBusinessCard aBusinessCard2 = null;
-        try
-        {
-          aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI2, new CommonsArrayList <> (aEntity3));
-          assertEquals (aPI2, aBusinessCard2.getParticpantIdentifier ());
-          assertEquals (1, aBusinessCard2.getEntityCount ());
-          assertEquals (nBCCount + 2, aBusinessCardMgr.getSMPBusinessCardCount ());
-
-          assertEquals (aBusinessCard2, aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSG2));
-          assertEquals (aBusinessCard2, aBusinessCardMgr.getSMPBusinessCardOfID (aSG2.getParticpantIdentifier ()));
-
-          // Cleanup
-          assertTrue (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard2).isChanged ());
-          assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
-          assertTrue (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard).isChanged ());
-          assertEquals (nBCCount + 0, aBusinessCardMgr.getSMPBusinessCardCount ());
-          assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isChanged ());
-          assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isChanged ());
-        }
-        finally
-        {
-          // Real cleanup
-          aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard2);
-          aSGMgr.deleteSMPServiceGroupNoEx (aPI2);
-        }
+        assertTrue (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard).isChanged ());
+        assertEquals (nBCCount + 0, aBusinessCardMgr.getSMPBusinessCardCount ());
+        assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isChanged ());
+        assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isChanged ());
       }
       finally
       {
         // Real cleanup
-        aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
-        aSGMgr.deleteSMPServiceGroupNoEx (aPI1);
+        aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard2);
+        aSGMgr.deleteSMPServiceGroupNoEx (aPI2);
       }
     }
     finally
     {
-      // Don't care about the result
-      aUserMgr.deleteUser (sUserID);
+      // Real cleanup
+      aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
+      aSGMgr.deleteSMPServiceGroupNoEx (aPI1);
     }
   }
 }

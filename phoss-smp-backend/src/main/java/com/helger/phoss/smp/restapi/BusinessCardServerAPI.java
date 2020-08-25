@@ -34,11 +34,11 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.user.ISMPUser;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
+import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.photon.security.user.IUser;
 
 /**
  * This class implements all the service methods, that must be provided by the
@@ -166,9 +166,8 @@ public final class BusinessCardServerAPI
       }
 
       // Check credentials and verify service group is owned by provided user
-      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-      aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
 
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr == null)
@@ -232,9 +231,8 @@ public final class BusinessCardServerAPI
         throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
-      final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-      final ISMPUser aSMPUser = aUserMgr.validateUserCredentials (aCredentials);
-      aUserMgr.verifyOwnership (aServiceGroupID, aSMPUser);
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
 
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr == null)

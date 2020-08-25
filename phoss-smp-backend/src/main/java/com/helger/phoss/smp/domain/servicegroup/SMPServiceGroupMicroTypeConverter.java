@@ -10,14 +10,15 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import java.util.function.Function;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.user.ISMPUser;
-import com.helger.phoss.smp.domain.user.ISMPUserProvider;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.user.IUser;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
@@ -52,10 +53,11 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   }
 
   @Nonnull
-  public static SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement, @Nonnull final ISMPUserProvider aUserProvider)
+  public static SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement,
+                                                 @Nonnull final Function <String, IUser> aUserProvider)
   {
     final String sOwnerID = aElement.getAttributeValue (ATTR_OWNER_ID);
-    final ISMPUser aOwner = aUserProvider.getUserOfID (sOwnerID);
+    final IUser aOwner = aUserProvider.apply (sOwnerID);
     if (aOwner == null)
       throw new IllegalStateException ("Failed to resolve user ID '" + sOwnerID + "'");
 
@@ -74,6 +76,6 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   @Nonnull
   public SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement)
   {
-    return convertToNative (aElement, SMPMetaManager.getUserMgr ());
+    return convertToNative (aElement, PhotonSecurityManager.getUserMgr ()::getUserOfID);
   }
 }

@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.backend.sql.model;
+package com.helger.phoss.smp.backend.sql.domain;
+
+import java.io.Serializable;
 
 import javax.annotation.Nonnull;
-
-import com.helger.phoss.smp.domain.user.ISMPUser;
 
 /**
  * Represents a single user within the SMP database.
  *
  * @author Philip Helger
  */
-public class DBUser implements ISMPUser
+public class DBUser implements Serializable
 {
   private final String m_sUserName;
   private final String m_sPassword;
@@ -34,11 +34,6 @@ public class DBUser implements ISMPUser
   {
     m_sUserName = sUserName;
     m_sPassword = sPassword;
-  }
-
-  public String getID ()
-  {
-    return getUserName ();
   }
 
   public String getUserName ()

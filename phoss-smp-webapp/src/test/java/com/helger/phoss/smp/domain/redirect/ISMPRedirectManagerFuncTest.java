@@ -31,9 +31,9 @@ import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.photon.security.CSecurity;
 
 /**
  * Test class for class {@link ISMPRedirectManager}.
@@ -48,85 +48,74 @@ public final class ISMPRedirectManagerFuncTest
   @Test
   public void testRedirect () throws SMPServerException
   {
-    final ISMPUserManager aUserMgr = SMPMetaManager.getUserMgr ();
-    final String sUserID = "junitredir";
-    // May fail
-    aUserMgr.createUser (sUserID, "dummy");
+    final String sUserID = CSecurity.USER_ADMINISTRATOR_ID;
     if (SMPMetaManager.getInstance ().getBackendConnectionEstablished ().isFalse ())
     {
       // Failed to get DB connection. E.g. MySQL down or misconfigured.
       return;
     }
 
+    final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
+    final IParticipantIdentifier aPI2 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest2");
+    final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc#ext:1.0");
+
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
+    assertNotNull (aSG);
     try
     {
-      final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
-      final IParticipantIdentifier aPI2 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest2");
-      final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc#ext:1.0");
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
-      final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
-      assertNotNull (aSG);
+      // Create new one
+      ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target", "suid", null, "<extredirect />");
+      assertNotNull (aRedirect);
+      assertSame (aSG, aRedirect.getServiceGroup ());
+      assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
+      assertEquals ("target", aRedirect.getTargetHref ());
+      assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
+      assertEquals ("<extredirect />", aRedirect.getFirstExtensionXML ().trim ());
+      final long nCount = aRedirectMgr.getSMPRedirectCount ();
+
+      // Update existing
+      aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target2", "suid2", null, "<extredirect2 />");
+      assertNotNull (aRedirect);
+      assertSame (aSG, aRedirect.getServiceGroup ());
+      assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
+      assertEquals ("target2", aRedirect.getTargetHref ());
+      assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
+      assertEquals ("<extredirect2 />", aRedirect.getFirstExtensionXML ().trim ());
+      assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
+
+      // Add second one
+      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
+      assertNotNull (aSG2);
       try
       {
-        final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-
-        // Create new one
-        ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target", "suid", null, "<extredirect />");
+        aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", null, "<extredirect2 />");
         assertNotNull (aRedirect);
-        assertSame (aSG, aRedirect.getServiceGroup ());
-        assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
-        assertEquals ("target", aRedirect.getTargetHref ());
-        assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
-        assertEquals ("<extredirect />", aRedirect.getFirstExtensionXML ().trim ());
-        final long nCount = aRedirectMgr.getSMPRedirectCount ();
-
-        // Update existing
-        aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "target2", "suid2", null, "<extredirect2 />");
-        assertNotNull (aRedirect);
-        assertSame (aSG, aRedirect.getServiceGroup ());
+        assertSame (aSG2, aRedirect.getServiceGroup ());
         assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
         assertEquals ("target2", aRedirect.getTargetHref ());
         assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
         assertEquals ("<extredirect2 />", aRedirect.getFirstExtensionXML ().trim ());
+        assertEquals (nCount + 1, aRedirectMgr.getSMPRedirectCount ());
+
+        // Cleanup
+        assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG2).isChanged ());
         assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
-
-        // Add second one
-        final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
-        assertNotNull (aSG2);
-        try
-        {
-          aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG2, aDocTypeID, "target2", "suid2", null, "<extredirect2 />");
-          assertNotNull (aRedirect);
-          assertSame (aSG2, aRedirect.getServiceGroup ());
-          assertTrue (aDocTypeID.hasSameContent (aRedirect.getDocumentTypeIdentifier ()));
-          assertEquals ("target2", aRedirect.getTargetHref ());
-          assertEquals ("suid2", aRedirect.getSubjectUniqueIdentifier ());
-          assertEquals ("<extredirect2 />", aRedirect.getFirstExtensionXML ().trim ());
-          assertEquals (nCount + 1, aRedirectMgr.getSMPRedirectCount ());
-
-          // Cleanup
-          assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG2).isChanged ());
-          assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
-          assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG).isChanged ());
-          assertEquals (nCount - 1, aRedirectMgr.getSMPRedirectCount ());
-          assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isChanged ());
-          assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isChanged ());
-        }
-        finally
-        {
-          aSGMgr.deleteSMPServiceGroupNoEx (aPI2);
-        }
+        assertTrue (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSG).isChanged ());
+        assertEquals (nCount - 1, aRedirectMgr.getSMPRedirectCount ());
+        assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isChanged ());
+        assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isChanged ());
       }
       finally
       {
-        aSGMgr.deleteSMPServiceGroupNoEx (aPI1);
+        aSGMgr.deleteSMPServiceGroupNoEx (aPI2);
       }
     }
     finally
     {
-      // Don't care about the result
-      aUserMgr.deleteUser (sUserID);
+      aSGMgr.deleteSMPServiceGroupNoEx (aPI1);
     }
   }
 }

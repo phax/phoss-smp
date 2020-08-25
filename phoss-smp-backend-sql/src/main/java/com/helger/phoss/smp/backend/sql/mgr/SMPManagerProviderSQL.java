@@ -41,8 +41,6 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
-import com.helger.phoss.smp.domain.user.ISMPUserManager;
-import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
 import com.helger.settings.exchange.configfile.ConfigFile;
@@ -139,13 +137,6 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     {
       throw new IllegalStateException (ex.getMessage (), ex);
     }
-  }
-
-  @Nonnull
-  public ISMPUserManager createUserMgr ()
-  {
-    // Use ph-oton
-    return new SMPUserManagerPhoton ();
   }
 
   @Nonnull
