@@ -94,7 +94,7 @@ public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
 
       // Update the ownership in "smp_ownership"
       // Remove the table "smp_user"
-      aSQLUserMgr.onMigrationUpdateOwnershipsAndKillUsers (aCreatedMappings);
+      aSQLUserMgr.updateOwnershipsAndKillUsers (aCreatedMappings);
 
       if (XMLMapHandler.writeMap (aCreatedMappings,
                                   new FileSystemResource (WebFileIO.getDataIO ()

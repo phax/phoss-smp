@@ -19,26 +19,19 @@ package com.helger.phoss.smp.backend.sql.migration;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsMap;
-import com.helger.commons.state.EChange;
-import com.helger.commons.state.ESuccess;
-import com.helger.commons.string.StringHelper;
 import com.helger.commons.type.ObjectType;
-import com.helger.commons.wrapper.Wrapper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.domain.DBUser;
 import com.helger.phoss.smp.backend.sql.mgr.AbstractJDBCEnabledManager;
-import com.helger.photon.audit.AuditHelper;
 
 /**
  * This is only used in the migration.
@@ -56,56 +49,6 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
   }
 
   @Nonnull
-  public ESuccess createUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
-  {
-    final Wrapper <ESuccess> ret = new Wrapper <> (ESuccess.FAILURE);
-    executor ().performInTransaction ( () -> {
-      if (getUserOfID (sUserName) != null)
-        ret.set (ESuccess.FAILURE);
-      else
-      {
-        final long nCount = executor ().insertOrUpdateOrDelete ("INSERT INTO smp_user (username, password) VALUES (?,?)",
-                                                                new ConstantPreparedStatementDataProvider (sUserName, sPassword));
-        ret.set (ESuccess.valueOf (nCount == 1));
-      }
-    });
-
-    if (ret.get ().isFailure ())
-    {
-      AuditHelper.onAuditCreateFailure (OT, sUserName);
-      return ESuccess.FAILURE;
-    }
-
-    AuditHelper.onAuditCreateSuccess (OT, sUserName);
-    return ESuccess.SUCCESS;
-  }
-
-  @Nonnull
-  public ESuccess updateUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
-  {
-    final long nCount = executor ().insertOrUpdateOrDelete ("UPDATE smp_user SET password=? WHERE username=?",
-                                                            new ConstantPreparedStatementDataProvider (sPassword, sUserName));
-    return ESuccess.valueOf (nCount == 1);
-  }
-
-  @Nonnull
-  public EChange deleteUser (@Nullable final String sUserName)
-  {
-    if (StringHelper.hasNoText (sUserName))
-      return EChange.UNCHANGED;
-
-    final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_user WHERE username=?",
-                                                            new ConstantPreparedStatementDataProvider (sUserName));
-    return EChange.valueOf (nCount == 1);
-  }
-
-  @Nonnegative
-  public long getUserCount ()
-  {
-    return executor ().queryCount ("SELECT COUNT(*) FROM smp_user");
-  }
-
-  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <DBUser> getAllUsers ()
   {
@@ -117,20 +60,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  @Nullable
-  public DBUser getUserOfID (@Nullable final String sUserName)
-  {
-    if (StringHelper.hasNoText (sUserName))
-      return null;
-
-    final Optional <DBResultRow> aDBResult = executor ().querySingle ("SELECT password FROM smp_user WHERE username=?",
-                                                                      new ConstantPreparedStatementDataProvider (sUserName));
-    if (!aDBResult.isPresent ())
-      return null;
-    return new DBUser (sUserName, aDBResult.get ().getAsString (0));
-  }
-
-  public void onMigrationUpdateOwnershipsAndKillUsers (@Nonnull final ICommonsMap <String, String> aOldToNewMap)
+  public void updateOwnershipsAndKillUsers (@Nonnull final ICommonsMap <String, String> aOldToNewMap)
   {
     ValueEnforcer.notNull (aOldToNewMap, "OldToNewMap");
 
