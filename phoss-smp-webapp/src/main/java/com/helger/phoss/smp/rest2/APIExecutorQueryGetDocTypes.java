@@ -89,7 +89,6 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
 
     final boolean bQueryBusinessCard = aRequestScope.params ().getAsBoolean ("businessCard", false);
     final boolean bXMLSchemaValidation = aRequestScope.params ().getAsBoolean ("xmlSchemaValidation", true);
-    final boolean bVerifySignature = aRequestScope.params ().getAsBoolean ("verifySignature", true);
 
     final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
@@ -103,9 +102,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
                  "' from '" +
                  aQueryParams.getSMPHostURI () +
                  "'; XSD validation=" +
-                 bXMLSchemaValidation +
-                 "; signature verification=" +
-                 bVerifySignature);
+                 bXMLSchemaValidation);
 
     ICommonsSortedMap <String, String> aSGHrefs = null;
     switch (eAPIType)
@@ -114,7 +111,6 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
       {
         final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (aQueryParams.getSMPHostURI ());
         aSMPClient.setXMLSchemaValidation (bXMLSchemaValidation);
-        aSMPClient.setVerifySignature (bVerifySignature);
 
         // Get all HRefs and sort them by decoded URL
         final com.helger.smpclient.peppol.jaxb.ServiceGroupType aSG = aSMPClient.getServiceGroupOrNull (aParticipantID);
@@ -138,7 +134,6 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
         aSGHrefs = new CommonsTreeMap <> ();
         final BDXRClientReadOnly aBDXR1Client = new BDXRClientReadOnly (aQueryParams.getSMPHostURI ());
         aBDXR1Client.setXMLSchemaValidation (bXMLSchemaValidation);
-        aBDXR1Client.setVerifySignature (bVerifySignature);
 
         // Get all HRefs and sort them by decoded URL
         final com.helger.xsds.bdxr.smp1.ServiceGroupType aSG = aBDXR1Client.getServiceGroupOrNull (aParticipantID);
