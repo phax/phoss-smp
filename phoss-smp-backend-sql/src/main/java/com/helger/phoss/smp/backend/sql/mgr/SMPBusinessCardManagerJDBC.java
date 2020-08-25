@@ -73,7 +73,8 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerJDBC.class);
 
   // Create with as minimal output as possible
-  private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false).setWriteNewlineAtEnd (false);
+  private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false)
+                                                                         .setWriteNewlineAtEnd (false);
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
@@ -95,7 +96,9 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     final JsonArray ret = new JsonArray ();
     if (aIDs != null)
       for (final SMPBusinessCardIdentifier aID : aIDs)
-        ret.add (new JsonObject ().add ("id", aID.getID ()).add ("scheme", aID.getScheme ()).add ("value", aID.getValue ()));
+        ret.add (new JsonObject ().add ("id", aID.getID ())
+                                  .add ("scheme", aID.getScheme ())
+                                  .add ("value", aID.getValue ()));
     return ret;
   }
 
@@ -177,13 +180,18 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     ValueEnforcer.notNull (aEntities, "Entities");
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities" + ")");
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
+                    aParticipantID.getURIEncoded () +
+                    ", " +
+                    aEntities.size () +
+                    " entities" +
+                    ")");
 
     final MutableBoolean aUpdated = new MutableBoolean (false);
     final ESuccess eSucces = executor ().performInTransaction ( () -> {
       // Delete all existing entities
       final String sPID = aParticipantID.getURIEncoded ();
-      final long nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
+      final long nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce" + " WHERE pid=?",
                                                                 new ConstantPreparedStatementDataProvider (sPID));
       if (nDeleted > 0)
       {
@@ -198,7 +206,9 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
         executor ().insertOrUpdateOrDelete ("INSERT INTO smp_bce (id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                             new ConstantPreparedStatementDataProvider (aEntity.getID (),
                                                                                        sPID,
-                                                                                       aEntity.names ().getFirst ().getName (),
+                                                                                       aEntity.names ()
+                                                                                              .getFirst ()
+                                                                                              .getName (),
                                                                                        aEntity.getCountryCode (),
                                                                                        aEntity.getGeographicalInformation (),
                                                                                        getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
@@ -224,9 +234,14 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("Finished createOrUpdateSMPBusinessCard");
 
     if (aUpdated.booleanValue ())
-      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT, "all", aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
+      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
+                                        "all",
+                                        aParticipantID.getURIEncoded (),
+                                        Integer.valueOf (aEntities.size ()));
     else
-      AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
+      AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
+                                        aParticipantID.getURIEncoded (),
+                                        Integer.valueOf (aEntities.size ()));
 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
@@ -243,7 +258,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
-    final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce WHERE pid=?",
+    final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce" + " WHERE pid=?",
                                                             new ConstantPreparedStatementDataProvider (aSMPBusinessCard.getID ()));
     if (nCount <= 0)
     {
@@ -257,7 +272,9 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Finished deleteSMPBusinessCard. Change=true");
 
-    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
+                                      aSMPBusinessCard.getID (),
+                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
