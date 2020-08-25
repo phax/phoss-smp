@@ -1,12 +1,18 @@
 /**
- * Copyright (C) 2015-2020 Philip Helger and contributors
+ * Copyright (C) 2019-2020 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
@@ -50,7 +56,7 @@ import com.helger.photon.audit.AuditHelper;
  * @author Philip Helger
  * @since 5.3.0
  */
-public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager implements ISMPUserManager
+public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
 {
   public static final ObjectType OT = new ObjectType ("smpuser");
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerJDBC.class);
@@ -58,11 +64,6 @@ public final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager impleme
   public SMPUserManagerJDBC (@Nonnull final EDatabaseType eDBType)
   {
     super (eDBType);
-  }
-
-  public boolean isSpecialUserManagementNeeded ()
-  {
-    return true;
   }
 
   @Nonnull
