@@ -51,6 +51,11 @@ import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
+/**
+ * Implementation of the REST API to query a BusinessCard from a remote SMP.
+ *
+ * @author Philip Helger
+ */
 public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetBusinessCard.class);
