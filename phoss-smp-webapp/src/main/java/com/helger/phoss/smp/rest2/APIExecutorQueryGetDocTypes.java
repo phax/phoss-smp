@@ -69,6 +69,14 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    // Is the remote query API disabled?
+    if (SMPServerConfiguration.isRestRemoteQueryAPIDisabled ())
+    {
+      LOGGER.warn ("The remote query API is disabled. getRemoteDocTypes will not be executed.");
+      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      return;
+    }
+
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
@@ -157,7 +165,9 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
 
     if (bQueryBusinessCard)
     {
-      final String sBCURL = aQueryParams.getSMPHostURI ().toString () + "/businesscard/" + aParticipantID.getURIEncoded ();
+      final String sBCURL = aQueryParams.getSMPHostURI ().toString () +
+                            "/businesscard/" +
+                            aParticipantID.getURIEncoded ();
       LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
       byte [] aData;
       try (HttpClientManager aHttpClientMgr = new HttpClientManager ())

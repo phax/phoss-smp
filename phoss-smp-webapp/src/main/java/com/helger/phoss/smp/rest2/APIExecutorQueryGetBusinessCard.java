@@ -62,6 +62,14 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    // Is the remote query API disabled?
+    if (SMPServerConfiguration.isRestRemoteQueryAPIDisabled ())
+    {
+      LOGGER.warn ("The remote query API is disabled. getRemoteBusinessCard will not be executed.");
+      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      return;
+    }
+
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
@@ -87,7 +95,9 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
 
     IJsonObject aJson = null;
 
-    final String sBCURL = aQueryParams.getSMPHostURI ().toString () + "/businesscard/" + aParticipantID.getURIEncoded ();
+    final String sBCURL = aQueryParams.getSMPHostURI ().toString () +
+                          "/businesscard/" +
+                          aParticipantID.getURIEncoded ();
     LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
     byte [] aData;
     try (HttpClientManager aHttpClientMgr = new HttpClientManager ())
@@ -125,7 +135,10 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     }
     else
     {
-      LOGGER.info (sLogPrefix + "Succesfully finished BusinessCard lookup lookup after " + aSW.getMillis () + " milliseconds");
+      LOGGER.info (sLogPrefix +
+                   "Succesfully finished BusinessCard lookup lookup after " +
+                   aSW.getMillis () +
+                   " milliseconds");
 
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());

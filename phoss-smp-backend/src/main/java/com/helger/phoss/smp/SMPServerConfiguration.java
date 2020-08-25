@@ -79,6 +79,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
   public static final String KEY_SMP_REST_LOG_EXCEPTIONS = "smp.rest.log.exceptions";
   public static final String KEY_SMP_REST_PAYLOAD_ON_ERROR = "smp.rest.payload.on.error";
+  public static final String KEY_SMP_REST_REMOTE_QUERY_API_DISABLED = "smp.rest.remote.queryapi.disabled";
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   /* legacy name */
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
@@ -104,6 +105,7 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
   public static final boolean DEFAULT_SMP_REST_LOG_EXCEPTIONS = false;
   public static final boolean DEFAULT_SMP_REST_PAYLOAD_ON_ERROR = true;
+  public static final boolean DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED = true;
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
   public static final boolean DEFAULT_SML_REQUIRED = true;
   public static final boolean DEFAULT_SML_ENABLED = false;
@@ -353,6 +355,18 @@ public final class SMPServerConfiguration
   public static boolean isRESTPayloadOnError ()
   {
     return getConfigFile ().getAsBoolean (KEY_SMP_REST_PAYLOAD_ON_ERROR, DEFAULT_SMP_REST_PAYLOAD_ON_ERROR);
+  }
+
+  /**
+   * @return <code>true</code> if the remote query API (get endpoints and
+   *         business cards from other SMP server) is disabled. By default it is
+   *         disabled.
+   * @since 5.3.0-RC2
+   */
+  public static boolean isRestRemoteQueryAPIDisabled ()
+  {
+    return getConfigFile ().getAsBoolean (KEY_SMP_REST_REMOTE_QUERY_API_DISABLED,
+                                          DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED);
   }
 
   /**

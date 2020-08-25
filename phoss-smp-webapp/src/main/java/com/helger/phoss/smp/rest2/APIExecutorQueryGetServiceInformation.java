@@ -61,6 +61,14 @@ public final class APIExecutorQueryGetServiceInformation extends AbstractSMPAPIE
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    // Is the remote query API disabled?
+    if (SMPServerConfiguration.isRestRemoteQueryAPIDisabled ())
+    {
+      LOGGER.warn ("The remote query API is disabled. getRemoteServiceInformation will not be executed.");
+      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      return;
+    }
+
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
@@ -121,7 +129,8 @@ public final class APIExecutorQueryGetServiceInformation extends AbstractSMPAPIE
         aBDXR1Client.setXMLSchemaValidation (bXMLSchemaValidation);
         aBDXR1Client.setVerifySignature (bVerifySignature);
 
-        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType aSSM = aBDXR1Client.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
+        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType aSSM = aBDXR1Client.getServiceMetadataOrNull (aParticipantID,
+                                                                                                                aDocTypeID);
         if (aSSM != null)
         {
           final com.helger.xsds.bdxr.smp1.ServiceMetadataType aSM = aSSM.getServiceMetadata ();
