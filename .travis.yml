@@ -33,7 +33,7 @@ pc2onmHKAT9taBJgSTuuTq2ws6DODhp5PBJkaHk02Z3xfr8dtLYKd1fG2ZkJLTQXqeiwt11RErJQgdir
 1y9W+K93OFSeXz54H/ejuqSn3z7d4W/H49guksThPzVzsVhMc8Cu9pYfArGC/UWby4OD35iyicickplsO7OoGdo5cykBGnaaSrP4Z19VPLYa8EFT994n06uAQyOz/ZQ3xLIEHE0IrIg8kTFMhYq1Yx9JTocNc+6f
 vVaztY+EpsNIh9mwkO3YjW4KGS3DGKiqJ0uA/tElX0EUNoQ55re8WM="
 
-before_script:
+before_install:
   - psql -c 'CREATE ROLE smp;' -U postgres
   
 install:
