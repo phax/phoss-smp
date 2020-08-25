@@ -67,7 +67,7 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.phoss.smp.ui.secure.hc.HCSMPUserSelect;
+import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
@@ -455,7 +455,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     }
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owning User")
-                                                 .setCtrl (new HCSMPUserSelect (new RequestField (FIELD_OWNING_USER_ID,
+                                                 .setCtrl (new HCUserSelect (new RequestField (FIELD_OWNING_USER_ID,
                                                                                                   aSelectedObject != null ? aSelectedObject.getOwnerID ()
                                                                                                                           : LoggedInUserManager.getInstance ()
                                                                                                                                                .getCurrentUserID ()),

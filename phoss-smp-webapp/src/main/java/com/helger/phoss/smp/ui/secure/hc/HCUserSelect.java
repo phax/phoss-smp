@@ -32,7 +32,7 @@ import com.helger.photon.uicore.html.select.HCExtSelect;
  *
  * @author Philip Helger
  */
-public class HCSMPUserSelect extends HCExtSelect
+public class HCUserSelect extends HCExtSelect
 {
   @Nonnull
   @Nonempty
@@ -41,10 +41,11 @@ public class HCSMPUserSelect extends HCExtSelect
     return aUser.getDisplayName ();
   }
 
-  public HCSMPUserSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
+  public HCUserSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
   {
     super (aRF);
 
+    // Use active users only
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ()
                                                   .getAllActiveUsers ()
                                                   .getSortedInline (IHasDisplayName.getComparatorCollating (aDisplayLocale)))

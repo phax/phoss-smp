@@ -62,7 +62,7 @@ import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.phoss.smp.ui.secure.hc.HCSMPUserSelect;
+import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
@@ -514,7 +514,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
                                                                " integration is enabled, existing business cards contained in the import are also overwritten!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_OVERWRITE_EXISTING)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owner of the new service groups")
-                                                 .setCtrl (new HCSMPUserSelect (new RequestField (FIELD_DEFAULT_OWNER), aDisplayLocale))
+                                                 .setCtrl (new HCUserSelect (new RequestField (FIELD_DEFAULT_OWNER), aDisplayLocale))
                                                  .setHelpText ("This owner is only selected, if the owner contained in the import file is unknown.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DEFAULT_OWNER)));
 
