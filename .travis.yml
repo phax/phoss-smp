@@ -35,6 +35,7 @@ vVaztY+EpsNIh9mwkO3YjW4KGS3DGKiqJ0uA/tElX0EUNoQ55re8WM="
 
 before_install:
   - psql -c "CREATE ROLE smp LOGIN PASSWORD 'smp';" -U postgres
+  - psql -c "CREATE DATABASE smp WITH ENCODING = 'UTF8' OWNER = smp;" -U postgres
   
 install:
 #  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -U -P jdeps
