@@ -15,13 +15,12 @@
 -- limitations under the License.
 --
 
-CREATE DATABASE smp;
+CREATE DATABASE smp WITH ENCODING = 'UTF8' OWNER = smp;
 
 CREATE TABLE smp_user (
   username varchar(256) NOT NULL,
   password varchar(256) NOT NULL,
-  PRIMARY KEY (username),
-  UNIQUE (username)
+  PRIMARY KEY (username)
 );
 INSERT INTO smp_user VALUES ('peppol_user','Test1234');
 
@@ -29,8 +28,7 @@ CREATE TABLE smp_service_group (
   businessIdentifierScheme varchar(25) NOT NULL,
   businessIdentifier varchar(50) NOT NULL,
   extension text,
-  PRIMARY KEY (businessIdentifierScheme,businessIdentifier),
-  UNIQUE (businessIdentifierScheme,businessIdentifier)
+  PRIMARY KEY (businessIdentifierScheme,businessIdentifier)
 );
 
 CREATE TABLE smp_service_metadata (
@@ -40,7 +38,6 @@ CREATE TABLE smp_service_metadata (
   documentIdentifier varchar(500) NOT NULL,
   extension text,
   PRIMARY KEY (businessIdentifierScheme,businessIdentifier,documentIdentifierScheme,documentIdentifier),
-  UNIQUE (businessIdentifierScheme,businessIdentifier,documentIdentifierScheme,documentIdentifier),
   CONSTRAINT FK_smp_service_metadata_businessIdentifier FOREIGN KEY (businessIdentifierScheme, businessIdentifier) REFERENCES smp_service_group (businessIdentifierScheme, businessIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -53,7 +50,6 @@ CREATE TABLE smp_process (
   processIdentifier varchar(200) NOT NULL,
   extension text,
   PRIMARY KEY (businessIdentifierScheme,businessIdentifier,documentIdentifierScheme,documentIdentifier,processIdentifierType,processIdentifier),
-  UNIQUE (businessIdentifierScheme,businessIdentifier,documentIdentifierScheme,documentIdentifier),
   CONSTRAINT FK_smp_process_documentIdentifierScheme FOREIGN KEY (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier) REFERENCES smp_service_metadata (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -112,8 +108,7 @@ CREATE TABLE smp_bce (
   contacts text,
   addon text,
   regdate date DEFAULT NULL,
-  PRIMARY KEY (id),
-  UNIQUE (pid)
+  PRIMARY KEY (id)
 );
 
 ALTER TABLE smp_user OWNER to smp;
