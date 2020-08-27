@@ -77,6 +77,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
+import com.helger.web.scope.mgr.WebScoped;
 
 public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 {
@@ -110,7 +111,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     public LongRunningJobResult createLongRunningJobResult ()
     {
       s_aRunningJobs.incrementAndGet ();
-      try
+      try (final WebScoped w = new WebScoped ())
       {
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
