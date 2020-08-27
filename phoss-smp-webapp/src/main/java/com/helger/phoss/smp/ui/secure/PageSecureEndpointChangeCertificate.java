@@ -96,19 +96,19 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
 
     private final ICommonsList <ISMPServiceInformation> m_aAllSIs;
     private final Locale m_aDisplayLocale;
-    private final String m_sOldCert;
-    private final String m_sNewCert;
+    private final String m_sOldUnifiedCert;
+    private final String m_sNewUnifiedCert;
 
-    public BulkChangeCertificate (final ICommonsList <ISMPServiceInformation> aAllSIs,
-                                  final Locale aDisplayLocale,
-                                  final String sOldCert,
-                                  final String sNewCert)
+    public BulkChangeCertificate (@Nonnull final ICommonsList <ISMPServiceInformation> aAllSIs,
+                                  @Nonnull final Locale aDisplayLocale,
+                                  @Nonnull final String sOldUnifiedCert,
+                                  @Nonnull final String sNewUnifiedCert)
     {
       super ("BulkChangeCertificate", new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change certificate"));
       m_aAllSIs = aAllSIs;
       m_aDisplayLocale = aDisplayLocale;
-      m_sOldCert = sOldCert;
-      m_sNewCert = sNewCert;
+      m_sOldUnifiedCert = sOldUnifiedCert;
+      m_sNewUnifiedCert = sNewUnifiedCert;
     }
 
     @Nonnull
@@ -128,9 +128,9 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
           boolean bChanged = false;
           for (final ISMPProcess aProcess : aSI.getAllProcesses ())
             for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-              if (m_sOldCert.equals (aEndpoint.getCertificate ()))
+              if (m_sOldUnifiedCert.equals (_getUnifiedCert (aEndpoint.getCertificate ())))
               {
-                ((SMPEndpoint) aEndpoint).setCertificate (m_sNewCert);
+                ((SMPEndpoint) aEndpoint).setCertificate (m_sNewUnifiedCert);
                 bChanged = true;
                 ++nChangedEndpoints;
               }
@@ -152,7 +152,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
           final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old certificate was changed in " +
                                                                         nChangedEndpoints +
                                                                         " endpoints to the new certificate:"),
-                                                                   _getCertificateDisplay (m_sNewCert, m_aDisplayLocale),
+                                                                   _getCertificateDisplay (m_sNewUnifiedCert, m_aDisplayLocale),
                                                                    div ("Effected service groups are:"),
                                                                    aUL);
           if (nSaveErrors == 0)
@@ -307,30 +307,30 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       bShowList = false;
       final FormErrorList aFormErrors = new FormErrorList ();
 
-      final String sOldCert = _getUnifiedCert (aWPEC.params ().getAsString (FIELD_OLD_CERTIFICATE));
+      final String sOldUnifiedCert = _getUnifiedCert (aWPEC.params ().getAsString (FIELD_OLD_CERTIFICATE));
 
       if (aWPEC.hasSubAction (CPageParam.ACTION_SAVE))
       {
-        final String sNewCert = _getUnifiedCert (aWPEC.params ().getAsString (FIELD_NEW_CERTIFICATE));
+        final String sNewUnifiedCert = _getUnifiedCert (aWPEC.params ().getAsString (FIELD_NEW_CERTIFICATE));
 
-        if (StringHelper.hasNoText (sOldCert))
+        if (StringHelper.hasNoText (sOldUnifiedCert))
           aFormErrors.addFieldInfo (FIELD_OLD_CERTIFICATE, "An old certificate must be provided");
         else
         {
-          final String sErrorDetails = _getCertificateParsingError (sOldCert);
+          final String sErrorDetails = _getCertificateParsingError (sOldUnifiedCert);
           if (sErrorDetails != null)
             aFormErrors.addFieldInfo (FIELD_OLD_CERTIFICATE, "The old certificate is invalid: " + sErrorDetails);
         }
 
-        if (StringHelper.hasNoText (sNewCert))
+        if (StringHelper.hasNoText (sNewUnifiedCert))
           aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE, "A new certificate must be provided");
         else
         {
-          final String sErrorDetails = _getCertificateParsingError (sNewCert);
+          final String sErrorDetails = _getCertificateParsingError (sNewUnifiedCert);
           if (sErrorDetails != null)
             aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE, "The new certificate is invalid: " + sErrorDetails);
           else
-            if (sNewCert.equals (sOldCert))
+            if (sNewUnifiedCert.equals (sOldUnifiedCert))
               aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE, "The new certificate is identical to the old certificate");
         }
 
@@ -338,17 +338,18 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         if (aFormErrors.containsNoError ())
         {
           PhotonWorkerPool.getInstance ()
-                          .run ("BulkChangeCertificate", new BulkChangeCertificate (aAllSIs, aDisplayLocale, sOldCert, sNewCert));
+                          .run ("BulkChangeCertificate",
+                                new BulkChangeCertificate (aAllSIs, aDisplayLocale, sOldUnifiedCert, sNewUnifiedCert));
 
           aWPEC.postRedirectGetInternal (success ().addChildren (div ("The bulk change of the endpoint certificate to"),
-                                                                 _getCertificateDisplay (sNewCert, aDisplayLocale),
+                                                                 _getCertificateDisplay (sNewUnifiedCert, aDisplayLocale),
                                                                  div ("is now running in the background.")));
         }
       }
 
-      final ICommonsSet <ISMPServiceGroup> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldCert);
+      final ICommonsSet <ISMPServiceGroup> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldUnifiedCert);
       final int nSGCount = CollectionHelper.getSize (aServiceGroups);
-      final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldCert));
+      final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldUnifiedCert));
       aNodeList.addChild (info ("The selected old certificate is currently used in " +
                                 nEPCount +
                                 " " +
@@ -363,15 +364,15 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT));
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_SUBACTION, CPageParam.ACTION_SAVE));
-      aForm.addChild (new HCHiddenField (FIELD_OLD_CERTIFICATE, sOldCert));
+      aForm.addChild (new HCHiddenField (FIELD_OLD_CERTIFICATE, sOldUnifiedCert));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Old certificate")
-                                                   .setCtrl (_getCertificateDisplay (sOldCert, aDisplayLocale))
+                                                   .setCtrl (_getCertificateDisplay (sOldUnifiedCert, aDisplayLocale))
                                                    .setHelpText ("The old certificate that is to be changed in all matching endpoints")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_OLD_CERTIFICATE)));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New certificate")
-                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_NEW_CERTIFICATE, sOldCert)))
+                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_NEW_CERTIFICATE, sOldUnifiedCert)))
                                                    .setHelpText ("The new certificate that is used instead")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_NEW_CERTIFICATE)));
 
