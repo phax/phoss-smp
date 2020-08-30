@@ -78,6 +78,11 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("global.debug", GlobalDebug.isDebugMode ());
     aStatusData.add ("global.production", GlobalDebug.isProductionMode ());
     aStatusData.add ("smp.backend", SMPServerConfiguration.getBackend ());
+    if ("sql".equalsIgnoreCase (SMPServerConfiguration.getBackend ()))
+    {
+      // Since 5.3.0-RC5
+      aStatusData.add ("smp.sql.target-database", SMPServerConfiguration.getConfigFile ().getAsString ("target-database"));
+    }
     aStatusData.add ("smp.mode", SMPWebAppConfiguration.isTestVersion () ? "test" : "production");
     aStatusData.add ("smp.resttype", SMPServerConfiguration.getRESTType ().getID ());
     aStatusData.add ("smp.identifiertype", SMPServerConfiguration.getIdentifierType ().getID ());
