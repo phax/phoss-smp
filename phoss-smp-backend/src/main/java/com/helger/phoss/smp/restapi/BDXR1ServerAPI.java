@@ -27,7 +27,6 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
-import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -591,8 +590,8 @@ public final class BDXR1ServerAPI
                                                              BooleanHelper.getBooleanValue (aJAXBEndpoint.isRequireBusinessLevelSignature (),
                                                                                             false),
                                                              aJAXBEndpoint.getMinimumAuthenticationLevel (),
-                                                             PDTXMLConverter.getLocalDateTime (aJAXBEndpoint.getServiceActivationDate ()),
-                                                             PDTXMLConverter.getLocalDateTime (aJAXBEndpoint.getServiceExpirationDate ()),
+                                                             aJAXBEndpoint.getServiceActivationDate (),
+                                                             aJAXBEndpoint.getServiceExpirationDate (),
                                                              Base64.encodeBytes (aJAXBEndpoint.getCertificate ()),
                                                              aJAXBEndpoint.getServiceDescription (),
                                                              aJAXBEndpoint.getTechnicalContactUrl (),

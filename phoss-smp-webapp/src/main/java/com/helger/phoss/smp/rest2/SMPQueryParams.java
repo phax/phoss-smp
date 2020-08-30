@@ -25,7 +25,7 @@ import com.helger.peppol.sml.ESMPAPIType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.smpclient.url.BDXLURLProvider;
-import com.helger.smpclient.url.IPeppolURLProvider;
+import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.PeppolDNSResolutionException;
 import com.helger.smpclient.url.PeppolURLProvider;
 
@@ -48,7 +48,7 @@ final class SMPQueryParams
   }
 
   @Nonnull
-  private static IPeppolURLProvider _getURLProvider (@Nonnull final ESMPAPIType eAPIType)
+  private static ISMPURLProvider _getURLProvider (@Nonnull final ESMPAPIType eAPIType)
   {
     return eAPIType == ESMPAPIType.PEPPOL ? PeppolURLProvider.INSTANCE : BDXLURLProvider.INSTANCE;
   }

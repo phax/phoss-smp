@@ -21,7 +21,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.datetime.util.PDTXMLConverter;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
@@ -213,8 +212,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     ret.setEndpointURI (m_sEndpointReference);
     ret.setRequireBusinessLevelSignature (Boolean.valueOf (m_bRequireBusinessLevelSignature));
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
-    ret.setServiceActivationDate (PDTXMLConverter.getXMLCalendar (m_aServiceActivationDT));
-    ret.setServiceExpirationDate (PDTXMLConverter.getXMLCalendar (m_aServiceExpirationDT));
+    ret.setServiceActivationDate (m_aServiceActivationDT);
+    ret.setServiceExpirationDate (m_aServiceExpirationDT);
     ret.setCertificate (CertificateHelper.convertCertificateStringToByteArray (m_sCertificate));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);

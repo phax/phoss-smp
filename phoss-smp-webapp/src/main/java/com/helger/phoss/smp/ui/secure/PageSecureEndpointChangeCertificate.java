@@ -97,18 +97,18 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     private final ICommonsList <ISMPServiceInformation> m_aAllSIs;
     private final Locale m_aDisplayLocale;
     private final String m_sOldUnifiedCert;
-    private final String m_sNewUnifiedCert;
+    private final String m_sNewCert;
 
     public BulkChangeCertificate (@Nonnull final ICommonsList <ISMPServiceInformation> aAllSIs,
                                   @Nonnull final Locale aDisplayLocale,
                                   @Nonnull final String sOldUnifiedCert,
-                                  @Nonnull final String sNewUnifiedCert)
+                                  @Nonnull final String sNewCert)
     {
       super ("BulkChangeCertificate", new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change certificate"));
       m_aAllSIs = aAllSIs;
       m_aDisplayLocale = aDisplayLocale;
       m_sOldUnifiedCert = sOldUnifiedCert;
-      m_sNewUnifiedCert = sNewUnifiedCert;
+      m_sNewCert = sNewCert;
     }
 
     @Nonnull
@@ -130,8 +130,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
             for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
               if (m_sOldUnifiedCert.equals (_getUnifiedCert (aEndpoint.getCertificate ())))
               {
-                ((SMPEndpoint) aEndpoint).setCertificate (m_sNewUnifiedCert);
                 bChanged = true;
+                ((SMPEndpoint) aEndpoint).setCertificate (m_sNewCert);
                 ++nChangedEndpoints;
               }
           if (bChanged)
@@ -152,7 +152,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
           final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old certificate was changed in " +
                                                                         nChangedEndpoints +
                                                                         " endpoints to the new certificate:"),
-                                                                   _getCertificateDisplay (m_sNewUnifiedCert, m_aDisplayLocale),
+                                                                   _getCertificateDisplay (m_sNewCert, m_aDisplayLocale),
                                                                    div ("Effected service groups are:"),
                                                                    aUL);
           if (nSaveErrors == 0)
@@ -311,7 +311,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
 
       if (aWPEC.hasSubAction (CPageParam.ACTION_SAVE))
       {
-        final String sNewUnifiedCert = _getUnifiedCert (aWPEC.params ().getAsString (FIELD_NEW_CERTIFICATE));
+        final String sNewCert = aWPEC.params ().getAsString (FIELD_NEW_CERTIFICATE);
+        final String sNewUnifiedCert = _getUnifiedCert (sNewCert);
 
         if (StringHelper.hasNoText (sOldUnifiedCert))
           aFormErrors.addFieldInfo (FIELD_OLD_CERTIFICATE, "An old certificate must be provided");
@@ -338,8 +339,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         if (aFormErrors.containsNoError ())
         {
           PhotonWorkerPool.getInstance ()
-                          .run ("BulkChangeCertificate",
-                                new BulkChangeCertificate (aAllSIs, aDisplayLocale, sOldUnifiedCert, sNewUnifiedCert));
+                          .run ("BulkChangeCertificate", new BulkChangeCertificate (aAllSIs, aDisplayLocale, sOldUnifiedCert, sNewCert));
 
           aWPEC.postRedirectGetInternal (success ().addChildren (div ("The bulk change of the endpoint certificate to"),
                                                                  _getCertificateDisplay (sNewUnifiedCert, aDisplayLocale),

@@ -126,7 +126,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
       if (aURLProvider instanceof IBDXLURLProvider)
         try
         {
-          ret = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (m_aParticipantID, m_sSMLZoneName, false);
+          ret = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (m_aParticipantID, m_sSMLZoneName);
         }
         catch (final PeppolDNSResolutionException ex2)
         {
