@@ -33,6 +33,7 @@ public final class SMPJDBCConfiguration
   public static final String CONFIG_JDBC_URL = "jdbc.url";
   public static final String CONFIG_JDBC_USER = "jdbc.user";
   public static final String CONFIG_JDBC_PASSWORD = "jdbc.password";
+  public static final String CONFIG_JDBC_SCHEMA = "jdbc.schema";
   public static final String CONFIG_TARGET_DATABASE = "target-database";
 
   @Since ("5.0.6")

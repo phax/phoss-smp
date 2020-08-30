@@ -79,7 +79,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
                                               .baselineVersion ("1")
                                               .baselineDescription ("SMP 5.2.x database layout, MySQL only")
                                               .locations ("db/migrate-" + m_eDBType.getID ())
-                                              .schemas ("smp")
+                                              .schemas (aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA, "smp"))
                                               /*
                                                * Avoid scanning the ClassPath by
                                                * enumerating them explicitly
