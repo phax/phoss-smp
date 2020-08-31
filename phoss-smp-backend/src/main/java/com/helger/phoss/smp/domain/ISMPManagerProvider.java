@@ -22,7 +22,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
-import com.helger.smpclient.url.IPeppolURLProvider;
+import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.PeppolURLProvider;
 
 /**
@@ -52,10 +52,10 @@ public interface ISMPManagerProvider
   {}
 
   /**
-   * @return The Peppol URL provider to be used. May not be <code>null</code>.
+   * @return The SMP URL provider to be used. May not be <code>null</code>.
    */
   @Nonnull
-  default IPeppolURLProvider createPeppolURLProvider ()
+  default ISMPURLProvider createSMPURLProvider ()
   {
     return PeppolURLProvider.INSTANCE;
   }

@@ -35,6 +35,7 @@ import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.servlet.StaticServerInfo;
 import com.helger.smpclient.url.IBDXLURLProvider;
 import com.helger.smpclient.url.IPeppolURLProvider;
+import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.PeppolDNSResolutionException;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
@@ -115,24 +116,23 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
   private String _getDynamicParticipantURLHostName ()
   {
     String ret = null;
-    final IPeppolURLProvider aURLProvider = SMPMetaManager.getPeppolURLProvider ();
+    final ISMPURLProvider aURLProvider = SMPMetaManager.getSMPURLProvider ();
     try
     {
-      ret = aURLProvider.getDNSNameOfParticipant (m_aParticipantID, m_sSMLZoneName);
+      if (aURLProvider instanceof IPeppolURLProvider)
+        ret = ((IPeppolURLProvider) aURLProvider).getDNSNameOfParticipant (m_aParticipantID, m_sSMLZoneName);
+      else
+        if (aURLProvider instanceof IBDXLURLProvider)
+        {
+          // Fallback by not resolving the NAPTR
+          ret = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (m_aParticipantID, m_sSMLZoneName);
+        }
     }
     catch (final PeppolDNSResolutionException ex)
     {
-      // Fallback by not resolving the NAPTR (if possible)
-      if (aURLProvider instanceof IBDXLURLProvider)
-        try
-        {
-          ret = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (m_aParticipantID, m_sSMLZoneName);
-        }
-        catch (final PeppolDNSResolutionException ex2)
-        {
-          // Ignore
-        }
+      // Ignore
     }
+
     if (ret == null)
       throw new IllegalStateException ("Failed to resolve host name for '" +
                                        m_aParticipantID.getURIEncoded () +

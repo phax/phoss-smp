@@ -101,7 +101,9 @@ import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.smpclient.url.IBDXLURLProvider;
 import com.helger.smpclient.url.IPeppolURLProvider;
+import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.PeppolDNSResolutionException;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
@@ -202,7 +204,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         }
 
         final String sSMLZoneName = aSettings.getSMLDNSZone ();
-        final IPeppolURLProvider aURLProvider = SMPMetaManager.getPeppolURLProvider ();
+        final ISMPURLProvider aURLProvider = SMPMetaManager.getSMPURLProvider ();
 
         final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
                                             new DTCol ("DNS name"),
@@ -214,9 +216,18 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           String sDNSName = null;
           try
           {
-            sDNSName = aURLProvider.getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (), sSMLZoneName);
+            if (aURLProvider instanceof IPeppolURLProvider)
+              sDNSName = ((IPeppolURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
+                                                                                      sSMLZoneName);
+            else
+              if (aURLProvider instanceof IBDXLURLProvider)
+              {
+                // Fallback by not resolving the NAPTR
+                sDNSName = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
+                                                                                      sSMLZoneName);
+              }
           }
-          catch (final PeppolDNSResolutionException ex1)
+          catch (final PeppolDNSResolutionException ex)
           {
             // Ignore
           }
@@ -456,10 +467,10 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owning User")
                                                  .setCtrl (new HCUserSelect (new RequestField (FIELD_OWNING_USER_ID,
-                                                                                                  aSelectedObject != null ? aSelectedObject.getOwnerID ()
-                                                                                                                          : LoggedInUserManager.getInstance ()
-                                                                                                                                               .getCurrentUserID ()),
-                                                                                aDisplayLocale))
+                                                                                               aSelectedObject != null ? aSelectedObject.getOwnerID ()
+                                                                                                                       : LoggedInUserManager.getInstance ()
+                                                                                                                                            .getCurrentUserID ()),
+                                                                             aDisplayLocale))
                                                  .setHelpText ("The user who owns this entry. Only this user can make changes via the REST API.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_OWNING_USER_ID)));
 
