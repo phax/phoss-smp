@@ -36,7 +36,6 @@ import com.helger.commons.timing.StopWatch;
 import com.helger.httpclient.HttpClientManager;
 import com.helger.httpclient.response.ResponseHandlerByteArray;
 import com.helger.json.IJsonObject;
-import com.helger.json.serialize.IJsonWriterSettings;
 import com.helger.json.serialize.JsonWriter;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.pd.businesscard.generic.PDBusinessCard;
@@ -59,7 +58,6 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetBusinessCard.class);
-  private static final IJsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (true);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -100,9 +98,7 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
 
     IJsonObject aJson = null;
 
-    final String sBCURL = aQueryParams.getSMPHostURI ().toString () +
-                          "/businesscard/" +
-                          aParticipantID.getURIEncoded ();
+    final String sBCURL = aQueryParams.getSMPHostURI ().toString () + "/businesscard/" + aParticipantID.getURIEncoded ();
     LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
     byte [] aData;
     try (HttpClientManager aHttpClientMgr = new HttpClientManager ())
@@ -140,15 +136,12 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     }
     else
     {
-      LOGGER.info (sLogPrefix +
-                   "Succesfully finished BusinessCard lookup lookup after " +
-                   aSW.getMillis () +
-                   " milliseconds");
+      LOGGER.info (sLogPrefix + "Succesfully finished BusinessCard lookup lookup after " + aSW.getMillis () + " milliseconds");
 
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());
 
-      final String sRet = new JsonWriter (JWS).writeAsString (aJson);
+      final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
       aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8)
                       .setMimeType (CMimeType.APPLICATION_JSON)
                       .enableCaching (3 * CGlobal.SECONDS_PER_HOUR);

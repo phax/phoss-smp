@@ -45,6 +45,7 @@ import com.helger.json.IJson;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
+import com.helger.json.serialize.IJsonWriterSettings;
 import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -73,8 +74,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerJDBC.class);
 
   // Create with as minimal output as possible
-  private static final JsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (false)
-                                                                         .setWriteNewlineAtEnd (false);
+  private static final IJsonWriterSettings JWS = JsonWriterSettings.DEFAULT_SETTINGS;
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
@@ -96,9 +96,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     final JsonArray ret = new JsonArray ();
     if (aIDs != null)
       for (final SMPBusinessCardIdentifier aID : aIDs)
-        ret.add (new JsonObject ().add ("id", aID.getID ())
-                                  .add ("scheme", aID.getScheme ())
-                                  .add ("value", aID.getValue ()));
+        ret.add (new JsonObject ().add ("id", aID.getID ()).add ("scheme", aID.getScheme ()).add ("value", aID.getValue ()));
     return ret;
   }
 
@@ -180,12 +178,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     ValueEnforcer.notNull (aEntities, "Entities");
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
-                    aParticipantID.getURIEncoded () +
-                    ", " +
-                    aEntities.size () +
-                    " entities" +
-                    ")");
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities" + ")");
 
     final MutableBoolean aUpdated = new MutableBoolean (false);
     final ESuccess eSucces = executor ().performInTransaction ( () -> {
@@ -206,9 +199,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
         executor ().insertOrUpdateOrDelete ("INSERT INTO smp_bce (id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                             new ConstantPreparedStatementDataProvider (aEntity.getID (),
                                                                                        sPID,
-                                                                                       aEntity.names ()
-                                                                                              .getFirst ()
-                                                                                              .getName (),
+                                                                                       aEntity.names ().getFirst ().getName (),
                                                                                        aEntity.getCountryCode (),
                                                                                        aEntity.getGeographicalInformation (),
                                                                                        getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
@@ -234,14 +225,9 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("Finished createOrUpdateSMPBusinessCard");
 
     if (aUpdated.booleanValue ())
-      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
-                                        "all",
-                                        aParticipantID.getURIEncoded (),
-                                        Integer.valueOf (aEntities.size ()));
+      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT, "all", aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
     else
-      AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
-                                        aParticipantID.getURIEncoded (),
-                                        Integer.valueOf (aEntities.size ()));
+      AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
@@ -272,9 +258,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Finished deleteSMPBusinessCard. Change=true");
 
-    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
-                                      aSMPBusinessCard.getID (),
-                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));

@@ -33,7 +33,6 @@ import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.timing.StopWatch;
 import com.helger.json.IJsonObject;
-import com.helger.json.serialize.IJsonWriterSettings;
 import com.helger.json.serialize.JsonWriter;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppol.sml.ESMPAPIType;
@@ -53,7 +52,6 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetServiceMetadata.class);
-  private static final IJsonWriterSettings JWS = new JsonWriterSettings ().setIndentEnabled (true);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -129,8 +127,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
         aBDXR1Client.setXMLSchemaValidation (bXMLSchemaValidation);
         aBDXR1Client.setVerifySignature (bVerifySignature);
 
-        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType aSSM = aBDXR1Client.getServiceMetadataOrNull (aParticipantID,
-                                                                                                                aDocTypeID);
+        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType aSSM = aBDXR1Client.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
         if (aSSM != null)
         {
           final com.helger.xsds.bdxr.smp1.ServiceMetadataType aSM = aSSM.getServiceMetadata ();
@@ -154,7 +151,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());
 
-      final String sRet = new JsonWriter (JWS).writeAsString (aJson);
+      final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
       aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8)
                       .setMimeType (CMimeType.APPLICATION_JSON)
                       .enableCaching (3 * CGlobal.SECONDS_PER_HOUR);
