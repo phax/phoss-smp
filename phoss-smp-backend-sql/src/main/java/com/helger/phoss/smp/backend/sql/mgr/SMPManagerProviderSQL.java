@@ -78,13 +78,17 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
                                               // Version 1 is the baseline
                                               .baselineVersion ("1")
                                               .baselineDescription ("SMP 5.2.x database layout, MySQL only")
+                                              // Separate directory per DB type
                                               .locations ("db/migrate-" + m_eDBType.getID ())
-                                              .schemas (aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA, "smp"))
                                               /*
                                                * Avoid scanning the ClassPath by
                                                * enumerating them explicitly
                                                */
                                               .javaMigrations (new V2__MigrateDBUsersToPhotonUsers ());
+
+    // Flyway to handle the DB schema?
+    aConfig.schemas (aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA, "smp"));
+
     final Flyway aFlyway = aConfig.load ();
     if (false)
       aFlyway.validate ();
