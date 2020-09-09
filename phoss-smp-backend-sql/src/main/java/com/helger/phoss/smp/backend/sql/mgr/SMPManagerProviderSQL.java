@@ -24,6 +24,7 @@ import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
 
 import com.helger.commons.state.ETriState;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -87,7 +88,17 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
                                               .javaMigrations (new V2__MigrateDBUsersToPhotonUsers ());
 
     // Flyway to handle the DB schema?
-    aConfig.schemas (aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA, "smp"));
+    final String sSchema = aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
+    if (StringHelper.hasText (sSchema))
+    {
+      // Use the schema only, if it is explicitly configured
+      // The default schema name is ["$user", public] and as such unusable
+      aConfig.schemas (sSchema);
+    }
+
+    // If no schema is specified, schema create should also be disabled
+    final boolean bCreateSchema = aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA_CREATE, false);
+    aConfig.createSchemas (bCreateSchema);
 
     final Flyway aFlyway = aConfig.load ();
     if (false)
