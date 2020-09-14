@@ -60,7 +60,7 @@ public final class APIExecutorCompleteServiceGroupGet extends AbstractSMPAPIExec
         aBytes = new SMPMarshallerCompleteServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
-      case BDXR:
+      case OASIS_BDXR_V1:
       {
         // Unspecified extension
         final com.helger.xsds.bdxr.smp1.CompleteServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);

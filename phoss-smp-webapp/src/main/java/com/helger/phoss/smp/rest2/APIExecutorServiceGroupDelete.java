@@ -62,7 +62,7 @@ public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
         case PEPPOL:
           new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, aBasicAuth);
           break;
-        case BDXR:
+        case OASIS_BDXR_V1:
           new BDXR1ServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, aBasicAuth);
           break;
         default:

@@ -75,7 +75,7 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
-      case BDXR:
+      case OASIS_BDXR_V1:
       {
         final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType ret = new BDXR1ServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
                                                                                                                                    sDocumentTypeID);

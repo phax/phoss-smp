@@ -63,7 +63,7 @@ public final class APIExecutorServiceMetadataDeleteAll implements IAPIExecutor
         case PEPPOL:
           new SMPServerAPI (aDataProvider).deleteServiceRegistrations (sServiceGroupID, aBasicAuth);
           break;
-        case BDXR:
+        case OASIS_BDXR_V1:
           new BDXR1ServerAPI (aDataProvider).deleteServiceRegistrations (sServiceGroupID, aBasicAuth);
           break;
         default:

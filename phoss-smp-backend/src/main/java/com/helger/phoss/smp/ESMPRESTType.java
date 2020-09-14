@@ -30,7 +30,7 @@ import com.helger.peppol.sml.ESMPAPIType;
 public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
 {
   PEPPOL ("peppol", "Peppol", ESMPAPIType.PEPPOL),
-  BDXR ("bdxr", "OASIS BDXR", ESMPAPIType.OASIS_BDXR_V1);
+  OASIS_BDXR_V1 ("bdxr", "OASIS BDXR SMP v1", ESMPAPIType.OASIS_BDXR_V1);
 
   private final String m_sID;
   private final String m_sDisplayName;
@@ -72,14 +72,19 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
     return this == PEPPOL;
   }
 
-  public boolean isBDXR ()
-  {
-    return this == BDXR;
-  }
-
   public boolean isPeppol ()
   {
     return this == PEPPOL;
+  }
+
+  public boolean isBDXR ()
+  {
+    return this == OASIS_BDXR_V1;
+  }
+
+  public boolean isPathConstraint ()
+  {
+    return this == PEPPOL || this == OASIS_BDXR_V1;
   }
 
   @Nullable

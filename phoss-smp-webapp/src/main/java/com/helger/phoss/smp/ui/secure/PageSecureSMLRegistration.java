@@ -39,6 +39,7 @@ import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
+import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
@@ -108,6 +109,9 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
   private void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
+    final boolean bUsePeppolConstraints = eRESTType.isPeppol ();
+    final boolean bUsePathConstraints = eRESTType.isPathConstraint ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLID);
     final String sPhysicalAddress = aWPEC.params ().getAsString (FIELD_PHYSICAL_ADDRESS);
@@ -151,21 +155,36 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       else
       {
         if (!"http".equals (aURL.getProtocol ()))
-          aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
-                                     "The provided logical address must use the 'http' protocol and may not use the '" +
-                                                            aURL.getProtocol () +
-                                                            "' protocol. According to the SMP specification, no other protocols than 'http' are allowed!");
-        // -1 means default port
-        if (aURL.getPort () != 80 && aURL.getPort () != -1)
-          aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
-                                     "The provided logical address must use the default http port 80 and not port " +
-                                                            aURL.getPort () +
-                                                            ". According to the SMP specification, no other ports are allowed!");
-        if (StringHelper.hasText (aURL.getPath ()) && !"/".equals (aURL.getPath ()))
-          aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
-                                     "The provided logical address may not contain a path (" +
-                                                            aURL.getPath () +
-                                                            ") because according to the SMP specifications it must run in the root (/) path!");
+        {
+          if (bUsePeppolConstraints || !"https".equals (aURL.getProtocol ()))
+            aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
+                                       "The provided logical address must use the 'http'" +
+                                                              (bUsePeppolConstraints ? "" : " or the 'https'") +
+                                                              " protocol and may not use the '" +
+                                                              aURL.getProtocol () +
+                                                              "' protocol." +
+                                                              (bUsePeppolConstraints ? " According to the Peppol SMP specification, no other protocols than 'http' are allowed!"
+                                                                                     : ""));
+        }
+
+        if (bUsePeppolConstraints)
+        {
+          // -1 means default port
+          if (aURL.getPort () != 80 && aURL.getPort () != -1)
+            aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
+                                       "The provided logical address must use the default http port 80 and not port " +
+                                                              aURL.getPort () +
+                                                              ". According to the Peppol SMP specification, no other ports are allowed!");
+        }
+
+        if (bUsePathConstraints)
+        {
+          if (StringHelper.hasText (aURL.getPath ()) && !"/".equals (aURL.getPath ()))
+            aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
+                                       "The provided logical address may not contain a path (" +
+                                                              aURL.getPath () +
+                                                              ") because according to the SMP specifications it must run in the root (/) path!");
+        }
       }
     }
 
@@ -223,6 +242,9 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
   private void _updateSMPatSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
+    final boolean bUsePeppolConstraints = eRESTType.isPeppol ();
+    final boolean bUsePathConstraints = eRESTType.isPathConstraint ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLID);
     final String sPhysicalAddress = aWPEC.params ().getAsString (FIELD_PHYSICAL_ADDRESS);
@@ -266,21 +288,34 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       else
       {
         if (!"http".equals (aURL.getProtocol ()))
-          aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
-                                     "The provided logical address must use the 'http' protocol and may not use the '" +
-                                                            aURL.getProtocol () +
-                                                            "' protocol. According to the SMP specification, no other protocols than 'http' are allowed!");
-        // -1 means default port
-        if (aURL.getPort () != 80 && aURL.getPort () != -1)
-          aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
-                                     "The provided logical address must use the default http port 80 and not port " +
-                                                            aURL.getPort () +
-                                                            ". According to the SMP specification, no other ports are allowed!");
-        if (StringHelper.hasText (aURL.getPath ()) && !"/".equals (aURL.getPath ()))
-          aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
-                                     "The provided logical address may not contain a path (" +
-                                                            aURL.getPath () +
-                                                            ") because according to the SMP specifications it must run in the root (/) path!");
+        {
+          if (bUsePeppolConstraints || !"https".equals (aURL.getProtocol ()))
+            aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
+                                       "The provided logical address must use the 'http'" +
+                                                              (bUsePeppolConstraints ? "" : " or the 'https'") +
+                                                              " protocol and may not use the '" +
+                                                              aURL.getProtocol () +
+                                                              "' protocol." +
+                                                              (bUsePeppolConstraints ? " According to the Peppol SMP specification, no other protocols than 'http' are allowed!"
+                                                                                     : ""));
+        }
+        if (bUsePeppolConstraints)
+        {
+          // -1 means default port
+          if (aURL.getPort () != 80 && aURL.getPort () != -1)
+            aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
+                                       "The provided logical address must use the default http port 80 and not port " +
+                                                              aURL.getPort () +
+                                                              ". According to the Peppol SMP specification, no other ports are allowed!");
+        }
+        if (bUsePathConstraints)
+        {
+          if (StringHelper.hasText (aURL.getPath ()) && !"/".equals (aURL.getPath ()))
+            aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
+                                       "The provided logical address may not contain a path (" +
+                                                              aURL.getPath () +
+                                                              ") because according to the SMP specifications it must run in the root (/) path!");
+        }
       }
     }
 

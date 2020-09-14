@@ -63,7 +63,7 @@ public final class APIExecutorListGet extends AbstractSMPAPIExecutor
         aBytes = new SMPMarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
-      case BDXR:
+      case OASIS_BDXR_V1:
       {
         // Unspecified extension
         final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,

@@ -89,7 +89,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
             }
             break;
           }
-          case BDXR:
+          case OASIS_BDXR_V1:
           {
             final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
             if (aServiceMetadata != null)

@@ -86,7 +86,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
             }
             break;
           }
-          case BDXR:
+          case OASIS_BDXR_V1:
           {
             final com.helger.xsds.bdxr.smp1.ServiceGroupType aServiceGroup = new BDXR1MarshallerServiceGroupType (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
             if (aServiceGroup != null)

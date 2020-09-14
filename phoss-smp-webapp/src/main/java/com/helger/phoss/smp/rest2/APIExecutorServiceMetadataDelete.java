@@ -63,7 +63,7 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
         case PEPPOL:
           new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
           break;
-        case BDXR:
+        case OASIS_BDXR_V1:
           new BDXR1ServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
           break;
         default:
