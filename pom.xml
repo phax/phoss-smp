@@ -117,7 +117,7 @@
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>8.2.6</version>
+        <version>8.2.7</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -128,6 +128,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- stay with 0.8.8 to avoid change with pd-client.properties -->
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
