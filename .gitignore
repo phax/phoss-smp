@@ -11,16 +11,22 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-bin/
-target/
-.pmd
-*.iml
-.settings/ 
-.project
-.classpath
-.factorypath
-conf/
 db-*-smp.sql
+private-*
+prod.*
+*.iml
+*.jks
+*.p12
+
+.settings/ 
+bin/
+conf/
+target/
+
+.factorypath
+.classpath
+.pmd
+.project
 pom.xml.releaseBackup
 release.properties
 zz
