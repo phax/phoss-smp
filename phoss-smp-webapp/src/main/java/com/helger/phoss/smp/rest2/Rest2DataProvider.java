@@ -36,7 +36,7 @@ import com.helger.servlet.StaticServerInfo;
 import com.helger.smpclient.url.IBDXLURLProvider;
 import com.helger.smpclient.url.IPeppolURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
-import com.helger.smpclient.url.PeppolDNSResolutionException;
+import com.helger.smpclient.url.SMPDNSResolutionException;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
@@ -128,7 +128,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
           ret = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (m_aParticipantID, m_sSMLZoneName);
         }
     }
-    catch (final PeppolDNSResolutionException ex)
+    catch (final SMPDNSResolutionException ex)
     {
       // Ignore
     }

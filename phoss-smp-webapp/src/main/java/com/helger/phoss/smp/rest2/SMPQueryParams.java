@@ -26,8 +26,8 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.smpclient.url.BDXLURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
-import com.helger.smpclient.url.PeppolDNSResolutionException;
 import com.helger.smpclient.url.PeppolURLProvider;
+import com.helger.smpclient.url.SMPDNSResolutionException;
 
 /**
  * Extracted because used some times
@@ -62,7 +62,7 @@ final class SMPQueryParams
       ret.m_aSMPHostURI = _getURLProvider (eAPIType).getSMPURIOfParticipant (aParticipantID,
                                                                              SMPMetaManager.getSettings ().getSMLDNSZone ());
     }
-    catch (final PeppolDNSResolutionException ex)
+    catch (final SMPDNSResolutionException ex)
     {
       // For BDXL lookup -> no such participant
       return null;

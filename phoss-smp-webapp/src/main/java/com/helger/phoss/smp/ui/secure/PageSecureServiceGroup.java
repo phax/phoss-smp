@@ -104,7 +104,7 @@ import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.smpclient.url.IBDXLURLProvider;
 import com.helger.smpclient.url.IPeppolURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
-import com.helger.smpclient.url.PeppolDNSResolutionException;
+import com.helger.smpclient.url.SMPDNSResolutionException;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 import com.helger.xservlet.forcedredirect.ForcedRedirectException;
@@ -227,7 +227,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                       sSMLZoneName);
               }
           }
-          catch (final PeppolDNSResolutionException ex)
+          catch (final SMPDNSResolutionException ex)
           {
             // Ignore
           }

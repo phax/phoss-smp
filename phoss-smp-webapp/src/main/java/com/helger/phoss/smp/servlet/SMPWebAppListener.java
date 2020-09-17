@@ -235,11 +235,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     if (aConfigRes != null)
       aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
                                                                         .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
-    final IReadableResource aPDClientConfig = PDClientConfiguration.getConfigFile ().getReadResource ();
-    if (aPDClientConfig != null)
-      aCFM.registerConfigurationFile (new ConfigurationFile (aPDClientConfig).setDescription (SMPWebAppConfiguration.getDirectoryName () +
-                                                                                              " client configuration")
-                                                                             .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
+    aCFM.registerAll (PDClientConfiguration.getConfig ());
 
     // If the SMP settings change, the PD client must be re-created
     SMPMetaManager.getSettingsMgr ().callbacks ().add (x -> PDClientProvider.getInstance ().resetPDClient ());

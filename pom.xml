@@ -75,21 +75,21 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>9.4.8</version>
+        <version>9.5.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-schedule-parent-pom</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>6.1.7</version>
+        <version>6.1.8</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -110,29 +110,28 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>9.3.3</version>
+        <version>9.3.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>8.2.7</version>
+        <version>8.2.8</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>8.2.1</version>
+        <version>8.2.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!-- stay with 0.8.8 to avoid change with pd-client.properties -->
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.8.8</version>
+        <version>0.9.1-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -170,7 +169,7 @@
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
-        <version>6.5.5</version>
+        <version>6.5.6</version>
       </dependency>
 
       <dependency>
