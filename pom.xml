@@ -103,7 +103,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-db-parent-pom</artifactId>
-        <version>6.3.0</version>
+        <version>6.3.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -124,7 +124,7 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>8.2.4</version>
+        <version>8.2.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -169,7 +169,7 @@
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
-        <version>6.5.7</version>
+        <version>7.0.0</version>
       </dependency>
 
       <dependency>
