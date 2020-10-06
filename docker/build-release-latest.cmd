@@ -16,7 +16,7 @@
 @REM
 
 @echo off
-set XVER=5.2.6
+set XVER=5.3.0
 
 @REM --------------- Building -----------------------
 

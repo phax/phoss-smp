@@ -6,9 +6,9 @@ It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/cefdi
 
 [![Gitter](https://badges.gitter.im/phax/phoss-smp.svg)](https://gitter.im/phax/peppol-smp-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Latest version: **[5.2.6](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-5.2.6)** (2020-08-20).
+Latest version: **[5.3.0](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-5.3.0)** (2020-10-06).
 
-**!! Users with SQL backend need to change the DB layout for 5.2.x !!**
+**!! Users with SQL backend need to change the DB layout for 5.3.x !!**
 
 Docker containers can be found, depending on the backend you want to use:
 * https://hub.docker.com/r/phelger/phoss-smp-xml/tags (same as https://hub.docker.com/r/phelger/smp/tags)
