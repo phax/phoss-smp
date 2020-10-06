@@ -343,7 +343,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
 
           aWPEC.postRedirectGetInternal (success ().addChildren (div ("The bulk change of the endpoint certificate to"),
                                                                  _getCertificateDisplay (sNewUnifiedCert, aDisplayLocale),
-                                                                 div ("is now running in the background.")));
+                                                                 div ("is now running in the background. Please manually refresh the page to see the update.")));
         }
       }
 

@@ -300,7 +300,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
                                                   sOldURL +
                                                   "' to '" +
                                                   sNewURL +
-                                                  "' is now running in the background."));
+                                                  "' is now running in the background. Please manually refresh the page to see the update."));
         }
       }
 
