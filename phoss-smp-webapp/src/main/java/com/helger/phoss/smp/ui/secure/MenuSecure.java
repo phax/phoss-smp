@@ -50,6 +50,8 @@ public final class MenuSecure
       final IMenuItemPage aServiceGroups = aMenuTree.createRootItem (new PageSecureServiceGroup (CMenuSecure.MENU_SERVICE_GROUPS));
       aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupExport (CMenuSecure.MENU_SERVICE_GROUPS_EXPORT));
       aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupImport (CMenuSecure.MENU_SERVICE_GROUPS_IMPORT));
+      aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupMigrateAway (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_AWAY));
+      aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupMigrateToHere (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_TO_HERE));
     }
     {
       final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new BasePageShowChildren <WebPageExecutionContext> (CMenuSecure.MENU_ENDPOINTS,
