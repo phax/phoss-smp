@@ -64,11 +64,12 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
   }
 
   @Nonnull
-  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID)
+  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
+                                                                      @Nonnull @Nonempty final String sMigrationKey)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
-    final SMPParticipantMigration ret = SMPParticipantMigration.createOutbound (aParticipantID);
+    final SMPParticipantMigration ret = SMPParticipantMigration.createOutbound (aParticipantID, sMigrationKey);
     _createSMPParticipantMigration (ret);
     return ret;
   }
@@ -79,10 +80,11 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
     if (StringHelper.hasNoText (sParticipantMigrationID))
       return EChange.UNCHANGED;
 
+    final SMPParticipantMigration aParticipantMigration;
     m_aRWLock.writeLock ().lock ();
     try
     {
-      final SMPParticipantMigration aParticipantMigration = internalDeleteItem (sParticipantMigrationID);
+      aParticipantMigration = internalDeleteItem (sParticipantMigrationID);
       if (aParticipantMigration == null)
       {
         AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT, "no-such-id", sParticipantMigrationID);
@@ -93,7 +95,12 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditDeleteSuccess (SMPParticipantMigration.OT, sParticipantMigrationID);
+    AuditHelper.onAuditDeleteSuccess (SMPParticipantMigration.OT,
+                                      sParticipantMigrationID,
+                                      aParticipantMigration.getDirection ().getID (),
+                                      aParticipantMigration.getParticipantIdentifier ().getURIEncoded (),
+                                      aParticipantMigration.getInitiationDateTime (),
+                                      aParticipantMigration.getMigrationKey ());
     return EChange.CHANGED;
   }
 

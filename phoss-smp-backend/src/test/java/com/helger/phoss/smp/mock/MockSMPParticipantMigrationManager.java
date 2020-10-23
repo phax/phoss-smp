@@ -13,6 +13,7 @@ package com.helger.phoss.smp.mock;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -26,7 +27,8 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
  */
 final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrationManager
 {
-  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID)
+  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
+                                                                      @Nonnull @Nonempty final String sMigrationKey)
   {
     throw new UnsupportedOperationException ();
   }

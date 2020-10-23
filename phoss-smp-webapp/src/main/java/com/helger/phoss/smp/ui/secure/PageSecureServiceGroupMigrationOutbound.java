@@ -16,10 +16,14 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import java.security.GeneralSecurityException;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
@@ -34,14 +38,22 @@ import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
+import com.helger.peppol.smlclient.participant.BadRequestFault;
+import com.helger.peppol.smlclient.participant.InternalErrorFault;
+import com.helger.peppol.smlclient.participant.NotFoundFault;
+import com.helger.peppol.smlclient.participant.UnauthorizedFault;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
+import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
@@ -67,6 +79,7 @@ import com.helger.photon.uictrls.datatables.column.EDTColType;
  */
 public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWebPageForm <ISMPParticipantMigration>
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureServiceGroupMigrationOutbound.class);
   private static final String FIELD_PARTICIPANT_ID = "pid";
 
   public PageSecureServiceGroupMigrationOutbound (@Nonnull @Nonempty final String sID)
@@ -79,9 +92,10 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                 @Nonnull final BootstrapForm aForm,
                                 @Nonnull final ISMPParticipantMigration aSelectedObject)
       {
-        aForm.addChild (question ("Are you sure you want to delete the outbound Participant Migration for '" +
+        aForm.addChild (question ("Are you sure you want to finish the outbound Participant Migration for '" +
                                   aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                  "'?"));
+                                  "'? Make sure that you communicated the Migration Key ").addChild (code (aSelectedObject.getMigrationKey ()))
+                                                                                          .addChild (" to the owner of the other SMP."));
       }
 
       @Override
@@ -91,7 +105,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
         if (aParticipantMigrationMgr.deleteParticipantMigration (aSelectedObject.getID ()).isChanged ())
           aWPEC.postRedirectGetInternal (success ("The outbound Participant Migration for '" +
                                                   aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                                  "' was successfully deleted!"));
+                                                  "' was successfully removed!"));
         else
           aWPEC.postRedirectGetInternal (error ("Failed to delete outbound Participant Migration for '" +
                                                 aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
@@ -107,7 +121,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     if (aSettings.getSMLInfo () == null)
     {
-      aNodeList.addChild (warn ("No valid SML Configuration is selected hence no participants can be migrated."));
+      aNodeList.addChild (warn ("No valid SML Configuration is selected hence no participant can be migrated."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Select SML Configuration in the Settings")
                                                 .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
                                                 .setIcon (EDefaultIcon.EDIT));
@@ -118,7 +132,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     }
     if (!aSettings.isSMLEnabled ())
     {
-      aNodeList.addChild (warn ("SML Connection is not configured hence no participants can be migrated."));
+      aNodeList.addChild (warn ("SML Connection is not configured hence no participant can be migrated."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Enable SML in the Settings")
                                                 .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
                                                 .setIcon (EDefaultIcon.EDIT));
@@ -202,7 +216,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                                                      aDisplayLocale,
                                                                                      x -> aAffectedPIDs.containsNone (y -> x.getParticpantIdentifier ()
                                                                                                                             .hasSameContent (y))))
-                                                 .setHelpText ("Select the Service Group to migrate to another SMP.")
+                                                 .setHelpText ("Select the Service Group to migrate to another SMP. Each Service Group can only be migrated once.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_PARTICIPANT_ID)));
   }
 
@@ -214,6 +228,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   {
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
     final String sParticipantID = aWPEC.params ().getAsString (FIELD_PARTICIPANT_ID);
     final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sParticipantID);
@@ -231,22 +246,39 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 
     if (aFormErrors.isEmpty ())
     {
-      final ISMPParticipantMigration aParticipantMigration = aParticipantMigrationMgr.createOutboundParticipantMigration (aParticipantID);
-      if (aParticipantMigration != null)
+      LOGGER.info ("Starting migration of participant ID '" + aParticipantID.getURIEncoded () + "'");
+
+      // Lets take this to the SML
+      String sMigrationKey = null;
+      if (true)
       {
-        final HCNodeList aNL = new HCNodeList ();
-        aNL.addChild (success ("The participant migration for '" +
-                               aParticipantID.getURIEncoded () +
-                               "' was successfully created. The created migration key is ").addChild (code (aParticipantMigration.getMigrationKey ())));
-        // Now lets take this to the SML
-        aWPEC.postRedirectGetInternal (aNL);
+        try
+        {
+          final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSettings.getSMLInfo ());
+          aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
+          sMigrationKey = aCaller.prepareToMigrate (aParticipantID, SMPServerConfiguration.getSMLSMPID ());
+        }
+        catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault ex)
+        {
+          aWPEC.postRedirectGetInternal (error ("Failed to prepare the migration for participant '" +
+                                                aParticipantID.getURIEncoded () +
+                                                "' in SML.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+        }
       }
       else
       {
-        aWPEC.postRedirectGetInternal (error ("Failed to create the outbound participant migration for participant '" +
-                                              aParticipantID.getURIEncoded () +
-                                              "'"));
+        // Dummy for testing only
+        sMigrationKey = ManageParticipantIdentifierServiceCaller.createRandomMigrationKey ();
+        LOGGER.warn ("Created migration key '" + sMigrationKey + "' was not send to SML!");
       }
+
+      // Remember internally
+      aParticipantMigrationMgr.createOutboundParticipantMigration (aParticipantID, sMigrationKey);
+
+      aWPEC.postRedirectGetInternal (success ().addChild (div ("The participant migration for '" +
+                                                               aParticipantID.getURIEncoded () +
+                                                               "' was successfully created."))
+                                               .addChild (div ("The created migration key is ").addChild (code (sMigrationKey))));
     }
   }
 
@@ -282,8 +314,9 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       aRow.addCell (isActionAllowed (aWPEC, EWebPageFormAction.DELETE, aCurObject)
                                                                                    ? createDeleteLink (aWPEC,
                                                                                                        aCurObject,
-                                                                                                       "Delete Participant Migration of " +
-                                                                                                                   sParticipantID)
+                                                                                                       "Finish Participant Migration of '" +
+                                                                                                                   sParticipantID +
+                                                                                                                   "'")
                                                                                    : createEmptyAction ());
     }
 

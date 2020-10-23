@@ -3,6 +3,7 @@ package com.helger.phoss.smp.domain.pmigration;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
@@ -18,14 +19,18 @@ public interface ISMPParticipantMigrationManager
 {
   /**
    * Create a new outbound participant migration for the provided participant
-   * identifier. The migration key is automatically created inside.
+   * identifier.
    *
    * @param aParticipantID
    *        The participant ID to use. May not be <code>null</code>.
+   * @param sMigrationKey
+   *        The migration key received from the SML. May neither be
+   *        <code>null</code> nor empty.
    * @return The created migration domain object. Never <code>null</code>.
    */
   @Nonnull
-  ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull IParticipantIdentifier aParticipantID);
+  ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull IParticipantIdentifier aParticipantID,
+                                                               @Nonnull @Nonempty String sMigrationKey);
 
   /**
    * Delete an existing participant migration.

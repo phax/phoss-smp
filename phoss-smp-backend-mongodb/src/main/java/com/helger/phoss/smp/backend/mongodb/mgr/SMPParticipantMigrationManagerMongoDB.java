@@ -42,7 +42,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
-  public ISMPParticipantMigration createOutboundParticipantMigration (final IParticipantIdentifier aParticipantID)
+  public ISMPParticipantMigration createOutboundParticipantMigration (final IParticipantIdentifier aParticipantID,
+                                                                      final String sMigrationKey)
   {
     // TODO
     throw new UnsupportedOperationException ();

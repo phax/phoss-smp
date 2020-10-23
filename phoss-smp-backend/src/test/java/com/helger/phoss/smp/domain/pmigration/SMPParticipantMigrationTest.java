@@ -11,6 +11,7 @@ import org.junit.rules.TestRule;
 
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.string.StringHelper;
+import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.SimpleIdentifierFactory;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
@@ -30,7 +31,8 @@ public final class SMPParticipantMigrationTest
   public void testOutbound ()
   {
     final IParticipantIdentifier aPI = SimpleIdentifierFactory.INSTANCE.createParticipantIdentifier ("foo", "bar");
-    final SMPParticipantMigration pm = SMPParticipantMigration.createOutbound (aPI);
+    final SMPParticipantMigration pm = SMPParticipantMigration.createOutbound (aPI,
+                                                                               ManageParticipantIdentifierServiceCaller.createRandomMigrationKey ());
     assertNotNull (pm);
     assertTrue (StringHelper.hasText (pm.getID ()));
     assertEquals (EParticipantMigrationDirection.OUTBOUND, pm.getDirection ());
