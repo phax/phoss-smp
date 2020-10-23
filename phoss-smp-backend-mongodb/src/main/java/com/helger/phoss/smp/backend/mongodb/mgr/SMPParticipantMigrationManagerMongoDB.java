@@ -16,6 +16,11 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
@@ -37,9 +42,45 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
-  public ISMPParticipantMigration createOutboundMigration (final IParticipantIdentifier aParticipantID)
+  public ISMPParticipantMigration createOutboundParticipantMigration (final IParticipantIdentifier aParticipantID)
   {
     // TODO
     throw new UnsupportedOperationException ();
+  }
+
+  @Nonnull
+  public EChange deleteParticipantMigration (@Nullable final String sParticipantMigrationID)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public ISMPParticipantMigration getParticipantMigrationOfID (final String sID)
+  {
+    // TODO
+    return null;
+  }
+
+  public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations ()
+  {
+    // TODO
+    return null;
+  }
+
+  public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations ()
+  {
+    // TODO
+    return null;
+  }
+
+  public boolean containsOutboundMigration (final IParticipantIdentifier aParticipantID)
+  {
+    // TODO
+    return false;
+  }
+
+  public boolean containsInboundMigration (final IParticipantIdentifier aParticipantID)
+  {
+    // TODO
+    return false;
   }
 }

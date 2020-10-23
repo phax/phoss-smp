@@ -34,6 +34,16 @@ public enum EParticipantMigrationDirection implements IHasID <String>
     return m_sID;
   }
 
+  public boolean isOutbound ()
+  {
+    return this == OUTBOUND;
+  }
+
+  public boolean isInbound ()
+  {
+    return this == INBOUND;
+  }
+
   @Nullable
   public static EParticipantMigrationDirection getFromIDOrNull (@Nullable final String sID)
   {

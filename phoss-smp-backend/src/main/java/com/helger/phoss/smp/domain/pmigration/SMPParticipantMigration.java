@@ -129,16 +129,23 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   @Nonnull
   public static SMPParticipantMigration createOutbound (@Nonnull final IParticipantIdentifier aParticipantID)
   {
+    return createOutbound (aParticipantID, ManageParticipantIdentifierServiceCaller.createRandomMigrationKey ());
+  }
+
+  @Nonnull
+  public static SMPParticipantMigration createOutbound (@Nonnull final IParticipantIdentifier aParticipantID,
+                                                        @Nonnull @Nonempty final String sMigrationKey)
+  {
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
                                         EParticipantMigrationDirection.OUTBOUND,
                                         aParticipantID,
                                         PDTFactory.getCurrentLocalDateTime (),
-                                        ManageParticipantIdentifierServiceCaller.createRandomMigrationKey ());
+                                        sMigrationKey);
   }
 
   @Nonnull
   public static SMPParticipantMigration createInbound (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                        @Nonnull @Nonempty final String sMigrationKey)
+                                                       @Nonnull @Nonempty final String sMigrationKey)
   {
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
                                         EParticipantMigrationDirection.INBOUND,

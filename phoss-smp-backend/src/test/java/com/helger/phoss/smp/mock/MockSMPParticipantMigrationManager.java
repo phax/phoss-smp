@@ -11,7 +11,10 @@
 package com.helger.phoss.smp.mock;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
@@ -23,8 +26,38 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
  */
 final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrationManager
 {
-  public ISMPParticipantMigration createOutboundMigration (@Nonnull final IParticipantIdentifier aParticipantID)
+  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();
+  }
+
+  public EChange deleteParticipantMigration (@Nullable final String sParticipantMigrationID)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public ISMPParticipantMigration getParticipantMigrationOfID (final String sID)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public boolean containsOutboundMigration (final IParticipantIdentifier aParticipantID)
+  {
+    return false;
+  }
+
+  public boolean containsInboundMigration (final IParticipantIdentifier aParticipantID)
+  {
+    return false;
   }
 }

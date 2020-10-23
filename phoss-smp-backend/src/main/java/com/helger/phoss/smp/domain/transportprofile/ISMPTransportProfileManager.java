@@ -70,8 +70,8 @@ public interface ISMPTransportProfileManager
    *        <code>null</code>.
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
-  @Nullable
-  EChange removeSMPTransportProfile (@Nullable String sSMPTransportProfileID);
+  @Nonnull
+  EChange deleteSMPTransportProfile (@Nullable String sSMPTransportProfileID);
 
   /**
    * @return An unsorted collection of all contained transport profile. Never

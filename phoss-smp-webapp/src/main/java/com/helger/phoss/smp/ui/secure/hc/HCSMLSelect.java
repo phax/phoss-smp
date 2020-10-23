@@ -56,10 +56,11 @@ public class HCSMLSelect extends HCExtSelect
                       @Nullable final Predicate <? super ISMLInfo> aFilter)
   {
     super (aRF);
-    SMPMetaManager.getSMLInfoMgr ()
-                  .getAllSMLInfos ()
-                  .getSortedInline (IHasDisplayName.getComparatorCollating (aDisplayLocale))
-                  .findAll (aFilter, x -> addOption (x.getID (), getDisplayName (x)));
+    for (final ISMLInfo aItem : SMPMetaManager.getSMLInfoMgr ()
+                                              .getAllSMLInfos ()
+                                              .getSortedInline (IHasDisplayName.getComparatorCollating (aDisplayLocale)))
+      if (aFilter == null || aFilter.test (aItem))
+        addOption (aItem.getID (), getDisplayName (aItem));
     addOptionPleaseSelect (aDisplayLocale);
   }
 }
