@@ -26,7 +26,8 @@ import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 
 /**
- * Special SMP server JUnit test rule.
+ * Special SMP server JUnit test rule. This test rules DOES NOT spawn a server
+ * process.
  *
  * @author Philip Helger
  */

@@ -7,12 +7,15 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.sml.CSMLDefault;
+import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppolid.IParticipantIdentifier;
 
 /**
@@ -31,16 +34,23 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   private final LocalDateTime m_aInitiationDateTime;
   private final String m_sMigrationKey;
 
+  /**
+   * Check if the provided migration key matches the SML requirements.
+   *
+   * @param sMigrationKey
+   *        The migration key to check. May be <code>null</code>.
+   * @return <code>true</code> if the key is valid, <code>false</code> if not.
+   */
   public static boolean isValidMigrationKey (@Nullable final String sMigrationKey)
   {
     return StringHelper.hasText (sMigrationKey) && RegExHelper.stringMatchesPattern (CSMLDefault.MIGRATION_CODE_PATTERN, sMigrationKey);
   }
 
-  public SMPParticipantMigration (@Nonnull @Nonempty final String sID,
-                                  @Nonnull final EParticipantMigrationDirection eDirection,
-                                  @Nonnull final IParticipantIdentifier aParticipantID,
-                                  @Nonnull final LocalDateTime aInitiationDateTime,
-                                  @Nonnull @Nonempty final String sMigrationKey)
+  protected SMPParticipantMigration (@Nonnull @Nonempty final String sID,
+                                     @Nonnull final EParticipantMigrationDirection eDirection,
+                                     @Nonnull final IParticipantIdentifier aParticipantID,
+                                     @Nonnull final LocalDateTime aInitiationDateTime,
+                                     @Nonnull @Nonempty final String sMigrationKey)
   {
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (eDirection, "eDirection");
@@ -114,5 +124,26 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
                                        .append ("InitiationDateTime", m_aInitiationDateTime)
                                        .append ("MigrationKey", m_sMigrationKey)
                                        .getToString ();
+  }
+
+  @Nonnull
+  public static SMPParticipantMigration createOutbound (@Nonnull final IParticipantIdentifier aParticipantID)
+  {
+    return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
+                                        EParticipantMigrationDirection.OUTBOUND,
+                                        aParticipantID,
+                                        PDTFactory.getCurrentLocalDateTime (),
+                                        ManageParticipantIdentifierServiceCaller.createRandomMigrationKey ());
+  }
+
+  @Nonnull
+  public static SMPParticipantMigration createInbound (@Nonnull final IParticipantIdentifier aParticipantID,
+                                                        @Nonnull @Nonempty final String sMigrationKey)
+  {
+    return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
+                                        EParticipantMigrationDirection.INBOUND,
+                                        aParticipantID,
+                                        PDTFactory.getCurrentLocalDateTime (),
+                                        sMigrationKey);
   }
 }

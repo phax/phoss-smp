@@ -15,6 +15,8 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardMicroTypeConverter;
+import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
+import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigrationMicroTypeConverter;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.phoss.smp.domain.redirect.SMPRedirectMicroTypeConverter;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
@@ -40,6 +42,7 @@ public final class MicroTypeConverterRegistrarSMPServer implements IMicroTypeCon
   {
     aRegistry.registerMicroElementTypeConverter (SMPBusinessCard.class, new SMPBusinessCardMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPEndpoint.class, new SMPEndpointMicroTypeConverter ());
+    aRegistry.registerMicroElementTypeConverter (SMPParticipantMigration.class, new SMPParticipantMigrationMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPProcess.class, new SMPProcessMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPRedirect.class, new SMPRedirectMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPServiceGroup.class, new SMPServiceGroupMicroTypeConverter ());
