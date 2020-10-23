@@ -92,10 +92,9 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                 @Nonnull final BootstrapForm aForm,
                                 @Nonnull final ISMPParticipantMigration aSelectedObject)
       {
-        aForm.addChild (question ("Are you sure you want to finish the outbound Participant Migration for '" +
+        aForm.addChild (question ("Are you sure you want to cancel the outbound Participant Migration for '" +
                                   aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                  "'? Make sure that you communicated the Migration Key ").addChild (code (aSelectedObject.getMigrationKey ()))
-                                                                                          .addChild (" to the owner of the other SMP."));
+                                  "'? This action will keep the Service Group in this SMP and not migrate it away."));
       }
 
       @Override
@@ -314,7 +313,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       aRow.addCell (isActionAllowed (aWPEC, EWebPageFormAction.DELETE, aCurObject)
                                                                                    ? createDeleteLink (aWPEC,
                                                                                                        aCurObject,
-                                                                                                       "Finish Participant Migration of '" +
+                                                                                                       "Cancel Participant Migration of '" +
                                                                                                                    sParticipantID +
                                                                                                                    "'")
                                                                                    : createEmptyAction ());
