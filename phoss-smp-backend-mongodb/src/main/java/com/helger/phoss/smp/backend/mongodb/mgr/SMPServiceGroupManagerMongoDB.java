@@ -197,7 +197,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   }
 
   @Nonnull
-  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID) throws SMPServerException
+  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
+                                        final boolean bDeleteInSML) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     if (LOGGER.isDebugEnabled ())
@@ -208,15 +209,18 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     if (aServiceGroup == null)
       return EChange.UNCHANGED;
 
-    // Delete in SML - throws exception in case of error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
-    try
+    if (bDeleteInSML)
     {
-      aHook.deleteServiceGroup (aParticipantID);
-    }
-    catch (final RegistrationHookException ex)
-    {
-      throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", ex);
+      // Delete in SML - throws exception in case of error
+      try
+      {
+        aHook.deleteServiceGroup (aParticipantID);
+      }
+      catch (final RegistrationHookException ex)
+      {
+        throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", ex);
+      }
     }
 
     // Delete all redirects (must be done before the SG is deleted)
@@ -236,14 +240,17 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
         LOGGER.debug ("deleteSMPServiceGroup - failure");
 
       // restore in SML
-      // Undo deletion in SML!
-      try
+      if (bDeleteInSML)
       {
-        aHook.undoDeleteServiceGroup (aParticipantID);
-      }
-      catch (final RegistrationHookException ex)
-      {
-        LOGGER.error ("Failed to undoDeleteServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex);
+        // Undo deletion in SML!
+        try
+        {
+          aHook.undoDeleteServiceGroup (aParticipantID);
+        }
+        catch (final RegistrationHookException ex)
+        {
+          LOGGER.error ("Failed to undoDeleteServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex);
+        }
       }
 
       throw new SMPNotFoundException ("No such service group '" + aParticipantID.getURIEncoded () + "'");

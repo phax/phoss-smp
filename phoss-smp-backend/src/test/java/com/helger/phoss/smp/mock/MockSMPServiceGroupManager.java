@@ -49,7 +49,7 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
     throw new UnsupportedOperationException ();
   }
 
-  public EChange deleteSMPServiceGroup (final IParticipantIdentifier aParticipantID)
+  public EChange deleteSMPServiceGroup (final IParticipantIdentifier aParticipantID, final boolean bDeleteInSML)
   {
     throw new UnsupportedOperationException ();
   }

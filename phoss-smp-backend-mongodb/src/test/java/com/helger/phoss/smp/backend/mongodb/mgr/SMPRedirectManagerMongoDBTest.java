@@ -69,7 +69,7 @@ public final class SMPRedirectManagerMongoDBTest
     // Delete existing service group
     final IParticipantIdentifier aPI = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                                        "0088:dummy");
-    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
     assertNotNull (aSG);
@@ -88,7 +88,7 @@ public final class SMPRedirectManagerMongoDBTest
     }
     finally
     {
-      aServiceGroupMgr.deleteSMPServiceGroup (aPI);
+      aServiceGroupMgr.deleteSMPServiceGroup (aPI, true);
     }
   }
 
@@ -109,7 +109,7 @@ public final class SMPRedirectManagerMongoDBTest
     // Delete existing service group
     final IParticipantIdentifier aPI = aIdentifierFactory.createParticipantIdentifier ("bla-sch-eme", "0088:UpperCase");
     assertNotNull (aPI);
-    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
     assertNotNull (aSG);
@@ -128,7 +128,7 @@ public final class SMPRedirectManagerMongoDBTest
     }
     finally
     {
-      aServiceGroupMgr.deleteSMPServiceGroup (aPI);
+      aServiceGroupMgr.deleteSMPServiceGroup (aPI, true);
     }
   }
 
@@ -156,7 +156,7 @@ public final class SMPRedirectManagerMongoDBTest
     // Delete existing service group
     final IParticipantIdentifier aPI = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                                        "0088:dummy");
-    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup ("blub", aPI, null);
     assertNotNull (aSG);
@@ -167,7 +167,7 @@ public final class SMPRedirectManagerMongoDBTest
     }
     finally
     {
-      aServiceGroupMgr.deleteSMPServiceGroup (aPI);
+      aServiceGroupMgr.deleteSMPServiceGroup (aPI, true);
     }
   }
 }
