@@ -27,6 +27,7 @@ import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.backend.SMPBackendRegistry;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.LoggingSMPBusinessCardCallback;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.LoggingSMPServiceGroupCallback;
@@ -66,6 +67,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPRedirectManager m_aRedirectMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
   private ISMPBusinessCardManager m_aBusinessCardMgr;
+  private ISMPParticipantMigrationManager m_aParticipantMigrationMgr;
   private ETriState m_eBackendConnectionEstablished = ETriState.UNDEFINED;
 
   /**
@@ -212,6 +214,10 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_aServiceInformationMgr == null)
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 
+      m_aParticipantMigrationMgr = s_aManagerProvider.createParticipantMigrationMgr ();
+      if (m_aParticipantMigrationMgr == null)
+        throw new IllegalStateException ("Failed to create ParticipantMigration manager!");
+
       // May be null!
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
 
@@ -288,6 +294,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static ISMPServiceInformationManager getServiceInformationMgr ()
   {
     return getInstance ().m_aServiceInformationMgr;
+  }
+
+  @Nonnull
+  public static ISMPParticipantMigrationManager getParticipantMigrationMgr ()
+  {
+    return getInstance ().m_aParticipantMigrationMgr;
   }
 
   @Nullable

@@ -23,15 +23,15 @@ import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
 /**
- * Class to migrate an existing ServiceGroup from this SMP to another SMP.
+ * Class to migrate an existing ServiceGroup from another SMP to this SMP.
  *
  * @author Philip Helger
  */
-public final class PageSecureServiceGroupMigrateAway extends AbstractSMPWebPage
+public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWebPage
 {
-  public PageSecureServiceGroupMigrateAway (@Nonnull @Nonempty final String sID)
+  public PageSecureServiceGroupMigrationInbound (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "Migrate to another SMP");
+    super (sID, "Migrate to this SMP");
   }
 
   @Override

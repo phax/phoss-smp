@@ -16,6 +16,7 @@ import com.helger.commons.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -75,6 +76,12 @@ public final class MockSMPManagerProvider implements ISMPManagerProvider
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new MockSMPServiceInformationManager ();
+  }
+
+  @Nonnull
+  public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
+  {
+    return new MockSMPParticipantMigrationManager ();
   }
 
   @Nonnull

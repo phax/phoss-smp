@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -113,6 +114,14 @@ public interface ISMPManagerProvider
   @Nonnull
   ISMPServiceInformationManager createServiceInformationMgr (@Nonnull IIdentifierFactory aIdentifierFactory,
                                                              @Nonnull ISMPServiceGroupManager aServiceGroupMgr);
+
+  /**
+   * @return A new SMP participant migration manager. May not be
+   *         <code>null</code>.
+   * @since 5.3.1
+   */
+  @Nonnull
+  ISMPParticipantMigrationManager createParticipantMigrationMgr ();
 
   /**
    * @param aIdentifierFactory
