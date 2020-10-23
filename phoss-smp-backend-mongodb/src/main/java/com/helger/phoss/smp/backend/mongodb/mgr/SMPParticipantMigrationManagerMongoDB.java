@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.mongodb.client.model.Indexes;
 
@@ -33,5 +35,11 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   {
     super ("smp-participant-migration");
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
+  }
+
+  public ISMPParticipantMigration createOutboundMigration (final IParticipantIdentifier aParticipantID)
+  {
+    // TODO
+    throw new UnsupportedOperationException ();
   }
 }

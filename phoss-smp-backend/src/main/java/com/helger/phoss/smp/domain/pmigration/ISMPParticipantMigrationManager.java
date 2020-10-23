@@ -1,5 +1,9 @@
 package com.helger.phoss.smp.domain.pmigration;
 
+import javax.annotation.Nonnull;
+
+import com.helger.peppolid.IParticipantIdentifier;
+
 /**
  * This is the interface for managing participant migrations.
  *
@@ -8,5 +12,6 @@ package com.helger.phoss.smp.domain.pmigration;
  */
 public interface ISMPParticipantMigrationManager
 {
-
+  @Nonnull
+  ISMPParticipantMigration createOutboundMigration (@Nonnull IParticipantIdentifier aParticipantID);
 }
