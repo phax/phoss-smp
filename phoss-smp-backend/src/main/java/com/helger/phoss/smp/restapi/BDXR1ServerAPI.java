@@ -363,7 +363,7 @@ public final class BDXR1ServerAPI
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
 
-      aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
+      aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID, true);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");

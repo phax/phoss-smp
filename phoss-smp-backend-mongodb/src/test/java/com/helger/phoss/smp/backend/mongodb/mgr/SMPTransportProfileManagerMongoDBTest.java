@@ -63,7 +63,7 @@ public final class SMPTransportProfileManagerMongoDBTest
         assertTrue (aInfo.getName ().startsWith ("bla "));
       }
       for (final ISMPTransportProfile aCreate : aCreated)
-        assertTrue (aMgr.removeSMPTransportProfile (aCreate.getID ()).isChanged ());
+        assertTrue (aMgr.deleteSMPTransportProfile (aCreate.getID ()).isChanged ());
       assertEquals (0, aMgr.getAllSMPTransportProfiles ().size ());
     }
   }

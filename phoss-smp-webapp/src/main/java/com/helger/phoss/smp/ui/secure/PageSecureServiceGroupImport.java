@@ -303,7 +303,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
           final IParticipantIdentifier aPI = aDeleteServiceGroup.getParticpantIdentifier ();
           try
           {
-            if (aServiceGroupMgr.deleteSMPServiceGroup (aPI).isChanged ())
+            if (aServiceGroupMgr.deleteSMPServiceGroup (aPI, true).isChanged ())
             {
               aLogger.success ("Successfully deleted service group " + aDeleteServiceGroup.getID ());
               aDeletedServiceGroups.add (aPI);

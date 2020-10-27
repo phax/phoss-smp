@@ -362,7 +362,7 @@ public final class SMPServerAPI
       SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
+      aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID, true);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");

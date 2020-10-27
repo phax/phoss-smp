@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.datetime.PDTFactory;
@@ -15,7 +18,6 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppol.sml.CSMLDefault;
-import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppolid.IParticipantIdentifier;
 
 /**
@@ -27,6 +29,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 public class SMPParticipantMigration implements ISMPParticipantMigration
 {
   public static final ObjectType OT = new ObjectType ("smpparticipantmigration");
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPParticipantMigration.class);
 
   private final String m_sID;
   private final EParticipantMigrationDirection m_eDirection;
@@ -57,7 +60,9 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aInitiationDateTime, "InitiationDateTime");
     ValueEnforcer.notEmpty (sMigrationKey, "MigrationKey");
-    ValueEnforcer.isTrue (isValidMigrationKey (sMigrationKey), () -> "The migration key '" + sMigrationKey + "' is invalid");
+
+    if (!isValidMigrationKey (sMigrationKey))
+      LOGGER.warn ("The migration key '" + sMigrationKey + "' is invalid");
 
     m_sID = sID;
     m_eDirection = eDirection;
@@ -127,18 +132,19 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   }
 
   @Nonnull
-  public static SMPParticipantMigration createOutbound (@Nonnull final IParticipantIdentifier aParticipantID)
+  public static SMPParticipantMigration createOutbound (@Nonnull final IParticipantIdentifier aParticipantID,
+                                                        @Nonnull @Nonempty final String sMigrationKey)
   {
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
                                         EParticipantMigrationDirection.OUTBOUND,
                                         aParticipantID,
                                         PDTFactory.getCurrentLocalDateTime (),
-                                        ManageParticipantIdentifierServiceCaller.createRandomMigrationKey ());
+                                        sMigrationKey);
   }
 
   @Nonnull
   public static SMPParticipantMigration createInbound (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                        @Nonnull @Nonempty final String sMigrationKey)
+                                                       @Nonnull @Nonempty final String sMigrationKey)
   {
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
                                         EParticipantMigrationDirection.INBOUND,
