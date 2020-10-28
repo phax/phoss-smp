@@ -40,6 +40,13 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
     {}
 
     @Override
+    protected boolean isUseDefaultAutoCommit ()
+    {
+      // No auto commit
+      return false;
+    }
+
+    @Override
     protected String getJDBCDriverClassName ()
     {
       return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER);
