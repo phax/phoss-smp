@@ -67,7 +67,9 @@ public final class MainDeleteManyServiceGroups
     try
     {
       final StopWatch aSWOverall = StopWatch.createdStarted ();
-      for (int i = 0; i < 1_000; ++i)
+      final int nStart = 0;
+      final int nCount = 100;
+      for (int i = nStart; i < nStart + nCount; ++i)
       {
         final StopWatch aSW = StopWatch.createdStarted ();
         final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
