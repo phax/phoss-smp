@@ -18,9 +18,7 @@ public final class SMPDBExecutor extends DBExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPDBExecutor.class);
 
-  public static final SMPDBExecutor INSTANCE = new SMPDBExecutor ();
-
-  private SMPDBExecutor ()
+  public SMPDBExecutor ()
   {
     super (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
 
@@ -35,8 +33,13 @@ public final class SMPDBExecutor extends DBExecutor
       // false: don't trigger callback, because the source is DBExecutor
       SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew, false);
     });
-    // Allow communicating in the other direction as well
-    SMPMetaManager.getInstance ().setBackendConnectionStatusChangeCallback (eNew -> this.resetConnectionEstablished ());
+
+    // Cannot be done here, because of initialization order
+    if (false)
+    {
+      // Allow communicating in the other direction as well
+      SMPMetaManager.getInstance ().setBackendConnectionStatusChangeCallback (eNew -> this.resetConnectionEstablished ());
+    }
 
     if (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
                           SMPJDBCConfiguration.DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE))

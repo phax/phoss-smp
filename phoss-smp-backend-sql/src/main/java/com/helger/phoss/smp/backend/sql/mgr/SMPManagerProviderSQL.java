@@ -27,6 +27,7 @@ import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
+import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
@@ -35,6 +36,7 @@ import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -60,10 +62,12 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   private static final String SMP_TRANSPORT_PROFILES_XML = "transportprofiles.xml";
 
   private final EDatabaseType m_eDBType;
+  private final SMPDBExecutor m_aDBExec;
 
   public SMPManagerProviderSQL ()
   {
     m_eDBType = SMPDataSourceSingleton.getDatabaseType ();
+    m_aDBExec = new SMPDBExecutor ();
   }
 
   public void beforeInitManagers ()
@@ -105,12 +109,22 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     if (false)
       aFlyway.validate ();
     aFlyway.migrate ();
+
+    // Register this here, so that the SMPMetaManager is available
+    // Allow communicating in the other direction as well
+    SMPMetaManager.getInstance ().setBackendConnectionStatusChangeCallback (eNew -> m_aDBExec.resetConnectionEstablished ());
   }
 
   @Nonnull
   public ETriState getBackendConnectionEstablishedDefaultState ()
   {
     return ETriState.UNDEFINED;
+  }
+
+  @Nonnull
+  public DBExecutor getDBExecutor ()
+  {
+    return m_aDBExec;
   }
 
   // TODO currently also file based
@@ -158,7 +172,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor.INSTANCE);
+    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (m_aDBExec);
     // Enable cache by default
     ret.setCacheEnabled (SMPServerConfiguration.getConfigFile ().getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
     return ret;
@@ -168,21 +182,21 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                 @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPRedirectManagerJDBC (SMPDBExecutor.INSTANCE, aServiceGroupMgr);
+    return new SMPRedirectManagerJDBC (m_aDBExec, aServiceGroupMgr);
   }
 
   @Nonnull
   public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPServiceInformationManagerJDBC (SMPDBExecutor.INSTANCE, aServiceGroupMgr);
+    return new SMPServiceInformationManagerJDBC (m_aDBExec, aServiceGroupMgr);
   }
 
   @Nullable
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                         @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPBusinessCardManagerJDBC (SMPDBExecutor.INSTANCE);
+    return new SMPBusinessCardManagerJDBC (m_aDBExec);
   }
 
   @Override

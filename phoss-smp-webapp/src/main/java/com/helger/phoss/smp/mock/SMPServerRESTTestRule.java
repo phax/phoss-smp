@@ -59,7 +59,7 @@ public class SMPServerRESTTestRule extends ExternalResource
     // SML disabled
     SMPMetaManager.getSettingsMgr ().updateSettings (false, true, false, false, "dummy", false, false, ESML.DEVELOPMENT_LOCAL);
 
-    LOGGER.info ("Finished before");
+    LOGGER.info ("Finished SMPServerRESTTestRule before");
   }
 
   @Override
@@ -67,13 +67,13 @@ public class SMPServerRESTTestRule extends ExternalResource
   {
     try
     {
-      LOGGER.info ("Shutting down server");
+      LOGGER.info ("Shutting down SMP server");
       if (m_aServer != null)
         m_aServer.shutDownServer ();
 
       // Reset for next run
       SMPMetaManager.setManagerProvider (null);
-      LOGGER.info ("Finished shutting down server");
+      LOGGER.info ("Finished shutting down SMP server");
     }
     catch (final IOException ex)
     {
