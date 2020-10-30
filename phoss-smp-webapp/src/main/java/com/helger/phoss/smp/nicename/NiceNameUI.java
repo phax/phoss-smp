@@ -120,7 +120,7 @@ public final class NiceNameUI
     {
       if (aNN.containsProcessID (aProcessID))
         return createFormattedID (sURI, "Matching Process Identifier", EBootstrapBadgeType.SUCCESS, false, bInDetails);
-      return createFormattedID (sURI, "Unexpected Process Identifier", EBootstrapBadgeType.WARNING, false, bInDetails);
+      return createFormattedID (sURI, "Unexpected Process Identifier", EBootstrapBadgeType.WARNING, false, bInDetails || true);
     }
     return createFormattedID (sURI, null, null, false, bInDetails);
   }
