@@ -33,6 +33,7 @@ import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.pub.SMPRendererPublic;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
@@ -103,12 +104,21 @@ public final class SMPRendererSecure
   @Nonnull
   public static IHCNode getMenuContent (@Nonnull final ILayoutExecutionContext aLEC)
   {
+    final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final HCNodeList ret = new HCNodeList ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
     ret.addChild (BootstrapMenuItemRenderer.createSideBarMenu (aLEC));
 
     final BootstrapSuccessBox aBox = new BootstrapSuccessBox ().addClass (CBootstrapCSS.MT_2);
+
+    if (SMPMetaManager.getInstance ().getBackendConnectionEstablished ().isFalse ())
+    {
+      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
+                                 .addChild (" No database connection: ")
+                                 .addChild (new HCA (CAjax.FUNCTION_BACKEND_CONNECTION_RESET.getInvocationURL (aRequestScope)).addChild ("Retry")));
+      aBox.setType (EBootstrapAlertType.DANGER);
+    }
 
     // Information on SML usage
     if (aSettings.isSMLEnabled ())

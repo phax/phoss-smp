@@ -56,6 +56,10 @@ public final class CAjax
                                                                                                            .withExecutor (AjaxExecutorSecureExportAllServiceGroups.class)
                                                                                                            .withFilter (FILTER_LOGIN)
                                                                                                            .build ();
+  public static final IAjaxFunctionDeclaration FUNCTION_BACKEND_CONNECTION_RESET = AjaxFunctionDeclaration.builder ("backendConnectionReset")
+                                                                                                          .withExecutor (AjaxExecutorSecureBackendConnectionReset.class)
+                                                                                                          .withFilter (FILTER_LOGIN)
+                                                                                                          .build ();
 
   private CAjax ()
   {}
@@ -66,5 +70,6 @@ public final class CAjax
     aAjaxRegistry.registerFunction (DATATABLES_I18N);
     aAjaxRegistry.registerFunction (LOGIN);
     aAjaxRegistry.registerFunction (FUNCTION_EXPORT_ALL_SERVICE_GROUPS);
+    aAjaxRegistry.registerFunction (FUNCTION_BACKEND_CONNECTION_RESET);
   }
 }
