@@ -28,8 +28,10 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.type.ObjectType;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
+import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
+import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.domain.DBUser;
 import com.helger.phoss.smp.backend.sql.mgr.AbstractJDBCEnabledManager;
 
@@ -43,9 +45,9 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
 {
   public static final ObjectType OT = new ObjectType ("smpuser");
 
-  public SMPUserManagerJDBC (@Nonnull final EDatabaseType eDBType)
+  public SMPUserManagerJDBC (@Nonnull final DBExecutor aDBExec)
   {
-    super (eDBType);
+    super (aDBExec);
   }
 
   @Nonnull
@@ -68,7 +70,8 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
       // Drop the Foreign Key Constraint - do this all the time
       try
       {
-        switch (m_eDBType)
+        final EDatabaseType eDBType = SMPDataSourceSingleton.getDatabaseType ();
+        switch (eDBType)
         {
           case MYSQL:
             executor ().executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
@@ -77,7 +80,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
             executor ().executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
             break;
           default:
-            throw new IllegalStateException ("The migration code for DB type " + m_eDBType + " is missing");
+            throw new IllegalStateException ("The migration code for DB type " + eDBType + " is missing");
         }
       }
       catch (final RuntimeException ex)

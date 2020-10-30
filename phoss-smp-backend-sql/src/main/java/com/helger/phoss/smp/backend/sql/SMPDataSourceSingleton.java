@@ -71,13 +71,13 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
     }
   }
 
-  private static final EDatabaseType s_eDBType;
+  private static final EDatabaseType DB_TYPE;
 
   static
   {
     final String sDBType = SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE);
-    s_eDBType = EDatabaseType.getFromIDOrNull (sDBType);
-    if (s_eDBType == null)
+    DB_TYPE = EDatabaseType.getFromIDOrNull (sDBType);
+    if (DB_TYPE == null)
       throw new IllegalStateException ("The database type MUST be provided and MUST be one of " +
                                        EDatabaseType.values () +
                                        " - provided value is '" +
@@ -113,6 +113,6 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   @Nonnull
   public static EDatabaseType getDatabaseType ()
   {
-    return s_eDBType;
+    return DB_TYPE;
   }
 }

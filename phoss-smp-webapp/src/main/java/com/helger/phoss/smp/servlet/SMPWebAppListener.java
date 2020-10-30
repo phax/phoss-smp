@@ -28,6 +28,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.datetime.PDTConfig;
+import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.IReadableResource;
@@ -72,6 +73,7 @@ import com.helger.photon.core.requestparam.RequestParameterManager;
 import com.helger.servlet.ServletContextPathHolder;
 import com.helger.servlet.response.UnifiedResponseDefaultSettings;
 import com.helger.wsclient.WSHelper;
+import com.helger.xservlet.requesttrack.RequestTracker;
 
 /**
  * Special SMP web app listener. This is the entry point for application
@@ -148,6 +150,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       ServletContextPathHolder.setCustomContextPath ("");
     }
     RequestParameterManager.getInstance ().setParameterHandler (new RequestParameterHandlerURLPathNamed ());
+
+    if (GlobalDebug.isDebugMode ())
+      RequestTracker.getInstance ().getRequestTrackingMgr ().setLongRunningCheckEnabled (false);
 
     // Handled via the XServletSettings instead
     UnifiedResponseDefaultSettings.setReferrerPolicy (null);
@@ -289,34 +294,12 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
         public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
         {
-          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-          if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
-          {
-            // Only if a business card is present
-            if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
-            {
-              // Notify PD server: update
-              PDClientProvider.getInstance ()
-                              .getPDClient ()
-                              .addServiceGroupToIndex (aServiceInformation.getServiceGroup ().getParticpantIdentifier ());
-            }
-          }
+          onSMPServiceInformationCreated (aServiceInformation);
         }
 
         public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
         {
-          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-          if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
-          {
-            // Only if a business card is present
-            if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
-            {
-              // Notify PD server: update
-              PDClientProvider.getInstance ()
-                              .getPDClient ()
-                              .addServiceGroupToIndex (aServiceInformation.getServiceGroup ().getParticpantIdentifier ());
-            }
-          }
+          onSMPServiceInformationCreated (aServiceInformation);
         }
       });
     }
@@ -325,18 +308,26 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     ProxySelectorProxySettingsManager.setAsDefault (true);
     final IProxySettings aProxyHttp = SMPServerConfiguration.getAsHttpProxySettings ();
     if (aProxyHttp != null)
+    {
+      // Register a handler that returns the "http" proxy, if an "http" URL is
+      // requested
       ProxySettingsManager.registerProvider ( (sProtocol, sHost, nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
                                                                                                      : null);
+    }
     final IProxySettings aProxyHttps = SMPServerConfiguration.getAsHttpsProxySettings ();
     if (aProxyHttps != null)
+    {
+      // Register a handler that returns the "https" proxy, if an "https" URL is
+      // requested
       ProxySettingsManager.registerProvider ( (sProtocol,
                                                sHost,
                                                nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps) : null);
+    }
 
     // Special http client config
     BasePageUtilsHttpClient.HttpClientConfigRegistry.register (new HttpClientConfig ("directoryclient",
                                                                                      "Directory client settings",
-                                                                                     x -> new PDHttpClientSettings (x)));
+                                                                                     PDHttpClientSettings::new));
   }
 
   @Override

@@ -40,6 +40,7 @@ import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
+import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.json.IJson;
 import com.helger.json.IJsonObject;
@@ -50,7 +51,6 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
@@ -78,9 +78,9 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPBusinessCardManagerJDBC (@Nonnull final EDatabaseType eDBType)
+  public SMPBusinessCardManagerJDBC (@Nonnull final DBExecutor aDBExec)
   {
-    super (eDBType);
+    super (aDBExec);
   }
 
   @Nonnull

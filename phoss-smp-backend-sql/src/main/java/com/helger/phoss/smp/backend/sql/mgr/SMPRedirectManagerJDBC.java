@@ -37,12 +37,12 @@ import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
+import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -65,9 +65,9 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
-  public SMPRedirectManagerJDBC (@Nonnull final EDatabaseType eDBType, @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public SMPRedirectManagerJDBC (@Nonnull final DBExecutor aDBExec, @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    super (eDBType);
+    super (aDBExec);
     m_aServiceGroupMgr = aServiceGroupMgr;
   }
 
