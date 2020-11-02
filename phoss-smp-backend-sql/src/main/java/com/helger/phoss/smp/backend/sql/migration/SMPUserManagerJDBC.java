@@ -18,6 +18,7 @@ package com.helger.phoss.smp.backend.sql.migration;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
@@ -45,16 +46,16 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
 {
   public static final ObjectType OT = new ObjectType ("smpuser");
 
-  public SMPUserManagerJDBC (@Nonnull final DBExecutor aDBExec)
+  public SMPUserManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
-    super (aDBExec);
+    super (aDBExecSupplier);
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <DBUser> getAllUsers ()
   {
-    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT username, password FROM smp_user");
+    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT username, password FROM smp_user");
     final ICommonsList <DBUser> ret = new CommonsArrayList <> ();
     if (aDBResult.isPresent ())
       for (final DBResultRow aRow : aDBResult.get ())
@@ -66,7 +67,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
   {
     ValueEnforcer.notNull (aOldToNewMap, "OldToNewMap");
 
-    executor ().performInTransaction ( () -> {
+    newExecutor ().performInTransaction ( () -> {
       // Drop the Foreign Key Constraint - do this all the time
       try
       {
@@ -74,10 +75,10 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
         switch (eDBType)
         {
           case MYSQL:
-            executor ().executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
+            newExecutor ().executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
             break;
           case POSTGRESQL:
-            executor ().executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
+            newExecutor ().executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
             break;
           default:
             throw new IllegalStateException ("The migration code for DB type " + eDBType + " is missing");
@@ -93,13 +94,13 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
       {
         final String sOld = aEntry.getKey ();
         final String sNew = aEntry.getValue ();
-        executor ().insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE username=?",
-                                            new ConstantPreparedStatementDataProvider (sNew, sOld));
+        newExecutor ().insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE username=?",
+                                               new ConstantPreparedStatementDataProvider (sNew, sOld));
       }
 
       try
       {
-        executor ().executeStatement ("DROP TABLE smp_user;");
+        newExecutor ().executeStatement ("DROP TABLE smp_user;");
       }
       catch (final RuntimeException ex)
       {

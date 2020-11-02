@@ -29,10 +29,9 @@ import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
+import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.domain.DBUser;
-import com.helger.phoss.smp.backend.sql.mgr.SMPManagerProviderSQL;
-import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.app.io.WebFileIO;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -51,7 +50,7 @@ public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
       LOGGER.info ("Migrating all DB users to ph-oton users");
       final EDatabaseType eDBType = SMPDataSourceSingleton.getDatabaseType ();
 
-      final SMPUserManagerJDBC aSQLUserMgr = new SMPUserManagerJDBC (((SMPManagerProviderSQL) SMPMetaManager.getManagerProvider ()).getDBExecutor ());
+      final SMPUserManagerJDBC aSQLUserMgr = new SMPUserManagerJDBC (SMPDBExecutor::new);
       final ICommonsList <DBUser> aSQLUsers = aSQLUserMgr.getAllUsers ();
       LOGGER.info ("Found " + aSQLUsers.size () + " DB user to migrate");
 

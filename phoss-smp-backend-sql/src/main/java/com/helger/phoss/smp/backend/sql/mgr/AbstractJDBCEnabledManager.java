@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,17 +31,17 @@ import com.helger.db.jdbc.executor.DBExecutor;
 
 public abstract class AbstractJDBCEnabledManager
 {
-  private final DBExecutor m_aDBExec;
+  private final Supplier <? extends DBExecutor> m_aDBExecSupplier;
 
-  protected AbstractJDBCEnabledManager (@Nonnull final DBExecutor aDBExec)
+  protected AbstractJDBCEnabledManager (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
-    m_aDBExec = aDBExec;
+    m_aDBExecSupplier = aDBExecSupplier;
   }
 
   @Nonnull
-  protected final DBExecutor executor ()
+  protected final DBExecutor newExecutor ()
   {
-    return m_aDBExec;
+    return m_aDBExecSupplier.get ();
   }
 
   @Nullable

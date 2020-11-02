@@ -62,12 +62,10 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   private static final String SMP_TRANSPORT_PROFILES_XML = "transportprofiles.xml";
 
   private final EDatabaseType m_eDBType;
-  private final SMPDBExecutor m_aDBExec;
 
   public SMPManagerProviderSQL ()
   {
     m_eDBType = SMPDataSourceSingleton.getDatabaseType ();
-    m_aDBExec = new SMPDBExecutor ();
   }
 
   public void beforeInitManagers ()
@@ -111,20 +109,19 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     aFlyway.migrate ();
 
     // Register this here, so that the SMPMetaManager is available
+    DBExecutor.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
+      // false: don't trigger callback, because the source is DBExecutor
+      SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew, false);
+    });
+
     // Allow communicating in the other direction as well
-    SMPMetaManager.getInstance ().setBackendConnectionStatusChangeCallback (eNew -> m_aDBExec.resetConnectionEstablished ());
+    SMPMetaManager.getInstance ().setBackendConnectionStatusChangeCallback (eNew -> DBExecutor.resetConnectionEstablished ());
   }
 
   @Nonnull
   public ETriState getBackendConnectionEstablishedDefaultState ()
   {
     return ETriState.UNDEFINED;
-  }
-
-  @Nonnull
-  public DBExecutor getDBExecutor ()
-  {
-    return m_aDBExec;
   }
 
   // TODO currently also file based
@@ -172,7 +169,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (m_aDBExec);
+    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor::new);
     // Enable cache by default
     ret.setCacheEnabled (SMPServerConfiguration.getConfigFile ().getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
     return ret;
@@ -182,21 +179,21 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                 @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPRedirectManagerJDBC (m_aDBExec, aServiceGroupMgr);
+    return new SMPRedirectManagerJDBC (SMPDBExecutor::new, aServiceGroupMgr);
   }
 
   @Nonnull
   public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPServiceInformationManagerJDBC (m_aDBExec, aServiceGroupMgr);
+    return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new, aServiceGroupMgr);
   }
 
   @Nullable
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                         @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPBusinessCardManagerJDBC (m_aDBExec);
+    return new SMPBusinessCardManagerJDBC (SMPDBExecutor::new);
   }
 
   @Override
