@@ -40,7 +40,7 @@ final class MockSMPTransportProfileManager implements ISMPTransportProfileManage
   }
 
   @Nonnull
-  public EChange removeSMPTransportProfile (final String sSMPTransportProfileID)
+  public EChange deleteSMPTransportProfile (final String sSMPTransportProfileID)
   {
     throw new UnsupportedOperationException ();
   }

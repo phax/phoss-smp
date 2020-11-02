@@ -98,7 +98,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
       protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPTransportProfile aSelectedObject)
       {
         final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
-        if (aTransportProfileMgr.removeSMPTransportProfile (aSelectedObject.getID ()).isChanged ())
+        if (aTransportProfileMgr.deleteSMPTransportProfile (aSelectedObject.getID ()).isChanged ())
           aWPEC.postRedirectGetInternal (success ("The transport profile '" + aSelectedObject.getID () + "' was successfully deleted!"));
         else
           aWPEC.postRedirectGetInternal (error ("Failed to delete transport profile '" + aSelectedObject.getID () + "'!"));

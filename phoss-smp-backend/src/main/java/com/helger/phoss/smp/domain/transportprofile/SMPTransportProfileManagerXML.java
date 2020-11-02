@@ -94,7 +94,7 @@ public final class SMPTransportProfileManagerXML extends AbstractPhotonMapBasedW
   }
 
   @Nullable
-  public EChange removeSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
+  public EChange deleteSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
   {
     if (StringHelper.hasNoText (sSMPTransportProfileID))
       return EChange.UNCHANGED;
