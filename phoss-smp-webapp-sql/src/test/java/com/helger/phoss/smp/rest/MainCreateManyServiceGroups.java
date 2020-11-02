@@ -17,6 +17,8 @@
 package com.helger.phoss.smp.rest;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.client.ClientBuilder;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.concurrent.ExecutorServiceHelper;
 import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
@@ -74,42 +77,50 @@ public final class MainCreateManyServiceGroups
       final StopWatch aSWOverall = StopWatch.createdStarted ();
       final int nStart = 0;
       final int nCount = 100;
+
+      final ExecutorService es = Executors.newFixedThreadPool (2);
+
       for (int i = nStart; i < nStart + nCount; ++i)
       {
-        final StopWatch aSW = StopWatch.createdStarted ();
-        final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
-                                                                                                                               StringHelper.getLeadingZero (i,
-                                                                                                                                                            7));
-        final String sPI = aPI.getURIEncoded ();
+        final int idx = i;
+        es.submit ( () -> {
+          final StopWatch aSW = StopWatch.createdStarted ();
+          final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
+                                                                                                                                 StringHelper.getLeadingZero (idx,
+                                                                                                                                                              7));
+          final String sPI = aPI.getURIEncoded ();
 
-        final ServiceGroupType aSG = new ServiceGroupType ();
-        aSG.setParticipantIdentifier (aPI);
-        aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
+          final ServiceGroupType aSG = new ServiceGroupType ();
+          aSG.setParticipantIdentifier (aPI);
+          aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
-        try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
-        {
-          // Delete old - don't care about the result
-          if (false)
-            ClientBuilder.newClient ()
-                         .target (sServerBasePath)
-                         .path (sPI)
-                         .request ()
-                         .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                         .delete ();
+          try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
+          {
+            // Delete old - don't care about the result
+            if (false)
+              ClientBuilder.newClient ()
+                           .target (sServerBasePath)
+                           .path (sPI)
+                           .request ()
+                           .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
+                           .delete ();
 
-          // Create a new
-          final Response aResponseMsg = ClientBuilder.newClient ()
-                                                     .target (sServerBasePath)
-                                                     .path (sPI)
-                                                     .request ()
-                                                     .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                                                     .put (Entity.xml (aObjFactory.createServiceGroup (aSG)));
-          _testResponseJerseyClient (aResponseMsg, 200);
-        }
+            // Create a new
+            final Response aResponseMsg = ClientBuilder.newClient ()
+                                                       .target (sServerBasePath)
+                                                       .path (sPI)
+                                                       .request ()
+                                                       .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
+                                                       .put (Entity.xml (aObjFactory.createServiceGroup (aSG)));
+            _testResponseJerseyClient (aResponseMsg, 200);
+          }
 
-        aSW.stop ();
-        LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
+          aSW.stop ();
+          LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
+        });
       }
+
+      ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (es);
       aSWOverall.stop ();
       LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getSeconds () + " seconds");
     }
