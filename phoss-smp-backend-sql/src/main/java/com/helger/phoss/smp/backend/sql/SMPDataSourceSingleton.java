@@ -16,15 +16,25 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
-import com.helger.db.jdbc.AbstractDBConnector;
+import com.helger.db.jdbc.IHasDataSource;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
+import com.helger.settings.exchange.configfile.ConfigFile;
 
 /**
  * DataSource provider singleton
@@ -34,40 +44,66 @@ import com.helger.scope.singleton.AbstractGlobalSingleton;
 @ThreadSafe
 public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
 {
-  public static final class SMPDataSourceProvider extends AbstractDBConnector
+  public static final class SMPDataSourceProvider implements IHasDataSource, Closeable
   {
+    private static final Logger LOGGER = LoggerFactory.getLogger (SMPDataSourceSingleton.SMPDataSourceProvider.class);
+    private final BasicDataSource m_aDataSource;
+
     private SMPDataSourceProvider ()
-    {}
-
-    @Override
-    protected boolean isUseDefaultAutoCommit ()
     {
-      // No auto commit
-      return false;
+      final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+
+      // build data source
+      // This is usually only called once on startup and than the same
+      // DataSource is reused during the entire lifetime
+      m_aDataSource = new BasicDataSource ();
+      m_aDataSource.setDriverClassName (aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER));
+      final String sUserName = aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER);
+      if (sUserName != null)
+        m_aDataSource.setUsername (sUserName);
+      final String sPassword = aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD);
+      if (sPassword != null)
+        m_aDataSource.setPassword (sPassword);
+      m_aDataSource.setUrl (aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL));
+
+      // settings
+      m_aDataSource.setDefaultAutoCommit (Boolean.FALSE);
+      m_aDataSource.setPoolPreparedStatements (true);
+
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info ("Created new DataSource " + m_aDataSource);
     }
 
-    @Override
-    protected String getJDBCDriverClassName ()
+    @Nonnull
+    public DataSource getDataSource ()
     {
-      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER);
+      return m_aDataSource;
     }
 
-    @Override
-    public String getConnectionUrl ()
+    public void close () throws IOException
     {
-      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL);
+      try
+      {
+        if (m_aDataSource != null && !m_aDataSource.isClosed ())
+        {
+          if (LOGGER.isDebugEnabled ())
+            LOGGER.debug ("Now closing DataSource");
+
+          m_aDataSource.close ();
+
+          if (LOGGER.isInfoEnabled ())
+            LOGGER.info ("Closed DataSource");
+        }
+      }
+      catch (final SQLException ex)
+      {
+        throw new IllegalStateException ("Failed to close DataSource " + m_aDataSource, ex);
+      }
     }
 
-    @Override
-    protected String getUserName ()
+    public boolean shouldCloseConnection ()
     {
-      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER);
-    }
-
-    @Override
-    protected String getPassword ()
-    {
-      return SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD);
+      return true;
     }
   }
 
