@@ -75,6 +75,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
+import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.ajax.decl.AjaxFunctionDeclaration;
 import com.helger.photon.app.PhotonUnifiedResponse;
@@ -220,19 +221,20 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getParticpantIdentifier ();
                           PDClient aPDClient = null;
+                          Exception aCaughtEx = null;
                           try
                           {
                             aPDClient = PDClientProvider.getInstance ().getPDClient ();
                           }
                           catch (final IllegalStateException ex)
                           {
-                            // fall through
+                            aCaughtEx = ex;
                           }
                           if (aPDClient == null)
                           {
                             aWPEC.postRedirectGetInternal (error ("Failed to create the " +
                                                                   sDirectoryName +
-                                                                  " client component. Please check your configuration."));
+                                                                  " client component. Please check your configuration.").addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
                           }
                           else
                           {
@@ -267,19 +269,20 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                           final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
                           PDClient aPDClient = null;
+                          Exception aCaughtEx = null;
                           try
                           {
                             aPDClient = PDClientProvider.getInstance ().getPDClient ();
                           }
                           catch (final IllegalStateException ex)
                           {
-                            // fall through
+                            aCaughtEx = ex;
                           }
                           if (aPDClient == null)
                           {
                             aWPEC.postRedirectGetInternal (error ("Failed to create the " +
                                                                   sDirectoryName +
-                                                                  " client component. Please check your configuration."));
+                                                                  " client component. Please check your configuration.").addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
                           }
                           else
                           {
