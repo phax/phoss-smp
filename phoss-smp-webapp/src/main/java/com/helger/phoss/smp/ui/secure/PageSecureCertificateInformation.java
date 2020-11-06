@@ -201,7 +201,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
 
-    // key store
+    // SMP Key store
     {
       final HCNodeList aTab = new HCNodeList ();
       if (!SMPKeyManager.isKeyStoreValid ())
@@ -212,6 +212,32 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       {
         // Successfully loaded private key
         final SMPKeyManager aKeyMgr = SMPKeyManager.getInstance ();
+
+        final KeyStore aKeyStore = aKeyMgr.getKeyStore ();
+        if (aKeyStore != null)
+        {
+          try
+          {
+            int nKeyEntries = 0;
+            for (final String sAlias : CollectionHelper.newList (aKeyStore.aliases ()))
+            {
+              if (aKeyStore.isKeyEntry (sAlias))
+                nKeyEntries++;
+            }
+            if (nKeyEntries == 0)
+              aTab.addChild (error ("Found no private key entry in the configured key store."));
+            else
+              if (nKeyEntries > 1)
+                aTab.addChild (warn ("The configured key store contains " +
+                                     nKeyEntries +
+                                     " key entries. It is highly recommended to have only the SMP key in the key store to avoid issues with the SML communication."));
+          }
+          catch (final GeneralSecurityException ex)
+          {
+            aTab.addChild (error ("Error iterating key store.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+          }
+        }
+
         final PrivateKeyEntry aKeyEntry = aKeyMgr.getPrivateKeyEntry ();
         if (aKeyEntry != null)
         {
@@ -264,7 +290,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       aTabBox.addTab ("keystore", "Keystore", aTab);
     }
 
-    // Trust store
+    // SMP Trust store
     {
       final HCNodeList aTab = new HCNodeList ();
       if (!SMPTrustManager.isTrustStoreValid ())
