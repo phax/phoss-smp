@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.domain;
 
+import java.util.function.Consumer;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -69,6 +71,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPBusinessCardManager m_aBusinessCardMgr;
   private ISMPParticipantMigrationManager m_aParticipantMigrationMgr;
   private ETriState m_eBackendConnectionEstablished = ETriState.UNDEFINED;
+  private Consumer <ETriState> m_aBackendConnectionStatusChangeCallback;
 
   /**
    * Set the manager provider to be used. This must be called exactly once
@@ -308,6 +311,10 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     return getInstance ().m_aBusinessCardMgr;
   }
 
+  /**
+   * @return <code>true</code> if an {@link ISMPBusinessCardManager} is present,
+   *         <code>false</code> if not.
+   */
   public static boolean hasBusinessCardMgr ()
   {
     return getBusinessCardMgr () != null;
@@ -319,10 +326,21 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     return m_aRWLock.readLockedGet ( () -> m_eBackendConnectionEstablished);
   }
 
-  public void setBackendConnectionEstablished (@Nonnull final ETriState eConnectionEstablished)
+  public void setBackendConnectionEstablished (@Nonnull final ETriState eConnectionEstablished, final boolean bTriggerCallback)
   {
     ValueEnforcer.notNull (eConnectionEstablished, "ConnectionEstablished");
-    m_aRWLock.writeLockedGet ( () -> m_eBackendConnectionEstablished = eConnectionEstablished);
+    m_aRWLock.writeLocked ( () -> {
+      m_eBackendConnectionEstablished = eConnectionEstablished;
+
+      // Avoid endless loop
+      if (bTriggerCallback && m_aBackendConnectionStatusChangeCallback != null)
+        m_aBackendConnectionStatusChangeCallback.accept (eConnectionEstablished);
+    });
+  }
+
+  public void setBackendConnectionStatusChangeCallback (@Nullable final Consumer <ETriState> aCB)
+  {
+    m_aRWLock.writeLockedGet ( () -> m_aBackendConnectionStatusChangeCallback = aCB);
   }
 
   /**

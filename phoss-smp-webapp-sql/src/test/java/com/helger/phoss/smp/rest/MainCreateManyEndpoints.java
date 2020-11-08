@@ -17,6 +17,8 @@
 package com.helger.phoss.smp.rest;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.client.ClientBuilder;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.concurrent.ExecutorServiceHelper;
 import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
@@ -84,6 +87,8 @@ public final class MainCreateManyEndpoints
       final StopWatch aSWOverall = StopWatch.createdStarted ();
       final ObjectFactory aObjFactory = new ObjectFactory ();
 
+      final ExecutorService es = Executors.newFixedThreadPool (4);
+
       for (final EPredefinedDocumentTypeIdentifier aEDT : new EPredefinedDocumentTypeIdentifier [] { EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CREDITNOTE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017,
@@ -102,66 +107,73 @@ public final class MainCreateManyEndpoints
         final String sDT = aDT.getURIEncoded ();
         final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
 
-        for (int i = 0; i < 1_000; ++i)
+        final int nStart = 0;
+        final int nCount = 100;
+
+        for (int i = nStart; i < nStart + nCount; ++i)
         {
-          final StopWatch aSW = StopWatch.createdStarted ();
-          final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
-                                                                                                                                 StringHelper.getLeadingZero (i,
-                                                                                                                                                              7));
-          final String sPI = aPI.getURIEncoded ();
+          final int idx = i;
+          es.submit ( () -> {
+            final StopWatch aSW = StopWatch.createdStarted ();
+            final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
+                                                                                                                                   StringHelper.getLeadingZero (idx,
+                                                                                                                                                                7));
+            final String sPI = aPI.getURIEncoded ();
 
-          final ServiceMetadataType aSM = new ServiceMetadataType ();
-          final ServiceInformationType aSI = new ServiceInformationType ();
-          aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
-          aSI.setDocumentIdentifier (aDT);
-          {
-            final ProcessListType aPL = new ProcessListType ();
-            final ProcessType aProcess = new ProcessType ();
-            aProcess.setProcessIdentifier (aProcID);
-            final ServiceEndpointList aSEL = new ServiceEndpointList ();
-            final EndpointType aEndpoint = new EndpointType ();
-            aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as2"));
-            aEndpoint.setRequireBusinessLevelSignature (false);
-            aEndpoint.setCertificate ("blacert");
-            aEndpoint.setServiceDescription ("Unit test service");
-            aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
-            aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID ());
-            aSEL.addEndpoint (aEndpoint);
-            aProcess.setServiceEndpointList (aSEL);
-            aPL.addProcess (aProcess);
-            aSI.setProcessList (aPL);
-          }
-          aSM.setServiceInformation (aSI);
+            final ServiceMetadataType aSM = new ServiceMetadataType ();
+            final ServiceInformationType aSI = new ServiceInformationType ();
+            aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
+            aSI.setDocumentIdentifier (aDT);
+            {
+              final ProcessListType aPL = new ProcessListType ();
+              final ProcessType aProcess = new ProcessType ();
+              aProcess.setProcessIdentifier (aProcID);
+              final ServiceEndpointList aSEL = new ServiceEndpointList ();
+              final EndpointType aEndpoint = new EndpointType ();
+              aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as2"));
+              aEndpoint.setRequireBusinessLevelSignature (false);
+              aEndpoint.setCertificate ("blacert");
+              aEndpoint.setServiceDescription ("Unit test service");
+              aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
+              aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID ());
+              aSEL.addEndpoint (aEndpoint);
+              aProcess.setServiceEndpointList (aSEL);
+              aPL.addProcess (aProcess);
+              aSI.setProcessList (aPL);
+            }
+            aSM.setServiceInformation (aSI);
 
-          try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
-          {
-            // Delete old - don't care about the result
-            if (false)
-              ClientBuilder.newClient ()
-                           .target (sServerBasePath)
-                           .path (sPI)
-                           .path ("services")
-                           .path (sDT)
-                           .request ()
-                           .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                           .delete ();
+            try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
+            {
+              // Delete old - don't care about the result
+              if (false)
+                ClientBuilder.newClient ()
+                             .target (sServerBasePath)
+                             .path (sPI)
+                             .path ("services")
+                             .path (sDT)
+                             .request ()
+                             .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
+                             .delete ();
 
-            // Create a new
-            final Response aResponseMsg = ClientBuilder.newClient ()
-                                                       .target (sServerBasePath)
-                                                       .path (sPI)
-                                                       .path ("services")
-                                                       .path (sDT)
-                                                       .request ()
-                                                       .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                                                       .put (Entity.xml (aObjFactory.createServiceMetadata (aSM)));
-            _testResponseJerseyClient (aResponseMsg, 200);
-          }
+              // Create a new
+              final Response aResponseMsg = ClientBuilder.newClient ()
+                                                         .target (sServerBasePath)
+                                                         .path (sPI)
+                                                         .path ("services")
+                                                         .path (sDT)
+                                                         .request ()
+                                                         .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
+                                                         .put (Entity.xml (aObjFactory.createServiceMetadata (aSM)));
+              _testResponseJerseyClient (aResponseMsg, 200);
+            }
 
-          aSW.stop ();
-          LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
+            aSW.stop ();
+            LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
+          });
         }
       }
+      ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (es);
       aSWOverall.stop ();
       LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getSeconds () + " seconds");
     }

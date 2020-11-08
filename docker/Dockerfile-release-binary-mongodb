@@ -33,7 +33,7 @@ RUN rm -r $CATALINA_HOME/webapps/*
 # Set arguments and labels after initial cleanup was performed :)
 ARG SMP_VERSION
 # Set to environment to be persistent
-ENV SMP_VERSION=${SMP_VERSION:-5.3.0}
+ENV SMP_VERSION=${SMP_VERSION:-5.3.1}
 LABEL vendor="Philip Helger"
 LABEL version=$SMP_VERSION
  

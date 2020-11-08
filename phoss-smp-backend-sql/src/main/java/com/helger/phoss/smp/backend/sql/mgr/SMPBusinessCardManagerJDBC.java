@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -40,6 +41,7 @@ import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
+import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.json.IJson;
 import com.helger.json.IJsonObject;
@@ -50,7 +52,6 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
@@ -78,9 +79,9 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPBusinessCardManagerJDBC (@Nonnull final EDatabaseType eDBType)
+  public SMPBusinessCardManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
-    super (eDBType);
+    super (aDBExecSupplier);
   }
 
   @Nonnull
@@ -181,11 +182,12 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities" + ")");
 
     final MutableBoolean aUpdated = new MutableBoolean (false);
-    final ESuccess eSucces = executor ().performInTransaction ( () -> {
+    final DBExecutor aExecutor = newExecutor ();
+    final ESuccess eSucces = aExecutor.performInTransaction ( () -> {
       // Delete all existing entities
       final String sPID = aParticipantID.getURIEncoded ();
-      final long nDeleted = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce" + " WHERE pid=?",
-                                                                new ConstantPreparedStatementDataProvider (sPID));
+      final long nDeleted = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_bce" + " WHERE pid=?",
+                                                              new ConstantPreparedStatementDataProvider (sPID));
       if (nDeleted > 0)
       {
         aUpdated.set (true);
@@ -196,17 +198,17 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
         // Single name only
-        executor ().insertOrUpdateOrDelete ("INSERT INTO smp_bce (id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                            new ConstantPreparedStatementDataProvider (aEntity.getID (),
-                                                                                       sPID,
-                                                                                       aEntity.names ().getFirst ().getName (),
-                                                                                       aEntity.getCountryCode (),
-                                                                                       aEntity.getGeographicalInformation (),
-                                                                                       getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
-                                                                                       getStringAsJson (aEntity.websiteURIs ()).getAsJsonString (JWS),
-                                                                                       getBCCAsJson (aEntity.contacts ()).getAsJsonString (JWS),
-                                                                                       aEntity.getAdditionalInformation (),
-                                                                                       aEntity.getRegistrationDate ()));
+        aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_bce (id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                          new ConstantPreparedStatementDataProvider (aEntity.getID (),
+                                                                                     sPID,
+                                                                                     aEntity.names ().getFirst ().getName (),
+                                                                                     aEntity.getCountryCode (),
+                                                                                     aEntity.getGeographicalInformation (),
+                                                                                     getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
+                                                                                     getStringAsJson (aEntity.websiteURIs ()).getAsJsonString (JWS),
+                                                                                     getBCCAsJson (aEntity.contacts ()).getAsJsonString (JWS),
+                                                                                     aEntity.getAdditionalInformation (),
+                                                                                     aEntity.getRegistrationDate ()));
       }
     });
     if (eSucces.isFailure ())
@@ -244,8 +246,8 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard (" + aSMPBusinessCard.getID () + ")");
 
-    final long nCount = executor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce" + " WHERE pid=?",
-                                                            new ConstantPreparedStatementDataProvider (aSMPBusinessCard.getID ()));
+    final long nCount = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_bce" + " WHERE pid=?",
+                                                               new ConstantPreparedStatementDataProvider (aSMPBusinessCard.getID ()));
     if (nCount <= 0)
     {
       if (LOGGER.isDebugEnabled ())
@@ -270,8 +272,8 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
-    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
-                                                                                  " FROM smp_bce");
+    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
+                                                                                     " FROM smp_bce");
     if (aDBResult.isPresent ())
     {
       final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
@@ -318,10 +320,10 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (aID == null)
       return null;
 
-    final Optional <ICommonsList <DBResultRow>> aDBResult = executor ().queryAll ("SELECT id, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
-                                                                                  " FROM smp_bce" +
-                                                                                  " WHERE pid=?",
-                                                                                  new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
+    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT id, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
+                                                                                     " FROM smp_bce" +
+                                                                                     " WHERE pid=?",
+                                                                                     new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
     if (!aDBResult.isPresent ())
       return null;
 
@@ -349,6 +351,6 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   @Nonnegative
   public long getSMPBusinessCardCount ()
   {
-    return executor ().queryCount ("SELECT COUNT (DISTINCT pid) FROM smp_bce");
+    return newExecutor ().queryCount ("SELECT COUNT (DISTINCT pid) FROM smp_bce");
   }
 }

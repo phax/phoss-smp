@@ -1,22 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (C) 2014-2020 Philip Helger and contributors
-    philip[at]helger[dot]com
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-            http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
 <root type="doctypeid">
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2::ApplicationResponse##urn:fdc:peppol.eu:poacc:trns:catalogue_response:3::2.1" name="Peppol Catalogue Response transaction 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:poacc:bis:catalogue_only:3" />
@@ -322,25 +304,30 @@
   <item id="busdox-docid-qns::urn:www.peppol.eu:schema:xsd:VirtualCompanyDossierPackage-1::VirtualCompanyDossierPackage##urn:www.cenbii.eu:transaction:biicoretrdm992:ver0.1:#urn:www.peppol.eu:bis:peppol992a:ver1.0::0.1" name="Peppol Virtual Company Dossier Package" deprecated="true">
     <procid scheme="cenbii-procid-ubl" value="none" />
   </item>
-  <item id="toop-doctypeid-qns::FinancialRecord::FINANCIAL_RECORD_TYPE::UNSTRUCTURED::toop-edm:v2.0" name="TOOP EDM Document Request on Fincancial Record" deprecated="false" />
-  <item id="toop-doctypeid-qns::QueryResponse::toop-edm:v2.0" name="TOOP EDM Response" deprecated="false" />
-  <item id="toop-doctypeid-qns::RegisteredOrganization::REGISTERED_ORGANIZATION_TYPE::CONCEPT##CCCEV::toop-edm:v2.0" name="TOOP EDM Concept Request on RegisteredOrganisation Data" deprecated="false" />
+  <item id="toop-doctypeid-qns::CrewCertificate::CREWCERTIFICATE_TYPE::UNSTRUCTURED::toop-edm:v2.0" name="TOOP Crew Certificate Data 2.0" deprecated="true" />
+  <item id="toop-doctypeid-qns::FinancialRecord::FINANCIAL_RECORD_TYPE::UNSTRUCTURED::toop-edm:v2.0" name="TOOP EDM Document Request on Fincancial Record 2.0" deprecated="true" />
+  <item id="toop-doctypeid-qns::FinancialRecord::FINANCIAL_RECORD_TYPE::UNSTRUCTURED::toop-edm:v2.1" name="TOOP EDM Document Request on Fincancial Record 2.1" deprecated="false" />
+  <item id="toop-doctypeid-qns::QueryResponse::toop-edm:v2.0" name="TOOP EDM Response 2.0" deprecated="true" />
+  <item id="toop-doctypeid-qns::QueryResponse::toop-edm:v2.1" name="TOOP EDM Response 2.1" deprecated="false" />
+  <item id="toop-doctypeid-qns::RegisteredOrganization::REGISTERED_ORGANIZATION_TYPE::CONCEPT##CCCEV::toop-edm:v2.0" name="TOOP EDM Concept Request on RegisteredOrganisation Data 2.0" deprecated="true" />
+  <item id="toop-doctypeid-qns::RegisteredOrganization::REGISTERED_ORGANIZATION_TYPE::CONCEPT##CCCEV::toop-edm:v2.1" name="TOOP EDM Concept Request on RegisteredOrganisation Data 2.1" deprecated="false" />
+  <item id="toop-doctypeid-qns::ShipCertificate::SHIPCERTIFICATE_TYPE::UNSTRUCTURED::toop-edm:v2.0" name="TOOP Ship Certificate Data 2.0" deprecated="true" />
   <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p10::Request##urn:eu.toop.request.registeredorganization::1.10" name="TOOP Registered Organization Request" deprecated="true" />
   <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p10::Response##urn:eu.toop.response.registeredorganization::1.10" name="TOOP Registered Organization Response" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.crewcertificate-list::1.40" name="TOOP Crew Certificate List Request" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.crewcertificate::1.40" name="TOOP Crew Certificate Request" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.evidence-list::1.40" name="TOOP Evidence List Request" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.evidence::1.40" name="TOOP Evidence Request" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.registeredorganization-list::1.40" name="TOOP Registered Organization List Request" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.registeredorganization::1.40" name="TOOP Registered Organization Request" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.shipcertificate-list::1.40" name="TOOP Ship Certificate List Request" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.shipcertificate::1.40" name="TOOP Ship Certificate Request" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.crewcertificate-list::1.40" name="TOOP Crew Certificate List Response" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.crewcertificate::1.40" name="TOOP Crew Certificate Response" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.evidence-list::1.40" name="TOOP Evidence List Response" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.evidence::1.40" name="TOOP Evidence Response" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.registeredorganization-list::1.40" name="TOOP Registered Organization List Response" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.registeredorganization::1.40" name="TOOP Registered Organization Response" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.shipcertificate-list::1.40" name="TOOP Ship Certificate List Response" deprecated="false" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.shipcertificate::1.40" name="TOOP Ship Certificate Response" deprecated="false" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.crewcertificate-list::1.40" name="TOOP Crew Certificate List Request" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.crewcertificate::1.40" name="TOOP Crew Certificate Request" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.evidence-list::1.40" name="TOOP Evidence List Request" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.evidence::1.40" name="TOOP Evidence Request" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.registeredorganization-list::1.40" name="TOOP Registered Organization List Request" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.registeredorganization::1.40" name="TOOP Registered Organization Request" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.shipcertificate-list::1.40" name="TOOP Ship Certificate List Request" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.shipcertificate::1.40" name="TOOP Ship Certificate Request" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.crewcertificate-list::1.40" name="TOOP Crew Certificate List Response" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.crewcertificate::1.40" name="TOOP Crew Certificate Response" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.evidence-list::1.40" name="TOOP Evidence List Response" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.evidence::1.40" name="TOOP Evidence Response" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.registeredorganization-list::1.40" name="TOOP Registered Organization List Response" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.registeredorganization::1.40" name="TOOP Registered Organization Response" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.shipcertificate-list::1.40" name="TOOP Ship Certificate List Response" deprecated="true" />
+  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.shipcertificate::1.40" name="TOOP Ship Certificate Response" deprecated="true" />
 </root>

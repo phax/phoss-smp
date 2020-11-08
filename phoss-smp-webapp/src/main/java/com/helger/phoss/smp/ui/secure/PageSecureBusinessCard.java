@@ -75,6 +75,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
+import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.ajax.decl.AjaxFunctionDeclaration;
 import com.helger.photon.app.PhotonUnifiedResponse;
@@ -218,22 +219,41 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                         {
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getParticpantIdentifier ();
-                          final ESuccess eSuccess = PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aParticipantID);
-                          if (eSuccess.isSuccess ())
+                          PDClient aPDClient = null;
+                          Exception aCaughtEx = null;
+                          try
                           {
-                            aWPEC.postRedirectGetInternal (success ("Successfully notified the " +
+                            aPDClient = PDClientProvider.getInstance ().getPDClient ();
+                          }
+                          catch (final IllegalStateException ex)
+                          {
+                            aCaughtEx = ex;
+                          }
+                          if (aPDClient == null)
+                          {
+                            aWPEC.postRedirectGetInternal (error ("Failed to create the " +
+                                                                  sDirectoryName +
+                                                                  " client component. Please check your configuration.").addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
+                          }
+                          else
+                          {
+                            final ESuccess eSuccess = aPDClient.addServiceGroupToIndex (aParticipantID);
+                            if (eSuccess.isSuccess ())
+                            {
+                              aWPEC.postRedirectGetInternal (success ("Successfully notified the " +
+                                                                      sDirectoryName +
+                                                                      " to index '" +
+                                                                      aParticipantID.getURIEncoded () +
+                                                                      "'"));
+                            }
+                            else
+                            {
+                              aWPEC.postRedirectGetInternal (error ("Error notifying the " +
                                                                     sDirectoryName +
                                                                     " to index '" +
                                                                     aParticipantID.getURIEncoded () +
                                                                     "'"));
-                          }
-                          else
-                          {
-                            aWPEC.postRedirectGetInternal (error ("Error notifying the " +
-                                                                  sDirectoryName +
-                                                                  " to index '" +
-                                                                  aParticipantID.getURIEncoded () +
-                                                                  "'"));
+                            }
                           }
                           return EShowList.SHOW_LIST;
                         }
@@ -246,42 +266,59 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                        @Nullable final ISMPBusinessCard aSelectedObject)
                         {
                           final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-                          final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
-
-                          final ICommonsList <String> aSuccess = new CommonsArrayList <> ();
-                          final ICommonsList <String> aFailure = new CommonsArrayList <> ();
-
-                          for (final ISMPBusinessCard aCurObject : aBusinessCardMgr.getAllSMPBusinessCards ())
+                          PDClient aPDClient = null;
+                          Exception aCaughtEx = null;
+                          try
                           {
-                            final IParticipantIdentifier aParticipantID = aCurObject.getParticpantIdentifier ();
-                            final ESuccess eSuccess = aPDClient.addServiceGroupToIndex (aParticipantID);
-                            (eSuccess.isSuccess () ? aSuccess : aFailure).add (aParticipantID.getURIEncoded ());
+                            aPDClient = PDClientProvider.getInstance ().getPDClient ();
                           }
-
-                          final HCNodeList aResultNodes = new HCNodeList ();
-                          if (aSuccess.isNotEmpty ())
+                          catch (final IllegalStateException ex)
                           {
-                            final BootstrapSuccessBox aBox = success ();
-                            for (final String sPI : aSuccess)
+                            aCaughtEx = ex;
+                          }
+                          if (aPDClient == null)
+                          {
+                            aWPEC.postRedirectGetInternal (error ("Failed to create the " +
+                                                                  sDirectoryName +
+                                                                  " client component. Please check your configuration.").addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
+                          }
+                          else
+                          {
+                            final ICommonsList <String> aSuccess = new CommonsArrayList <> ();
+                            final ICommonsList <String> aFailure = new CommonsArrayList <> ();
+
+                            for (final ISMPBusinessCard aCurObject : aBusinessCardMgr.getAllSMPBusinessCards ())
                             {
-                              aBox.addChild (div ("Successfully notified the " + sDirectoryName + " to index '" + sPI + "'"));
+                              final IParticipantIdentifier aParticipantID = aCurObject.getParticpantIdentifier ();
+                              final ESuccess eSuccess = aPDClient.addServiceGroupToIndex (aParticipantID);
+                              (eSuccess.isSuccess () ? aSuccess : aFailure).add (aParticipantID.getURIEncoded ());
                             }
-                            aResultNodes.addChild (aBox);
-                          }
-                          if (aFailure.isNotEmpty ())
-                          {
-                            final BootstrapErrorBox aBox = error ();
-                            for (final String sPI : aFailure)
-                            {
-                              aBox.addChild (div ("Error notifying the " + sDirectoryName + " to index '" + sPI + "'"));
-                            }
-                            aResultNodes.addChild (aBox);
-                          }
-                          if (aResultNodes.hasNoChildren ())
-                            aResultNodes.addChild (info ("No participants to be indexed to " + sDirectoryName + "."));
 
-                          aWPEC.postRedirectGetInternal (aResultNodes);
+                            final HCNodeList aResultNodes = new HCNodeList ();
+                            if (aSuccess.isNotEmpty ())
+                            {
+                              final BootstrapSuccessBox aBox = success ();
+                              for (final String sPI : aSuccess)
+                              {
+                                aBox.addChild (div ("Successfully notified the " + sDirectoryName + " to index '" + sPI + "'"));
+                              }
+                              aResultNodes.addChild (aBox);
+                            }
+                            if (aFailure.isNotEmpty ())
+                            {
+                              final BootstrapErrorBox aBox = error ();
+                              for (final String sPI : aFailure)
+                              {
+                                aBox.addChild (div ("Error notifying the " + sDirectoryName + " to index '" + sPI + "'"));
+                              }
+                              aResultNodes.addChild (aBox);
+                            }
+                            if (aResultNodes.hasNoChildren ())
+                              aResultNodes.addChild (info ("No participants to be indexed to " + sDirectoryName + "."));
+
+                            aWPEC.postRedirectGetInternal (aResultNodes);
+                          }
                           return EShowList.SHOW_LIST;
                         }
                       });

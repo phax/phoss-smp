@@ -27,13 +27,16 @@ import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
+import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
+import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigrationManagerXML;
@@ -107,6 +110,15 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     if (false)
       aFlyway.validate ();
     aFlyway.migrate ();
+
+    // Register this here, so that the SMPMetaManager is available
+    DBExecutor.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
+      // false: don't trigger callback, because the source is DBExecutor
+      SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew, false);
+    });
+
+    // Allow communicating in the other direction as well
+    SMPMetaManager.getInstance ().setBackendConnectionStatusChangeCallback (eNew -> DBExecutor.resetConnectionEstablished ());
   }
 
   @Nonnull
@@ -160,7 +172,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Nonnull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (m_eDBType);
+    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor::new);
     // Enable cache by default
     ret.setCacheEnabled (SMPServerConfiguration.getConfigFile ().getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
     return ret;
@@ -170,14 +182,14 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                 @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPRedirectManagerJDBC (m_eDBType, aServiceGroupMgr);
+    return new SMPRedirectManagerJDBC (SMPDBExecutor::new, aServiceGroupMgr);
   }
 
   @Nonnull
   public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPServiceInformationManagerJDBC (m_eDBType, aServiceGroupMgr);
+    return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new, aServiceGroupMgr);
   }
 
   @Nonnull
@@ -197,12 +209,12 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                         @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPBusinessCardManagerJDBC (m_eDBType);
+    return new SMPBusinessCardManagerJDBC (SMPDBExecutor::new);
   }
 
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).getToString ();
+    return new ToStringGenerator (this).append ("DBType", m_eDBType).getToString ();
   }
 }

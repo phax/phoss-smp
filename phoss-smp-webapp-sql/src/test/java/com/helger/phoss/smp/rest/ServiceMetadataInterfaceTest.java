@@ -161,7 +161,7 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
       final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
       Response aResponseMsg;
 
-      final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), new int [] { 404, 500 });
+      final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404, 500);
       if (nStatus == 500)
       {
         // Seems like MySQL is not running
@@ -386,7 +386,7 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
       final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
       Response aResponseMsg;
 
-      final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), new int [] { 404, 500 });
+      final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404, 500);
       if (nStatus == 500)
       {
         // Seems like MySQL is not running
@@ -496,6 +496,7 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
         // PUT ServiceGroup
         aSMPClient.saveServiceGroup (aSG, CREDENTIALS);
 
+        // Verify
         assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
         assertNotNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
         assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
@@ -510,14 +511,20 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
         {
           // PUT 1 ServiceInformation
           aSMPClient.saveServiceRedirect (aPI_LC, aDT, aRedir, CREDENTIALS);
+
+          // Verify
           assertNotNull (aSRMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
           // PUT 2 ServiceInformation
           aSMPClient.saveServiceRedirect (aPI_LC, aDT, aRedir, CREDENTIALS);
+
+          // Verify
           assertNotNull (aSRMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
           // DELETE 1 Redirect
           aSMPClient.deleteServiceRegistration (aPI_LC, aDT, CREDENTIALS);
+
+          // Verify
           assertNull (aSRMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
         }
         finally
@@ -531,6 +538,7 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
           {
             // Expected
           }
+          // Verify
           assertNull (aSRMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
         }
 
@@ -548,6 +556,7 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
           // Expected
         }
 
+        // Verify
         assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
         assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
         assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));

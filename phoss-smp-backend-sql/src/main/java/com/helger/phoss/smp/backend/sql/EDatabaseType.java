@@ -31,6 +31,7 @@ import com.helger.commons.name.IHasDisplayName;
  */
 public enum EDatabaseType implements IHasID <String>, IHasDisplayName
 {
+  // IDs must be lowercase because they are used in directory names
   MYSQL ("mysql", "MySQL"),
   POSTGRESQL ("postgresql", "PostgreSQL");
 
