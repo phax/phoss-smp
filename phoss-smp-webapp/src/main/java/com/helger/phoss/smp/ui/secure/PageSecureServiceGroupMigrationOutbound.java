@@ -34,6 +34,7 @@ import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
+import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -104,7 +105,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
         if (aParticipantMigrationMgr.deleteParticipantMigration (aSelectedObject.getID ()).isChanged ())
           aWPEC.postRedirectGetInternal (success ("The outbound Participant Migration for '" +
                                                   aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                                  "' was successfully removed!"));
+                                                  "' was successfully cancelled!"));
         else
           aWPEC.postRedirectGetInternal (error ("Failed to delete outbound Participant Migration for '" +
                                                 aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
@@ -287,6 +288,15 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+
+    {
+      final HCOL aOL = new HCOL ();
+      aOL.addItem ("The migration is initiated on this SMP, and the SML is informed about the upcoming migration");
+      aOL.addItem ("The other SMP, that is taking over the Service Group must acknowledge the migration by providing the same migration code (created by this SMP) to the SML");
+      aOL.addItem ("If the migration was successful, the Service Group must be deleted on this SMP, ideally a temporary redirect is created. If the migration was cancelled no action is needed.");
+      aNodeList.addChild (info (div ("The process of migrating a Service Group to another SMP consists of multiple steps:")).addChild (aOL)
+                                                                                                                            .addChild (div ("Therefore each open Migration must either be finished (deleting the Service Group) or cancelled (no action taken).")));
+    }
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addChild (new BootstrapButton ().addChild ("Start Participant Migration")
