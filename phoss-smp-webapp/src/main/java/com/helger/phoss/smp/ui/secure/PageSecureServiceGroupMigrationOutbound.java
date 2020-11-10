@@ -61,12 +61,14 @@ import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.icon.EDefaultIcon;
+import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
@@ -82,6 +84,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureServiceGroupMigrationOutbound.class);
   private static final String FIELD_PARTICIPANT_ID = "pid";
+  private static final String ACTION_FINALIZE_MIGRATION = "finishmig";
 
   public PageSecureServiceGroupMigrationOutbound (@Nonnull @Nonempty final String sID)
   {
@@ -112,6 +115,17 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                 "'!"));
       }
     });
+    addCustomHandler (ACTION_FINALIZE_MIGRATION,
+                      new AbstractBootstrapWebPageActionHandler <ISMPParticipantMigration, WebPageExecutionContext> (true)
+                      {
+
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nonnull final ISMPParticipantMigration aSelectedObject)
+                        {
+                          // TODO
+                          return null;
+                        }
+                      });
   }
 
   @Override
