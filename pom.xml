@@ -67,7 +67,7 @@
   </developers>
 
   <properties>
-    <log4j.version>2.13.3</log4j.version>
+    <log4j.version>2.14.0</log4j.version>
   </properties>
   
   <dependencyManagement>
@@ -110,21 +110,21 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>9.3.4</version>
+        <version>9.5.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>8.2.8</version>
+        <version>8.2.9</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>8.2.5</version>
+        <version>8.2.6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
