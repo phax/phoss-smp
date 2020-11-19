@@ -63,7 +63,7 @@ public final class NiceNameHandler
   public static ICommonsOrderedMap <String, NiceNameEntry> readEntries (@Nonnull final IReadableResource aRes, final boolean bReadProcIDs)
   {
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Trying to read nice name entries from " + aRes.getPath ());
+      LOGGER.info ("Trying to read nice name entries from '" + aRes.getPath () + "'");
 
     final ICommonsOrderedMap <String, NiceNameEntry> ret = new CommonsLinkedHashMap <> ();
     final IMicroDocument aDoc = MicroReader.readMicroXML (aRes);

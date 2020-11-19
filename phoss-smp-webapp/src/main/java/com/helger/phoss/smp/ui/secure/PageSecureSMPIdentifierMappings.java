@@ -30,9 +30,13 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.nicename.NiceNameEntry;
 import com.helger.phoss.smp.nicename.NiceNameHandler;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.photon.bootstrap4.button.BootstrapButton;
+import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
+import com.helger.photon.uicore.css.CPageParam;
+import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 
@@ -44,6 +48,8 @@ import com.helger.photon.uictrls.datatables.column.DTCol;
  */
 public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
 {
+  private static final String ACTION_RELOAD = "reload";
+
   public PageSecureSMPIdentifierMappings (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Identifier Mappings");
@@ -70,6 +76,17 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
   protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+
+    final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
+    aToolbar.addChild (new BootstrapButton ().addChild ("Reload")
+                                             .setIcon (EDefaultIcon.REFRESH)
+                                             .setOnClick (aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_RELOAD)));
+
+    if (aWPEC.hasAction (ACTION_RELOAD))
+    {
+      NiceNameHandler.reloadNames ();
+      aNodeList.addChild (success ("Successfully reloaded name mappings"));
+    }
 
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
     aTabBox.addTab ("doctypes", "Document Types", _createList (aWPEC, NiceNameHandler.getAllDocumentTypeMappings (), "doctypes"));
