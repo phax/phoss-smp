@@ -184,4 +184,18 @@ public final class NiceNameHandler
       RWLOCK.readLock ().unlock ();
     }
   }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static ICommonsOrderedMap <String, NiceNameEntry> getAllDocumentTypeMappings ()
+  {
+    return RWLOCK.readLockedGet ( () -> DOCTYPE_IDS.getClone ());
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static ICommonsOrderedMap <String, NiceNameEntry> getAllProcessMappings ()
+  {
+    return RWLOCK.readLockedGet ( () -> PROCESS_IDS.getClone ());
+  }
 }

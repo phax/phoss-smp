@@ -50,6 +50,7 @@ public final class CMenuSecure
   public static final String MENU_SML_REGISTRATION = "sml_registration";
   public static final String MENU_SML_CERTIFICATE_UPDATE = "sml_certificate_update";
   public static final String MENU_SMP_SETTINGS = "smp_settings";
+  public static final String MENU_SMP_IDENTIFIER_MAPPINGS = "smp_id_mappings";
   public static final String MENU_CHANGE_PASSWORD = "change_pw";
 
   private CMenuSecure ()
