@@ -19,6 +19,7 @@
   <item id="cenbii-procid-ubl::urn:fdc:www.efaktura.gov.pl:ver1.0:account_corr:ver1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:www.efaktura.gov.pl:ver1.0:corr_inv:ver1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:www.efaktura.gov.pl:ver1.0:receipt_advice:ver1.0" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:kosit:profile:reporting:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii01:ver1.0" name="Peppol predefined" deprecated="true" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii01:ver2.0" name="Peppol predefined" deprecated="true" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii03:ver1.0" name="Peppol predefined" deprecated="true" />

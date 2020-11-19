@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root type="doctypeid">
+  <item id="busdox-docid-qns::urn:kosit:names:spec:peppol-reporting:schema:xsd:Reporting-1::APData##Reporting::1.0" name="Peppol German Peppol Usage Evaluation AP" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:kosit:profile:reporting:1.0" />
+  </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2::ApplicationResponse##urn:fdc:peppol.eu:poacc:trns:catalogue_response:3::2.1" name="Peppol Catalogue Response transaction 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:poacc:bis:catalogue_only:3" />
   </item>
@@ -193,7 +196,10 @@
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:poacc:bis:ordering:3" />
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:poacc:bis:order_only:3" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Order-2::Order##urn:fdc:peppol.eu:poacc:trns:order:3:extended:urn:fdc:anskaffelser.no:2019:ehf:spec:3.0::2.1" name="Peppol EHF Advanced Order Initiation 3.0" deprecated="false">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Order-2::Order##urn:fdc:peppol.eu:poacc:trns:order:3:extended:urn:fdc:anskaffelser.no:2019:ehf:spec:3.0::2.1" name="Peppol EHF Advanced Order Initiation 3.0 (invalid)" deprecated="true">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:09:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Order-2::Order##urn:fdc:peppol.eu:poacc:trns:order:3:extended:urn:fdc:anskaffelser.no:2019:ehf:spec:3.0::2.2" name="Peppol EHF Advanced Order Initiation 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:09:1.0" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Order-2::Order##urn:fdc:peppol.eu:poacc:trns:order:3:restrictive:urn:www.agid.gov.it:trns:ordine:3.1::2.1" name="Peppol SimpleOrder_IT" deprecated="false">
@@ -220,10 +226,16 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Order-2::Order##urn:www.cenbii.eu:transaction:biitrns001:ver2.0:extended:urn:www.peppol.eu:bis:peppol3a:ver2.0:extended:urn:www.simplerinvoicing.org:si:si-ubl:ver1.2::2.1" name="Peppol SI-UBL 1.2 Order" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:www.cenbii.eu:profile:bii03:ver2.0" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-2::OrderCancellation##urn:fdc:anskaffelser.no:2019:ehf:spec:adv-order-cancellation:3.0::2.1" name="Peppol EHF Advanced Order Cancellation 3.0" deprecated="false">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-2::OrderCancellation##urn:fdc:anskaffelser.no:2019:ehf:spec:adv-order-cancellation:3.0::2.1" name="Peppol EHF Advanced Order Cancellation 3.0 (invalid)" deprecated="true">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:09:1.0" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderChange-2::OrderChange##urn:fdc:anskaffelser.no:2019:ehf:spec:adv-order-change:3.0::2.1" name="Peppol EHF Advanced Order Change 3.0" deprecated="false">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-2::OrderCancellation##urn:fdc:anskaffelser.no:2019:ehf:spec:adv-order-cancellation:3.0::2.2" name="Peppol EHF Advanced Order Cancellation 3.0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:09:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderChange-2::OrderChange##urn:fdc:anskaffelser.no:2019:ehf:spec:adv-order-change:3.0::2.1" name="Peppol EHF Advanced Order Change 3.0 (invalid)" deprecated="true">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:09:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderChange-2::OrderChange##urn:fdc:anskaffelser.no:2019:ehf:spec:adv-order-change:3.0::2.2" name="Peppol EHF Advanced Order Change 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:09:1.0" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderResponse-2::Order##urn:www.cenbii.eu:transaction:biitrns076:ver2.0:extended:urn:www.peppol.eu:bis:peppol28a:ver1.0::2.1" name="Peppol Ordering profile OrderResponse V1" deprecated="true">
@@ -238,7 +250,10 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderResponse-2::OrderResponse##urn:fdc:peppol.eu:poacc:trns:order_response:3::2.1" name="Peppol Order Response transaction 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:poacc:bis:ordering:3" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderResponse-2::OrderResponse##urn:fdc:peppol.eu:poacc:trns:order_response:3:extended:urn:fdc:anskaffelser.no:2019:ehf:spec:3.0::2.1" name="Peppol EHF Advanced Order Response 3.0" deprecated="false">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderResponse-2::OrderResponse##urn:fdc:peppol.eu:poacc:trns:order_response:3:extended:urn:fdc:anskaffelser.no:2019:ehf:spec:3.0::2.1" name="Peppol EHF Advanced Order Response 3.0 (invalid)" deprecated="true">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:09:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderResponse-2::OrderResponse##urn:fdc:peppol.eu:poacc:trns:order_response:3:extended:urn:fdc:anskaffelser.no:2019:ehf:spec:3.0::2.2" name="Peppol EHF Advanced Order Response 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:09:1.0" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:OrderResponse-2::OrderResponse##urn:fdc:peppol.eu:poacc:trns:order_response:3:restrictive:urn:www.agid.gov.it:trns:risposta_ordine:3.0::2.1" name="Peppol OrderResponse_IT" deprecated="false">
