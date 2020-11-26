@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app http://xmlns.oracle.com/weblogic/weblogic-web-app/1.4/weblogic-web-app.xsd">
+  <context-root>phoss-smp-webapp-mongodb</context-root>
+  <container-descriptor>
+    <container-initializer-enabled>true</container-initializer-enabled>
+    <prefer-application-packages>
+
+    </prefer-application-packages>
+    <allow-all-roles>true</allow-all-roles>
+    <prefer-application-resources>
+
+    </prefer-application-resources>
+  </container-descriptor>
+  <work-manager>
+    <name>servicesWorkManager</name>
+    <max-threads-constraint>
+      <name>maxThreads</name>
+      <count>30</count>
+    </max-threads-constraint>
+    <capacity>
+      <name>maxCapacity</name>
+      <count>100</count>
+    </capacity>
+  </work-manager>
+</weblogic-web-app>
