@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -349,13 +348,13 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroups()");
 
-    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username" +
-                                                                                     " FROM smp_service_group AS sg, smp_ownership AS so" +
-                                                                                     " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier");
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username" +
+                                                                          " FROM smp_service_group sg, smp_ownership so" +
+                                                                          " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier");
 
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
-    if (aDBResult.isPresent ())
-      for (final DBResultRow aRow : aDBResult.get ())
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
         ret.add (new SMPServiceGroup (aRow.getAsString (3),
                                       new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
                                       aRow.getAsString (2)));
@@ -369,15 +368,15 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
 
-    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension" +
-                                                                                     " FROM smp_service_group AS sg, smp_ownership AS so" +
-                                                                                     " WHERE so.username=?" +
-                                                                                     " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
-                                                                                     new ConstantPreparedStatementDataProvider (sOwnerID));
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension" +
+                                                                          " FROM smp_service_group sg, smp_ownership so" +
+                                                                          " WHERE so.username=?" +
+                                                                          " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
+                                                                          new ConstantPreparedStatementDataProvider (sOwnerID));
 
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
-    if (aDBResult.isPresent ())
-      for (final DBResultRow aRow : aDBResult.get ())
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
         ret.add (new SMPServiceGroup (sOwnerID,
                                       new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
                                       aRow.getAsString (2)));
@@ -391,7 +390,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("getSMPServiceGroupCountOfOwner(" + sOwnerID + ")");
 
     return newExecutor ().queryCount ("SELECT COUNT(sg.businessIdentifier)" +
-                                      " FROM smp_service_group AS sg, smp_ownership AS so" +
+                                      " FROM smp_service_group sg, smp_ownership so" +
                                       " WHERE so.username=?" +
                                       " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
                                       new ConstantPreparedStatementDataProvider (sOwnerID));
@@ -412,13 +411,14 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       return ret;
 
     // Not in cache
-    final Optional <DBResultRow> aResult = newExecutor ().querySingle ("SELECT sg.extension, so.username" +
-                                                                       " FROM smp_service_group AS sg, smp_ownership AS so" +
-                                                                       " WHERE sg.businessIdentifierScheme=? AND sg.businessIdentifier=?" +
-                                                                       " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
-                                                                       new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                                                  aParticipantID.getValue ()));
-    if (!aResult.isPresent ())
+    final Wrapper <DBResultRow> aResult = new Wrapper <> ();
+    newExecutor ().querySingle ("SELECT sg.extension, so.username" +
+                                " FROM smp_service_group sg, smp_ownership so" +
+                                " WHERE sg.businessIdentifierScheme=? AND sg.businessIdentifier=?" +
+                                " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
+                                new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (), aParticipantID.getValue ()),
+                                aResult::set);
+    if (aResult.isNotSet ())
       return null;
 
     ret = new SMPServiceGroup (aResult.get ().getAsString (1), aParticipantID, aResult.get ().getAsString (0));

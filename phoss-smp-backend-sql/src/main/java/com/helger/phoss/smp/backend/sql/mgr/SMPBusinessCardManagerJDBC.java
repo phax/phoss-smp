@@ -19,7 +19,6 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnegative;
@@ -272,15 +271,15 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
-    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
-                                                                                     " FROM smp_bce");
-    if (aDBResult.isPresent ())
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
+                                                                          " FROM smp_bce");
+    if (aDBResult != null)
     {
       final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
 
       // Group by ID
       final IMultiMapListBased <IParticipantIdentifier, SMPBusinessCardEntity> aEntityMap = new MultiHashMapArrayListBased <> ();
-      for (final DBResultRow aRow : aDBResult.get ())
+      for (final DBResultRow aRow : aDBResult)
       {
         final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aRow.getAsString (0));
         // Single name only
@@ -320,18 +319,18 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (aID == null)
       return null;
 
-    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT id, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
-                                                                                     " FROM smp_bce" +
-                                                                                     " WHERE pid=?",
-                                                                                     new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
-    if (!aDBResult.isPresent ())
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
+                                                                          " FROM smp_bce" +
+                                                                          " WHERE pid=?",
+                                                                          new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
+    if (aDBResult == null)
       return null;
 
-    if (aDBResult.get ().isEmpty ())
+    if (aDBResult.isEmpty ())
       return null;
 
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
-    for (final DBResultRow aRow : aDBResult.get ())
+    for (final DBResultRow aRow : aDBResult)
     {
       final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aRow.getAsString (0));
       // Single name only
