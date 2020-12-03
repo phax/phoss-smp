@@ -18,14 +18,9 @@
 @echo off
 set XVER=5.3.1
 
-@REM --------------- Building -----------------------
-
-docker pull tomcat:9-jre11
-if errorlevel 1 goto end
-
 @REM --------------- XML -----------------------
 
-docker build --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-xml-%XVER% -f Dockerfile-release-binary-xml .
+docker build --pull --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-xml-%XVER% -f Dockerfile-release-binary-xml .
 if errorlevel 1 goto end
 
 @REM legacy names
@@ -46,7 +41,7 @@ if errorlevel 1 goto end
 
 @REM --------------- SQL -----------------------
 
-docker build --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-sql-%XVER% -f Dockerfile-release-binary-sql .
+docker build --pull --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-sql-%XVER% -f Dockerfile-release-binary-sql .
 if errorlevel 1 goto end
 
 docker tag phoss-smp-release-binary-sql-%XVER% phelger/phoss-smp-sql:%XVER%
@@ -57,7 +52,7 @@ if errorlevel 1 goto end
 
 @REM --------------- MongoDB -----------------------
 
-docker build --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-mongodb-%XVER% -f Dockerfile-release-binary-mongodb .
+docker build --pull --build-arg SMP_VERSION=%XVER% -t phoss-smp-release-binary-mongodb-%XVER% -f Dockerfile-release-binary-mongodb .
 if errorlevel 1 goto end
 
 docker tag phoss-smp-release-binary-mongodb-%XVER% phelger/phoss-smp-mongodb:%XVER%
