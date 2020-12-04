@@ -83,7 +83,7 @@ public final class SMPServiceInformationTest
     assertEquals (1, aProcess.getAllEndpoints ().size ());
     assertEquals ("[{\"Any\":\"<extproc />\"}]", aProcess.getExtensionsAsString ());
 
-    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
+    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                  "testdoctype");
     final SMPServiceInformation aSI = new SMPServiceInformation (aSG, aDocTypeID, CollectionHelper.newList (aProcess), "<extsi/>");
     assertSame (aSG, aSI.getServiceGroup ());
@@ -127,7 +127,7 @@ public final class SMPServiceInformationTest
     assertEquals (1, aProcess.getAllEndpoints ().size ());
     assertNull (aProcess.getExtensionsAsString ());
 
-    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
+    final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                  "testdoctype");
     final SMPServiceInformation aSI = new SMPServiceInformation (aSG, aDocTypeID, CollectionHelper.newList (aProcess), (String) null);
     assertSame (aSG, aSI.getServiceGroup ());
