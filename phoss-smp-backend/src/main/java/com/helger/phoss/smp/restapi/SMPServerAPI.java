@@ -70,12 +70,12 @@ import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 public final class SMPServerAPI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerAPI.class);
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterInvocation = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
-                                                                                                                                   "$call");
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
-                                                                                                                                "$success");
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterError = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
-                                                                                                                              "$error");
+  private static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_INVOCATION = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
+                                                                                                                                  "$call");
+  private static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_SUCCESS = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
+                                                                                                                               "$success");
+  private static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_ERROR = StatisticsManager.getKeyedCounterHandler (SMPServerAPI.class.getName () +
+                                                                                                                             "$error");
   private static final String LOG_PREFIX = "[SMP REST API] ";
 
   private final ISMPServerAPIDataProvider m_aAPIProvider;
@@ -93,7 +93,7 @@ public final class SMPServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -147,14 +147,14 @@ public final class SMPServerAPI
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
       return aCompleteServiceGroup;
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -168,7 +168,7 @@ public final class SMPServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -197,14 +197,14 @@ public final class SMPServerAPI
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
       return aRefList;
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -217,7 +217,7 @@ public final class SMPServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -259,14 +259,14 @@ public final class SMPServerAPI
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
       return aSG;
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -280,7 +280,7 @@ public final class SMPServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog + " ==> " + aServiceGroup);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -327,13 +327,13 @@ public final class SMPServerAPI
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -346,7 +346,7 @@ public final class SMPServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -366,13 +366,13 @@ public final class SMPServerAPI
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -386,7 +386,7 @@ public final class SMPServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -441,14 +441,14 @@ public final class SMPServerAPI
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
       return aSignedServiceMetadata;
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -464,7 +464,7 @@ public final class SMPServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog + " ==> " + aServiceMetadata);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -491,8 +491,11 @@ public final class SMPServerAPI
         // metadata (body) must equal path
         if (aServiceInformation.getParticipantIdentifier () == null)
         {
-          throw new SMPBadRequestException ("Save service metadata was called with bad parameters. serviceInfo:!NO PARTICIPANT ID! param:" +
-                                            aServiceGroupID.getURIEncoded (),
+          throw new SMPBadRequestException ("Save service metadata was inconsistent values.\n" +
+                                            "ServiceInfo Participant ID: <none>\n" +
+                                            "URL Parameter value: '" +
+                                            aServiceGroupID.getURIEncoded () +
+                                            "'",
                                             m_aAPIProvider.getCurrentURI ());
         }
         final IParticipantIdentifier aPayloadServiceGroupID;
@@ -512,18 +515,24 @@ public final class SMPServerAPI
         if (!aServiceGroupID.hasSameContent (aPayloadServiceGroupID))
         {
           // Participant ID in URL must match the one in XML structure
-          throw new SMPBadRequestException ("Save service metadata was called with bad parameters. serviceInfo:" +
-                                            (aPayloadServiceGroupID == null ? "!NO PARTICIPANT ID!"
-                                                                            : aPayloadServiceGroupID.getURIEncoded ()) +
-                                            " param:" +
-                                            aServiceGroupID.getURIEncoded (),
+          throw new SMPBadRequestException ("Save service metadata was called with inconsistent values.\n" +
+                                            "ServiceInfo Participant ID: " +
+                                            (aPayloadServiceGroupID == null ? "<none>"
+                                                                            : "'" + aPayloadServiceGroupID.getURIEncoded () + "'") +
+                                            "\n" +
+                                            "URL Parameter value: '" +
+                                            aServiceGroupID.getURIEncoded () +
+                                            "'",
                                             m_aAPIProvider.getCurrentURI ());
         }
 
         if (aServiceInformation.getDocumentIdentifier () == null)
         {
-          throw new SMPBadRequestException ("Save service metadata was called with bad parameters. serviceInfo:!NO DOCUMENT TYPE ID! param:" +
-                                            aDocTypeID.getURIEncoded (),
+          throw new SMPBadRequestException ("Save service metadata was called with inconsistent values.\n" +
+                                            "ServiceInfo Document Type ID: <none>\n" +
+                                            "URL Parameter value: '" +
+                                            aDocTypeID.getURIEncoded () +
+                                            "'",
                                             m_aAPIProvider.getCurrentURI ());
         }
         final IDocumentTypeIdentifier aPayloadDocumentTypeID = aIdentifierFactory.createDocumentTypeIdentifier (aServiceInformation.getDocumentIdentifier ()
@@ -533,10 +542,13 @@ public final class SMPServerAPI
         if (!aDocTypeID.hasSameContent (aPayloadDocumentTypeID))
         {
           // Document type ID in URL must match the one in XML structure
-          throw new SMPBadRequestException ("Save service metadata was called with bad parameters. serviceInfo:" +
+          throw new SMPBadRequestException ("Save service metadata was called with inconsistent values.\n" +
+                                            "ServiceInfo Document Type ID: '" +
                                             aPayloadDocumentTypeID.getURIEncoded () +
-                                            " param:" +
-                                            aDocTypeID.getURIEncoded (),
+                                            "'\n" +
+                                            "URL Parameter value: '" +
+                                            aDocTypeID.getURIEncoded () +
+                                            "'",
                                             m_aAPIProvider.getCurrentURI ());
         }
       }
@@ -569,7 +581,7 @@ public final class SMPServerAPI
         {
           if (LOGGER.isErrorEnabled ())
             LOGGER.error (sLog + " - Redirect - failure");
-          s_aStatsCounterError.increment (sAction);
+          STATS_COUNTER_ERROR.increment (sAction);
           return ESuccess.FAILURE;
         }
       }
@@ -610,7 +622,7 @@ public final class SMPServerAPI
           {
             if (LOGGER.isErrorEnabled ())
               LOGGER.error (sLog + " - ServiceInformation - failure");
-            s_aStatsCounterError.increment (sAction);
+            STATS_COUNTER_ERROR.increment (sAction);
             return ESuccess.FAILURE;
           }
         }
@@ -618,20 +630,20 @@ public final class SMPServerAPI
         {
           if (LOGGER.isErrorEnabled ())
             LOGGER.error (sLog + " - neither Redirect nor ServiceInformation");
-          s_aStatsCounterError.increment (sAction);
+          STATS_COUNTER_ERROR.increment (sAction);
           return ESuccess.FAILURE;
         }
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
       return ESuccess.SUCCESS;
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -645,7 +657,7 @@ public final class SMPServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -695,7 +707,7 @@ public final class SMPServerAPI
         }
         if (LOGGER.isInfoEnabled ())
           LOGGER.info (sLog + " SUCCESS - ServiceInformation");
-        s_aStatsCounterSuccess.increment (sAction);
+        STATS_COUNTER_SUCCESS.increment (sAction);
       }
       else
       {
@@ -714,7 +726,7 @@ public final class SMPServerAPI
           }
           if (LOGGER.isInfoEnabled ())
             LOGGER.info (sLog + " SUCCESS - Redirect");
-          s_aStatsCounterSuccess.increment (sAction);
+          STATS_COUNTER_SUCCESS.increment (sAction);
         }
         else
         {
@@ -727,7 +739,7 @@ public final class SMPServerAPI
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -740,7 +752,7 @@ public final class SMPServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -772,13 +784,13 @@ public final class SMPServerAPI
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS - " + eChange);
 
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -789,7 +801,7 @@ public final class SMPServerAPI
   @Nonnull
   public static IStatisticsHandlerKeyedCounter getInvocationCounter ()
   {
-    return s_aStatsCounterInvocation;
+    return STATS_COUNTER_INVOCATION;
   }
 
   /**
@@ -798,7 +810,7 @@ public final class SMPServerAPI
   @Nonnull
   public static IStatisticsHandlerKeyedCounter getSuccessCounter ()
   {
-    return s_aStatsCounterSuccess;
+    return STATS_COUNTER_SUCCESS;
   }
 
   /**
@@ -807,6 +819,6 @@ public final class SMPServerAPI
   @Nonnull
   public static IStatisticsHandlerKeyedCounter getErrorCounter ()
   {
-    return s_aStatsCounterError;
+    return STATS_COUNTER_ERROR;
   }
 }
