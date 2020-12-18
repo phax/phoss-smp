@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 
 /**
  * HTTP 404 exception wrapper
- * 
+ *
  * @author Philip Helger
  */
 public class SMPNotFoundException extends SMPServerException
@@ -30,7 +30,7 @@ public class SMPNotFoundException extends SMPServerException
    */
   public SMPNotFoundException (@Nonnull final String sMessage)
   {
-    super ("Not found: " + sMessage);
+    this (sMessage, null);
   }
 
   /**
