@@ -68,7 +68,8 @@ public final class MainCreateManyEndpoints
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+                                                 @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
@@ -77,7 +78,7 @@ public final class MainCreateManyEndpoints
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
-  public static void main (final String [] args) throws Throwable
+  public static void main (final String [] args)
   {
     final String sServerBasePath = "http://localhost:90";
     final WebScopeTestRule aRule = new WebScopeTestRule ();
@@ -163,7 +164,8 @@ public final class MainCreateManyEndpoints
                                                          .path ("services")
                                                          .path (sDT)
                                                          .request ()
-                                                         .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
+                                                         .header (CHttpHeader.AUTHORIZATION,
+                                                                  CREDENTIALS.getRequestValue ())
                                                          .put (Entity.xml (aObjFactory.createServiceMetadata (aSM)));
               _testResponseJerseyClient (aResponseMsg, 200);
             }
@@ -175,7 +177,11 @@ public final class MainCreateManyEndpoints
       }
       ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (es);
       aSWOverall.stop ();
-      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getSeconds () + " seconds");
+      LOGGER.info ("Overall process took " +
+                   aSWOverall.getMillis () +
+                   " ms or " +
+                   aSWOverall.getSeconds () +
+                   " seconds");
     }
     finally
     {

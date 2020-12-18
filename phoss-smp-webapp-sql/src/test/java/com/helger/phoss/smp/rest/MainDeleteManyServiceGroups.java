@@ -50,7 +50,8 @@ public final class MainDeleteManyServiceGroups
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+                                                 @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
@@ -59,7 +60,7 @@ public final class MainDeleteManyServiceGroups
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
-  public static void main (final String [] args) throws Throwable
+  public static void main (final String [] args)
   {
     final String sServerBasePath = "http://localhost:90";
     final WebScopeTestRule aRule = new WebScopeTestRule ();
@@ -93,7 +94,11 @@ public final class MainDeleteManyServiceGroups
         LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
       }
       aSWOverall.stop ();
-      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getSeconds () + " seconds");
+      LOGGER.info ("Overall process took " +
+                   aSWOverall.getMillis () +
+                   " ms or " +
+                   aSWOverall.getSeconds () +
+                   " seconds");
     }
     finally
     {
