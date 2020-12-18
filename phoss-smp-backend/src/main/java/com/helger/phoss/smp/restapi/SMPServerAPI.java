@@ -86,9 +86,9 @@ public final class SMPServerAPI
   }
 
   @Nonnull
-  public CompleteServiceGroupType getCompleteServiceGroup (final String sServiceGroupID) throws SMPServerException
+  public CompleteServiceGroupType getCompleteServiceGroup (final String sPathServiceGroupID) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "GET /complete/" + sServiceGroupID;
+    final String sLog = LOG_PREFIX + "GET /complete/" + sPathServiceGroupID;
     final String sAction = "getCompleteServiceGroup";
 
     if (LOGGER.isInfoEnabled ())
@@ -98,21 +98,22 @@ public final class SMPServerAPI
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPNotFoundException ("Unknown Service Group ID '" + sPathServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
       // Then add the service metadata references
@@ -126,7 +127,7 @@ public final class SMPServerAPI
         if (aServiceInfo != null && aServiceInfo.getTotalEndpointCount () > 0)
         {
           final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
-          aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
+          aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aPathServiceGroupID, aDocTypeID));
           aRefCollection.addServiceMetadataReference (aMetadataReference);
         }
       }
@@ -160,10 +161,10 @@ public final class SMPServerAPI
   }
 
   @Nonnull
-  public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sUserID,
+  public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sPathUserID,
                                                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "GET /list/" + sUserID;
+    final String sLog = LOG_PREFIX + "GET /list/" + sPathUserID;
     final String sAction = "getServiceGroupReferenceList";
 
     if (LOGGER.isInfoEnabled ())
@@ -172,13 +173,14 @@ public final class SMPServerAPI
 
     try
     {
-      if (!aCredentials.getUserName ().equals (sUserID))
+      if (!aCredentials.getUserName ().equals (sPathUserID))
       {
         throw new SMPUnauthorizedException ("URL user name '" +
-                                            sUserID +
+                                            sPathUserID +
                                             "' does not match HTTP Basic Auth user name '" +
                                             aCredentials.getUserName () +
-                                            "'");
+                                            "'",
+                                            m_aAPIProvider.getCurrentURI ());
       }
 
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
@@ -210,9 +212,9 @@ public final class SMPServerAPI
   }
 
   @Nonnull
-  public ServiceGroupType getServiceGroup (final String sServiceGroupID) throws SMPServerException
+  public ServiceGroupType getServiceGroup (final String sPathServiceGroupID) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "GET /" + sServiceGroupID;
+    final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID;
     final String sAction = "getServiceGroup";
 
     if (LOGGER.isInfoEnabled ())
@@ -222,22 +224,23 @@ public final class SMPServerAPI
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
       // Retrieve the service group
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
       // Then add the service metadata references
@@ -251,7 +254,7 @@ public final class SMPServerAPI
         if (aServiceInfo != null && aServiceInfo.getTotalEndpointCount () > 0)
         {
           final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
-          aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aServiceGroupID, aDocTypeID));
+          aMetadataReference.setHref (m_aAPIProvider.getServiceMetadataReferenceHref (aPathServiceGroupID, aDocTypeID));
           aCollectionType.addServiceMetadataReference (aMetadataReference);
         }
       }
@@ -271,11 +274,11 @@ public final class SMPServerAPI
     }
   }
 
-  public void saveServiceGroup (@Nonnull final String sServiceGroupID,
+  public void saveServiceGroup (@Nonnull final String sPathServiceGroupID,
                                 @Nonnull final ServiceGroupType aServiceGroup,
                                 @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "PUT /" + sServiceGroupID;
+    final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID;
     final String sAction = "saveServiceGroup";
 
     if (LOGGER.isInfoEnabled ())
@@ -285,11 +288,12 @@ public final class SMPServerAPI
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
       }
 
       // Parse the content of the payload with the same identifier factory to
@@ -305,14 +309,13 @@ public final class SMPServerAPI
         aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceGroup.getParticipantIdentifier ().getScheme (),
                                                                                  aServiceGroup.getParticipantIdentifier ().getValue ());
       }
-      if (!aServiceGroupID.hasSameContent (aPayloadServiceGroupID))
+      if (!aPathServiceGroupID.hasSameContent (aPayloadServiceGroupID))
       {
         // Business identifiers must be equal
-        throw new SMPBadRequestException ("ServiceGroup Inconsistency. The URL points to " +
-                                          aServiceGroupID.getURIEncoded () +
-                                          " whereas the ServiceGroup contains " +
-                                          (aPayloadServiceGroupID == null ? "!NO PARTICIPANT ID!"
-                                                                          : aPayloadServiceGroupID.getURIEncoded ()),
+        throw new SMPBadRequestException ("Service Group Inconsistency. The URL points to '" +
+                                          aPathServiceGroupID.getURIEncoded () +
+                                          "' whereas the Service Group contains " +
+                                          (aPayloadServiceGroupID == null ? "<none>" : "'" + aPayloadServiceGroupID.getURIEncoded () + "'"),
                                           m_aAPIProvider.getCurrentURI ());
       }
 
@@ -320,10 +323,10 @@ public final class SMPServerAPI
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final String sExtension = SMPExtensionConverter.convertToString (aServiceGroup.getExtension ());
-      if (aServiceGroupMgr.containsSMPServiceGroupWithID (aServiceGroupID))
-        aServiceGroupMgr.updateSMPServiceGroup (aServiceGroupID, aSMPUser.getID (), sExtension);
+      if (aServiceGroupMgr.containsSMPServiceGroupWithID (aPathServiceGroupID))
+        aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension);
       else
-        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aServiceGroupID, sExtension);
+        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aPathServiceGroupID, sExtension);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
@@ -338,10 +341,10 @@ public final class SMPServerAPI
     }
   }
 
-  public void deleteServiceGroup (@Nonnull final String sServiceGroupID,
+  public void deleteServiceGroup (@Nonnull final String sPathServiceGroupID,
                                   @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "DELETE /" + sServiceGroupID;
+    final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID;
     final String sAction = "deleteServiceGroup";
 
     if (LOGGER.isInfoEnabled ())
@@ -351,18 +354,19 @@ public final class SMPServerAPI
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
       }
 
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
-      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
+      SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID);
+      aServiceGroupMgr.deleteSMPServiceGroup (aPathServiceGroupID);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
@@ -378,10 +382,10 @@ public final class SMPServerAPI
   }
 
   @Nonnull
-  public SignedServiceMetadataType getServiceRegistration (@Nonnull final String sServiceGroupID,
-                                                           @Nonnull final String sDocumentTypeID) throws SMPServerException
+  public SignedServiceMetadataType getServiceRegistration (@Nonnull final String sPathServiceGroupID,
+                                                           @Nonnull final String sPathDocTypeID) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "GET /" + sServiceGroupID + "/services/" + sDocumentTypeID;
+    final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "getServiceRegistration";
 
     if (LOGGER.isInfoEnabled ())
@@ -391,28 +395,29 @@ public final class SMPServerAPI
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
       }
 
-      final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
-        throw new SMPNotFoundException ("No such serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPNotFoundException ("No such Service Group '" + sPathServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
-      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocumentTypeID);
-      if (aDocTypeID == null)
+      final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
+      if (aPathDocTypeID == null)
       {
-        throw new SMPBadRequestException ("Failed to parse documentTypeID '" + sDocumentTypeID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse Document Type ID '" + sPathDocTypeID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
       // First check for redirection, then for actual service
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-      final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
+      final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroup, aPathDocTypeID);
 
       final SignedServiceMetadataType aSignedServiceMetadata = new SignedServiceMetadataType ();
       if (aRedirect != null)
@@ -423,8 +428,8 @@ public final class SMPServerAPI
       {
         // Get as regular service information
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                                           aDocTypeID);
+        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroup,
+                                                                                                                           aPathDocTypeID);
         final ServiceMetadataType aSM = aServiceInfo == null ? null : aServiceInfo.getAsJAXBObjectPeppol ();
         if (aSM != null)
         {
@@ -433,7 +438,7 @@ public final class SMPServerAPI
         else
         {
           // Neither nor is present, or no endpoint is available
-          throw new SMPNotFoundException ("service(" + sServiceGroupID + "," + sDocumentTypeID + ")", m_aAPIProvider.getCurrentURI ());
+          throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")", m_aAPIProvider.getCurrentURI ());
         }
       }
 
@@ -454,12 +459,12 @@ public final class SMPServerAPI
   }
 
   @Nonnull
-  public ESuccess saveServiceRegistration (@Nonnull final String sServiceGroupID,
-                                           @Nonnull final String sDocumentTypeID,
+  public ESuccess saveServiceRegistration (@Nonnull final String sPathServiceGroupID,
+                                           @Nonnull final String sPathDocumentTypeID,
                                            @Nonnull final ServiceMetadataType aServiceMetadata,
                                            @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "PUT /" + sServiceGroupID + "/services/" + sDocumentTypeID;
+    final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + "/services/" + sPathDocumentTypeID;
     final String sAction = "saveServiceRegistration";
 
     if (LOGGER.isInfoEnabled ())
@@ -469,18 +474,20 @@ public final class SMPServerAPI
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
       }
 
-      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocumentTypeID);
-      if (aDocTypeID == null)
+      final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocumentTypeID);
+      if (aPathDocTypeID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse documentTypeID '" + sDocumentTypeID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse Document Type ID '" + sPathDocumentTypeID + "'",
+                                          m_aAPIProvider.getCurrentURI ());
       }
 
       // May be null for a Redirect!
@@ -491,10 +498,10 @@ public final class SMPServerAPI
         // metadata (body) must equal path
         if (aServiceInformation.getParticipantIdentifier () == null)
         {
-          throw new SMPBadRequestException ("Save service metadata was inconsistent values.\n" +
-                                            "ServiceInfo Participant ID: <none>\n" +
+          throw new SMPBadRequestException ("Save Service Metadata has inconsistent values.\n" +
+                                            "Service Information Participant ID: <none>\n" +
                                             "URL Parameter value: '" +
-                                            aServiceGroupID.getURIEncoded () +
+                                            aPathServiceGroupID.getURIEncoded () +
                                             "'",
                                             m_aAPIProvider.getCurrentURI ());
         }
@@ -512,42 +519,42 @@ public final class SMPServerAPI
                                                                                                       .getValue ());
         }
 
-        if (!aServiceGroupID.hasSameContent (aPayloadServiceGroupID))
+        if (!aPathServiceGroupID.hasSameContent (aPayloadServiceGroupID))
         {
           // Participant ID in URL must match the one in XML structure
-          throw new SMPBadRequestException ("Save service metadata was called with inconsistent values.\n" +
-                                            "ServiceInfo Participant ID: " +
+          throw new SMPBadRequestException ("Save Service Metadata was called with inconsistent values.\n" +
+                                            "Service Infoformation Participant ID: " +
                                             (aPayloadServiceGroupID == null ? "<none>"
                                                                             : "'" + aPayloadServiceGroupID.getURIEncoded () + "'") +
                                             "\n" +
-                                            "URL Parameter value: '" +
-                                            aServiceGroupID.getURIEncoded () +
+                                            "URL parameter value: '" +
+                                            aPathServiceGroupID.getURIEncoded () +
                                             "'",
                                             m_aAPIProvider.getCurrentURI ());
         }
 
         if (aServiceInformation.getDocumentIdentifier () == null)
         {
-          throw new SMPBadRequestException ("Save service metadata was called with inconsistent values.\n" +
-                                            "ServiceInfo Document Type ID: <none>\n" +
-                                            "URL Parameter value: '" +
-                                            aDocTypeID.getURIEncoded () +
+          throw new SMPBadRequestException ("Save Service Metadata was called with inconsistent values.\n" +
+                                            "Service Information Document Type ID: <none>\n" +
+                                            "URL parameter value: '" +
+                                            aPathDocTypeID.getURIEncoded () +
                                             "'",
                                             m_aAPIProvider.getCurrentURI ());
         }
-        final IDocumentTypeIdentifier aPayloadDocumentTypeID = aIdentifierFactory.createDocumentTypeIdentifier (aServiceInformation.getDocumentIdentifier ()
-                                                                                                                                   .getScheme (),
-                                                                                                                aServiceInformation.getDocumentIdentifier ()
-                                                                                                                                   .getValue ());
-        if (!aDocTypeID.hasSameContent (aPayloadDocumentTypeID))
+        final IDocumentTypeIdentifier aPayloadDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (aServiceInformation.getDocumentIdentifier ()
+                                                                                                                              .getScheme (),
+                                                                                                           aServiceInformation.getDocumentIdentifier ()
+                                                                                                                              .getValue ());
+        if (!aPathDocTypeID.hasSameContent (aPayloadDocTypeID))
         {
           // Document type ID in URL must match the one in XML structure
-          throw new SMPBadRequestException ("Save service metadata was called with inconsistent values.\n" +
-                                            "ServiceInfo Document Type ID: '" +
-                                            aPayloadDocumentTypeID.getURIEncoded () +
+          throw new SMPBadRequestException ("Save Service Metadata was called with inconsistent values.\n" +
+                                            "Service Information Document Type ID: '" +
+                                            aPayloadDocTypeID.getURIEncoded () +
                                             "'\n" +
-                                            "URL Parameter value: '" +
-                                            aDocTypeID.getURIEncoded () +
+                                            "URL parameter value: '" +
+                                            aPathDocTypeID.getURIEncoded () +
                                             "'",
                                             m_aAPIProvider.getCurrentURI ());
         }
@@ -555,14 +562,14 @@ public final class SMPServerAPI
 
       // Main save
       final IUser aDataUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
-      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aDataUser);
+      SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aDataUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
         // Service group not found
-        throw new SMPNotFoundException ("No such serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP", m_aAPIProvider.getCurrentURI ());
       }
 
       if (aServiceMetadata.getRedirect () != null)
@@ -571,8 +578,8 @@ public final class SMPServerAPI
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         // not available in Peppol mode
         final X509Certificate aCertificate = null;
-        if (aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
-                                                    aDocTypeID,
+        if (aRedirectMgr.createOrUpdateSMPRedirect (aPathServiceGroup,
+                                                    aPathDocTypeID,
                                                     aServiceMetadata.getRedirect ().getHref (),
                                                     aServiceMetadata.getRedirect ().getCertificateUID (),
                                                     aCertificate,
@@ -617,7 +624,10 @@ public final class SMPServerAPI
 
           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
           final String sExtensionXML = SMPExtensionConverter.convertToString (aServiceInformation.getExtension ());
-          if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aServiceGroup, aDocTypeID, aProcesses, sExtensionXML))
+          if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPathServiceGroup,
+                                                                                     aPathDocTypeID,
+                                                                                     aProcesses,
+                                                                                     sExtensionXML))
                              .isFailure ())
           {
             if (LOGGER.isErrorEnabled ())
@@ -648,11 +658,11 @@ public final class SMPServerAPI
     }
   }
 
-  public void deleteServiceRegistration (@Nonnull final String sServiceGroupID,
-                                         @Nonnull final String sDocumentTypeID,
+  public void deleteServiceRegistration (@Nonnull final String sPathServiceGroupID,
+                                         @Nonnull final String sPathDocTypeID,
                                          @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "DELETE /" + sServiceGroupID + "/services/" + sDocumentTypeID;
+    final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "deleteServiceRegistration";
 
     if (LOGGER.isInfoEnabled ())
@@ -662,35 +672,34 @@ public final class SMPServerAPI
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse participant identifier '" + sServiceGroupID + "'",
+        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
                                           m_aAPIProvider.getCurrentURI ());
       }
 
-      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocumentTypeID);
-      if (aDocTypeID == null)
+      final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
+      if (aPathDocTypeID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse document type identifier '" + sDocumentTypeID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("Failed to parse Document Type ID '" + sPathDocTypeID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
-      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
+      SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aServiceGroup == null)
       {
-        throw new SMPNotFoundException ("Service group '" + sServiceGroupID + "' not on this SMP");
+        throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP", m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
-                                                                                                                         aDocTypeID);
+                                                                                                                         aPathDocTypeID);
       if (aServiceInfo != null)
       {
         // Handle service information
@@ -698,10 +707,10 @@ public final class SMPServerAPI
         if (eChange.isUnchanged ())
         {
           // Most likely an internal error or an inconsistency
-          throw new SMPNotFoundException ("serviceInformation (" +
-                                          aServiceGroupID.getURIEncoded () +
+          throw new SMPNotFoundException ("serviceInformation(" +
+                                          aPathServiceGroupID.getURIEncoded () +
                                           ", " +
-                                          aDocTypeID.getURIEncoded () +
+                                          aPathDocTypeID.getURIEncoded () +
                                           ")",
                                           m_aAPIProvider.getCurrentURI ());
         }
@@ -713,7 +722,7 @@ public final class SMPServerAPI
       {
         // No Service Info, so should be a redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-        final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
+        final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aPathDocTypeID);
         if (aRedirect != null)
         {
           // Handle redirect
@@ -721,7 +730,11 @@ public final class SMPServerAPI
           if (eChange.isUnchanged ())
           {
             // Most likely an internal error or an inconsistency
-            throw new SMPNotFoundException ("redirect(" + aServiceGroupID.getURIEncoded () + ", " + aDocTypeID.getURIEncoded () + ")",
+            throw new SMPNotFoundException ("redirect(" +
+                                            aPathServiceGroupID.getURIEncoded () +
+                                            ", " +
+                                            aPathDocTypeID.getURIEncoded () +
+                                            ")",
                                             m_aAPIProvider.getCurrentURI ());
           }
           if (LOGGER.isInfoEnabled ())
@@ -731,7 +744,7 @@ public final class SMPServerAPI
         else
         {
           // Neither redirect nor endpoint found
-          throw new SMPNotFoundException ("service(" + sServiceGroupID + "," + sDocumentTypeID + ")", m_aAPIProvider.getCurrentURI ());
+          throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")", m_aAPIProvider.getCurrentURI ());
         }
       }
     }
@@ -744,10 +757,10 @@ public final class SMPServerAPI
     }
   }
 
-  public void deleteServiceRegistrations (@Nonnull final String sServiceGroupID,
+  public void deleteServiceRegistrations (@Nonnull final String sPathServiceGroupID,
                                           @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "DELETE /" + sServiceGroupID + "/services/";
+    final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/";
     final String sAction = "deleteServiceRegistrations";
 
     if (LOGGER.isInfoEnabled ())
@@ -757,22 +770,22 @@ public final class SMPServerAPI
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse participant identifier '" + sServiceGroupID + "'",
+        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
                                           m_aAPIProvider.getCurrentURI ());
       }
 
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
-      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
+      SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aServiceGroup == null)
       {
-        throw new SMPNotFoundException ("Service group '" + sServiceGroupID + "' not on this SMP");
+        throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP", m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
