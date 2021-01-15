@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.backend.sql.migration;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -55,10 +54,10 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
   @ReturnsMutableCopy
   public ICommonsList <DBUser> getAllUsers ()
   {
-    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT username, password FROM smp_user");
     final ICommonsList <DBUser> ret = new CommonsArrayList <> ();
-    if (aDBResult.isPresent ())
-      for (final DBResultRow aRow : aDBResult.get ())
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT username, password FROM smp_user");
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
         ret.add (new DBUser (aRow.getAsString (0), aRow.getAsString (1)));
     return ret;
   }
