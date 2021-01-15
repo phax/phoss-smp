@@ -35,6 +35,8 @@ import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
+import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigrationManagerXML;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -59,6 +61,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   private static final String SML_INFO_XML = "sml-info.xml";
   private static final String SMP_SETTINGS_XML = "smp-settings.xml";
   private static final String SMP_TRANSPORT_PROFILES_XML = "transportprofiles.xml";
+  private static final String SMP_PARTICIPANT_MIGRATION_XML = "smp-participant-migration.xml";
 
   private final EDatabaseType m_eDBType;
 
@@ -156,6 +159,19 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new, aServiceGroupMgr);
+  }
+
+  @Nonnull
+  public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
+  {
+    try
+    {
+      return new SMPParticipantMigrationManagerXML (SMP_PARTICIPANT_MIGRATION_XML);
+    }
+    catch (final DAOException ex)
+    {
+      throw new RuntimeException (ex.getMessage (), ex);
+    }
   }
 
   @Nullable

@@ -149,7 +149,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         {
           // Delete the service group both locally and on the SML (if active)!
           final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-          if (aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier ()).isChanged ())
+          if (aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier (), true).isChanged ())
           {
             aWPEC.postRedirectGetInternal (success ("The SMP ServiceGroup for participant '" +
                                                     aSelectedObject.getParticpantIdentifier ().getURIEncoded () +

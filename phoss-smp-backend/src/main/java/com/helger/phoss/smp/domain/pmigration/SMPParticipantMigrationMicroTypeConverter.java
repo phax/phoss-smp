@@ -1,0 +1,74 @@
+/**
+ * Copyright (C) 2015-2020 Philip Helger and contributors
+ * philip[at]helger[dot]com
+ *
+ * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package com.helger.phoss.smp.domain.pmigration;
+
+import java.time.LocalDateTime;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.helger.commons.annotation.Nonempty;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
+import com.helger.xml.microdom.IMicroElement;
+import com.helger.xml.microdom.MicroElement;
+import com.helger.xml.microdom.convert.IMicroTypeConverter;
+import com.helger.xml.microdom.convert.MicroTypeConverter;
+
+/**
+ * This class is internally used to convert {@link SMPParticipantMigration} from
+ * and to XML.
+ *
+ * @author Philip Helger
+ */
+public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTypeConverter <SMPParticipantMigration>
+{
+  private static final String ATTR_ID = "id";
+  private static final String ATTR_DIRECTION = "direction";
+  private static final String ELEMENT_PARTICIPANT_IDENTIFIER = "participant";
+  private static final String ATTR_INITIATION_DATETIME = "initdt";
+  private static final String ATTR_MIGRATION_KEY = "migkey";
+
+  @Nonnull
+  public IMicroElement convertToMicroElement (@Nonnull final SMPParticipantMigration aValue,
+                                              @Nullable final String sNamespaceURI,
+                                              @Nonnull @Nonempty final String sTagName)
+  {
+    final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
+    aElement.setAttribute (ATTR_ID, aValue.getID ());
+    aElement.setAttribute (ATTR_DIRECTION, aValue.getDirection ().getID ());
+    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticipantIdentifier (),
+                                                                    sNamespaceURI,
+                                                                    ELEMENT_PARTICIPANT_IDENTIFIER));
+    aElement.setAttributeWithConversion (ATTR_INITIATION_DATETIME, aValue.getInitiationDateTime ());
+    aElement.setAttribute (ATTR_MIGRATION_KEY, aValue.getMigrationKey ());
+    return aElement;
+  }
+
+  @Nonnull
+  public SMPParticipantMigration convertToNative (@Nonnull final IMicroElement aElement)
+  {
+    final String sID = aElement.getAttributeValue (ATTR_ID);
+
+    final String sDirection = aElement.getAttributeValue (ATTR_DIRECTION);
+    final EParticipantMigrationDirection eDirection = EParticipantMigrationDirection.getFromIDOrNull (sDirection);
+    if (eDirection == null)
+      throw new IllegalStateException ("Failed to resolve Participant Migration Direction with ID '" + sDirection + "'");
+
+    final SimpleParticipantIdentifier aParticipantID = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PARTICIPANT_IDENTIFIER),
+                                                                                           SimpleParticipantIdentifier.class);
+
+    final LocalDateTime aInitiationDT = aElement.getAttributeValueWithConversion (ATTR_INITIATION_DATETIME, LocalDateTime.class);
+
+    final String sMigrationKey = aElement.getAttributeValue (ATTR_MIGRATION_KEY);
+
+    return new SMPParticipantMigration (sID, eDirection, aParticipantID, aInitiationDT, sMigrationKey);
+  }
+}

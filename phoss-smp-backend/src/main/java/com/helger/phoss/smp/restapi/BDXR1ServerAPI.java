@@ -366,7 +366,7 @@ public final class BDXR1ServerAPI
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      aServiceGroupMgr.deleteSMPServiceGroup (aPathServiceGroupID);
+      aServiceGroupMgr.deleteSMPServiceGroup (aPathServiceGroupID, true);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");

@@ -196,7 +196,8 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   }
 
   @Nonnull
-  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID) throws SMPServerException
+  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
+                                        final boolean bDeleteInSML) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
@@ -215,13 +216,16 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
 
     // Delete in SML - throws exception in case of error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
-    try
+    if (bDeleteInSML)
     {
-      aHook.deleteServiceGroup (aParticipantID);
-    }
-    catch (final RegistrationHookException ex)
-    {
-      throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", ex);
+      try
+      {
+        aHook.deleteServiceGroup (aParticipantID);
+      }
+      catch (final RegistrationHookException ex)
+      {
+        throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", ex);
+      }
     }
 
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
@@ -239,13 +243,16 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
           LOGGER.debug ("deleteSMPServiceGroup - failure");
 
         // Restore in SML again
-        try
+        if (bDeleteInSML)
         {
-          aHook.undoDeleteServiceGroup (aParticipantID);
-        }
-        catch (final RegistrationHookException ex2)
-        {
-          LOGGER.error ("Failed to undoDeleteServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex2);
+          try
+          {
+            aHook.undoDeleteServiceGroup (aParticipantID);
+          }
+          catch (final RegistrationHookException ex2)
+          {
+            LOGGER.error ("Failed to undoDeleteServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex2);
+          }
         }
         return EChange.UNCHANGED;
       }

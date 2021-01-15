@@ -71,8 +71,8 @@ public final class ISMPServiceGroupManagerFuncTest
       assertNull (aSGMgr.getSMPServiceGroupOfID (aPI2));
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner1ID).size ());
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).size ());
-      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isUnchanged ());
-      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isUnchanged ());
+      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1, true).isUnchanged ());
+      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2, true).isUnchanged ());
       assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner1ID, sExtension).isUnchanged ());
       assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner1ID, sExtension).isUnchanged ());
       assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner2ID, sExtension).isUnchanged ());
@@ -131,8 +131,8 @@ public final class ISMPServiceGroupManagerFuncTest
       assertTrue (aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).contains (aSG2));
 
       // delete SG1
-      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isChanged ());
-      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isUnchanged ());
+      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1, true).isChanged ());
+      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1, true).isUnchanged ());
 
       // Check manager state
       assertEquals (nCount + 1, aSGMgr.getSMPServiceGroupCount ());
@@ -147,8 +147,8 @@ public final class ISMPServiceGroupManagerFuncTest
       assertTrue (aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).contains (aSG2));
 
       // Finally delete SG2
-      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isChanged ());
-      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isUnchanged ());
+      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2, true).isChanged ());
+      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2, true).isUnchanged ());
 
       // Check empty state
       assertEquals (nCount, aSGMgr.getSMPServiceGroupCount ());
@@ -159,8 +159,8 @@ public final class ISMPServiceGroupManagerFuncTest
       assertNull (aSGMgr.getSMPServiceGroupOfID (aPI2));
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner1ID).size ());
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).size ());
-      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isUnchanged ());
-      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isUnchanged ());
+      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1, true).isUnchanged ());
+      assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2, true).isUnchanged ());
       assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner1ID, sExtension).isUnchanged ());
       assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner1ID, sExtension).isUnchanged ());
       assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner2ID, sExtension).isUnchanged ());
@@ -169,8 +169,8 @@ public final class ISMPServiceGroupManagerFuncTest
     finally
     {
       // Don't care about the result
-      aSGMgr.deleteSMPServiceGroupNoEx (aPI1);
-      aSGMgr.deleteSMPServiceGroupNoEx (aPI2);
+      aSGMgr.deleteSMPServiceGroupNoEx (aPI1, true);
+      aSGMgr.deleteSMPServiceGroupNoEx (aPI2, true);
     }
   }
 }

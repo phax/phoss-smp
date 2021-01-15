@@ -1,8 +1,9 @@
 # phoss SMP Docker configuration
 
 This folder contains the Docker configuration files for phoss SMP.
-It is based on the official `tomcat:9-jre11` image since v5.1.2.
-It was previously based on the official `tomcat:8.5` image.
+It is based on the official `tomcat:9-jdk11` image since v5.3.2.
+It was previously based on the official `tomcat:9-jre11` image (v5.1.2 to v5.3.1).
+It was previously based on the official `tomcat:8.5` image (up to v5.1.1).
 
 Prebuild images are available from:
 * https://hub.docker.com/r/phelger/
@@ -87,6 +88,24 @@ docker rm phoss-smp-release-from-source-xml
 
 It exposes port 8888 where Tomcat is running successfully.
 Open `http://localhost:8888` in your browser.
+
+## Latest snapshot version from source, MongoDB backend
+
+```
+docker build --pull -t phoss-smp-snapshot-from-source-mongodb -f Dockerfile-snapshot-from-source-mongodb .
+docker run -d --name phoss-smp-snapshot-from-source-mongodb -p 8888:8080 phoss-smp-snapshot-from-source-mongodb
+docker stop phoss-smp-snapshot-from-source-mongodb
+docker rm phoss-smp-snapshot-from-source-mongodb
+```
+
+## Latest snapshot version from source, SQL backend
+
+```
+docker build --pull -t phoss-smp-snapshot-from-source-sql -f Dockerfile-snapshot-from-source-sql .
+docker run -d --name phoss-smp-snapshot-from-source-sql -p 8888:8080 phoss-smp-snapshot-from-source-sql
+docker stop phoss-smp-snapshot-from-source-sql
+docker rm phoss-smp-snapshot-from-source-sql
+```
 
 ## Latest snapshot version from source, XML Backend
 

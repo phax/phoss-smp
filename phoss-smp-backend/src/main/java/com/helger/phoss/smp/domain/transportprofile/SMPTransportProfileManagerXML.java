@@ -93,7 +93,7 @@ public final class SMPTransportProfileManagerXML extends AbstractPhotonMapBasedW
     return EChange.CHANGED;
   }
 
-  @Nullable
+  @Nonnull
   public EChange deleteSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
   {
     if (StringHelper.hasNoText (sSMPTransportProfileID))

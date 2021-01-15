@@ -63,7 +63,7 @@ public final class ISMPServiceInformationManagerFuncTest
       return;
     }
 
-    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1, true);
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (sUserID, aPI1, null);
     assertNotNull (aSG);
     try
@@ -93,7 +93,7 @@ public final class ISMPServiceInformationManagerFuncTest
     finally
     {
       // Don't care about the result
-      aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1);
+      aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1, true);
     }
   }
 }

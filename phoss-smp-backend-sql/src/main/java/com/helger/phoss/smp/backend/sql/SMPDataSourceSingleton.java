@@ -137,15 +137,24 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   @Override
   protected void onBeforeDestroy (@Nonnull final IScope aScopeToBeDestroyed) throws Exception
   {
+    // Close the DataSource provider
     StreamHelper.close (m_aDSP);
   }
 
+  /**
+   * @return The singleton DataSource provider to use. Uses the configuration
+   *         file to determine the settings.
+   */
   @Nonnull
   public SMPDataSourceProvider getDataSourceProvider ()
   {
     return m_aDSP;
   }
 
+  /**
+   * @return The database system determined from the configuration file. Never
+   *         <code>null</code>.
+   */
   @Nonnull
   public static EDatabaseType getDatabaseType ()
   {

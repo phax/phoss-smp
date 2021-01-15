@@ -24,6 +24,7 @@ import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -80,6 +81,12 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new SMPServiceInformationManagerMongoDB (aIdentifierFactory, aServiceGroupMgr);
+  }
+
+  @Nonnull
+  public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
+  {
+    return new SMPParticipantMigrationManagerMongoDB ();
   }
 
   @Nullable

@@ -75,7 +75,7 @@ public final class SMPServiceInformationManagerXMLTest
     // Delete existing service group
     final IParticipantIdentifier aPI = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                                        "0088:dummy");
-    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
     assertNotNull (aSG);
@@ -218,7 +218,7 @@ public final class SMPServiceInformationManagerXMLTest
     }
     finally
     {
-      aServiceGroupMgr.deleteSMPServiceGroup (aPI);
+      aServiceGroupMgr.deleteSMPServiceGroup (aPI, true);
     }
   }
 }

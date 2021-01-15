@@ -123,21 +123,21 @@ public final class ISMPBusinessCardManagerFuncTest
         assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
         assertTrue (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard).isChanged ());
         assertEquals (nBCCount + 0, aBusinessCardMgr.getSMPBusinessCardCount ());
-        assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2).isChanged ());
-        assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1).isChanged ());
+        assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2, true).isChanged ());
+        assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1, true).isChanged ());
       }
       finally
       {
         // Real cleanup
         aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard2);
-        aSGMgr.deleteSMPServiceGroupNoEx (aPI2);
+        aSGMgr.deleteSMPServiceGroupNoEx (aPI2, true);
       }
     }
     finally
     {
       // Real cleanup
       aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
-      aSGMgr.deleteSMPServiceGroupNoEx (aPI1);
+      aSGMgr.deleteSMPServiceGroupNoEx (aPI1, true);
     }
   }
 }

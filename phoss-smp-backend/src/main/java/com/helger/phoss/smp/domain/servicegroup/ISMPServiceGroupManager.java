@@ -110,6 +110,9 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @param aParticipantIdentifier
    *        The participant identifier to be deleted. May not be
    *        <code>null</code>.
+   * @param bDeleteInSML
+   *        <code>true</code> if the service group should also be deleted in the
+   *        SML, <code>false</code> if not.
    * @return {@link EChange#CHANGED} if the passed service group is contained
    *         and was successfully deleted, {@link EChange#UNCHANGED} otherwise.
    * @throws SMPServerException
@@ -118,7 +121,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @see ISMPRedirectManager#deleteAllSMPRedirectsOfServiceGroup(ISMPServiceGroup)
    */
   @Nonnull
-  EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier) throws SMPServerException;
+  EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier, boolean bDeleteInSML) throws SMPServerException;
 
   /**
    * Delete the service group, and swallow all exceptions. This is only
@@ -127,16 +130,19 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @param aParticipantIdentifier
    *        The participant identifier to be deleted. May not be
    *        <code>null</code>.
+   * @param bDeleteInSML
+   *        <code>true</code> if the service group should also be deleted in the
+   *        SML, <code>false</code> if not.
    * @return {@link EChange#CHANGED} if the passed service group is contained
    *         and was successfully deleted, {@link EChange#UNCHANGED} otherwise.
-   * @see #deleteSMPServiceGroup(IParticipantIdentifier)
+   * @see #deleteSMPServiceGroup(IParticipantIdentifier, boolean)
    */
   @Nonnull
-  default EChange deleteSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  default EChange deleteSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier, final boolean bDeleteInSML)
   {
     try
     {
-      return deleteSMPServiceGroup (aParticipantIdentifier);
+      return deleteSMPServiceGroup (aParticipantIdentifier, bDeleteInSML);
     }
     catch (final SMPServerException ex)
     {

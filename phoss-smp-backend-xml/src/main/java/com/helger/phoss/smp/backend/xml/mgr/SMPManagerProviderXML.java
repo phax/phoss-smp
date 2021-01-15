@@ -25,6 +25,8 @@ import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
+import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigrationManagerXML;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -48,6 +50,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
   public static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";
   public static final String SMP_REDIRECT_XML = "smp-redirect.xml";
   public static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
+  public static final String SMP_PARTICIPANT_MIGRATION_XML = "smp-participant-migration.xml";
   public static final String SMP_BUSINESS_CARD_XML = "smp-business-card.xml";
 
   public SMPManagerProviderXML ()
@@ -132,6 +135,19 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     try
     {
       return new SMPServiceInformationManagerXML (SMP_SERVICE_INFORMATION_XML);
+    }
+    catch (final DAOException ex)
+    {
+      throw new RuntimeException (ex.getMessage (), ex);
+    }
+  }
+
+  @Nonnull
+  public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
+  {
+    try
+    {
+      return new SMPParticipantMigrationManagerXML (SMP_PARTICIPANT_MIGRATION_XML);
     }
     catch (final DAOException ex)
     {

@@ -262,7 +262,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   }
 
   @Nonnull
-  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID) throws SMPServerException
+  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
+                                        final boolean bDeleteInSML) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     if (LOGGER.isDebugEnabled ())
@@ -280,6 +281,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       if (aDBServiceGroup == null)
         throw new SMPNotFoundException ("The service group with ID " + aParticipantID.getURIEncoded () + " does not exist!");
 
+      if (bDeleteInSML)
       {
         // Delete in SML - and remember that
         // throws exception in case of error
@@ -299,7 +301,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (eSuccess.isFailure ())
     {
       // Error writing to the DB
-      if (aDeletedServiceGroupInSML.booleanValue ())
+      if (bDeleteInSML && aDeletedServiceGroupInSML.booleanValue ())
       {
         // Undo deletion in SML!
         try

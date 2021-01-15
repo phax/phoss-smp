@@ -83,7 +83,6 @@ import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.button.EBootstrapButtonSize;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
@@ -334,8 +333,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     if (!aSettings.isDirectoryIntegrationEnabled ())
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild (SMPWebAppConfiguration.getDirectoryName () +
-                                                            " integration is disabled hence no Business Cards can be created."));
+      aNodeList.addChild (warn (SMPWebAppConfiguration.getDirectoryName () +
+                                " integration is disabled hence no Business Cards can be created."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Change settings")
                                                 .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SMP_SETTINGS))
                                                 .setIcon (EDefaultIcon.YES));
@@ -345,7 +344,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
     if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
     {
-      aNodeList.addChild (new BootstrapWarnBox ().addChild ("No Service Group is present! At least one Service Group must be present to create a Business Card for it."));
+      aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to create a Business Card for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new Service Group")
                                                 .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SERVICE_GROUPS))
                                                 .setIcon (EDefaultIcon.YES));
