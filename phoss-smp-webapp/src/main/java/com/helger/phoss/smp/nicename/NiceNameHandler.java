@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014-2020 Philip Helger and contributors
+ * Copyright (C) 2014-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,7 +63,7 @@ public final class NiceNameHandler
   public static ICommonsOrderedMap <String, NiceNameEntry> readEntries (@Nonnull final IReadableResource aRes, final boolean bReadProcIDs)
   {
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Trying to read nice name entries from " + aRes.getPath ());
+      LOGGER.info ("Trying to read nice name entries from '" + aRes.getPath () + "'");
 
     final ICommonsOrderedMap <String, NiceNameEntry> ret = new CommonsLinkedHashMap <> ();
     final IMicroDocument aDoc = MicroReader.readMicroXML (aRes);
@@ -183,5 +183,19 @@ public final class NiceNameHandler
     {
       RWLOCK.readLock ().unlock ();
     }
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static ICommonsOrderedMap <String, NiceNameEntry> getAllDocumentTypeMappings ()
+  {
+    return RWLOCK.readLockedGet ( () -> DOCTYPE_IDS.getClone ());
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static ICommonsOrderedMap <String, NiceNameEntry> getAllProcessMappings ()
+  {
+    return RWLOCK.readLockedGet ( () -> PROCESS_IDS.getClone ());
   }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2020 Philip Helger and contributors
+ * Copyright (C) 2019-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.backend.sql.migration;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -55,10 +54,10 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
   @ReturnsMutableCopy
   public ICommonsList <DBUser> getAllUsers ()
   {
-    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT username, password FROM smp_user");
     final ICommonsList <DBUser> ret = new CommonsArrayList <> ();
-    if (aDBResult.isPresent ())
-      for (final DBResultRow aRow : aDBResult.get ())
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT username, password FROM smp_user");
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
         ret.add (new DBUser (aRow.getAsString (0), aRow.getAsString (1)));
     return ret;
   }
@@ -76,6 +75,9 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
         {
           case MYSQL:
             newExecutor ().executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
+            break;
+          case ORACLE:
+            newExecutor ().executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT smp_ownership_username_fk;");
             break;
           case POSTGRESQL:
             newExecutor ().executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");

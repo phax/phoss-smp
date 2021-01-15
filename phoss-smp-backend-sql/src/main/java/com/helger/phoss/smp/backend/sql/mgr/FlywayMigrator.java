@@ -1,0 +1,92 @@
+/**
+ * Copyright (C) 2019-2021 Philip Helger and contributors
+ * philip[at]helger[dot]com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.helger.phoss.smp.backend.sql.mgr;
+
+import javax.annotation.Nonnull;
+
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.flywaydb.core.internal.jdbc.DriverDataSource;
+
+import com.helger.commons.ValueEnforcer;
+import com.helger.commons.string.StringHelper;
+import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.backend.sql.EDatabaseType;
+import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
+import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
+import com.helger.settings.exchange.configfile.ConfigFile;
+
+/**
+ * This class has the sole purpose of encapsulating the org.flywaydb classes, so
+ * that it's usage can be turned off (for whatever reason).
+ *
+ * @author Philip Helger
+ */
+final class FlywayMigrator
+{
+  // Indirection level to not load org.flyway classes by default
+  public static final class Singleton
+  {
+    static final FlywayMigrator INSTANCE = new FlywayMigrator ();
+  }
+
+  private FlywayMigrator ()
+  {}
+
+  void runFlyway (@Nonnull final EDatabaseType eDBType)
+  {
+    ValueEnforcer.notNull (eDBType, "DBType");
+
+    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+    final FluentConfiguration aConfig = Flyway.configure ()
+                                              .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
+                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),
+                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL),
+                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER),
+                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD)))
+                                              // Required for creating DB table
+                                              .baselineOnMigrate (true)
+                                              // Version 1 is the baseline
+                                              .baselineVersion ("1")
+                                              .baselineDescription ("SMP 5.2.x database layout, MySQL only")
+                                              // Separate directory per DB type
+                                              .locations ("db/migrate-" + eDBType.getID ())
+                                              /*
+                                               * Avoid scanning the ClassPath by
+                                               * enumerating them explicitly
+                                               */
+                                              .javaMigrations (new V2__MigrateDBUsersToPhotonUsers ());
+
+    // Flyway to handle the DB schema?
+    final String sSchema = aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
+    if (StringHelper.hasText (sSchema))
+    {
+      // Use the schema only, if it is explicitly configured
+      // The default schema name is ["$user", public] and as such unusable
+      aConfig.schemas (sSchema);
+    }
+
+    // If no schema is specified, schema create should also be disabled
+    final boolean bCreateSchema = aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA_CREATE, false);
+    aConfig.createSchemas (bCreateSchema);
+
+    final Flyway aFlyway = aConfig.load ();
+    if (false)
+      aFlyway.validate ();
+    aFlyway.migrate ();
+  }
+}

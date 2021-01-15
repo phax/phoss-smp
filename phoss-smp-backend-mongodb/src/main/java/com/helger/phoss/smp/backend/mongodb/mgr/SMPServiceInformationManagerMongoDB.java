@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2020 Philip Helger and contributors
+ * Copyright (C) 2019-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -216,7 +216,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       for (final Document aDocP : aDoc.getList (BSON_PROCESSES, Document.class))
       {
         final SMPProcess aProcess = toProcess (aDocP);
-        if (aProcess == null)
+        if (aProcess != null)
           aProcesses.add (aProcess);
       }
     final String sExtension = aDoc.getString (BSON_EXTENSIONS);

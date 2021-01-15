@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2020 Philip Helger and contributors
+ * Copyright (C) 2019-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.security.cert.X509Certificate;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnegative;
@@ -37,6 +36,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.wrapper.Wrapper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
@@ -251,11 +251,11 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
-    final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
-                                                                                     " FROM smp_service_metadata_redirection");
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
+                                                                          " FROM smp_service_metadata_redirection");
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
-    if (aDBResult.isPresent ())
-      for (final DBResultRow aRow : aDBResult.get ())
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
       {
         final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (new SimpleParticipantIdentifier (aRow.getAsString (0),
                                                                                                                            aRow.getAsString (1)));
@@ -278,13 +278,13 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     if (aServiceGroup != null)
     {
       final IParticipantIdentifier aParticipantID = aServiceGroup.getParticpantIdentifier ();
-      final Optional <ICommonsList <DBResultRow>> aDBResult = newExecutor ().queryAll ("SELECT documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
-                                                                                       " FROM smp_service_metadata_redirection" +
-                                                                                       " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                                                                       new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                                                                  aParticipantID.getValue ()));
-      if (aDBResult.isPresent ())
-        for (final DBResultRow aRow : aDBResult.get ())
+      final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
+                                                                            " FROM smp_service_metadata_redirection" +
+                                                                            " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                                                            new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                                       aParticipantID.getValue ()));
+      if (aDBResult != null)
+        for (final DBResultRow aRow : aDBResult)
         {
           final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (aRow.getAsString (4));
           ret.add (new SMPRedirect (aServiceGroup,
@@ -314,14 +314,16 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       return null;
 
     final IParticipantIdentifier aParticipantID = aServiceGroup.getParticpantIdentifier ();
-    final Optional <DBResultRow> aDBResult = newExecutor ().querySingle ("SELECT redirectionUrl, certificateUID, certificate, extension" +
-                                                                         " FROM smp_service_metadata_redirection" +
-                                                                         " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
-                                                                         new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                                                    aParticipantID.getValue (),
-                                                                                                                    aDocTypeID.getScheme (),
-                                                                                                                    aDocTypeID.getValue ()));
-    if (!aDBResult.isPresent ())
+    final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
+    newExecutor ().querySingle ("SELECT redirectionUrl, certificateUID, certificate, extension" +
+                                " FROM smp_service_metadata_redirection" +
+                                " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
+                                new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                           aParticipantID.getValue (),
+                                                                           aDocTypeID.getScheme (),
+                                                                           aDocTypeID.getValue ()),
+                                aDBResult::set);
+    if (aDBResult.isNotSet ())
       return null;
 
     final DBResultRow aRow = aDBResult.get ();

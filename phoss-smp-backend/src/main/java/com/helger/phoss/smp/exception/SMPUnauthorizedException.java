@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Philip Helger and contributors
+ * Copyright (C) 2015-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -9,6 +9,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package com.helger.phoss.smp.exception;
+
+import java.net.URI;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +28,16 @@ public class SMPUnauthorizedException extends SMPServerException
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPUnauthorizedException.class);
 
-  public SMPUnauthorizedException (final String sMsg)
+  public SMPUnauthorizedException (@Nonnull final String sMessage)
   {
-    super (sMsg);
+    this (sMessage, null);
+  }
+
+  public SMPUnauthorizedException (@Nonnull final String sMessage, @Nullable final URI aNotFoundURI)
+  {
+    super (sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
 
     // Always log!
-    LOGGER.warn (sMsg);
+    LOGGER.warn (sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
   }
 }

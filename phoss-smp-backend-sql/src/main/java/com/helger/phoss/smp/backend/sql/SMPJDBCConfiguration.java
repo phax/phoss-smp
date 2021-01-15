@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2020 Philip Helger and contributors
+ * Copyright (C) 2019-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,6 +55,8 @@ public final class SMPJDBCConfiguration
   public static final String CONFIG_JDBC_DEBUG_TRANSACTIONS = "jdbc.debug.transactions";
   @Since ("5.3.0")
   public static final String CONFIG_JDBC_DEBUG_SQL = "jdbc.debug.sql";
+  @Since ("5.3.2")
+  public static final String CONFIG_SMP_FLYWAY_ENABLED = "smp.flyway.enabled";
 
   @PresentForCodeCoverage
   private static final SMPJDBCConfiguration s_aInstance = new SMPJDBCConfiguration ();

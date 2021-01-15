@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014-2020 Philip Helger and contributors
+ * Copyright (C) 2014-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,6 +52,7 @@ public final class CMenuSecure
   public static final String MENU_SML_REGISTRATION = "sml_registration";
   public static final String MENU_SML_CERTIFICATE_UPDATE = "sml_certificate_update";
   public static final String MENU_SMP_SETTINGS = "smp_settings";
+  public static final String MENU_SMP_IDENTIFIER_MAPPINGS = "smp_id_mappings";
   public static final String MENU_CHANGE_PASSWORD = "change_pw";
 
   private CMenuSecure ()

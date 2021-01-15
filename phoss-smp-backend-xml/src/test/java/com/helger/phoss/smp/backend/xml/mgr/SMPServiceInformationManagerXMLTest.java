@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Philip Helger and contributors
+ * Copyright (C) 2015-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -85,7 +85,7 @@ public final class SMPServiceInformationManagerXMLTest
       final LocalDateTime aEndDT = aStartDT.plusYears (1);
       final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                                         "testproc");
-      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DEFAULT_DOCUMENT_TYPE_SCHEME,
+      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                                   "testdoctype");
 
       {

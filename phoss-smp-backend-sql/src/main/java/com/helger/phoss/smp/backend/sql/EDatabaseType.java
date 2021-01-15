@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2020 Philip Helger and contributors
+ * Copyright (C) 2019-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,7 @@ public enum EDatabaseType implements IHasID <String>, IHasDisplayName
 {
   // IDs must be lowercase because they are used in directory names
   MYSQL ("mysql", "MySQL"),
+  ORACLE ("oracle", "Oracle"),
   POSTGRESQL ("postgresql", "PostgreSQL");
 
   private final String m_sID;
