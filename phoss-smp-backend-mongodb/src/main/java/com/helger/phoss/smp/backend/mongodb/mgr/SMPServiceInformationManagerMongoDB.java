@@ -216,7 +216,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       for (final Document aDocP : aDoc.getList (BSON_PROCESSES, Document.class))
       {
         final SMPProcess aProcess = toProcess (aDocP);
-        if (aProcess == null)
+        if (aProcess != null)
           aProcesses.add (aProcess);
       }
     final String sExtension = aDoc.getString (BSON_EXTENSIONS);
