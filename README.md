@@ -6,7 +6,7 @@ It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/cefdi
 
 [![Gitter](https://badges.gitter.im/phax/phoss-smp.svg)](https://gitter.im/phax/peppol-smp-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Latest version: **[5.3.1](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-5.3.1)** (2020-11-03).
+Latest version: **[5.3.2](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-5.3.2)** (2021-01-15).
 See the special [Migrations guide](https://github.com/phax/phoss-smp/wiki/Migrations) for actions necessary on updates/version changes.
 
 **!! Users with SQL backend need to change the DB layout for 5.3.x !!**
