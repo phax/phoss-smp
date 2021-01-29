@@ -17,6 +17,7 @@ prod.*
 *.iml
 *.jks
 *.p12
+_*.cmd
 
 .settings/ 
 bin/
