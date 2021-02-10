@@ -372,7 +372,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_OLD_CERTIFICATE)));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New certificate")
-                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_NEW_CERTIFICATE, sOldUnifiedCert)))
+                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_NEW_CERTIFICATE,
+                                                                                               sOldUnifiedCert)).setRows (10))
                                                    .setHelpText ("The new certificate that is used instead")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_NEW_CERTIFICATE)));
 
