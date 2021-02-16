@@ -184,9 +184,9 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   }
 
   @Nonnull
-  public com.helger.smpclient.peppol.jaxb.EndpointType getAsJAXBObjectPeppol ()
+  public com.helger.xsds.peppol.smp1.EndpointType getAsJAXBObjectPeppol ()
   {
-    final com.helger.smpclient.peppol.jaxb.EndpointType ret = new com.helger.smpclient.peppol.jaxb.EndpointType ();
+    final com.helger.xsds.peppol.smp1.EndpointType ret = new com.helger.xsds.peppol.smp1.EndpointType ();
     // EndpointReference element is mandatory
     ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (m_sEndpointReference != null ? m_sEndpointReference
                                                                                                                : ""));
@@ -279,7 +279,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   }
 
   @Nonnull
-  public static SMPEndpoint createFromJAXB (@Nonnull final com.helger.smpclient.peppol.jaxb.EndpointType aEndpoint)
+  public static SMPEndpoint createFromJAXB (@Nonnull final com.helger.xsds.peppol.smp1.EndpointType aEndpoint)
   {
     return new SMPEndpoint (aEndpoint.getTransportProfile (),
                             W3CEndpointReferenceHelper.getAddress (aEndpoint.getEndpointReference ()),

@@ -54,10 +54,10 @@ import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.smpclient.exception.SMPClientException;
 import com.helger.smpclient.exception.SMPClientNotFoundException;
 import com.helger.smpclient.peppol.SMPClient;
-import com.helger.smpclient.peppol.jaxb.ObjectFactory;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
 import com.helger.web.scope.mgr.WebScoped;
+import com.helger.xsds.peppol.smp1.ObjectFactory;
+import com.helger.xsds.peppol.smp1.ServiceGroupType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
 /**
  * Test class for class {@link Rest2Filter}.
@@ -117,7 +117,7 @@ public final class ServiceGroupInterfaceTest
       Response aResponseMsg;
 
       // GET
-      final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), new int [] { 404, 500 });
+      final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404, 500);
       if (nStatus == 500)
       {
         // Seems like MySQL is not running

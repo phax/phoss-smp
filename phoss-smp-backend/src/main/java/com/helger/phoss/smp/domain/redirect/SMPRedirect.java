@@ -128,15 +128,15 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   }
 
   @Nonnull
-  public com.helger.smpclient.peppol.jaxb.ServiceMetadataType getAsJAXBObjectPeppol ()
+  public com.helger.xsds.peppol.smp1.ServiceMetadataType getAsJAXBObjectPeppol ()
   {
-    final com.helger.smpclient.peppol.jaxb.RedirectType aRedirect = new com.helger.smpclient.peppol.jaxb.RedirectType ();
+    final com.helger.xsds.peppol.smp1.RedirectType aRedirect = new com.helger.xsds.peppol.smp1.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
     aRedirect.setExtension (getAsPeppolExtension ());
     // Certificate is not used here
 
-    final com.helger.smpclient.peppol.jaxb.ServiceMetadataType ret = new com.helger.smpclient.peppol.jaxb.ServiceMetadataType ();
+    final com.helger.xsds.peppol.smp1.ServiceMetadataType ret = new com.helger.xsds.peppol.smp1.ServiceMetadataType ();
     ret.setRedirect (aRedirect);
     return ret;
   }

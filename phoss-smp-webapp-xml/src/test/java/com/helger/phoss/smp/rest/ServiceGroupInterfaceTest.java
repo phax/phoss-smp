@@ -54,9 +54,9 @@ import com.helger.photon.security.CSecurity;
 import com.helger.smpclient.exception.SMPClientException;
 import com.helger.smpclient.exception.SMPClientNotFoundException;
 import com.helger.smpclient.peppol.SMPClient;
-import com.helger.smpclient.peppol.jaxb.ObjectFactory;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
+import com.helger.xsds.peppol.smp1.ObjectFactory;
+import com.helger.xsds.peppol.smp1.ServiceGroupType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
 /**
  * Test class for class {@link Rest2Filter}

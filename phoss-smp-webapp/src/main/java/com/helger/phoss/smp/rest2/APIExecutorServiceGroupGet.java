@@ -55,7 +55,7 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
     {
       case PEPPOL:
       {
-        final com.helger.smpclient.peppol.jaxb.ServiceGroupType ret = new SMPServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
+        final com.helger.xsds.peppol.smp1.ServiceGroupType ret = new SMPServerAPI (aDataProvider).getServiceGroup (sServiceGroupID);
         aBytes = new SMPMarshallerServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }

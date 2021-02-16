@@ -93,13 +93,13 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
 
   @Nullable
   @ReturnsMutableCopy
-  public com.helger.smpclient.peppol.jaxb.ExtensionType getAsPeppolExtension ()
+  public com.helger.xsds.peppol.smp1.ExtensionType getAsPeppolExtension ()
   {
     if (m_aExtensions.isEmpty ())
       return null;
 
     // Use only the XML element of the first extension
-    final com.helger.smpclient.peppol.jaxb.ExtensionType ret = new com.helger.smpclient.peppol.jaxb.ExtensionType ();
+    final com.helger.xsds.peppol.smp1.ExtensionType ret = new com.helger.xsds.peppol.smp1.ExtensionType ();
     ret.setAny ((Element) m_aExtensions.getFirst ().getAny ());
     return ret;
   }

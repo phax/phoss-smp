@@ -36,11 +36,11 @@ import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
-import com.helger.smpclient.peppol.jaxb.ObjectFactory;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.web.scope.mock.WebScopeTestRule;
+import com.helger.xsds.peppol.smp1.ObjectFactory;
+import com.helger.xsds.peppol.smp1.ServiceGroupType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
 /**
  * Create many service groups - please make sure the SML connection is not

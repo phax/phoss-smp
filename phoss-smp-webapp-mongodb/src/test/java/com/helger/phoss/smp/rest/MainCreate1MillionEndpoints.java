@@ -46,15 +46,15 @@ import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
-import com.helger.smpclient.peppol.jaxb.EndpointType;
-import com.helger.smpclient.peppol.jaxb.ObjectFactory;
-import com.helger.smpclient.peppol.jaxb.ProcessListType;
-import com.helger.smpclient.peppol.jaxb.ProcessType;
-import com.helger.smpclient.peppol.jaxb.ServiceEndpointList;
-import com.helger.smpclient.peppol.jaxb.ServiceInformationType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataType;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
+import com.helger.xsds.peppol.smp1.EndpointType;
+import com.helger.xsds.peppol.smp1.ObjectFactory;
+import com.helger.xsds.peppol.smp1.ProcessListType;
+import com.helger.xsds.peppol.smp1.ProcessType;
+import com.helger.xsds.peppol.smp1.ServiceEndpointList;
+import com.helger.xsds.peppol.smp1.ServiceInformationType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataType;
 
 /**
  * Create one million endpoints. Run this AFTER

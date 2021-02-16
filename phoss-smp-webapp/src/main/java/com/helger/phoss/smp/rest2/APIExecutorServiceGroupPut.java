@@ -78,7 +78,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
         {
           case PEPPOL:
           {
-            final com.helger.smpclient.peppol.jaxb.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
+            final com.helger.xsds.peppol.smp1.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
             if (aServiceGroup != null)
             {
               new SMPServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, aBasicAuth);

@@ -131,7 +131,7 @@ public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, 
    *         created.
    */
   @Nullable
-  com.helger.smpclient.peppol.jaxb.ServiceMetadataType getAsJAXBObjectPeppol ();
+  com.helger.xsds.peppol.smp1.ServiceMetadataType getAsJAXBObjectPeppol ();
 
   /**
    * @return This service information object as a BDXR SMP JAXB object for the
