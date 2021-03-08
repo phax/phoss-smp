@@ -51,7 +51,7 @@ public final class SMPServiceGroupTest
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, "<foobar />");
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
-    assertEquals (aPI, aSG.getParticpantIdentifier ());
+    assertEquals (aPI, aSG.getParticipantIdentifier ());
     assertEquals ("[{\"Any\":\"<foobar />\"}]", aSG.getExtensionsAsString ());
 
     final com.helger.xsds.peppol.smp1.ServiceGroupType aSGPeppol = aSG.getAsJAXBObjectPeppol ();
@@ -82,7 +82,7 @@ public final class SMPServiceGroupTest
                                                      BDXR1ExtensionConverter.convertToString (new CommonsArrayList <> (aExt, aExt2)));
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
-    assertEquals (aPI, aSG.getParticpantIdentifier ());
+    assertEquals (aPI, aSG.getParticipantIdentifier ());
     assertNotNull (aSG.getExtensionsAsString ());
 
     final com.helger.xsds.bdxr.smp1.ServiceGroupType aSGBDXR = aSG.getAsJAXBObjectBDXR1 ();

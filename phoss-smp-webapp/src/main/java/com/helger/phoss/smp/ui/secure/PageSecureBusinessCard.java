@@ -218,7 +218,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                        @Nonnull final ISMPBusinessCard aSelectedObject)
                         {
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
-                          final IParticipantIdentifier aParticipantID = aSelectedObject.getParticpantIdentifier ();
+                          final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
                           PDClient aPDClient = null;
                           Exception aCaughtEx = null;
                           try
@@ -290,7 +290,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
                             for (final ISMPBusinessCard aCurObject : aBusinessCardMgr.getAllSMPBusinessCards ())
                             {
-                              final IParticipantIdentifier aParticipantID = aCurObject.getParticpantIdentifier ();
+                              final IParticipantIdentifier aParticipantID = aCurObject.getParticipantIdentifier ();
                               final ESuccess eSuccess = aPDClient.addServiceGroupToIndex (aParticipantID);
                               (eSuccess.isSuccess () ? aSuccess : aFailure).add (aParticipantID.getURIEncoded ());
                             }
@@ -485,7 +485,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       else
         if (!bEdit)
         {
-          final ISMPBusinessCard aExistingBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroup.getParticpantIdentifier ());
+          final ISMPBusinessCard aExistingBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
           if (aExistingBusinessCard != null)
             aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The selected Service Group already has a Business Card assigned!");
         }
@@ -657,7 +657,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     {
       // Store in a consistent manner
       aSMPEntities.sort ( (o1, o2) -> o1.names ().getFirst ().getName ().compareToIgnoreCase (o2.names ().getFirst ().getName ()));
-      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticpantIdentifier (), aSMPEntities) != null)
+      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (), aSMPEntities) != null)
       {
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
         aWPEC.postRedirectGetInternal (success ("The Business Card for Service Group '" +
@@ -1030,7 +1030,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       ret.addChild (createEmptyAction ());
     ret.addChild (new HCTextNode (" "));
     ret.addChild (new HCA (LinkHelper.getURLWithServerAndContext ("businesscard/" +
-                                                                  aCurObject.getParticpantIdentifier ().getURIPercentEncoded ()))
+                                                                  aCurObject.getParticipantIdentifier ().getURIPercentEncoded ()))
                                                                                                                                  .setTitle ("Perform SMP query on " +
                                                                                                                                             sDisplayName)
                                                                                                                                  .setTargetBlank ()

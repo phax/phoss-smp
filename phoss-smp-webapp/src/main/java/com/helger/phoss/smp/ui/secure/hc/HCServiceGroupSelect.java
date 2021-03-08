@@ -41,7 +41,7 @@ public class HCServiceGroupSelect extends HCExtSelect
   public static String getDisplayName (@Nonnull final ISMPServiceGroup aServiceGroup)
   {
     final String sOwnerName = SMPCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
-    return aServiceGroup.getParticpantIdentifier ().getURIEncoded () + " [" + sOwnerName + "]";
+    return aServiceGroup.getParticipantIdentifier ().getURIEncoded () + " [" + sOwnerName + "]";
   }
 
   public HCServiceGroupSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)

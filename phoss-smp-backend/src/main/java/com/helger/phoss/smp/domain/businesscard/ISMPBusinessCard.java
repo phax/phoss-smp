@@ -41,7 +41,7 @@ public interface ISMPBusinessCard extends IHasID <String>, Serializable
    *         belongs. Never <code>null</code>.
    */
   @Nonnull
-  IParticipantIdentifier getParticpantIdentifier ();
+  IParticipantIdentifier getParticipantIdentifier ();
 
   /**
    * @return A copy of all {@link SMPBusinessCardEntity} objects. Never

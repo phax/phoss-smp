@@ -190,7 +190,7 @@ public final class SMPServerAPI
       final ServiceGroupReferenceListType aRefList = new ServiceGroupReferenceListType ();
       for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
       {
-        final String sHref = m_aAPIProvider.getServiceGroupHref (aServiceGroup.getParticpantIdentifier ());
+        final String sHref = m_aAPIProvider.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ());
 
         final ServiceGroupReferenceType aServGroupRefType = new ServiceGroupReferenceType ();
         aServGroupRefType.setHref (sHref);

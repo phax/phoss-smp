@@ -28,7 +28,7 @@ public class LoggingSMPServiceGroupCallback implements ISMPServiceGroupCallback
 
   public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup)
   {
-    LOGGER.info ("Successfully Created ServiceGroup with ID '" + aServiceGroup.getParticpantIdentifier ().getURIEncoded () + "'");
+    LOGGER.info ("Successfully Created ServiceGroup with ID '" + aServiceGroup.getParticipantIdentifier ().getURIEncoded () + "'");
   }
 
   public void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)

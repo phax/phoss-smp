@@ -530,7 +530,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
           // Show per service group errors
           if (aULPerSG.hasChildren ())
-            aOL.addItem (div ("Service group ").addChild (code (aServiceGroup.getParticpantIdentifier ().getURIEncoded ())), aULPerSG);
+            aOL.addItem (div ("Service group ").addChild (code (aServiceGroup.getParticipantIdentifier ().getURIEncoded ())), aULPerSG);
         }
       }
     }

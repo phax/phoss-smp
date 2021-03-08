@@ -95,7 +95,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos)
     {
       final ISMPServiceGroup aServiceGroup = aServiceInfo.getServiceGroup ();
-      final IParticipantIdentifier aParticipantID = aServiceGroup.getParticpantIdentifier ();
+      final IParticipantIdentifier aParticipantID = aServiceGroup.getParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aServiceInfo.getDocumentTypeIdentifier ();
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
       {

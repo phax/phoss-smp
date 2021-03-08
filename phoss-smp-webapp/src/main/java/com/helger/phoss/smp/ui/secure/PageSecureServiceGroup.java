@@ -107,7 +107,6 @@ import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.SMPDNSResolutionException;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
-import com.helger.xservlet.forcedredirect.ForcedRedirectException;
 
 @WorkInProgress
 public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPServiceGroup>
@@ -132,7 +131,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                 @Nonnull final ISMPServiceGroup aSelectedObject)
       {
         final BootstrapQuestionBox aQB = question (div ("Are you sure you want to delete the complete service group '" +
-                                                        aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
+                                                        aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
                                                         "'?")).addChild (div ("This means that all endpoints and all redirects are deleted as well."));
         if (SMPMetaManager.hasBusinessCardMgr ())
           aQB.addChild (div ("If a Business Card for this service group exists, it will also be deleted."));
@@ -145,33 +144,33 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       @Override
       protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPServiceGroup aSelectedObject)
       {
+        final HCNodeList aNL = new HCNodeList ();
+        final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
+
         try
         {
           // Delete the service group both locally and on the SML (if active)!
           final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-          if (aServiceGroupMgr.deleteSMPServiceGroup (aSelectedObject.getParticpantIdentifier (), true).isChanged ())
+          if (aServiceGroupMgr.deleteSMPServiceGroup (aParticipantID, true).isChanged ())
           {
-            aWPEC.postRedirectGetInternal (success ("The SMP ServiceGroup for participant '" +
-                                                    aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
-                                                    "' was successfully deleted!"));
+            aNL.addChild (success ("The SMP ServiceGroup for participant '" +
+                                   aParticipantID.getURIEncoded () +
+                                   "' was successfully deleted!"));
           }
           else
           {
-            aWPEC.postRedirectGetInternal (error ("The SMP ServiceGroup for participant '" +
-                                                  aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
-                                                  "' could not be deleted! Please check the logs."));
+            aNL.addChild (error ("The SMP ServiceGroup for participant '" +
+                                 aParticipantID.getURIEncoded () +
+                                 "' could not be deleted! Please check the logs."));
           }
-        }
-        catch (final ForcedRedirectException ex)
-        {
-          throw ex;
         }
         catch (final Exception ex)
         {
-          aWPEC.postRedirectGetInternal (error ("Error deleting the SMP ServiceGroup for participant '" +
-                                                aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
-                                                "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+          aNL.addChild (error ("Error deleting the SMP ServiceGroup for participant '" +
+                               aParticipantID.getURIEncoded () +
+                               "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         }
+        aWPEC.postRedirectGetInternal (aNL);
       }
     });
     addCustomHandler (ACTION_CHECK_DNS, new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (false)
@@ -217,13 +216,13 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           try
           {
             if (aURLProvider instanceof IPeppolURLProvider)
-              sDNSName = ((IPeppolURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
+              sDNSName = ((IPeppolURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
                                                                                       sSMLZoneName);
             else
               if (aURLProvider instanceof IBDXLURLProvider)
               {
                 // Fallback by not resolving the NAPTR
-                sDNSName = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticpantIdentifier (),
+                sDNSName = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
                                                                                       sSMLZoneName);
               }
           }
@@ -256,7 +255,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
             }
 
           final HCRow aRow = aTable.addBodyRow ();
-          aRow.addCell (aServiceGroup.getParticpantIdentifier ().getURIEncoded ());
+          aRow.addCell (aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
           if (sDNSName != null)
             aRow.addCell (new HCA (new SimpleURL ("http://" + sDNSName)).setTargetBlank ().addChild (sDNSName));
           else
@@ -308,18 +307,19 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         final StringMap aTargetParams = new StringMap ();
         aTargetParams.putIn (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
         final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+        final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
         try
         {
-          aHook.createServiceGroup (aSelectedObject.getParticpantIdentifier ());
+          aHook.createServiceGroup (aParticipantID);
           aWPEC.postRedirectGetInternal (success ("The Service group '" +
-                                                  aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
+                                                  aParticipantID.getURIEncoded () +
                                                   "' was successfully registered at the configured SML!"),
                                          aTargetParams);
         }
         catch (final RegistrationHookException ex)
         {
           aWPEC.postRedirectGetInternal (error ("Error registering the Service group '" +
-                                                aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
+                                                aParticipantID.getURIEncoded () +
                                                 "' at the configured SML!").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)),
                                          aTargetParams);
         }
@@ -339,16 +339,16 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                           final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
                           try
                           {
-                            aHook.deleteServiceGroup (aSelectedObject.getParticpantIdentifier ());
+                            aHook.deleteServiceGroup (aSelectedObject.getParticipantIdentifier ());
                             aWPEC.postRedirectGetInternal (success ("The Service group '" +
-                                                                    aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
+                                                                    aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
                                                                     "' was successfully unregistered from the configured SML!"),
                                                            aTargetParams);
                           }
                           catch (final RegistrationHookException ex)
                           {
                             aWPEC.postRedirectGetInternal (error ("Error unregistering the Service group '" +
-                                                                  aSelectedObject.getParticpantIdentifier ().getURIEncoded () +
+                                                                  aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
                                                                   "' from the configured SML!").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)),
                                                            aTargetParams);
                           }
@@ -400,7 +400,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
-                                                 .setCtrl (aSelectedObject.getParticpantIdentifier ().getURIEncoded ()));
+                                                 .setCtrl (aSelectedObject.getParticipantIdentifier ().getURIEncoded ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
                                                  .setCtrl (SMPCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
     if (aSelectedObject.extensions ().isNotEmpty ())
@@ -447,12 +447,12 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       final BootstrapRow aRow = new BootstrapRow ();
       aRow.createColumn (GS_IDENTIFIER_SCHEME)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_SCHEME,
-                                                   aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ().getScheme ()
+                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ().getScheme ()
                                                                            : sDefaultScheme)).setPlaceholder ("Identifier scheme")
                                                                                              .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
-                                                   aSelectedObject != null ? aSelectedObject.getParticpantIdentifier ().getValue () : null))
+                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ().getValue () : null))
                                                                                                                                             .setPlaceholder ("Identifier value")
                                                                                                                                             .setReadOnly (bEdit));
 
@@ -627,7 +627,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     {
 
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
-      final String sDisplayName = aCurObject.getParticpantIdentifier ().getURIEncoded ();
+      final String sDisplayName = aCurObject.getParticipantIdentifier ().getURIEncoded ();
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
@@ -679,7 +679,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             new HCTextNode (" "),
                             createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
                             new HCTextNode (" "),
-                            new HCA (LinkHelper.getURLWithServerAndContext (aCurObject.getParticpantIdentifier ()
+                            new HCA (LinkHelper.getURLWithServerAndContext (aCurObject.getParticipantIdentifier ()
                                                                                       .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
                                                                                                                            sDisplayName)
                                                                                                                 .setTargetBlank ()
@@ -688,7 +688,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       {
         aActions.addChildren (new HCTextNode (" "),
                               new HCA (LinkHelper.getURLWithServerAndContext ("complete/" +
-                                                                              aCurObject.getParticpantIdentifier ()
+                                                                              aCurObject.getParticipantIdentifier ()
                                                                                         .getURIPercentEncoded ())).setTitle ("Perform complete SMP query on " +
                                                                                                                              sDisplayName)
                                                                                                                   .setTargetBlank ()

@@ -145,21 +145,55 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                         protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
                                                       @Nonnull final ISMPParticipantMigration aSelectedObject)
                         {
-                          final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
-                          if (aParticipantMigrationMgr.setParticipantMigrationState (aSelectedObject.getID (),
-                                                                                     EParticipantMigrationState.MIGRATED)
-                                                      .isChanged ())
+                          final HCNodeList aNL = new HCNodeList ();
+                          final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
+                          boolean bDeletedServiceGroup = false;
+
+                          try
                           {
-                            aWPEC.postRedirectGetInternal (success ("The outbound Participant Migration for '" +
-                                                                    aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                                                    "' was successfully migrated!"));
+                            // Delete the service group only locally but not in
+                            // the SML
+                            final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+                            if (aServiceGroupMgr.deleteSMPServiceGroup (aParticipantID, false).isChanged ())
+                            {
+                              aNL.addChild (success ("The SMP ServiceGroup for participant '" +
+                                                     aParticipantID.getURIEncoded () +
+                                                     "' was successfully deleted from this SMP!"));
+                              bDeletedServiceGroup = true;
+                            }
+                            else
+                            {
+                              aNL.addChild (error ("The SMP ServiceGroup for participant '" +
+                                                   aParticipantID.getURIEncoded () +
+                                                   "' could not be deleted! Please check the logs."));
+                            }
                           }
-                          else
+                          catch (final Exception ex)
                           {
-                            aWPEC.postRedirectGetInternal (error ("Failed to migrate outbound Participant Migration for '" +
-                                                                  aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                                                  "'!"));
+                            aNL.addChild (error ("Error deleting the SMP ServiceGroup for participant '" +
+                                                 aParticipantID.getURIEncoded () +
+                                                 "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
                           }
+
+                          if (bDeletedServiceGroup)
+                          {
+                            final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+                            if (aParticipantMigrationMgr.setParticipantMigrationState (aSelectedObject.getID (),
+                                                                                       EParticipantMigrationState.MIGRATED)
+                                                        .isChanged ())
+                            {
+                              aNL.addChild (success ("The outbound Participant Migration for '" +
+                                                     aParticipantID.getURIEncoded () +
+                                                     "' was successfully performed!"));
+                            }
+                            else
+                            {
+                              aNL.addChild (error ("Failed to perform outbound Participant Migration for '" +
+                                                   aParticipantID.getURIEncoded () +
+                                                   "'!"));
+                            }
+                          }
+                          aWPEC.postRedirectGetInternal (aNL);
                         }
                       });
   }
@@ -186,16 +220,6 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       aNodeList.addChild (new BootstrapButton ().addChild ("Enable SML in the Settings")
                                                 .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
                                                 .setIcon (EDefaultIcon.EDIT));
-      return EValidity.INVALID;
-    }
-
-    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
-    {
-      aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to migrate it."));
-      aNodeList.addChild (new BootstrapButton ().addChild ("Create new Service Group")
-                                                .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SERVICE_GROUPS))
-                                                .setIcon (EDefaultIcon.YES));
       return EValidity.INVALID;
     }
 
@@ -265,7 +289,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 
     final HCServiceGroupSelect aSGSelect = new HCServiceGroupSelect (new RequestField (FIELD_PARTICIPANT_ID),
                                                                      aDisplayLocale,
-                                                                     x -> aPIDsThatCannotBeUsed.containsNone (y -> x.getParticpantIdentifier ()
+                                                                     x -> aPIDsThatCannotBeUsed.containsNone (y -> x.getParticipantIdentifier ()
                                                                                                                     .hasSameContent (y)));
     if (!aSGSelect.containsAnyServiceGroup ())
     {
@@ -403,16 +427,28 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       final HCOL aOL = new HCOL ();
       aOL.addItem ("The migration is initiated on this SMP, and the SML is informed about the upcoming migration");
       aOL.addItem ("The other SMP, that is taking over the Service Group must acknowledge the migration by providing the same migration code (created by this SMP) to the SML");
-      aOL.addItem ("If the migration was successful, the Service Group must be deleted on this SMP, ideally a temporary redirect is created. If the migration was cancelled no action is needed.");
+      aOL.addItem ("If the migration was successful, the Service Group must be deleted from this SMP, ideally a temporary redirect to the new SMP is created. If the migration was cancelled no action is needed.");
       aNodeList.addChild (info (div ("The process of migrating a Service Group to another SMP consists of multiple steps:")).addChild (aOL)
                                                                                                                             .addChild (div ("Therefore each open Migration must either be finished (deleting the Service Group) or cancelled (no action taken).")));
     }
 
-    final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-    aToolbar.addChild (new BootstrapButton ().addChild ("Start Participant Migration")
-                                             .setOnClick (createCreateURL (aWPEC))
-                                             .setIcon (EDefaultIcon.NEW));
-    aNodeList.addChild (aToolbar);
+    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
+    if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
+    {
+      aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to migrate it."));
+      if (false)
+        aNodeList.addChild (new BootstrapButton ().addChild ("Create new Service Group")
+                                                  .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SERVICE_GROUPS))
+                                                  .setIcon (EDefaultIcon.YES));
+    }
+    else
+    {
+      final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+      aToolbar.addChild (new BootstrapButton ().addChild ("Start Participant Migration")
+                                               .setOnClick (createCreateURL (aWPEC))
+                                               .setIcon (EDefaultIcon.NEW));
+      aNodeList.addChild (aToolbar);
+    }
 
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
 

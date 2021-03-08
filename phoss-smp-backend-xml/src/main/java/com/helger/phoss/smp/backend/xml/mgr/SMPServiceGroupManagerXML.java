@@ -81,7 +81,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                                                 @Nullable final String sExtension) throws SMPServerException
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
-    ValueEnforcer.notNull (aParticipantID, "ParticpantID");
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup (" +

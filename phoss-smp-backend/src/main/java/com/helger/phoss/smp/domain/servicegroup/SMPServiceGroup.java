@@ -107,7 +107,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   }
 
   @Nonnull
-  public IParticipantIdentifier getParticpantIdentifier ()
+  public IParticipantIdentifier getParticipantIdentifier ()
   {
     return m_aParticipantIdentifier;
   }

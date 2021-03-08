@@ -57,13 +57,6 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     throw new UnsupportedOperationException ();
   }
 
-  @Nonnull
-  public EChange deleteParticipantMigration (@Nullable final String sParticipantMigrationID)
-  {
-    // TODO
-    throw new UnsupportedOperationException ();
-  }
-
   public ISMPParticipantMigration getParticipantMigrationOfID (final String sID)
   {
     // TODO

@@ -310,7 +310,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (aServiceGroup == null)
       return null;
 
-    return getSMPBusinessCardOfID (aServiceGroup.getParticpantIdentifier ());
+    return getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
   }
 
   @Nullable

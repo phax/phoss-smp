@@ -131,7 +131,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       aUpdated.set (eDeleted.isChanged ());
 
       // Insert new processes
-      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticpantIdentifier ();
+      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
 
       aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_service_metadata (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, extension) VALUES (?, ?, ?, ?, ?)",
@@ -233,7 +233,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (-1));
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
-      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticpantIdentifier ();
+      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
       final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_endpoint" +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
@@ -294,7 +294,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       // get the old ones first
       aAllDeleted.set (getAllSMPServiceInformationOfServiceGroup (aServiceGroup));
 
-      final IParticipantIdentifier aPID = aServiceGroup.getParticpantIdentifier ();
+      final IParticipantIdentifier aPID = aServiceGroup.getParticipantIdentifier ();
       final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_endpoint" +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (aPID.getScheme (),
@@ -335,7 +335,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (0));
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
-      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticpantIdentifier ();
+      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
       final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
       final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_endpoint" +
@@ -418,7 +418,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     {
       final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aEntry.getKey ());
       if (aServiceGroup == null)
-        throw new IllegalStateException ("Failed to resolve service group for particpant ID '" + aEntry.getKey ().getURIEncoded () + "'");
+        throw new IllegalStateException ("Failed to resolve service group for participant ID '" + aEntry.getKey ().getURIEncoded () + "'");
 
       // Per document type ID
       for (final Map.Entry <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>> aEntry2 : aEntry.getValue ()
@@ -454,7 +454,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
-      final IParticipantIdentifier aPID = aServiceGroup.getParticpantIdentifier ();
+      final IParticipantIdentifier aPID = aServiceGroup.getParticipantIdentifier ();
       final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                                                                             "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
                                                                             "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
@@ -527,7 +527,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
     if (aServiceGroup != null)
     {
-      final IParticipantIdentifier aPID = aServiceGroup.getParticpantIdentifier ();
+      final IParticipantIdentifier aPID = aServiceGroup.getParticipantIdentifier ();
       final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier" +
                                                                             " FROM smp_service_metadata AS sm" +
                                                                             " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
@@ -549,7 +549,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (aDocTypeID == null)
       return null;
 
-    final IParticipantIdentifier aPID = aServiceGroup.getParticpantIdentifier ();
+    final IParticipantIdentifier aPID = aServiceGroup.getParticipantIdentifier ();
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.extension," +
                                                                           "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
                                                                           "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +

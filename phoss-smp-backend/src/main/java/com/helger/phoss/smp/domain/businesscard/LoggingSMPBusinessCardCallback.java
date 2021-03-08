@@ -27,11 +27,11 @@ public class LoggingSMPBusinessCardCallback implements ISMPBusinessCardCallback
 
   public void onSMPBusinessCardCreatedOrUpdated (@Nonnull final ISMPBusinessCard aBusinessCard)
   {
-    LOGGER.info ("Successfully Created/Updated BusinessCard with ID '" + aBusinessCard.getParticpantIdentifier ().getURIEncoded () + "'");
+    LOGGER.info ("Successfully Created/Updated BusinessCard with ID '" + aBusinessCard.getParticipantIdentifier ().getURIEncoded () + "'");
   }
 
   public void onSMPBusinessCardDeleted (@Nonnull final ISMPBusinessCard aBusinessCard)
   {
-    LOGGER.info ("Successfully Deleted BusinessCard with ID '" + aBusinessCard.getParticpantIdentifier ().getURIEncoded () + "'");
+    LOGGER.info ("Successfully Deleted BusinessCard with ID '" + aBusinessCard.getParticipantIdentifier ().getURIEncoded () + "'");
   }
 }

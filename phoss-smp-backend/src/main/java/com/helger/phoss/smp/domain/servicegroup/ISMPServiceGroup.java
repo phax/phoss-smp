@@ -49,7 +49,7 @@ public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHas
    *         <code>null</code>.
    */
   @Nonnull
-  IParticipantIdentifier getParticpantIdentifier ();
+  IParticipantIdentifier getParticipantIdentifier ();
 
   /**
    * @return This service information object as a Peppol SMP JAXB object for the
