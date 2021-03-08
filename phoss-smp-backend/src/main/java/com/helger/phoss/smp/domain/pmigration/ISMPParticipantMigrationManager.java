@@ -13,7 +13,7 @@ import com.helger.peppolid.IParticipantIdentifier;
  * This is the interface for managing participant migrations.
  *
  * @author Philip Helger
- * @since 5.3.1
+ * @since 5.4.0
  */
 public interface ISMPParticipantMigrationManager
 {
@@ -33,15 +33,18 @@ public interface ISMPParticipantMigrationManager
                                                                @Nonnull @Nonempty String sMigrationKey);
 
   /**
-   * Delete an existing participant migration.
+   * Change the participant migration state of the provided participant ID.
    *
    * @param sParticipantMigrationID
    *        The ID of the participant migration to be deleted. May be
    *        <code>null</code>.
+   * @param eNewState
+   *        The new participant migration state to use. May not be
+   *        <code>null</code>.
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
   @Nonnull
-  EChange deleteParticipantMigration (@Nullable String sParticipantMigrationID);
+  EChange setParticipantMigrationState (@Nullable String sParticipantMigrationID, @Nonnull EParticipantMigrationState eNewState);
 
   /**
    * Find the participant migration with the provided ID.
@@ -54,20 +57,24 @@ public interface ISMPParticipantMigrationManager
   ISMPParticipantMigration getParticipantMigrationOfID (@Nullable String sID);
 
   /**
+   * @param eState
+   *        The state to be used to filter. May be <code>null</code>.
    * @return A list of all contained outbound participant migrations. Never
    *         <code>null</code> but maybe empty.
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations ();
+  ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable EParticipantMigrationState eState);
 
   /**
+   * @param eState
+   *        The state to be used to filter. May be <code>null</code>.
    * @return A list of all contained inbound participant migrations. Never
    *         <code>null</code> but maybe empty.
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations ();
+  ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable EParticipantMigrationState eState);
 
   /**
    * Check if an outbound migration for the provided participant identifier is
@@ -78,7 +85,7 @@ public interface ISMPParticipantMigrationManager
    * @return <code>true</code> if an outbound migration is already running,
    *         <code>false</code> if not.
    */
-  boolean containsOutboundMigration (@Nullable IParticipantIdentifier aParticipantID);
+  boolean containsOutboundMigrationInProgress (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
    * Check if an inbound migration for the provided participant identifier is
@@ -89,5 +96,5 @@ public interface ISMPParticipantMigrationManager
    * @return <code>true</code> if an inbound migration is already running,
    *         <code>false</code> if not.
    */
-  boolean containsInboundMigration (@Nullable IParticipantIdentifier aParticipantID);
+  boolean containsInboundMigrationInProgress (@Nullable IParticipantIdentifier aParticipantID);
 }

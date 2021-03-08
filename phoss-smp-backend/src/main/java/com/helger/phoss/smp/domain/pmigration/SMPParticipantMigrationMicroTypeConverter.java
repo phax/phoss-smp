@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.ContainsSoftMigration;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.xml.microdom.IMicroElement;
@@ -27,11 +28,13 @@ import com.helger.xml.microdom.convert.MicroTypeConverter;
  * and to XML.
  *
  * @author Philip Helger
+ * @since 5.4.0
  */
 public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTypeConverter <SMPParticipantMigration>
 {
   private static final String ATTR_ID = "id";
   private static final String ATTR_DIRECTION = "direction";
+  private static final String ATTR_STATE = "state";
   private static final String ELEMENT_PARTICIPANT_IDENTIFIER = "participant";
   private static final String ATTR_INITIATION_DATETIME = "initdt";
   private static final String ATTR_MIGRATION_KEY = "migkey";
@@ -44,6 +47,7 @@ public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTy
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_ID, aValue.getID ());
     aElement.setAttribute (ATTR_DIRECTION, aValue.getDirection ().getID ());
+    aElement.setAttribute (ATTR_STATE, aValue.getState ().getID ());
     aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticipantIdentifier (),
                                                                     sNamespaceURI,
                                                                     ELEMENT_PARTICIPANT_IDENTIFIER));
@@ -53,6 +57,7 @@ public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTy
   }
 
   @Nonnull
+  @ContainsSoftMigration
   public SMPParticipantMigration convertToNative (@Nonnull final IMicroElement aElement)
   {
     final String sID = aElement.getAttributeValue (ATTR_ID);
@@ -62,6 +67,16 @@ public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTy
     if (eDirection == null)
       throw new IllegalStateException ("Failed to resolve Participant Migration Direction with ID '" + sDirection + "'");
 
+    String sState = aElement.getAttributeValue (ATTR_STATE);
+    if (sState == null)
+    {
+      // Migration
+      sState = EParticipantMigrationState.IN_PROGRESS.getID ();
+    }
+    final EParticipantMigrationState eState = EParticipantMigrationState.getFromIDOrNull (sState);
+    if (eState == null)
+      throw new IllegalStateException ("Failed to resolve Participant Migration State with ID '" + sState + "'");
+
     final SimpleParticipantIdentifier aParticipantID = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PARTICIPANT_IDENTIFIER),
                                                                                            SimpleParticipantIdentifier.class);
 
@@ -69,6 +84,6 @@ public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTy
 
     final String sMigrationKey = aElement.getAttributeValue (ATTR_MIGRATION_KEY);
 
-    return new SMPParticipantMigration (sID, eDirection, aParticipantID, aInitiationDT, sMigrationKey);
+    return new SMPParticipantMigration (sID, eDirection, eState, aParticipantID, aInitiationDT, sMigrationKey);
   }
 }

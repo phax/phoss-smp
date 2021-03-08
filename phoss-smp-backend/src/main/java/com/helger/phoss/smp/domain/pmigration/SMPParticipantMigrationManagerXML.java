@@ -20,7 +20,7 @@ import com.helger.photon.audit.AuditHelper;
  * The XML implementation of {@link ISMPParticipantMigrationManager}
  *
  * @author Philip Helger
- * @since 5.3.1
+ * @since 5.4.0
  */
 public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPParticipantMigration, SMPParticipantMigration>
                                                implements
@@ -75,6 +75,37 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
   }
 
   @Nonnull
+  public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
+                                               @Nonnull final EParticipantMigrationState eNewState)
+  {
+    ValueEnforcer.notNull (eNewState, "NewState");
+
+    final SMPParticipantMigration aPM = getOfID (sParticipantMigrationID);
+    if (aPM == null)
+    {
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, sParticipantMigrationID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    m_aRWLock.writeLock ().lock ();
+    try
+    {
+      EChange eChange = EChange.UNCHANGED;
+      eChange = eChange.or (aPM.setState (eNewState));
+      if (eChange.isUnchanged ())
+        return EChange.UNCHANGED;
+
+      internalUpdateItem (aPM);
+    }
+    finally
+    {
+      m_aRWLock.writeLock ().unlock ();
+    }
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "migration-state", sParticipantMigrationID, eNewState);
+    return EChange.CHANGED;
+  }
+
+  @Nonnull
   public EChange deleteParticipantMigration (@Nullable final String sParticipantMigrationID)
   {
     if (StringHelper.hasNoText (sParticipantMigrationID))
@@ -112,27 +143,31 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations ()
+  public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
-    return getAll (x -> x.getDirection ().isOutbound ());
+    return getAll (x -> x.getDirection ().isOutbound () && x.isMatchingState (eState));
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations ()
+  public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
-    return getAll (x -> x.getDirection ().isInbound ());
+    return getAll (x -> x.getDirection ().isInbound () && x.isMatchingState (eState));
   }
 
-  public boolean containsOutboundMigration (@Nullable final IParticipantIdentifier aParticipantID)
+  public boolean containsOutboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
   {
     return aParticipantID != null &&
-           containsAny (x -> x.getDirection ().isOutbound () && x.getParticipantIdentifier ().hasSameContent (aParticipantID));
+           containsAny (x -> x.getDirection ().isOutbound () &&
+                             x.getState ().isInProgress () &&
+                             x.getParticipantIdentifier ().hasSameContent (aParticipantID));
   }
 
-  public boolean containsInboundMigration (@Nullable final IParticipantIdentifier aParticipantID)
+  public boolean containsInboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
   {
     return aParticipantID != null &&
-           containsAny (x -> x.getDirection ().isInbound () && x.getParticipantIdentifier ().hasSameContent (aParticipantID));
+           containsAny (x -> x.getDirection ().isInbound () &&
+                             x.getState ().isInProgress () &&
+                             x.getParticipantIdentifier ().hasSameContent (aParticipantID));
   }
 }

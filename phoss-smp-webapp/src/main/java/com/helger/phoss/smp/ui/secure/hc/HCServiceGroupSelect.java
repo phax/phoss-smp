@@ -64,4 +64,15 @@ public class HCServiceGroupSelect extends HCExtSelect
     if (!hasSelectedOption ())
       addOptionPleaseSelect (aDisplayLocale);
   }
+
+  public boolean containsAnyServiceGroup ()
+  {
+    // TODO use containsEffectiveOption in photon > 8.2.10
+    final int nOptions = getOptionCount ();
+    if (nOptions == 0)
+      return false;
+    if (nOptions > 1)
+      return true;
+    return !getOptionAtIndex (0).containsClass (HCExtSelect.CSS_CLASS_SPECIAL_OPTION);
+  }
 }

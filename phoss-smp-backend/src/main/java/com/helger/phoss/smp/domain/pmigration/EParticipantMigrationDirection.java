@@ -11,7 +11,7 @@ import com.helger.commons.lang.EnumHelper;
  * Defines the directions for SMP participant migrations.
  *
  * @author Philip Helger
- * @since 5.3.1
+ * @since 5.4.0
  */
 public enum EParticipantMigrationDirection implements IHasID <String>
 {
@@ -20,7 +20,7 @@ public enum EParticipantMigrationDirection implements IHasID <String>
   /** Migrate a participant from another SMP to this SMP. */
   INBOUND ("inbound");
 
-  private String m_sID;
+  private final String m_sID;
 
   EParticipantMigrationDirection (@Nonnull @Nonempty final String sID)
   {

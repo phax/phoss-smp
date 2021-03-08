@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.mongodb.client.model.Indexes;
@@ -30,7 +31,7 @@ import com.mongodb.client.model.Indexes;
  * Implementation of {@link ISMPParticipantMigrationManager} for MongoDB
  *
  * @author Philip Helger
- * @since 5.3.1
+ * @since 5.4.0
  */
 public final class SMPParticipantMigrationManagerMongoDB extends AbstractManagerMongoDB implements ISMPParticipantMigrationManager
 {
@@ -49,9 +50,17 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     throw new UnsupportedOperationException ();
   }
 
+  public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
+                                               @Nonnull final EParticipantMigrationState eNewState)
+  {
+    // TODO
+    throw new UnsupportedOperationException ();
+  }
+
   @Nonnull
   public EChange deleteParticipantMigration (@Nullable final String sParticipantMigrationID)
   {
+    // TODO
     throw new UnsupportedOperationException ();
   }
 
@@ -61,25 +70,25 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return null;
   }
 
-  public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations ()
+  public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
     // TODO
     return null;
   }
 
-  public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations ()
+  public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
     // TODO
     return null;
   }
 
-  public boolean containsOutboundMigration (final IParticipantIdentifier aParticipantID)
+  public boolean containsOutboundMigrationInProgress (final IParticipantIdentifier aParticipantID)
   {
     // TODO
     return false;
   }
 
-  public boolean containsInboundMigration (final IParticipantIdentifier aParticipantID)
+  public boolean containsInboundMigrationInProgress (final IParticipantIdentifier aParticipantID)
   {
     // TODO
     return false;

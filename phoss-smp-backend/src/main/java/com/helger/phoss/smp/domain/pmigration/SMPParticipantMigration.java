@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.regex.RegExHelper;
+import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
@@ -24,15 +26,17 @@ import com.helger.peppolid.IParticipantIdentifier;
  * Default implementation of {@link ISMPParticipantMigration}
  *
  * @author Philip Helger
- * @since 5.3.1
+ * @since 5.4.0
  */
+@NotThreadSafe
 public class SMPParticipantMigration implements ISMPParticipantMigration
 {
-  public static final ObjectType OT = new ObjectType ("smpparticipantmigration");
+  public static final ObjectType OT = new ObjectType ("SmpParticipantMigration");
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPParticipantMigration.class);
 
   private final String m_sID;
   private final EParticipantMigrationDirection m_eDirection;
+  private EParticipantMigrationState m_eState;
   private final IParticipantIdentifier m_aParticipantID;
   private final LocalDateTime m_aInitiationDateTime;
   private final String m_sMigrationKey;
@@ -51,12 +55,14 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
 
   protected SMPParticipantMigration (@Nonnull @Nonempty final String sID,
                                      @Nonnull final EParticipantMigrationDirection eDirection,
+                                     @Nonnull final EParticipantMigrationState eState,
                                      @Nonnull final IParticipantIdentifier aParticipantID,
                                      @Nonnull final LocalDateTime aInitiationDateTime,
                                      @Nonnull @Nonempty final String sMigrationKey)
   {
     ValueEnforcer.notEmpty (sID, "ID");
-    ValueEnforcer.notNull (eDirection, "eDirection");
+    ValueEnforcer.notNull (eDirection, "Direction");
+    ValueEnforcer.notNull (eState, "State");
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aInitiationDateTime, "InitiationDateTime");
     ValueEnforcer.notEmpty (sMigrationKey, "MigrationKey");
@@ -66,6 +72,7 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
 
     m_sID = sID;
     m_eDirection = eDirection;
+    m_eState = eState;
     m_aParticipantID = aParticipantID;
     m_aInitiationDateTime = aInitiationDateTime;
     m_sMigrationKey = sMigrationKey;
@@ -82,6 +89,22 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   public EParticipantMigrationDirection getDirection ()
   {
     return m_eDirection;
+  }
+
+  @Nonnull
+  public EParticipantMigrationState getState ()
+  {
+    return m_eState;
+  }
+
+  @Nonnull
+  public EChange setState (@Nonnull final EParticipantMigrationState eState)
+  {
+    ValueEnforcer.notNull (eState, "State");
+    if (eState.equals (m_eState))
+      return EChange.UNCHANGED;
+    m_eState = eState;
+    return EChange.CHANGED;
   }
 
   @Nonnull
@@ -125,6 +148,7 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   {
     return new ToStringGenerator (this).append ("ID", m_sID)
                                        .append ("Direction", m_eDirection)
+                                       .append ("State", m_eState)
                                        .append ("ParticipantID", m_aParticipantID)
                                        .append ("InitiationDateTime", m_aInitiationDateTime)
                                        .append ("MigrationKey", m_sMigrationKey)
@@ -137,6 +161,7 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   {
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
                                         EParticipantMigrationDirection.OUTBOUND,
+                                        EParticipantMigrationState.IN_PROGRESS,
                                         aParticipantID,
                                         PDTFactory.getCurrentLocalDateTime (),
                                         sMigrationKey);
@@ -148,6 +173,7 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   {
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
                                         EParticipantMigrationDirection.INBOUND,
+                                        EParticipantMigrationState.IN_PROGRESS,
                                         aParticipantID,
                                         PDTFactory.getCurrentLocalDateTime (),
                                         sMigrationKey);

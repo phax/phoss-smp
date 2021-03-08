@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import java.security.GeneralSecurityException;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -26,28 +25,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashSet;
+import com.helger.commons.collection.impl.ICommonsIterable;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
+import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
+import com.helger.html.hc.html.tabular.IHCCell;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
-import com.helger.peppol.smlclient.participant.BadRequestFault;
-import com.helger.peppol.smlclient.participant.InternalErrorFault;
-import com.helger.peppol.smlclient.participant.NotFoundFault;
-import com.helger.peppol.smlclient.participant.UnauthorizedFault;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -61,14 +61,14 @@ import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
-import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
-import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerWithQuery;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
+import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
-import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
@@ -84,46 +84,82 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureServiceGroupMigrationOutbound.class);
   private static final String FIELD_PARTICIPANT_ID = "pid";
+  private static final String ACTION_CANCEL_MIGRATION = "cancelmig";
   private static final String ACTION_FINALIZE_MIGRATION = "finishmig";
 
   public PageSecureServiceGroupMigrationOutbound (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Migrate to another SMP");
-    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPParticipantMigration, WebPageExecutionContext> ()
-    {
-      @Override
-      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final BootstrapForm aForm,
-                                @Nonnull final ISMPParticipantMigration aSelectedObject)
-      {
-        aForm.addChild (question ("Are you sure you want to cancel the outbound Participant Migration for '" +
-                                  aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                  "'? This action will keep the Service Group in this SMP and not migrate it away."));
-      }
-
-      @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPParticipantMigration aSelectedObject)
-      {
-        final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
-        if (aParticipantMigrationMgr.deleteParticipantMigration (aSelectedObject.getID ()).isChanged ())
-          aWPEC.postRedirectGetInternal (success ("The outbound Participant Migration for '" +
-                                                  aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                                  "' was successfully cancelled!"));
-        else
-          aWPEC.postRedirectGetInternal (error ("Failed to delete outbound Participant Migration for '" +
-                                                aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                                "'!"));
-      }
-    });
-    addCustomHandler (ACTION_FINALIZE_MIGRATION,
-                      new AbstractBootstrapWebPageActionHandler <ISMPParticipantMigration, WebPageExecutionContext> (true)
+    addCustomHandler (ACTION_CANCEL_MIGRATION,
+                      new AbstractBootstrapWebPageActionHandlerWithQuery <ISMPParticipantMigration, WebPageExecutionContext> (true,
+                                                                                                                              ACTION_CANCEL_MIGRATION,
+                                                                                                                              "cancelmig")
                       {
-
-                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                       @Nonnull final ISMPParticipantMigration aSelectedObject)
+                        @Override
+                        protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                                  @Nonnull final BootstrapForm aForm,
+                                                  @Nonnull final ISMPParticipantMigration aSelectedObject)
                         {
-                          // TODO
-                          return null;
+                          aForm.addChild (question ("Are you sure you want to cancel the outbound Participant Migration for '" +
+                                                    aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                                                    "'? This action will keep the Service Group in this SMP and not migrate it away."));
+                        }
+
+                        @Override
+                        protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                      @Nonnull final ISMPParticipantMigration aSelectedObject)
+                        {
+                          final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+                          if (aParticipantMigrationMgr.setParticipantMigrationState (aSelectedObject.getID (),
+                                                                                     EParticipantMigrationState.CANCELLED)
+                                                      .isChanged ())
+                          {
+                            aWPEC.postRedirectGetInternal (success ("The outbound Participant Migration for '" +
+                                                                    aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                                                                    "' was successfully cancelled!"));
+                          }
+                          else
+                          {
+                            aWPEC.postRedirectGetInternal (error ("Failed to cancel outbound Participant Migration for '" +
+                                                                  aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                                                                  "'!"));
+                          }
+                        }
+                      });
+    addCustomHandler (ACTION_FINALIZE_MIGRATION,
+                      new AbstractBootstrapWebPageActionHandlerWithQuery <ISMPParticipantMigration, WebPageExecutionContext> (true,
+                                                                                                                              ACTION_FINALIZE_MIGRATION,
+                                                                                                                              "finalizemig")
+                      {
+                        @Override
+                        protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                                  @Nonnull final BootstrapForm aForm,
+                                                  @Nonnull final ISMPParticipantMigration aSelectedObject)
+                        {
+                          aForm.addChild (question ("Are you sure you want to fianlize the outbound Participant Migration for '" +
+                                                    aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                                                    "'? This action will delete the Service Group in this SMP."));
+                        }
+
+                        @Override
+                        protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                      @Nonnull final ISMPParticipantMigration aSelectedObject)
+                        {
+                          final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+                          if (aParticipantMigrationMgr.setParticipantMigrationState (aSelectedObject.getID (),
+                                                                                     EParticipantMigrationState.MIGRATED)
+                                                      .isChanged ())
+                          {
+                            aWPEC.postRedirectGetInternal (success ("The outbound Participant Migration for '" +
+                                                                    aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                                                                    "' was successfully migrated!"));
+                          }
+                          else
+                          {
+                            aWPEC.postRedirectGetInternal (error ("Failed to migrate outbound Participant Migration for '" +
+                                                                  aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                                                                  "'!"));
+                          }
                         }
                       });
   }
@@ -200,6 +236,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                                                    aSelectedObject.getParticipantIdentifier ()
                                                                                                   .getURIEncoded ())).addChild (aSelectedObject.getParticipantIdentifier ()
                                                                                                                                                .getURIEncoded ())));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Migration state").setCtrl (aSelectedObject.getState ().getDisplayName ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Initiation datetime")
                                                  .setCtrl (PDTToString.getAsString (aSelectedObject.getInitiationDateTime (),
                                                                                     aDisplayLocale)));
@@ -218,20 +255,31 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
-    aForm.addChild (getUIHandler ().createActionHeader ("Start a Participant Migration from this SMP to another SMP"));
-
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
-    final ICommonsList <ISMPParticipantMigration> aExistingOutgoingMigrations = aParticipantMigrationMgr.getAllOutboundParticipantMigrations ();
-    final ICommonsList <IParticipantIdentifier> aAffectedPIDs = new CommonsArrayList <> (aExistingOutgoingMigrations,
-                                                                                         ISMPParticipantMigration::getParticipantIdentifier);
+    // State is filtered below
+    final ICommonsList <ISMPParticipantMigration> aExistingOutgoingMigrations = aParticipantMigrationMgr.getAllOutboundParticipantMigrations (null);
+    final ICommonsSet <IParticipantIdentifier> aPIDsThatCannotBeUsed = new CommonsHashSet <> ();
+    aPIDsThatCannotBeUsed.addAllMapped (aExistingOutgoingMigrations,
+                                        x -> x.getState ().preventsNewMigration (),
+                                        ISMPParticipantMigration::getParticipantIdentifier);
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                 .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_PARTICIPANT_ID),
-                                                                                     aDisplayLocale,
-                                                                                     x -> aAffectedPIDs.containsNone (y -> x.getParticpantIdentifier ()
-                                                                                                                            .hasSameContent (y))))
-                                                 .setHelpText ("Select the Service Group to migrate to another SMP. Each Service Group can only be migrated once.")
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_PARTICIPANT_ID)));
+    final HCServiceGroupSelect aSGSelect = new HCServiceGroupSelect (new RequestField (FIELD_PARTICIPANT_ID),
+                                                                     aDisplayLocale,
+                                                                     x -> aPIDsThatCannotBeUsed.containsNone (y -> x.getParticpantIdentifier ()
+                                                                                                                    .hasSameContent (y)));
+    if (!aSGSelect.containsAnyServiceGroup ())
+    {
+      aForm.addChild (warn ("No Service Group on this SMP can currently be migrated."));
+    }
+    else
+    {
+      aForm.addChild (getUIHandler ().createActionHeader ("Start a Participant Migration from this SMP to another SMP"));
+
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
+                                                   .setCtrl (aSGSelect)
+                                                   .setHelpText ("Select the Service Group to migrate to another SMP. Each Service Group can only be migrated once.")
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_PARTICIPANT_ID)));
+    }
   }
 
   @Override
@@ -254,7 +302,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
         aFormErrors.addFieldError (FIELD_PARTICIPANT_ID, "The selected Service Group does not exist.");
       else
       {
-        if (aParticipantMigrationMgr.containsOutboundMigration (aParticipantID))
+        if (aParticipantMigrationMgr.containsOutboundMigrationInProgress (aParticipantID))
           aFormErrors.addFieldError (FIELD_PARTICIPANT_ID, "The migration of the selected Service Group is already in progress.");
       }
 
@@ -271,9 +319,11 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
           final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSettings.getSMLInfo ());
           aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
           sMigrationKey = aCaller.prepareToMigrate (aParticipantID, SMPServerConfiguration.getSMLSMPID ());
+          LOGGER.info ("Successfully called prepareToMigrate on SML. Created migration key is '" + sMigrationKey + "'");
         }
-        catch (final GeneralSecurityException | BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault ex)
+        catch (final Exception ex)
         {
+          LOGGER.error ("Error invoking prepareToMigrate on SML", ex);
           aWPEC.postRedirectGetInternal (error ("Failed to prepare the migration for participant '" +
                                                 aParticipantID.getURIEncoded () +
                                                 "' in SML.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
@@ -296,11 +346,57 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     }
   }
 
+  @Nonnull
+  private IHCNode _createTable (@Nonnull final WebPageExecutionContext aWPEC,
+                                @Nonnull final ICommonsIterable <ISMPParticipantMigration> aMigs,
+                                @Nonnull final EParticipantMigrationState eState)
+  {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+
+    final HCTable aTable = new HCTable (new DTCol ("ID").setVisible (false),
+                                        new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
+                                        new DTCol ("Initiation").setDisplayType (EDTColType.DATETIME, aDisplayLocale),
+                                        new DTCol ("Migration Key"),
+                                        new BootstrapDTColAction (aDisplayLocale)).setID (getID () + eState.getID ());
+    for (final ISMPParticipantMigration aCurObject : aMigs)
+    {
+      final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
+      final String sParticipantID = aCurObject.getParticipantIdentifier ().getURIEncoded ();
+
+      final HCRow aRow = aTable.addBodyRow ();
+      aRow.addCell (aCurObject.getID ());
+      aRow.addCell (a (aViewLink).addChild (sParticipantID));
+      aRow.addCell (PDTToString.getAsString (aCurObject.getInitiationDateTime (), aDisplayLocale));
+      aRow.addCell (code (aCurObject.getMigrationKey ()));
+
+      final IHCCell <?> aActionCell = aRow.addCell ();
+      aActionCell.addChild (eState.isInProgress () ? new HCA (aWPEC.getSelfHref ()
+                                                                   .add (CPageParam.PARAM_ACTION, ACTION_FINALIZE_MIGRATION)
+                                                                   .add (CPageParam.PARAM_OBJECT, aCurObject.getID ()))
+                                                                                                                       .setTitle ("Finalize Participant Migration of '" +
+                                                                                                                                  sParticipantID +
+                                                                                                                                  "'")
+                                                                                                                       .addChild (EDefaultIcon.YES.getAsNode ())
+                                                   : createEmptyAction ());
+      aActionCell.addChild (" ");
+      aActionCell.addChild (eState.isInProgress () ? new HCA (aWPEC.getSelfHref ()
+                                                                   .add (CPageParam.PARAM_ACTION, ACTION_CANCEL_MIGRATION)
+                                                                   .add (CPageParam.PARAM_OBJECT, aCurObject.getID ()))
+                                                                                                                       .setTitle ("Cancel Participant Migration of '" +
+                                                                                                                                  sParticipantID +
+                                                                                                                                  "'")
+                                                                                                                       .addChild (EDefaultIcon.NO.getAsNode ())
+                                                   : createEmptyAction ());
+    }
+
+    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+    return new HCNodeList ().addChild (aTable).addChild (aDataTables);
+  }
+
   @Override
   protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
 
     {
@@ -318,32 +414,15 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                              .setIcon (EDefaultIcon.NEW));
     aNodeList.addChild (aToolbar);
 
-    final HCTable aTable = new HCTable (new DTCol ("ID").setVisible (false),
-                                        new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("Initiation").setDisplayType (EDTColType.DATETIME, aDisplayLocale),
-                                        new DTCol ("Migration Key"),
-                                        new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPParticipantMigration aCurObject : aParticipantMigrationMgr.getAllOutboundParticipantMigrations ())
+    final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
+
+    final ICommonsList <ISMPParticipantMigration> aAllMigs = aParticipantMigrationMgr.getAllOutboundParticipantMigrations (null);
+    for (final EParticipantMigrationState eState : EParticipantMigrationState.values ())
     {
-      final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
-      final String sParticipantID = aCurObject.getParticipantIdentifier ().getURIEncoded ();
-
-      final HCRow aRow = aTable.addBodyRow ();
-      aRow.addCell (aCurObject.getID ());
-      aRow.addCell (a (aViewLink).addChild (sParticipantID));
-      aRow.addCell (PDTToString.getAsString (aCurObject.getInitiationDateTime (), aDisplayLocale));
-      aRow.addCell (code (aCurObject.getMigrationKey ()));
-
-      aRow.addCell (isActionAllowed (aWPEC, EWebPageFormAction.DELETE, aCurObject)
-                                                                                   ? createDeleteLink (aWPEC,
-                                                                                                       aCurObject,
-                                                                                                       "Cancel Participant Migration of '" +
-                                                                                                                   sParticipantID +
-                                                                                                                   "'")
-                                                                                   : createEmptyAction ());
+      final ICommonsList <ISMPParticipantMigration> aMatchingMigs = aAllMigs.getAll (x -> x.getState () == eState);
+      aTabBox.addTab (eState.getID (),
+                      eState.getDisplayName () + " (" + aMatchingMigs.size () + ")",
+                      _createTable (aWPEC, aMatchingMigs, eState));
     }
-
-    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-    aNodeList.addChild (aTable).addChild (aDataTables);
   }
 }

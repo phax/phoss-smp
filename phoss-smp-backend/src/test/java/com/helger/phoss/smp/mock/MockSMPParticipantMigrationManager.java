@@ -17,6 +17,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 
@@ -33,6 +34,12 @@ final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrati
     throw new UnsupportedOperationException ();
   }
 
+  public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
+                                               @Nonnull final EParticipantMigrationState eNewState)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
   public EChange deleteParticipantMigration (@Nullable final String sParticipantMigrationID)
   {
     throw new UnsupportedOperationException ();
@@ -43,22 +50,22 @@ final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrati
     throw new UnsupportedOperationException ();
   }
 
-  public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations ()
+  public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations ()
+  public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public boolean containsOutboundMigration (final IParticipantIdentifier aParticipantID)
+  public boolean containsOutboundMigrationInProgress (final IParticipantIdentifier aParticipantID)
   {
     return false;
   }
 
-  public boolean containsInboundMigration (final IParticipantIdentifier aParticipantID)
+  public boolean containsInboundMigrationInProgress (final IParticipantIdentifier aParticipantID)
   {
     return false;
   }
