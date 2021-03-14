@@ -40,14 +40,14 @@ public class BusinessCardSMPServiceGroupCallback implements ISMPServiceGroupCall
     m_aBusinessCardMgr = aBusinessCardMgr;
   }
 
-  public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup)
+  public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup, final boolean bCreateInSML)
   {}
 
   public void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
   {}
 
   @Override
-  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID)
+  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID, final boolean bDeleteInSML)
   {
     // If service group is deleted, also delete respective business card
     final ISMPBusinessCard aBusinessCard = m_aBusinessCardMgr.getSMPBusinessCardOfID (aParticipantID);

@@ -102,7 +102,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   @Nonnull
   public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
                                                 @Nonnull final IParticipantIdentifier aParticipantID,
-                                                @Nullable final String sExtension) throws SMPServerException
+                                                @Nullable final String sExtension,
+                                                final boolean bCreateInSML) throws SMPServerException
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
@@ -113,6 +114,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                     aParticipantID.getURIEncoded () +
                     ", " +
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ", " +
+                    bCreateInSML +
                     ")");
 
     final MutableBoolean aCreatedSGHook = new MutableBoolean (false);
@@ -127,10 +130,13 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       if (aDBServiceGroup != null)
         throw new IllegalStateException ("The service group with ID " + aParticipantID.getURIEncoded () + " already exists!");
 
-      // It's a new service group - Create in SML and remember that
-      // Throws exception in case of an error
-      aHook.createServiceGroup (aParticipantID);
-      aCreatedSGHook.set (true);
+      if (bCreateInSML)
+      {
+        // It's a new service group - Create in SML and remember that
+        // Throws exception in case of an error
+        aHook.createServiceGroup (aParticipantID);
+        aCreatedSGHook.set (true);
+      }
 
       // Did not exist. Create it.
       if (aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_service_group (businessIdentifierScheme, businessIdentifier, extension) VALUES (?, ?, ?)",
@@ -162,7 +168,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     if (eSuccess.isFailure () || aCaughtException.isSet () || !aCreatedSGDB.booleanValue ())
     {
-      AuditHelper.onAuditCreateFailure (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), sOwnerID, sExtension);
+      AuditHelper.onAuditCreateFailure (SMPServiceGroup.OT,
+                                        aParticipantID.getURIEncoded (),
+                                        sOwnerID,
+                                        sExtension,
+                                        Boolean.valueOf (bCreateInSML));
 
       // Propagate contained exception
       final Exception ex = aCaughtException.get ();
@@ -176,13 +186,17 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup succeeded");
 
-    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), sOwnerID, sExtension);
+    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
+                                      aParticipantID.getURIEncoded (),
+                                      sOwnerID,
+                                      sExtension,
+                                      Boolean.valueOf (bCreateInSML));
 
     final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
     if (m_aCache != null)
       m_aCache.put (aParticipantID.getURIEncoded (), aServiceGroup);
 
-    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aServiceGroup));
+    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aServiceGroup, bCreateInSML));
     return aServiceGroup;
   }
 
@@ -337,7 +351,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
       if (m_aCache != null)
         m_aCache.remove (aParticipantID.getURIEncoded ());
-      m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
+      m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID, bDeleteInSML));
     }
 
     return eChange;

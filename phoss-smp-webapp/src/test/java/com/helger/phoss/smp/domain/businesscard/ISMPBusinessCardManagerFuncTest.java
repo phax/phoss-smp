@@ -78,7 +78,7 @@ public final class ISMPBusinessCardManagerFuncTest
     final IParticipantIdentifier aPI2 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest2");
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
+    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null, true);
     assertNotNull (aSG);
     ISMPBusinessCard aBusinessCard = null;
     try
@@ -105,7 +105,7 @@ public final class ISMPBusinessCardManagerFuncTest
       assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticipantIdentifier ()));
 
       // Add second one
-      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
+      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null, true);
       assertNotNull (aSG2);
       ISMPBusinessCard aBusinessCard2 = null;
       try

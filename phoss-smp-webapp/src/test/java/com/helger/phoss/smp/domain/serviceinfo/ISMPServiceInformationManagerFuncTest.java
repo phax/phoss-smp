@@ -64,7 +64,7 @@ public final class ISMPServiceInformationManagerFuncTest
     }
 
     aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1, true);
-    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (sUserID, aPI1, null);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (sUserID, aPI1, null, true);
     assertNotNull (aSG);
     try
     {

@@ -26,9 +26,12 @@ public class LoggingSMPServiceGroupCallback implements ISMPServiceGroupCallback
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (LoggingSMPServiceGroupCallback.class);
 
-  public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup)
+  public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup, final boolean bCreateInSML)
   {
-    LOGGER.info ("Successfully Created ServiceGroup with ID '" + aServiceGroup.getParticipantIdentifier ().getURIEncoded () + "'");
+    LOGGER.info ("Successfully Created ServiceGroup with ID '" +
+                 aServiceGroup.getParticipantIdentifier ().getURIEncoded () +
+                 "'" +
+                 (bCreateInSML ? " also in SML" : ""));
   }
 
   public void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
@@ -36,7 +39,7 @@ public class LoggingSMPServiceGroupCallback implements ISMPServiceGroupCallback
     LOGGER.info ("Successfully Updated ServiceGroup with ID '" + aParticipantID.getURIEncoded () + "'");
   }
 
-  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID)
+  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID, final boolean bDeleteInSML)
   {
     LOGGER.info ("Successfully Deleted ServiceGroup with ID '" + aParticipantID.getURIEncoded () + "'");
   }

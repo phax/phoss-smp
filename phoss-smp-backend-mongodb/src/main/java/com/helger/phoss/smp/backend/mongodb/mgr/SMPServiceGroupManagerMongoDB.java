@@ -16,8 +16,6 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
-import java.util.function.Consumer;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -106,7 +104,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   @Nonnull
   public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
                                                 @Nonnull final IParticipantIdentifier aParticipantID,
-                                                @Nullable final String sExtension) throws SMPServerException
+                                                @Nullable final String sExtension,
+                                                final boolean bCreateInSML) throws SMPServerException
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
@@ -117,20 +116,23 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                     aParticipantID.getURIEncoded () +
                     ", " +
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ", " +
+                    bCreateInSML +
                     ")");
 
     final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
 
     // It's a new service group - throws exception in case of an error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
-    try
-    {
-      aHook.createServiceGroup (aParticipantID);
-    }
-    catch (final RegistrationHookException ex)
-    {
-      throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML", ex);
-    }
+    if (bCreateInSML)
+      try
+      {
+        aHook.createServiceGroup (aParticipantID);
+      }
+      catch (final RegistrationHookException ex)
+      {
+        throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML", ex);
+      }
 
     try
     {
@@ -141,22 +143,29 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
       // An error occurred - remove from SML again
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("createSMPServiceGroup - failure in storing");
-      try
-      {
-        aHook.undoCreateServiceGroup (aParticipantID);
-      }
-      catch (final RegistrationHookException ex2)
-      {
-        LOGGER.error ("Failed to undoCreateServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex2);
-      }
+
+      if (bCreateInSML)
+        try
+        {
+          aHook.undoCreateServiceGroup (aParticipantID);
+        }
+        catch (final RegistrationHookException ex2)
+        {
+          LOGGER.error ("Failed to undoCreateServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex2);
+        }
       throw ex;
     }
 
-    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID (), sOwnerID, aParticipantID.getURIEncoded (), sExtension);
+    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
+                                      aSMPServiceGroup.getID (),
+                                      sOwnerID,
+                                      aParticipantID.getURIEncoded (),
+                                      sExtension,
+                                      Boolean.valueOf (bCreateInSML));
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup - success");
 
-    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aSMPServiceGroup));
+    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aSMPServiceGroup, bCreateInSML));
 
     return aSMPServiceGroup;
   }
@@ -202,7 +211,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
+      LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ", " + bDeleteInSML + ")");
 
     // Check first in memory, to avoid unnecessary deletion
     final ISMPServiceGroup aServiceGroup = getSMPServiceGroupOfID (aParticipantID);
@@ -256,11 +265,11 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
       throw new SMPNotFoundException ("No such service group '" + aParticipantID.getURIEncoded () + "'");
     }
 
-    AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aParticipantID);
+    AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aParticipantID, Boolean.valueOf (bDeleteInSML));
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup - success");
 
-    m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
+    m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID, bDeleteInSML));
 
     return EChange.CHANGED;
   }
@@ -270,7 +279,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
-    getCollection ().find ().forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
+    getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 
@@ -279,7 +288,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
   {
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
-    getCollection ().find (new Document (BSON_OWNER_ID, sOwnerID)).forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
+    getCollection ().find (new Document (BSON_OWNER_ID, sOwnerID)).forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 

@@ -60,7 +60,7 @@ public final class ISMPRedirectManagerFuncTest
     final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc#ext:1.0");
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null);
+    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null, true);
     assertNotNull (aSG);
     try
     {
@@ -87,7 +87,7 @@ public final class ISMPRedirectManagerFuncTest
       assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
 
       // Add second one
-      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
+      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null, true);
       assertNotNull (aSG2);
       try
       {

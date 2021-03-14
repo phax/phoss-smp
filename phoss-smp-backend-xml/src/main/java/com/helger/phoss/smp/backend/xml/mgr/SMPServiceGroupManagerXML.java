@@ -78,7 +78,8 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   @Nonnull
   public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
                                                 @Nonnull final IParticipantIdentifier aParticipantID,
-                                                @Nullable final String sExtension) throws SMPServerException
+                                                @Nullable final String sExtension,
+                                                final boolean bCreateInSML) throws SMPServerException
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
@@ -90,20 +91,23 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                     aParticipantID.getURIEncoded () +
                     ", " +
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    ", " +
+                    bCreateInSML +
                     ")");
 
     final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
 
     // It's a new service group - throws exception in case of an error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
-    try
-    {
-      aHook.createServiceGroup (aParticipantID);
-    }
-    catch (final RegistrationHookException ex)
-    {
-      throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML", ex);
-    }
+    if (bCreateInSML)
+      try
+      {
+        aHook.createServiceGroup (aParticipantID);
+      }
+      catch (final RegistrationHookException ex)
+      {
+        throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML", ex);
+      }
 
     m_aRWLock.writeLock ().lock ();
     try
@@ -115,14 +119,16 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       // An error occurred - remove from SML again
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("createSMPServiceGroup - failure in storing");
-      try
-      {
-        aHook.undoCreateServiceGroup (aParticipantID);
-      }
-      catch (final RegistrationHookException ex2)
-      {
-        LOGGER.error ("Failed to undoCreateServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex2);
-      }
+
+      if (bCreateInSML)
+        try
+        {
+          aHook.undoCreateServiceGroup (aParticipantID);
+        }
+        catch (final RegistrationHookException ex2)
+        {
+          LOGGER.error ("Failed to undoCreateServiceGroup (" + aParticipantID.getURIEncoded () + ")", ex2);
+        }
       throw ex;
     }
     finally
@@ -130,11 +136,16 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       m_aRWLock.writeLock ().unlock ();
     }
 
-    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID (), sOwnerID, aParticipantID.getURIEncoded (), sExtension);
+    AuditHelper.onAuditCreateSuccess (SMPServiceGroup.OT,
+                                      aSMPServiceGroup.getID (),
+                                      sOwnerID,
+                                      aParticipantID.getURIEncoded (),
+                                      sExtension,
+                                      Boolean.valueOf (bCreateInSML));
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createSMPServiceGroup - success");
 
-    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aSMPServiceGroup));
+    m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aSMPServiceGroup, bCreateInSML));
 
     return aSMPServiceGroup;
   }
@@ -202,7 +213,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ")");
+      LOGGER.debug ("deleteSMPServiceGroup (" + aParticipantID.getURIEncoded () + ", " + bDeleteInSML + ")");
 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     final SMPServiceGroup aSMPServiceGroup = getOfID (sServiceGroupID);
@@ -217,7 +228,6 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     // Delete in SML - throws exception in case of error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
     if (bDeleteInSML)
-    {
       try
       {
         aHook.deleteServiceGroup (aParticipantID);
@@ -226,7 +236,6 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       {
         throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", ex);
       }
-    }
 
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -310,12 +319,12 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       m_aRWLock.writeLock ().unlock ();
     }
 
-    AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID ());
+    AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aSMPServiceGroup.getID (), Boolean.valueOf (bDeleteInSML));
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPServiceGroup - success");
 
-    m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID));
+    m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID, bDeleteInSML));
 
     return EChange.CHANGED;
   }

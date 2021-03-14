@@ -77,7 +77,7 @@ public final class SMPServiceInformationManagerXMLTest
                                                                                        "0088:dummy");
     aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
-    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, true);
     assertNotNull (aSG);
     try
     {

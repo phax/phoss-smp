@@ -79,7 +79,7 @@ public final class ISMPServiceGroupManagerFuncTest
       assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner2ID, sExtension).isUnchanged ());
 
       // Register first and check state
-      ISMPServiceGroup aSG1 = aSGMgr.createSMPServiceGroup (sOwner1ID, aPI1, sExtension);
+      ISMPServiceGroup aSG1 = aSGMgr.createSMPServiceGroup (sOwner1ID, aPI1, sExtension, true);
       assertNotNull (aSG1);
       assertEquals (aPI1, aSG1.getParticipantIdentifier ());
       assertEquals (sSG1, aSG1.getID ());
@@ -109,7 +109,7 @@ public final class ISMPServiceGroupManagerFuncTest
       aSG1 = aSGMgr.getSMPServiceGroupOfID (aPI1);
       assertEquals (sOwner2ID, aSG1.getOwnerID ());
 
-      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sOwner2ID, aPI2, sExtension);
+      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sOwner2ID, aPI2, sExtension, true);
       assertNotNull (aSG2);
       assertEquals (aPI2, aSG2.getParticipantIdentifier ());
       assertEquals (sSG2, aSG2.getID ());

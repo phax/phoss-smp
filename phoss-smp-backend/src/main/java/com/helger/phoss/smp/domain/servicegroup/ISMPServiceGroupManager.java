@@ -51,6 +51,9 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @param sExtension
    *        The optional extension element that must be either a well-formed XML
    *        string (for Peppol SMP) or a valid JSON string (for BDXR SMP).
+   * @param bCreateInSML
+   *        <code>true</code> if the service group should also be created in the
+   *        SML, <code>false</code> if not.
    * @return The created service group object. Never <code>null</code>.
    * @throws SMPServerException
    *         In case of error
@@ -60,7 +63,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   @Nonnull
   ISMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty String sOwnerID,
                                           @Nonnull IParticipantIdentifier aParticipantIdentifier,
-                                          @Nullable String sExtension) throws SMPServerException;
+                                          @Nullable String sExtension,
+                                          boolean bCreateInSML) throws SMPServerException;
 
   /**
    * Update an existing service group. Note: the participant ID of a service

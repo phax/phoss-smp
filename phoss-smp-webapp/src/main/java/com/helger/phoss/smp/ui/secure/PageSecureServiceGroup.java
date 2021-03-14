@@ -452,9 +452,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                              .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
-                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ().getValue () : null))
-                                                                                                                                            .setPlaceholder ("Identifier value")
-                                                                                                                                            .setReadOnly (bEdit));
+                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ().getValue ()
+                                                                           : null)).setPlaceholder ("Identifier value")
+                                                                                   .setReadOnly (bEdit));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
@@ -556,7 +556,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         Exception aCaughtEx = null;
         try
         {
-          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension);
+          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension, true);
         }
         catch (final Exception ex)
         {

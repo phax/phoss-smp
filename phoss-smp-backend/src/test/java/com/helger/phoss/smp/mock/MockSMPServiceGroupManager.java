@@ -39,7 +39,8 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
 
   public ISMPServiceGroup createSMPServiceGroup (final String sOwnerID,
                                                  final IParticipantIdentifier aParticipantID,
-                                                 final String sExtension)
+                                                 final String sExtension,
+                                                 final boolean bCreateInSML)
   {
     throw new UnsupportedOperationException ();
   }

@@ -326,7 +326,8 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
           {
             aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
                                                                        aImportServiceGroup.getParticipantIdentifier (),
-                                                                       aImportServiceGroup.getExtensionsAsString ());
+                                                                       aImportServiceGroup.getExtensionsAsString (),
+                                                                       true);
             aLogger.success ("Successfully created service group " + aImportServiceGroup.getID ());
           }
           catch (final Exception ex)
