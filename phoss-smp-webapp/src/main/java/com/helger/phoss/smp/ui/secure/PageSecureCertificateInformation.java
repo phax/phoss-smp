@@ -279,7 +279,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
               final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert, aNowLDT, aDisplayLocale);
-              aOL.addItem (aCertDetails.setResponsive (true));
+              aOL.addItem (aCertDetails);
             }
             else
               aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " + ClassHelper.getClassName (aCert));
@@ -318,7 +318,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
               final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert, aNowLDT, aDisplayLocale);
-              aOL.addItem (aCertDetails.setResponsive (true));
+              aOL.addItem (aCertDetails);
             }
             else
               aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " + ClassHelper.getClassName (aCert));
@@ -399,7 +399,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               {
                 final X509Certificate aX509Cert = (X509Certificate) aCert;
                 final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert, aNowLDT, aDisplayLocale);
-                aUL.addItem (aCertDetails.setResponsive (true));
+                aUL.addItem (aCertDetails);
               }
               else
                 aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " + ClassHelper.getClassName (aCert));
@@ -438,7 +438,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               {
                 final X509Certificate aX509Cert = (X509Certificate) aCert;
                 final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert, aNowLDT, aDisplayLocale);
-                aOL.addItem (aCertDetails.setResponsive (true));
+                aOL.addItem (aCertDetails);
               }
               else
                 aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " + ClassHelper.getClassName (aCert));
