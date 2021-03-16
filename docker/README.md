@@ -189,7 +189,7 @@ My suggestion is to create a child dockerfile like `Example-Dockerfile-with-conf
 It sets the system properties to the SMP configuration files in the virtual path `/config`.
 See https://docs.docker.com/storage/volumes/ for the Docker configuration on volumes and mount points.
 
-The main change is the `-v` parameter that mounts a local directory into the running image. `/host-directory/config` in the example down below must be changed to an existing directory containing the files `smp-server.properties`, `webapp.properties` and `pd-client.properties` (as named in the example dockerfile).
+The main change is the `-v` parameter that mounts a local directory into the running image. `/host-directory/config` in the example down below must be changed to an existing directory containing the files `smp-server.properties`, `webapp.properties` and `application.properties` (since v5.3.x) (or `pd-client.properties` before v5.3.x) (as named in the example dockerfile).
 
 ```
 docker build --pull -t phoss-smp-with-config -f Example-Dockerfile-with-configuration .
@@ -210,4 +210,14 @@ On my Windows machine I use the following command to run the whole SMP on port 8
 
 ```
 docker run -d --name phoss-smp-with-config -p 8888:8080 -v c:\dev\git\phoss-smp\docker\example-config-dir:/config -v C:\dev\git\phoss-smp\docker\persistent\:/home/git/conf phoss-smp-with-config
+```
+
+### Usage of environment variables
+
+Alternatively the full paths of the configuration properties can also be provided with environment variables:
+
+```
+-e "SMP_SERVER_CONFIG=/config/smp-server.properties"
+-e "SMP_WEBAPP_CONFIG=/config/webapp.properties"
+-e "CONFIG_FILE=/config/application.properties"
 ```
