@@ -70,8 +70,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPServiceInformationManager m_aServiceInformationMgr;
   private ISMPBusinessCardManager m_aBusinessCardMgr;
   private ISMPParticipantMigrationManager m_aParticipantMigrationMgr;
-  private ETriState m_eBackendConnectionEstablished = ETriState.UNDEFINED;
-  private Consumer <ETriState> m_aBackendConnectionStatusChangeCallback;
+  private ETriState m_eBackendConnectionState = ETriState.UNDEFINED;
+  private Consumer <ETriState> m_aBackendConnectionStateChangeCallback;
 
   /**
    * Set the manager provider to be used. This must be called exactly once
@@ -184,8 +184,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         // fall through. Certificate stays invalid, no SML access possible.
       }
 
-      m_eBackendConnectionEstablished = s_aManagerProvider.getBackendConnectionEstablishedDefaultState ();
-      if (m_eBackendConnectionEstablished == null)
+      m_eBackendConnectionState = s_aManagerProvider.getBackendConnectionEstablishedDefaultState ();
+      if (m_eBackendConnectionState == null)
         throw new IllegalStateException ("Failed to get default backend connection state!");
 
       m_aSMPURLProvider = s_aManagerProvider.createSMPURLProvider ();
@@ -321,26 +321,35 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   }
 
   @Nonnull
-  public ETriState getBackendConnectionEstablished ()
+  public ETriState getBackendConnectionState ()
   {
-    return m_aRWLock.readLockedGet ( () -> m_eBackendConnectionEstablished);
+    return m_aRWLock.readLockedGet ( () -> m_eBackendConnectionState);
   }
 
-  public void setBackendConnectionEstablished (@Nonnull final ETriState eConnectionEstablished, final boolean bTriggerCallback)
+  public void setBackendConnectionState (@Nonnull final ETriState eConnectionEstablished, final boolean bTriggerCallback)
   {
     ValueEnforcer.notNull (eConnectionEstablished, "ConnectionEstablished");
+
     m_aRWLock.writeLocked ( () -> {
-      m_eBackendConnectionEstablished = eConnectionEstablished;
+      m_eBackendConnectionState = eConnectionEstablished;
 
       // Avoid endless loop
-      if (bTriggerCallback && m_aBackendConnectionStatusChangeCallback != null)
-        m_aBackendConnectionStatusChangeCallback.accept (eConnectionEstablished);
+      if (bTriggerCallback && m_aBackendConnectionStateChangeCallback != null)
+        m_aBackendConnectionStateChangeCallback.accept (eConnectionEstablished);
     });
   }
 
-  public void setBackendConnectionStatusChangeCallback (@Nullable final Consumer <ETriState> aCB)
+  /**
+   * Set the SMP callback that should be invoked if the backend connection
+   * established state changed. This needs to be a custom callback for
+   * dependency reasons and is only used by the SQL backend.
+   *
+   * @param aCB
+   *        The callback to invoke. May be <code>null</code>.
+   */
+  public void setBackendConnectionStateChangeCallback (@Nullable final Consumer <ETriState> aCB)
   {
-    m_aRWLock.writeLockedGet ( () -> m_aBackendConnectionStatusChangeCallback = aCB);
+    m_aRWLock.writeLockedGet ( () -> m_aBackendConnectionStateChangeCallback = aCB);
   }
 
   /**
