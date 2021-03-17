@@ -126,6 +126,7 @@
         </excludes>
       </resource>
     </resources>
+    
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
