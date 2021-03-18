@@ -43,7 +43,7 @@ public final class AjaxExecutorSecureBackendConnectionReset extends AbstractSMPA
     LOGGER.info ("The Backend Connection Established status is reset to undefined");
 
     // Trigger callback to communicate back to DBExecutor
-    SMPMetaManager.getInstance ().setBackendConnectionEstablished (ETriState.UNDEFINED, true);
+    SMPMetaManager.getInstance ().setBackendConnectionState (ETriState.UNDEFINED, true);
 
     // Build the XML response
     aAjaxResponse.createSeeOther (aLEC.getSelfHref ());

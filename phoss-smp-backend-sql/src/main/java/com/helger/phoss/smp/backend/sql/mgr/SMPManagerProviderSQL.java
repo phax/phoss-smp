@@ -83,11 +83,11 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     // Register this here, so that the SMPMetaManager is available
     DBExecutor.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
       // false: don't trigger callback, because the source is DBExecutor
-      SMPMetaManager.getInstance ().setBackendConnectionEstablished (eNew, false);
+      SMPMetaManager.getInstance ().setBackendConnectionState (eNew, false);
     });
 
     // Allow communicating in the other direction as well
-    SMPMetaManager.getInstance ().setBackendConnectionStatusChangeCallback (eNew -> DBExecutor.resetConnectionEstablished ());
+    SMPMetaManager.getInstance ().setBackendConnectionStateChangeCallback (eNew -> DBExecutor.resetConnectionEstablished ());
   }
 
   @Nonnull

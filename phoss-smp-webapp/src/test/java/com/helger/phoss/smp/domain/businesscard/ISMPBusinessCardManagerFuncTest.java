@@ -51,7 +51,7 @@ public final class ISMPBusinessCardManagerFuncTest
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
 
     final String sUserID = CSecurity.USER_ADMINISTRATOR_ID;
-    if (SMPMetaManager.getInstance ().getBackendConnectionEstablished ().isFalse ())
+    if (SMPMetaManager.getInstance ().getBackendConnectionState ().isFalse ())
     {
       // Failed to get DB connection. E.g. MySQL down or misconfigured.
       return;

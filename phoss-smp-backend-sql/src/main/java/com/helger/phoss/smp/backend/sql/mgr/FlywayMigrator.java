@@ -60,6 +60,10 @@ final class FlywayMigrator
                                                                                  aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD)))
                                               // Required for creating DB table
                                               .baselineOnMigrate (true)
+                                              // Disable validation, because
+                                              // DDL comments are also taken
+                                              // into consideration
+                                              .validateOnMigrate (false)
                                               // Version 1 is the baseline
                                               .baselineVersion ("1")
                                               .baselineDescription ("SMP 5.2.x database layout, MySQL only")

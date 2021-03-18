@@ -112,7 +112,7 @@ public final class SMPRendererSecure
 
     final BootstrapSuccessBox aBox = new BootstrapSuccessBox ().addClass (CBootstrapCSS.MT_2);
 
-    if (SMPMetaManager.getInstance ().getBackendConnectionEstablished ().isFalse ())
+    if (SMPMetaManager.getInstance ().getBackendConnectionState ().isFalse ())
     {
       aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                  .addChild (" No database connection: ")
