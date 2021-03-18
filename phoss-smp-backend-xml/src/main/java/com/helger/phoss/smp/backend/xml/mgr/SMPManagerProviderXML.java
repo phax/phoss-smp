@@ -26,7 +26,6 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
-import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigrationManagerXML;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;

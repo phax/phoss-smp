@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -43,8 +44,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
-  public ISMPParticipantMigration createOutboundParticipantMigration (final IParticipantIdentifier aParticipantID,
-                                                                      final String sMigrationKey)
+  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
+                                                                      @Nonnull @Nonempty final String sMigrationKey)
   {
     // TODO
     throw new UnsupportedOperationException ();
@@ -57,7 +58,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     throw new UnsupportedOperationException ();
   }
 
-  public ISMPParticipantMigration getParticipantMigrationOfID (final String sID)
+  public ISMPParticipantMigration getParticipantMigrationOfID (@Nullable final String sID)
   {
     // TODO
     return null;
@@ -75,13 +76,13 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return null;
   }
 
-  public boolean containsOutboundMigrationInProgress (final IParticipantIdentifier aParticipantID)
+  public boolean containsOutboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
   {
     // TODO
     return false;
   }
 
-  public boolean containsInboundMigrationInProgress (final IParticipantIdentifier aParticipantID)
+  public boolean containsInboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
   {
     // TODO
     return false;
