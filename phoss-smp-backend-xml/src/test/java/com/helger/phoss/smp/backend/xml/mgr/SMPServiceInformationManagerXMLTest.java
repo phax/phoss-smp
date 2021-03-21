@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,8 +81,8 @@ public final class SMPServiceInformationManagerXMLTest
     assertNotNull (aSG);
     try
     {
-      final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
-      final LocalDateTime aEndDT = aStartDT.plusYears (1);
+      final OffsetDateTime aStartDT = PDTFactory.getCurrentOffsetDateTime ();
+      final OffsetDateTime aEndDT = aStartDT.plusYears (1);
       final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                                         "testproc");
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
@@ -109,7 +109,9 @@ public final class SMPServiceInformationManagerXMLTest
                                           .isSuccess ());
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
+        assertEquals (1,
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                      .getProcessCount ());
         assertEquals (1,
                       CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
@@ -119,7 +121,8 @@ public final class SMPServiceInformationManagerXMLTest
 
       {
         // Replace endpoint URL with equal transport profile -> replace
-        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG, aDocTypeID);
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+                                                                                                                         aDocTypeID);
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
         assertNotNull (aProcess);
@@ -137,7 +140,9 @@ public final class SMPServiceInformationManagerXMLTest
         assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (aSI).isSuccess ());
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
+        assertEquals (1,
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                      .getProcessCount ());
         assertEquals (1,
                       CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
@@ -155,7 +160,8 @@ public final class SMPServiceInformationManagerXMLTest
       {
         // Add endpoint with different transport profile -> added to existing
         // process
-        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG, aDocTypeID);
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+                                                                                                                         aDocTypeID);
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
         assertNotNull (aProcess);
@@ -173,7 +179,9 @@ public final class SMPServiceInformationManagerXMLTest
         assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (aSI).isSuccess ());
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (1, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
+        assertEquals (1,
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                      .getProcessCount ());
         assertEquals (2,
                       CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()
@@ -184,7 +192,8 @@ public final class SMPServiceInformationManagerXMLTest
       {
         // Add endpoint with different process - add to existing
         // serviceGroup+docType part
-        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG, aDocTypeID);
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+                                                                                                                         aDocTypeID);
         assertNotNull (aSI);
         final SMPEndpoint aEP = new SMPEndpoint ("tp",
                                                  "http://localhost/as2",
@@ -203,7 +212,9 @@ public final class SMPServiceInformationManagerXMLTest
         assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (aSI).isSuccess ());
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
-        assertEquals (2, CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ()).getProcessCount ());
+        assertEquals (2,
+                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                      .getProcessCount ());
         assertEquals (2,
                       CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
                                       .getAllProcesses ()

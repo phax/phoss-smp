@@ -22,12 +22,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import com.helger.collection.multimap.MultiHashMapArrayListBased;
-import com.helger.collection.multimap.MultiHashMapHashSetBased;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashMap;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.CommonsTreeSet;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.collection.impl.ICommonsSortedSet;
 import com.helger.commons.compare.ESortOrder;
@@ -100,7 +102,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
                                   final String sOldURL,
                                   final String sNewURL)
     {
-      super ("BulkChangeEndpointURL", new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"));
+      super ("BulkChangeEndpointURL",
+             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"));
       m_aAllSIs = aAllSIs;
       m_aServiceGroup = aServiceGroup;
       m_sOldURL = sOldURL;
@@ -203,7 +206,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     {
       aNodeList.addChild (warn ("No service group is present! At least one service group must be present to change endpoints."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
-                                                .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC, CMenuSecure.MENU_SERVICE_GROUPS))
+                                                .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC,
+                                                                                                  CMenuSecure.MENU_SERVICE_GROUPS))
                                                 .setIcon (EDefaultIcon.YES));
       return EValidity.INVALID;
     }
@@ -220,8 +224,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     boolean bShowList = true;
 
-    final MultiHashMapArrayListBased <String, ISMPEndpoint> aEndpointsGroupedPerURL = new MultiHashMapArrayListBased <> ();
-    final MultiHashMapHashSetBased <String, ISMPServiceGroup> aServiceGroupsGroupedPerURL = new MultiHashMapHashSetBased <> ();
+    final ICommonsMap <String, ICommonsList <ISMPEndpoint>> aEndpointsGroupedPerURL = new CommonsHashMap <> ();
+    final ICommonsMap <String, ICommonsSet <ISMPServiceGroup>> aServiceGroupsGroupedPerURL = new CommonsHashMap <> ();
     final ICommonsList <ISMPServiceInformation> aAllSIs = aServiceInfoMgr.getAllSMPServiceInformation ();
     int nTotalEndpointCount = 0;
     int nTotalEndpointCountWithURL = 0;
@@ -234,8 +238,11 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
           ++nTotalEndpointCount;
           if (aEndpoint.hasEndpointReference ())
           {
-            aEndpointsGroupedPerURL.putSingle (aEndpoint.getEndpointReference (), aEndpoint);
-            aServiceGroupsGroupedPerURL.putSingle (aEndpoint.getEndpointReference (), aSG);
+            aEndpointsGroupedPerURL.computeIfAbsent (aEndpoint.getEndpointReference (), k -> new CommonsArrayList <> ())
+                                   .add (aEndpoint);
+            aServiceGroupsGroupedPerURL.computeIfAbsent (aEndpoint.getEndpointReference (),
+                                                         k -> new CommonsHashSet <> ())
+                                       .add (aSG);
             ++nTotalEndpointCountWithURL;
           }
         }
@@ -294,7 +301,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         if (aFormErrors.isEmpty ())
         {
           PhotonWorkerPool.getInstance ()
-                          .run ("BulkChangeEndpointURL", new BulkChangeEndpointURL (aAllSIs, aServiceGroup, sOldURL, sNewURL));
+                          .run ("BulkChangeEndpointURL",
+                                new BulkChangeEndpointURL (aAllSIs, aServiceGroup, sOldURL, sNewURL));
 
           aWPEC.postRedirectGetInternal (success ("The bulk change of the endpoint URL from '" +
                                                   sOldURL +
@@ -363,7 +371,9 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     {
       aNodeList.addChild (info ().addChildren (div ("This page lets you change the URLs of multiple endpoints at once. This is e.g. helpful when the underlying server got a new URL."),
                                                div ("Currently " +
-                                                    (nTotalEndpointCount == 1 ? "1 endpoint is" : nTotalEndpointCount + " endpoints are") +
+                                                    (nTotalEndpointCount == 1 ? "1 endpoint is"
+                                                                              : nTotalEndpointCount +
+                                                                                " endpoints are") +
                                                     " registered" +
                                                     (nTotalEndpointCountWithURL < nTotalEndpointCount ? " of which " +
                                                                                                         nTotalEndpointCountWithURL +
@@ -372,7 +382,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
                                                     ".")));
 
       final HCTable aTable = new HCTable (new DTCol ("Endpoint URL").setInitialSorting (ESortOrder.ASCENDING),
-                                          new DTCol ("Service Group Count").setDisplayType (EDTColType.INT, aDisplayLocale),
+                                          new DTCol ("Service Group Count").setDisplayType (EDTColType.INT,
+                                                                                            aDisplayLocale),
                                           new DTCol ("Endpoint Count").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
       aEndpointsGroupedPerURL.forEach ( (sURL, aEndpoints) -> {
@@ -384,8 +395,11 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
         aRow.addCell (Integer.toString (aEndpoints.size ()));
 
-        final ISimpleURL aEditURL = aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT).add (FIELD_OLD_URL, sURL);
-        aRow.addCell (new HCA (aEditURL).setTitle ("Change all endpoints pointing to " + sURL).addChild (EDefaultIcon.EDIT.getAsNode ()));
+        final ISimpleURL aEditURL = aWPEC.getSelfHref ()
+                                         .add (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT)
+                                         .add (FIELD_OLD_URL, sURL);
+        aRow.addCell (new HCA (aEditURL).setTitle ("Change all endpoints pointing to " + sURL)
+                                        .addChild (EDefaultIcon.EDIT.getAsNode ()));
       });
 
       final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);

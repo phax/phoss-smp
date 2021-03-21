@@ -20,8 +20,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -57,8 +57,8 @@ public abstract class AbstractJDBCEnabledManager
   }
 
   @Nullable
-  public static Timestamp toTimestamp (@Nullable final LocalDateTime aLDT)
+  public static Timestamp toTimestamp (@Nullable final OffsetDateTime aODT)
   {
-    return aLDT == null ? null : Timestamp.valueOf (aLDT);
+    return aODT == null ? null : Timestamp.from (aODT.toInstant ());
   }
 }

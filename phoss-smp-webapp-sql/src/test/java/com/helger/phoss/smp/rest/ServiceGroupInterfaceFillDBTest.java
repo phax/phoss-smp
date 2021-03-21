@@ -68,8 +68,8 @@ public final class ServiceGroupInterfaceFillDBTest extends AbstractSMPWebAppSQLT
     LOGGER.info ("Created " +
                  nCount +
                  " ServiceGroups in " +
-                 aSW.getSeconds () +
-                 " seconds (= " +
+                 aSW.getDuration () +
+                 " (= " +
                  (aSW.getMillis () / nCount) +
                  " ms/entry)");
   }

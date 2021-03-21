@@ -18,11 +18,12 @@ package com.helger.phoss.smp.ui.secure;
 
 import javax.annotation.Nonnull;
 
-import com.helger.collection.multimap.IMultiMapListBased;
-import com.helger.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.attr.StringMap;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCLI;
@@ -78,8 +79,9 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
     aNodeList.addChild (aToolbar);
 
     // Create list of service groups
-    final IMultiMapListBased <ISMPServiceGroup, ISMPServiceInformation> aMap = new MultiHashMapArrayListBased <> ();
-    aServiceInfoMgr.getAllSMPServiceInformation ().forEach (x -> aMap.putSingle (x.getServiceGroup (), x));
+    final ICommonsMap <ISMPServiceGroup, ICommonsList <ISMPServiceInformation>> aMap = new CommonsHashMap <> ();
+    aServiceInfoMgr.getAllSMPServiceInformation ()
+                   .forEach (x -> aMap.computeIfAbsent (x.getServiceGroup (), k -> new CommonsArrayList <> ()).add (x));
 
     final HCUL aULSG = new HCUL ();
     final ICommonsList <ISMPServiceGroup> aServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ()
@@ -101,11 +103,15 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
           final HCUL aULP = new HCUL ();
           final IDocumentTypeIdentifier aDocTypeID = aServiceInfo.getDocumentTypeIdentifier ();
 
-          final ICommonsList <ISMPProcess> aProcesses = aServiceInfo.getAllProcesses ().getSortedInline (ISMPProcess.comparator ());
+          final ICommonsList <ISMPProcess> aProcesses = aServiceInfo.getAllProcesses ()
+                                                                    .getSortedInline (ISMPProcess.comparator ());
           for (final ISMPProcess aProcess : aProcesses)
           {
-            final BootstrapTable aEPTable = new BootstrapTable (HCCol.perc (40), HCCol.perc (40), HCCol.perc (20)).setBordered (true);
-            final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ().getSortedInline (ISMPEndpoint.comparator ());
+            final BootstrapTable aEPTable = new BootstrapTable (HCCol.perc (40),
+                                                                HCCol.perc (40),
+                                                                HCCol.perc (20)).setBordered (true);
+            final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ()
+                                                                   .getSortedInline (ISMPEndpoint.comparator ());
             for (final ISMPEndpoint aEndpoint : aEndpoints)
             {
               final StringMap aParams = createParamMap (aServiceInfo, aProcess, aEndpoint);
@@ -114,7 +120,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
 
               final String sTransportProfile = aEndpoint.getTransportProfile ();
               final ISimpleURL aViewURL = createViewURL (aWPEC, aServiceInfo, aParams);
-              aBodyRow.addCell (new HCA (aViewURL).addChild (NiceNameUI.getTransportProfile (sTransportProfile, false)));
+              aBodyRow.addCell (new HCA (aViewURL).addChild (NiceNameUI.getTransportProfile (sTransportProfile,
+                                                                                             false)));
 
               aBodyRow.addCell (aEndpoint.getEndpointReference ());
 
@@ -124,13 +131,17 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
               final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
                                                                                     Rest2Filter.PATH_SERVICES +
                                                                                     aDocTypeID.getURIPercentEncoded ());
-              aBodyRow.addAndReturnCell (new HCA (aViewURL).setTitle ("View endpoint").addChild (EDefaultIcon.MAGNIFIER.getAsNode ()),
+              aBodyRow.addAndReturnCell (new HCA (aViewURL).setTitle ("View endpoint")
+                                                           .addChild (EDefaultIcon.MAGNIFIER.getAsNode ()),
                                          new HCTextNode (" "),
-                                         new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),
+                                         new HCA (aEditURL).setTitle ("Edit endpoint")
+                                                           .addChild (EDefaultIcon.EDIT.getAsNode ()),
                                          new HCTextNode (" "),
-                                         new HCA (aCopyURL).setTitle ("Copy endpoint").addChild (EDefaultIcon.COPY.getAsNode ()),
+                                         new HCA (aCopyURL).setTitle ("Copy endpoint")
+                                                           .addChild (EDefaultIcon.COPY.getAsNode ()),
                                          new HCTextNode (" "),
-                                         new HCA (aDeleteURL).setTitle ("Delete endpoint").addChild (EDefaultIcon.DELETE.getAsNode ()),
+                                         new HCA (aDeleteURL).setTitle ("Delete endpoint")
+                                                             .addChild (EDefaultIcon.DELETE.getAsNode ()),
                                          new HCTextNode (" "),
                                          new HCA (aPreviewURL).setTitle ("Perform SMP query on endpoint")
                                                               .setTargetBlank ()
@@ -147,7 +158,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
               aDiv.addChild (" ")
                   .addChild (new HCA (aWPEC.getSelfHref ()
                                            .addAll (createParamMap (aServiceInfo, aProcess, (ISMPEndpoint) null))
-                                           .add (CPageParam.PARAM_ACTION, ACTION_DELETE_PROCESS)).setTitle ("Delete process")
+                                           .add (CPageParam.PARAM_ACTION, ACTION_DELETE_PROCESS))
+                                                                                                 .setTitle ("Delete process")
                                                                                                  .addChild (EDefaultIcon.DELETE.getAsNode ()));
             }
             else
@@ -156,7 +168,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
 
           // Show document types + children
           final HCLI aLI = aULDT.addItem ();
-          final HCDiv aDiv = div ().addChild (NiceNameUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier (), false))
+          final HCDiv aDiv = div ().addChild (NiceNameUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier (),
+                                                                            false))
                                    .addChild (" ")
                                    .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
                                                                                               Rest2Filter.PATH_SERVICES +
@@ -168,8 +181,11 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
           {
             aDiv.addChild (" ")
                 .addChild (new HCA (aWPEC.getSelfHref ()
-                                         .addAll (createParamMap (aServiceInfo, (ISMPProcess) null, (ISMPEndpoint) null))
-                                         .add (CPageParam.PARAM_ACTION, ACTION_DELETE_DOCUMENT_TYPE)).setTitle ("Delete document type")
+                                         .addAll (createParamMap (aServiceInfo,
+                                                                  (ISMPProcess) null,
+                                                                  (ISMPEndpoint) null))
+                                         .add (CPageParam.PARAM_ACTION, ACTION_DELETE_DOCUMENT_TYPE))
+                                                                                                     .setTitle ("Delete document type")
                                                                                                      .addChild (EDefaultIcon.DELETE.getAsNode ()));
           }
           else

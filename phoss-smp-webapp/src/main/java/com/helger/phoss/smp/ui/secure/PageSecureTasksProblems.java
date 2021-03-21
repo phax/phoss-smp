@@ -23,7 +23,7 @@ import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -137,8 +137,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
   private void _checkPrivateKey (@Nonnull final WebPageExecutionContext aWPEC,
                                  @Nonnull final HCOL aOL,
-                                 @Nonnull final LocalDateTime aNowDT,
-                                 @Nonnull final LocalDateTime aNowPlusDT,
+                                 @Nonnull final OffsetDateTime aNowDT,
+                                 @Nonnull final OffsetDateTime aNowPlusDT,
                                  @Nonnull final KeyStore.PrivateKeyEntry aKeyEntry)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -149,16 +149,18 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       {
         final X509Certificate aX509Cert = (X509Certificate) aCert;
 
-        final String sLogPrefix = "The provided certificate with subject '" + aX509Cert.getSubjectX500Principal ().getName () + "' ";
+        final String sLogPrefix = "The provided certificate with subject '" +
+                                  aX509Cert.getSubjectX500Principal ().getName () +
+                                  "' ";
 
-        final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
+        final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
         if (aNowDT.isBefore (aNotBefore))
         {
           aOL.addItem (_createError (sLogPrefix + " is not yet valid."),
                        div ("It will be valid from " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
         }
 
-        final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
+        final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
         if (aNowDT.isAfter (aNotAfter))
         {
           aOL.addItem (_createError (sLogPrefix + " is already expired."),
@@ -180,13 +182,14 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
   private void _checkKeyStore (@Nonnull final WebPageExecutionContext aWPEC,
                                @Nonnull final HCOL aOL,
-                               @Nonnull final LocalDateTime aNowDT,
-                               @Nonnull final LocalDateTime aNowPlusDT)
+                               @Nonnull final OffsetDateTime aNowDT,
+                               @Nonnull final OffsetDateTime aNowPlusDT)
   {
     if (!SMPKeyManager.isKeyStoreValid ())
     {
       // Loading failed - wrong path or wrong password or so
-      aOL.addItem (_createError ("Problem with the certificate configuration"), div (SMPKeyManager.getInitializationError ()));
+      aOL.addItem (_createError ("Problem with the certificate configuration"),
+                   div (SMPKeyManager.getInitializationError ()));
     }
     else
     {
@@ -205,8 +208,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
   private void _iterateTrustStore (@Nonnull final WebPageExecutionContext aWPEC,
                                    @Nonnull final HCOL aOL,
-                                   @Nonnull final LocalDateTime aNowDT,
-                                   @Nonnull final LocalDateTime aNowPlusDT,
+                                   @Nonnull final OffsetDateTime aNowDT,
+                                   @Nonnull final OffsetDateTime aNowPlusDT,
                                    @Nonnull final KeyStore aTrustStore)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -222,17 +225,20 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
         {
           final X509Certificate aX509Cert = (X509Certificate) aCert;
 
-          final String sLogPrefix = "The provided certificate with subject '" + aX509Cert.getSubjectX500Principal ().getName () + "' ";
+          final String sLogPrefix = "The provided certificate with subject '" +
+                                    aX509Cert.getSubjectX500Principal ().getName () +
+                                    "' ";
 
-          final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
+          final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
           if (aNowDT.isBefore (aNotBefore))
           {
             aTrustStoreOL.addItem (_createError (sLogPrefix + " is not yet valid."),
-                                   div ("It will be valid from " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+                                   div ("It will be valid from " +
+                                        PDTToString.getAsString (aNotBefore, aDisplayLocale)));
             bHasError = true;
           }
 
-          final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
+          final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
           if (aNowDT.isAfter (aNotAfter))
           {
             aTrustStoreOL.addItem (_createError (sLogPrefix + " is already expired."),
@@ -242,7 +248,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
           else
             if (aNowPlusDT.isAfter (aNotAfter))
               aTrustStoreOL.addItem (_createWarning (sLogPrefix + " will expire soon."),
-                                     div ("It is only valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+                                     div ("It is only valid until " +
+                                          PDTToString.getAsString (aNotAfter, aDisplayLocale)));
         }
         else
           aTrustStoreOL.addItem (_createWarning ("The certificate is not an X.509 certificate! It is internally a " +
@@ -251,25 +258,28 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     }
     catch (final GeneralSecurityException ex)
     {
-      aTrustStoreOL.addItem (_createError ("Error iterating trust store."), div (SMPCommonUI.getTechnicalDetailsUI (ex)));
+      aTrustStoreOL.addItem (_createError ("Error iterating trust store."),
+                             div (SMPCommonUI.getTechnicalDetailsUI (ex)));
       bHasError = true;
     }
 
     if (aTrustStoreOL.hasChildren ())
-      aOL.addItem (bHasError ? _createError ("Trust store issues") : _createWarning ("Trust store issues"), aTrustStoreOL);
+      aOL.addItem (bHasError ? _createError ("Trust store issues") : _createWarning ("Trust store issues"),
+                   aTrustStoreOL);
   }
 
   private void _checkTrustStore (@Nonnull final WebPageExecutionContext aWPEC,
                                  @Nonnull final HCOL aOL,
-                                 @Nonnull final LocalDateTime aNowDT,
-                                 @Nonnull final LocalDateTime aNowPlusDT)
+                                 @Nonnull final OffsetDateTime aNowDT,
+                                 @Nonnull final OffsetDateTime aNowPlusDT)
   {
     // check truststore configuration
     if (!SMPTrustManager.isTrustStoreValid ())
     {
       // Ignore error if no trust store is configured
       if (SMPTrustManager.getInitializationErrorCode () != EKeyStoreLoadError.KEYSTORE_NO_PATH)
-        aOL.addItem (_createWarning ("Problem with the truststore configuration"), div (SMPTrustManager.getInitializationError ()));
+        aOL.addItem (_createWarning ("Problem with the truststore configuration"),
+                     div (SMPTrustManager.getInitializationError ()));
     }
     else
     {
@@ -324,8 +334,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
   private void _checkDirectoryConfig (@Nonnull final WebPageExecutionContext aWPEC,
                                       @Nonnull final HCOL aOL,
-                                      @Nonnull final LocalDateTime aNowDT,
-                                      @Nonnull final LocalDateTime aNowPlusDT)
+                                      @Nonnull final OffsetDateTime aNowDT,
+                                      @Nonnull final OffsetDateTime aNowPlusDT)
   {
     final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
@@ -388,8 +398,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    final LocalDateTime aNowDT = PDTFactory.getCurrentLocalDateTime ();
-    final LocalDateTime aNowPlusDT = aNowDT.plusMonths (3);
+    final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
+    final OffsetDateTime aNowPlusDT = aNowDT.plusMonths (3);
 
     aNodeList.addChild (info ("This page tries to identify upcoming tasks and potential problems in the SMP configuration. It is meant to highlight immediate and upcoming action items as well as potential misconfiguration."));
 
@@ -397,9 +407,12 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
     // Check for default password
     if (PhotonSecurityManager.getUserMgr ()
-                             .areUserIDAndPasswordValid (CSecurity.USER_ADMINISTRATOR_ID, CSecurity.USER_ADMINISTRATOR_PASSWORD))
+                             .areUserIDAndPasswordValid (CSecurity.USER_ADMINISTRATOR_ID,
+                                                         CSecurity.USER_ADMINISTRATOR_PASSWORD))
     {
-      aOL.addItem (_createError ("Please change the password of the default user " + CSecurity.USER_ADMINISTRATOR_EMAIL + "!"),
+      aOL.addItem (_createError ("Please change the password of the default user " +
+                                 CSecurity.USER_ADMINISTRATOR_EMAIL +
+                                 "!"),
                    div ("This is a severe security risk"));
     }
 
@@ -427,7 +440,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       else
       {
         // For all service groups
-        for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (aServiceGroups, ISMPServiceGroup.comparator ()))
+        for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (aServiceGroups,
+                                                                                ISMPServiceGroup.comparator ()))
         {
           final HCUL aULPerSG = new HCUL ();
           final ICommonsList <ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
@@ -461,7 +475,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
                     if (aEndpoint.getServiceActivationDateTime ().isAfter (aNowDT))
                       aULPerEndpoint.addItem (_createWarning ("The endpoint is not yet active."),
                                               div ("It will be active from " +
-                                                   PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (), aDisplayLocale) +
+                                                   PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (),
+                                                                            aDisplayLocale) +
                                                    "."));
                   }
 
@@ -470,13 +485,15 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
                     if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowDT))
                       aULPerEndpoint.addItem (_createError ("The endpoint is no longer active."),
                                               div ("It was valid until " +
-                                                   PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (), aDisplayLocale) +
+                                                   PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
+                                                                            aDisplayLocale) +
                                                    "."));
                     else
                       if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowPlusDT))
                         aULPerEndpoint.addItem (_createWarning ("The endpoint will be inactive soon."),
                                                 div ("It is only valid until " +
-                                                     PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (), aDisplayLocale) +
+                                                     PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
+                                                                              aDisplayLocale) +
                                                      "."));
                   }
 
@@ -493,15 +510,19 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
                     aULPerEndpoint.addItem (_createError ("The X.509 certificate configured at the endpoint is invalid and could not be interpreted as a certificate."));
                   else
                   {
-                    final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
+                    final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
                     if (aNowDT.isBefore (aNotBefore))
                       aULPerEndpoint.addItem (_createError ("The endpoint certificate is not yet active."),
-                                              div ("It will be valid from " + PDTToString.getAsString (aNotBefore, aDisplayLocale) + "."));
+                                              div ("It will be valid from " +
+                                                   PDTToString.getAsString (aNotBefore, aDisplayLocale) +
+                                                   "."));
 
-                    final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
+                    final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
                     if (aNowDT.isAfter (aNotAfter))
                       aULPerEndpoint.addItem (_createError ("The endpoint certificate is already expired."),
-                                              div ("It was valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale) + "."));
+                                              div ("It was valid until " +
+                                                   PDTToString.getAsString (aNotAfter, aDisplayLocale) +
+                                                   "."));
                     else
                       if (aNowPlusDT.isAfter (aNotAfter))
                         aULPerEndpoint.addItem (_createWarning ("The endpoint certificate will expire soon."),
@@ -512,7 +533,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
                   // Show per endpoint errors
                   if (aULPerEndpoint.hasChildren ())
-                    aULPerProcess.addItem (div ("Transport profile ").addChild (code (aEndpoint.getTransportProfile ())), aULPerEndpoint);
+                    aULPerProcess.addItem (div ("Transport profile ").addChild (code (aEndpoint.getTransportProfile ())),
+                                           aULPerEndpoint);
                 }
                 // Show per process errors
                 if (aULPerProcess.hasChildren ())
@@ -530,7 +552,9 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
           // Show per service group errors
           if (aULPerSG.hasChildren ())
-            aOL.addItem (div ("Service group ").addChild (code (aServiceGroup.getParticipantIdentifier ().getURIEncoded ())), aULPerSG);
+            aOL.addItem (div ("Service group ").addChild (code (aServiceGroup.getParticipantIdentifier ()
+                                                                             .getURIEncoded ())),
+                         aULPerSG);
         }
       }
     }

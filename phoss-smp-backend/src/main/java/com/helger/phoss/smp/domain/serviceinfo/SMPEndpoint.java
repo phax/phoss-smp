@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,8 +40,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   private String m_sEndpointReference;
   private boolean m_bRequireBusinessLevelSignature;
   private String m_sMinimumAuthenticationLevel;
-  private LocalDateTime m_aServiceActivationDT;
-  private LocalDateTime m_aServiceExpirationDT;
+  private OffsetDateTime m_aServiceActivationDT;
+  private OffsetDateTime m_aServiceExpirationDT;
   private String m_sCertificate;
   private String m_sServiceDescription;
   private String m_sTechnicalContactUrl;
@@ -51,8 +51,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                       @Nullable final String sEndpointReference,
                       final boolean bRequireBusinessLevelSignature,
                       @Nullable final String sMinimumAuthenticationLevel,
-                      @Nullable final LocalDateTime aServiceActivationDT,
-                      @Nullable final LocalDateTime aServiceExpirationDT,
+                      @Nullable final OffsetDateTime aServiceActivationDT,
+                      @Nullable final OffsetDateTime aServiceExpirationDT,
                       @Nullable final String sCertificate,
                       @Nullable final String sServiceDescription,
                       @Nullable final String sTechnicalContactUrl,
@@ -118,23 +118,23 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   }
 
   @Nullable
-  public LocalDateTime getServiceActivationDateTime ()
+  public OffsetDateTime getServiceActivationDateTime ()
   {
     return m_aServiceActivationDT;
   }
 
-  public final void setServiceActivationDateTime (@Nullable final LocalDateTime aServiceActivationDate)
+  public final void setServiceActivationDateTime (@Nullable final OffsetDateTime aServiceActivationDate)
   {
     m_aServiceActivationDT = aServiceActivationDate;
   }
 
   @Nullable
-  public LocalDateTime getServiceExpirationDateTime ()
+  public OffsetDateTime getServiceExpirationDateTime ()
   {
     return m_aServiceExpirationDT;
   }
 
-  public final void setServiceExpirationDateTime (@Nullable final LocalDateTime aServiceExpirationDate)
+  public final void setServiceExpirationDateTime (@Nullable final OffsetDateTime aServiceExpirationDate)
   {
     m_aServiceExpirationDT = aServiceExpirationDate;
   }
@@ -265,16 +265,16 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   public String toString ()
   {
     return ToStringGenerator.getDerived (super.toString ())
-                            .append ("transportProfile", m_sTransportProfile)
-                            .append ("endpointReference", m_sEndpointReference)
-                            .append ("requireBusinessLevelSignature", m_bRequireBusinessLevelSignature)
-                            .append ("minimumAuthenticationLevel", m_sMinimumAuthenticationLevel)
-                            .append ("serviceActivationDate", m_aServiceActivationDT)
-                            .append ("serviceExpirationDate", m_aServiceExpirationDT)
-                            .append ("certificate", m_sCertificate)
-                            .append ("serviceDescription", m_sServiceDescription)
-                            .append ("technicalContactUrl", m_sTechnicalContactUrl)
-                            .append ("technicalInformationUrl", m_sTechnicalInformationUrl)
+                            .append ("TransportProfile", m_sTransportProfile)
+                            .append ("EndpointReference", m_sEndpointReference)
+                            .append ("RequireBusinessLevelSignature", m_bRequireBusinessLevelSignature)
+                            .append ("MinimumAuthenticationLevel", m_sMinimumAuthenticationLevel)
+                            .append ("ServiceActivationDate", m_aServiceActivationDT)
+                            .append ("ServiceExpirationDate", m_aServiceExpirationDT)
+                            .append ("Certificate", m_sCertificate)
+                            .append ("ServiceDescription", m_sServiceDescription)
+                            .append ("TechnicalContactUrl", m_sTechnicalContactUrl)
+                            .append ("TechnicalInformationUrl", m_sTechnicalInformationUrl)
                             .getToString ();
   }
 

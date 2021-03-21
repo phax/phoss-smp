@@ -16,10 +16,11 @@
  */
 package com.helger.phoss.smp.ui.ajax;
 
+import java.util.function.Predicate;
+
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.helger.commons.functional.IPredicate;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -40,25 +41,25 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 public final class CAjax
 {
   public static final IAjaxFunctionDeclaration DATATABLES = AjaxFunctionDeclaration.builder ("dataTables")
-                                                                                   .withExecutor (AjaxExecutorDataTables.class)
+                                                                                   .executor (AjaxExecutorDataTables.class)
                                                                                    .build ();
   public static final IAjaxFunctionDeclaration DATATABLES_I18N = AjaxFunctionDeclaration.builder ("datatables-i18n")
-                                                                                        .withExecutor (new AjaxExecutorDataTablesI18N (CSMPServer.DEFAULT_LOCALE))
+                                                                                        .executor (new AjaxExecutorDataTablesI18N (CSMPServer.DEFAULT_LOCALE))
                                                                                         .build ();
-  private static final IPredicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () == EHttpMethod.POST;
+  private static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () == EHttpMethod.POST;
   public static final IAjaxFunctionDeclaration LOGIN = AjaxFunctionDeclaration.builder ("login")
-                                                                              .withFilter (FILTER_HTTP_POST.and (x -> SMPWebAppConfiguration.isPublicLoginEnabled ()))
-                                                                              .withExecutor (AjaxExecutorPublicLogin.class)
+                                                                              .filter (FILTER_HTTP_POST.and (x -> SMPWebAppConfiguration.isPublicLoginEnabled ()))
+                                                                              .executor (AjaxExecutorPublicLogin.class)
                                                                               .build ();
-  private static final IPredicate <? super IRequestWebScopeWithoutResponse> FILTER_LOGIN = x -> LoggedInUserManager.getInstance ()
-                                                                                                                   .isUserLoggedInInCurrentSession ();
+  private static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_LOGIN = x -> LoggedInUserManager.getInstance ()
+                                                                                                                  .isUserLoggedInInCurrentSession ();
   public static final IAjaxFunctionDeclaration FUNCTION_EXPORT_ALL_SERVICE_GROUPS = AjaxFunctionDeclaration.builder ("exportAllServiceGroups")
-                                                                                                           .withExecutor (AjaxExecutorSecureExportAllServiceGroups.class)
-                                                                                                           .withFilter (FILTER_LOGIN)
+                                                                                                           .executor (AjaxExecutorSecureExportAllServiceGroups.class)
+                                                                                                           .filter (FILTER_LOGIN)
                                                                                                            .build ();
   public static final IAjaxFunctionDeclaration FUNCTION_BACKEND_CONNECTION_RESET = AjaxFunctionDeclaration.builder ("backendConnectionReset")
-                                                                                                          .withExecutor (AjaxExecutorSecureBackendConnectionReset.class)
-                                                                                                          .withFilter (FILTER_LOGIN)
+                                                                                                          .executor (AjaxExecutorSecureBackendConnectionReset.class)
+                                                                                                          .filter (FILTER_LOGIN)
                                                                                                           .build ();
 
   private CAjax ()
