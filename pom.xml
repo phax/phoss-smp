@@ -75,63 +75,63 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>10.0.0-SNAPSHOT</version>
+        <version>10.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.schedule</groupId>
         <artifactId>ph-schedule-parent-pom</artifactId>
-        <version>4.2.0-SNAPSHOT</version>
+        <version>4.2.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>com.helger</groupId>
+        <groupId>com.helger.masterdata</groupId>
         <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>6.2.0-SNAPSHOT</version>
+        <version>6.2.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css-parent-pom</artifactId>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>6.3.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-db-parent-pom</artifactId>
-        <version>6.6.0-SNAPSHOT</version>
+        <version>6.6.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>9.6.0-SNAPSHOT</version>
+        <version>9.6.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>8.3.0-SNAPSHOT</version>
+        <version>8.3.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>8.4.2-SNAPSHOT</version>
+        <version>8.5.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.9.5-SNAPSHOT</version>
+        <version>0.9.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -169,7 +169,7 @@
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
-        <version>7.5.4</version>
+        <version>7.7.0</version>
       </dependency>
 
       <dependency>
@@ -245,7 +245,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>6.2.4</version><!--$NO-MVN-MAN-VER$-->
+          <version>6.3.0</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>
