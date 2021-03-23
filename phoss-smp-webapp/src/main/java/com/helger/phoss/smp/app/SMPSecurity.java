@@ -18,6 +18,9 @@ package com.helger.phoss.smp.app;
 
 import javax.annotation.concurrent.Immutable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRoleManager;
@@ -32,11 +35,15 @@ import com.helger.photon.security.usergroup.IUserGroupManager;
 @Immutable
 public final class SMPSecurity
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPSecurity.class);
+
   private SMPSecurity ()
   {}
 
   public static void init ()
   {
+    LOGGER.info ("Starting to initialize SMP security");
+
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final IUserGroupManager aUserGroupMgr = PhotonSecurityManager.getUserGroupMgr ();
     final IRoleManager aRoleMgr = PhotonSecurityManager.getRoleMgr ();
@@ -104,5 +111,7 @@ public final class SMPSecurity
 
     // Setup internal error handler (if configured)
     SMPInternalErrorHandler.doSetup ();
+
+    LOGGER.info ("Finished initializing SMP security");
   }
 }

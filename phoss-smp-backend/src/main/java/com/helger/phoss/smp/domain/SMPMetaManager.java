@@ -349,7 +349,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
    */
   public void setBackendConnectionStateChangeCallback (@Nullable final Consumer <ETriState> aCB)
   {
-    m_aRWLock.writeLockedGet ( () -> m_aBackendConnectionStateChangeCallback = aCB);
+    m_aRWLock.writeLocked( () -> m_aBackendConnectionStateChangeCallback = aCB);
   }
 
   /**

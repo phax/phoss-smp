@@ -21,6 +21,8 @@ import javax.annotation.Nonnull;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.string.StringHelper;
@@ -38,6 +40,8 @@ import com.helger.settings.exchange.configfile.ConfigFile;
  */
 final class FlywayMigrator
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (FlywayMigrator.Singleton.class);
+
   // Indirection level to not load org.flyway classes by default
   public static final class Singleton
   {
@@ -92,5 +96,7 @@ final class FlywayMigrator
     if (false)
       aFlyway.validate ();
     aFlyway.migrate ();
+
+    LOGGER.info ("Finished running Flyway");
   }
 }

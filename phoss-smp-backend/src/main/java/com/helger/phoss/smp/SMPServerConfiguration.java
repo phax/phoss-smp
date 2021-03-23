@@ -159,7 +159,7 @@ public final class SMPServerConfiguration
                                                            .addPath (PATH_PRIVATE_SMP_SERVER_PROPERTIES)
                                                            .addPath (PATH_SMP_SERVER_PROPERTIES);
 
-    return s_aRWLock.writeLockedGet ( () -> {
+    return s_aRWLock.writeLocked ( () -> {
       s_aConfigFile = aCFB.build ();
       if (s_aConfigFile.isRead ())
       {

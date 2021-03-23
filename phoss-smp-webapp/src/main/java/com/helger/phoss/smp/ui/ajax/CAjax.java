@@ -21,6 +21,9 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.http.EHttpMethod;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -62,6 +65,8 @@ public final class CAjax
                                                                                                           .filter (FILTER_LOGIN)
                                                                                                           .build ();
 
+  private static final Logger LOGGER = LoggerFactory.getLogger (CAjax.class);
+
   private CAjax ()
   {}
 
@@ -72,5 +77,6 @@ public final class CAjax
     aAjaxRegistry.registerFunction (LOGIN);
     aAjaxRegistry.registerFunction (FUNCTION_EXPORT_ALL_SERVICE_GROUPS);
     aAjaxRegistry.registerFunction (FUNCTION_BACKEND_CONNECTION_RESET);
+    LOGGER.info ("Successfully registered the Ajax functions");
   }
 }

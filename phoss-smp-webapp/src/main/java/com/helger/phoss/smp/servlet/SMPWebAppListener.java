@@ -178,7 +178,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.hasNoText (SMPWebAppConfiguration.getImprintText ()))
       LOGGER.warn ("The custom Imprint is enabled in the configuration file, but no imprint text is configured. Therefore no imprint will be shown.");
-
   }
 
   @Override
@@ -197,11 +196,14 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     // Create all menu items
     {
+      LOGGER.info ("Initializing public menu");
       final MenuTree aMenuTree = new MenuTree ();
       MenuPublic.init (aMenuTree);
       PhotonGlobalState.state (CApplicationID.APP_ID_PUBLIC).setMenuTree (aMenuTree);
     }
+
     {
+      LOGGER.info ("Initializing secure menu");
       final MenuTree aMenuTree = new MenuTree ();
       MenuSecure.init (aMenuTree);
       PhotonGlobalState.state (CApplicationID.APP_ID_SECURE).setMenuTree (aMenuTree);
@@ -215,13 +217,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
-  protected void initUI ()
-  {
-    // UI stuff
-    SMPCommonUI.init ();
-  }
-
-  @Override
   protected void initSecurity ()
   {
     // Set all security related stuff
@@ -229,8 +224,16 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
+  protected void initUI ()
+  {
+    // UI stuff
+    SMPCommonUI.init ();
+  }
+
+  @Override
   protected void initManagers ()
   {
+    LOGGER.info ("Init of ConfigurationFileManager");
     final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
     aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
                                                                                                 .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
@@ -242,6 +245,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                                                         .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
     aCFM.registerAll (PDClientConfiguration.getConfig ());
 
+    LOGGER.info ("Init of Directory client stuff");
     // If the SMP settings change, the PD client must be re-created
     SMPMetaManager.getSettingsMgr ().callbacks ().add (x -> PDClientProvider.getInstance ().resetPDClient ());
 
@@ -304,6 +308,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       });
     }
 
+    LOGGER.info ("Init of HTTP and Proxy settings");
     // Register global proxy servers
     ProxySelectorProxySettingsManager.setAsDefault (true);
     final IProxySettings aProxyHttp = SMPServerConfiguration.getAsHttpProxySettings ();
@@ -328,6 +333,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     BasePageUtilsHttpClient.HttpClientConfigRegistry.register (new HttpClientConfig ("directoryclient",
                                                                                      "Directory client settings",
                                                                                      PDHttpClientSettings::new));
+
+    LOGGER.info ("Finished init of managers");
   }
 
   @Override
