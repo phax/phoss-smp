@@ -17,6 +17,7 @@ Prebuild images are available from:
 
 **Note:** The default exposed port of all of these images is 8080.
 
+**Note:** The Tomcat logs inside the image are residing in `/usr/local/tomcat/logs`
 
 # Running pre-build image from Docker Hub
 
