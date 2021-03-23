@@ -159,15 +159,15 @@ public final class SMPServerConfiguration
                                                            .addPath (PATH_PRIVATE_SMP_SERVER_PROPERTIES)
                                                            .addPath (PATH_SMP_SERVER_PROPERTIES);
 
-    return s_aRWLock.writeLocked ( () -> {
+    return s_aRWLock.writeLockedGet ( () -> {
       s_aConfigFile = aCFB.build ();
       if (s_aConfigFile.isRead ())
       {
-        LOGGER.info ("Read Peppol SMP server properties from " + s_aConfigFile.getReadResource ().getPath ());
+        LOGGER.info ("Read SMP server properties from " + s_aConfigFile.getReadResource ().getPath ());
         return ESuccess.SUCCESS;
       }
 
-      LOGGER.warn ("Failed to read Peppol SMP server properties from " + aCFB.getAllPaths ());
+      LOGGER.warn ("Failed to read  SMP server properties from " + aCFB.getAllPaths ());
       return ESuccess.FAILURE;
     });
   }
@@ -365,8 +365,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isRestRemoteQueryAPIDisabled ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_REST_REMOTE_QUERY_API_DISABLED,
-                                          DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED);
+    return getConfigFile ().getAsBoolean (KEY_SMP_REST_REMOTE_QUERY_API_DISABLED, DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED);
   }
 
   /**

@@ -110,7 +110,7 @@ public final class NiceNameHandler
         aDocTypeIDRes = new ClassPathResource ("codelists/smp/doctypeid-mapping.xml");
 
       final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes, true);
-      RWLOCK.writeLockedGet ( () -> DOCTYPE_IDS = aDocTypeIDs);
+      RWLOCK.writeLocked ( () -> DOCTYPE_IDS = aDocTypeIDs);
       LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document type nice name entries");
     }
 
@@ -134,7 +134,7 @@ public final class NiceNameHandler
         aProcessIDRes = new ClassPathResource ("codelists/smp/processid-mapping.xml");
 
       final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes, false);
-      RWLOCK.writeLockedGet ( () -> PROCESS_IDS = aProcessIDs);
+      RWLOCK.writeLocked ( () -> PROCESS_IDS = aProcessIDs);
       LOGGER.info ("Loaded " + aProcessIDs.size () + " process nice name entries");
     }
   }
