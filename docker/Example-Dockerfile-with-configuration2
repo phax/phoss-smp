@@ -18,5 +18,13 @@
 # Use an existing image as the basis
 FROM phelger/phoss-smp-xml
 
-# Add configuration file paths via system properties
-ENV CATALINA_OPTS="$CATALINA_OPTS -Dsmp.server.properties.path=/config/smp-server.properties -Dsmp.webapp.properties.path=/config/webapp.properties -Dconfig.file=/config/application.properties"
+# Add configuration file paths via env vars
+ENV SMP_SERVER_CONFIG=/config/smp-server.properties \
+    SMP_WEBAPP_CONFIG=/config/webapp.properties \
+    CONFIG_FILE=/config/application.properties
+
+# Copy the local configuration files into the image
+WORKDIR /config
+COPY *.properties .
+#COPY *.p12 .
+#COPY *.jks .
