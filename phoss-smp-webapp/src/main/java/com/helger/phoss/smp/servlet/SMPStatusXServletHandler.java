@@ -74,6 +74,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     aStatusData.add ("version.smp", CSMPServer.getVersionNumber ());
     // Since 5.0.7
     aStatusData.add ("build.timestamp", CSMPServer.getBuildTimestamp ());
+    // Since 5.4.0
+    aStatusData.addIfNotNull ("startup.datetime", PDTWebDateHelper.getAsStringXSD (SMPWebAppListener.getStartupDateTime ()));
     aStatusData.add ("version.java", SystemProperties.getJavaVersion ());
     aStatusData.add ("global.debug", GlobalDebug.isDebugMode ());
     aStatusData.add ("global.production", GlobalDebug.isProductionMode ());

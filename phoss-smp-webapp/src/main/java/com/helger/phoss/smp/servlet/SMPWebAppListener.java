@@ -16,9 +16,11 @@
  */
 package com.helger.phoss.smp.servlet;
 
+import java.time.OffsetDateTime;
 import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
 
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.datetime.PDTConfig;
+import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.ClassPathResource;
@@ -84,6 +87,13 @@ import com.helger.xservlet.requesttrack.RequestTracker;
 public class SMPWebAppListener extends WebAppListenerBootstrap
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppListener.class);
+  private static OffsetDateTime s_aStartupDateTime;
+
+  @Nullable
+  public static OffsetDateTime getStartupDateTime ()
+  {
+    return s_aStartupDateTime;
+  }
 
   @Override
   protected String getInitParameterDebug (@Nonnull final ServletContext aSC)
@@ -135,6 +145,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       throw new InitializationException (sErrorMsg);
     }
     LOGGER.info ("Set default timezone to '" + CSMP.DEFAULT_TIMEZONE + "'");
+
+    s_aStartupDateTime = PDTFactory.getCurrentOffsetDateTime ();
 
     // Enable JaxWS debugging?
     if (SMPWebAppConfiguration.isGlobalDebugJaxWS ())
