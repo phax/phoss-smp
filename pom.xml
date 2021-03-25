@@ -270,15 +270,16 @@
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
           <excludes>
-            <exclude>**/NOTICE</exclude>
-            <exclude>**/LICENSE</exclude>
             <exclude>**/Dockerfile*</exclude>
             <exclude>**/example*</exclude>
-            <exclude>docs/**</exclude>
+            <exclude>**/LICENSE</exclude>
+            <exclude>**/NOTICE</exclude>
             <exclude>**/*.j2</exclude>
-            <exclude>**/*.p12</exclude>
             <exclude>**/*.jks</exclude>
+            <exclude>**/*.p12</exclude>
             <exclude>**/*.txt</exclude>
+            <exclude>docs/**</exclude>
+            <exclude>vagrant/.vagrant/**</exclude>
           </excludes>
         </configuration>
       </plugin>
