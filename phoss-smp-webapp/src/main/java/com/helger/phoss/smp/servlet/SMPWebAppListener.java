@@ -146,7 +146,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     }
     LOGGER.info ("Set default timezone to '" + CSMP.DEFAULT_TIMEZONE + "'");
 
-    s_aStartupDateTime = PDTFactory.getCurrentOffsetDateTime ();
+    s_aStartupDateTime = PDTFactory.getCurrentOffsetDateTimeUTC ();
 
     // Enable JaxWS debugging?
     if (SMPWebAppConfiguration.isGlobalDebugJaxWS ())
