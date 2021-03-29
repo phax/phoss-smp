@@ -21,10 +21,12 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
+import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigrationManagerXML;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -83,9 +85,22 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
     return new SMPServiceInformationManagerMongoDB (aIdentifierFactory, aServiceGroupMgr);
   }
 
+  private static final String SMP_PARTICIPANT_MIGRATION_XML = "smp-participant-migration.xml";
+
   @Nonnull
   public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
   {
+    // TODO
+    if (true)
+      try
+      {
+        return new SMPParticipantMigrationManagerXML (SMP_PARTICIPANT_MIGRATION_XML);
+      }
+      catch (final DAOException ex)
+      {
+        throw new RuntimeException (ex.getMessage (), ex);
+      }
+
     return new SMPParticipantMigrationManagerMongoDB ();
   }
 
