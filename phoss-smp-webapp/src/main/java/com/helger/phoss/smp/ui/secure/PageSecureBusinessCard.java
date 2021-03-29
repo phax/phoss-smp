@@ -342,7 +342,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
 
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
+    if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
     {
       aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to create a Business Card for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new Service Group")
@@ -1031,10 +1031,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     ret.addChild (new HCTextNode (" "));
     ret.addChild (new HCA (LinkHelper.getURLWithServerAndContext ("businesscard/" +
                                                                   aCurObject.getParticipantIdentifier ().getURIPercentEncoded ()))
-                                                                                                                                 .setTitle ("Perform SMP query on " +
-                                                                                                                                            sDisplayName)
-                                                                                                                                 .setTargetBlank ()
-                                                                                                                                 .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                                                                                                                                  .setTitle ("Perform SMP query on " +
+                                                                                                                                             sDisplayName)
+                                                                                                                                  .setTargetBlank ()
+                                                                                                                                  .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
 
     // When auto update is enabled, there is no need for a manual update
     // Change: update possibility always, in case document type was changed

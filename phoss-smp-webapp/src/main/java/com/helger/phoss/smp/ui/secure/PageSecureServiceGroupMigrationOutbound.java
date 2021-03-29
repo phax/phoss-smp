@@ -433,7 +433,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     }
 
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
+    if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
     {
       aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to migrate it."));
       if (false)

@@ -124,7 +124,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
+    if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
     {
       aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to create a Redirect for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new Service Group")
