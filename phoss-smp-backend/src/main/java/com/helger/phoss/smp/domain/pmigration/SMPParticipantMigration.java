@@ -63,12 +63,12 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
     return StringHelper.hasText (sMigrationKey) && RegExHelper.stringMatchesPattern (CSMLDefault.MIGRATION_CODE_PATTERN, sMigrationKey);
   }
 
-  protected SMPParticipantMigration (@Nonnull @Nonempty final String sID,
-                                     @Nonnull final EParticipantMigrationDirection eDirection,
-                                     @Nonnull final EParticipantMigrationState eState,
-                                     @Nonnull final IParticipantIdentifier aParticipantID,
-                                     @Nonnull final LocalDateTime aInitiationDateTime,
-                                     @Nonnull @Nonempty final String sMigrationKey)
+  public SMPParticipantMigration (@Nonnull @Nonempty final String sID,
+                                  @Nonnull final EParticipantMigrationDirection eDirection,
+                                  @Nonnull final EParticipantMigrationState eState,
+                                  @Nonnull final IParticipantIdentifier aParticipantID,
+                                  @Nonnull final LocalDateTime aInitiationDateTime,
+                                  @Nonnull @Nonempty final String sMigrationKey)
   {
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (eDirection, "Direction");

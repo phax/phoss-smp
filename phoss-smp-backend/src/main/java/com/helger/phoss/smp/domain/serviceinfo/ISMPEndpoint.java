@@ -10,7 +10,6 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
@@ -29,7 +28,7 @@ import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
  *
  * @author Philip Helger
  */
-public interface ISMPEndpoint extends Serializable, ISMPHasExtension
+public interface ISMPEndpoint extends ISMPHasExtension
 {
   /**
    * @return the type of BUSDOX transport that is being used between access

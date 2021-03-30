@@ -10,7 +10,6 @@
  */
 package com.helger.phoss.smp.domain.businesscard;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 import javax.annotation.Nonnegative;
@@ -34,7 +33,7 @@ import com.helger.peppolid.IParticipantIdentifier;
  * @author Philip Helger
  */
 @MustImplementEqualsAndHashcode
-public interface ISMPBusinessCard extends IHasID <String>, Serializable
+public interface ISMPBusinessCard extends IHasID <String>
 {
   /**
    * @return The participant ID of the service group to which this business card

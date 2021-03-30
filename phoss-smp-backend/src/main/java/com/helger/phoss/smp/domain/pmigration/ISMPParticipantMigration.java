@@ -10,7 +10,6 @@
  */
 package com.helger.phoss.smp.domain.pmigration;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import javax.annotation.Nonnull;
@@ -26,7 +25,7 @@ import com.helger.peppolid.IParticipantIdentifier;
  * @author Philip Helger
  * @since 5.4.0
  */
-public interface ISMPParticipantMigration extends IHasID <String>, Serializable
+public interface ISMPParticipantMigration extends IHasID <String>
 {
   /**
    * @return Outbound or inbound migration? Never <code>null</code>.
