@@ -96,9 +96,10 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   @ReturnsMutableCopy
   public static SMPServiceGroup toDomain (@Nonnull final Document aDoc)
   {
-    return new SMPServiceGroup (aDoc.getString (BSON_OWNER_ID),
-                                toParticipantID (aDoc.get (BSON_PARTICIPANT_ID, Document.class)),
-                                aDoc.getString (BSON_EXTENSION));
+    final String sOwnerID = aDoc.getString (BSON_OWNER_ID);
+    final IParticipantIdentifier aParticipantIdentifier = toParticipantID (aDoc.get (BSON_PARTICIPANT_ID, Document.class));
+    final String sExtension = aDoc.getString (BSON_EXTENSION);
+    return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
   }
 
   @Nonnull
