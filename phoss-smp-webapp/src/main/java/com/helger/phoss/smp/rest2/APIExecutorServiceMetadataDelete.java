@@ -49,7 +49,7 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       LOGGER.warn ("The writable REST API is disabled. deleteServiceRegistration will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
     {

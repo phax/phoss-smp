@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.http.CHttp;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -50,7 +51,7 @@ public final class APIExecutorServiceMetadataDeleteAll implements IAPIExecutor
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       LOGGER.warn ("The writable REST API is disabled. deleteServiceRegistrations will not be executed.");
-      aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
+      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
     {

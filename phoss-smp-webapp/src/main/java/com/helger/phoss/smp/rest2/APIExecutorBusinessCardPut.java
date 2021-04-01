@@ -53,7 +53,7 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       LOGGER.warn ("The writable REST API is disabled. saveBusinessCard will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
       if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
@@ -62,7 +62,7 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
         LOGGER.warn ("The " +
                      SMPWebAppConfiguration.getDirectoryName () +
                      " integration is disabled. saveBusinessCard will not be executed.");
-        aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+        aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
       }
       else
       {
