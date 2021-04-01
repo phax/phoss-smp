@@ -49,12 +49,12 @@ import com.helger.photon.security.user.IUser;
 public final class BusinessCardServerAPI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (BusinessCardServerAPI.class);
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterInvocation = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
-                                                                                                                                   "$call");
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterSuccess = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
-                                                                                                                                "$success");
-  private static final IMutableStatisticsHandlerKeyedCounter s_aStatsCounterError = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
-                                                                                                                              "$error");
+  private static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_INVOCATION = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
+                                                                                                                                  "$call");
+  private static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_SUCCESS = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
+                                                                                                                               "$success");
+  private static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_ERROR = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
+                                                                                                                             "$error");
   private static final String LOG_PREFIX = "[BusinessCard REST API] ";
 
   private final ISMPServerAPIDataProvider m_aAPIProvider;
@@ -72,7 +72,7 @@ public final class BusinessCardServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -107,14 +107,14 @@ public final class BusinessCardServerAPI
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
       return aBusinessCard.getAsJAXBObject ();
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -129,7 +129,7 @@ public final class BusinessCardServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog + " ==> " + aBusinessCard);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -182,20 +182,20 @@ public final class BusinessCardServerAPI
       {
         if (LOGGER.isWarnEnabled ())
           LOGGER.warn (sLog + " ERROR");
-        s_aStatsCounterError.increment (sAction);
+        STATS_COUNTER_ERROR.increment (sAction);
         return ESuccess.FAILURE;
       }
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
       return ESuccess.SUCCESS;
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -219,7 +219,7 @@ public final class BusinessCardServerAPI
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info (sLog);
-    s_aStatsCounterInvocation.increment (sAction);
+    STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
     {
@@ -251,13 +251,13 @@ public final class BusinessCardServerAPI
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
-      s_aStatsCounterSuccess.increment (sAction);
+      STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)
     {
       if (LOGGER.isWarnEnabled ())
         LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
-      s_aStatsCounterError.increment (sAction);
+      STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
   }
@@ -268,7 +268,7 @@ public final class BusinessCardServerAPI
   @Nonnull
   public static IStatisticsHandlerKeyedCounter getInvocationCounter ()
   {
-    return s_aStatsCounterInvocation;
+    return STATS_COUNTER_INVOCATION;
   }
 
   /**
@@ -277,7 +277,7 @@ public final class BusinessCardServerAPI
   @Nonnull
   public static IStatisticsHandlerKeyedCounter getSuccessCounter ()
   {
-    return s_aStatsCounterSuccess;
+    return STATS_COUNTER_SUCCESS;
   }
 
   /**
@@ -286,6 +286,6 @@ public final class BusinessCardServerAPI
   @Nonnull
   public static IStatisticsHandlerKeyedCounter getErrorCounter ()
   {
-    return s_aStatsCounterError;
+    return STATS_COUNTER_ERROR;
   }
 }
