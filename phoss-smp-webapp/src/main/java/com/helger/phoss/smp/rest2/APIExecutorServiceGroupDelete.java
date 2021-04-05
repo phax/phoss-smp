@@ -49,7 +49,7 @@ public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       LOGGER.warn ("The writable REST API is disabled. deleteServiceGroup will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
     {

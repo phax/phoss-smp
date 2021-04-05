@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.backend.xml.mgr;
+package com.helger.phoss.smp.domain.pmigration;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,10 +29,6 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
-import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
-import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
-import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
 import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
 

@@ -10,7 +10,6 @@
  */
 package com.helger.phoss.smp.domain.redirect;
 
-import java.io.Serializable;
 import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
@@ -29,7 +28,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
  *
  * @author Philip Helger
  */
-public interface ISMPRedirect extends IHasID <String>, Serializable, ISMPHasExtension
+public interface ISMPRedirect extends IHasID <String>, ISMPHasExtension
 {
   /**
    * The ID of an SMP redirect is usually the combination of service group ID

@@ -209,14 +209,17 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       aNodeList.addChild (new BootstrapButton ().addChild ("Select SML Configuration in the Settings")
                                                 .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
                                                 .setIcon (EDefaultIcon.EDIT));
-      aNodeList.addChild (new BootstrapButton ().addChild ("Create a new SML Configuration")
-                                                .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SML_CONFIGURATION))
-                                                .setIcon (EDefaultIcon.YES));
+      if (aSettings.isSMLEnabled () || aSettings.isSMLRequired ())
+      {
+        aNodeList.addChild (new BootstrapButton ().addChild ("Create a new SML Configuration")
+                                                  .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SML_CONFIGURATION))
+                                                  .setIcon (EDefaultIcon.YES));
+      }
       return EValidity.INVALID;
     }
     if (!aSettings.isSMLEnabled ())
     {
-      aNodeList.addChild (warn ("SML Connection is not configured hence no participant can be migrated."));
+      aNodeList.addChild (warn ("SML Connection is not enabled hence no participant can be migrated."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Enable SML in the Settings")
                                                 .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
                                                 .setIcon (EDefaultIcon.EDIT));
@@ -433,7 +436,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     }
 
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () == 0)
+    if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
     {
       aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to migrate it."));
       if (false)

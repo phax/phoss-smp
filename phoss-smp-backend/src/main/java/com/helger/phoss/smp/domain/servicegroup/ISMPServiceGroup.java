@@ -10,7 +10,6 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 import javax.annotation.Nonnull;
@@ -27,7 +26,7 @@ import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
  * @author Philip Helger
  */
 @MustImplementEqualsAndHashcode
-public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHasExtension
+public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension
 {
   /**
    * @return the URI encoded participant identifier is the ID.

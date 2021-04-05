@@ -19,6 +19,7 @@ package com.helger.phoss.smp.ui.secure;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
@@ -37,6 +38,8 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
   @Override
   protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
   {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    aNodeList.addChild (warn ("This functionality has not yet been implemented"));
     // TODO
   }
 }

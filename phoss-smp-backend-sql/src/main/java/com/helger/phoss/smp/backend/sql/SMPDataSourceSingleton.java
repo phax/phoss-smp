@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.db.jdbc.IHasDataSource;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.scope.IScope;
@@ -115,7 +116,10 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
     DB_TYPE = EDatabaseType.getFromIDOrNull (sDBType);
     if (DB_TYPE == null)
       throw new IllegalStateException ("The database type MUST be provided and MUST be one of " +
-                                       EDatabaseType.values () +
+                                       StringHelper.imploder ()
+                                                   .source (EDatabaseType.values (), EDatabaseType::getID)
+                                                   .separator (", ")
+                                                   .build () +
                                        " - provided value is '" +
                                        sDBType +
                                        "'");

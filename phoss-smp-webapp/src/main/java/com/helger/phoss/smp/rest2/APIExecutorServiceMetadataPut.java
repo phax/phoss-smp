@@ -55,7 +55,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
       LOGGER.warn ("The writable REST API is disabled. saveServiceRegistration will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
     {
