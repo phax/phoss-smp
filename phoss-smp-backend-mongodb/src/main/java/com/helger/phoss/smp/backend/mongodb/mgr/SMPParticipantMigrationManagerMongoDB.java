@@ -23,9 +23,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.typeconvert.TypeConverter;
@@ -35,6 +38,8 @@ import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
+import com.helger.photon.audit.AuditHelper;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 
 /**
@@ -43,7 +48,8 @@ import com.mongodb.client.model.Indexes;
  * @author Philip Helger
  * @since 5.4.0
  */
-public final class SMPParticipantMigrationManagerMongoDB extends AbstractManagerMongoDB implements ISMPParticipantMigrationManager
+public final class SMPParticipantMigrationManagerMongoDB extends AbstractManagerMongoDB implements
+                                                         ISMPParticipantMigrationManager
 {
   private static final String BSON_ID = "id";
   private static final String BSON_DIRECTION = "direction";
@@ -83,54 +89,111 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return new SMPParticipantMigration (sID, eDirection, eState, aParticipantID, aInitiationDateTime, sMigrationKey);
   }
 
+  private void _createParticipantMigration (@Nonnull final SMPParticipantMigration aSMPParticipantMigration)
+  {
+    ValueEnforcer.notNull (aSMPParticipantMigration, "SMPParticipantMigration");
+    getCollection ().insertOne (toBson (aSMPParticipantMigration));
+
+    AuditHelper.onAuditCreateSuccess (SMPParticipantMigration.OT,
+                                      aSMPParticipantMigration.getID (),
+                                      aSMPParticipantMigration.getDirection (),
+                                      aSMPParticipantMigration.getParticipantIdentifier ().getURIEncoded (),
+                                      aSMPParticipantMigration.getInitiationDateTime (),
+                                      aSMPParticipantMigration.getMigrationKey ());
+  }
+
   @Nonnull
   public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
                                                                       @Nonnull @Nonempty final String sMigrationKey)
   {
-    // TODO
-    throw new UnsupportedOperationException ();
+    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createOutbound (aParticipantID,
+                                                                                                     sMigrationKey);
+    _createParticipantMigration (aSMPParticipantMigration);
+    return aSMPParticipantMigration;
   }
 
   @Nonnull
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
                                                @Nonnull final EParticipantMigrationState eNewState)
   {
-    // TODO
-    throw new UnsupportedOperationException ();
+    final SMPParticipantMigration aPM = getParticipantMigrationOfID (sParticipantMigrationID);
+    if (aPM == null)
+    {
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, sParticipantMigrationID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    {
+      EChange eChange = EChange.UNCHANGED;
+      eChange = eChange.or (aPM.setState (eNewState));
+      if (eChange.isUnchanged ())
+        return EChange.UNCHANGED;
+
+      getCollection ().findOneAndReplace (new Document (BSON_ID, sParticipantMigrationID), toBson (aPM));
+    }
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT,
+                                      "migration-state",
+                                      sParticipantMigrationID,
+                                      eNewState);
+    return EChange.CHANGED;
   }
 
   @Nullable
-  public ISMPParticipantMigration getParticipantMigrationOfID (@Nullable final String sID)
+  public SMPParticipantMigration getParticipantMigrationOfID (@Nullable final String sID)
   {
-    // TODO
-    return null;
+    final Document aMatch = getCollection ().find (new Document (BSON_ID, sID)).first ();
+    if (aMatch == null)
+      return null;
+    return toDomain (aMatch);
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
-    // TODO
-    return null;
+    Bson aFilter = new Document (BSON_DIRECTION, EParticipantMigrationDirection.OUTBOUND.getID ());
+    if (eState != null)
+      aFilter = Filters.and (aFilter, new Document (BSON_STATE, eState.getID ()));
+
+    final ICommonsList <ISMPParticipantMigration> ret = new CommonsArrayList <> ();
+    getCollection ().find (aFilter).forEach (x -> ret.add (toDomain (x)));
+    return ret;
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
-    // TODO
-    return null;
+    Bson aFilter = new Document (BSON_DIRECTION, EParticipantMigrationDirection.INBOUND.getID ());
+    if (eState != null)
+      aFilter = Filters.and (aFilter, new Document (BSON_STATE, eState.getID ()));
+
+    final ICommonsList <ISMPParticipantMigration> ret = new CommonsArrayList <> ();
+    getCollection ().find (aFilter).forEach (x -> ret.add (toDomain (x)));
+    return ret;
   }
 
   public boolean containsOutboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    // TODO
-    return false;
+    if (aParticipantID == null)
+      return false;
+
+    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION,
+                                                             EParticipantMigrationDirection.OUTBOUND.getID ()),
+                                               new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
+                           .iterator ()
+                           .hasNext ();
   }
 
   public boolean containsInboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    // TODO
-    return false;
+    if (aParticipantID == null)
+      return false;
+
+    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION,
+                                                             EParticipantMigrationDirection.INBOUND.getID ()),
+                                               new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
+                           .iterator ()
+                           .hasNext ();
   }
 }

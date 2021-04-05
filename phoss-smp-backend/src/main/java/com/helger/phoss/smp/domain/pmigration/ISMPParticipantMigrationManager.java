@@ -54,7 +54,8 @@ public interface ISMPParticipantMigrationManager
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
   @Nonnull
-  EChange setParticipantMigrationState (@Nullable String sParticipantMigrationID, @Nonnull EParticipantMigrationState eNewState);
+  EChange setParticipantMigrationState (@Nullable String sParticipantMigrationID,
+                                        @Nonnull EParticipantMigrationState eNewState);
 
   /**
    * Find the participant migration with the provided ID.
@@ -67,6 +68,8 @@ public interface ISMPParticipantMigrationManager
   ISMPParticipantMigration getParticipantMigrationOfID (@Nullable String sID);
 
   /**
+   * Get all outbound participant migrations that have the provided state.
+   *
    * @param eState
    *        The state to be used to filter. May be <code>null</code>.
    * @return A list of all contained outbound participant migrations. Never
@@ -77,6 +80,8 @@ public interface ISMPParticipantMigrationManager
   ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable EParticipantMigrationState eState);
 
   /**
+   * Get all inbound participant migrations that have the provided state.
+   *
    * @param eState
    *        The state to be used to filter. May be <code>null</code>.
    * @return A list of all contained inbound participant migrations. Never

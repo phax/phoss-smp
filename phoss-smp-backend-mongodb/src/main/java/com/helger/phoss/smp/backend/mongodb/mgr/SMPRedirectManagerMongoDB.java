@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.security.cert.X509Certificate;
-import java.util.function.Consumer;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -152,7 +151,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   {
     // ServiceGroup and DocType are never changed -> therefore the ID is never
     // changed
-    final Document aOldDoc = getCollection ().findOneAndReplace (new Document (BSON_ID, aSMPRedirect.getID ()), toBson (aSMPRedirect));
+    final Document aOldDoc = getCollection ().findOneAndReplace (new Document (BSON_ID, aSMPRedirect.getID ()),
+                                                                 toBson (aSMPRedirect));
     if (aOldDoc != null)
       AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
                                         aSMPRedirect.getID (),
@@ -190,7 +190,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocumentTypeIdentifier);
+    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                   aDocumentTypeIdentifier);
     final SMPRedirect aNewRedirect = new SMPRedirect (aServiceGroup,
                                                       aDocumentTypeIdentifier,
                                                       sTargetHref,
@@ -268,7 +269,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
-    getCollection ().find ().forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
+    getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 
@@ -286,7 +287,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (StringHelper.hasText (sServiceGroupID))
       getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, sServiceGroupID))
-                      .forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
+                      .forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 
@@ -305,7 +306,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     if (aDocTypeID == null)
       return null;
 
-    final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()),
+    final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID,
+                                                                              aServiceGroup.getID ()),
                                                                 new Document (BSON_DOCTYPE_ID, toBson (aDocTypeID))))
                                             .first ();
     if (aMatch == null)
