@@ -70,7 +70,8 @@ public final class SMPBusinessCardTest
   @Test
   public void testBasic ()
   {
-    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME, "0088:dummy");
+    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                        "0088:dummy");
 
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
@@ -81,7 +82,6 @@ public final class SMPBusinessCardTest
       assertEquals (aSG.getID (), aBC.getID ());
       assertNotNull (aBC.getAllEntities ());
       assertTrue (aBC.getAllEntities ().isEmpty ());
-      CommonsTestHelper.testDefaultSerialization (aBC);
       _testXMLConversion (aBC);
     }
 
@@ -97,7 +97,8 @@ public final class SMPBusinessCardTest
       aEntity1.websiteURIs ().add ("http://www.helger.com");
       aEntity1.websiteURIs ().add ("https://github.com/phax/phoss-smp");
       aEntity1.contacts ().add (new SMPBusinessCardContact ("type 1", "Whoever", "with a phone", "and@an.email.org"));
-      aEntity1.contacts ().add (new SMPBusinessCardContact ("type 2", "Whoever else", "without a phone", "but@an.email.org"));
+      aEntity1.contacts ()
+              .add (new SMPBusinessCardContact ("type 2", "Whoever else", "without a phone", "but@an.email.org"));
       aEntity1.setAdditionalInformation ("this is line1\nfollowed by line 2\r\nand now eoai");
       aEntity1.setRegistrationDate (PDTFactory.getCurrentLocalDate ());
 
@@ -111,7 +112,8 @@ public final class SMPBusinessCardTest
       aEntity2.websiteURIs ().add ("http://www.helger.com");
       aEntity2.websiteURIs ().add ("https://github.com/phax/phoss-smp");
       aEntity2.contacts ().add (new SMPBusinessCardContact ("type 1", "Whoever", "with a phone", "and@an.email.org"));
-      aEntity2.contacts ().add (new SMPBusinessCardContact ("type 2", "Whoever else", "without a phone", "but@an.email.org"));
+      aEntity2.contacts ()
+              .add (new SMPBusinessCardContact ("type 2", "Whoever else", "without a phone", "but@an.email.org"));
       aEntity2.setAdditionalInformation ("this is line1\nfollowed by line 2\r\nand now eoai");
       aEntity2.setRegistrationDate (PDTFactory.getCurrentLocalDate ());
 
@@ -124,7 +126,6 @@ public final class SMPBusinessCardTest
       assertEquals (aSG.getID (), aBC.getID ());
       assertNotNull (aBC.getAllEntities ());
       assertEquals (3, aBC.getAllEntities ().size ());
-      CommonsTestHelper.testDefaultSerialization (aBC);
       _testXMLConversion (aBC);
     }
   }
