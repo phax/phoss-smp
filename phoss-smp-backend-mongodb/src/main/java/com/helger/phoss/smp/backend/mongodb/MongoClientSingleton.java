@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.UsedViaReflection;
+import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.scope.IScope;
@@ -65,6 +66,12 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
     LOGGER.info ("Using Mongo DB database name '" + sDBName + "'");
 
     m_aProvider = new MongoClientProvider (sConnectionString, sDBName);
+  }
+
+  @Override
+  protected void onBeforeDestroy (final IScope aScopeToBeDestroyed) throws Exception
+  {
+    StreamHelper.close (m_aProvider);
   }
 
   @Nonnull
