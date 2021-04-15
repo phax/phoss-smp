@@ -134,11 +134,13 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
       final Document aDoc = toBson (m_aSettings);
       if (m_aInsertDocument.getAndSet (false))
       {
-        getCollection ().insertOne (aDoc);
+        if (!getCollection ().insertOne (aDoc).wasAcknowledged ())
+          throw new IllegalStateException ("Failed to insert into MongoDB Collection");
       }
       else
       {
-        getCollection ().replaceOne (new Document (BSON_ID, ID_SETTINGS), aDoc);
+        if (!getCollection ().replaceOne (new Document (BSON_ID, ID_SETTINGS), aDoc).wasAcknowledged ())
+          throw new IllegalStateException ("Failed to replace in MongoDB Collection");
       }
 
       // Invoke callbacks

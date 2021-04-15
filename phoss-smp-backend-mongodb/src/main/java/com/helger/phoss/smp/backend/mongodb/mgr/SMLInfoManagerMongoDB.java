@@ -87,7 +87,8 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   {
     final SMLInfo aSMLInfo = new SMLInfo (sDisplayName, sDNSZone, sManagementServiceURL, bClientCertificateRequired);
 
-    getCollection ().insertOne (toBson (aSMLInfo));
+    if (!getCollection ().insertOne (toBson (aSMLInfo)).wasAcknowledged ())
+      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
 
     AuditHelper.onAuditCreateSuccess (SMLInfo.OT,
                                       aSMLInfo.getID (),

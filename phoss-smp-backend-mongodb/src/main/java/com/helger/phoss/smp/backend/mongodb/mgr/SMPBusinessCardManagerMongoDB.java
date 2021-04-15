@@ -259,7 +259,8 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   @IsLocked (ELockType.WRITE)
   private ISMPBusinessCard _createSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard)
   {
-    getCollection ().insertOne (toBson (aSMPBusinessCard));
+    if (!getCollection ().insertOne (toBson (aSMPBusinessCard)).wasAcknowledged ())
+      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
 
     AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     return aSMPBusinessCard;

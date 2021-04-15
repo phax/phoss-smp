@@ -120,9 +120,15 @@ public class MongoDBIDFactory extends AbstractPersistingLongIDFactory
     aDoc.append (BSON_LONG_VALUE, Long.valueOf (nNewValue));
     aDoc.append ("last-modification", new Date ());
     if (bCreate)
-      m_aCollection.insertOne (aDoc);
+    {
+      if (!m_aCollection.insertOne (aDoc).wasAcknowledged ())
+        throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+    }
     else
-      m_aCollection.replaceOne (aFilter, aDoc);
+    {
+      if (!m_aCollection.replaceOne (aFilter, aDoc).wasAcknowledged ())
+        throw new IllegalStateException ("Failed to replace in MongoDB Collection");
+    }
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Updated MongoDB ID to " + nNewValue);

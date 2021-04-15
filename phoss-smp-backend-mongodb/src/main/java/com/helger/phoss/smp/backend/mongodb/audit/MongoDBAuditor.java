@@ -103,6 +103,7 @@ public class MongoDBAuditor implements IAuditor
       aDoc.append ("args", aDocArgs);
     }
 
-    m_aCollection.insertOne (aDoc);
+    if (!m_aCollection.insertOne (aDoc).wasAcknowledged ())
+      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
   }
 }

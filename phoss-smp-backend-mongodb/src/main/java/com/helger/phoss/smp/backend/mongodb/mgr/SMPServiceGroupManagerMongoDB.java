@@ -137,7 +137,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
 
     try
     {
-      getCollection ().insertOne (toBson (aSMPServiceGroup));
+      if (!getCollection ().insertOne (toBson (aSMPServiceGroup)).wasAcknowledged ())
+        throw new IllegalStateException ("Failed to insert into MongoDB Collection");
     }
     catch (final RuntimeException ex)
     {

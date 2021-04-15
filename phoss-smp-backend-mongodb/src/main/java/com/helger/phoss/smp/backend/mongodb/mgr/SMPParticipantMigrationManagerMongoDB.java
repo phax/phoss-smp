@@ -48,8 +48,7 @@ import com.mongodb.client.model.Indexes;
  * @author Philip Helger
  * @since 5.4.0
  */
-public final class SMPParticipantMigrationManagerMongoDB extends AbstractManagerMongoDB implements
-                                                         ISMPParticipantMigrationManager
+public final class SMPParticipantMigrationManagerMongoDB extends AbstractManagerMongoDB implements ISMPParticipantMigrationManager
 {
   private static final String BSON_ID = "id";
   private static final String BSON_DIRECTION = "direction";
@@ -92,7 +91,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   private void _createParticipantMigration (@Nonnull final SMPParticipantMigration aSMPParticipantMigration)
   {
     ValueEnforcer.notNull (aSMPParticipantMigration, "SMPParticipantMigration");
-    getCollection ().insertOne (toBson (aSMPParticipantMigration));
+    if (!getCollection ().insertOne (toBson (aSMPParticipantMigration)).wasAcknowledged ())
+      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
 
     AuditHelper.onAuditCreateSuccess (SMPParticipantMigration.OT,
                                       aSMPParticipantMigration.getID (),
@@ -106,8 +106,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
                                                                       @Nonnull @Nonempty final String sMigrationKey)
   {
-    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createOutbound (aParticipantID,
-                                                                                                     sMigrationKey);
+    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createOutbound (aParticipantID, sMigrationKey);
     _createParticipantMigration (aSMPParticipantMigration);
     return aSMPParticipantMigration;
   }
@@ -131,10 +130,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
 
       getCollection ().findOneAndReplace (new Document (BSON_ID, sParticipantMigrationID), toBson (aPM));
     }
-    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT,
-                                      "migration-state",
-                                      sParticipantMigrationID,
-                                      eNewState);
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "migration-state", sParticipantMigrationID, eNewState);
     return EChange.CHANGED;
   }
 
@@ -178,8 +174,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     if (aParticipantID == null)
       return false;
 
-    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION,
-                                                             EParticipantMigrationDirection.OUTBOUND.getID ()),
+    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION, EParticipantMigrationDirection.OUTBOUND.getID ()),
                                                new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
                            .iterator ()
                            .hasNext ();
@@ -190,8 +185,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     if (aParticipantID == null)
       return false;
 
-    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION,
-                                                             EParticipantMigrationDirection.INBOUND.getID ()),
+    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION, EParticipantMigrationDirection.INBOUND.getID ()),
                                                new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
                            .iterator ()
                            .hasNext ();

@@ -85,7 +85,8 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
 
     final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID, sName, bIsDeprecated);
 
-    getCollection ().insertOne (toBson (aSMPTransportProfile));
+    if (!getCollection ().insertOne (toBson (aSMPTransportProfile)).wasAcknowledged ())
+      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
 
     AuditHelper.onAuditCreateSuccess (SMPTransportProfile.OT, sID, sName, Boolean.valueOf (bIsDeprecated));
     return aSMPTransportProfile;
