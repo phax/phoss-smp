@@ -50,19 +50,17 @@ import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumb;
 import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumbProvider;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.dropdown.BootstrapDropdownMenu;
-import com.helger.photon.bootstrap4.ext.BootstrapSystemMessage;
 import com.helger.photon.bootstrap4.layout.BootstrapContainer;
 import com.helger.photon.bootstrap4.navbar.BootstrapNavbar;
 import com.helger.photon.bootstrap4.navbar.BootstrapNavbarNav;
 import com.helger.photon.bootstrap4.navbar.BootstrapNavbarToggleable;
-import com.helger.photon.bootstrap4.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapMenuItemRenderer;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapMenuItemRendererHorz;
+import com.helger.photon.bootstrap4.uictrls.ext.BootstrapPageRenderer;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.appid.CApplicationID;
 import com.helger.photon.core.appid.PhotonGlobalState;
@@ -70,7 +68,6 @@ import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.execcontext.ISimpleWebExecutionContext;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.core.html.CLayout;
-import com.helger.photon.core.interror.InternalErrorBuilder;
 import com.helger.photon.core.menu.IMenuItemExternal;
 import com.helger.photon.core.menu.IMenuItemPage;
 import com.helger.photon.core.menu.IMenuObject;
@@ -81,11 +78,7 @@ import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.util.SecurityHelper;
-import com.helger.photon.uicore.page.IWebPage;
-import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xservlet.forcedredirect.ForcedRedirectException;
-import com.helger.xservlet.forcedredirect.ForcedRedirectManager;
 
 /**
  * The public application viewport renderer (menu + content area)
@@ -201,82 +194,6 @@ public final class SMPRendererPublic
     return BootstrapMenuItemRenderer.createSideBarMenu (aLEC, aCallback);
   }
 
-  @SuppressWarnings ("unchecked")
-  @Nonnull
-  public static IHCNode getPageContent (@Nonnull final ILayoutExecutionContext aLEC)
-  {
-    final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
-
-    // Get the requested menu item
-    final IMenuItemPage aSelectedMenuItem = aLEC.getSelectedMenuItem ();
-
-    // Resolve the page of the selected menu item (if found)
-    IWebPage <WebPageExecutionContext> aDisplayPage;
-    if (aSelectedMenuItem.matchesDisplayFilter ())
-    {
-      // Only if we have display rights!
-      aDisplayPage = (IWebPage <WebPageExecutionContext>) aSelectedMenuItem.getPage ();
-    }
-    else
-    {
-      // No rights -> goto start page
-      aDisplayPage = (IWebPage <WebPageExecutionContext>) aLEC.getMenuTree ().getDefaultMenuItem ().getPage ();
-    }
-
-    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (aLEC, aDisplayPage);
-
-    // Build page content: header + content
-    final HCNodeList aPageContainer = new HCNodeList ();
-
-    // First add the system message
-    aPageContainer.addChild (BootstrapSystemMessage.createDefault ());
-
-    // Handle 404 case here (see error404.jsp)
-    if ("true".equals (aRequestScope.params ().getAsString ("httpError")))
-    {
-      final String sHttpStatusCode = aRequestScope.params ().getAsString ("httpStatusCode");
-      final String sHttpStatusMessage = aRequestScope.params ().getAsString ("httpStatusMessage");
-      final String sHttpRequestURI = aRequestScope.params ().getAsString ("httpRequestUri");
-      aPageContainer.addChild (new BootstrapErrorBox ().addChild ("HTTP error " +
-                                                                  sHttpStatusCode +
-                                                                  " (" +
-                                                                  sHttpStatusMessage +
-                                                                  ")" +
-                                                                  (StringHelper.hasText (sHttpRequestURI) ? " for request URI " +
-                                                                                                            sHttpRequestURI
-                                                                                                          : "")));
-    }
-    else
-    {
-      // Add the forced redirect content here
-      if (aWPEC.params ().containsKey (ForcedRedirectManager.REQUEST_PARAMETER_PRG_ACTIVE))
-        aPageContainer.addChild ((IHCNode) ForcedRedirectManager.getLastForcedRedirectContent (aDisplayPage.getID ()));
-    }
-
-    final String sHeaderText = aDisplayPage.getHeaderText (aWPEC);
-    aPageContainer.addChild (BootstrapWebPageUIHandler.INSTANCE.createPageHeader (sHeaderText));
-    // Main fill content
-    try
-    {
-      aDisplayPage.getContent (aWPEC);
-    }
-    catch (final ForcedRedirectException ex)
-    {
-      throw ex;
-    }
-    catch (final RuntimeException ex)
-    {
-      new InternalErrorBuilder ().setDisplayLocale (aWPEC.getDisplayLocale ())
-                                 .setRequestScope (aRequestScope)
-                                 .setThrowable (ex)
-                                 .setUIErrorHandlerFor (aWPEC.getNodeList ())
-                                 .handle ();
-    }
-    // Add result
-    aPageContainer.addChild (aWPEC.getNodeList ());
-    return aPageContainer;
-  }
-
   /**
    * @param bShowAuthor
    *        <code>true</code> to show the author, <code>false</code> to hide it.
@@ -372,22 +289,7 @@ public final class SMPRendererPublic
     }
 
     // Content
-    try
-    {
-      aOuterContainer.addChild (getPageContent (aLEC));
-    }
-    catch (final ForcedRedirectException ex)
-    {
-      throw ex;
-    }
-    catch (final RuntimeException ex)
-    {
-      new InternalErrorBuilder ().setDisplayLocale (aDisplayLocale)
-                                 .setRequestScope (aLEC.getRequestScope ())
-                                 .setThrowable (ex)
-                                 .setUIErrorHandlerFor (aOuterContainer)
-                                 .handle ();
-    }
+    aOuterContainer.addChild (BootstrapPageRenderer.getPageContent (aLEC));
 
     // Footer
     {
