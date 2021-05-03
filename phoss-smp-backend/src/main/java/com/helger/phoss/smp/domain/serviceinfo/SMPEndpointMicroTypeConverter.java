@@ -11,14 +11,13 @@
 package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ContainsSoftMigration;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.datetime.PDTFactory;
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.commons.string.StringParser;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
@@ -84,23 +83,23 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     final boolean bRequireBusinessLevelSignature = StringParser.parseBool (sRequireBusinessLevelSignature,
                                                                            SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aElement.getAttributeValue (ATTR_MINIMUM_AUTHENTICATION_LEVEL);
-    OffsetDateTime aServiceActivationDate = aElement.getAttributeValueWithConversion (ATTR_SERVICE_ACTIVATION_DATE,
-                                                                                      OffsetDateTime.class);
+    XMLOffsetDateTime aServiceActivationDate = aElement.getAttributeValueWithConversion (ATTR_SERVICE_ACTIVATION_DATE,
+                                                                                         XMLOffsetDateTime.class);
     if (aServiceActivationDate == null)
     {
       final LocalDateTime aServiceActivationDateLDT = aElement.getAttributeValueWithConversion (ATTR_SERVICE_ACTIVATION_DATE,
                                                                                                 LocalDateTime.class);
       if (aServiceActivationDateLDT != null)
-        aServiceActivationDate = PDTFactory.createOffsetDateTimeUTC (aServiceActivationDateLDT);
+        aServiceActivationDate = XMLOffsetDateTime.of (aServiceActivationDateLDT, null);
     }
-    OffsetDateTime aServiceExpirationDate = aElement.getAttributeValueWithConversion (ATTR_SERVICE_EXPIRATION_DATE,
-                                                                                      OffsetDateTime.class);
+    XMLOffsetDateTime aServiceExpirationDate = aElement.getAttributeValueWithConversion (ATTR_SERVICE_EXPIRATION_DATE,
+                                                                                         XMLOffsetDateTime.class);
     if (aServiceExpirationDate == null)
     {
       final LocalDateTime aServiceExpirationDateLDT = aElement.getAttributeValueWithConversion (ATTR_SERVICE_EXPIRATION_DATE,
                                                                                                 LocalDateTime.class);
       if (aServiceExpirationDateLDT != null)
-        aServiceExpirationDate = PDTFactory.createOffsetDateTimeUTC (aServiceExpirationDateLDT);
+        aServiceExpirationDate = XMLOffsetDateTime.of (aServiceExpirationDateLDT, null);
     }
     final String sCertificate = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE);
     final String sServiceDescription = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_SERVICE_DESCRIPTION);

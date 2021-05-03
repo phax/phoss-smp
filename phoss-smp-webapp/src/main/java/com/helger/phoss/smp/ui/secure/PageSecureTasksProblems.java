@@ -33,6 +33,7 @@ import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.string.StringHelper;
@@ -472,7 +473,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
                   if (aEndpoint.getServiceActivationDateTime () != null)
                   {
-                    if (aEndpoint.getServiceActivationDateTime ().isAfter (aNowDT))
+                    if (aEndpoint.getServiceActivationDateTime ().isAfter (XMLOffsetDateTime.of (aNowDT)))
                       aULPerEndpoint.addItem (_createWarning ("The endpoint is not yet active."),
                                               div ("It will be active from " +
                                                    PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (),
@@ -482,14 +483,14 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
                   if (aEndpoint.getServiceExpirationDateTime () != null)
                   {
-                    if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowDT))
+                    if (aEndpoint.getServiceExpirationDateTime ().isBefore (XMLOffsetDateTime.of (aNowDT)))
                       aULPerEndpoint.addItem (_createError ("The endpoint is no longer active."),
                                               div ("It was valid until " +
                                                    PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
                                                                             aDisplayLocale) +
                                                    "."));
                     else
-                      if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowPlusDT))
+                      if (aEndpoint.getServiceExpirationDateTime ().isBefore (XMLOffsetDateTime.of (aNowPlusDT)))
                         aULPerEndpoint.addItem (_createWarning ("The endpoint will be inactive soon."),
                                                 div ("It is only valid until " +
                                                      PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),

@@ -11,7 +11,6 @@
 package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,6 +18,7 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.compare.CompareHelper;
 import com.helger.commons.compare.IComparator;
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
@@ -96,7 +96,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
    *         services that are not yet activated.
    */
   @Nullable
-  OffsetDateTime getServiceActivationDateTime ();
+  XMLOffsetDateTime getServiceActivationDateTime ();
 
   /**
    * @return Activation date of the service. Senders should ignore services that
@@ -105,7 +105,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
   @Nullable
   default LocalDate getServiceActivationDate ()
   {
-    final OffsetDateTime aServiceActivationDT = getServiceActivationDateTime ();
+    final XMLOffsetDateTime aServiceActivationDT = getServiceActivationDateTime ();
     return aServiceActivationDT != null ? aServiceActivationDT.toLocalDate () : null;
   }
 
@@ -124,7 +124,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
    *         services that are expired.
    */
   @Nullable
-  OffsetDateTime getServiceExpirationDateTime ();
+  XMLOffsetDateTime getServiceExpirationDateTime ();
 
   /**
    * @return Expiration date of the service. Senders should ignore services that
@@ -133,7 +133,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
   @Nullable
   default LocalDate getServiceExpirationDate ()
   {
-    final OffsetDateTime aServiceExpirationDT = getServiceExpirationDateTime ();
+    final XMLOffsetDateTime aServiceExpirationDT = getServiceExpirationDateTime ();
     return aServiceExpirationDT != null ? aServiceExpirationDT.toLocalDate () : null;
   }
 

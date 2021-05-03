@@ -20,8 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.time.OffsetDateTime;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -29,6 +27,7 @@ import org.junit.rules.TestRule;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -81,8 +80,8 @@ public final class SMPServiceInformationManagerXMLTest
     assertNotNull (aSG);
     try
     {
-      final OffsetDateTime aStartDT = PDTFactory.getCurrentOffsetDateTime ();
-      final OffsetDateTime aEndDT = aStartDT.plusYears (1);
+      final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
+      final XMLOffsetDateTime aEndDT = aStartDT.plusYears (1);
       final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                                         "testproc");
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,

@@ -21,12 +21,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.OffsetDateTime;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.db.jdbc.executor.DBExecutor;
 
 public abstract class AbstractJDBCEnabledManager
@@ -57,7 +57,7 @@ public abstract class AbstractJDBCEnabledManager
   }
 
   @Nullable
-  public static Timestamp toTimestamp (@Nullable final OffsetDateTime aODT)
+  public static Timestamp toTimestamp (@Nullable final XMLOffsetDateTime aODT)
   {
     return aODT == null ? null : Timestamp.from (aODT.toInstant ());
   }
