@@ -276,9 +276,10 @@ public final class BDXR1ServerAPI
 
   public void saveServiceGroup (@Nonnull final String sPathServiceGroupID,
                                 @Nonnull final ServiceGroupType aServiceGroup,
+                                final boolean bCreateInSML,
                                 @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID;
+    final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + (bCreateInSML ? "" : " (no SML interaction)");
     final String sAction = "saveServiceGroup";
 
     if (LOGGER.isInfoEnabled ())
@@ -326,7 +327,7 @@ public final class BDXR1ServerAPI
       if (aServiceGroupMgr.containsSMPServiceGroupWithID (aPathServiceGroupID))
         aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension);
       else
-        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aPathServiceGroupID, sExtension, true);
+        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aPathServiceGroupID, sExtension, bCreateInSML);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
@@ -342,9 +343,10 @@ public final class BDXR1ServerAPI
   }
 
   public void deleteServiceGroup (@Nonnull final String sPathServiceGroupID,
+                                  final boolean bDeleteInSML,
                                   @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID;
+    final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + (bDeleteInSML ? "" : " (no SML interaction)");
     final String sAction = "deleteServiceGroup";
 
     if (LOGGER.isInfoEnabled ())
@@ -366,7 +368,7 @@ public final class BDXR1ServerAPI
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      aServiceGroupMgr.deleteSMPServiceGroup (aPathServiceGroupID, true);
+      aServiceGroupMgr.deleteSMPServiceGroup (aPathServiceGroupID, bDeleteInSML);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");

@@ -56,14 +56,15 @@ public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
       final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
       final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
       final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
+      final boolean bDeleteInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("delete-in-sml"));
 
       switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
-          new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, aBasicAuth);
+          new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, bDeleteInSML, aBasicAuth);
           break;
         case OASIS_BDXR_V1:
-          new BDXR1ServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, aBasicAuth);
+          new BDXR1ServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, bDeleteInSML, aBasicAuth);
           break;
         default:
           throw new UnsupportedOperationException ("Unsupported REST type specified!");
