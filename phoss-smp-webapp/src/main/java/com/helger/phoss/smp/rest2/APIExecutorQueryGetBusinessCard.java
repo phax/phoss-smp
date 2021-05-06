@@ -79,7 +79,7 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     final String sParticipantID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
     final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sParticipantID);
     if (aParticipantID == null)
-      throw new SMPBadRequestException ("Failed to parse Service Group '" + sParticipantID + "'", null);
+      throw SMPBadRequestException.failedToParseSG (sParticipantID, null);
 
     final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
 

@@ -103,8 +103,7 @@ public final class BDXR1ServerAPI
       if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -228,8 +227,7 @@ public final class BDXR1ServerAPI
       if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -293,8 +291,7 @@ public final class BDXR1ServerAPI
       if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       // Parse the content of the payload with the same identifier factory to
@@ -360,8 +357,7 @@ public final class BDXR1ServerAPI
       if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
@@ -401,8 +397,7 @@ public final class BDXR1ServerAPI
       if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPServiceGroup aPathServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPathServiceGroupID);
@@ -414,7 +409,7 @@ public final class BDXR1ServerAPI
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
       if (aPathDocTypeID == null)
       {
-        throw new SMPBadRequestException ("Failed to parse Document Type ID '" + sPathDocTypeID + "'", m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseDocType (sPathDocTypeID, m_aAPIProvider.getCurrentURI ());
       }
 
       // First check for redirection, then for actual service
@@ -480,16 +475,14 @@ public final class BDXR1ServerAPI
       if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocumentTypeID);
       if (aPathDocTypeID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Document Type ID '" + sPathDocumentTypeID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseDocType (sPathDocumentTypeID, m_aAPIProvider.getCurrentURI ());
       }
 
       // May be null for a Redirect!
@@ -679,15 +672,14 @@ public final class BDXR1ServerAPI
       if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
       if (aPathDocTypeID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Document Type ID '" + sPathDocTypeID + "'", m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseDocType (sPathDocTypeID, m_aAPIProvider.getCurrentURI ());
       }
 
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
@@ -777,8 +769,7 @@ public final class BDXR1ServerAPI
       if (aPathServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse Service Group ID '" + sPathServiceGroupID + "'",
-                                          m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);

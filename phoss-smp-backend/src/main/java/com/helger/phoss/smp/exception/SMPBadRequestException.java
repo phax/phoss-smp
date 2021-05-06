@@ -33,6 +33,18 @@ public class SMPBadRequestException extends SMPServerException
    */
   public SMPBadRequestException (@Nonnull final String sMessage, @Nullable final URI aNotFoundURI)
   {
-    super ("Bad request: " + sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
+    super ("Bad request: " + sMessage + (aNotFoundURI == null ? "" : " at '" + aNotFoundURI.toString () + "'"));
+  }
+
+  @Nonnull
+  public static SMPBadRequestException failedToParseSG (@Nonnull final String sServiceGroupID, @Nullable final URI aNotFoundURI)
+  {
+    return new SMPBadRequestException ("Failed to parse Service Group ID '" + sServiceGroupID + "'", aNotFoundURI);
+  }
+
+  @Nonnull
+  public static SMPBadRequestException failedToParseDocType (@Nonnull final String sDocTypeID, @Nullable final URI aNotFoundURI)
+  {
+    return new SMPBadRequestException ("Failed to parse Document Type ID '" + sDocTypeID + "'", aNotFoundURI);
   }
 }

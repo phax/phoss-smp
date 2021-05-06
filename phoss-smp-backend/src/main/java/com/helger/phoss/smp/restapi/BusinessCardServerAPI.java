@@ -81,7 +81,7 @@ public final class BusinessCardServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -89,7 +89,7 @@ public final class BusinessCardServerAPI
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPNotFoundException ("Unknown Service Group '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
@@ -139,7 +139,7 @@ public final class BusinessCardServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final IParticipantIdentifier aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aBusinessCard.getParticipantIdentifier ()
@@ -228,7 +228,7 @@ public final class BusinessCardServerAPI
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        throw new SMPBadRequestException ("Failed to parse serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
 
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
