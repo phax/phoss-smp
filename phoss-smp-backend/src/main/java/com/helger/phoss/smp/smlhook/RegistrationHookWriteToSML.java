@@ -70,7 +70,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
       LOGGER.info ("Performing SML query to '" + sEndpointURL + "'");
 
     // SSL socket factory
-    SSLSocketFactory aSocketFactory;
+    final SSLSocketFactory aSocketFactory;
     if (sLowerURL.startsWith ("https://"))
     {
       // https connection
@@ -94,7 +94,7 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     }
 
     // Hostname verifier
-    HostnameVerifier aHostnameVerifier;
+    final HostnameVerifier aHostnameVerifier;
     if (sLowerURL.contains ("//localhost") || sLowerURL.contains ("//127.0.0.1"))
     {
       // Accept all hostnames
