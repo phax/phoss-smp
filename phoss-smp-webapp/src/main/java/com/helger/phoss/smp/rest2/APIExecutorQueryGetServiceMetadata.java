@@ -73,14 +73,14 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
     final String sParticipantID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
     final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sParticipantID);
     if (aParticipantID == null)
-      throw new SMPBadRequestException ("Failed to parse Service Group '" + sParticipantID + "'", null);
+      throw SMPBadRequestException.failedToParseSG (sParticipantID, null);
 
     final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
 
     final String sDocTypeID = aPathVariables.get (Rest2Filter.PARAM_DOCUMENT_TYPE_ID);
     final IDocumentTypeIdentifier aDocTypeID = aIF.parseDocumentTypeIdentifier (sDocTypeID);
     if (aDocTypeID == null)
-      throw new SMPBadRequestException ("Invalid document type ID '" + sDocTypeID + "' provided.", null);
+      throw SMPBadRequestException.failedToParseDocType (sDocTypeID, null);
 
     final boolean bXMLSchemaValidation = aRequestScope.params ().getAsBoolean ("xmlSchemaValidation", true);
     final boolean bVerifySignature = aRequestScope.params ().getAsBoolean ("verifySignature", true);

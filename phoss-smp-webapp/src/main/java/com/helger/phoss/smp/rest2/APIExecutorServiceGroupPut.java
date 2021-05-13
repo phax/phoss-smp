@@ -72,6 +72,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
         final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
         final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
         final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
+        final boolean bCreateInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("create-in-sml"));
 
         ESuccess eSuccess = ESuccess.FAILURE;
         switch (SMPServerConfiguration.getRESTType ())
@@ -81,7 +82,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
             final com.helger.xsds.peppol.smp1.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
             if (aServiceGroup != null)
             {
-              new SMPServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, aBasicAuth);
+              new SMPServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, bCreateInSML, aBasicAuth);
               eSuccess = ESuccess.SUCCESS;
             }
             break;
@@ -91,7 +92,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
             final com.helger.xsds.bdxr.smp1.ServiceGroupType aServiceGroup = new BDXR1MarshallerServiceGroupType (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
             if (aServiceGroup != null)
             {
-              new BDXR1ServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, aBasicAuth);
+              new BDXR1ServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, bCreateInSML, aBasicAuth);
               eSuccess = ESuccess.SUCCESS;
             }
             break;

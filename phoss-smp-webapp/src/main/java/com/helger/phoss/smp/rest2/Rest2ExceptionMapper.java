@@ -50,8 +50,19 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
 
   private static void _logRestException (@Nonnull final String sMsg, @Nonnull final Throwable t)
   {
-    if (SMPServerConfiguration.isRESTLogExceptions ())
-      LOGGER.error (Rest2Filter.LOG_PREFIX + sMsg, t);
+    _logRestException (sMsg, t, false);
+  }
+
+  private static void _logRestException (@Nonnull final String sMsg, @Nonnull final Throwable t, final boolean bForceNoStackTrace)
+  {
+    final boolean bConfiguredToLog = SMPServerConfiguration.isRESTLogExceptions ();
+    if (bConfiguredToLog)
+    {
+      if (bForceNoStackTrace)
+        LOGGER.error (Rest2Filter.LOG_PREFIX + sMsg + " - " + getResponseEntityWithoutStackTrace (t));
+      else
+        LOGGER.error (Rest2Filter.LOG_PREFIX + sMsg, t);
+    }
     else
       LOGGER.error (Rest2Filter.LOG_PREFIX +
                     sMsg +
@@ -123,7 +134,8 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     }
     if (aThrowable instanceof SMPBadRequestException)
     {
-      _logRestException ("Bad request", aThrowable);
+      // Forcing no stack trace, because the context should be self-explanatory
+      _logRestException ("Bad request", aThrowable, true);
       _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_BAD_REQUEST, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }

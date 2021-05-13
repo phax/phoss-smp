@@ -186,7 +186,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     aKeyManagerFactory.init (getKeyStore (), SMPServerConfiguration.getKeyStoreKeyPassword ());
 
     // Trust manager
-    TrustManager [] aTrustManagers;
+    final TrustManager [] aTrustManagers;
     if (SMPTrustManager.isTrustStoreValid ())
     {
       final TrustManagerFactory aTrustManagerFactory = TrustManagerFactory.getInstance (TrustManagerFactory.getDefaultAlgorithm ());
