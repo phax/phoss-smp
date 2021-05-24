@@ -272,13 +272,14 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             // else: we don't care
           }
 
+          final String sAlias = SMPServerConfiguration.getKeyStoreKeyAlias ();
           final HCOL aOL = new HCOL ();
           for (final Certificate aCert : aChain)
           {
             if (aCert instanceof X509Certificate)
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert, aNowLDT, aDisplayLocale);
+              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias, aX509Cert, aNowLDT, aDisplayLocale);
               aOL.addItem (aCertDetails);
             }
             else
@@ -317,7 +318,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             if (aCert instanceof X509Certificate)
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert, aNowLDT, aDisplayLocale);
+              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias, aX509Cert, aNowLDT, aDisplayLocale);
               aOL.addItem (aCertDetails);
             }
             else
@@ -398,7 +399,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               if (aCert instanceof X509Certificate)
               {
                 final X509Certificate aX509Cert = (X509Certificate) aCert;
-                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert, aNowLDT, aDisplayLocale);
+                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias, aX509Cert, aNowLDT, aDisplayLocale);
                 aUL.addItem (aCertDetails);
               }
               else
@@ -437,7 +438,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               if (aCert instanceof X509Certificate)
               {
                 final X509Certificate aX509Cert = (X509Certificate) aCert;
-                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (aX509Cert, aNowLDT, aDisplayLocale);
+                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias, aX509Cert, aNowLDT, aDisplayLocale);
                 aOL.addItem (aCertDetails);
               }
               else
