@@ -68,7 +68,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPKeyManager.class);
 
-  private static final AtomicBoolean s_aKeyStoreValid = new AtomicBoolean (false);
+  private static final AtomicBoolean KEY_STORE_VALID = new AtomicBoolean (false);
   private static EKeyStoreLoadError s_eInitError;
   private static String s_sInitError;
 
@@ -77,7 +77,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
   private static void _setKeyStoreValid (final boolean bValid)
   {
-    s_aKeyStoreValid.set (bValid);
+    KEY_STORE_VALID.set (bValid);
   }
 
   private static void _loadError (@Nullable final EKeyStoreLoadError eInitError, @Nullable final String sInitError)
@@ -276,7 +276,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    */
   public static boolean isKeyStoreValid ()
   {
-    return s_aKeyStoreValid.get ();
+    return KEY_STORE_VALID.get ();
   }
 
   /**
