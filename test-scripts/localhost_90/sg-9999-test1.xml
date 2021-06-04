@@ -19,4 +19,6 @@
 -->
 <ServiceGroup xmlns="http://busdox.org/serviceMetadata/publishing/1.0/">
   <ParticipantIdentifier xmlns="http://busdox.org/transport/identifiers/1.0/" scheme="iso6523-actorid-upis">9999:test1</ParticipantIdentifier>
+  <!-- empty element is mandatory -->
+  <ServiceMetadataReferenceCollection/>
 </ServiceGroup>
