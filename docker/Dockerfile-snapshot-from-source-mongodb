@@ -24,6 +24,7 @@ ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_EN
 
 # Install vim, Java 11 JDK, Maven and Git
 RUN apt-get update \
+  && apt-get upgrade -y \
   && apt-get install -y vim git maven \
   && rm -rf /var/lib/apt/lists/*
 
