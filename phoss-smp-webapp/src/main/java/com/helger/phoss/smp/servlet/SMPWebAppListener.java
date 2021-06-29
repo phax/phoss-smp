@@ -126,26 +126,32 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     return SMPServerConfiguration.getPublicServerURL ();
   }
 
-  @Override
-  protected void initGlobalSettings ()
+  private static void _initTimeZone ()
   {
+    final String sDesiredTimeZone = CSMP.DEFAULT_TIMEZONE;
+
     // Check if the timezone is supported
-    if (!ArrayHelper.contains (TimeZone.getAvailableIDs (), CSMP.DEFAULT_TIMEZONE))
+    if (!ArrayHelper.contains (TimeZone.getAvailableIDs (), sDesiredTimeZone))
     {
-      final String sErrorMsg = "The default time zone '" + CSMP.DEFAULT_TIMEZONE + "' is not supported!";
+      final String sErrorMsg = "The default time zone '" + sDesiredTimeZone + "' is not supported!";
       LOGGER.error (sErrorMsg);
       throw new InitializationException (sErrorMsg);
     }
 
     // Set the default timezone
-    if (PDTConfig.setDefaultDateTimeZoneID (CSMP.DEFAULT_TIMEZONE).isFailure ())
+    if (PDTConfig.setDefaultDateTimeZoneID (sDesiredTimeZone).isFailure ())
     {
-      final String sErrorMsg = "Failed to set default time zone to '" + CSMP.DEFAULT_TIMEZONE + "'!";
+      final String sErrorMsg = "Failed to set default time zone to '" + sDesiredTimeZone + "'!";
       LOGGER.error (sErrorMsg);
       throw new InitializationException (sErrorMsg);
     }
-    LOGGER.info ("Set default timezone to '" + CSMP.DEFAULT_TIMEZONE + "'");
+    LOGGER.info ("Set default timezone to '" + sDesiredTimeZone + "'");
+  }
 
+  @Override
+  protected void initGlobalSettings ()
+  {
+    _initTimeZone ();
     s_aStartupDateTime = PDTFactory.getCurrentOffsetDateTimeUTC ();
 
     // Enable JaxWS debugging?
@@ -169,8 +175,11 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Handled via the XServletSettings instead
     UnifiedResponseDefaultSettings.setReferrerPolicy (null);
     UnifiedResponseDefaultSettings.setXFrameOptions (null, null);
-    // SMP is http only
-    UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
+    if (SMPServerConfiguration.getRESTType ().isPeppol ())
+    {
+      // Peppol SMP is always http only
+      UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
+    }
 
     // Avoid writing unnecessary stuff
     setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
