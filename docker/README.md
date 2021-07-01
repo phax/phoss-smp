@@ -24,9 +24,9 @@ Prebuild images are available from:
 Running a pre-build image (XML backend only):
 
 ```
-docker run -d --name phoss-smp-release-binary-xml-5.3.2 -p 8888:8080 phelger/smp:5.3.2
-docker stop phoss-smp-release-binary-xml-5.3.2
-docker rm phoss-smp-release-binary-xml-5.3.2
+docker run -d --name phoss-smp -p 8888:8080 phelger/phoss-smp-xml:latest
+docker stop phoss-smp
+docker rm phoss-smp
 ```
 
 The command line exposes port 8888 locally if Tomcat is running successfully.
