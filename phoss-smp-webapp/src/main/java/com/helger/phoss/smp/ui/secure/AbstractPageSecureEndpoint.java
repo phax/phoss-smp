@@ -462,8 +462,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                    .setCtrl (aEndpointCert == null ? strong ("!!!FAILED TO INTERPRETE!!!")
                                                                                    : SMPCommonUI.createCertificateDetailsTable (aEndpointCert,
                                                                                                                                 aNowLDT,
-                                                                                                                                aDisplayLocale)
-                                                                                                .setResponsive (true)));
+                                                                                                                                aDisplayLocale)));
     }
 
     if (aSelectedEndpoint.hasServiceDescription ())

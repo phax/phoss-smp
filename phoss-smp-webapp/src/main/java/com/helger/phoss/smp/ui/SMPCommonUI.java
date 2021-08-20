@@ -38,6 +38,7 @@ import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.math.MathHelper;
+import com.helger.css.property.CCSSProperties;
 import com.helger.datetime.util.PDTDisplayHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
@@ -100,6 +101,24 @@ public final class SMPCommonUI
 
   private SMPCommonUI ()
   {}
+
+  @Nonnull
+  private static String _inGroupsOf (@Nonnull final String s, final int nChars)
+  {
+    if (nChars < 1)
+      return s;
+    final int nMax = s.length ();
+    final StringBuilder aSB = new StringBuilder (nMax * 2);
+    int nIndex = 0;
+    while (nIndex < nMax - 1)
+    {
+      if (aSB.length () > 0)
+        aSB.append (' ');
+      aSB.append (s, nIndex, Integer.min (nIndex + nChars, nMax));
+      nIndex += nChars;
+    }
+    return aSB.toString ();
+  }
 
   public static void init ()
   {
@@ -225,11 +244,14 @@ public final class SMPCommonUI
     final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
     final PublicKey aPublicKey = aX509Cert.getPublicKey ();
 
-    final BootstrapTable aCertDetails = new BootstrapTable (HCCol.perc (20), HCCol.star ());
+    final BootstrapTable aCertDetails = new BootstrapTable (new HCCol ().addStyle (CCSSProperties.WIDTH.newValue ("12rem")), HCCol.star ());
+    aCertDetails.setResponsive (true);
     aCertDetails.addBodyRow ().addCell ("Version:").addCell (Integer.toString (aX509Cert.getVersion ()));
     aCertDetails.addBodyRow ().addCell ("Subject:").addCell (aX509Cert.getSubjectX500Principal ().getName ());
     aCertDetails.addBodyRow ().addCell ("Issuer:").addCell (aX509Cert.getIssuerX500Principal ().getName ());
-    aCertDetails.addBodyRow ().addCell ("Serial number:").addCell (aX509Cert.getSerialNumber ().toString (16));
+    aCertDetails.addBodyRow ()
+                .addCell ("Serial number:")
+                .addCell (aX509Cert.getSerialNumber ().toString () + " / 0x" + _inGroupsOf (aX509Cert.getSerialNumber ().toString (16), 4));
     aCertDetails.addBodyRow ()
                 .addCell ("Valid from:")
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotBefore, aDisplayLocale) + " "),
