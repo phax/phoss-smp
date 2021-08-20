@@ -37,6 +37,18 @@ import com.helger.peppolid.IParticipantIdentifier;
 public interface ISMPBusinessCard extends IHasID <String>, Serializable
 {
   /**
+   * @return The participant identifier of this service group. Never
+   *         <code>null</code>.
+   * @deprecated Since 5.3.3; Use {@link #getParticipantIdentifier()} instead
+   */
+  @Nonnull
+  @Deprecated
+  default IParticipantIdentifier getParticpantIdentifier ()
+  {
+    return getParticipantIdentifier ();
+  }
+
+  /**
    * @return The participant ID of the service group to which this business card
    *         belongs. Never <code>null</code>.
    */

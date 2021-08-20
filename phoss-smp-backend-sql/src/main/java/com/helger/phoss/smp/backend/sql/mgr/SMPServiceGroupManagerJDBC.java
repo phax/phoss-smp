@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import javax.annotation.CheckForSigned;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -445,7 +446,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                                                                       aParticipantID.getValue ()));
   }
 
-  @Nonnegative
+  @CheckForSigned
   public long getSMPServiceGroupCount ()
   {
     if (LOGGER.isDebugEnabled ())

@@ -47,6 +47,18 @@ public interface ISMPServiceGroup extends IHasID <String>, Serializable, ISMPHas
   /**
    * @return The participant identifier of this service group. Never
    *         <code>null</code>.
+   * @deprecated Since 5.3.3; Use {@link #getParticipantIdentifier()} instead
+   */
+  @Nonnull
+  @Deprecated
+  default IParticipantIdentifier getParticpantIdentifier ()
+  {
+    return getParticipantIdentifier ();
+  }
+
+  /**
+   * @return The participant identifier of this service group. Never
+   *         <code>null</code>.
    */
   @Nonnull
   IParticipantIdentifier getParticipantIdentifier ();

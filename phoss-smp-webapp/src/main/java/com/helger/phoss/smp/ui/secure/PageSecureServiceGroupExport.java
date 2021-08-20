@@ -54,20 +54,23 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
 
     final boolean bHandleBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
 
-    if (nServiceGroupCount == 0)
-      aNodeList.addChild (warn ("Since no service group is present, nothing can be exported!"));
+    if (nServiceGroupCount < 0)
+      aNodeList.addChild (error ("The number of service groups is unknown, hence nothing can be exported!"));
     else
-    {
-      aNodeList.addChild (info ("Export " +
-                                (nServiceGroupCount == 1 ? "service group" : "all " + nServiceGroupCount + " service groups") +
-                                (bHandleBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s") : "") +
-                                " to an XML file."));
-    }
+      if (nServiceGroupCount == 0)
+        aNodeList.addChild (warn ("Since no service group is present, nothing can be exported!"));
+      else
+      {
+        aNodeList.addChild (info ("Export " +
+                                  (nServiceGroupCount == 1 ? "service group" : "all " + nServiceGroupCount + " service groups") +
+                                  (bHandleBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s") : "") +
+                                  " to an XML file."));
+      }
 
     final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
     aToolbar.addChild (new BootstrapButton ().addChild ("Export all Service Groups")
                                              .setIcon (EDefaultIcon.SAVE_ALL)
                                              .setOnClick (CAjax.FUNCTION_EXPORT_ALL_SERVICE_GROUPS.getInvocationURL (aRequestScope))
-                                             .setDisabled (nServiceGroupCount == 0));
+                                             .setDisabled (nServiceGroupCount <= 0));
   }
 }

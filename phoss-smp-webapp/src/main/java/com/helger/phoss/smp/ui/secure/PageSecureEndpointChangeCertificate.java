@@ -197,7 +197,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupMgr.getSMPServiceGroupCount () == 0)
+    if (aServiceGroupMgr.getSMPServiceGroupCount () <= 0)
     {
       aNodeList.addChild (warn ("No service group is present! At least one service group must be present to change certificates."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")

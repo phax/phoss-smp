@@ -240,7 +240,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupMgr.getSMPServiceGroupCount () == 0)
+    if (aServiceGroupMgr.getSMPServiceGroupCount () <= 0)
     {
       aNodeList.addChild (warn ("No service group is present! At least one service group must be present to create an endpoint for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
@@ -250,7 +250,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     }
 
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
-    if (aTransportProfileMgr.getSMPTransportProfileCount () == 0)
+    if (aTransportProfileMgr.getSMPTransportProfileCount () <= 0)
     {
       aNodeList.addChild (warn ("No transport profile is present! At least one transport profile must be present to create an endpoint for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new transport profile")
