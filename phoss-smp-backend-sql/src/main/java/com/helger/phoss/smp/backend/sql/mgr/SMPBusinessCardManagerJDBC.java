@@ -28,14 +28,14 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.collection.multimap.IMultiMapListBased;
-import com.helger.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
@@ -278,7 +278,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
 
       // Group by ID
-      final IMultiMapListBased <IParticipantIdentifier, SMPBusinessCardEntity> aEntityMap = new MultiHashMapArrayListBased <> ();
+      final ICommonsMap <IParticipantIdentifier, ICommonsList <SMPBusinessCardEntity>> aEntityMap = new CommonsHashMap <> ();
       for (final DBResultRow aRow : aDBResult)
       {
         final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aRow.getAsString (0));
@@ -291,7 +291,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
         aEntity.contacts ().setAll (getJsonAsBCC (aRow.getAsString (7)));
         aEntity.setAdditionalInformation (aRow.getAsString (8));
         aEntity.setRegistrationDate (aRow.get (9).getAsLocalDate ());
-        aEntityMap.putSingle (aIF.parseParticipantIdentifier (aRow.getAsString (1)), aEntity);
+        aEntityMap.computeIfAbsent (aIF.parseParticipantIdentifier (aRow.getAsString (1)), k -> new CommonsArrayList <> ()).add (aEntity);
       }
 
       // Convert

@@ -111,8 +111,8 @@ public final class ServiceMetadataInterfaceFillDBTest extends AbstractSMPWebAppS
     LOGGER.info ("Created " +
                  nEndpoints +
                  " ServiceInformation in " +
-                 aSW.getSeconds () +
-                 " seconds (= " +
+                 aSW.getMillis () +
+                 " ms (= " +
                  (aSW.getMillis () / nEndpoints) +
                  " ms/entry)");
   }

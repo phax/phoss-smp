@@ -22,12 +22,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import com.helger.collection.multimap.MultiHashMapArrayListBased;
-import com.helger.collection.multimap.MultiHashMapHashSetBased;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashMap;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.CommonsTreeSet;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.collection.impl.ICommonsSortedSet;
 import com.helger.commons.compare.ESortOrder;
@@ -220,8 +222,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     boolean bShowList = true;
 
-    final MultiHashMapArrayListBased <String, ISMPEndpoint> aEndpointsGroupedPerURL = new MultiHashMapArrayListBased <> ();
-    final MultiHashMapHashSetBased <String, ISMPServiceGroup> aServiceGroupsGroupedPerURL = new MultiHashMapHashSetBased <> ();
+    final ICommonsMap <String, ICommonsList <ISMPEndpoint>> aEndpointsGroupedPerURL = new CommonsHashMap <> ();
+    final ICommonsMap <String, ICommonsSet <ISMPServiceGroup>> aServiceGroupsGroupedPerURL = new CommonsHashMap <> ();
     final ICommonsList <ISMPServiceInformation> aAllSIs = aServiceInfoMgr.getAllSMPServiceInformation ();
     int nTotalEndpointCount = 0;
     int nTotalEndpointCountWithURL = 0;
@@ -234,8 +236,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
           ++nTotalEndpointCount;
           if (aEndpoint.hasEndpointReference ())
           {
-            aEndpointsGroupedPerURL.putSingle (aEndpoint.getEndpointReference (), aEndpoint);
-            aServiceGroupsGroupedPerURL.putSingle (aEndpoint.getEndpointReference (), aSG);
+            aEndpointsGroupedPerURL.computeIfAbsent (aEndpoint.getEndpointReference (), k -> new CommonsArrayList <> ()).add (aEndpoint);
+            aServiceGroupsGroupedPerURL.computeIfAbsent (aEndpoint.getEndpointReference (), k -> new CommonsHashSet <> ()).add (aSG);
             ++nTotalEndpointCountWithURL;
           }
         }

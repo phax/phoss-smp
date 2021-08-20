@@ -42,6 +42,9 @@ import com.helger.peppolid.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
+import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
+import com.helger.web.scope.mgr.WebScoped;
+import com.helger.web.scope.mock.WebScopeTestRule;
 import com.helger.xsds.peppol.smp1.EndpointType;
 import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ProcessListType;
@@ -49,9 +52,6 @@ import com.helger.xsds.peppol.smp1.ProcessType;
 import com.helger.xsds.peppol.smp1.ServiceEndpointList;
 import com.helger.xsds.peppol.smp1.ServiceInformationType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
-import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
-import com.helger.web.scope.mgr.WebScoped;
-import com.helger.web.scope.mock.WebScopeTestRule;
 
 /**
  * Create one million endpoints. Run this AFTER
@@ -92,10 +92,10 @@ public final class MainCreateManyEndpoints
                                                                                                      EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_1_2,
                                                                                                      EPredefinedDocumentTypeIdentifier.INVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0,
                                                                                                      EPredefinedDocumentTypeIdentifier.CREDITNOTE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0,
-                                                                                                     EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0,
+                                                                                                     EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_02,
                                                                                                      EPredefinedDocumentTypeIdentifier.INVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0_CONFORMANT_XOEV_DE_KOSIT_EXTENSION_XRECHNUNG_2_0,
                                                                                                      EPredefinedDocumentTypeIdentifier.CREDITNOTE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0_CONFORMANT_XOEV_DE_KOSIT_EXTENSION_XRECHNUNG_2_0,
-                                                                                                     EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0_CONFORMANT_XOEV_DE_KOSIT_EXTENSION_XRECHNUNG_2_0 })
+                                                                                                     EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0_CONFORMANT_XOEV_DE_KOSIT_EXTENSION_XRECHNUNG_2_02 })
 
       {
         final PeppolDocumentTypeIdentifier aDT = aEDT.getAsDocumentTypeIdentifier ();
@@ -163,7 +163,7 @@ public final class MainCreateManyEndpoints
         }
       }
       aSWOverall.stop ();
-      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getSeconds () + " seconds");
+      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms");
     }
     finally
     {

@@ -40,10 +40,10 @@ import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
+import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
-import com.helger.web.scope.mgr.WebScoped;
 
 /**
  * Create one million service groups - please make sure the SML connection is
@@ -113,7 +113,7 @@ public final class MainCreate1MillionServiceGroups
         LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
       }
       aSWOverall.stop ();
-      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getSeconds () + " seconds");
+      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms");
     }
     finally
     {

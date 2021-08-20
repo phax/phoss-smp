@@ -46,6 +46,8 @@ import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
+import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
+import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xsds.peppol.smp1.EndpointType;
 import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ProcessListType;
@@ -53,8 +55,6 @@ import com.helger.xsds.peppol.smp1.ProcessType;
 import com.helger.xsds.peppol.smp1.ServiceEndpointList;
 import com.helger.xsds.peppol.smp1.ServiceInformationType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
-import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
-import com.helger.web.scope.mgr.WebScoped;
 
 /**
  * Create one million endpoints. Run this AFTER
@@ -151,7 +151,7 @@ public final class MainCreate1MillionEndpoints
         LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
       }
       aSWOverall.stop ();
-      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getSeconds () + " seconds");
+      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms");
     }
     finally
     {

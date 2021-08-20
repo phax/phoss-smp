@@ -10,14 +10,13 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import java.time.OffsetDateTime;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
@@ -40,8 +39,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   private String m_sEndpointReference;
   private boolean m_bRequireBusinessLevelSignature;
   private String m_sMinimumAuthenticationLevel;
-  private OffsetDateTime m_aServiceActivationDT;
-  private OffsetDateTime m_aServiceExpirationDT;
+  private XMLOffsetDateTime m_aServiceActivationDT;
+  private XMLOffsetDateTime m_aServiceExpirationDT;
   private String m_sCertificate;
   private String m_sServiceDescription;
   private String m_sTechnicalContactUrl;
@@ -51,8 +50,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                       @Nullable final String sEndpointReference,
                       final boolean bRequireBusinessLevelSignature,
                       @Nullable final String sMinimumAuthenticationLevel,
-                      @Nullable final OffsetDateTime aServiceActivationDT,
-                      @Nullable final OffsetDateTime aServiceExpirationDT,
+                      @Nullable final XMLOffsetDateTime aServiceActivationDT,
+                      @Nullable final XMLOffsetDateTime aServiceExpirationDT,
                       @Nullable final String sCertificate,
                       @Nullable final String sServiceDescription,
                       @Nullable final String sTechnicalContactUrl,
@@ -118,23 +117,23 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   }
 
   @Nullable
-  public OffsetDateTime getServiceActivationDateTime ()
+  public XMLOffsetDateTime getServiceActivationDateTime ()
   {
     return m_aServiceActivationDT;
   }
 
-  public final void setServiceActivationDateTime (@Nullable final OffsetDateTime aServiceActivationDate)
+  public final void setServiceActivationDateTime (@Nullable final XMLOffsetDateTime aServiceActivationDate)
   {
     m_aServiceActivationDT = aServiceActivationDate;
   }
 
   @Nullable
-  public OffsetDateTime getServiceExpirationDateTime ()
+  public XMLOffsetDateTime getServiceExpirationDateTime ()
   {
     return m_aServiceExpirationDT;
   }
 
-  public final void setServiceExpirationDateTime (@Nullable final OffsetDateTime aServiceExpirationDate)
+  public final void setServiceExpirationDateTime (@Nullable final XMLOffsetDateTime aServiceExpirationDate)
   {
     m_aServiceExpirationDT = aServiceExpirationDate;
   }

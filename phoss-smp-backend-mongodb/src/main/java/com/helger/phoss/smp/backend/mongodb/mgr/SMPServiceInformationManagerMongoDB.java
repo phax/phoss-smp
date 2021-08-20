@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -35,6 +34,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
@@ -140,8 +140,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final boolean bRequireBusinessLevelSignature = aDoc.getBoolean (BSON_BUSINESSLEVELSIG,
                                                                     SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aDoc.getString (BSON_MINIMUM_AUTHENTICATION_LEVEL);
-    final LocalDateTime aServiceActivationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEACTIVATION), LocalDateTime.class);
-    final LocalDateTime aServiceExpirationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEEXPIRATION), LocalDateTime.class);
+    final XMLOffsetDateTime aServiceActivationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEACTIVATION), XMLOffsetDateTime.class);
+    final XMLOffsetDateTime aServiceExpirationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEEXPIRATION), XMLOffsetDateTime.class);
     final String sCertificate = aDoc.getString (BSON_CERTIFICATE);
     final String sServiceDescription = aDoc.getString (BSON_SERVICE_DESCRIPTION);
     final String sTechnicalContactUrl = aDoc.getString (BSON_TECHCONTACTURL);

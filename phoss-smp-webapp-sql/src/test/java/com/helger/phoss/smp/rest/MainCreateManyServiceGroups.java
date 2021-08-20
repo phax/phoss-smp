@@ -122,7 +122,7 @@ public final class MainCreateManyServiceGroups
 
       ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (es);
       aSWOverall.stop ();
-      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getSeconds () + " seconds");
+      LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms");
     }
     finally
     {

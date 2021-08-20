@@ -65,12 +65,6 @@ public final class ServiceGroupInterfaceFillDBTest extends AbstractSMPWebAppSQLT
       aSMPClient.saveServiceGroup (aSG, CREDENTIALS);
     }
     aSW.stop ();
-    LOGGER.info ("Created " +
-                 nCount +
-                 " ServiceGroups in " +
-                 aSW.getSeconds () +
-                 " seconds (= " +
-                 (aSW.getMillis () / nCount) +
-                 " ms/entry)");
+    LOGGER.info ("Created " + nCount + " ServiceGroups in " + aSW.getMillis () + " ms (= " + (aSW.getMillis () / nCount) + " ms/entry)");
   }
 }

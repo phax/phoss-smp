@@ -19,13 +19,12 @@ package com.helger.phoss.smp.domain.serviceinfo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.time.LocalDateTime;
-
 import org.junit.Rule;
 import org.junit.Test;
 
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -68,8 +67,8 @@ public final class ISMPServiceInformationManagerFuncTest
     assertNotNull (aSG);
     try
     {
-      final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
-      final LocalDateTime aEndDT = aStartDT.plusYears (1);
+      final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
+      final XMLOffsetDateTime aEndDT = aStartDT.plusYears (1);
       final SMPEndpoint aEP = new SMPEndpoint ("tp",
                                                "http://localhost/as2",
                                                false,

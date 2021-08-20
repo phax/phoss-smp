@@ -18,11 +18,12 @@ package com.helger.phoss.smp.ui.secure;
 
 import javax.annotation.Nonnull;
 
-import com.helger.collection.multimap.IMultiMapListBased;
-import com.helger.collection.multimap.MultiHashMapArrayListBased;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.attr.StringMap;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCLI;
@@ -78,8 +79,9 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
     aNodeList.addChild (aToolbar);
 
     // Create list of service groups
-    final IMultiMapListBased <ISMPServiceGroup, ISMPServiceInformation> aMap = new MultiHashMapArrayListBased <> ();
-    aServiceInfoMgr.getAllSMPServiceInformation ().forEach (x -> aMap.putSingle (x.getServiceGroup (), x));
+    final ICommonsMap <ISMPServiceGroup, ICommonsList <ISMPServiceInformation>> aMap = new CommonsHashMap <> ();
+    aServiceInfoMgr.getAllSMPServiceInformation ()
+                   .forEach (x -> aMap.computeIfAbsent (x.getServiceGroup (), k -> new CommonsArrayList <> ()).add (x));
 
     final HCUL aULSG = new HCUL ();
     final ICommonsList <ISMPServiceGroup> aServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ()
