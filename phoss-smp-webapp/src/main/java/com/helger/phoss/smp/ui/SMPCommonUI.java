@@ -38,6 +38,7 @@ import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.math.MathHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.css.property.CCSSProperties;
 import com.helger.datetime.util.PDTDisplayHelper;
 import com.helger.html.hc.IHCNode;
@@ -236,7 +237,8 @@ public final class SMPCommonUI
   }
 
   @Nonnull
-  public static BootstrapTable createCertificateDetailsTable (@Nonnull final X509Certificate aX509Cert,
+  public static BootstrapTable createCertificateDetailsTable (@Nullable final String sAlias,
+                                                              @Nonnull final X509Certificate aX509Cert,
                                                               @Nonnull final LocalDateTime aNowLDT,
                                                               @Nonnull final Locale aDisplayLocale)
   {
@@ -246,6 +248,8 @@ public final class SMPCommonUI
 
     final BootstrapTable aCertDetails = new BootstrapTable (new HCCol ().addStyle (CCSSProperties.WIDTH.newValue ("12rem")), HCCol.star ());
     aCertDetails.setResponsive (true);
+    if (StringHelper.hasText (sAlias))
+      aCertDetails.addBodyRow ().addCell ("Alias:").addCell (sAlias);
     aCertDetails.addBodyRow ().addCell ("Version:").addCell (Integer.toString (aX509Cert.getVersion ()));
     aCertDetails.addBodyRow ().addCell ("Subject:").addCell (aX509Cert.getSubjectX500Principal ().getName ());
     aCertDetails.addBodyRow ().addCell ("Issuer:").addCell (aX509Cert.getIssuerX500Principal ().getName ());

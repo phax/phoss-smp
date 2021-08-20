@@ -460,7 +460,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       final X509Certificate aEndpointCert = CertificateHelper.convertStringToCertficateOrNull (aSelectedEndpoint.getCertificate ());
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate")
                                                    .setCtrl (aEndpointCert == null ? strong ("!!!FAILED TO INTERPRETE!!!")
-                                                                                   : SMPCommonUI.createCertificateDetailsTable (aEndpointCert,
+                                                                                   : SMPCommonUI.createCertificateDetailsTable (null,
+                                                                                                                                aEndpointCert,
                                                                                                                                 aNowLDT,
                                                                                                                                 aDisplayLocale)));
     }
