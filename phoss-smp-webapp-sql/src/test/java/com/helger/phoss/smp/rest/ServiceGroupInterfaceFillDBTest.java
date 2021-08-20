@@ -31,8 +31,8 @@ import com.helger.phoss.smp.mock.MockSMPClient;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.smpclient.exception.SMPClientException;
 import com.helger.smpclient.peppol.SMPClient;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
+import com.helger.xsds.peppol.smp1.ServiceGroupType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
 /**
  * Create 2000 service groups

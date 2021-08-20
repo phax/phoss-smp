@@ -54,9 +54,9 @@ import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.smpclient.exception.SMPClientException;
 import com.helger.smpclient.exception.SMPClientNotFoundException;
 import com.helger.smpclient.peppol.SMPClient;
-import com.helger.smpclient.peppol.jaxb.ObjectFactory;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
+import com.helger.xsds.peppol.smp1.ObjectFactory;
+import com.helger.xsds.peppol.smp1.ServiceGroupType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**

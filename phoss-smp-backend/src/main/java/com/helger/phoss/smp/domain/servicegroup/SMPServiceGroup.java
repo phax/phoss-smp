@@ -113,9 +113,9 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   }
 
   @Nonnull
-  public com.helger.smpclient.peppol.jaxb.ServiceGroupType getAsJAXBObjectPeppol ()
+  public com.helger.xsds.peppol.smp1.ServiceGroupType getAsJAXBObjectPeppol ()
   {
-    final com.helger.smpclient.peppol.jaxb.ServiceGroupType ret = new com.helger.smpclient.peppol.jaxb.ServiceGroupType ();
+    final com.helger.xsds.peppol.smp1.ServiceGroupType ret = new com.helger.xsds.peppol.smp1.ServiceGroupType ();
     // Explicit constructor call is needed here!
     ret.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aParticipantIdentifier));
     if (false)

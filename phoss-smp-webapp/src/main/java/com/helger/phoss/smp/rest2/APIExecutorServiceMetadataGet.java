@@ -66,7 +66,7 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     {
       case PEPPOL:
       {
-        final com.helger.smpclient.peppol.jaxb.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
+        final com.helger.xsds.peppol.smp1.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
                                                                                                                                         sDocumentTypeID);
 
         // Convert to DOM document

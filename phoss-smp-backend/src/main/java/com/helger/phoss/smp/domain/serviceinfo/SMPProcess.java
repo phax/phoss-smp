@@ -33,8 +33,8 @@ import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.bdxr.smp1.process.BDXR1ProcessIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
-import com.helger.smpclient.peppol.jaxb.EndpointType;
-import com.helger.smpclient.peppol.jaxb.ProcessType;
+import com.helger.xsds.peppol.smp1.EndpointType;
+import com.helger.xsds.peppol.smp1.ProcessType;
 import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
 
 /**
@@ -135,7 +135,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   }
 
   @Nullable
-  public com.helger.smpclient.peppol.jaxb.ProcessType getAsJAXBObjectPeppol ()
+  public com.helger.xsds.peppol.smp1.ProcessType getAsJAXBObjectPeppol ()
   {
     if (m_aEndpoints.isEmpty ())
     {
@@ -143,10 +143,10 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
       return null;
     }
 
-    final com.helger.smpclient.peppol.jaxb.ProcessType ret = new com.helger.smpclient.peppol.jaxb.ProcessType ();
+    final com.helger.xsds.peppol.smp1.ProcessType ret = new com.helger.xsds.peppol.smp1.ProcessType ();
     // Explicit constructor call is needed here!
     ret.setProcessIdentifier (new SimpleProcessIdentifier (m_aProcessIdentifier));
-    final com.helger.smpclient.peppol.jaxb.ServiceEndpointList aEndpointList = new com.helger.smpclient.peppol.jaxb.ServiceEndpointList ();
+    final com.helger.xsds.peppol.smp1.ServiceEndpointList aEndpointList = new com.helger.xsds.peppol.smp1.ServiceEndpointList ();
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
       aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectPeppol ());
     ret.setServiceEndpointList (aEndpointList);

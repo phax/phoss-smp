@@ -111,12 +111,12 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
         aSMPClient.setXMLSchemaValidation (bXMLSchemaValidation);
 
         // Get all HRefs and sort them by decoded URL
-        final com.helger.smpclient.peppol.jaxb.ServiceGroupType aSG = aSMPClient.getServiceGroupOrNull (aParticipantID);
+        final com.helger.xsds.peppol.smp1.ServiceGroupType aSG = aSMPClient.getServiceGroupOrNull (aParticipantID);
         // Map from cleaned URL to original URL
         if (aSG != null && aSG.getServiceMetadataReferenceCollection () != null)
         {
           aSGHrefs = new CommonsTreeMap <> ();
-          for (final com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceType aSMR : aSG.getServiceMetadataReferenceCollection ()
+          for (final com.helger.xsds.peppol.smp1.ServiceMetadataReferenceType aSMR : aSG.getServiceMetadataReferenceCollection ()
                                                                                              .getServiceMetadataReference ())
           {
             // Decoded href is important for unification

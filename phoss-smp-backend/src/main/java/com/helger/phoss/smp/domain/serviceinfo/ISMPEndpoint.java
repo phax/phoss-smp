@@ -12,7 +12,7 @@ package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -97,7 +97,7 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    *         services that are not yet activated.
    */
   @Nullable
-  LocalDateTime getServiceActivationDateTime ();
+  OffsetDateTime getServiceActivationDateTime ();
 
   /**
    * @return Activation date of the service. Senders should ignore services that
@@ -106,7 +106,7 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
   @Nullable
   default LocalDate getServiceActivationDate ()
   {
-    final LocalDateTime aServiceActivationDT = getServiceActivationDateTime ();
+    final OffsetDateTime aServiceActivationDT = getServiceActivationDateTime ();
     return aServiceActivationDT != null ? aServiceActivationDT.toLocalDate () : null;
   }
 
@@ -125,7 +125,7 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    *         services that are expired.
    */
   @Nullable
-  LocalDateTime getServiceExpirationDateTime ();
+  OffsetDateTime getServiceExpirationDateTime ();
 
   /**
    * @return Expiration date of the service. Senders should ignore services that
@@ -134,7 +134,7 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
   @Nullable
   default LocalDate getServiceExpirationDate ()
   {
-    final LocalDateTime aServiceExpirationDT = getServiceExpirationDateTime ();
+    final OffsetDateTime aServiceExpirationDT = getServiceExpirationDateTime ();
     return aServiceExpirationDT != null ? aServiceExpirationDT.toLocalDate () : null;
   }
 
@@ -201,7 +201,7 @@ public interface ISMPEndpoint extends Serializable, ISMPHasExtension
    *         REST interface. Never <code>null</code>.
    */
   @Nonnull
-  com.helger.smpclient.peppol.jaxb.EndpointType getAsJAXBObjectPeppol ();
+  com.helger.xsds.peppol.smp1.EndpointType getAsJAXBObjectPeppol ();
 
   /**
    * @return This service information object as a BDXR SMP JAXB object for the

@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.backend;
 
+import java.util.function.Supplier;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -24,7 +26,6 @@ import com.helger.commons.collection.impl.CommonsLinkedHashMap;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
-import com.helger.commons.functional.ISupplier;
 import com.helger.commons.lang.ServiceLoaderHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
@@ -50,7 +51,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   private static boolean s_bDefaultInstantiated = false;
 
   private final SimpleReadWriteLock m_aRWLock = new SimpleReadWriteLock ();
-  private final ICommonsMap <String, ISupplier <? extends ISMPManagerProvider>> m_aMap = new CommonsLinkedHashMap <> ();
+  private final ICommonsMap <String, Supplier <? extends ISMPManagerProvider>> m_aMap = new CommonsLinkedHashMap <> ();
 
   private SMPBackendRegistry ()
   {
@@ -73,7 +74,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     return ret;
   }
 
-  public void registerSMPBackend (@Nonnull @Nonempty final String sID, @Nonnull final ISupplier <? extends ISMPManagerProvider> aFactory)
+  public void registerSMPBackend (@Nonnull @Nonempty final String sID, @Nonnull final Supplier <? extends ISMPManagerProvider> aFactory)
   {
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (aFactory, "Factory");
@@ -100,7 +101,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     if (StringHelper.hasNoText (sBackendID))
       return null;
 
-    final ISupplier <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLockedGet ( () -> m_aMap.get (sBackendID));
+    final Supplier <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLockedGet ( () -> m_aMap.get (sBackendID));
     return aFactory == null ? null : aFactory.get ();
   }
 

@@ -46,20 +46,20 @@ import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.photon.security.user.IUser;
-import com.helger.smpclient.peppol.jaxb.CompleteServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.EndpointType;
-import com.helger.smpclient.peppol.jaxb.ProcessListType;
-import com.helger.smpclient.peppol.jaxb.ProcessType;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupReferenceListType;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupReferenceType;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.ServiceInformationType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataType;
-import com.helger.smpclient.peppol.jaxb.SignedServiceMetadataType;
 import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
+import com.helger.xsds.peppol.smp1.CompleteServiceGroupType;
+import com.helger.xsds.peppol.smp1.EndpointType;
+import com.helger.xsds.peppol.smp1.ProcessListType;
+import com.helger.xsds.peppol.smp1.ProcessType;
+import com.helger.xsds.peppol.smp1.ServiceGroupReferenceListType;
+import com.helger.xsds.peppol.smp1.ServiceGroupReferenceType;
+import com.helger.xsds.peppol.smp1.ServiceGroupType;
+import com.helger.xsds.peppol.smp1.ServiceInformationType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataType;
+import com.helger.xsds.peppol.smp1.SignedServiceMetadataType;
 
 /**
  * This class implements all the service methods, that must be provided by the

@@ -15,14 +15,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-import java.time.LocalDateTime;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -52,8 +51,8 @@ public final class SMPServiceInformationTest
     final IParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("0088:dummy");
     final ISMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
-    final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
-    final LocalDateTime aEndDT = aStartDT.plusYears (1);
+    final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
+    final XMLOffsetDateTime aEndDT = aStartDT.plusYears (1);
     final SMPEndpoint aEP = new SMPEndpoint ("tp",
                                              "http://localhost/as2",
                                              false,
@@ -102,8 +101,8 @@ public final class SMPServiceInformationTest
                                              "http://localhost/as2",
                                              false,
                                              (String) null,
-                                             (LocalDateTime) null,
-                                             (LocalDateTime) null,
+                                             (XMLOffsetDateTime) null,
+                                             (XMLOffsetDateTime) null,
                                              "cert",
                                              "sd",
                                              "tc",

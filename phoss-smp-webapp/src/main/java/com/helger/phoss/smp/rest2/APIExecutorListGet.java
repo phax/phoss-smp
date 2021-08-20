@@ -58,7 +58,7 @@ public final class APIExecutorListGet extends AbstractSMPAPIExecutor
       case PEPPOL:
       {
         // Unspecified extension
-        final com.helger.smpclient.peppol.jaxb.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
+        final com.helger.xsds.peppol.smp1.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
                                                                                                                                                   aBasicAuth);
         aBytes = new SMPMarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;

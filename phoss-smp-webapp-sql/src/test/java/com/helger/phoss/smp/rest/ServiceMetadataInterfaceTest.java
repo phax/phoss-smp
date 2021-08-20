@@ -61,19 +61,19 @@ import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.smpclient.exception.SMPClientException;
 import com.helger.smpclient.exception.SMPClientNotFoundException;
 import com.helger.smpclient.peppol.SMPClient;
-import com.helger.smpclient.peppol.jaxb.EndpointType;
-import com.helger.smpclient.peppol.jaxb.ObjectFactory;
-import com.helger.smpclient.peppol.jaxb.ProcessListType;
-import com.helger.smpclient.peppol.jaxb.ProcessType;
-import com.helger.smpclient.peppol.jaxb.RedirectType;
-import com.helger.smpclient.peppol.jaxb.ServiceEndpointList;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.ServiceInformationType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataType;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
+import com.helger.xsds.peppol.smp1.EndpointType;
+import com.helger.xsds.peppol.smp1.ObjectFactory;
+import com.helger.xsds.peppol.smp1.ProcessListType;
+import com.helger.xsds.peppol.smp1.ProcessType;
+import com.helger.xsds.peppol.smp1.RedirectType;
+import com.helger.xsds.peppol.smp1.ServiceEndpointList;
+import com.helger.xsds.peppol.smp1.ServiceGroupType;
+import com.helger.xsds.peppol.smp1.ServiceInformationType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataType;
 
 /**
  * Test class for class {@link Rest2Filter}.

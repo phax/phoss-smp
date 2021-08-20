@@ -73,7 +73,7 @@ import com.helger.photon.core.requestparam.RequestParameterManager;
 import com.helger.servlet.ServletContextPathHolder;
 import com.helger.servlet.response.UnifiedResponseDefaultSettings;
 import com.helger.wsclient.WSHelper;
-import com.helger.xservlet.requesttrack.RequestTracker;
+import com.helger.xservlet.requesttrack.RequestTrackerSettings;
 
 /**
  * Special SMP web app listener. This is the entry point for application
@@ -152,7 +152,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     RequestParameterManager.getInstance ().setParameterHandler (new RequestParameterHandlerURLPathNamed ());
 
     if (GlobalDebug.isDebugMode ())
-      RequestTracker.getInstance ().getRequestTrackingMgr ().setLongRunningCheckEnabled (false);
+    {
+      RequestTrackerSettings.setLongRunningRequestsCheckEnabled (false);
+      RequestTrackerSettings.setParallelRunningRequestsCheckEnabled (false);
+    }
 
     // Handled via the XServletSettings instead
     UnifiedResponseDefaultSettings.setReferrerPolicy (null);

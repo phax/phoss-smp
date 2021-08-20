@@ -40,9 +40,9 @@ import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
-import com.helger.smpclient.peppol.jaxb.ObjectFactory;
-import com.helger.smpclient.peppol.jaxb.ServiceGroupType;
-import com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType;
+import com.helger.xsds.peppol.smp1.ObjectFactory;
+import com.helger.xsds.peppol.smp1.ServiceGroupType;
+import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**

@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.annotation.ContainsSoftMigration;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.commons.string.StringParser;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
@@ -71,6 +73,7 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
   }
 
   @Nonnull
+  @ContainsSoftMigration
   public SMPEndpoint convertToNative (@Nonnull final IMicroElement aElement)
   {
     final String sTransportProfile = aElement.getAttributeValue (ATTR_TRANSPORT_PROFILE);
@@ -79,10 +82,24 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     final boolean bRequireBusinessLevelSignature = StringParser.parseBool (sRequireBusinessLevelSignature,
                                                                            SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aElement.getAttributeValue (ATTR_MINIMUM_AUTHENTICATION_LEVEL);
-    final LocalDateTime aServiceActivationDate = aElement.getAttributeValueWithConversion (ATTR_SERVICE_ACTIVATION_DATE,
-                                                                                           LocalDateTime.class);
-    final LocalDateTime aServiceExpirationDate = aElement.getAttributeValueWithConversion (ATTR_SERVICE_EXPIRATION_DATE,
-                                                                                           LocalDateTime.class);
+    XMLOffsetDateTime aServiceActivationDate = aElement.getAttributeValueWithConversion (ATTR_SERVICE_ACTIVATION_DATE,
+                                                                                         XMLOffsetDateTime.class);
+    if (aServiceActivationDate == null)
+    {
+      final LocalDateTime aServiceActivationDateLDT = aElement.getAttributeValueWithConversion (ATTR_SERVICE_ACTIVATION_DATE,
+                                                                                                LocalDateTime.class);
+      if (aServiceActivationDateLDT != null)
+        aServiceActivationDate = XMLOffsetDateTime.of (aServiceActivationDateLDT, null);
+    }
+    XMLOffsetDateTime aServiceExpirationDate = aElement.getAttributeValueWithConversion (ATTR_SERVICE_EXPIRATION_DATE,
+                                                                                         XMLOffsetDateTime.class);
+    if (aServiceExpirationDate == null)
+    {
+      final LocalDateTime aServiceExpirationDateLDT = aElement.getAttributeValueWithConversion (ATTR_SERVICE_EXPIRATION_DATE,
+                                                                                                LocalDateTime.class);
+      if (aServiceExpirationDateLDT != null)
+        aServiceExpirationDate = XMLOffsetDateTime.of (aServiceExpirationDateLDT, null);
+    }
     final String sCertificate = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE);
     final String sServiceDescription = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_SERVICE_DESCRIPTION);
     final String sTechnicalContactUrl = aElement.getAttributeValue (ATTR_TECHNICAL_CONTACT_URL);

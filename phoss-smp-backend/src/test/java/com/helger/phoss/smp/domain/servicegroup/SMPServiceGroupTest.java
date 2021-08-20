@@ -54,9 +54,9 @@ public final class SMPServiceGroupTest
     assertEquals (aPI, aSG.getParticpantIdentifier ());
     assertEquals ("[{\"Any\":\"<foobar />\"}]", aSG.getExtensionsAsString ());
 
-    final com.helger.smpclient.peppol.jaxb.ServiceGroupType aSGPeppol = aSG.getAsJAXBObjectPeppol ();
+    final com.helger.xsds.peppol.smp1.ServiceGroupType aSGPeppol = aSG.getAsJAXBObjectPeppol ();
     assertNotNull (aSGPeppol.getExtension ());
-    aSGPeppol.setServiceMetadataReferenceCollection (new com.helger.smpclient.peppol.jaxb.ServiceMetadataReferenceCollectionType ());
+    aSGPeppol.setServiceMetadataReferenceCollection (new com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType ());
 
     final Document aDoc = new SMPMarshallerServiceGroupType (true).getAsDocument (aSGPeppol);
     assertNotNull (aDoc);
