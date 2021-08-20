@@ -382,7 +382,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
               // If the service group to which the business card belongs was
               // already deleted, don't display an error, as the business card
               // was automatically deleted afterwards
-              if (!aDeletedServiceGroups.contains (aDeleteBusinessCard.getParticpantIdentifier ()))
+              if (!aDeletedServiceGroups.contains (aDeleteBusinessCard.getParticipantIdentifier ()))
                 aLogger.error ("Failed to delete business card " + aDeleteBusinessCard.getID ());
             }
           }
@@ -396,7 +396,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
         for (final ISMPBusinessCard aImportBusinessCard : aImportBusinessCards)
           try
           {
-            if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getParticpantIdentifier (),
+            if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getParticipantIdentifier (),
                                                                 aImportBusinessCard.getAllEntities ()) != null)
               aLogger.success ("Successfully created business card " + aImportBusinessCard.getID ());
           }

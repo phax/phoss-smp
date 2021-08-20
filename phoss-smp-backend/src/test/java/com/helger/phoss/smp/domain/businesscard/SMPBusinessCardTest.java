@@ -77,7 +77,7 @@ public final class SMPBusinessCardTest
     // Test empty
     {
       final SMPBusinessCard aBC = new SMPBusinessCard (aPI, new CommonsArrayList <> ());
-      assertEquals (aPI, aBC.getParticpantIdentifier ());
+      assertEquals (aPI, aBC.getParticipantIdentifier ());
       assertEquals (aSG.getID (), aBC.getID ());
       assertNotNull (aBC.getAllEntities ());
       assertTrue (aBC.getAllEntities ().isEmpty ());
@@ -120,7 +120,7 @@ public final class SMPBusinessCardTest
       aEntity3.setCountryCode ("US");
 
       final SMPBusinessCard aBC = new SMPBusinessCard (aPI, new CommonsArrayList <> (aEntity1, aEntity2, aEntity3));
-      assertEquals (aPI, aBC.getParticpantIdentifier ());
+      assertEquals (aPI, aBC.getParticipantIdentifier ());
       assertEquals (aSG.getID (), aBC.getID ());
       assertNotNull (aBC.getAllEntities ());
       assertEquals (3, aBC.getAllEntities ().size ());

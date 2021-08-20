@@ -218,7 +218,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                        @Nonnull final ISMPBusinessCard aSelectedObject)
                         {
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
-                          final IParticipantIdentifier aParticipantID = aSelectedObject.getParticpantIdentifier ();
+                          final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
                           final ESuccess eSuccess = PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aParticipantID);
                           if (eSuccess.isSuccess ())
                           {
@@ -255,7 +255,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
                           for (final ISMPBusinessCard aCurObject : aBusinessCardMgr.getAllSMPBusinessCards ())
                           {
-                            final IParticipantIdentifier aParticipantID = aCurObject.getParticpantIdentifier ();
+                            final IParticipantIdentifier aParticipantID = aCurObject.getParticipantIdentifier ();
                             final ESuccess eSuccess = aPDClient.addServiceGroupToIndex (aParticipantID);
                             (eSuccess.isSuccess () ? aSuccess : aFailure).add (aParticipantID.getURIEncoded ());
                           }
@@ -994,7 +994,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       ret.addChild (createEmptyAction ());
     ret.addChild (new HCTextNode (" "));
     ret.addChild (new HCA (LinkHelper.getURLWithServerAndContext ("businesscard/" +
-                                                                  aCurObject.getParticpantIdentifier ().getURIPercentEncoded ()))
+                                                                  aCurObject.getParticipantIdentifier ().getURIPercentEncoded ()))
                                                                                                                                  .setTitle ("Perform SMP query on " +
                                                                                                                                             sDisplayName)
                                                                                                                                  .setTargetBlank ()

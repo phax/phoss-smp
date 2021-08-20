@@ -65,7 +65,7 @@ public class SMPBusinessCard implements ISMPBusinessCard
   }
 
   @Nonnull
-  public IParticipantIdentifier getParticpantIdentifier ()
+  public IParticipantIdentifier getParticipantIdentifier ()
   {
     return m_aParticipantID;
   }

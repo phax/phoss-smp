@@ -275,7 +275,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
           if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
           {
             // Notify PD server: add
-            PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aBusinessCard.getParticpantIdentifier ());
+            PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
           }
         }
 
@@ -285,7 +285,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
           if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
           {
             // Notify PD server: delete
-            PDClientProvider.getInstance ().getPDClient ().deleteServiceGroupFromIndex (aBusinessCard.getParticpantIdentifier ());
+            PDClientProvider.getInstance ().getPDClient ().deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
           }
         }
       });

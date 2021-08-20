@@ -87,7 +87,7 @@ public final class ISMPBusinessCardManagerFuncTest
 
       // Create new one
       aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI1, new CommonsArrayList <> (aEntity1));
-      assertEquals (aPI1, aBusinessCard.getParticpantIdentifier ());
+      assertEquals (aPI1, aBusinessCard.getParticipantIdentifier ());
       assertEquals (1, aBusinessCard.getEntityCount ());
 
       assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
@@ -96,7 +96,7 @@ public final class ISMPBusinessCardManagerFuncTest
 
       // Update existing
       aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI1, new CommonsArrayList <> (aEntity1, aEntity2));
-      assertEquals (aPI1, aBusinessCard.getParticpantIdentifier ());
+      assertEquals (aPI1, aBusinessCard.getParticipantIdentifier ());
       assertEquals (2, aBusinessCard.getEntityCount ());
 
       // Must not have changed
@@ -111,7 +111,7 @@ public final class ISMPBusinessCardManagerFuncTest
       try
       {
         aBusinessCard2 = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI2, new CommonsArrayList <> (aEntity3));
-        assertEquals (aPI2, aBusinessCard2.getParticpantIdentifier ());
+        assertEquals (aPI2, aBusinessCard2.getParticipantIdentifier ());
         assertEquals (1, aBusinessCard2.getEntityCount ());
         assertEquals (nBCCount + 2, aBusinessCardMgr.getSMPBusinessCardCount ());
 
