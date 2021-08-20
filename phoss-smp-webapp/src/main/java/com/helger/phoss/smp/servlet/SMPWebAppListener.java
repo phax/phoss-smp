@@ -200,11 +200,13 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     // Create all menu items
     {
+      LOGGER.info ("Initializing public menu");
       final MenuTree aMenuTree = new MenuTree ();
       MenuPublic.init (aMenuTree);
       PhotonGlobalState.state (CApplicationID.APP_ID_PUBLIC).setMenuTree (aMenuTree);
     }
     {
+      LOGGER.info ("Initializing secure menu");
       final MenuTree aMenuTree = new MenuTree ();
       MenuSecure.init (aMenuTree);
       PhotonGlobalState.state (CApplicationID.APP_ID_SECURE).setMenuTree (aMenuTree);
@@ -218,13 +220,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
-  protected void initUI ()
-  {
-    // UI stuff
-    SMPCommonUI.init ();
-  }
-
-  @Override
   protected void initSecurity ()
   {
     // Set all security related stuff
@@ -232,8 +227,16 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
+  protected void initUI ()
+  {
+    // UI stuff
+    SMPCommonUI.init ();
+  }
+
+  @Override
   protected void initManagers ()
   {
+    LOGGER.info ("Init of ConfigurationFileManager");
     final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
     aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
                                                                                                 .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
@@ -307,6 +310,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       });
     }
 
+    LOGGER.info ("Init of HTTP and Proxy settings");
     // Register global proxy servers
     ProxySelectorProxySettingsManager.setAsDefault (true);
     final IProxySettings aProxyHttp = SMPServerConfiguration.getAsHttpProxySettings ();
