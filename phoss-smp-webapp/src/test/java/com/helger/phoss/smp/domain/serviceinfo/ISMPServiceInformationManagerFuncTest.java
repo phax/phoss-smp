@@ -56,7 +56,7 @@ public final class ISMPServiceInformationManagerFuncTest
     final IProcessIdentifier aProcessID = PeppolIdentifierFactory.INSTANCE.createProcessIdentifierWithDefaultScheme ("junit-proc");
 
     final String sUserID = CSecurity.USER_ADMINISTRATOR_ID;
-    if (SMPMetaManager.getInstance ().getBackendConnectionEstablished ().isFalse ())
+    if (SMPMetaManager.getInstance ().getBackendConnectionState ().isFalse ())
     {
       // Failed to get DB connection. E.g. MySQL down or misconfigured.
       return;
