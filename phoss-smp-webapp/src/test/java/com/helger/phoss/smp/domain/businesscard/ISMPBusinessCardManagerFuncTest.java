@@ -92,7 +92,7 @@ public final class ISMPBusinessCardManagerFuncTest
 
       assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
       assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSG));
-      assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticpantIdentifier ()));
+      assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticipantIdentifier ()));
 
       // Update existing
       aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI1, new CommonsArrayList <> (aEntity1, aEntity2));
@@ -102,7 +102,7 @@ public final class ISMPBusinessCardManagerFuncTest
       // Must not have changed
       assertEquals (nBCCount + 1, aBusinessCardMgr.getSMPBusinessCardCount ());
       assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSG));
-      assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticpantIdentifier ()));
+      assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticipantIdentifier ()));
 
       // Add second one
       final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null);
@@ -116,7 +116,7 @@ public final class ISMPBusinessCardManagerFuncTest
         assertEquals (nBCCount + 2, aBusinessCardMgr.getSMPBusinessCardCount ());
 
         assertEquals (aBusinessCard2, aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aSG2));
-        assertEquals (aBusinessCard2, aBusinessCardMgr.getSMPBusinessCardOfID (aSG2.getParticpantIdentifier ()));
+        assertEquals (aBusinessCard2, aBusinessCardMgr.getSMPBusinessCardOfID (aSG2.getParticipantIdentifier ()));
 
         // Cleanup
         assertTrue (aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard2).isChanged ());

@@ -88,7 +88,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   {
     final Document ret = new Document ().append (BSON_ID, aValue.getID ())
                                         .append (BSON_OWNER_ID, aValue.getOwnerID ())
-                                        .append (BSON_PARTICIPANT_ID, toBson (aValue.getParticpantIdentifier ()));
+                                        .append (BSON_PARTICIPANT_ID, toBson (aValue.getParticipantIdentifier ()));
     if (aValue.extensions ().isNotEmpty ())
       ret.append (BSON_EXTENSION, aValue.getExtensionsAsString ());
     return ret;

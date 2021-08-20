@@ -96,7 +96,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                 @Nonnull final ISMPRedirect aSelectedObject)
       {
         aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
-                                           aSelectedObject.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ()));
+                                           aSelectedObject.getServiceGroup ().getParticipantIdentifier ().getURIEncoded ()));
         aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID, aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
 
         aForm.addChild (question ("Are you sure you want to delete the Redirect for Service Group '" +
@@ -411,7 +411,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       final ISimpleURL aCopyURL = createCopyURL (aWPEC, aCurObject).addAll (aParams);
       final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aCurObject).addAll (aParams);
       final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aCurObject.getServiceGroup ()
-                                                                                      .getParticpantIdentifier ()
+                                                                                      .getParticipantIdentifier ()
                                                                                       .getURIPercentEncoded () +
                                                                             Rest2Filter.PATH_SERVICES +
                                                                             aCurObject.getDocumentTypeIdentifier ()

@@ -354,7 +354,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     if (aServiceGroup == null)
       return null;
 
-    return getSMPBusinessCardOfID (aServiceGroup.getParticpantIdentifier ());
+    return getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
   }
 
   @Nullable

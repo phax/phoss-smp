@@ -138,7 +138,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
 
         aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
-                                           aSelectedObject.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ()));
+                                           aSelectedObject.getServiceGroup ().getParticipantIdentifier ().getURIEncoded ()));
         aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_SCHEME, aSelectedObject.getDocumentTypeIdentifier ().getScheme ()));
         aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_VALUE, aSelectedObject.getDocumentTypeIdentifier ().getValue ()));
         aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID_SCHEME, aSelectedProcess.getProcessIdentifier ().getScheme ()));
@@ -338,7 +338,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                              @Nullable final ISMPEndpoint aEndpoint)
   {
     final StringMap ret = new StringMap ();
-    ret.putIn (FIELD_SERVICE_GROUP_ID, aServiceInfo.getServiceGroup ().getParticpantIdentifier ().getURIEncoded ());
+    ret.putIn (FIELD_SERVICE_GROUP_ID, aServiceInfo.getServiceGroup ().getParticipantIdentifier ().getURIEncoded ());
     ret.putIn (FIELD_DOCTYPE_ID_SCHEME, aServiceInfo.getDocumentTypeIdentifier ().getScheme ());
     ret.putIn (FIELD_DOCTYPE_ID_VALUE, aServiceInfo.getDocumentTypeIdentifier ().getValue ());
     if (aProcess != null)
@@ -662,13 +662,13 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         if (bEdit)
         {
           aWPEC.postRedirectGetInternal (success ("Successfully edited the endpoint for service group '" +
-                                                  aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                                                  aServiceGroup.getParticipantIdentifier ().getURIEncoded () +
                                                   "'."));
         }
         else
         {
           aWPEC.postRedirectGetInternal (success ("Successfully created a new endpoint for service group '" +
-                                                  aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                                                  aServiceGroup.getParticipantIdentifier ().getURIEncoded () +
                                                   "'."));
         }
       }
@@ -677,13 +677,13 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         if (bEdit)
         {
           aWPEC.postRedirectGetInternal (error ("Error editing the endpoint for service group '" +
-                                                aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                                                aServiceGroup.getParticipantIdentifier ().getURIEncoded () +
                                                 "'."));
         }
         else
         {
           aWPEC.postRedirectGetInternal (error ("Error creating a new endpoint for service group '" +
-                                                aServiceGroup.getParticpantIdentifier ().getURIEncoded () +
+                                                aServiceGroup.getParticipantIdentifier ().getURIEncoded () +
                                                 "'."));
         }
       }

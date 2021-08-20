@@ -111,12 +111,12 @@ public final class PagePublicStart extends AbstractSMPWebPage
         aFinalTable = aTable;
 
         // Sort manually
-        aServiceGroups.sort (Comparator.comparing (x -> x.getParticpantIdentifier ().getURIEncoded ()));
+        aServiceGroups.sort (Comparator.comparing (x -> x.getParticipantIdentifier ().getURIEncoded ()));
       }
 
       for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
       {
-        final String sDisplayName = aServiceGroup.getParticpantIdentifier ().getURIEncoded ();
+        final String sDisplayName = aServiceGroup.getParticipantIdentifier ().getURIEncoded ();
 
         final HCRow aRow = aFinalTable.addBodyRow ();
         aRow.addCell (sDisplayName);
@@ -131,8 +131,8 @@ public final class PagePublicStart extends AbstractSMPWebPage
         {
           aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.extensions ().isNotEmpty (), aDisplayLocale));
         }
-        final Rest2DataProvider aDP = new Rest2DataProvider (aRequestScope, aServiceGroup.getParticpantIdentifier ().getURIEncoded ());
-        aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticpantIdentifier ()))).setTitle ("Perform SMP query on " +
+        final Rest2DataProvider aDP = new Rest2DataProvider (aRequestScope, aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
+        aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
                                                                                                                              sDisplayName)
                                                                                                                   .setTargetBlank ()
                                                                                                                   .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));

@@ -228,9 +228,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
         // Update extension
         final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_service_group SET extension=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (sNewExtension,
-                                                                                                         aDBServiceGroup.getParticpantIdentifier ()
+                                                                                                         aDBServiceGroup.getParticipantIdentifier ()
                                                                                                                         .getScheme (),
-                                                                                                         aDBServiceGroup.getParticpantIdentifier ()
+                                                                                                         aDBServiceGroup.getParticipantIdentifier ()
                                                                                                                         .getValue ()));
         if (nCount != 1)
           throw new IllegalStateException ("Failed to update the service_group extension to '" + sNewExtension + "'");

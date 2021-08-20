@@ -89,7 +89,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
     for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
     {
       // Print service group
-      final IParticipantIdentifier aParticipantID = aServiceGroup.getParticpantIdentifier ();
+      final IParticipantIdentifier aParticipantID = aServiceGroup.getParticipantIdentifier ();
       final HCLI aLISG = aULSG.addAndReturnItem (new HCA (createViewURL (aWPEC,
                                                                          CMenuSecure.MENU_SERVICE_GROUPS,
                                                                          aServiceGroup)).addChild (aParticipantID.getURIEncoded ()));

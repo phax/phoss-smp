@@ -449,7 +449,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       else
         if (!bEdit)
         {
-          final ISMPBusinessCard aExistingBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroup.getParticpantIdentifier ());
+          final ISMPBusinessCard aExistingBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
           if (aExistingBusinessCard != null)
             aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The selected Service Group already has a Business Card assigned!");
         }
@@ -621,7 +621,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     {
       // Store in a consistent manner
       aSMPEntities.sort ( (o1, o2) -> o1.names ().getFirst ().getName ().compareToIgnoreCase (o2.names ().getFirst ().getName ()));
-      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticpantIdentifier (), aSMPEntities) != null)
+      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (), aSMPEntities) != null)
       {
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
         aWPEC.postRedirectGetInternal (success ("The Business Card for Service Group '" +

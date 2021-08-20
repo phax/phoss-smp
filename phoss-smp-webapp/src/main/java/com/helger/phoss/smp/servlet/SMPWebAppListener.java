@@ -305,7 +305,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
               // Notify PD server: update
               PDClientProvider.getInstance ()
                               .getPDClient ()
-                              .addServiceGroupToIndex (aServiceInformation.getServiceGroup ().getParticpantIdentifier ());
+                              .addServiceGroupToIndex (aServiceInformation.getServiceGroup ().getParticipantIdentifier ());
             }
           }
         }

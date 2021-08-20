@@ -175,7 +175,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     if (aServiceGroup == null)
       return null;
 
-    return getSMPBusinessCardOfID (aServiceGroup.getParticpantIdentifier ());
+    return getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
   }
 
   @Nullable

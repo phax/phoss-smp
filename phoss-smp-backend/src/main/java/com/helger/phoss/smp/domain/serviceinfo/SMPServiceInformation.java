@@ -191,7 +191,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
 
     final com.helger.xsds.peppol.smp1.ServiceInformationType aSI = new com.helger.xsds.peppol.smp1.ServiceInformationType ();
     // Explicit constructor call is needed here!
-    aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
+    aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aServiceGroup.getParticipantIdentifier ()));
     aSI.setDocumentIdentifier (new SimpleDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.xsds.peppol.smp1.ProcessListType aProcesses = new com.helger.xsds.peppol.smp1.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
@@ -224,7 +224,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
 
     final com.helger.xsds.bdxr.smp1.ServiceInformationType aSI = new com.helger.xsds.bdxr.smp1.ServiceInformationType ();
     // Explicit constructor call is needed here!
-    aSI.setParticipantIdentifier (new BDXR1ParticipantIdentifier (m_aServiceGroup.getParticpantIdentifier ()));
+    aSI.setParticipantIdentifier (new BDXR1ParticipantIdentifier (m_aServiceGroup.getParticipantIdentifier ()));
     aSI.setDocumentIdentifier (new BDXR1DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.xsds.bdxr.smp1.ProcessListType aProcesses = new com.helger.xsds.bdxr.smp1.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())

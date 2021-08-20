@@ -300,7 +300,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
         final ICommonsSet <IParticipantIdentifier> aDeletedServiceGroups = new CommonsHashSet <> ();
         for (final ISMPServiceGroup aDeleteServiceGroup : aDeleteServiceGroups)
         {
-          final IParticipantIdentifier aPI = aDeleteServiceGroup.getParticpantIdentifier ();
+          final IParticipantIdentifier aPI = aDeleteServiceGroup.getParticipantIdentifier ();
           try
           {
             if (aServiceGroupMgr.deleteSMPServiceGroup (aPI).isChanged ())
@@ -325,7 +325,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
           try
           {
             aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
-                                                                       aImportServiceGroup.getParticpantIdentifier (),
+                                                                       aImportServiceGroup.getParticipantIdentifier (),
                                                                        aImportServiceGroup.getExtensionsAsString ());
             aLogger.success ("Successfully created service group " + aImportServiceGroup.getID ());
           }

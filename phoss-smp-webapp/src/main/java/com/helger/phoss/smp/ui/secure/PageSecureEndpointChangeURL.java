@@ -333,7 +333,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         aSGSelect.addOption (SERVICE_GROUP_ALL, "All affected Service Groups");
         if (aServiceGroups != null)
           for (final ISMPServiceGroup aSG : aServiceGroups.getSorted (ISMPServiceGroup.comparator ()))
-            aSGSelect.addOption (aSG.getID (), aSG.getParticpantIdentifier ().getURIEncoded ());
+            aSGSelect.addOption (aSG.getID (), aSG.getParticipantIdentifier ().getURIEncoded ());
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service group")
                                                      .setCtrl (aSGSelect)
                                                      .setHelpText ("If a specific service group is selected, the URL change will only happen in the endpoints of the selected service group. Othwerwise the endpoint is changed in ALL service groups with matching endpoints.")

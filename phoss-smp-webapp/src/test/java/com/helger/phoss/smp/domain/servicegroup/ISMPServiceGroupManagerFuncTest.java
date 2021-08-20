@@ -81,7 +81,7 @@ public final class ISMPServiceGroupManagerFuncTest
       // Register first and check state
       ISMPServiceGroup aSG1 = aSGMgr.createSMPServiceGroup (sOwner1ID, aPI1, sExtension);
       assertNotNull (aSG1);
-      assertEquals (aPI1, aSG1.getParticpantIdentifier ());
+      assertEquals (aPI1, aSG1.getParticipantIdentifier ());
       assertEquals (sSG1, aSG1.getID ());
       assertEquals (sOwner1ID, aSG1.getOwnerID ());
       assertEquals (sExtension, aSG1.getFirstExtensionXML ().trim ());
@@ -111,7 +111,7 @@ public final class ISMPServiceGroupManagerFuncTest
 
       final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sOwner2ID, aPI2, sExtension);
       assertNotNull (aSG2);
-      assertEquals (aPI2, aSG2.getParticpantIdentifier ());
+      assertEquals (aPI2, aSG2.getParticipantIdentifier ());
       assertEquals (sSG2, aSG2.getID ());
       assertEquals (sOwner2ID, aSG2.getOwnerID ());
       assertEquals (sExtension, aSG2.getFirstExtensionXML ().trim ());
