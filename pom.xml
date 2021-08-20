@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2015-2021 Philip Helger and contributors
+    Copyright (C) 2015-2020 Philip Helger and contributors
     philip[at]helger[dot]com
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,7 +103,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-db-parent-pom</artifactId>
-        <version>6.7.1-SNAPSHOT</version>
+        <version>6.7.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
