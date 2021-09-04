@@ -21,6 +21,7 @@
   <item id="cenbii-procid-ubl::none" name="Peppol predefined" deprecated="true" />
   <item id="cenbii-procid-ubl::urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:09:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:poacc:selfbilling:01:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p001:01:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p002:01:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p003:01:1.0" name="Peppol predefined" deprecated="false" />
