@@ -199,9 +199,10 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     if (aParticipantID == null)
       return false;
 
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_pmigration WHERE direction=? and state=?",
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_pmigration WHERE direction=? and state=? and pid=?",
                                       new ConstantPreparedStatementDataProvider (eDirection.getID (),
-                                                                                 EParticipantMigrationState.IN_PROGRESS.getID ())) > 0;
+                                                                                 EParticipantMigrationState.IN_PROGRESS.getID (),
+                                                                                 aParticipantID.getURIEncoded ())) > 0;
   }
 
   public boolean containsOutboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
