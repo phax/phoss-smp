@@ -169,7 +169,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     }
     RequestParameterManager.getInstance ().setParameterHandler (new RequestParameterHandlerURLPathNamed ());
 
-    if (GlobalDebug.isDebugMode ())
+    if (!GlobalDebug.isProductionMode ())
     {
       RequestTrackerSettings.setLongRunningRequestsCheckEnabled (false);
       RequestTrackerSettings.setParallelRunningRequestsCheckEnabled (false);
