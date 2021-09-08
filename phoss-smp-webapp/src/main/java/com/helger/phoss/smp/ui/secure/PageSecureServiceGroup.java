@@ -23,6 +23,9 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.WorkInProgress;
 import com.helger.commons.collection.attr.StringMap;
@@ -111,6 +114,8 @@ import com.helger.xml.microdom.serialize.MicroReader;
 @WorkInProgress
 public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPServiceGroup>
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureServiceGroup.class);
+
   private static final String FIELD_PARTICIPANT_ID_SCHEME = "participantidscheme";
   private static final String FIELD_PARTICIPANT_ID_VALUE = "participantidvalue";
   private static final String FIELD_OWNING_USER_ID = "owninguser";
@@ -224,6 +229,12 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                 // Fallback by not resolving the NAPTR
                 sDNSName = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
                                                                                       sSMLZoneName);
+              }
+              else
+              {
+                // Of course this should never happen
+                LOGGER.error ("Unexpected URL provider found: " + aURLProvider);
+                continue;
               }
           }
           catch (final SMPDNSResolutionException ex)
@@ -596,7 +607,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    if (aSettings.isSMLRequired ())
+    if (aSettings.isSMLRequired () || aSettings.isSMLEnabled ())
     {
       // Disable button if no SML URL is configured
       // Disable button if no service group is present

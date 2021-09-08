@@ -36,9 +36,10 @@ public interface ISMPParticipantMigrationManager
    * @param sMigrationKey
    *        The migration key received from the SML. May neither be
    *        <code>null</code> nor empty.
-   * @return The created migration domain object. Never <code>null</code>.
+   * @return The created migration domain object. May be <code>null</code> in
+   *         case persistence failed.
    */
-  @Nonnull
+  @Nullable
   ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull IParticipantIdentifier aParticipantID,
                                                                @Nonnull @Nonempty String sMigrationKey);
 
@@ -54,8 +55,7 @@ public interface ISMPParticipantMigrationManager
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
   @Nonnull
-  EChange setParticipantMigrationState (@Nullable String sParticipantMigrationID,
-                                        @Nonnull EParticipantMigrationState eNewState);
+  EChange setParticipantMigrationState (@Nullable String sParticipantMigrationID, @Nonnull EParticipantMigrationState eNewState);
 
   /**
    * Find the participant migration with the provided ID.

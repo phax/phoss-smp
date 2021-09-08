@@ -31,6 +31,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.typeconvert.TypeConverter;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
@@ -115,6 +116,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
                                                @Nonnull final EParticipantMigrationState eNewState)
   {
+    ValueEnforcer.notNull (eNewState, "NewState");
+
     final SMPParticipantMigration aPM = getParticipantMigrationOfID (sParticipantMigrationID);
     if (aPM == null)
     {
@@ -137,6 +140,9 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   @Nullable
   public SMPParticipantMigration getParticipantMigrationOfID (@Nullable final String sID)
   {
+    if (StringHelper.hasNoText (sID))
+      return null;
+
     final Document aMatch = getCollection ().find (new Document (BSON_ID, sID)).first ();
     if (aMatch == null)
       return null;

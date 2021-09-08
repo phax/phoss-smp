@@ -20,21 +20,29 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.db.jdbc.executor.DBExecutor;
 
+/**
+ * Base class for all JDBC enabled managers.
+ *
+ * @author Philip Helger
+ */
 public abstract class AbstractJDBCEnabledManager
 {
   private final Supplier <? extends DBExecutor> m_aDBExecSupplier;
 
   protected AbstractJDBCEnabledManager (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
+    ValueEnforcer.notNull (aDBExecSupplier, "DBExecSupplier");
     m_aDBExecSupplier = aDBExecSupplier;
   }
 
@@ -54,6 +62,12 @@ public abstract class AbstractJDBCEnabledManager
   public static Date toDate (@Nullable final LocalDate aLD)
   {
     return aLD == null ? null : Date.valueOf (aLD);
+  }
+
+  @Nullable
+  public static Timestamp toTimestamp (@Nullable final LocalDateTime aLDT)
+  {
+    return aLDT == null ? null : Timestamp.valueOf (aLDT);
   }
 
   @Nullable

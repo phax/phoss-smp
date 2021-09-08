@@ -113,13 +113,13 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                                                                                                            sCertificate,
                                                                                                            sExtension));
         if (nCreated != 1)
-          throw new IllegalStateException ("Failed to create new DB entry");
+          throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
         aCreatedNew.set (true);
       }
       else
       {
         // Update existing
-        final long nCreated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_service_metadata_redirection" +
+        final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_service_metadata_redirection" +
                                                                 " SET redirectionUrl=?, certificateUID=?, certificate=?, extension=?" +
                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
                                                                 new ConstantPreparedStatementDataProvider (sRedirectUrl,
@@ -130,8 +130,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                                                                                                            aParticipantID.getValue (),
                                                                                                            aDocTypeID.getScheme (),
                                                                                                            aDocTypeID.getValue ()));
-        if (nCreated != 1)
-          throw new IllegalStateException ("Failed to update existing DB entry");
+        if (nUpdated != 1)
+          throw new IllegalStateException ("Failed to update existing DB entry (" + nUpdated + ")");
         aCreatedNew.set (false);
       }
     });

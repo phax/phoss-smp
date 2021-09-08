@@ -364,12 +364,21 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       }
 
       // Remember internally
-      aParticipantMigrationMgr.createOutboundParticipantMigration (aParticipantID, sMigrationKey);
-
-      aWPEC.postRedirectGetInternal (success ().addChild (div ("The participant migration for '" +
+      if (aParticipantMigrationMgr.createOutboundParticipantMigration (aParticipantID, sMigrationKey) != null)
+      {
+        aWPEC.postRedirectGetInternal (success ().addChild (div ("The participant migration for '" +
+                                                                 aParticipantID.getURIEncoded () +
+                                                                 "' was successfully created."))
+                                                 .addChild (div ("The created migration key is ").addChild (code (sMigrationKey))));
+      }
+      else
+      {
+        aWPEC.postRedirectGetInternal (error ().addChild (div ("Failed to store the participant migration for '" +
                                                                aParticipantID.getURIEncoded () +
-                                                               "' was successfully created."))
-                                               .addChild (div ("The created migration key is ").addChild (code (sMigrationKey))));
+                                                               "'."))
+                                               .addChild (div ("The created migration key is ").addChild (code (sMigrationKey)))
+                                               .addChild (". Please note it down manually!"));
+      }
     }
   }
 
@@ -431,8 +440,10 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       aOL.addItem ("The migration is initiated on this SMP, and the SML is informed about the upcoming migration");
       aOL.addItem ("The other SMP, that is taking over the Service Group must acknowledge the migration by providing the same migration code (created by this SMP) to the SML");
       aOL.addItem ("If the migration was successful, the Service Group must be deleted from this SMP, ideally a temporary redirect to the new SMP is created. If the migration was cancelled no action is needed.");
-      aNodeList.addChild (info (div ("The process of migrating a Service Group to another SMP consists of multiple steps:")).addChild (aOL)
-                                                                                                                            .addChild (div ("Therefore each open Migration must either be finished (deleting the Service Group) or cancelled (no action taken).")));
+      aNodeList.addChild (info ().addChild (div ("The process of migrating a Service Group to another SMP consists of multiple steps:"))
+                                 .addChild (aOL)
+                                 .addChild (div ("Therefore each open Migration must either be finished (deleting the Service Group) or cancelled (no action taken)." +
+                                                 " If a Migration is cancelled, it can be retried later.")));
     }
 
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
