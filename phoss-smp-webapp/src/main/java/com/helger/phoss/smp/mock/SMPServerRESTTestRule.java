@@ -18,12 +18,14 @@ package com.helger.phoss.smp.mock;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.lang.ClassPathHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.peppol.sml.ESML;
@@ -59,7 +61,7 @@ public class SMPServerRESTTestRule extends ExternalResource
     // SML disabled
     SMPMetaManager.getSettingsMgr ().updateSettings (false, true, false, false, "dummy", false, false, ESML.DEVELOPMENT_LOCAL);
 
-    LOGGER.info ("Finished SMPServerRESTTestRule before");
+    LOGGER.info ("Finished SMPServerRESTTestRule before. Listening at '" + getFullURL () + "'");
   }
 
   @Override
@@ -91,7 +93,13 @@ public class SMPServerRESTTestRule extends ExternalResource
     }
   }
 
-  public String getFullURL ()
+  /**
+   * @return The full URL with port and context path that is the basis for the
+   *         running test instance.
+   */
+  @Nonnull
+  @Nonempty
+  public final String getFullURL ()
   {
     return "http://localhost:" + MockWebServer.PORT + MockWebServer.CONTEXT_PATH;
   }

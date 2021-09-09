@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2014-2021 Philip Helger and contributors
+    philip[at]helger[dot]com
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<smp:ServiceMetadata xmlns:smp="http://docs.oasis-open.org/bdxr/ns/SMP/2016/05">
+  <smp:ServiceInformation>
+    <smp:ParticipantIdentifier scheme="iso6523-actorid-upis">9915:xxx</smp:ParticipantIdentifier>
+    <smp:DocumentIdentifier scheme="busdox-docid-qns">urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0::2.1</smp:DocumentIdentifier>
+    <smp:ProcessList>
+      <smp:Process>
+        <smp:ProcessIdentifier scheme="cenbii-procid-ubl">urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</smp:ProcessIdentifier>
+        <smp:ServiceEndpointList>
+          <smp:Endpoint transportProfile="peppol-transport-as4-v2_0">
+            <smp:EndpointURI>http://test.smpserver/as4</smp:EndpointURI>
+            <smp:RequireBusinessLevelSignature>false</smp:RequireBusinessLevelSignature>
+            <smp:Certificate>YmxhY2VydA==</smp:Certificate>
+            <smp:ServiceDescription>Unit test service</smp:ServiceDescription>
+            <smp:TechnicalContactUrl>https://github.com/phax/phoss-smp</smp:TechnicalContactUrl>
+          </smp:Endpoint>
+        </smp:ServiceEndpointList>
+      </smp:Process>
+    </smp:ProcessList>
+  </smp:ServiceInformation>
+</smp:ServiceMetadata>

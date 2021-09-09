@@ -30,14 +30,15 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
+import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
+import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.security.CSecurity;
-import com.helger.web.scope.mock.WebScopeTestRule;
 
 /**
  * Create one million endpoints. Run this AFTER
@@ -45,9 +46,9 @@ import com.helger.web.scope.mock.WebScopeTestRule;
  *
  * @author Philip Helger
  */
-public final class MainReadFromFile
+public final class MainReadFromFilePeppol
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (MainReadFromFile.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (MainReadFromFilePeppol.class);
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
@@ -62,11 +63,12 @@ public final class MainReadFromFile
 
   public static void main (final String [] args) throws Throwable
   {
-    final String sServerBasePath = "http://localhost:90";
-    final WebScopeTestRule aRule = new WebScopeTestRule ();
+    final SMPServerRESTTestRule aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-xml-peppol.properties")
+                                                                                    .getAbsolutePath ());
     aRule.before ();
     try
     {
+      final String sServerBasePath = aRule.getFullURL ();
       final StopWatch aSWOverall = StopWatch.createdStarted ();
 
       // These values must match the values in the test file

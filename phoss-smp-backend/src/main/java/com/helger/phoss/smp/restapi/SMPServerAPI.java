@@ -643,8 +643,9 @@ public final class SMPServerAPI
                                             m_aAPIProvider.getCurrentURI ());
         }
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      if (false)
+        if (LOGGER.isInfoEnabled ())
+          LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return ESuccess.SUCCESS;
     }

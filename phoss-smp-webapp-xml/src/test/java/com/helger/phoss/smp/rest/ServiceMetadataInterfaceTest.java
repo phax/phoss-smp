@@ -87,7 +87,7 @@ public final class ServiceMetadataInterfaceTest
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   @Rule
-  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-xml.properties")
+  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-xml-peppol.properties")
                                                                                            .getAbsolutePath ());
 
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
