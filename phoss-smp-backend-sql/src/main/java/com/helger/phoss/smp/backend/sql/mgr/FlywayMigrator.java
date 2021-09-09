@@ -55,6 +55,8 @@ final class FlywayMigrator
   {
     ValueEnforcer.notNull (eDBType, "DBType");
 
+    LOGGER.info ("Startint to run Flyway");
+
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
     final FluentConfiguration aConfig = Flyway.configure ()
                                               .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
