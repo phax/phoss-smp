@@ -21,6 +21,11 @@ import org.junit.Test;
 import com.helger.commons.mock.SPITestHelper;
 import com.helger.photon.core.mock.PhotonCoreValidator;
 
+/**
+ * Test SPI definitions and web.xml
+ *
+ * @author Philip Helger
+ */
 public final class SPITest
 {
   @Test
