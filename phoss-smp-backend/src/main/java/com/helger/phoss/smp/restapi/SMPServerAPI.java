@@ -470,6 +470,7 @@ public final class SMPServerAPI
 
     try
     {
+      // Parse provided identifiers
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
       final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
       if (aPathServiceGroupID == null)
@@ -582,10 +583,12 @@ public final class SMPServerAPI
                                                                                                            .getExtension ())) == null)
         {
           if (LOGGER.isErrorEnabled ())
-            LOGGER.error (sLog + " - Redirect - failure");
+            LOGGER.error (sLog + " - ERROR - Redirect");
           STATS_COUNTER_ERROR.increment (sAction);
           return ESuccess.FAILURE;
         }
+        if (LOGGER.isInfoEnabled ())
+          LOGGER.info (sLog + " SUCCESS - Redirect");
       }
       else
         if (aServiceInformation != null)
@@ -626,17 +629,18 @@ public final class SMPServerAPI
                              .isFailure ())
           {
             if (LOGGER.isErrorEnabled ())
-              LOGGER.error (sLog + " - ServiceInformation - failure");
+              LOGGER.error (sLog + " - ERROR - ServiceInformation");
             STATS_COUNTER_ERROR.increment (sAction);
             return ESuccess.FAILURE;
           }
+
+          if (LOGGER.isInfoEnabled ())
+            LOGGER.info (sLog + " SUCCESS - ServiceInformation");
         }
         else
         {
-          if (LOGGER.isErrorEnabled ())
-            LOGGER.error (sLog + " - neither Redirect nor ServiceInformation");
-          STATS_COUNTER_ERROR.increment (sAction);
-          return ESuccess.FAILURE;
+          throw new SMPBadRequestException ("Save Service Metadata was called with neither a Redirect nor a ServiceInformation",
+                                            m_aAPIProvider.getCurrentURI ());
         }
 
       if (LOGGER.isInfoEnabled ())
@@ -678,7 +682,7 @@ public final class SMPServerAPI
       if (aPathDocTypeID == null)
       {
         // Invalid identifier
-        throw SMPBadRequestException.failedToParseDocType (sPathDocTypeID + "'", m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseDocType (sPathDocTypeID, m_aAPIProvider.getCurrentURI ());
       }
 
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
