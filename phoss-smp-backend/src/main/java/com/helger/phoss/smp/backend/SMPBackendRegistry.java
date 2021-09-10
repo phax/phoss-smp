@@ -44,7 +44,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
 {
   private static final class SingletonHolder
   {
-    static final SMPBackendRegistry s_aInstance = new SMPBackendRegistry ();
+    static final SMPBackendRegistry INSTANCE = new SMPBackendRegistry ();
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBackendRegistry.class);
@@ -69,7 +69,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   @Nonnull
   public static SMPBackendRegistry getInstance ()
   {
-    final SMPBackendRegistry ret = SingletonHolder.s_aInstance;
+    final SMPBackendRegistry ret = SingletonHolder.INSTANCE;
     s_bDefaultInstantiated = true;
     return ret;
   }
