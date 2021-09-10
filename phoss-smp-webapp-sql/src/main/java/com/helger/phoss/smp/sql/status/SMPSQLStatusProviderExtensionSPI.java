@@ -91,7 +91,9 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
       ret.put ("smp.sql.target-database",
                SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE));
 
-      // It takes approx 4 seconds on a local MySQL to say "no" by default
+      // Since 5.4.0
+      // It takes approximately 4 seconds on a local MySQL to say "no
+      // connection" by default
       ret.put ("smp.sql.db.connection-possible", Boolean.valueOf (_isDBConnectionPossible ()));
     }
     else
