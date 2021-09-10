@@ -1,3 +1,19 @@
+/**
+ * Copyright (C) 2014-2021 Philip Helger and contributors
+ * philip[at]helger[dot]com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.helger.phoss.smp.status;
 
 import java.security.KeyStore.PrivateKeyEntry;
@@ -8,12 +24,20 @@ import java.time.LocalDateTime;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTWebDateHelper;
 import com.helger.commons.debug.GlobalDebug;
+import com.helger.commons.lang.ServiceLoaderHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
+import com.helger.commons.timing.StopWatch;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
 import com.helger.peppol.sml.ISMLInfo;
@@ -34,6 +58,15 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 @ThreadSafe
 public final class SMPStatusProvider
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPStatusProvider.class);
+  private static final ICommonsList <ISMPStatusProviderExtensionSPI> LIST = new CommonsArrayList <> ();
+  static
+  {
+    LIST.addAll (ServiceLoaderHelper.getAllSPIImplementations (ISMPStatusProviderExtensionSPI.class));
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Found " + LIST.size () + " implementation(s) of " + ISMPStatusProviderExtensionSPI.class.getSimpleName ());
+  }
+
   private SMPStatusProvider ()
   {}
 
@@ -41,6 +74,10 @@ public final class SMPStatusProvider
   @ReturnsMutableCopy
   public static IJsonObject getDefaultStatusData ()
   {
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Building status data");
+
+    final StopWatch aSW = StopWatch.createdStarted ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final LocalDateTime aNow = PDTFactory.getCurrentLocalDateTime ();
     final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
@@ -56,11 +93,6 @@ public final class SMPStatusProvider
     aStatusData.add ("global.debug", GlobalDebug.isDebugMode ());
     aStatusData.add ("global.production", GlobalDebug.isProductionMode ());
     aStatusData.add ("smp.backend", SMPServerConfiguration.getBackend ());
-    if ("sql".equalsIgnoreCase (SMPServerConfiguration.getBackend ()))
-    {
-      // Since 5.3.0-RC5
-      aStatusData.add ("smp.sql.target-database", SMPServerConfiguration.getConfigFile ().getAsString ("target-database"));
-    }
     aStatusData.add ("smp.mode", SMPWebAppConfiguration.isTestVersion () ? "test" : "production");
     aStatusData.add ("smp.resttype", SMPServerConfiguration.getRESTType ().getID ());
     aStatusData.add ("smp.identifiertype", SMPServerConfiguration.getIdentifierType ().getID ());
@@ -125,6 +157,20 @@ public final class SMPStatusProvider
     aStatusData.add ("csp.enabled", SMPWebAppConfiguration.isCSPEnabled ());
     aStatusData.add ("csp.reporting.only", SMPWebAppConfiguration.isCSPReportingOnly ());
     aStatusData.add ("csp.reporting.enabled", SMPWebAppConfiguration.isCSPReportingEnabled ());
+
+    // Add SPI data as well
+    for (final ISMPStatusProviderExtensionSPI aImpl : LIST)
+    {
+      final ICommonsOrderedMap <String, ?> aMap = aImpl.getAdditionalStatusData ();
+      aStatusData.addAll (aMap);
+    }
+
+    final long nMillis = aSW.stopAndGetMillis ();
+    if (nMillis > 100)
+      LOGGER.info ("Finished building status data after " + nMillis + " milliseconds which is considered to be too long");
+    else
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Finished building status data");
 
     return aStatusData;
   }
