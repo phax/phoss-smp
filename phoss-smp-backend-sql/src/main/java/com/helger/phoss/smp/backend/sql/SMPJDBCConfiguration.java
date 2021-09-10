@@ -59,7 +59,7 @@ public final class SMPJDBCConfiguration
   public static final String CONFIG_SMP_FLYWAY_ENABLED = "smp.flyway.enabled";
 
   @PresentForCodeCoverage
-  private static final SMPJDBCConfiguration s_aInstance = new SMPJDBCConfiguration ();
+  private static final SMPJDBCConfiguration INSTANCE = new SMPJDBCConfiguration ();
 
   private SMPJDBCConfiguration ()
   {}
