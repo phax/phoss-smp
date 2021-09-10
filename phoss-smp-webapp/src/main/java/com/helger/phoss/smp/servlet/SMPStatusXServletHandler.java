@@ -54,7 +54,11 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     // Build data to provide
     final IJsonObject aStatusData;
     if (SMPServerConfiguration.isStatusEnabled ())
-      aStatusData = SMPStatusProvider.getDefaultStatusData ();
+    {
+      // Special boolean parameter to ensure status works as health check
+      final boolean bDisableLongRunningOperations = aRequestScope.params ().getAsBoolean ("disable-long-running", false);
+      aStatusData = SMPStatusProvider.getDefaultStatusData (bDisableLongRunningOperations);
+    }
     else
     {
       // Status is disabled in the configuration

@@ -38,6 +38,12 @@ import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton.SMPDataSourceProv
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
 
+/**
+ * SQL specific status item provider.
+ *
+ * @author Philip Helger
+ * @since 5.4.0
+ */
 @IsSPIImplementation
 public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExtensionSPI
 {
@@ -82,7 +88,7 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
   }
 
   @Nonnull
-  public ICommonsOrderedMap <String, ?> getAdditionalStatusData ()
+  public ICommonsOrderedMap <String, ?> getAdditionalStatusData (final boolean bDisableLongRunningOperations)
   {
     final ICommonsOrderedMap <String, Object> ret = new CommonsLinkedHashMap <> ();
     if (SMPServerConfiguration.getConfigFile ().getAsBoolean ("smp.status.sql.enabled", true))
@@ -91,10 +97,13 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
       ret.put ("smp.sql.target-database",
                SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE));
 
-      // Since 5.4.0
-      // It takes approximately 4 seconds on a local MySQL to say "no
-      // connection" by default
-      ret.put ("smp.sql.db.connection-possible", Boolean.valueOf (_isDBConnectionPossible ()));
+      if (!bDisableLongRunningOperations)
+      {
+        // Since 5.4.0
+        // It takes approximately 4 seconds on a local MySQL to say "no
+        // connection" by default
+        ret.put ("smp.sql.db.connection-possible", Boolean.valueOf (_isDBConnectionPossible ()));
+      }
     }
     else
     {

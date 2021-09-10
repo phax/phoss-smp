@@ -32,9 +32,13 @@ import com.helger.commons.collection.impl.ICommonsOrderedMap;
 public interface ISMPStatusProviderExtensionSPI
 {
   /**
+   * @param bDisableLongRunningOperations
+   *        an explicit parameter that can be used to disable long running
+   *        operations which may be the case if the status API is used for
+   *        health checking
    * @return An ordered map with additional status data elements. May be
    *         <code>null</code> or empty.
    */
   @Nullable
-  ICommonsOrderedMap <String, ?> getAdditionalStatusData ();
+  ICommonsOrderedMap <String, ?> getAdditionalStatusData (boolean bDisableLongRunningOperations);
 }

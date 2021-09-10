@@ -72,7 +72,7 @@ public final class SMPStatusProvider
 
   @Nonnull
   @ReturnsMutableCopy
-  public static IJsonObject getDefaultStatusData ()
+  public static IJsonObject getDefaultStatusData (final boolean bDisableLongRunningOperations)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Building status data");
@@ -161,7 +161,7 @@ public final class SMPStatusProvider
     // Add SPI data as well
     for (final ISMPStatusProviderExtensionSPI aImpl : LIST)
     {
-      final ICommonsOrderedMap <String, ?> aMap = aImpl.getAdditionalStatusData ();
+      final ICommonsOrderedMap <String, ?> aMap = aImpl.getAdditionalStatusData (bDisableLongRunningOperations);
       aStatusData.addAll (aMap);
     }
 
