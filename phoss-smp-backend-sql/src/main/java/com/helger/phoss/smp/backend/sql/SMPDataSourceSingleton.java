@@ -22,7 +22,6 @@ import java.sql.SQLException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -76,7 +75,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
     }
 
     @Nonnull
-    public DataSource getDataSource ()
+    public BasicDataSource getDataSource ()
     {
       return m_aDataSource;
     }
