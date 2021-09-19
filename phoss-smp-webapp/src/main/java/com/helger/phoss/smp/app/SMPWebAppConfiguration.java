@@ -62,7 +62,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppConfiguration.class);
 
-  private static final ConfigFile s_aConfigFile;
+  private static final ConfigFile CONFIG_FILE;
 
   static
   {
@@ -72,10 +72,10 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
                                                            .addPath ("private-" + PATH_WEBAPP_PROPERTIES)
                                                            .addPath (PATH_WEBAPP_PROPERTIES);
 
-    s_aConfigFile = aCFB.build ();
-    if (!s_aConfigFile.isRead ())
+    CONFIG_FILE = aCFB.build ();
+    if (!CONFIG_FILE.isRead ())
       throw new IllegalStateException ("Failed to read Peppol SMP UI properties from " + aCFB.getAllPaths ());
-    LOGGER.info ("Read " + CSMP.APPLICATION_TITLE + " UI properties from " + s_aConfigFile.getReadResource ().getPath ());
+    LOGGER.info ("Read " + CSMP.APPLICATION_TITLE + " UI properties from " + CONFIG_FILE.getReadResource ().getPath ());
   }
 
   @Deprecated
@@ -90,7 +90,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nonnull
   public static ConfigFile getConfigFile ()
   {
-    return s_aConfigFile;
+    return CONFIG_FILE;
   }
 
   @Nonnull
