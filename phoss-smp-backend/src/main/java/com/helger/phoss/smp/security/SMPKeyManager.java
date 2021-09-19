@@ -173,6 +173,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
   /**
    * Create an SSLContext based on the configured key store and trust store.
+   * This is required for communication with the SMI/SML as well as other
+   * network dependent components like the Peppol Directory.
    *
    * @return A new {@link SSLContext} and never <code>null</code>.
    * @throws GeneralSecurityException
@@ -189,6 +191,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     final TrustManager [] aTrustManagers;
     if (SMPTrustManager.isTrustStoreValid ())
     {
+      // Explicitly use the configured truststore
       final TrustManagerFactory aTrustManagerFactory = TrustManagerFactory.getInstance (TrustManagerFactory.getDefaultAlgorithm ());
       aTrustManagerFactory.init (SMPTrustManager.getInstance ().getTrustStore ());
       aTrustManagers = aTrustManagerFactory.getTrustManagers ();
@@ -197,6 +200,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     {
       // No trust store defined
       aTrustManagers = new TrustManager [] { new TrustManagerTrustAll () };
+      LOGGER.warn ("No truststore is configured, so the build SSL/TLS connection will trust all hosts!");
     }
 
     // Assign key manager and empty trust manager to SSL/TLS context
@@ -205,6 +209,24 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     return aSSLCtx;
   }
 
+  /**
+   * Sign the provided element with the configured certificate using XMLDSig.
+   *
+   * @param aElementToSign
+   *        The XML element to sign. May not be <code>null</code>.
+   * @param bBDXR
+   *        <code>true</code> to use OASIS BDXR mode, <code>false</code> to use
+   *        Peppol mode. This differences are the hash algorithm as well as the
+   *        canonicalization algorithms.
+   * @throws NoSuchAlgorithmException
+   *         An algorithm is not supported by the underlying platform.
+   * @throws InvalidAlgorithmParameterException
+   *         Parameters for certain algorithms are invalid.
+   * @throws MarshalException
+   *         Marshalling the signature failed
+   * @throws XMLSignatureException
+   *         Some XMLDSig speciifc stuff failed
+   */
   public void signXML (@Nonnull final Element aElementToSign, final boolean bBDXR) throws NoSuchAlgorithmException,
                                                                                    InvalidAlgorithmParameterException,
                                                                                    MarshalException,
@@ -254,19 +276,6 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
     // Marshal, generate, and sign the enveloped signature.
     aSignature.sign (aSignContext);
-  }
-
-  /**
-   * @return A shortcut method to determine if the certification configuration
-   *         is valid or not. This method can be used, even if
-   *         {@link #getInstance()} throws an exception.
-   * @deprecated Use {@link #isKeyStoreValid()} instead. Deprecated as per
-   *             v5.2.1
-   */
-  @Deprecated
-  public static boolean isCertificateValid ()
-  {
-    return isKeyStoreValid ();
   }
 
   /**

@@ -37,7 +37,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPTrustManager.class);
 
-  private static final AtomicBoolean s_aTrustStoreValid = new AtomicBoolean (false);
+  private static final AtomicBoolean TRUST_STORE_VALID = new AtomicBoolean (false);
   private static EKeyStoreLoadError s_eInitError;
   private static String s_sInitError;
 
@@ -45,7 +45,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
 
   private static void _setTrustStoreValid (final boolean bValid)
   {
-    s_aTrustStoreValid.set (bValid);
+    TRUST_STORE_VALID.set (bValid);
   }
 
   private static void _loadError (@Nullable final EKeyStoreLoadError eInitError, @Nullable final String sInitError)
@@ -100,26 +100,13 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
   }
 
   /**
-   * @return A shortcut method to determine if the certification configuration
-   *         is valid or not. This method can be used, even if
-   *         {@link #getInstance()} throws an exception.
-   * @deprecated Use {@link #isTrustStoreValid()} instead. Deprecated as per
-   *             v5.2.1
-   */
-  @Deprecated
-  public static boolean isCertificateValid ()
-  {
-    return isTrustStoreValid ();
-  }
-
-  /**
    * @return A shortcut method to determine if the trust store configuration is
    *         valid or not. This method can be used, even if
    *         {@link #getInstance()} throws an exception.
    */
   public static boolean isTrustStoreValid ()
   {
-    return s_aTrustStoreValid.get ();
+    return TRUST_STORE_VALID.get ();
   }
 
   /**
