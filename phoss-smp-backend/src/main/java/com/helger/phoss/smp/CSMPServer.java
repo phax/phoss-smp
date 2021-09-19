@@ -31,6 +31,16 @@ public final class CSMPServer
 {
   public static final Locale DEFAULT_LOCALE = LocaleCache.getInstance ().getLocale ("en", "US");
 
+  /** A regular expression pattern to validate the SMP ID. */
+  public static final String PATTERN_SMP_ID = "[a-zA-Z0-9\\-\\.]+";
+
+  /**
+   * The default time zone is (for historical reasons) UTC, but
+   * https://github.com/phax/phoss-smp/issues/167 asked to make this
+   * customizable
+   */
+  public static final String DEFAULT_TIMEZONE = "UTC";
+
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
 
   private static final String VERSION_NUMBER;

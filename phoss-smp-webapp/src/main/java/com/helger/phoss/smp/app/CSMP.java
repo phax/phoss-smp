@@ -83,11 +83,6 @@ public final class CSMP
   public static final Locale USER_ADMINISTRATOR_LOCALE = CSMPServer.DEFAULT_LOCALE;
   public static final ICommonsMap <String, String> USER_ADMINISTRATOR_CUSTOMATTRS = null;
 
-  /** A regular expression pattern to validate the SMP ID. */
-  public static final String PATTERN_SMP_ID = "[a-zA-Z0-9\\-\\.]+";
-
-  public static final String DEFAULT_TIMEZONE = "UTC";
-
   public static final boolean ENABLE_ISSUE_56 = false;
 
   private CSMP ()

@@ -45,7 +45,6 @@ import com.helger.pd.client.PDClientConfiguration;
 import com.helger.pd.client.PDHttpClientSettings;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.SMPServerConfiguration;
-import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPSecurity;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -128,7 +127,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
   private static void _initTimeZone ()
   {
-    final String sDesiredTimeZone = CSMP.DEFAULT_TIMEZONE;
+    final String sDesiredTimeZone = SMPServerConfiguration.getTimeZoneOrDefault ();
 
     // Check if the timezone is supported
     if (!ArrayHelper.contains (TimeZone.getAvailableIDs (), sDesiredTimeZone))
@@ -145,13 +144,21 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       LOGGER.error (sErrorMsg);
       throw new InitializationException (sErrorMsg);
     }
+
     LOGGER.info ("Set default timezone to '" + sDesiredTimeZone + "'");
+  }
+
+  @Override
+  protected void onTheVeryBeginning (final ServletContext aSC)
+  {
+    super.onTheVeryBeginning (aSC);
+
+    _initTimeZone ();
   }
 
   @Override
   protected void initGlobalSettings ()
   {
-    _initTimeZone ();
     s_aStartupDateTime = PDTFactory.getCurrentOffsetDateTimeUTC ();
 
     // Enable JaxWS debugging?
@@ -190,12 +197,14 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Check SMP ID
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
     if (StringHelper.hasNoText (sSMPID))
-      throw new IllegalArgumentException ("The SMP ID is missing. It must match the regular expression '" + CSMP.PATTERN_SMP_ID + "'!");
-    if (!RegExHelper.stringMatchesPattern (CSMP.PATTERN_SMP_ID, sSMPID))
+      throw new IllegalArgumentException ("The SMP ID is missing. It must match the regular expression '" +
+                                          CSMPServer.PATTERN_SMP_ID +
+                                          "'!");
+    if (!RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, sSMPID))
       throw new IllegalArgumentException ("The provided SMP ID '" +
                                           sSMPID +
                                           "' is not valid when used as a DNS name. It must match the regular expression '" +
-                                          CSMP.PATTERN_SMP_ID +
+                                          CSMPServer.PATTERN_SMP_ID +
                                           "'!");
     if (LOGGER.isInfoEnabled ())
       LOGGER.info ("This SMP has the ID '" + sSMPID + "'");

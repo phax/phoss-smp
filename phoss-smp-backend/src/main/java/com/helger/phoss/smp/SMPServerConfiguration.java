@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.CGlobal;
+import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
@@ -81,17 +82,18 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_PAYLOAD_ON_ERROR = "smp.rest.payload.on.error";
   public static final String KEY_SMP_REST_REMOTE_QUERY_API_DISABLED = "smp.rest.remote.queryapi.disabled";
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
-  /* legacy name */
+  public static final String KEY_SMP_TIMEZONE = "smp.timezone";
+  /* legacy name - should not contain "peppol" */
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
-  /* legacy name */
+  /* legacy name - should not contain "peppol" */
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED = "smp.peppol.directory.integration.required";
-  /* legacy name */
+  /* legacy name - should not contain "peppol" */
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.peppol.directory.integration.autoupdate";
-  /* legacy name */
+  /* legacy name - should not contain "peppol" */
   public static final String KEY_SMP_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
-  /* legacy name */
+  /* legacy name - should be called "enabled" instead of "active" */
   public static final String KEY_SML_ENABLED = "sml.active";
-  /* legacy name */
+  /* legacy name - should be called "required" instead of "needed" */
   public static final String KEY_SML_REQUIRED = "sml.needed";
   public static final String KEY_SML_SMPID = "sml.smpid";
   public static final String KEY_SML_SMP_IP = "sml.smp.ip";
@@ -377,6 +379,13 @@ public final class SMPServerConfiguration
   public static boolean isStatusEnabled ()
   {
     return getConfigFile ().getAsBoolean (KEY_SMP_STATUS_ENABLED, DEFAULT_SMP_STATUS_ENABLED);
+  }
+
+  @Nonnull
+  @Nonempty
+  public static String getTimeZoneOrDefault ()
+  {
+    return s_aConfigFile.getAsString (KEY_SMP_TIMEZONE, CSMPServer.DEFAULT_TIMEZONE);
   }
 
   /**
