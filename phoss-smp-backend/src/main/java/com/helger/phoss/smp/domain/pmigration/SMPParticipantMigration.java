@@ -169,6 +169,7 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   public static SMPParticipantMigration createOutbound (@Nonnull final IParticipantIdentifier aParticipantID,
                                                         @Nonnull @Nonempty final String sMigrationKey)
   {
+    // Outbound starts "in progress"
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
                                         EParticipantMigrationDirection.OUTBOUND,
                                         EParticipantMigrationState.IN_PROGRESS,
@@ -181,9 +182,10 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   public static SMPParticipantMigration createInbound (@Nonnull final IParticipantIdentifier aParticipantID,
                                                        @Nonnull @Nonempty final String sMigrationKey)
   {
+    // Inbound is directly "migrated"
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
                                         EParticipantMigrationDirection.INBOUND,
-                                        EParticipantMigrationState.IN_PROGRESS,
+                                        EParticipantMigrationState.MIGRATED,
                                         aParticipantID,
                                         PDTFactory.getCurrentLocalDateTime (),
                                         sMigrationKey);

@@ -66,7 +66,6 @@ import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
 import com.helger.photon.bootstrap4.grid.BootstrapRow;
 import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapTechnicalUI;
 import com.helger.photon.core.form.FormErrorList;
@@ -389,9 +388,8 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
 
     final HCTable aTable = new HCTable (new DTCol ("ID").setVisible (false),
                                         new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("Initiation").setDisplayType (EDTColType.DATETIME, aDisplayLocale),
-                                        new DTCol ("Migration Key"),
-                                        new BootstrapDTColAction (aDisplayLocale)).setID (getID () + eState.getID ());
+                                        new DTCol ("Migration").setDisplayType (EDTColType.DATETIME, aDisplayLocale),
+                                        new DTCol ("Migration Key")).setID (getID () + eState.getID ());
     for (final ISMPParticipantMigration aCurObject : aMigs)
     {
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
