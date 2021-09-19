@@ -90,19 +90,19 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
 
   @Nonnull
   @Nonempty
-  public String getID ()
+  public final String getID ()
   {
     return m_sID;
   }
 
   @Nonnull
-  public EParticipantMigrationDirection getDirection ()
+  public final EParticipantMigrationDirection getDirection ()
   {
     return m_eDirection;
   }
 
   @Nonnull
-  public EParticipantMigrationState getState ()
+  public final EParticipantMigrationState getState ()
   {
     return m_eState;
   }
@@ -118,20 +118,20 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
   }
 
   @Nonnull
-  public IParticipantIdentifier getParticipantIdentifier ()
+  public final IParticipantIdentifier getParticipantIdentifier ()
   {
     return m_aParticipantID;
   }
 
   @Nonnull
-  public LocalDateTime getInitiationDateTime ()
+  public final LocalDateTime getInitiationDateTime ()
   {
     return m_aInitiationDateTime;
   }
 
   @Nonnull
   @Nonempty
-  public String getMigrationKey ()
+  public final String getMigrationKey ()
   {
     return m_sMigrationKey;
   }

@@ -113,6 +113,15 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   }
 
   @Nonnull
+  public ISMPParticipantMigration createInboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
+                                                                     @Nonnull @Nonempty final String sMigrationKey)
+  {
+    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createInbound (aParticipantID, sMigrationKey);
+    _createParticipantMigration (aSMPParticipantMigration);
+    return aSMPParticipantMigration;
+  }
+
+  @Nonnull
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
                                                @Nonnull final EParticipantMigrationState eNewState)
   {

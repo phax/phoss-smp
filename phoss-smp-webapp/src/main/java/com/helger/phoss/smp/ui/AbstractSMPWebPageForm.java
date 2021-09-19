@@ -16,12 +16,20 @@
  */
 package com.helger.phoss.smp.ui;
 
+import java.util.Locale;
+
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.error.IError;
 import com.helger.commons.id.IHasID;
+import com.helger.commons.string.StringHelper;
+import com.helger.html.hc.impl.HCNodeList;
+import com.helger.photon.bootstrap4.alert.BootstrapBox;
+import com.helger.photon.bootstrap4.alert.EBootstrapAlertType;
 import com.helger.photon.bootstrap4.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap4.pages.AbstractBootstrapWebPageForm;
+import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
 /**
@@ -42,5 +50,20 @@ public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> 
   public AbstractSMPWebPageForm (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
   {
     super (sID, sName);
+  }
+
+  @Override
+  protected void onInputFormError (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
+  {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+
+    // Show all global errors that don't have a specific error field
+    for (final IError aError : aFormErrors)
+      if (StringHelper.hasNoText (aError.getErrorFieldName ()))
+      {
+        final EBootstrapAlertType eType = aError.isError () ? EBootstrapAlertType.DANGER : EBootstrapAlertType.WARNING;
+        aNodeList.addChild (new BootstrapBox (eType).addChild (aError.getAsString (aDisplayLocale)));
+      }
   }
 }

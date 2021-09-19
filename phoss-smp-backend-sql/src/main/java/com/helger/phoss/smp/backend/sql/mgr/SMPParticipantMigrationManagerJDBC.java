@@ -96,6 +96,14 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     return _createParticipantMigration (aSMPParticipantMigration);
   }
 
+  @Nullable
+  public ISMPParticipantMigration createInboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
+                                                                     @Nonnull @Nonempty final String sMigrationKey)
+  {
+    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createInbound (aParticipantID, sMigrationKey);
+    return _createParticipantMigration (aSMPParticipantMigration);
+  }
+
   @Nonnull
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
                                                @Nonnull final EParticipantMigrationState eNewState)

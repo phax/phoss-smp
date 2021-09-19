@@ -85,6 +85,17 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
   }
 
   @Nonnull
+  public ISMPParticipantMigration createInboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
+                                                                     @Nonnull @Nonempty final String sMigrationKey)
+  {
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+
+    final SMPParticipantMigration ret = SMPParticipantMigration.createInbound (aParticipantID, sMigrationKey);
+    _createSMPParticipantMigration (ret);
+    return ret;
+  }
+
+  @Nonnull
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
                                                @Nonnull final EParticipantMigrationState eNewState)
   {

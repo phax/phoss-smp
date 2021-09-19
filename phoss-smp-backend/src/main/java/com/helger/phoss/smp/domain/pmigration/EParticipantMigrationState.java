@@ -74,6 +74,18 @@ public enum EParticipantMigrationState implements IHasID <String>, IHasDisplayNa
     return this == IN_PROGRESS || this == MIGRATED;
   }
 
+  public boolean isOutboundState ()
+  {
+    // All states are for outbound migrations
+    return true;
+  }
+
+  public boolean isInboundState ()
+  {
+    // no multi-step process
+    return this == MIGRATED;
+  }
+
   @Nullable
   public static EParticipantMigrationState getFromIDOrNull (@Nullable final String sID)
   {

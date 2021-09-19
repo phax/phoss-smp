@@ -29,12 +29,13 @@ public interface ISMPParticipantMigrationManager
 {
   /**
    * Create a new outbound participant migration for the provided participant
-   * identifier.
+   * identifier. This means the participant is migrated FROM this SMP to another
+   * SMP.
    *
    * @param aParticipantID
    *        The participant ID to use. May not be <code>null</code>.
    * @param sMigrationKey
-   *        The migration key received from the SML. May neither be
+   *        The migration key send to the SMK/SML. May neither be
    *        <code>null</code> nor empty.
    * @return The created migration domain object. May be <code>null</code> in
    *         case persistence failed.
@@ -42,6 +43,23 @@ public interface ISMPParticipantMigrationManager
   @Nullable
   ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull IParticipantIdentifier aParticipantID,
                                                                @Nonnull @Nonempty String sMigrationKey);
+
+  /**
+   * Create a new inbound participant migration for the provided participant
+   * identifier. This means, the participant is migrated from another SMP TO
+   * this SMP.
+   *
+   * @param aParticipantID
+   *        The participant ID to use. May not be <code>null</code>.
+   * @param sMigrationKey
+   *        The migration key received from the other SMP. May neither be
+   *        <code>null</code> nor empty.
+   * @return The created migration domain object. May be <code>null</code> in
+   *         case persistence failed.
+   */
+  @Nullable
+  ISMPParticipantMigration createInboundParticipantMigration (@Nonnull IParticipantIdentifier aParticipantID,
+                                                              @Nonnull @Nonempty String sMigrationKey);
 
   /**
    * Change the participant migration state of the provided participant ID.

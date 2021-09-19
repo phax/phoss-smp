@@ -76,7 +76,10 @@ import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 
 /**
- * Class to migrate an existing ServiceGroup from this SMP to another SMP.
+ * Class to migrate an existing ServiceGroup of this SMP to another SMP. After
+ * "prepare to migrate" on the SMK/SML it is up to the user to decide, if the
+ * migration was successful or not. In case of a successful migration, the
+ * Service Group is deleted in this SMP.
  *
  * @author Philip Helger
  */
@@ -226,6 +229,15 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       return EValidity.INVALID;
     }
 
+    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
+    if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
+    {
+      aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to migrate it."));
+      // Note: makes no to allow to create a new Service Group here and than
+      // directly migrate it away
+      return EValidity.INVALID;
+    }
+
     return super.isValidToDisplayPage (aWPEC);
   }
 
@@ -285,11 +297,16 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
     // State is filtered below
     final ICommonsList <ISMPParticipantMigration> aExistingOutgoingMigrations = aParticipantMigrationMgr.getAllOutboundParticipantMigrations (null);
+
+    // Get all participant identifiers for which NO new migration can be
+    // initiated (because they were already migrated or migration is currently
+    // in progress)
     final ICommonsSet <IParticipantIdentifier> aPIDsThatCannotBeUsed = new CommonsHashSet <> ();
     aPIDsThatCannotBeUsed.addAllMapped (aExistingOutgoingMigrations,
                                         x -> x.getState ().preventsNewMigration (),
                                         ISMPParticipantMigration::getParticipantIdentifier);
 
+    // Filter out all for which it makes no sense
     final HCServiceGroupSelect aSGSelect = new HCServiceGroupSelect (new RequestField (FIELD_PARTICIPANT_ID),
                                                                      aDisplayLocale,
                                                                      x -> aPIDsThatCannotBeUsed.containsNone (y -> x.getParticipantIdentifier ()
@@ -319,7 +336,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
-    final String sParticipantID = aWPEC.params ().getAsString (FIELD_PARTICIPANT_ID);
+    final String sParticipantID = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID);
     final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sParticipantID);
 
     if (StringHelper.hasNoText (sParticipantID))
@@ -345,6 +362,8 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
         {
           final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSettings.getSMLInfo ());
           aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
+
+          // SML call
           sMigrationKey = aCaller.prepareToMigrate (aParticipantID, SMPServerConfiguration.getSMLSMPID ());
           LOGGER.info ("Successfully called prepareToMigrate on SML. Created migration key is '" + sMigrationKey + "'");
         }
@@ -438,7 +457,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     {
       final HCOL aOL = new HCOL ();
       aOL.addItem ("The migration is initiated on this SMP, and the SML is informed about the upcoming migration");
-      aOL.addItem ("The other SMP, that is taking over the Service Group must acknowledge the migration by providing the same migration code (created by this SMP) to the SML");
+      aOL.addItem ("The other SMP, that is taking over the Service Group, must acknowledge the migration by providing the same migration code (created by this SMP) to the SML");
       aOL.addItem ("If the migration was successful, the Service Group must be deleted from this SMP, ideally a temporary redirect to the new SMP is created. If the migration was cancelled no action is needed.");
       aNodeList.addChild (info ().addChild (div ("The process of migrating a Service Group to another SMP consists of multiple steps:"))
                                  .addChild (aOL)
@@ -446,16 +465,6 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                  " If a Migration is cancelled, it can be retried later.")));
     }
 
-    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
-    {
-      aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to migrate it."));
-      if (false)
-        aNodeList.addChild (new BootstrapButton ().addChild ("Create new Service Group")
-                                                  .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SERVICE_GROUPS))
-                                                  .setIcon (EDefaultIcon.YES));
-    }
-    else
     {
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
       aToolbar.addChild (new BootstrapButton ().addChild ("Start Participant Migration")
@@ -468,11 +477,12 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 
     final ICommonsList <ISMPParticipantMigration> aAllMigs = aParticipantMigrationMgr.getAllOutboundParticipantMigrations (null);
     for (final EParticipantMigrationState eState : EParticipantMigrationState.values ())
-    {
-      final ICommonsList <ISMPParticipantMigration> aMatchingMigs = aAllMigs.getAll (x -> x.getState () == eState);
-      aTabBox.addTab (eState.getID (),
-                      eState.getDisplayName () + " (" + aMatchingMigs.size () + ")",
-                      _createTable (aWPEC, aMatchingMigs, eState));
-    }
+      if (eState.isOutboundState ())
+      {
+        final ICommonsList <ISMPParticipantMigration> aMatchingMigs = aAllMigs.getAll (x -> x.getState () == eState);
+        aTabBox.addTab (eState.getID (),
+                        eState.getDisplayName () + " (" + aMatchingMigs.size () + ")",
+                        _createTable (aWPEC, aMatchingMigs, eState));
+      }
   }
 }

@@ -158,20 +158,20 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
           if (aServiceGroupMgr.deleteSMPServiceGroup (aParticipantID, true).isChanged ())
           {
-            aNL.addChild (success ("The SMP ServiceGroup for participant '" +
+            aNL.addChild (success ("The SMP Service Group for participant '" +
                                    aParticipantID.getURIEncoded () +
                                    "' was successfully deleted!"));
           }
           else
           {
-            aNL.addChild (error ("The SMP ServiceGroup for participant '" +
+            aNL.addChild (error ("The SMP Service Group for participant '" +
                                  aParticipantID.getURIEncoded () +
                                  "' could not be deleted! Please check the logs."));
           }
         }
         catch (final Exception ex)
         {
-          aNL.addChild (error ("Error deleting the SMP ServiceGroup for participant '" +
+          aNL.addChild (error ("Error deleting the SMP Service Group for participant '" +
                                aParticipantID.getURIEncoded () +
                                "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         }
@@ -503,12 +503,12 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-    final String sParticipantIDScheme = aWPEC.params ().getAsString (FIELD_PARTICIPANT_ID_SCHEME);
-    final String sParticipantIDValue = aWPEC.params ().getAsString (FIELD_PARTICIPANT_ID_VALUE);
+    final String sParticipantIDScheme = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID_SCHEME);
+    final String sParticipantIDValue = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID_VALUE);
     IParticipantIdentifier aParticipantID = null;
-    final String sOwningUserID = aWPEC.params ().getAsString (FIELD_OWNING_USER_ID);
+    final String sOwningUserID = aWPEC.params ().getAsStringTrimmed (FIELD_OWNING_USER_ID);
     final IUser aOwningUser = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwningUserID);
-    final String sExtension = aWPEC.params ().getAsString (FIELD_EXTENSION);
+    final String sExtension = aWPEC.params ().getAsStringTrimmed (FIELD_EXTENSION);
 
     // validations
     if (aIdentifierFactory.isParticipantIdentifierSchemeMandatory () && StringHelper.hasNoText (sParticipantIDScheme))
@@ -549,13 +549,13 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         try
         {
           aServiceGroupMgr.updateSMPServiceGroup (aParticipantID, aOwningUser.getID (), sExtension);
-          aWPEC.postRedirectGetInternal (success ("The SMP ServiceGroup for participant '" +
+          aWPEC.postRedirectGetInternal (success ("The SMP Service Group for participant '" +
                                                   aParticipantID.getURIEncoded () +
                                                   "' was successfully updated."));
         }
         catch (final SMPServerException ex)
         {
-          aWPEC.postRedirectGetInternal (error ("Error updating the SMP ServiceGroup for participant '" +
+          aWPEC.postRedirectGetInternal (error ("Error updating the SMP Service Group for participant '" +
                                                 aParticipantID.getURIEncoded () +
                                                 "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         }
@@ -575,13 +575,13 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         }
         if (aSG != null)
         {
-          aWPEC.postRedirectGetInternal (success ("The new SMP ServiceGroup for participant '" +
+          aWPEC.postRedirectGetInternal (success ("The new SMP Service Group for participant '" +
                                                   aParticipantID.getURIEncoded () +
                                                   "' was successfully created."));
         }
         else
         {
-          aWPEC.postRedirectGetInternal (error ("Error creating the new SMP ServiceGroup for participant '" +
+          aWPEC.postRedirectGetInternal (error ("Error creating the new SMP Service Group for participant '" +
                                                 aParticipantID.getURIEncoded () +
                                                 "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
         }
