@@ -266,100 +266,112 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected void initManagers ()
   {
-    LOGGER.info ("Init of ConfigurationFileManager");
-    final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
-    aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
-                                                                                                .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
-    aCFM.registerConfigurationFile (new ConfigurationFile (SMPWebAppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
-                                                                                                         .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
-    final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
-    if (aConfigRes != null)
-      aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
-                                                                        .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
-    aCFM.registerAll (PDClientConfiguration.getConfig ());
-
-    LOGGER.info ("Init of Directory client stuff");
-    // If the SMP settings change, the PD client must be re-created
-    SMPMetaManager.getSettingsMgr ().callbacks ().add (x -> PDClientProvider.getInstance ().resetPDClient ());
-
-    // Callback on BusinessCard manager - if something happens, notify PD server
-    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-    if (aBusinessCardMgr != null)
     {
-      aBusinessCardMgr.bcCallbacks ().add (new ISMPBusinessCardCallback ()
+      LOGGER.info ("Init of ConfigurationFileManager");
+      final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
+      aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
+                                                                                                  .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
+      aCFM.registerConfigurationFile (new ConfigurationFile (SMPWebAppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
+                                                                                                           .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
+      final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
+      if (aConfigRes != null)
       {
-        public void onSMPBusinessCardCreatedOrUpdated (@Nonnull final ISMPBusinessCard aBusinessCard)
-        {
-          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-          if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
-          {
-            // Notify PD server: add
-            PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
-          }
-        }
+        aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
+                                                                          .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
+      }
+      aCFM.registerAll (PDClientConfiguration.getConfig ());
+    }
 
-        public void onSMPBusinessCardDeleted (@Nonnull final ISMPBusinessCard aBusinessCard)
-        {
-          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-          if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
-          {
-            // Notify PD server: delete
-            PDClientProvider.getInstance ().getPDClient ().deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
-          }
-        }
-      });
+    {
+      LOGGER.info ("Init of Directory client stuff");
 
-      // If a service information is create, updated or deleted, also update
-      // Business Card at PD
-      SMPMetaManager.getServiceInformationMgr ().serviceInformationCallbacks ().add (new ISMPServiceInformationCallback ()
+      // If the SMP settings change, the PD client must be re-created
+      SMPMetaManager.getSettingsMgr ().callbacks ().add (x -> PDClientProvider.getInstance ().resetPDClient ());
+
+      // Callback on BusinessCard manager - if something happens, notify PD
+      // server
+      final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+      if (aBusinessCardMgr != null)
       {
-        public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
+        aBusinessCardMgr.bcCallbacks ().add (new ISMPBusinessCardCallback ()
         {
-          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-          if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
+          public void onSMPBusinessCardCreatedOrUpdated (@Nonnull final ISMPBusinessCard aBusinessCard)
           {
-            // Only if a business card is present
-            if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
+            final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+            if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
             {
-              // Notify PD server: update
-              PDClientProvider.getInstance ()
-                              .getPDClient ()
-                              .addServiceGroupToIndex (aServiceInformation.getServiceGroup ().getParticipantIdentifier ());
+              // Notify PD server: add
+              PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
             }
           }
-        }
 
-        public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
-        {
-          onSMPServiceInformationCreated (aServiceInformation);
-        }
+          public void onSMPBusinessCardDeleted (@Nonnull final ISMPBusinessCard aBusinessCard)
+          {
+            final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+            if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
+            {
+              // Notify PD server: delete
+              PDClientProvider.getInstance ().getPDClient ().deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
+            }
+          }
+        });
 
-        public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
+        // If a service information is create, updated or deleted, also update
+        // Business Card at PD
+        SMPMetaManager.getServiceInformationMgr ().serviceInformationCallbacks ().add (new ISMPServiceInformationCallback ()
         {
-          onSMPServiceInformationCreated (aServiceInformation);
-        }
-      });
+          public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
+          {
+            final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+            if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
+            {
+              // Only if a business card is present
+              if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
+              {
+                // Notify PD server: update
+                PDClientProvider.getInstance ()
+                                .getPDClient ()
+                                .addServiceGroupToIndex (aServiceInformation.getServiceGroup ().getParticipantIdentifier ());
+              }
+            }
+          }
+
+          public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
+          {
+            onSMPServiceInformationCreated (aServiceInformation);
+          }
+
+          public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
+          {
+            onSMPServiceInformationCreated (aServiceInformation);
+          }
+        });
+      }
     }
 
-    LOGGER.info ("Init of HTTP and Proxy settings");
-    // Register global proxy servers
-    ProxySelectorProxySettingsManager.setAsDefault (true);
-    final IProxySettings aProxyHttp = SMPServerConfiguration.getAsHttpProxySettings ();
-    if (aProxyHttp != null)
     {
-      // Register a handler that returns the "http" proxy, if an "http" URL is
-      // requested
-      ProxySettingsManager.registerProvider ( (sProtocol, sHost, nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
-                                                                                                     : null);
-    }
-    final IProxySettings aProxyHttps = SMPServerConfiguration.getAsHttpsProxySettings ();
-    if (aProxyHttps != null)
-    {
-      // Register a handler that returns the "https" proxy, if an "https" URL is
-      // requested
-      ProxySettingsManager.registerProvider ( (sProtocol,
-                                               sHost,
-                                               nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps) : null);
+      LOGGER.info ("Init of HTTP and Proxy settings");
+      // Register global proxy servers
+      ProxySelectorProxySettingsManager.setAsDefault (true);
+      final IProxySettings aProxyHttp = SMPServerConfiguration.getAsHttpProxySettings ();
+      if (aProxyHttp != null)
+      {
+        // Register a handler that returns the "http" proxy, if an "http" URL is
+        // requested
+        ProxySettingsManager.registerProvider ( (sProtocol,
+                                                 sHost,
+                                                 nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp) : null);
+      }
+      final IProxySettings aProxyHttps = SMPServerConfiguration.getAsHttpsProxySettings ();
+      if (aProxyHttps != null)
+      {
+        // Register a handler that returns the "https" proxy, if an "https" URL
+        // is
+        // requested
+        ProxySettingsManager.registerProvider ( (sProtocol,
+                                                 sHost,
+                                                 nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps) : null);
+      }
     }
 
     // Special http client config
