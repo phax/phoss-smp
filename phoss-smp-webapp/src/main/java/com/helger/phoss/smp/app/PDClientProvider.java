@@ -63,7 +63,11 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
    */
   public void resetPDClient ()
   {
-    m_aRWLock.writeLocked ( () -> m_aPDClient = null);
+    m_aRWLock.writeLocked ( () -> {
+      // Ensure to close the old one first
+      StreamHelper.close (m_aPDClient);
+      m_aPDClient = null;
+    });
   }
 
   /**
