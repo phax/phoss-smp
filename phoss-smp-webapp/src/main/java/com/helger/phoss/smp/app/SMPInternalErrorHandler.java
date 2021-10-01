@@ -105,5 +105,9 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
       if (LOGGER.isInfoEnabled ())
         LOGGER.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);
     }
+    else
+    {
+      LOGGER.info ("No internal error handler configuration was found. So not sending emails in case of error.");
+    }
   }
 }
