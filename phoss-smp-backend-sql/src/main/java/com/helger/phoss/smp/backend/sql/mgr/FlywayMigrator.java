@@ -38,6 +38,7 @@ import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.backend.sql.migration.V5__MigrateTransportProfilesToDB;
+import com.helger.photon.audit.AuditHelper;
 import com.helger.settings.exchange.configfile.ConfigFile;
 
 /**
@@ -92,7 +93,24 @@ final class FlywayMigrator
     {
       public void handle (@Nonnull final Event aEvent, @Nonnull final Context aContext)
       {
-        // TODO
+        if (aEvent == Event.AFTER_EACH_MIGRATE)
+        {
+          if (aContext != null)
+          {
+            final MigrationInfo aMI = aContext.getMigrationInfo ();
+            if (aMI instanceof MigrationInfoImpl)
+            {
+              final ResolvedMigration aRM = ((MigrationInfoImpl) aMI).getResolvedMigration ();
+              // Version 6 establishes the audit table
+              if (aRM != null && aRM.getVersion ().isAtLeast ("7"))
+                AuditHelper.onAuditExecuteSuccess ("sql-migration",
+                                                   aRM.getVersion ().toString (),
+                                                   aRM.getDescription (),
+                                                   aRM.getType ().name (),
+                                                   aRM.getPhysicalLocation ());
+            }
+          }
+        }
       }
     };
 
