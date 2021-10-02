@@ -53,10 +53,10 @@ import com.helger.security.authentication.subject.user.ICurrentUserIDProvider;
  *
  * @author Philip Helger
  */
-public class JDBCAuditor extends AbstractJDBCEnabledManager implements IAuditor
+public class AuditorJDBC extends AbstractJDBCEnabledManager implements IAuditor
 {
   public static final int OBJECT_TYPE_MAX_LENGTH = 100;
-  private static final Logger LOGGER = LoggerFactory.getLogger (JDBCAuditor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (AuditorJDBC.class);
 
   private final ICurrentUserIDProvider m_aCurrentUserIDProvider;
 
@@ -69,7 +69,7 @@ public class JDBCAuditor extends AbstractJDBCEnabledManager implements IAuditor
    * @param aCurrentUserIDProvider
    *        The current user ID provider. May not be <code>null</code>.
    */
-  public JDBCAuditor (final Supplier <? extends DBExecutor> aDBExecSupplier, @Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
+  public AuditorJDBC (final Supplier <? extends DBExecutor> aDBExecSupplier, @Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
   {
     super (aDBExecSupplier);
     m_aCurrentUserIDProvider = ValueEnforcer.notNull (aCurrentUserIDProvider, "UserIDProvider");

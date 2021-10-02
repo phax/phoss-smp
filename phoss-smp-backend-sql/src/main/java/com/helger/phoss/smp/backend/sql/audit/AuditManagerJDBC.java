@@ -38,11 +38,11 @@ import com.helger.photon.security.login.LoggedInUserManager;
  */
 public class AuditManagerJDBC implements IAuditManager
 {
-  private final JDBCAuditor m_aAuditor;
+  private final AuditorJDBC m_aAuditor;
 
   public AuditManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
-    m_aAuditor = new JDBCAuditor (aDBExecSupplier, LoggedInUserManager.getInstance ());
+    m_aAuditor = new AuditorJDBC (aDBExecSupplier, LoggedInUserManager.getInstance ());
   }
 
   public boolean isInMemory ()
