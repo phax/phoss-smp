@@ -69,7 +69,8 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Create new
       final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_tprofile (id, name, deprecated) VALUES (?, ?, ?)",
-                                                              new ConstantPreparedStatementDataProvider (ret.getID (),
+                                                              new ConstantPreparedStatementDataProvider (getTrimmedToLength (ret.getID (),
+                                                                                                                             45),
                                                                                                          ret.getName (),
                                                                                                          Boolean.valueOf (ret.isDeprecated ())));
       if (nCreated != 1)
