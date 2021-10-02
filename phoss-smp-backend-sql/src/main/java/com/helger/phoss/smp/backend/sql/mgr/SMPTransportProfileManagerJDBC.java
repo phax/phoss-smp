@@ -112,7 +112,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
 
     if (aUpdated.is0 ())
     {
-      // No such participant migration ID
+      // No such transport profile ID
       AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id");
       return EChange.UNCHANGED;
     }

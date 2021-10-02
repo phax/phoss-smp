@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.sql.audit;
 
 import java.time.LocalDate;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -24,7 +25,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
+import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.photon.audit.IAuditItem;
 import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.audit.IAuditor;
@@ -39,9 +40,9 @@ public class AuditManagerJDBC implements IAuditManager
 {
   private final JDBCAuditor m_aAuditor;
 
-  public AuditManagerJDBC ()
+  public AuditManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
-    m_aAuditor = new JDBCAuditor (SMPDBExecutor::new, LoggedInUserManager.getInstance ());
+    m_aAuditor = new JDBCAuditor (aDBExecSupplier, LoggedInUserManager.getInstance ());
   }
 
   public boolean isInMemory ()
