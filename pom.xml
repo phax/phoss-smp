@@ -117,7 +117,7 @@
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>8.3.1</version>
+        <version>8.3.2-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
