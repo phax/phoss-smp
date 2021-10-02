@@ -73,18 +73,16 @@ final class FlywayMigrator
       {
         if (LOGGER.isInfoEnabled ())
           LOGGER.info ("Flyway: Event " + aEvent.getId ());
-        if (aEvent == Event.AFTER_EACH_MIGRATE)
+
+        if (aEvent == Event.AFTER_EACH_MIGRATE && aContext != null)
         {
-          if (aContext != null)
+          final MigrationInfo aMI = aContext.getMigrationInfo ();
+          if (aMI instanceof MigrationInfoImpl)
           {
-            final MigrationInfo aMI = aContext.getMigrationInfo ();
-            if (aMI instanceof MigrationInfoImpl)
-            {
-              final ResolvedMigration aRM = ((MigrationInfoImpl) aMI).getResolvedMigration ();
-              if (aRM != null)
-                if (LOGGER.isInfoEnabled ())
-                  LOGGER.info ("  Performed migration: " + aRM);
-            }
+            final ResolvedMigration aRM = ((MigrationInfoImpl) aMI).getResolvedMigration ();
+            if (aRM != null)
+              if (LOGGER.isInfoEnabled ())
+                LOGGER.info ("  Performed migration: " + aRM);
           }
         }
       }
@@ -93,22 +91,21 @@ final class FlywayMigrator
     {
       public void handle (@Nonnull final Event aEvent, @Nonnull final Context aContext)
       {
-        if (aEvent == Event.AFTER_EACH_MIGRATE)
+        if (aEvent == Event.AFTER_EACH_MIGRATE && aContext != null)
         {
-          if (aContext != null)
+          final MigrationInfo aMI = aContext.getMigrationInfo ();
+          if (aMI instanceof MigrationInfoImpl)
           {
-            final MigrationInfo aMI = aContext.getMigrationInfo ();
-            if (aMI instanceof MigrationInfoImpl)
-            {
-              final ResolvedMigration aRM = ((MigrationInfoImpl) aMI).getResolvedMigration ();
-              // Version 6 establishes the audit table
-              if (aRM != null && aRM.getVersion ().isAtLeast ("7"))
-                AuditHelper.onAuditExecuteSuccess ("sql-migration",
-                                                   aRM.getVersion ().toString (),
-                                                   aRM.getDescription (),
-                                                   aRM.getType ().name (),
-                                                   aRM.getPhysicalLocation ());
-            }
+            final ResolvedMigration aRM = ((MigrationInfoImpl) aMI).getResolvedMigration ();
+            // Version 6 establishes the audit table - so don't audit anything
+            // before that version
+            if (aRM != null && aRM.getVersion ().isAtLeast ("7"))
+              AuditHelper.onAuditExecuteSuccess ("sql-migration-success",
+                                                 aRM.getVersion ().toString (),
+                                                 aRM.getDescription (),
+                                                 aRM.getScript (),
+                                                 aRM.getType ().name (),
+                                                 aRM.getPhysicalLocation ());
           }
         }
       }
