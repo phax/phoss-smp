@@ -39,8 +39,21 @@ import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.photon.audit.AuditHelper;
 
+/**
+ * Implementation of {@link ISMPTransportProfileManager} for SQL backends.
+ *
+ * @author Philip Helger
+ * @since 5.5.0
+ */
 public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager implements ISMPTransportProfileManager
 {
+  /**
+   * Constructor
+   *
+   * @param aDBExecSupplier
+   *        The supplier for {@link DBExecutor} objects. May not be
+   *        <code>null</code>.
+   */
   public SMPTransportProfileManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);

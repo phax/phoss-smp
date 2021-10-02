@@ -78,6 +78,13 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
+  /**
+   * Constructor
+   *
+   * @param aDBExecSupplier
+   *        The supplier for {@link DBExecutor} objects. May not be
+   *        <code>null</code>.
+   */
   public SMPBusinessCardManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);

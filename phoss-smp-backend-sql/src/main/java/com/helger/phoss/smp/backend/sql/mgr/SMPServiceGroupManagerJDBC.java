@@ -75,6 +75,13 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
   private ExpiringMap <String, SMPServiceGroup> m_aCache;
 
+  /**
+   * Constructor
+   *
+   * @param aDBExecSupplier
+   *        The supplier for {@link DBExecutor} objects. May not be
+   *        <code>null</code>.
+   */
   public SMPServiceGroupManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);

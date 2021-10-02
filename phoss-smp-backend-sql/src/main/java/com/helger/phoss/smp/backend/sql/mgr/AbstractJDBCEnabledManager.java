@@ -40,6 +40,13 @@ public abstract class AbstractJDBCEnabledManager
 {
   private final Supplier <? extends DBExecutor> m_aDBExecSupplier;
 
+  /**
+   * Constructor
+   *
+   * @param aDBExecSupplier
+   *        The supplier for {@link DBExecutor} objects. May not be
+   *        <code>null</code>.
+   */
   protected AbstractJDBCEnabledManager (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     ValueEnforcer.notNull (aDBExecSupplier, "DBExecSupplier");

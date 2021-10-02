@@ -66,6 +66,15 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
+  /**
+   * Constructor
+   *
+   * @param aDBExecSupplier
+   *        The supplier for {@link DBExecutor} objects. May not be
+   *        <code>null</code>.
+   * @param aServiceGroupMgr
+   *        The service group manager to use. May not be <code>null</code>.
+   */
   public SMPRedirectManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier,
                                  @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {

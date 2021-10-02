@@ -103,6 +103,15 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
+  /**
+   * Constructor
+   *
+   * @param aDBExecSupplier
+   *        The supplier for {@link DBExecutor} objects. May not be
+   *        <code>null</code>.
+   * @param aServiceGroupMgr
+   *        The service group manager to use. May not be <code>null</code>.
+   */
   public SMPServiceInformationManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier,
                                            @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {

@@ -45,6 +45,13 @@ import com.helger.photon.audit.AuditHelper;
 
 public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManager implements ISMPParticipantMigrationManager
 {
+  /**
+   * Constructor
+   *
+   * @param aDBExecSupplier
+   *        The supplier for {@link DBExecutor} objects. May not be
+   *        <code>null</code>.
+   */
   public SMPParticipantMigrationManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
