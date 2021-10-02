@@ -25,11 +25,9 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.io.file.SimpleFileIO;
 import com.helger.commons.string.StringParser;
-import com.helger.phoss.smp.backend.mongodb.PhotonSecurityManagerFactoryMongoDB;
 import com.helger.phoss.smp.backend.mongodb.audit.MongoDBIDFactory;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.photon.app.io.WebFileIO;
-import com.helger.photon.security.mgr.PhotonSecurityManager;
 
 /**
  * Special SMP web app listener for MongoDB
@@ -58,14 +56,5 @@ public class SMPWebAppListenerMongoDB extends SMPWebAppListener
     // Set persistent ID provider: Mongo based based
     GlobalIDFactory.setPersistentLongIDFactory (new MongoDBIDFactory (nInitialCount));
     GlobalIDFactory.setPersistentIntIDFactory ( () -> (int) GlobalIDFactory.getNewPersistentLongID ());
-  }
-
-  @Override
-  protected void initGlobalSettings ()
-  {
-    super.initGlobalSettings ();
-
-    // Set the special PhotonSecurityManager factory
-    PhotonSecurityManager.setFactory (new PhotonSecurityManagerFactoryMongoDB ());
   }
 }
