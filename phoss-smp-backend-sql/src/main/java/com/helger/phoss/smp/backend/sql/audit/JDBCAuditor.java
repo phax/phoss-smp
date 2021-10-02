@@ -16,24 +16,37 @@
  */
 package com.helger.phoss.smp.backend.sql.audit;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.type.ObjectType;
+import com.helger.commons.wrapper.Wrapper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
-import com.helger.json.JsonArray;
+import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.phoss.smp.backend.sql.mgr.AbstractJDBCEnabledManager;
+import com.helger.photon.audit.AuditItem;
 import com.helger.photon.audit.EAuditActionType;
+import com.helger.photon.audit.IAuditActionStringProvider;
+import com.helger.photon.audit.IAuditItem;
 import com.helger.photon.audit.IAuditor;
+import com.helger.security.authentication.subject.user.CUserID;
+import com.helger.security.authentication.subject.user.ICurrentUserIDProvider;
 
 /**
  * A special implementation of {@link IAuditor} writing data to a SQL table
@@ -45,16 +58,21 @@ public class JDBCAuditor extends AbstractJDBCEnabledManager implements IAuditor
   public static final int OBJECT_TYPE_MAX_LENGTH = 100;
   private static final Logger LOGGER = LoggerFactory.getLogger (JDBCAuditor.class);
 
+  private final ICurrentUserIDProvider m_aCurrentUserIDProvider;
+
   /**
    * Constructor
    *
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be
    *        <code>null</code>.
+   * @param aCurrentUserIDProvider
+   *        The current user ID provider. May not be <code>null</code>.
    */
-  public JDBCAuditor (final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public JDBCAuditor (final Supplier <? extends DBExecutor> aDBExecSupplier, @Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
   {
     super (aDBExecSupplier);
+    m_aCurrentUserIDProvider = ValueEnforcer.notNull (aCurrentUserIDProvider, "UserIDProvider");
   }
 
   public void createAuditItem (@Nonnull final EAuditActionType eActionType,
@@ -63,29 +81,66 @@ public class JDBCAuditor extends AbstractJDBCEnabledManager implements IAuditor
                                @Nullable final String sAction,
                                @Nullable final Object... aArgs)
   {
+    // Maybe null, so default like XML version
+    final String sUserID = StringHelper.getNotEmpty (m_aCurrentUserIDProvider.getCurrentUserID (), CUserID.USER_ID_GUEST);
     // Combine arguments
-    final String sArgs = new JsonArray ().addAll (aArgs).getAsJsonString ();
+    final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType.getName () : sAction,
+                                                                      aArgs);
 
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eDBSuccess = aExecutor.performInTransaction ( () -> {
       // Create new
-      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_audit (dt, actiontype, success, objtype, action, args) VALUES (?, ?, ?, ?, ?, ?)",
+      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_audit (dt, userid, actiontype, success, action)" +
+                                                              " VALUES (?, ?, ?, ?, ?)",
                                                               new ConstantPreparedStatementDataProvider (toTimestamp (PDTFactory.getCurrentLocalDateTime ()),
+                                                                                                         getTrimmedToLength (sUserID, 20),
                                                                                                          getTrimmedToLength (eActionType.getID (),
                                                                                                                              10),
                                                                                                          Boolean.valueOf (eSuccess.isSuccess ()),
-                                                                                                         getTrimmedToLength (aActionObjectType != null ? aActionObjectType.getName ()
-                                                                                                                                                       : null,
-                                                                                                                             100),
-                                                                                                         getTrimmedToLength (StringHelper.hasText (sAction) ? sAction
-                                                                                                                                                            : null,
-                                                                                                                             100),
-                                                                                                         sArgs));
+                                                                                                         sFullAction));
       if (nCreated != 1)
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
     });
 
     if (eDBSuccess.isFailure ())
       LOGGER.error ("Failed to write audit item to DB");
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public ICommonsList <IAuditItem> getLastAuditItems (@Nonnegative final int nMaxItems)
+  {
+    ValueEnforcer.isGT0 (nMaxItems, "MaxItems");
+
+    final ICommonsList <IAuditItem> ret = new CommonsArrayList <> ();
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT dt, userid, actiontype, success, action FROM smp_audit" +
+                                                                          " ORDER BY dt DESC" +
+                                                                          " LIMIT ?",
+                                                                          new ConstantPreparedStatementDataProvider (Integer.valueOf (nMaxItems)));
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
+      {
+        ret.add (new AuditItem (aRow.getAsLocalDateTime (0),
+                                aRow.getAsString (1),
+                                EAuditActionType.getFromIDOrNull (aRow.getAsString (2)),
+                                ESuccess.valueOf (aRow.getAsBoolean (3)),
+                                aRow.getAsString (4)));
+      }
+    return ret;
+  }
+
+  @Nullable
+  public LocalDate getEarliestAuditDate ()
+  {
+    final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
+    newExecutor ().querySingle ("SELECT dt FROM smp_audit ORDER BY dt ASC LIMIT 1", aDBResult::set);
+    if (aDBResult.isSet ())
+    {
+      // getAsLocalDate does not work
+      final LocalDateTime aLDT = aDBResult.get ().getAsLocalDateTime (0);
+      if (aLDT != null)
+        return aLDT.toLocalDate ();
+    }
+    return null;
   }
 }

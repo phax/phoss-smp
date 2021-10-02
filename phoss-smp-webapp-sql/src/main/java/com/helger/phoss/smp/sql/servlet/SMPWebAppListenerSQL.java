@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2021 Philip Helger and contributors
+ * Copyright (C) 2014-2021 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,11 +25,10 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.io.file.SimpleFileIO;
 import com.helger.commons.string.StringParser;
-import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
-import com.helger.phoss.smp.backend.sql.audit.JDBCAuditor;
+import com.helger.phoss.smp.backend.sql.PhotonSecurityManagerFactoryJDBC;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.photon.app.io.WebFileIO;
-import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 
 /**
  * Special SMP web app listener for the SQL backend
@@ -71,8 +70,7 @@ public class SMPWebAppListenerSQL extends SMPWebAppListener
   {
     super.initGlobalSettings ();
 
-    // Set the special Auditor that directly writes to the DB
-    // No migration necessary
-    AuditHelper.setAuditor (new JDBCAuditor (SMPDBExecutor::new));
+    // Set the special PhotonSecurityManager factory
+    PhotonSecurityManager.setFactory (new PhotonSecurityManagerFactoryJDBC ());
   }
 }

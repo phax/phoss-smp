@@ -17,16 +17,14 @@
 
 CREATE TABLE smp_audit (
   dt         timestamp    NOT NULL,
+  userid     varchar(20)  NOT NULL,
   actiontype varchar(10)  NOT NULL,
   success    boolean      NOT NULL,
-  objtype    varchar(100),
-  action     varchar(100),
-  args       text
+  action     text
 );
 
 COMMENT ON COLUMN smp_audit.dt         IS 'Internal ID';
+COMMENT ON COLUMN smp_audit.userid     IS 'The executing user ID';
 COMMENT ON COLUMN smp_audit.actiontype IS 'Transport profile name';
 COMMENT ON COLUMN smp_audit.success    IS 'Was the action successful or not?';
-COMMENT ON COLUMN smp_audit.objtype    IS 'The object type';
-COMMENT ON COLUMN smp_audit.action     IS 'The action that was performed';
-COMMENT ON COLUMN smp_audit.args       IS 'The arguments of the audit action';
+COMMENT ON COLUMN smp_audit.action     IS 'The action and arguments that were performed';
