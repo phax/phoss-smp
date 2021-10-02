@@ -27,6 +27,9 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.db.jdbc.executor.DBExecutor;
@@ -38,6 +41,7 @@ import com.helger.db.jdbc.executor.DBExecutor;
  */
 public abstract class AbstractJDBCEnabledManager
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractJDBCEnabledManager.class);
   private final Supplier <? extends DBExecutor> m_aDBExecSupplier;
 
   /**
@@ -81,5 +85,20 @@ public abstract class AbstractJDBCEnabledManager
   public static Timestamp toTimestamp (@Nullable final XMLOffsetDateTime aODT)
   {
     return aODT == null ? null : Timestamp.from (aODT.toInstant ());
+  }
+
+  @Nullable
+  public static String getTrimmedToLength (@Nullable final String s, final int nMaxLengthIncl)
+  {
+    ValueEnforcer.isGT0 (nMaxLengthIncl, "MaxLengthIncl");
+    if (s == null)
+      return null;
+
+    final int nLength = s.length ();
+    if (nLength <= nMaxLengthIncl)
+      return s;
+
+    LOGGER.warn ("Cutting value with length " + nLength + " to " + nMaxLengthIncl + " for DB");
+    return s.substring (0, nMaxLengthIncl);
   }
 }

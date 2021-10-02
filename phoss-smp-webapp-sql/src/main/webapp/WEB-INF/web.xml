@@ -23,7 +23,7 @@
   <display-name>phoss SMP (SQL backend)</display-name>
 
   <listener>
-    <listener-class>com.helger.phoss.smp.servlet.SMPWebAppListener</listener-class>
+    <listener-class>com.helger.phoss.smp.sql.servlet.SMPWebAppListenerSQL</listener-class>
   </listener>
 
   <filter>

@@ -72,6 +72,7 @@ import com.helger.photon.core.locale.ILocaleManager;
 import com.helger.photon.core.menu.MenuTree;
 import com.helger.photon.core.requestparam.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.core.requestparam.RequestParameterManager;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.servlet.ServletContextPathHolder;
 import com.helger.servlet.response.UnifiedResponseDefaultSettings;
 import com.helger.wsclient.WSHelper;
@@ -211,6 +212,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.hasNoText (SMPWebAppConfiguration.getImprintText ()))
       LOGGER.warn ("The custom Imprint is enabled in the configuration file, but no imprint text is configured. Therefore no imprint will be shown.");
+
+    // Ensure e.g. the Audit Manager is initialized so that it is safe to be
+    // overwritten
+    PhotonSecurityManager.getInstance ();
   }
 
   @Override
