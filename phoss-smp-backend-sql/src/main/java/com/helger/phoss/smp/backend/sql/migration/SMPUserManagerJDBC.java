@@ -45,6 +45,13 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
 {
   public static final ObjectType OT = new ObjectType ("smpuser");
 
+  /**
+   * Constructor
+   *
+   * @param aDBExecSupplier
+   *        The supplier for {@link DBExecutor} objects. May not be
+   *        <code>null</code>.
+   */
   public SMPUserManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
