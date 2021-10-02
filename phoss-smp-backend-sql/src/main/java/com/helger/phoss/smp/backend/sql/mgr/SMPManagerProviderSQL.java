@@ -42,7 +42,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
 import com.helger.settings.exchange.configfile.ConfigFile;
@@ -59,7 +58,6 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
 
   private static final String SML_INFO_XML = "sml-info.xml";
   private static final String SMP_SETTINGS_XML = "smp-settings.xml";
-  private static final String SMP_TRANSPORT_PROFILES_XML = "transportprofiles.xml";
 
   private final EDatabaseType m_eDBType;
 
@@ -122,18 +120,10 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     }
   }
 
-  // TODO currently also file based
   @Nonnull
   public ISMPTransportProfileManager createTransportProfileMgr ()
   {
-    try
-    {
-      return new SMPTransportProfileManagerXML (SMP_TRANSPORT_PROFILES_XML);
-    }
-    catch (final DAOException ex)
-    {
-      throw new IllegalStateException (ex.getMessage (), ex);
-    }
+    return new SMPTransportProfileManagerJDBC (SMPDBExecutor::new);
   }
 
   @Nonnull

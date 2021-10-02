@@ -19,7 +19,14 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import javax.annotation.Nonnull;
 
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.api.callback.BaseCallback;
+import org.flywaydb.core.api.callback.Callback;
+import org.flywaydb.core.api.callback.Context;
+import org.flywaydb.core.api.callback.Event;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.flywaydb.core.api.resolver.ResolvedMigration;
+import org.flywaydb.core.internal.info.MigrationInfoImpl;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +37,7 @@ import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
+import com.helger.phoss.smp.backend.sql.migration.V5__MigrateTransportProfilesToDB;
 import com.helger.settings.exchange.configfile.ConfigFile;
 
 /**
@@ -58,6 +66,36 @@ final class FlywayMigrator
     LOGGER.info ("Starting to run Flyway");
 
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+    final Callback aCallbackLogging = new BaseCallback ()
+    {
+      public void handle (@Nonnull final Event aEvent, @Nonnull final Context aContext)
+      {
+        if (LOGGER.isInfoEnabled ())
+          LOGGER.info ("Flyway: Event " + aEvent.getId ());
+        if (aEvent == Event.AFTER_EACH_MIGRATE)
+        {
+          if (aContext != null)
+          {
+            final MigrationInfo aMI = aContext.getMigrationInfo ();
+            if (aMI instanceof MigrationInfoImpl)
+            {
+              final ResolvedMigration aRM = ((MigrationInfoImpl) aMI).getResolvedMigration ();
+              if (aRM != null)
+                if (LOGGER.isInfoEnabled ())
+                  LOGGER.info ("  Performed migration: " + aRM);
+            }
+          }
+        }
+      }
+    };
+    final Callback aCallbackAudit = new BaseCallback ()
+    {
+      public void handle (@Nonnull final Event aEvent, @Nonnull final Context aContext)
+      {
+        // TODO
+      }
+    };
+
     final FluentConfiguration aConfig = Flyway.configure ()
                                               .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
                                                                                  aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),
@@ -79,7 +117,9 @@ final class FlywayMigrator
                                                * Avoid scanning the ClassPath by
                                                * enumerating them explicitly
                                                */
-                                              .javaMigrations (new V2__MigrateDBUsersToPhotonUsers ());
+                                              .javaMigrations (new V2__MigrateDBUsersToPhotonUsers (),
+                                                               new V5__MigrateTransportProfilesToDB ())
+                                              .callbacks (aCallbackLogging, aCallbackAudit);
 
     // Flyway to handle the DB schema?
     final String sSchema = aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
