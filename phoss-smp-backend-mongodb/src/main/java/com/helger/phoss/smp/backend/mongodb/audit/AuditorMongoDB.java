@@ -54,7 +54,7 @@ import com.mongodb.client.MongoCollection;
  *
  * @author Philip Helger
  */
-public class MongoDBAuditor implements IAuditor
+public class AuditorMongoDB implements IAuditor
 {
   /** The default collection name if none is provided */
   public static final String DEFAULT_COLLECTION_NAME = "smp-audit";
@@ -69,7 +69,7 @@ public class MongoDBAuditor implements IAuditor
    * @param aCurrentUserIDProvider
    *        The current user ID provider. May not be <code>null</code>.
    */
-  public MongoDBAuditor (@Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
+  public AuditorMongoDB (@Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
   {
     this (DEFAULT_COLLECTION_NAME, aCurrentUserIDProvider);
   }
@@ -82,7 +82,7 @@ public class MongoDBAuditor implements IAuditor
    * @param aCurrentUserIDProvider
    *        The current user ID provider. May not be <code>null</code>.
    */
-  public MongoDBAuditor (@Nonnull @Nonempty final String sCollectionName, @Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
+  public AuditorMongoDB (@Nonnull @Nonempty final String sCollectionName, @Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
   {
     ValueEnforcer.notEmpty (sCollectionName, "CollectionName");
     m_aCollection = MongoClientSingleton.getInstance ().getCollection (sCollectionName);

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.io.file.SimpleFileIO;
 import com.helger.commons.string.StringParser;
-import com.helger.phoss.smp.backend.mongodb.audit.MongoDBIDFactory;
+import com.helger.phoss.smp.backend.mongodb.audit.IDFactoryMongoDB;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.photon.app.io.WebFileIO;
 
@@ -54,7 +54,7 @@ public class SMPWebAppListenerMongoDB extends SMPWebAppListener
       nInitialCount = 0;
 
     // Set persistent ID provider: Mongo based based
-    GlobalIDFactory.setPersistentLongIDFactory (new MongoDBIDFactory (nInitialCount));
+    GlobalIDFactory.setPersistentLongIDFactory (new IDFactoryMongoDB (nInitialCount));
     GlobalIDFactory.setPersistentIntIDFactory ( () -> (int) GlobalIDFactory.getNewPersistentLongID ());
   }
 }

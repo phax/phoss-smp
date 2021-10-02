@@ -39,7 +39,7 @@ import com.mongodb.client.MongoCollection;
  * @author Philip Helger
  * @since 5.2.1
  */
-public class MongoDBIDFactory extends AbstractPersistingLongIDFactory
+public class IDFactoryMongoDB extends AbstractPersistingLongIDFactory
 {
   /** The default number of values to reserve with a single IO action */
   public static final int DEFAULT_RESERVE_COUNT = 20;
@@ -47,7 +47,7 @@ public class MongoDBIDFactory extends AbstractPersistingLongIDFactory
   /** The default collection name if none is provided */
   public static final String DEFAULT_COLLECTION_NAME = "smp-settings";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger (MongoDBIDFactory.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (IDFactoryMongoDB.class);
 
   private static final String BSON_ID = "id";
   private static final String BSON_LONG_VALUE = "longvalue";
@@ -65,7 +65,7 @@ public class MongoDBIDFactory extends AbstractPersistingLongIDFactory
    *        Initial count to be used, if no MongoDB document exists. Must be
    *        &ge; 0.
    */
-  public MongoDBIDFactory (@Nonnegative final long nInitialCount)
+  public IDFactoryMongoDB (@Nonnegative final long nInitialCount)
   {
     this (DEFAULT_COLLECTION_NAME, DEFAULT_RESERVE_COUNT, nInitialCount);
   }
@@ -82,7 +82,7 @@ public class MongoDBIDFactory extends AbstractPersistingLongIDFactory
    *        Initial count to be used, if no MongoDB document exists. Must be
    *        &ge; 0.
    */
-  public MongoDBIDFactory (@Nonnull @Nonempty final String sCollectionName,
+  public IDFactoryMongoDB (@Nonnull @Nonempty final String sCollectionName,
                            @Nonnegative final int nReserveCount,
                            @Nonnegative final long nInitialCount)
   {
@@ -143,7 +143,7 @@ public class MongoDBIDFactory extends AbstractPersistingLongIDFactory
       return true;
     if (!super.equals (o))
       return false;
-    final MongoDBIDFactory rhs = (MongoDBIDFactory) o;
+    final IDFactoryMongoDB rhs = (IDFactoryMongoDB) o;
     return m_sCollectionName.equals (rhs.m_sCollectionName);
   }
 

@@ -36,11 +36,11 @@ import com.helger.photon.security.login.LoggedInUserManager;
  */
 public class AuditManagerMongoDB implements IAuditManager
 {
-  private final MongoDBAuditor m_aAuditor;
+  private final AuditorMongoDB m_aAuditor;
 
   public AuditManagerMongoDB ()
   {
-    m_aAuditor = new MongoDBAuditor (LoggedInUserManager.getInstance ());
+    m_aAuditor = new AuditorMongoDB (LoggedInUserManager.getInstance ());
   }
 
   public boolean isInMemory ()
