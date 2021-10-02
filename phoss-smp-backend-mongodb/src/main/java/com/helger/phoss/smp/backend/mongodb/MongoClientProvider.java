@@ -40,8 +40,8 @@ import com.mongodb.client.MongoDatabase;
  */
 public class MongoClientProvider implements AutoCloseable
 {
-  public static final Integer INDEX_ASCENDING = Integer.valueOf (1);
-  public static final Integer INDEX_DESCENDING = Integer.valueOf (-1);
+  public static final Integer SORT_ASCENDING = Integer.valueOf (1);
+  public static final Integer SORT_DESCENDING = Integer.valueOf (-1);
 
   private final MongoClient m_aMongoClient;
   private final MongoDatabase m_aDatabase;

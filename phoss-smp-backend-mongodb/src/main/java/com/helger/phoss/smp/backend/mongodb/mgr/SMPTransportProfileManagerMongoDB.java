@@ -16,8 +16,6 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
-import java.util.function.Consumer;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -129,7 +127,7 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
   public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
   {
     final ICommonsList <ISMPTransportProfile> ret = new CommonsArrayList <> ();
-    getCollection ().find ().forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
+    getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 

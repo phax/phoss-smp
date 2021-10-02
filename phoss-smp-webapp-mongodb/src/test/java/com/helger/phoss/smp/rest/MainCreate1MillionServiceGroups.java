@@ -35,10 +35,10 @@ import com.helger.commons.timing.StopWatch;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
-import com.helger.phoss.smp.backend.mongodb.audit.MongoDBAuditor;
+import com.helger.phoss.smp.backend.mongodb.PhotonSecurityManagerFactoryMongoDB;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
-import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.CSecurity;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xsds.peppol.smp1.ObjectFactory;
@@ -57,8 +57,7 @@ public final class MainCreate1MillionServiceGroups
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
-                                                 @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
@@ -74,7 +73,8 @@ public final class MainCreate1MillionServiceGroups
     aRule.before ();
     try
     {
-      AuditHelper.setAuditor (new MongoDBAuditor ());
+      // Set the special PhotonSecurityManager factory
+      PhotonSecurityManager.setFactory (new PhotonSecurityManagerFactoryMongoDB ());
       final ObjectFactory aObjFactory = new ObjectFactory ();
       final StopWatch aSWOverall = StopWatch.createdStarted ();
       for (int i = 0; i < 1_000_000; ++i)

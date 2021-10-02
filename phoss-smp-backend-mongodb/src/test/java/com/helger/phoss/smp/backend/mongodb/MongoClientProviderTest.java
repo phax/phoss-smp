@@ -53,7 +53,7 @@ public final class MongoClientProviderTest
                                                    new Document ().append ("x", Integer.valueOf (203)).append ("y", Integer.valueOf (102)));
       final MongoCollection <Document> aCollection = aCP.getCollection ("coll1");
 
-      final String sIndexName = aCollection.createIndex (new Document ("name", MongoClientProvider.INDEX_ASCENDING));
+      final String sIndexName = aCollection.createIndex (new Document ("name", MongoClientProvider.SORT_ASCENDING));
       LOGGER.info ("Index name: " + sIndexName);
 
       assertNotNull (aCollection);

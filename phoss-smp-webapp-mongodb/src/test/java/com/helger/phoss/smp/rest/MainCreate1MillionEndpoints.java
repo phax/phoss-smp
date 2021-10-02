@@ -41,10 +41,10 @@ import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.peppolid.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.phoss.smp.backend.mongodb.audit.MongoDBAuditor;
+import com.helger.phoss.smp.backend.mongodb.PhotonSecurityManagerFactoryMongoDB;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
-import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.CSecurity;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
@@ -68,8 +68,7 @@ public final class MainCreate1MillionEndpoints
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
-                                                 @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
@@ -85,7 +84,8 @@ public final class MainCreate1MillionEndpoints
     aRule.before ();
     try
     {
-      AuditHelper.setAuditor (new MongoDBAuditor ());
+      // Set the special PhotonSecurityManager factory
+      PhotonSecurityManager.setFactory (new PhotonSecurityManagerFactoryMongoDB ());
       final ObjectFactory aObjFactory = new ObjectFactory ();
       final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30.getAsDocumentTypeIdentifier ();
       final String sDT = aDT.getURIEncoded ();

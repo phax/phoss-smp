@@ -16,6 +16,12 @@
  */
 package com.helger.phoss.smp.backend.mongodb.audit;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -23,16 +29,23 @@ import org.bson.Document;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.type.ObjectType;
+import com.helger.commons.typeconvert.TypeConverter;
+import com.helger.peppol.smp.SMPTransportProfile;
+import com.helger.phoss.smp.backend.mongodb.MongoClientProvider;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
+import com.helger.photon.audit.AuditItem;
 import com.helger.photon.audit.EAuditActionType;
+import com.helger.photon.audit.IAuditActionStringProvider;
+import com.helger.photon.audit.IAuditItem;
 import com.helger.photon.audit.IAuditor;
+import com.helger.security.authentication.subject.user.CUserID;
+import com.helger.security.authentication.subject.user.ICurrentUserIDProvider;
 import com.mongodb.client.MongoCollection;
 
 /**
@@ -47,14 +60,18 @@ public class MongoDBAuditor implements IAuditor
   public static final String DEFAULT_COLLECTION_NAME = "smp-audit";
 
   private final MongoCollection <Document> m_aCollection;
+  private final ICurrentUserIDProvider m_aCurrentUserIDProvider;
 
   /**
    * Default constructor using {@link #DEFAULT_COLLECTION_NAME} as the
    * collection name.
+   *
+   * @param aCurrentUserIDProvider
+   *        The current user ID provider. May not be <code>null</code>.
    */
-  public MongoDBAuditor ()
+  public MongoDBAuditor (@Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
   {
-    this (DEFAULT_COLLECTION_NAME);
+    this (DEFAULT_COLLECTION_NAME, aCurrentUserIDProvider);
   }
 
   /**
@@ -62,11 +79,54 @@ public class MongoDBAuditor implements IAuditor
    *
    * @param sCollectionName
    *        Collection name to use. May neither be <code>null</code> nor empty.
+   * @param aCurrentUserIDProvider
+   *        The current user ID provider. May not be <code>null</code>.
    */
-  public MongoDBAuditor (@Nonnull @Nonempty final String sCollectionName)
+  public MongoDBAuditor (@Nonnull @Nonempty final String sCollectionName, @Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
   {
     ValueEnforcer.notEmpty (sCollectionName, "CollectionName");
     m_aCollection = MongoClientSingleton.getInstance ().getCollection (sCollectionName);
+    m_aCurrentUserIDProvider = ValueEnforcer.notNull (aCurrentUserIDProvider, "UserIDProvider");
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static Document toBson (@Nonnull final IAuditItem aValue)
+  {
+    return new Document ().append ("dt", TypeConverter.convert (aValue.getDateTime (), Date.class))
+                          .append ("userid", aValue.getUserID ())
+                          .append ("type", aValue.getTypeID ())
+                          .append ("success", Boolean.valueOf (aValue.isSuccess ()))
+                          .append ("action", aValue.getAction ());
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public static AuditItem toDomain (@Nonnull final Document aDoc)
+  {
+    final LocalDateTime aDT = TypeConverter.convert (aDoc.getDate ("dt"), LocalDateTime.class);
+
+    String sAction = aDoc.getString ("action");
+    final List <Document> aArgsList = aDoc.getList ("args", Document.class);
+    if (aArgsList != null)
+    {
+      // Old style
+      if (sAction != null)
+        sAction = aDoc.getString ("objectType");
+
+      final ICommonsList <Object> aArgValues = new CommonsArrayList <> ();
+      for (final Document aArgDoc : aArgsList)
+        aArgValues.add (aArgDoc.getString ("arg"));
+
+      // Combine now
+      sAction = IAuditActionStringProvider.JSON.apply (sAction, aArgValues.toArray ());
+    }
+
+    return new AuditItem (aDT,
+                          aDoc.getString ("userid"),
+                          EAuditActionType.getFromIDOrNull (aDoc.getString ("type")),
+                          ESuccess.valueOf (aDoc.getBoolean ("success", SMPTransportProfile.DEFAULT_DEPRECATED)),
+                          sAction);
   }
 
   public void createAuditItem (@Nonnull final EAuditActionType eActionType,
@@ -75,35 +135,39 @@ public class MongoDBAuditor implements IAuditor
                                @Nullable final String sAction,
                                @Nullable final Object... aArgs)
   {
-    final Document aDoc = new Document ();
-    aDoc.append ("dt", PDTFactory.getCurrentLocalDateTime ());
-    aDoc.append ("type", eActionType.getID ());
-    aDoc.append ("success", Boolean.valueOf (eSuccess.isSuccess ()));
-    if (aActionObjectType != null)
-      aDoc.append ("objectType", aActionObjectType.getName ());
-    if (StringHelper.hasText (sAction))
-      aDoc.append ("action", sAction);
-    if (ArrayHelper.isNotEmpty (aArgs))
-    {
-      final ICommonsList <Document> aDocArgs = new CommonsArrayList <> ();
-      for (final Object aArg : aArgs)
-      {
-        Object aRealArg;
-        if (aArg == null)
-        {
-          aRealArg = null;
-        }
-        else
-        {
-          // Manually convert to String
-          aRealArg = String.valueOf (aArg);
-        }
-        aDocArgs.add (new Document ().append ("arg", aRealArg));
-      }
-      aDoc.append ("args", aDocArgs);
-    }
+    final String sUserID = StringHelper.getNotEmpty (m_aCurrentUserIDProvider.getCurrentUserID (), CUserID.USER_ID_GUEST);
+    final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType.getName () : sAction,
+                                                                      aArgs);
 
-    if (!m_aCollection.insertOne (aDoc).wasAcknowledged ())
+    final IAuditItem aAuditItem = new AuditItem (sUserID, eActionType, eSuccess, sFullAction);
+    if (!m_aCollection.insertOne (toBson (aAuditItem)).wasAcknowledged ())
       throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public ICommonsList <IAuditItem> getLastAuditItems (@Nonnegative final int nMaxItems)
+  {
+    ValueEnforcer.isGT0 (nMaxItems, "MaxItems");
+
+    final ICommonsList <IAuditItem> ret = new CommonsArrayList <> ();
+    m_aCollection.find ()
+                 .sort (new Document ("dt", MongoClientProvider.SORT_DESCENDING))
+                 .limit (nMaxItems)
+                 .forEach (x -> ret.add (toDomain (x)));
+    return ret;
+  }
+
+  @Nullable
+  public LocalDate getEarliestAuditDate ()
+  {
+    final Document aDoc = m_aCollection.find ().sort (new Document ("dt", MongoClientProvider.SORT_ASCENDING)).batchSize (1).first ();
+    if (aDoc != null)
+    {
+      final LocalDateTime aLDT = TypeConverter.convert (aDoc.getDate ("dt"), LocalDateTime.class);
+      if (aLDT != null)
+        return aLDT.toLocalDate ();
+    }
+    return null;
   }
 }
