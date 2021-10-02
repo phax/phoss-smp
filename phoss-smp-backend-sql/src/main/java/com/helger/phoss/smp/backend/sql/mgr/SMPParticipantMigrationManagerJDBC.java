@@ -121,7 +121,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Update existing
-      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_pmigration" + " SET state=?" + " WHERE id=?",
+      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_pmigration SET state=? WHERE id=?",
                                                               new ConstantPreparedStatementDataProvider (eNewState.getID (),
                                                                                                          sParticipantMigrationID));
       aUpdated.set (nUpdated);
@@ -230,7 +230,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     if (aParticipantID == null)
       return false;
 
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_pmigration WHERE direction=? and state=? and pid=?",
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_pmigration WHERE direction=? AND state=? AND pid=?",
                                       new ConstantPreparedStatementDataProvider (eDirection.getID (),
                                                                                  EParticipantMigrationState.IN_PROGRESS.getID (),
                                                                                  aParticipantID.getURIEncoded ())) > 0;
