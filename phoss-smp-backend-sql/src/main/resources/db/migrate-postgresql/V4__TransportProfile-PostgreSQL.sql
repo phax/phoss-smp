@@ -16,8 +16,8 @@
 --
 
 CREATE TABLE smp_tprofile (
-  id varchar(45) NOT NULL,
-  name text NOT NULL,
-  deprecated boolean NOT NULL,
+  id         varchar(45) NOT NULL,
+  name       text        NOT NULL,
+  deprecated boolean     NOT NULL,
   PRIMARY KEY (id)
 );

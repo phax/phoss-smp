@@ -16,8 +16,8 @@
 --
 
 CREATE TABLE `smp_tprofile` (
-  `id` varchar(45) NOT NULL COMMENT 'Internal ID',
-  `name` text NOT NULL COMMENT 'Transport profile name',
-  `deprecated` tinyint(1) NOT NULL COMMENT 'Deprecated or not?',
+  `id`         varchar(45) NOT NULL COMMENT 'Internal ID',
+  `name`       text        NOT NULL COMMENT 'Transport profile name',
+  `deprecated` tinyint(1)  NOT NULL COMMENT 'Deprecated or not?',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SMP Transport Profile Entity';
