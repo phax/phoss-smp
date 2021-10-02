@@ -25,10 +25,8 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.io.file.SimpleFileIO;
 import com.helger.commons.string.StringParser;
-import com.helger.phoss.smp.backend.sql.PhotonSecurityManagerFactoryJDBC;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.photon.app.io.WebFileIO;
-import com.helger.photon.security.mgr.PhotonSecurityManager;
 
 /**
  * Special SMP web app listener for the SQL backend
@@ -63,14 +61,5 @@ public class SMPWebAppListenerSQL extends SMPWebAppListener
       // (nInitialCount));
       GlobalIDFactory.setPersistentIntIDFactory ( () -> (int) GlobalIDFactory.getNewPersistentLongID ());
     }
-  }
-
-  @Override
-  protected void initGlobalSettings ()
-  {
-    super.initGlobalSettings ();
-
-    // Set the special PhotonSecurityManager factory
-    PhotonSecurityManager.setFactory (new PhotonSecurityManagerFactoryJDBC ());
   }
 }

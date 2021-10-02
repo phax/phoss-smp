@@ -29,6 +29,7 @@ import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
+import com.helger.phoss.smp.backend.sql.PhotonSecurityManagerFactoryJDBC;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
@@ -44,6 +45,7 @@ import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.settings.exchange.configfile.ConfigFile;
 
 /**
@@ -69,6 +71,11 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public void beforeInitManagers ()
   {
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+
+    // Set the special PhotonSecurityManager factory
+    // Must be before Flyway, so that auditing of Flyway actions work
+    PhotonSecurityManager.setFactory (new PhotonSecurityManagerFactoryJDBC ());
+    PhotonSecurityManager.getInstance ();
 
     // Flyway migration is enabled by default
     if (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_SMP_FLYWAY_ENABLED, true))
