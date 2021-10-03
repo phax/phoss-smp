@@ -229,7 +229,6 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (_internalCreateItem (aUser).isFailure ())
     {
       AuditHelper.onAuditCreateFailure (User.OT,
-                                        "failed-to-save",
                                         aUser.getID (),
                                         aUser.getLoginName (),
                                         aUser.getEmailAddress (),
@@ -239,7 +238,8 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
                                         aUser.getDesiredLocale (),
                                         aUser.attrs (),
                                         Boolean.valueOf (aUser.isDisabled ()),
-                                        bPredefined ? "predefined" : "custom");
+                                        bPredefined ? "predefined" : "custom",
+                                        "database-error");
     }
     else
     {
@@ -530,6 +530,9 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
                               @Nullable final Map <String, String> aNewCustomAttrs,
                               final boolean bNewDisabled)
   {
+    if (StringHelper.hasNoText (sUserID))
+      return EChange.UNCHANGED;
+
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
@@ -556,19 +559,30 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditModifyFailure (User.OT, sUserID, "database-error");
+      AuditHelper.onAuditModifyFailure (User.OT,
+                                        "set-all",
+                                        sUserID,
+                                        sNewLoginName,
+                                        sNewEmailAddress,
+                                        sNewFirstName,
+                                        sNewLastName,
+                                        sNewDescription,
+                                        aNewDesiredLocale,
+                                        aNewCustomAttrs,
+                                        Boolean.valueOf (bNewDisabled),
+                                        "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such user ID
-      AuditHelper.onAuditModifyFailure (User.OT, sUserID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (User.OT, "set-all", sUserID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
     AuditHelper.onAuditModifySuccess (User.OT,
-                                      "all",
+                                      "set-all",
                                       sUserID,
                                       sNewLoginName,
                                       sNewEmailAddress,
@@ -588,6 +602,9 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   @Nonnull
   public EChange setUserPassword (@Nullable final String sUserID, @Nonnull final String sNewPlainTextPassword)
   {
+    if (StringHelper.hasNoText (sUserID))
+      return EChange.UNCHANGED;
+
     // Create a new password salt upon password change
     final PasswordHash aPasswordHash = GlobalPasswordSettings.createUserDefaultPasswordHash (new PasswordSalt (), sNewPlainTextPassword);
 
@@ -611,18 +628,18 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditModifyFailure (User.OT, sUserID, "database-error");
+      AuditHelper.onAuditModifyFailure (User.OT, "set-password", sUserID, "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such user ID
-      AuditHelper.onAuditModifyFailure (User.OT, sUserID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (User.OT, "set-password", sUserID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
-    AuditHelper.onAuditModifySuccess (User.OT, "password", sUserID);
+    AuditHelper.onAuditModifySuccess (User.OT, "set-password", sUserID);
 
     if (LOGGER.isInfoEnabled ())
       LOGGER.info ("The password of user '" + sUserID + "' was changed");
@@ -636,6 +653,9 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   @Nonnull
   public EChange updateUserLastLogin (@Nullable final String sUserID)
   {
+    if (StringHelper.hasNoText (sUserID))
+      return EChange.UNCHANGED;
+
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
@@ -651,14 +671,14 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditModifyFailure (User.OT, sUserID, "database-error");
+      AuditHelper.onAuditModifyFailure (User.OT, "update-last-login", sUserID, "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such user ID
-      AuditHelper.onAuditModifyFailure (User.OT, sUserID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (User.OT, "update-last-login", sUserID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -669,6 +689,9 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   @Nonnull
   public EChange updateUserLastFailedLogin (@Nullable final String sUserID)
   {
+    if (StringHelper.hasNoText (sUserID))
+      return EChange.UNCHANGED;
+
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
@@ -681,18 +704,18 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditModifyFailure (User.OT, sUserID, "database-error");
+      AuditHelper.onAuditModifyFailure (User.OT, "update-last-failed-login", sUserID, "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such user ID
-      AuditHelper.onAuditModifyFailure (User.OT, sUserID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (User.OT, "update-last-failed-login", sUserID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
-    AuditHelper.onAuditModifySuccess (User.OT, "update-last-failed-login", sUserID);
+    AuditHelper.onAuditModifySuccess (User.OT, "set-last-failed-login", sUserID);
 
     // Execute callback as the very last action
     m_aCallbacks.forEach (aCB -> aCB.onUserLastFailedLoginUpdated (sUserID));
@@ -703,6 +726,9 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   @Nonnull
   public EChange deleteUser (@Nullable final String sUserID)
   {
+    if (StringHelper.hasNoText (sUserID))
+      return EChange.UNCHANGED;
+
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
@@ -740,6 +766,9 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   @Nonnull
   public EChange undeleteUser (@Nullable final String sUserID)
   {
+    if (StringHelper.hasNoText (sUserID))
+      return EChange.UNCHANGED;
+
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
@@ -777,6 +806,9 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   @Nonnull
   public EChange disableUser (@Nullable final String sUserID)
   {
+    if (StringHelper.hasNoText (sUserID))
+      return EChange.UNCHANGED;
+
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
@@ -792,14 +824,14 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditUndeleteFailure (User.OT, sUserID, "database-error");
+      AuditHelper.onAuditModifyFailure (User.OT, "disable", sUserID, "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such user ID
-      AuditHelper.onAuditUndeleteFailure (User.OT, sUserID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (User.OT, "disable", sUserID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -814,6 +846,9 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   @Nonnull
   public EChange enableUser (@Nullable final String sUserID)
   {
+    if (StringHelper.hasNoText (sUserID))
+      return EChange.UNCHANGED;
+
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
@@ -829,14 +864,14 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditUndeleteFailure (User.OT, sUserID, "database-error");
+      AuditHelper.onAuditModifyFailure (User.OT, "enable", sUserID, "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such user ID
-      AuditHelper.onAuditUndeleteFailure (User.OT, sUserID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (User.OT, "enable", sUserID, "no-such-id");
       return EChange.UNCHANGED;
     }
 

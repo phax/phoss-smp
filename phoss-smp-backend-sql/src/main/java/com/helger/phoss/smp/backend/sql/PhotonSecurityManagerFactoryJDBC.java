@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import com.helger.dao.DAOException;
 import com.helger.phoss.smp.backend.sql.audit.AuditManagerJDBC;
 import com.helger.phoss.smp.backend.sql.security.RoleManagerJDBC;
+import com.helger.phoss.smp.backend.sql.security.UserGroupManagerJDBC;
 import com.helger.phoss.smp.backend.sql.security.UserManagerJDBC;
 import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -28,9 +29,7 @@ import com.helger.photon.security.role.IRoleManager;
 import com.helger.photon.security.token.user.IUserTokenManager;
 import com.helger.photon.security.token.user.UserTokenManager;
 import com.helger.photon.security.user.IUserManager;
-import com.helger.photon.security.user.UserManager;
 import com.helger.photon.security.usergroup.IUserGroupManager;
-import com.helger.photon.security.usergroup.UserGroupManager;
 
 public class PhotonSecurityManagerFactoryJDBC implements PhotonSecurityManager.IFactory
 {
@@ -43,9 +42,7 @@ public class PhotonSecurityManagerFactoryJDBC implements PhotonSecurityManager.I
   @Nonnull
   public IUserManager createUserMgr () throws DAOException
   {
-    if (true)
-      return new UserManagerJDBC (SMPDBExecutor::new);
-    return new UserManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY + PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML);
+    return new UserManagerJDBC (SMPDBExecutor::new);
   }
 
   @Nonnull
@@ -58,10 +55,7 @@ public class PhotonSecurityManagerFactoryJDBC implements PhotonSecurityManager.I
   public IUserGroupManager createUserGroupMgr (@Nonnull final IUserManager aUserMgr,
                                                @Nonnull final IRoleManager aRoleMgr) throws DAOException
   {
-    return new UserGroupManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
-                                 PhotonSecurityManager.FactoryXML.FILENAME_USERGROUPS_XML,
-                                 aUserMgr,
-                                 aRoleMgr);
+    return new UserGroupManagerJDBC (SMPDBExecutor::new, aUserMgr, aRoleMgr);
   }
 
   @Nonnull

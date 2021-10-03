@@ -15,12 +15,18 @@
 -- limitations under the License.
 --
 
-CREATE TABLE `smp_pmigration` (
-  `id`        varchar(45)  NOT NULL COMMENT 'Internal ID',
-  `direction` varchar(45)  NOT NULL COMMENT 'Migration direction',
-  `state`     varchar(45)  NOT NULL COMMENT 'Migration state',
-  `pid`       varchar(255) NOT NULL COMMENT 'Participant/Business ID',
-  `initdt`    datetime     NOT NULL COMMENT 'The date and time when the migration was initiated',
-  `migkey`    varchar(45)  NOT NULL COMMENT 'The migration key itself',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SMP Participant Migration Entity';
+CREATE TABLE smp_secusergroup (
+  id             varchar(45)  NOT NULL,
+  creationdt     timestamp,
+  creationuserid varchar(20),
+  lastmoddt      timestamp,
+  lastmoduserid  varchar(20),
+  deletedt       timestamp,
+  deleteuserid   varchar(20),
+  attrs          text,
+  name           varchar(255) NOT NULL,
+  description    text,
+  userids        text,
+  roleids        text,
+  CONSTRAINT smp_secusergroup_pk PRIMARY KEY (id) USING INDEX tablespace USERS
+);

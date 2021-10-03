@@ -25,13 +25,17 @@ import javax.annotation.Nullable;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.CommonsLinkedHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.json.IJson;
+import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
+import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonReader;
 import com.helger.phoss.smp.backend.sql.mgr.AbstractJDBCEnabledManager;
@@ -56,6 +60,14 @@ public abstract class AbstractJDBCEnabledSecurityManager extends AbstractJDBCEna
   }
 
   @Nullable
+  protected static final String attrsToString (@Nullable final Map <String, String> aAttrs)
+  {
+    if (CollectionHelper.isEmpty (aAttrs))
+      return null;
+    return new JsonObject ().addAll (aAttrs).getAsJsonString ();
+  }
+
+  @Nullable
   protected static final ICommonsOrderedMap <String, String> attrsToMap (@Nullable final String sAttrs)
   {
     if (StringHelper.hasNoText (sAttrs))
@@ -71,10 +83,25 @@ public abstract class AbstractJDBCEnabledSecurityManager extends AbstractJDBCEna
   }
 
   @Nullable
-  protected static final String attrsToString (@Nullable final Map <String, String> aAttrs)
+  protected static final String idsToString (@Nullable final Iterable <String> aIDs)
   {
-    if (CollectionHelper.isEmpty (aAttrs))
+    if (CollectionHelper.isEmpty (aIDs))
       return null;
-    return new JsonObject ().addAll (aAttrs).getAsJsonString ();
+    return new JsonArray ().addAll (aIDs).getAsJsonString ();
+  }
+
+  @Nullable
+  protected static final ICommonsSet <String> idsToSet (@Nullable final String sIDs)
+  {
+    if (StringHelper.hasNoText (sIDs))
+      return null;
+
+    final IJsonArray aJson = JsonReader.builder ().source (sIDs).readAsArray ();
+    if (aJson == null)
+      return null;
+    final ICommonsSet <String> ret = new CommonsHashSet <> ();
+    for (final IJson aEntry : aJson)
+      ret.add (aEntry.getAsValue ().getAsString ());
+    return ret;
   }
 }

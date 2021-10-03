@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-CREATE TABLE smp_secusergroup (
+CREATE TABLE smp_secuser (
   id             varchar(45)  NOT NULL,
   creationdt     timestamp,
   creationuserid varchar(20),
@@ -24,9 +24,18 @@ CREATE TABLE smp_secusergroup (
   deletedt       timestamp,
   deleteuserid   varchar(20),
   attrs          text,
-  name           varchar(255) NOT NULL,
+  loginname      text         NOT NULL,
+  email          text,
+  pwalgo         varchar(100) NOT NULL,
+  pwsalt         text         NOT NULL,
+  pwhash         text         NOT NULL,
+  firstname      text,
+  lastname       text,
   description    text,
-  userids        text,
-  roleids        text,
-  PRIMARY KEY (id)
+  locale         varchar(20),
+  lastlogindt    timestamp,
+  logincount     integer,
+  failedlogins   integer,
+  disabled       boolean      NOT NULL,
+  CONSTRAINT smp_secuser_pk PRIMARY KEY (id) USING INDEX tablespace USERS
 );

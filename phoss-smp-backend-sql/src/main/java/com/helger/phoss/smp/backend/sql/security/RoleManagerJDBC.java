@@ -156,11 +156,11 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (_internalCreateItem (aRole).isFailure ())
     {
       AuditHelper.onAuditCreateFailure (Role.OT,
-                                        "failed-to-save",
                                         aRole.getID (),
                                         aRole.getName (),
                                         aRole.getDescription (),
-                                        bPredefined ? "predefined" : "custom");
+                                        bPredefined ? "predefined" : "custom",
+                                        "database-error");
     }
     else
     {
@@ -204,11 +204,29 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (StringHelper.hasNoText (sRoleID))
       return EChange.UNCHANGED;
 
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_secrole WHERE id=?",
-                                                                 new ConstantPreparedStatementDataProvider (sRoleID));
-    if (nDeleted == 0)
+    final MutableLong aUpdated = new MutableLong (-1);
+    final DBExecutor aExecutor = newExecutor ();
+    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+      // Update existing
+      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_secrole SET deletedt=?, deleteuserid=? WHERE id=?",
+                                                              new ConstantPreparedStatementDataProvider (toTimestamp (PDTFactory.getCurrentLocalDateTime ()),
+                                                                                                         getTrimmedToLength (BusinessObjectHelper.getUserIDOrFallback (),
+                                                                                                                             20),
+                                                                                                         sRoleID));
+      aUpdated.set (nUpdated);
+    });
+
+    if (eSuccess.isFailure ())
     {
-      AuditHelper.onAuditDeleteFailure (Role.OT, "no-such-id", sRoleID);
+      // DB error
+      AuditHelper.onAuditDeleteFailure (Role.OT, sRoleID, "database-error");
+      return EChange.UNCHANGED;
+    }
+
+    if (aUpdated.is0 ())
+    {
+      // No such user ID
+      AuditHelper.onAuditDeleteFailure (Role.OT, sRoleID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -251,6 +269,9 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   @Nonnull
   public EChange renameRole (@Nullable final String sRoleID, @Nonnull @Nonempty final String sNewName)
   {
+    if (StringHelper.hasNoText (sRoleID))
+      return EChange.UNCHANGED;
+
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
@@ -267,18 +288,18 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditModifyFailure (Role.OT, sRoleID, "database-error");
+      AuditHelper.onAuditModifyFailure (Role.OT, "set-name", sRoleID, sNewName, "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such role ID
-      AuditHelper.onAuditModifyFailure (Role.OT, sRoleID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (Role.OT, "set-name", sRoleID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
-    AuditHelper.onAuditModifySuccess (Role.OT, "name", sRoleID, sNewName);
+    AuditHelper.onAuditModifySuccess (Role.OT, "set-name", sRoleID, sNewName);
 
     // Execute callback as the very last action
     m_aCallbacks.forEach (aCB -> aCB.onRoleRenamed (sRoleID));
@@ -292,6 +313,9 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
                               @Nullable final String sNewDescription,
                               @Nullable final Map <String, String> aNewCustomAttrs)
   {
+    if (StringHelper.hasNoText (sRoleID))
+      return EChange.UNCHANGED;
+
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
@@ -310,18 +334,18 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditModifyFailure (Role.OT, sRoleID, "database-error");
+      AuditHelper.onAuditModifyFailure (Role.OT, "set-all", sRoleID, sNewName, sNewDescription, aNewCustomAttrs, "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such role ID
-      AuditHelper.onAuditModifyFailure (Role.OT, sRoleID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (Role.OT, "set-all", sRoleID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
-    AuditHelper.onAuditModifySuccess (Role.OT, "all", sRoleID, sNewName, sNewDescription, aNewCustomAttrs);
+    AuditHelper.onAuditModifySuccess (Role.OT, "set-all", sRoleID, sNewName, sNewDescription, aNewCustomAttrs);
 
     // Execute callback as the very last action
     m_aCallbacks.forEach (aCB -> aCB.onRoleUpdated (sRoleID));

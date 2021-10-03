@@ -19,7 +19,7 @@ CREATE TABLE smp_tprofile (
   id         varchar(45) NOT NULL,
   name       text        NOT NULL,
   deprecated boolean     NOT NULL,
-  constraint smp_tprofile_pk PRIMARY KEY (id) using index tablespace USERS
+  CONSTRAINT smp_tprofile_pk PRIMARY KEY (id) USING INDEX tablespace USERS
 );
 
 COMMENT ON COLUMN smp_tprofile.id         IS 'Internal ID';

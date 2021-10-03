@@ -106,14 +106,14 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "database-error");
+      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "database-error", "update");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such transport profile ID
-      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id", "update");
       return EChange.UNCHANGED;
     }
 
