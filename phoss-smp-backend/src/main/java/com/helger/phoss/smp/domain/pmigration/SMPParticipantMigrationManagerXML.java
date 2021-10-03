@@ -104,7 +104,7 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
     final SMPParticipantMigration aPM = getOfID (sParticipantMigrationID);
     if (aPM == null)
     {
-      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, sParticipantMigrationID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -122,7 +122,7 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "migration-state", sParticipantMigrationID, eNewState);
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, eNewState);
     return EChange.CHANGED;
   }
 
@@ -139,7 +139,7 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
       aParticipantMigration = internalDeleteItem (sParticipantMigrationID);
       if (aParticipantMigration == null)
       {
-        AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT, "no-such-id", sParticipantMigrationID);
+        AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT, sParticipantMigrationID, "no-such-id");
         return EChange.UNCHANGED;
       }
     }

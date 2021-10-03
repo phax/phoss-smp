@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -274,6 +273,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
                                                                  toBson (aSMPBusinessCard));
     if (aOldDoc != null)
       AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
+                                        "set-all",
                                         aSMPBusinessCard.getID (),
                                         Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     return aSMPBusinessCard;
@@ -326,7 +326,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, aSMPBusinessCard.getID ()));
     if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, "no-such-id", aSMPBusinessCard.getID ());
+      AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, aSMPBusinessCard.getID (), "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -334,6 +334,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
 
     AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard successful");
 
@@ -345,7 +346,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
-    getCollection ().find ().forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
+    getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 

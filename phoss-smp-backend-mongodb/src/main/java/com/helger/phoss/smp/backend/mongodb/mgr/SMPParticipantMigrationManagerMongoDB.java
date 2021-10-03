@@ -130,7 +130,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     final SMPParticipantMigration aPM = getParticipantMigrationOfID (sParticipantMigrationID);
     if (aPM == null)
     {
-      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, sParticipantMigrationID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -142,7 +142,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
 
       getCollection ().findOneAndReplace (new Document (BSON_ID, sParticipantMigrationID), toBson (aPM));
     }
-    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "migration-state", sParticipantMigrationID, eNewState);
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, eNewState);
     return EChange.CHANGED;
   }
 

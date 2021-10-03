@@ -87,7 +87,10 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     m_aRWLock.writeLocked ( () -> {
       internalUpdateItem (aSMPBusinessCard);
     });
-    AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
+                                      "set-all",
+                                      aSMPBusinessCard.getID (),
+                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     return aSMPBusinessCard;
   }
 
@@ -141,7 +144,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
       final SMPBusinessCard aRealBusinessCard = internalDeleteItem (aSMPBusinessCard.getID ());
       if (aRealBusinessCard == null)
       {
-        AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, "no-such-id", aSMPBusinessCard.getID ());
+        AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, aSMPBusinessCard.getID (), "no-such-id");
         return EChange.UNCHANGED;
       }
     }

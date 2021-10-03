@@ -70,7 +70,7 @@ public final class SMPTransportProfileManagerXML extends AbstractPhotonMapBasedW
     final SMPTransportProfile aSMPTransportProfile = getOfID (sSMPTransportProfileID);
     if (aSMPTransportProfile == null)
     {
-      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, "set-all", sSMPTransportProfileID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -89,7 +89,7 @@ public final class SMPTransportProfileManagerXML extends AbstractPhotonMapBasedW
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT, "all", sSMPTransportProfileID, sName, Boolean.valueOf (bIsDeprecated));
+    AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT, "set-all", sSMPTransportProfileID, sName, Boolean.valueOf (bIsDeprecated));
     return EChange.CHANGED;
   }
 
@@ -105,7 +105,7 @@ public final class SMPTransportProfileManagerXML extends AbstractPhotonMapBasedW
       final SMPTransportProfile aSMPTransportProfile = internalDeleteItem (sSMPTransportProfileID);
       if (aSMPTransportProfile == null)
       {
-        AuditHelper.onAuditDeleteFailure (SMPTransportProfile.OT, "no-such-id", sSMPTransportProfileID);
+        AuditHelper.onAuditDeleteFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id");
         return EChange.UNCHANGED;
       }
     }

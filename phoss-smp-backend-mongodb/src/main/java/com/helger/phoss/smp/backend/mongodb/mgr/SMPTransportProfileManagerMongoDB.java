@@ -102,7 +102,7 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     if (aOldDoc == null)
       return EChange.UNCHANGED;
 
-    AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT, "all", sSMPTransportProfileID, sName, Boolean.valueOf (bIsDeprecated));
+    AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT, "set-all", sSMPTransportProfileID, sName, Boolean.valueOf (bIsDeprecated));
     return EChange.CHANGED;
   }
 
@@ -115,7 +115,7 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sSMPTransportProfileID));
     if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", sSMPTransportProfileID);
+      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, sSMPTransportProfileID, "no-such-id");
       return EChange.UNCHANGED;
     }
     AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT, sSMPTransportProfileID);

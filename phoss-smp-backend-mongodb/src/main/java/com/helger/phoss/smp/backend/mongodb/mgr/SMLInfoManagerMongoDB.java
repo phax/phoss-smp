@@ -116,7 +116,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
       return EChange.UNCHANGED;
 
     AuditHelper.onAuditModifySuccess (SMLInfo.OT,
-                                      "all",
+                                      "set-all",
                                       sSMLInfoID,
                                       sDisplayName,
                                       sDNSZone,
@@ -134,7 +134,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sSMLInfoID));
     if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMLInfo.OT, "no-such-id", sSMLInfoID);
+      AuditHelper.onAuditDeleteFailure (SMLInfo.OT, sSMLInfoID, "no-such-id");
       return EChange.UNCHANGED;
     }
     AuditHelper.onAuditDeleteSuccess (SMLInfo.OT, sSMLInfoID);

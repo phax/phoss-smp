@@ -95,6 +95,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
       internalUpdateItem (aSMPRedirect);
     });
     AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
+                                      "set-all",
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
                                       aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
@@ -185,7 +186,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
       final SMPRedirect aRealRedirect = internalDeleteItem (aSMPRedirect.getID ());
       if (aRealRedirect == null)
       {
-        AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
+        AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, aSMPRedirect.getID (), "no-such-id");
         if (LOGGER.isDebugEnabled ())
           LOGGER.debug ("deleteSMPRedirect - failure");
         return EChange.UNCHANGED;

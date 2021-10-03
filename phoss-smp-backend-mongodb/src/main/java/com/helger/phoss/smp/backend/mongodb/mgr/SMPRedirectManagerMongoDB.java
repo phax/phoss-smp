@@ -155,6 +155,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     final Document aOldDoc = getCollection ().findOneAndReplace (new Document (BSON_ID, aSMPRedirect.getID ()), toBson (aSMPRedirect));
     if (aOldDoc != null)
       AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
+                                        "set-all",
                                         aSMPRedirect.getID (),
                                         aSMPRedirect.getServiceGroupID (),
                                         aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
@@ -234,7 +235,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, aSMPRedirect.getID ()));
     if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
+      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, aSMPRedirect.getID (), "no-such-id");
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("deleteSMPRedirect - failure");
       return EChange.UNCHANGED;

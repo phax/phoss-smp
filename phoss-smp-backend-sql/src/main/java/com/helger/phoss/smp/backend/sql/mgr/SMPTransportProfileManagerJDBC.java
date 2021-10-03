@@ -79,11 +79,11 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
 
     if (eSuccess.isFailure ())
     {
-      AuditHelper.onAuditCreateFailure (SMPTransportProfile.OT, "failed-to-save", ret.getID ());
+      AuditHelper.onAuditCreateFailure (SMPTransportProfile.OT, sID, sName, Boolean.valueOf (bIsDeprecated), "database-error");
       return null;
     }
 
-    AuditHelper.onAuditCreateSuccess (SMPTransportProfile.OT, ret.getID (), ret.getName (), Boolean.valueOf (ret.isDeprecated ()));
+    AuditHelper.onAuditCreateSuccess (SMPTransportProfile.OT, sID, sName, Boolean.valueOf (bIsDeprecated));
     return ret;
   }
 
@@ -106,14 +106,14 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "database-error", "update");
+      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, "update", sSMPTransportProfileID, "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such transport profile ID
-      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id", "update");
+      AuditHelper.onAuditModifyFailure (SMPTransportProfile.OT, "update", sSMPTransportProfileID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -131,7 +131,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
                                                                  new ConstantPreparedStatementDataProvider (sSMPTransportProfileID));
     if (nDeleted == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPTransportProfile.OT, "no-such-id", sSMPTransportProfileID);
+      AuditHelper.onAuditDeleteFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id");
       return EChange.UNCHANGED;
     }
 

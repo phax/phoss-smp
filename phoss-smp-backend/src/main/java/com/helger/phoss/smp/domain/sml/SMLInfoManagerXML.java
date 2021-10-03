@@ -72,7 +72,7 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
     final SMLInfo aSMLInfo = getOfID (sSMLInfoID);
     if (aSMLInfo == null)
     {
-      AuditHelper.onAuditModifyFailure (SMLInfo.OT, sSMLInfoID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMLInfo.OT, "set-all", sSMLInfoID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -94,7 +94,7 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
       m_aRWLock.writeLock ().unlock ();
     }
     AuditHelper.onAuditModifySuccess (SMLInfo.OT,
-                                      "all",
+                                      "set-all",
                                       sSMLInfoID,
                                       sDisplayName,
                                       sDNSZone,
@@ -115,7 +115,7 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
       final SMLInfo aSMLInfo = internalDeleteItem (sSMLInfoID);
       if (aSMLInfo == null)
       {
-        AuditHelper.onAuditDeleteFailure (SMLInfo.OT, "no-such-id", sSMLInfoID);
+        AuditHelper.onAuditDeleteFailure (SMLInfo.OT, sSMLInfoID, "no-such-id");
         return EChange.UNCHANGED;
       }
     }

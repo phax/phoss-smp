@@ -173,6 +173,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     else
     {
       AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
+                                        "set-all",
                                         aSMPRedirect.getID (),
                                         aSMPRedirect.getServiceGroupID (),
                                         aSMPRedirect.getDocumentTypeIdentifier ().getURIEncoded (),
@@ -202,7 +203,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                                                                                                             aDocTypeID.getValue ()));
     if (nDeleted == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, "no-such-id", aSMPRedirect.getID ());
+      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, aSMPRedirect.getID (), "no-such-id");
       return EChange.UNCHANGED;
     }
 

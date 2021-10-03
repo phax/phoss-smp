@@ -194,11 +194,11 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                                                                                  Updates.set (BSON_EXTENSION, sExtension)));
     if (aOldDoc == null)
     {
-      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "no-such-id", sServiceGroupID);
+      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "set-all", sServiceGroupID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
-    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sServiceGroupID, sNewOwnerID, sExtension);
+    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "set-all", sServiceGroupID, sNewOwnerID, sExtension);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup - success");
 
@@ -246,7 +246,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sServiceGroupID));
     if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
+      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, aParticipantID, "no-such-id");
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("deleteSMPServiceGroup - failure");
 

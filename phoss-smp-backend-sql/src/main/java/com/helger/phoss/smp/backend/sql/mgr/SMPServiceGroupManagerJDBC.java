@@ -262,7 +262,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     if (eSuccess.isFailure () || aCaughtException.isSet ())
     {
-      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), sNewOwnerID, sNewExtension);
+      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "set-all", aParticipantID.getURIEncoded (), sNewOwnerID, sNewExtension);
 
       final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)
@@ -274,7 +274,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup succeeded. Change=" + eChange.isChanged ());
 
-    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), sNewOwnerID, sNewExtension);
+    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "set-all", aParticipantID.getURIEncoded (), sNewOwnerID, sNewExtension);
 
     // Callback only if something changed
     if (eChange.isChanged ())
@@ -339,7 +339,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     if (aCaughtException.isSet ())
     {
-      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, aParticipantID.getURIEncoded ());
+      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, aParticipantID.getURIEncoded (), "database-error");
 
       final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)

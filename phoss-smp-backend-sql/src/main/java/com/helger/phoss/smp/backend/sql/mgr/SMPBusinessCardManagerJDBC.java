@@ -220,7 +220,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (eSucces.isFailure ())
     {
       if (aUpdated.booleanValue ())
-        AuditHelper.onAuditModifyFailure (SMPBusinessCard.OT, "all", aParticipantID.getURIEncoded ());
+        AuditHelper.onAuditModifyFailure (SMPBusinessCard.OT, "set-all", aParticipantID.getURIEncoded ());
       else
         AuditHelper.onAuditCreateFailure (SMPBusinessCard.OT, aParticipantID.getURIEncoded ());
 
@@ -233,7 +233,10 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("Finished createOrUpdateSMPBusinessCard");
 
     if (aUpdated.booleanValue ())
-      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT, "all", aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
+      AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
+                                        "set-all",
+                                        aParticipantID.getURIEncoded (),
+                                        Integer.valueOf (aEntities.size ()));
     else
       AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aParticipantID.getURIEncoded (), Integer.valueOf (aEntities.size ()));
 
@@ -259,7 +262,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Finished deleteSMPBusinessCard. Change=false");
 
-      AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, "no-such-id", aSMPBusinessCard.getID ());
+      AuditHelper.onAuditDeleteFailure (SMPBusinessCard.OT, aSMPBusinessCard.getID (), "no-such-id");
       return EChange.UNCHANGED;
     }
 

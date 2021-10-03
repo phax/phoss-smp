@@ -82,7 +82,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
 
     if (eSuccess.isFailure ())
     {
-      AuditHelper.onAuditCreateFailure (SMPParticipantMigration.OT, "failed-to-save", aSMPParticipantMigration.getID ());
+      AuditHelper.onAuditCreateFailure (SMPParticipantMigration.OT, aSMPParticipantMigration.getID (), "database-error");
       return null;
     }
 
@@ -130,18 +130,22 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     if (eSuccess.isFailure ())
     {
       // DB error
-      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, sParticipantMigrationID, "database-error");
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT,
+                                        "set-migration-state",
+                                        sParticipantMigrationID,
+                                        eNewState,
+                                        "database-error");
       return EChange.UNCHANGED;
     }
 
     if (aUpdated.is0 ())
     {
       // No such participant migration ID
-      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, sParticipantMigrationID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, "no-such-id");
       return EChange.UNCHANGED;
     }
 
-    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "migration-state", sParticipantMigrationID, eNewState);
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, eNewState);
     return EChange.CHANGED;
   }
 

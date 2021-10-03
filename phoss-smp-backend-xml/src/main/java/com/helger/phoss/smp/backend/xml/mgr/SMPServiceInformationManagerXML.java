@@ -122,6 +122,7 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
       });
 
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
+                                        "set-all",
                                         aOldInformation.getID (),
                                         aOldInformation.getServiceGroupID (),
                                         aOldInformation.getDocumentTypeIdentifier ().getURIEncoded (),
@@ -206,7 +207,7 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
       final SMPServiceInformation aRealServiceInformation = internalDeleteItem (aSMPServiceInformation.getID ());
       if (aRealServiceInformation == null)
       {
-        AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
+        AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, aSMPServiceInformation.getID (), "no-such-id");
         if (LOGGER.isDebugEnabled ())
           LOGGER.debug ("deleteSMPServiceInformation - failure");
         return EChange.UNCHANGED;
@@ -253,9 +254,9 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
     final SMPServiceInformation aRealServiceInformation = getOfID (aSMPServiceInformation.getID ());
     if (aRealServiceInformation == null)
     {
-      AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
+      AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, aSMPServiceInformation.getID (), "no-such-id");
       if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("deleteSMPProcess - failure");
+        LOGGER.debug ("deleteSMPProcess - failure - no such service information");
       return EChange.UNCHANGED;
     }
 
@@ -266,11 +267,11 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
       if (aRealServiceInformation.deleteProcess (aProcess).isUnchanged ())
       {
         AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT,
-                                          "no-such-process",
                                           aSMPServiceInformation.getID (),
-                                          aProcess.getProcessIdentifier ().getURIEncoded ());
+                                          aProcess.getProcessIdentifier ().getURIEncoded (),
+                                          "no-such-process");
         if (LOGGER.isDebugEnabled ())
-          LOGGER.debug ("deleteSMPProcess - failure");
+          LOGGER.debug ("deleteSMPProcess - failure - no such process");
         return EChange.UNCHANGED;
       }
 

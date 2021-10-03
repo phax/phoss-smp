@@ -194,6 +194,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (aUpdated.booleanValue ())
     {
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
+                                        "set-all",
                                         aSMPServiceInformation.getID (),
                                         aSMPServiceInformation.getServiceGroupID (),
                                         aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),

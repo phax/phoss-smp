@@ -171,7 +171,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     final SMPServiceGroup aSMPServiceGroup = getOfID (sServiceGroupID);
     if (aSMPServiceGroup == null)
     {
-      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "no-such-id", sServiceGroupID);
+      AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "set-all", sServiceGroupID, "no-such-id");
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("updateSMPServiceGroup - failure");
       throw new SMPNotFoundException ("No such service group '" + sServiceGroupID + "'");
@@ -196,7 +196,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       m_aRWLock.writeLock ().unlock ();
     }
 
-    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "all", sServiceGroupID, sNewOwnerID, sExtension);
+    AuditHelper.onAuditModifySuccess (SMPServiceGroup.OT, "set-all", sServiceGroupID, sNewOwnerID, sExtension);
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("updateSMPServiceGroup - success");
@@ -219,7 +219,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     final SMPServiceGroup aSMPServiceGroup = getOfID (sServiceGroupID);
     if (aSMPServiceGroup == null)
     {
-      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aParticipantID);
+      AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, aParticipantID, "no-such-id");
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("deleteSMPServiceGroup - failure");
       throw new SMPNotFoundException ("No such service group '" + aParticipantID.getURIEncoded () + "'");
@@ -247,7 +247,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     {
       if (internalDeleteItem (aSMPServiceGroup.getID ()) == null)
       {
-        AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, "no-such-id", aSMPServiceGroup.getID ());
+        AuditHelper.onAuditDeleteFailure (SMPServiceGroup.OT, aSMPServiceGroup.getID (), "no-such-id");
         if (LOGGER.isDebugEnabled ())
           LOGGER.debug ("deleteSMPServiceGroup - failure");
 
