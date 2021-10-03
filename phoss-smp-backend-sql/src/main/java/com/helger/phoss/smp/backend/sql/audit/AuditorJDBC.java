@@ -99,7 +99,11 @@ public class AuditorJDBC extends AbstractJDBCEnabledManager implements IAuditor
                                                                                                          Boolean.valueOf (eSuccess.isSuccess ()),
                                                                                                          sFullAction));
       if (nCreated != 1)
+      {
+        // This may be triggered on the first startup where the smp_audit table
+        // is not yet present
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
+      }
     });
 
     if (eDBSuccess.isFailure ())
