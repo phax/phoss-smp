@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import com.helger.dao.DAOException;
 import com.helger.phoss.smp.backend.sql.audit.AuditManagerJDBC;
 import com.helger.phoss.smp.backend.sql.security.RoleManagerJDBC;
+import com.helger.phoss.smp.backend.sql.security.UserManagerJDBC;
 import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRoleManager;
@@ -42,6 +43,8 @@ public class PhotonSecurityManagerFactoryJDBC implements PhotonSecurityManager.I
   @Nonnull
   public IUserManager createUserMgr () throws DAOException
   {
+    if (true)
+      return new UserManagerJDBC (SMPDBExecutor::new);
     return new UserManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY + PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML);
   }
 

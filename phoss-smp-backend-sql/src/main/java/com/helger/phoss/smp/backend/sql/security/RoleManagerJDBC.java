@@ -28,6 +28,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.mutable.MutableLong;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
@@ -38,6 +39,7 @@ import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.CSecurity;
+import com.helger.photon.security.object.BusinessObjectHelper;
 import com.helger.photon.security.object.StubObject;
 import com.helger.photon.security.role.IRole;
 import com.helger.photon.security.role.IRoleManager;
@@ -64,7 +66,8 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   public ICommonsList <IRole> getAll ()
   {
     final ICommonsList <IRole> ret = new CommonsArrayList <> ();
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, creationdt, creationuserid, lastmoddt, lastmoduserid, deletedt, deleteuserid, attrs, name, description" +
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, creationdt, creationuserid, lastmoddt, lastmoduserid, deletedt, deleteuserid, attrs," +
+                                                                          " name, description" +
                                                                           " FROM smp_secrole");
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
@@ -102,7 +105,7 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     return true;
   }
 
-  public void createDefaults ()
+  public void createDefaultsForTest ()
   {
     if (!containsWithID (CSecurity.ROLE_ADMINISTRATOR_ID))
       _internalCreateItem (RoleManager.createDefaultRoleAdministrator ());
@@ -123,7 +126,8 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     final DBExecutor aExecutor = newExecutor ();
     return aExecutor.performInTransaction ( () -> {
       // Create new
-      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_secrole (id, creationdt, creationuserid, lastmoddt, lastmoduserid, deletedt, deleteuserid, attrs, name, description)" +
+      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_secrole (id, creationdt, creationuserid, lastmoddt, lastmoduserid, deletedt, deleteuserid, attrs," +
+                                                              " name, description)" +
                                                               " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                                               new ConstantPreparedStatementDataProvider (getTrimmedToLength (aRole.getID (),
                                                                                                                              45),
@@ -223,7 +227,8 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    newExecutor ().querySingle ("SELECT creationdt, creationuserid, lastmoddt, lastmoduserid, deletedt, deleteuserid, attrs, name, description" +
+    newExecutor ().querySingle ("SELECT creationdt, creationuserid, lastmoddt, lastmoduserid, deletedt, deleteuserid, attrs," +
+                                " name, description" +
                                 " FROM smp_secrole" +
                                 " WHERE id=?",
                                 new ConstantPreparedStatementDataProvider (sRoleID),
@@ -250,8 +255,12 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Update existing
-      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_secrole SET name=? WHERE id=?",
-                                                              new ConstantPreparedStatementDataProvider (sNewName, sRoleID));
+      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_secrole SET name=?, lastmoddt=?, lastmoduserid=? WHERE id=?",
+                                                              new ConstantPreparedStatementDataProvider (sNewName,
+                                                                                                         toTimestamp (PDTFactory.getCurrentLocalDateTime ()),
+                                                                                                         getTrimmedToLength (BusinessObjectHelper.getUserIDOrFallback (),
+                                                                                                                             20),
+                                                                                                         sRoleID));
       aUpdated.set (nUpdated);
     });
 
@@ -287,10 +296,13 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Update existing
-      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_secrole SET name=?, description=?, attrs=? WHERE id=?",
+      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_secrole SET name=?, description=?, attrs=?, lastmoddt=?, lastmoduserid=? WHERE id=?",
                                                               new ConstantPreparedStatementDataProvider (sNewName,
                                                                                                          sNewDescription,
                                                                                                          attrsToString (aNewCustomAttrs),
+                                                                                                         toTimestamp (PDTFactory.getCurrentLocalDateTime ()),
+                                                                                                         getTrimmedToLength (BusinessObjectHelper.getUserIDOrFallback (),
+                                                                                                                             20),
                                                                                                          sRoleID));
       aUpdated.set (nUpdated);
     });
