@@ -27,59 +27,61 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.dao.DAOException;
-import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
-import com.helger.phoss.smp.backend.sql.mgr.SMPTransportProfileManagerJDBC;
-import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
+import com.helger.phoss.smp.backend.sql.security.RoleManagerJDBC;
 import com.helger.photon.app.io.WebFileIO;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.role.IRole;
+import com.helger.photon.security.role.Role;
+import com.helger.photon.security.role.RoleManager;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
- * Migrate all transport profiles from the XML file to the DB
+ * Migrate all security roles from the XML file to the DB
  *
  * @author Philip Helger
  * @since 8.5.0
  */
-public final class V5__MigrateTransportProfilesToDB extends BaseJavaMigration
+public final class V10__MigrateRolesToDB extends BaseJavaMigration
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (V5__MigrateTransportProfilesToDB.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (V10__MigrateRolesToDB.class);
 
   public void migrate (@Nonnull final Context context)
   {
     try (final WebScoped aWS = new WebScoped ())
     {
-      LOGGER.info ("Migrating all transport profiles to the DB");
+      LOGGER.info ("Migrating all roles to the DB");
 
-      final String sFilename = "transportprofiles.xml";
+      final String sFilename = PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY + PhotonSecurityManager.FactoryXML.FILENAME_ROLES_XML;
       final File aFile = WebFileIO.getDataIO ().getFile (sFilename);
       if (aFile.exists ())
       {
-        final SMPTransportProfileManagerXML aMgrXML = new SMPTransportProfileManagerXML (sFilename);
-        final ICommonsList <ISMPTransportProfile> aTransportProfiles = aMgrXML.getAll ();
-
-        if (aTransportProfiles.isNotEmpty ())
+        final RoleManager aMgrXML = new RoleManager (sFilename);
+        final ICommonsList <IRole> aRoles = aMgrXML.getAll ();
+        if (aRoles.isNotEmpty ())
         {
-          final SMPTransportProfileManagerJDBC aMgrNew = new SMPTransportProfileManagerJDBC (SMPDBExecutor::new);
-          for (final ISMPTransportProfile aTransportProfile : aTransportProfiles)
-            if (aMgrNew.createSMPTransportProfile (aTransportProfile.getID (),
-                                                   aTransportProfile.getName (),
-                                                   aTransportProfile.isDeprecated ()) == null)
-              LOGGER.error ("Failed to migrate " + aTransportProfile + " to DB");
+          final RoleManagerJDBC aMgrNew = new RoleManagerJDBC (SMPDBExecutor::new);
+          for (final IRole aRole : aRoles)
+          {
+            // Don't run the callback here
+            if (aMgrNew.internalCreateNewRole ((Role) aRole, false, false) == null)
+              LOGGER.error ("Failed to migrate role " + aRole + " to DB");
+          }
         }
 
         // Rename to avoid later inconsistencies
         WebFileIO.getDataIO ().renameFile (sFilename, sFilename + ".migrated");
 
-        LOGGER.info ("Finished migrating all " + aTransportProfiles.size () + " transport profiles to the DB");
+        LOGGER.info ("Finished migrating all " + aRoles.size () + " roles to the DB");
       }
       else
       {
-        LOGGER.info ("No transport profile file found");
+        LOGGER.info ("No role file found");
       }
     }
     catch (final DAOException ex)
     {
-      LOGGER.warn ("Error reading the XML transport profiles", ex);
+      LOGGER.warn ("Error reading the XML roles", ex);
     }
   }
 }

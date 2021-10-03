@@ -234,8 +234,8 @@ public class UserGroupManagerJDBC extends AbstractJDBCEnabledSecurityManager imp
     });
   }
 
-  @Nonnull
-  private void _createNewUserGroup (@Nonnull final UserGroup aUserGroup, final boolean bPredefined)
+  @Nullable
+  public UserGroup internalCreateNewUserGroup (@Nonnull final UserGroup aUserGroup, final boolean bPredefined, final boolean bRunCallback)
   {
     // Store
     if (_internalCreateItem (aUserGroup).isFailure ())
@@ -247,33 +247,36 @@ public class UserGroupManagerJDBC extends AbstractJDBCEnabledSecurityManager imp
                                         aUserGroup.attrs (),
                                         bPredefined ? "predefined" : "custom",
                                         "database-error");
+      return null;
     }
-    else
-    {
-      AuditHelper.onAuditCreateSuccess (UserGroup.OT,
-                                        aUserGroup.getID (),
-                                        aUserGroup.getName (),
-                                        aUserGroup.getDescription (),
-                                        aUserGroup.attrs (),
-                                        bPredefined ? "predefined" : "custom");
 
+    AuditHelper.onAuditCreateSuccess (UserGroup.OT,
+                                      aUserGroup.getID (),
+                                      aUserGroup.getName (),
+                                      aUserGroup.getDescription (),
+                                      aUserGroup.attrs (),
+                                      bPredefined ? "predefined" : "custom");
+
+    if (bRunCallback)
+    {
       // Execute callback as the very last action
-      m_aCallbacks.forEach (aCB -> aCB.onUserGroupCreated (aUserGroup, false));
+      m_aCallbacks.forEach (aCB -> aCB.onUserGroupCreated (aUserGroup, bPredefined));
     }
+
+    return aUserGroup;
   }
 
-  @Nonnull
+  @Nullable
   public IUserGroup createNewUserGroup (@Nonnull @Nonempty final String sName,
                                         @Nullable final String sDescription,
                                         @Nullable final Map <String, String> aCustomAttrs)
   {
     // Create user group
     final UserGroup aUserGroup = new UserGroup (sName, sDescription, aCustomAttrs);
-    _createNewUserGroup (aUserGroup, false);
-    return aUserGroup;
+    return internalCreateNewUserGroup (aUserGroup, false, true);
   }
 
-  @Nonnull
+  @Nullable
   public IUserGroup createPredefinedUserGroup (@Nonnull @Nonempty final String sID,
                                                @Nonnull @Nonempty final String sName,
                                                @Nullable final String sDescription,
@@ -281,8 +284,7 @@ public class UserGroupManagerJDBC extends AbstractJDBCEnabledSecurityManager imp
   {
     // Create user group
     final UserGroup aUserGroup = new UserGroup (StubObject.createForCurrentUserAndID (sID, aCustomAttrs), sName, sDescription);
-    _createNewUserGroup (aUserGroup, true);
-    return aUserGroup;
+    return internalCreateNewUserGroup (aUserGroup, true, true);
   }
 
   @Nonnull

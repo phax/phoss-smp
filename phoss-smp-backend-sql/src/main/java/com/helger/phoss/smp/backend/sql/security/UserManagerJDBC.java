@@ -222,8 +222,8 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     });
   }
 
-  @Nonnull
-  private void _createNewUser (@Nonnull final User aUser, final boolean bPredefined)
+  @Nullable
+  public User internalCreateNewUser (@Nonnull final User aUser, final boolean bPredefined, final boolean bRunCallback)
   {
     // Store
     if (_internalCreateItem (aUser).isFailure ())
@@ -240,24 +240,27 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
                                         Boolean.valueOf (aUser.isDisabled ()),
                                         bPredefined ? "predefined" : "custom",
                                         "database-error");
+      return null;
     }
-    else
-    {
-      AuditHelper.onAuditCreateSuccess (User.OT,
-                                        aUser.getID (),
-                                        aUser.getLoginName (),
-                                        aUser.getEmailAddress (),
-                                        aUser.getFirstName (),
-                                        aUser.getLastName (),
-                                        aUser.getDescription (),
-                                        aUser.getDesiredLocale (),
-                                        aUser.attrs (),
-                                        Boolean.valueOf (aUser.isDisabled ()),
-                                        bPredefined ? "predefined" : "custom");
 
+    AuditHelper.onAuditCreateSuccess (User.OT,
+                                      aUser.getID (),
+                                      aUser.getLoginName (),
+                                      aUser.getEmailAddress (),
+                                      aUser.getFirstName (),
+                                      aUser.getLastName (),
+                                      aUser.getDescription (),
+                                      aUser.getDesiredLocale (),
+                                      aUser.attrs (),
+                                      Boolean.valueOf (aUser.isDisabled ()),
+                                      bPredefined ? "predefined" : "custom");
+
+    if (bRunCallback)
+    {
       // Execute callback as the very last action
       m_aCallbacks.forEach (aCB -> aCB.onUserCreated (aUser, bPredefined));
     }
+    return aUser;
   }
 
   @Nullable
@@ -291,8 +294,7 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
                                  aDesiredLocale,
                                  aCustomAttrs,
                                  bDisabled);
-    _createNewUser (aUser, false);
-    return aUser;
+    return internalCreateNewUser (aUser, false, true);
   }
 
   @Nullable
@@ -329,8 +331,7 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
                                                    aDesiredLocale,
                                                    aCustomAttrs,
                                                    bDisabled);
-    _createNewUser (aUser, true);
-    return aUser;
+    return internalCreateNewUser (aUser, true, true);
   }
 
   @Nullable

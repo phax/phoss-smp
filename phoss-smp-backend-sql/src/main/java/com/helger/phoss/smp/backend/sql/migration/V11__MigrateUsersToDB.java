@@ -27,59 +27,62 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.dao.DAOException;
-import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
-import com.helger.phoss.smp.backend.sql.mgr.SMPTransportProfileManagerJDBC;
-import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
+import com.helger.phoss.smp.backend.sql.security.UserManagerJDBC;
 import com.helger.photon.app.io.WebFileIO;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.user.IUser;
+import com.helger.photon.security.user.User;
+import com.helger.photon.security.user.UserManager;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
- * Migrate all transport profiles from the XML file to the DB
+ * Migrate all security users from the XML file to the DB
  *
  * @author Philip Helger
  * @since 8.5.0
  */
-public final class V5__MigrateTransportProfilesToDB extends BaseJavaMigration
+public final class V11__MigrateUsersToDB extends BaseJavaMigration
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (V5__MigrateTransportProfilesToDB.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (V11__MigrateUsersToDB.class);
 
   public void migrate (@Nonnull final Context context)
   {
     try (final WebScoped aWS = new WebScoped ())
     {
-      LOGGER.info ("Migrating all transport profiles to the DB");
+      LOGGER.info ("Migrating all users to the DB");
 
-      final String sFilename = "transportprofiles.xml";
+      final String sFilename = PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY + PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML;
       final File aFile = WebFileIO.getDataIO ().getFile (sFilename);
       if (aFile.exists ())
       {
-        final SMPTransportProfileManagerXML aMgrXML = new SMPTransportProfileManagerXML (sFilename);
-        final ICommonsList <ISMPTransportProfile> aTransportProfiles = aMgrXML.getAll ();
+        final UserManager aMgrXML = new UserManager (sFilename);
+        final ICommonsList <IUser> aUsers = aMgrXML.getAll ();
 
-        if (aTransportProfiles.isNotEmpty ())
+        if (aUsers.isNotEmpty ())
         {
-          final SMPTransportProfileManagerJDBC aMgrNew = new SMPTransportProfileManagerJDBC (SMPDBExecutor::new);
-          for (final ISMPTransportProfile aTransportProfile : aTransportProfiles)
-            if (aMgrNew.createSMPTransportProfile (aTransportProfile.getID (),
-                                                   aTransportProfile.getName (),
-                                                   aTransportProfile.isDeprecated ()) == null)
-              LOGGER.error ("Failed to migrate " + aTransportProfile + " to DB");
+          final UserManagerJDBC aMgrNew = new UserManagerJDBC (SMPDBExecutor::new);
+          for (final IUser aUser : aUsers)
+          {
+            // Don't run the callback here
+            if (aMgrNew.internalCreateNewUser ((User) aUser, false, false) == null)
+              LOGGER.error ("Failed to migrate user " + aUser + " to DB");
+          }
         }
 
         // Rename to avoid later inconsistencies
         WebFileIO.getDataIO ().renameFile (sFilename, sFilename + ".migrated");
 
-        LOGGER.info ("Finished migrating all " + aTransportProfiles.size () + " transport profiles to the DB");
+        LOGGER.info ("Finished migrating all " + aUsers.size () + " users to the DB");
       }
       else
       {
-        LOGGER.info ("No transport profile file found");
+        LOGGER.info ("No user file found");
       }
     }
     catch (final DAOException ex)
     {
-      LOGGER.warn ("Error reading the XML transport profiles", ex);
+      LOGGER.warn ("Error reading the XML users", ex);
     }
   }
 }

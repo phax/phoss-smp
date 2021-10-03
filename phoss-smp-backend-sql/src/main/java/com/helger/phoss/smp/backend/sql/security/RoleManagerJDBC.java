@@ -149,8 +149,8 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     });
   }
 
-  @Nonnull
-  private void _createNewRole (@Nonnull final Role aRole, final boolean bPredefined)
+  @Nullable
+  public Role internalCreateNewRole (@Nonnull final Role aRole, final boolean bPredefined, final boolean bRunCallback)
   {
     // Store
     if (_internalCreateItem (aRole).isFailure ())
@@ -161,32 +161,35 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
                                         aRole.getDescription (),
                                         bPredefined ? "predefined" : "custom",
                                         "database-error");
+      return null;
     }
-    else
-    {
-      AuditHelper.onAuditCreateSuccess (Role.OT,
-                                        aRole.getID (),
-                                        aRole.getName (),
-                                        aRole.getDescription (),
-                                        bPredefined ? "predefined" : "custom");
 
+    AuditHelper.onAuditCreateSuccess (Role.OT,
+                                      aRole.getID (),
+                                      aRole.getName (),
+                                      aRole.getDescription (),
+                                      bPredefined ? "predefined" : "custom");
+
+    if (bRunCallback)
+    {
       // Execute callback as the very last action
       m_aCallbacks.forEach (aCB -> aCB.onRoleCreated (aRole, bPredefined));
     }
+
+    return aRole;
   }
 
-  @Nonnull
+  @Nullable
   public IRole createNewRole (@Nonnull @Nonempty final String sName,
                               @Nullable final String sDescription,
                               @Nullable final Map <String, String> aCustomAttrs)
   {
     // Create role
     final Role aRole = new Role (sName, sDescription, aCustomAttrs);
-    _createNewRole (aRole, false);
-    return aRole;
+    return internalCreateNewRole (aRole, false, true);
   }
 
-  @Nonnull
+  @Nullable
   public IRole createPredefinedRole (@Nonnull @Nonempty final String sID,
                                      @Nonnull @Nonempty final String sName,
                                      @Nullable final String sDescription,
@@ -194,8 +197,7 @@ public class RoleManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
   {
     // Create role
     final Role aRole = new Role (StubObject.createForCurrentUserAndID (sID, aCustomAttrs), sName, sDescription);
-    _createNewRole (aRole, true);
-    return aRole;
+    return internalCreateNewRole (aRole, true, true);
   }
 
   @Nonnull
