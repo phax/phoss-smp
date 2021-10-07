@@ -18,7 +18,6 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
 import com.helger.dao.DAOException;
-import com.helger.peppol.sml.ISMLInfo;
 import com.helger.photon.app.dao.AbstractPhotonSimpleDAO;
 import com.helger.settings.ISettings;
 import com.helger.settings.Settings;
@@ -67,7 +66,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   }
 
   @Nonnull
-  @ReturnsMutableObject ("by design")
+  @ReturnsMutableObject
   public final CallbackList <ISMPSettingsCallback> callbacks ()
   {
     return m_aCallbacks;
@@ -87,7 +86,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
                                  @Nullable final String sDirectoryHostName,
                                  final boolean bSMLActive,
                                  final boolean bSMLRequired,
-                                 @Nullable final ISMLInfo aSMLInfo)
+                                 @Nullable final String sSMLInfoID)
   {
     EChange eChange = EChange.UNCHANGED;
     m_aRWLock.writeLock ().lock ();
@@ -100,7 +99,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
       eChange = eChange.or (m_aSettings.setDirectoryHostName (sDirectoryHostName));
       eChange = eChange.or (m_aSettings.setSMLRequired (bSMLRequired));
       eChange = eChange.or (m_aSettings.setSMLEnabled (bSMLActive));
-      eChange = eChange.or (m_aSettings.setSMLInfoID (aSMLInfo == null ? null : aSMLInfo.getID ()));
+      eChange = eChange.or (m_aSettings.setSMLInfoID (sSMLInfoID));
       if (eChange.isChanged ())
         markAsChanged ();
     }

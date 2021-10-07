@@ -55,7 +55,7 @@ public final class SMPJDBCConfiguration
   public static final String CONFIG_JDBC_DEBUG_TRANSACTIONS = "jdbc.debug.transactions";
   @Since ("5.3.0")
   public static final String CONFIG_JDBC_DEBUG_SQL = "jdbc.debug.sql";
-  @Since ("5.3.3")
+  @Since ("5.4.0")
   public static final String CONFIG_SMP_FLYWAY_ENABLED = "smp.flyway.enabled";
 
   @PresentForCodeCoverage

@@ -25,6 +25,7 @@ import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.settings.ISettings;
+import com.helger.settings.Settings;
 import com.helger.settings.SettingsWithDefault;
 
 /**
@@ -41,11 +42,19 @@ public class SMPSettings implements ISMPSettings
 
   private static final ObjectType OT = new ObjectType ("smp-settings");
 
-  private SettingsWithDefault m_aSettings;
+  private Settings m_aSettings;
 
   public SMPSettings ()
   {
-    setToConfigurationValues ();
+    this (true);
+  }
+
+  public SMPSettings (final boolean bReadFromConfiguration)
+  {
+    if (bReadFromConfiguration)
+      setToConfigurationValues ();
+    else
+      m_aSettings = new Settings ("smp-settings");
   }
 
   @Nonnull
@@ -179,7 +188,7 @@ public class SMPSettings implements ISMPSettings
 
   @Nonnull
   @ReturnsMutableCopy
-  public SettingsWithDefault getAsSettings ()
+  public Settings getAsSettings ()
   {
     return m_aSettings;
   }

@@ -52,7 +52,7 @@ public final class SMPSettingsManagerMongoDBTest
     {
       final ISMPSettings aSettings = aMgr.getSettings ();
       assertNotNull (aSettings);
-      aMgr.updateSettings (true, true, true, true, "v1", true, true, aSMLInfo);
+      aMgr.updateSettings (true, true, true, true, "v1", true, true, aSMLInfo.getID ());
       assertTrue (aSettings.isRESTWritableAPIDisabled ());
       assertTrue (aSettings.isDirectoryIntegrationRequired ());
       assertTrue (aSettings.isDirectoryIntegrationEnabled ());
@@ -62,7 +62,7 @@ public final class SMPSettingsManagerMongoDBTest
       assertTrue (aSettings.isSMLEnabled ());
       assertEquals (aSMLInfo, aSettings.getSMLInfo ());
 
-      aMgr.updateSettings (false, false, false, false, "v2", false, false, aSMLInfo);
+      aMgr.updateSettings (false, false, false, false, "v2", false, false, aSMLInfo.getID ());
       assertFalse (aSettings.isRESTWritableAPIDisabled ());
       assertFalse (aSettings.isDirectoryIntegrationRequired ());
       assertFalse (aSettings.isDirectoryIntegrationEnabled ());

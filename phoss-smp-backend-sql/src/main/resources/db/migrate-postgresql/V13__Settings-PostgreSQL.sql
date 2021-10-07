@@ -16,7 +16,7 @@
 --
 
 CREATE TABLE smp_settings (
-  id    varchar(20)  NOT NULL,
+  id    varchar(45)  NOT NULL,
   value varchar(500),
   PRIMARY KEY (id)
 );

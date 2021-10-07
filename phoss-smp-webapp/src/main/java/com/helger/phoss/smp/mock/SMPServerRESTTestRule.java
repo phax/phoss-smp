@@ -59,7 +59,7 @@ public class SMPServerRESTTestRule extends ExternalResource
     // Ensure non-invasive setup
     // PD enabled but no auto-update
     // SML disabled
-    SMPMetaManager.getSettingsMgr ().updateSettings (false, true, false, false, "dummy", false, false, ESML.DEVELOPMENT_LOCAL);
+    SMPMetaManager.getSettingsMgr ().updateSettings (false, true, false, false, "dummy", false, false, ESML.DEVELOPMENT_LOCAL.getID ());
 
     LOGGER.info ("Finished SMPServerRESTTestRule before. Listening at '" + getFullURL () + "'");
   }

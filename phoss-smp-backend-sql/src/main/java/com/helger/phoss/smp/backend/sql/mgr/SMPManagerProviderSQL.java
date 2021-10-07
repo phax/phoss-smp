@@ -44,7 +44,6 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
-import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.settings.exchange.configfile.ConfigFile;
 
@@ -59,7 +58,6 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPManagerProviderSQL.class);
 
   private static final String SML_INFO_XML = "sml-info.xml";
-  private static final String SMP_SETTINGS_XML = "smp-settings.xml";
 
   private final EDatabaseType m_eDBType;
 
@@ -113,18 +111,10 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     }
   }
 
-  // TODO currently also file based
   @Nonnull
   public ISMPSettingsManager createSettingsMgr ()
   {
-    try
-    {
-      return new SMPSettingsManagerXML (SMP_SETTINGS_XML);
-    }
-    catch (final DAOException ex)
-    {
-      throw new IllegalStateException (ex.getMessage (), ex);
-    }
+    return new SMPSettingsManagerJDBC (SMPDBExecutor::new);
   }
 
   @Nonnull

@@ -27,7 +27,6 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsCallback;
@@ -116,9 +115,9 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
                                  final boolean bDirectoryIntegrationRequired,
                                  final boolean bDirectoryIntegrationAutoUpdate,
                                  @Nullable final String sDirectoryHostName,
-                                 final boolean bSMLActive,
+                                 final boolean bSMLEnabled,
                                  final boolean bSMLRequired,
-                                 @Nullable final ISMLInfo aSMLInfo)
+                                 @Nullable final String sSMLInfoID)
   {
     EChange eChange = EChange.UNCHANGED;
     eChange = eChange.or (m_aSettings.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
@@ -126,9 +125,9 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
     eChange = eChange.or (m_aSettings.setDirectoryIntegrationRequired (bDirectoryIntegrationRequired));
     eChange = eChange.or (m_aSettings.setDirectoryIntegrationAutoUpdate (bDirectoryIntegrationAutoUpdate));
     eChange = eChange.or (m_aSettings.setDirectoryHostName (sDirectoryHostName));
-    eChange = eChange.or (m_aSettings.setSMLEnabled (bSMLActive));
+    eChange = eChange.or (m_aSettings.setSMLEnabled (bSMLEnabled));
     eChange = eChange.or (m_aSettings.setSMLRequired (bSMLRequired));
-    eChange = eChange.or (m_aSettings.setSMLInfoID (aSMLInfo == null ? null : aSMLInfo.getID ()));
+    eChange = eChange.or (m_aSettings.setSMLInfoID (sSMLInfoID));
     if (eChange.isChanged ())
     {
       final Document aDoc = toBson (m_aSettings);

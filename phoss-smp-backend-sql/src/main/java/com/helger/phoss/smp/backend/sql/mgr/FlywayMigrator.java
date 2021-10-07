@@ -39,6 +39,7 @@ import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V10__MigrateRolesToDB;
 import com.helger.phoss.smp.backend.sql.migration.V11__MigrateUsersToDB;
 import com.helger.phoss.smp.backend.sql.migration.V12__MigrateUserGroupsToDB;
+import com.helger.phoss.smp.backend.sql.migration.V14__MigrateSettingsToDB;
 import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.backend.sql.migration.V5__MigrateTransportProfilesToDB;
 import com.helger.photon.audit.AuditHelper;
@@ -139,7 +140,8 @@ final class FlywayMigrator
                                                                new V5__MigrateTransportProfilesToDB (),
                                                                new V10__MigrateRolesToDB (),
                                                                new V11__MigrateUsersToDB (),
-                                                               new V12__MigrateUserGroupsToDB ())
+                                                               new V12__MigrateUserGroupsToDB (),
+                                                               new V14__MigrateSettingsToDB ())
                                               .callbacks (aCallbackLogging, aCallbackAudit);
 
     // Flyway to handle the DB schema?

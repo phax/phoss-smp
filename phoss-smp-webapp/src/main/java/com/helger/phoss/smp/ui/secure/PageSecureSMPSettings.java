@@ -186,7 +186,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                      sDirectoryHostName,
                                      bSMLActive,
                                      bSMLRequired,
-                                     aSMLInfo);
+                                     aSMLInfo == null ? null : aSMLInfo.getID ());
       aWPEC.postRedirectGetInternal (success ("The SMP settings were successfully saved."));
     }
   }

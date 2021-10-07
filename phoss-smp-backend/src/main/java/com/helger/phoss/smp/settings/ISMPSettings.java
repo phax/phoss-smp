@@ -98,11 +98,7 @@ public interface ISMPSettings extends ITypedObject <String>
    * @since 5.0.7
    */
   @Nullable
-  default String getSMLInfoID ()
-  {
-    final ISMLInfo aSMLInfo = getSMLInfo ();
-    return aSMLInfo == null ? null : aSMLInfo.getID ();
-  }
+  String getSMLInfoID ();
 
   /**
    * @return The DNS zone in which the SML operates. May be <code>null</code> if
