@@ -85,7 +85,7 @@ public final class V12__MigrateUserGroupsToDB extends BaseJavaMigration
       }
       else
       {
-        LOGGER.info ("No user group file found");
+        LOGGER.warn ("No user group file found");
       }
     }
     catch (final DAOException ex)

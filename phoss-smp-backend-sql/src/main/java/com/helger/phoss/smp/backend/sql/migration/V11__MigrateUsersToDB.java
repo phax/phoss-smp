@@ -77,7 +77,7 @@ public final class V11__MigrateUsersToDB extends BaseJavaMigration
       }
       else
       {
-        LOGGER.info ("No user file found");
+        LOGGER.warn ("No user file found");
       }
     }
     catch (final DAOException ex)

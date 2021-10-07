@@ -16,9 +16,11 @@
 --
 
 CREATE TABLE smp_audit (
+  id         int          NOT NULL AUTO_INCREMENT,
   dt         timestamp    NOT NULL,
   userid     varchar(20)  NOT NULL,
   actiontype varchar(10)  NOT NULL,
   success    boolean      NOT NULL,
-  action     text
+  action     text,
+  PRIMARY KEY (id)
 );

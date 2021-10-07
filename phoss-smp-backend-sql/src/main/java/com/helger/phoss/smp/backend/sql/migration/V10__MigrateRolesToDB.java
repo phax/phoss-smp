@@ -76,7 +76,7 @@ public final class V10__MigrateRolesToDB extends BaseJavaMigration
       }
       else
       {
-        LOGGER.info ("No role file found");
+        LOGGER.warn ("No role file found");
       }
     }
     catch (final DAOException ex)
