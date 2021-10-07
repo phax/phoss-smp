@@ -17,7 +17,7 @@
 
 CREATE TABLE `smp_audit` (
   `id`         int          NOT NULL AUTO_INCREMENT COMMENT 'Ensure order of entry',
-  `dt`         datetime     NOT NULL                COMMENT 'The date and time of the audit item',
+  `dt`         datetime     NOT NULL                COMMENT 'The date and time of the execution',
   `userid`     varchar(20)  NOT NULL                COMMENT 'The executing user ID',
   `actiontype` varchar(10)  NOT NULL                COMMENT 'The object type',
   `success`    tinyint(1)   NOT NULL                COMMENT 'Was the action successful or not?',

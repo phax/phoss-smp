@@ -25,8 +25,9 @@ CREATE TABLE smp_audit (
   CONSTRAINT smp_audit_pk PRIMARY KEY (id) USING INDEX tablespace USERS
 );
 
-COMMENT ON COLUMN smp_audit.dt         IS 'Internal ID';
+COMMENT ON COLUMN smp_audit.id         IS 'Internal ID';
+COMMENT ON COLUMN smp_audit.dt         IS 'The date and time of the execution';
 COMMENT ON COLUMN smp_audit.userid     IS 'The executing user ID';
-COMMENT ON COLUMN smp_audit.actiontype IS 'Transport profile name';
+COMMENT ON COLUMN smp_audit.actiontype IS 'The action type';
 COMMENT ON COLUMN smp_audit.success    IS 'Was the action successful or not?';
 COMMENT ON COLUMN smp_audit.action     IS 'The action and arguments that were performed';
