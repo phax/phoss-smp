@@ -43,7 +43,7 @@ public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (V2__MigrateDBUsersToPhotonUsers.class);
 
-  public void migrate (@Nonnull final Context context)
+  public void migrate (@Nonnull final Context context) throws Exception
   {
     try (final WebScoped aWS = new WebScoped ())
     {

@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.dao.DAOException;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.security.UserManagerJDBC;
 import com.helger.photon.app.io.WebFileIO;
@@ -40,13 +39,13 @@ import com.helger.web.scope.mgr.WebScoped;
  * Migrate all security users from the XML file to the DB
  *
  * @author Philip Helger
- * @since 8.5.0
+ * @since 5.5.0
  */
 public final class V11__MigrateUsersToDB extends BaseJavaMigration
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (V11__MigrateUsersToDB.class);
 
-  public void migrate (@Nonnull final Context context)
+  public void migrate (@Nonnull final Context context) throws Exception
   {
     try (final WebScoped aWS = new WebScoped ())
     {
@@ -79,10 +78,6 @@ public final class V11__MigrateUsersToDB extends BaseJavaMigration
       {
         LOGGER.warn ("No user file found");
       }
-    }
-    catch (final DAOException ex)
-    {
-      LOGGER.warn ("Error reading the XML users", ex);
     }
   }
 }
