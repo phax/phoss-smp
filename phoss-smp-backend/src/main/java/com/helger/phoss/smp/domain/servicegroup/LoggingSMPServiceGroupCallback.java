@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.CSMPServer;
 
 /**
  * Logging implementation of {@link ISMPServiceGroupCallback}
@@ -31,7 +32,7 @@ public class LoggingSMPServiceGroupCallback implements ISMPServiceGroupCallback
     LOGGER.info ("Successfully Created ServiceGroup with ID '" +
                  aServiceGroup.getParticipantIdentifier ().getURIEncoded () +
                  "'" +
-                 (bCreateInSML ? " also in SML" : " but not in SML"));
+                 (bCreateInSML ? "" : CSMPServer.LOG_SUFFIX_NO_SML_INTERACTION));
   }
 
   public void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
@@ -44,6 +45,6 @@ public class LoggingSMPServiceGroupCallback implements ISMPServiceGroupCallback
     LOGGER.info ("Successfully Deleted ServiceGroup with ID '" +
                  aParticipantID.getURIEncoded () +
                  "'" +
-                 (bDeleteInSML ? " also in SML" : " but not in SML"));
+                 (bDeleteInSML ? "" : CSMPServer.LOG_SUFFIX_NO_SML_INTERACTION));
   }
 }

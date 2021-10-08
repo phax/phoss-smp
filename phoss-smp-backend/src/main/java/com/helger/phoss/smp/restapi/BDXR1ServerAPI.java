@@ -32,6 +32,7 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -277,7 +278,7 @@ public final class BDXR1ServerAPI
                                 final boolean bCreateInSML,
                                 @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + (bCreateInSML ? "" : " (no SML interaction)");
+    final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + (bCreateInSML ? "" : CSMPServer.LOG_SUFFIX_NO_SML_INTERACTION);
     final String sAction = "saveServiceGroup";
 
     if (LOGGER.isInfoEnabled ())
@@ -339,11 +340,12 @@ public final class BDXR1ServerAPI
     }
   }
 
-  public void deleteServiceGroup (@Nonnull final String sPathServiceGroupID,
-                                  final boolean bDeleteInSML,
-                                  @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+  @Nonnull
+  public EChange deleteServiceGroup (@Nonnull final String sPathServiceGroupID,
+                                     final boolean bDeleteInSML,
+                                     @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + (bDeleteInSML ? "" : " (no SML interaction)");
+    final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + (bDeleteInSML ? "" : CSMPServer.LOG_SUFFIX_NO_SML_INTERACTION);
     final String sAction = "deleteServiceGroup";
 
     if (LOGGER.isInfoEnabled ())
@@ -364,11 +366,13 @@ public final class BDXR1ServerAPI
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      aServiceGroupMgr.deleteSMPServiceGroup (aPathServiceGroupID, bDeleteInSML);
+      final EChange eDeleted = aServiceGroupMgr.deleteSMPServiceGroup (aPathServiceGroupID, bDeleteInSML);
 
       if (LOGGER.isInfoEnabled ())
         LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
+
+      return eDeleted;
     }
     catch (final SMPServerException ex)
     {

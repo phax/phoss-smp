@@ -41,6 +41,8 @@ public final class CSMPServer
    */
   public static final String DEFAULT_TIMEZONE = "UTC";
 
+  public static final String LOG_SUFFIX_NO_SML_INTERACTION = " (no SML interaction)";
+
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
 
   private static final String VERSION_NUMBER;
