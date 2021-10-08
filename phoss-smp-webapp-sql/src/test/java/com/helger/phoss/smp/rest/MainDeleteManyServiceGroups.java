@@ -50,8 +50,7 @@ public final class MainDeleteManyServiceGroups
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
-                                                 @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
@@ -69,7 +68,7 @@ public final class MainDeleteManyServiceGroups
     {
       final StopWatch aSWOverall = StopWatch.createdStarted ();
       final int nStart = 0;
-      final int nCount = 100;
+      final int nCount = 1000;
       for (int i = nStart; i < nStart + nCount; ++i)
       {
         final StopWatch aSW = StopWatch.createdStarted ();

@@ -33,8 +33,8 @@ import com.helger.db.jdbc.ConnectionFromDataSource;
 import com.helger.db.jdbc.IHasConnection;
 import com.helger.db.jdbc.executor.DBNoConnectionException;
 import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.backend.sql.SMPDataSourceProvider;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
-import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton.SMPDataSourceProvider;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
 

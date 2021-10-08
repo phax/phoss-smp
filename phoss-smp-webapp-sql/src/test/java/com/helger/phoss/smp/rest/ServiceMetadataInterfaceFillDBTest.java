@@ -50,7 +50,7 @@ import com.helger.xsds.peppol.smp1.ServiceInformationType;
  *
  * @author Philip Helger
  */
-@Ignore
+@Ignore ("because it requires prerequisites")
 public final class ServiceMetadataInterfaceFillDBTest extends AbstractSMPWebAppSQLTest
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (ServiceMetadataInterfaceFillDBTest.class);
@@ -90,8 +90,7 @@ public final class ServiceMetadataInterfaceFillDBTest extends AbstractSMPWebAppS
             aProcess.setProcessIdentifier (aProcID);
             final ServiceEndpointList aSEL = new ServiceEndpointList ();
             final EndpointType aEndpoint = new EndpointType ();
-            aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/" +
-                                                                                                eTP.getID ()));
+            aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/" + eTP.getID ()));
             aEndpoint.setRequireBusinessLevelSignature (false);
             aEndpoint.setCertificate ("blacert");
             aEndpoint.setServiceDescription ("Unit test service");

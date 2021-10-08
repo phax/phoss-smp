@@ -87,7 +87,16 @@ public class AuditorJDBC extends AbstractJDBCEnabledManager implements IAuditor
     final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType.getName () : sAction,
                                                                       aArgs);
 
-    final DBExecutor aExecutor = newExecutor ();
+    final DBExecutor aExecutor;
+    try
+    {
+      aExecutor = newExecutor ();
+    }
+    catch (final IllegalStateException ex)
+    {
+      // Happens e.g. on shutdown
+      return;
+    }
     final ESuccess eDBSuccess = aExecutor.performInTransaction ( () -> {
       // Create new
       final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_audit (dt, userid, actiontype, success, action)" +

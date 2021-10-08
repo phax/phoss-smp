@@ -48,7 +48,6 @@ import com.helger.phoss.smp.settings.SMPSettings;
 
 public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implements ISMPSettingsManager
 {
-  private static final String LATEST_ID = "latest-id";
   private static final String SMP_REST_WRITABLE_API_DISABLED = "smp-rest-writable-api-disabled";
   private static final String DIRECTORY_INTEGRATION_REQUIRED = "directory-required";
   private static final String DIRECTORY_INTEGRATION_ENABLED = "directory-enabled";
@@ -79,8 +78,28 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     return m_aCallbacks;
   }
 
+  static void setSettingsValue (@Nonnull final DBExecutor aExecutor, @Nonnull @Nonempty final String sKey, @Nullable final String sValue)
+  {
+    ValueEnforcer.notNull (aExecutor, "Executor");
+    ValueEnforcer.notEmpty (sKey, "Key");
+
+    // update
+    final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_settings SET value=? WHERE id=?",
+                                                            new ConstantPreparedStatementDataProvider (getTrimmedToLength (sValue, 500),
+                                                                                                       getTrimmedToLength (sKey, 45)));
+    if (nUpdated == 0)
+    {
+      // Create
+      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_settings (id, value) VALUES (?, ?)",
+                                                              new ConstantPreparedStatementDataProvider (getTrimmedToLength (sKey, 45),
+                                                                                                         getTrimmedToLength (sValue, 500)));
+      if (nCreated != 1)
+        throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
+    }
+  }
+
   @Nonnull
-  public ESuccess setValues (@Nonnull @Nonempty final Map <String, String> aEntries)
+  public ESuccess setSettingsValues (@Nonnull @Nonempty final Map <String, String> aEntries)
   {
     ValueEnforcer.notEmpty (aEntries, "Entries");
 
@@ -91,27 +110,14 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
         final String sKey = aEntry.getKey ();
         final String sValue = aEntry.getValue ();
 
-        // update
-        final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_settings SET value=? WHERE id=?",
-                                                                new ConstantPreparedStatementDataProvider (getTrimmedToLength (sValue, 500),
-                                                                                                           getTrimmedToLength (sKey, 45)));
-        if (nUpdated == 0)
-        {
-          // Create
-          final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_settings (id, value) VALUES (?, ?)",
-                                                                  new ConstantPreparedStatementDataProvider (getTrimmedToLength (sKey, 45),
-                                                                                                             getTrimmedToLength (sValue,
-                                                                                                                                 500)));
-          if (nCreated != 1)
-            throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
-        }
+        setSettingsValue (aExecutor, sKey, sValue);
       }
     });
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsMap <String, String> getAllValues ()
+  public ICommonsMap <String, String> getAllSettingsValues ()
   {
     final ICommonsMap <String, String> ret = new CommonsHashMap <> ();
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, value FROM smp_settings");
@@ -122,15 +128,13 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   }
 
   @Nullable
-  public String getValue (@Nullable final String sKey)
+  public static String getSettingsValue (@Nonnull final DBExecutor aExecutor, @Nullable final String sKey)
   {
     if (StringHelper.hasNoText (sKey))
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    newExecutor ().querySingle ("SELECT value FROM smp_settings WHERE id=?",
-                                new ConstantPreparedStatementDataProvider (sKey),
-                                aDBResult::set);
+    aExecutor.querySingle ("SELECT value FROM smp_settings WHERE id=?", new ConstantPreparedStatementDataProvider (sKey), aDBResult::set);
     if (aDBResult.isNotSet ())
       return null;
 
@@ -138,15 +142,18 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   }
 
   @Nullable
-  public String getLatestID ()
+  public String getSettingsValue (@Nullable final String sKey)
   {
-    return getValue (LATEST_ID);
+    if (StringHelper.hasNoText (sKey))
+      return null;
+
+    return getSettingsValue (newExecutor (), sKey);
   }
 
   @Nonnull
   public ISMPSettings getSettings ()
   {
-    final ICommonsMap <String, String> aValues = getAllValues ();
+    final ICommonsMap <String, String> aValues = getAllSettingsValues ();
     final SMPSettings ret = new SMPSettings (false);
     ret.setRESTWritableAPIDisabled (StringParser.parseBool (aValues.get (SMP_REST_WRITABLE_API_DISABLED),
                                                             SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED));
@@ -182,7 +189,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     aMap.putIn (SML_ENABLED, bSMLEnabled);
     aMap.putIn (SML_REQUIRED, bSMLRequired);
     aMap.putIn (SML_INFO_ID, sSMLInfoID);
-    if (setValues (aMap).isFailure ())
+    if (setSettingsValues (aMap).isFailure ())
       return EChange.UNCHANGED;
     return EChange.CHANGED;
   }

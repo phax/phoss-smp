@@ -42,7 +42,7 @@ public class SMPWebAppListenerMongoDB extends SMPWebAppListener
   protected void initGlobalIDFactory ()
   {
     // Check if an old value is present
-    long nInitialCount;
+    final long nInitialCount;
     final File aOldFile = WebFileIO.getDataIO ().getFile (ID_FILENAME);
     if (aOldFile.exists ())
     {
@@ -53,7 +53,7 @@ public class SMPWebAppListenerMongoDB extends SMPWebAppListener
     else
       nInitialCount = 0;
 
-    // Set persistent ID provider: Mongo based based
+    // Set persistent ID provider: MongoDB based
     GlobalIDFactory.setPersistentLongIDFactory (new IDFactoryMongoDB (nInitialCount));
     GlobalIDFactory.setPersistentIntIDFactory ( () -> (int) GlobalIDFactory.getNewPersistentLongID ());
   }

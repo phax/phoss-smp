@@ -57,8 +57,7 @@ public final class MainCreateManyServiceGroups
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
-                                                 @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
@@ -77,7 +76,7 @@ public final class MainCreateManyServiceGroups
       final ObjectFactory aObjFactory = new ObjectFactory ();
       final StopWatch aSWOverall = StopWatch.createdStarted ();
       final int nStart = 0;
-      final int nCount = 100;
+      final int nCount = 1000;
 
       final ExecutorService es = Executors.newFixedThreadPool (2);
 
@@ -111,8 +110,7 @@ public final class MainCreateManyServiceGroups
                                                        .target (sServerBasePath)
                                                        .path (sPI)
                                                        .request ()
-                                                       .header (CHttpHeader.AUTHORIZATION,
-                                                                CREDENTIALS.getRequestValue ())
+                                                       .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
                                                        .put (Entity.xml (aObjFactory.createServiceGroup (aSG)));
             _testResponseJerseyClient (aResponseMsg, 200);
           }
