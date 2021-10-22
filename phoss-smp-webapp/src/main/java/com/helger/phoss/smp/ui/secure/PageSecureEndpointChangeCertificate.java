@@ -52,6 +52,7 @@ import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCCode;
+import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -239,8 +240,12 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     {
       final int nDisplayLen = 20;
       final String sCertPart = (sCert.length () > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert);
-      return new HCDiv ().addChild ("Invalid certificate" + (sCert.length () > nDisplayLen ? " starting with: " : ": "))
-                         .addChild (new HCCode ().addChild (sCertPart));
+      final HCDiv ret = new HCDiv ().addChild ("Invalid certificate").addChild (sCert.length () > nDisplayLen ? " starting with: " : ": ");
+      if (sCertPart.length () > 0)
+        ret.addChild (new HCCode ().addChild (sCertPart));
+      else
+        ret.addChild (new HCEM ().addChild ("empty"));
+      return ret;
     }
 
     final HCNodeList ret = new HCNodeList ();
