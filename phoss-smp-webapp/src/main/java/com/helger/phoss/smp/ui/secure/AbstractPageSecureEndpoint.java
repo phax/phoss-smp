@@ -501,35 +501,36 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-    final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID () : aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
+    final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
+                                         : aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
 
     final String sDocTypeIDScheme = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getScheme ()
-                                          : aWPEC.params ().getAsString (FIELD_DOCTYPE_ID_SCHEME);
+                                          : aWPEC.params ().getAsStringTrimmed (FIELD_DOCTYPE_ID_SCHEME);
     final String sDocTypeIDValue = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getValue ()
-                                         : aWPEC.params ().getAsString (FIELD_DOCTYPE_ID_VALUE);
+                                         : aWPEC.params ().getAsStringTrimmed (FIELD_DOCTYPE_ID_VALUE);
     IDocumentTypeIdentifier aDocTypeID = null;
     final String sProcessIDScheme = bEdit ? aSelectedProcess.getProcessIdentifier ().getScheme ()
-                                          : aWPEC.params ().getAsString (FIELD_PROCESS_ID_SCHEME);
+                                          : aWPEC.params ().getAsStringTrimmed (FIELD_PROCESS_ID_SCHEME);
     final String sProcessIDValue = bEdit ? aSelectedProcess.getProcessIdentifier ().getValue ()
-                                         : aWPEC.params ().getAsString (FIELD_PROCESS_ID_VALUE);
+                                         : aWPEC.params ().getAsStringTrimmed (FIELD_PROCESS_ID_VALUE);
     IProcessIdentifier aProcessID = null;
 
     final String sTransportProfileID = bEdit ? aSelectedEndpoint.getTransportProfile ()
-                                             : aWPEC.params ().getAsString (FIELD_TRANSPORT_PROFILE);
+                                             : aWPEC.params ().getAsStringTrimmed (FIELD_TRANSPORT_PROFILE);
     final ISMPTransportProfile aTransportProfile = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfileID);
-    final String sEndpointReference = aWPEC.params ().getAsString (FIELD_ENDPOINT_REFERENCE);
+    final String sEndpointReference = aWPEC.params ().getAsStringTrimmed (FIELD_ENDPOINT_REFERENCE);
     final boolean bRequireBusinessLevelSignature = aWPEC.params ().getAsBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
-    final String sMinimumAuthenticationLevel = aWPEC.params ().getAsString (FIELD_MINIMUM_AUTHENTICATION_LEVEL);
-    final String sNotBefore = aWPEC.params ().getAsString (FIELD_NOT_BEFORE);
+    final String sMinimumAuthenticationLevel = aWPEC.params ().getAsStringTrimmed (FIELD_MINIMUM_AUTHENTICATION_LEVEL);
+    final String sNotBefore = aWPEC.params ().getAsStringTrimmed (FIELD_NOT_BEFORE);
     final LocalDate aNotBeforeDate = PDTFromString.getLocalDateFromString (sNotBefore, aDisplayLocale);
-    final String sNotAfter = aWPEC.params ().getAsString (FIELD_NOT_AFTER);
+    final String sNotAfter = aWPEC.params ().getAsStringTrimmed (FIELD_NOT_AFTER);
     final LocalDate aNotAfterDate = PDTFromString.getLocalDateFromString (sNotAfter, aDisplayLocale);
-    final String sCertificate = aWPEC.params ().getAsString (FIELD_CERTIFICATE);
-    final String sServiceDescription = aWPEC.params ().getAsString (FIELD_SERVICE_DESCRIPTION);
-    final String sTechnicalContact = aWPEC.params ().getAsString (FIELD_TECHNICAL_CONTACT);
-    final String sTechnicalInformation = aWPEC.params ().getAsString (FIELD_TECHNICAL_INFORMATION);
-    final String sExtension = aWPEC.params ().getAsString (FIELD_EXTENSION);
+    final String sCertificate = aWPEC.params ().getAsStringTrimmed (FIELD_CERTIFICATE);
+    final String sServiceDescription = aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_DESCRIPTION);
+    final String sTechnicalContact = aWPEC.params ().getAsStringTrimmed (FIELD_TECHNICAL_CONTACT);
+    final String sTechnicalInformation = aWPEC.params ().getAsStringTrimmed (FIELD_TECHNICAL_INFORMATION);
+    final String sExtension = aWPEC.params ().getAsStringTrimmed (FIELD_EXTENSION);
 
     // validations
     if (StringHelper.hasNoText (sServiceGroupID))
