@@ -178,7 +178,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
         final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, null);
         if (aBC == null)
         {
-          LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData));
+          LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
         }
         else
         {
