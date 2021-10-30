@@ -124,7 +124,7 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>8.6.3</version>
+        <version>8.6.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -149,17 +149,17 @@
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.26</version>
+        <version>8.0.27</version>
       </dependency>
       <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
-        <version>4.3.2</version>
+        <version>4.3.3</version>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.2.24</version>
+        <version>42.3.0</version>
       </dependency>
       <dependency>
         <groupId>net.jodah</groupId>
@@ -169,7 +169,7 @@
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
-        <version>8.0.0</version>
+        <version>8.0.2</version>
       </dependency>
 
       <dependency>
