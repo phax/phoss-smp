@@ -22,10 +22,10 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>1.11.3</version>
+    <version>1.11.4</version>
   </parent>
   <artifactId>phoss-smp-parent-pom</artifactId>
-  <version>5.4.0</version>
+  <version>5.4.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>phoss-smp-parent-pom</name>
   <description>Base POM to build the phoss SMP projects</description>
@@ -49,7 +49,7 @@
     <connection>scm:git:git@github.com:phax/phoss-smp.git</connection>
     <developerConnection>scm:git:git@github.com:phax/phoss-smp.git</developerConnection>
     <url>http://github.com/phax/phoss-smp</url>
-    <tag>phoss-smp-parent-pom-5.4.0</tag>
+    <tag>5.4</tag>
   </scm>
 
   <organization>
@@ -75,7 +75,7 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>10.1.2</version>
+        <version>10.1.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -89,7 +89,7 @@
       <dependency>
         <groupId>com.helger.masterdata</groupId>
         <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>6.2.0</version>
+        <version>6.2.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -124,7 +124,7 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>8.6.2</version>
+        <version>8.6.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -149,17 +149,17 @@
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.26</version>
+        <version>8.0.27</version>
       </dependency>
       <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
-        <version>4.3.2</version>
+        <version>4.3.3</version>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.2.23</version>
+        <version>42.3.0</version>
       </dependency>
       <dependency>
         <groupId>net.jodah</groupId>
@@ -169,7 +169,7 @@
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
-        <version>7.15.0</version>
+        <version>8.0.2</version>
       </dependency>
 
       <dependency>
