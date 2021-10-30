@@ -25,6 +25,7 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
  * Mock implementation of {@link ISMPParticipantMigrationManager}.
  *
  * @author Philip Helger
+ * @since 5.4.0
  */
 final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrationManager
 {

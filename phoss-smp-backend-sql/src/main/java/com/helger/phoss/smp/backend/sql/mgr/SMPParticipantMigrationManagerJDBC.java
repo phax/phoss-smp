@@ -43,6 +43,12 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
 import com.helger.photon.audit.AuditHelper;
 
+/**
+ * Implementation of {@link ISMPParticipantMigrationManager} for JDBC
+ *
+ * @author Philip Helger
+ * @since 5.4.0
+ */
 public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManager implements ISMPParticipantMigrationManager
 {
   /**
