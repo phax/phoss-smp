@@ -287,7 +287,7 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     // Create user
     final User aUser = new User (sLoginName,
                                  sEmailAddress,
-                                 GlobalPasswordSettings.createUserDefaultPasswordHash (new PasswordSalt (), sPlainTextPassword),
+                                 GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (), sPlainTextPassword),
                                  sFirstName,
                                  sLastName,
                                  sDescription,
@@ -323,7 +323,7 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
     final User aUser = User.createdPredefinedUser (sID,
                                                    sLoginName,
                                                    sEmailAddress,
-                                                   GlobalPasswordSettings.createUserDefaultPasswordHash (new PasswordSalt (),
+                                                   GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
                                                                                                          sPlainTextPassword),
                                                    sFirstName,
                                                    sLastName,
@@ -607,7 +607,8 @@ public class UserManagerJDBC extends AbstractJDBCEnabledSecurityManager implemen
       return EChange.UNCHANGED;
 
     // Create a new password salt upon password change
-    final PasswordHash aPasswordHash = GlobalPasswordSettings.createUserDefaultPasswordHash (new PasswordSalt (), sNewPlainTextPassword);
+    final PasswordHash aPasswordHash = GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
+                                                                                             sNewPlainTextPassword);
 
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
