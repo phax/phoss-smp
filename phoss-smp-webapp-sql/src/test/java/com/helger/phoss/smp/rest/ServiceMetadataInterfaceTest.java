@@ -480,11 +480,20 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
 
       try
       {
+        aSMPClient.deleteServiceGroup (aPI_LC, CREDENTIALS);
+      }
+      catch (final SMPClientNotFoundException ex)
+      {
+        // Expected
+      }
+
+      try
+      {
         assertNull (aSMPClient.getServiceGroupOrNull (aPI_LC));
       }
       catch (final SMPClientException ex)
       {
-        // Seems like MySQL is not running
+        // Seems like DB server is not running
         return;
       }
       assertNull (aSMPClient.getServiceGroupOrNull (aPI_UC));
