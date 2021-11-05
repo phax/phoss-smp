@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.rest2;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -115,7 +116,7 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
       LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
     else
     {
-      final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, null);
+      final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, (Charset) null);
       if (aBC == null)
       {
         LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
