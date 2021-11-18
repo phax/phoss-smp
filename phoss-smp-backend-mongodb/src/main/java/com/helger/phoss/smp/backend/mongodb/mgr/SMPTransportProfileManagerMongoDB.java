@@ -106,7 +106,7 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     return EChange.CHANGED;
   }
 
-  @Nullable
+  @Nonnull
   public EChange deleteSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
   {
     if (StringHelper.hasNoText (sSMPTransportProfileID))

@@ -10,8 +10,6 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import java.io.Serializable;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,7 +33,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
  *
  * @author Philip Helger
  */
-public interface ISMPServiceInformation extends Serializable, ISMPHasExtension, IHasID <String>
+public interface ISMPServiceInformation extends ISMPHasExtension, IHasID <String>
 {
   /**
    * @return The service group to which this service information belongs. Never

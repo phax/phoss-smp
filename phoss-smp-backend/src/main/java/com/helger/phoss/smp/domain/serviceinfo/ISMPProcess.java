@@ -10,8 +10,6 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import java.io.Serializable;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,7 +30,7 @@ import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
  *
  * @author Philip Helger
  */
-public interface ISMPProcess extends Serializable, ISMPHasExtension
+public interface ISMPProcess extends ISMPHasExtension
 {
   /**
    * @return The process identifier of this process. Never <code>null</code>.

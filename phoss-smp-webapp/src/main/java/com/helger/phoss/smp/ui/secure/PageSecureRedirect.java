@@ -93,7 +93,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       @Override
       protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nonnull final BootstrapForm aForm,
-                                @Nonnull final ISMPRedirect aSelectedObject)
+                                @Nullable final ISMPRedirect aSelectedObject)
       {
         aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
                                            aSelectedObject.getServiceGroup ().getParticipantIdentifier ().getURIEncoded ()));
@@ -107,7 +107,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPRedirect aSelectedObject)
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPRedirect aSelectedObject)
       {
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         if (aRedirectMgr.deleteSMPRedirect (aSelectedObject).isChanged ())

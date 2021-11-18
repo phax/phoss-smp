@@ -143,20 +143,20 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
   private static final String PARAM_ENTITY_ID = "entityid";
 
-  private static final AjaxFunctionDeclaration s_aAjaxCreateEntity;
-  private static final AjaxFunctionDeclaration s_aAjaxCreateContact;
-  private static final AjaxFunctionDeclaration s_aAjaxCreateIdentifier;
+  private static final AjaxFunctionDeclaration AJAX_CREATE_ENTITY;
+  private static final AjaxFunctionDeclaration AJAX_CREATE_CONTACT;
+  private static final AjaxFunctionDeclaration AJAX_CREATE_IDENTIFIER;
 
   static
   {
-    s_aAjaxCreateEntity = addAjax ( (aRequestScope, aAjaxResponse) -> {
+    AJAX_CREATE_ENTITY = addAjax ( (aRequestScope, aAjaxResponse) -> {
       final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
       final IHCNode aNode = _createEntityInputForm (aLEC, (SMPBusinessCardEntity) null, (String) null, new FormErrorList (), false);
 
       // Build the HTML response
       aAjaxResponse.html (aNode);
     });
-    s_aAjaxCreateContact = addAjax ( (aRequestScope, aAjaxResponse) -> {
+    AJAX_CREATE_CONTACT = addAjax ( (aRequestScope, aAjaxResponse) -> {
       final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
       final String sEntityID = aRequestScope.params ().getAsString (PARAM_ENTITY_ID);
 
@@ -165,7 +165,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       // Build the HTML response
       aAjaxResponse.html (aNode);
     });
-    s_aAjaxCreateIdentifier = addAjax ( (aRequestScope, aAjaxResponse) -> {
+    AJAX_CREATE_IDENTIFIER = addAjax ( (aRequestScope, aAjaxResponse) -> {
       final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
       final String sEntityID = aRequestScope.params ().getAsString (PARAM_ENTITY_ID);
 
@@ -188,7 +188,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       @Override
       protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nonnull final BootstrapForm aForm,
-                                @Nonnull final ISMPBusinessCard aSelectedObject)
+                                @Nullable final ISMPBusinessCard aSelectedObject)
       {
         aForm.addChild (question ("Are you sure you want to delete the Business Card for service group '" +
                                   aSelectedObject.getID () +
@@ -196,7 +196,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPBusinessCard aSelectedObject)
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPBusinessCard aSelectedObject)
       {
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
         if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
@@ -849,7 +849,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (s_aAjaxCreateIdentifier.getInvocationURL (aRequestScope).add (PARAM_ENTITY_ID, sEntityID))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (AJAX_CREATE_IDENTIFIER.getInvocationURL (aRequestScope).add (PARAM_ENTITY_ID, sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());
@@ -906,7 +906,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (s_aAjaxCreateContact.getInvocationURL (aRequestScope).add (PARAM_ENTITY_ID, sEntityID))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (AJAX_CREATE_CONTACT.getInvocationURL (aRequestScope).add (PARAM_ENTITY_ID, sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());
@@ -997,7 +997,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aJSAppend.body ().add (JQuery.idRef (aEntityContainer).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
       final JSPackage aOnAdd = new JSPackage ();
-      aOnAdd.add (new JQueryAjaxBuilder ().url (s_aAjaxCreateEntity.getInvocationURL (aRequestScope))
+      aOnAdd.add (new JQueryAjaxBuilder ().url (AJAX_CREATE_ENTITY.getInvocationURL (aRequestScope))
                                           .data (new JSAssocArray ())
                                           .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                           .build ());

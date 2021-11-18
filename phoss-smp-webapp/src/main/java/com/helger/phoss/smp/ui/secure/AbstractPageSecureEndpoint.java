@@ -132,7 +132,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       @Override
       protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nonnull final BootstrapForm aForm,
-                                @Nonnull final ISMPServiceInformation aSelectedObject)
+                                @Nullable final ISMPServiceInformation aSelectedObject)
       {
         final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
         final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
@@ -153,7 +153,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPServiceInformation aSelectedObject)
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPServiceInformation aSelectedObject)
       {
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 

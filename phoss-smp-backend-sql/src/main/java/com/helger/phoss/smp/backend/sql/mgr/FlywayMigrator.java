@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationInfo;
@@ -56,9 +57,13 @@ final class FlywayMigrator
   private static final Logger LOGGER = LoggerFactory.getLogger (FlywayMigrator.Singleton.class);
 
   // Indirection level to not load org.flyway classes by default
+  @Immutable
   public static final class Singleton
   {
     static final FlywayMigrator INSTANCE = new FlywayMigrator ();
+
+    private Singleton ()
+    {}
   }
 
   private FlywayMigrator ()

@@ -326,6 +326,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
       }
     }
     catch (final Exception ex)
-    {}
+    {
+      LOGGER.error ("Failed to reload from configuration", ex);
+    }
   }
 }

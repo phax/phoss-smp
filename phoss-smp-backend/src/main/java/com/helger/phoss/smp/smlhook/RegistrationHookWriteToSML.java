@@ -49,9 +49,6 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
   // SMP ID is static and cannot change
   private static final String SMP_ID = SMPServerConfiguration.getSMLSMPID ();
 
-  static
-  {}
-
   public RegistrationHookWriteToSML ()
   {}
 

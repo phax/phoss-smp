@@ -261,13 +261,13 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
       // Exception handler is handled internally
       aAPI.getInvoker ().invoke (aInvokableDescriptor, aRequestScope, aUnifiedResponse);
     }
-    catch (final Exception ex)
+    catch (final IOException | ServletException ex)
     {
       // Re-throw
-      if (ex instanceof IOException)
-        throw (IOException) ex;
-      if (ex instanceof ServletException)
-        throw (ServletException) ex;
+      throw ex;
+    }
+    catch (final Exception ex)
+    {
       throw new ServletException (ex);
     }
 

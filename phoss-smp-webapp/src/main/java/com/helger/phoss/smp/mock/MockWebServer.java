@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.mock;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import com.helger.photon.jetty.JettyRunner;
 
@@ -26,11 +27,15 @@ import com.helger.photon.jetty.JettyRunner;
  *
  * @author Philip Helger
  */
+@Immutable
 final class MockWebServer
 {
   public static final String CONTEXT_PATH = "/unittest";
   public static final int PORT = 9090;
   public static final int STOP_PORT = PORT - 1;
+
+  private MockWebServer ()
+  {}
 
   /**
    * Starts HTTP server exposing JAX-RS resources defined in this application.

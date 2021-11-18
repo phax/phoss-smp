@@ -101,7 +101,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                         @Override
                         protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
                                                   @Nonnull final BootstrapForm aForm,
-                                                  @Nonnull final ISMPParticipantMigration aSelectedObject)
+                                                  @Nullable final ISMPParticipantMigration aSelectedObject)
                         {
                           aForm.addChild (question ("Are you sure you want to cancel the outbound Participant Migration for '" +
                                                     aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
@@ -110,7 +110,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 
                         @Override
                         protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                      @Nonnull final ISMPParticipantMigration aSelectedObject)
+                                                      @Nullable final ISMPParticipantMigration aSelectedObject)
                         {
                           final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
                           if (aParticipantMigrationMgr.setParticipantMigrationState (aSelectedObject.getID (),
@@ -137,7 +137,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                         @Override
                         protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
                                                   @Nonnull final BootstrapForm aForm,
-                                                  @Nonnull final ISMPParticipantMigration aSelectedObject)
+                                                  @Nullable final ISMPParticipantMigration aSelectedObject)
                         {
                           aForm.addChild (question ("Are you sure you want to fianlize the outbound Participant Migration for '" +
                                                     aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
@@ -146,7 +146,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 
                         @Override
                         protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                      @Nonnull final ISMPParticipantMigration aSelectedObject)
+                                                      @Nullable final ISMPParticipantMigration aSelectedObject)
                         {
                           final HCNodeList aNL = new HCNodeList ();
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
