@@ -39,9 +39,11 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.wrapper.Wrapper;
+import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
+import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -177,9 +179,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                        aEndpoint.getEndpointReference (),
                                                                                        aEndpoint.getMinimumAuthenticationLevel (),
                                                                                        Boolean.valueOf (aEndpoint.isRequireBusinessLevelSignature ()),
-                                                                                       toTimestamp (aEndpoint.getServiceActivationDateTime ()),
+                                                                                       DBValueHelper.toTimestamp (aEndpoint.getServiceActivationDateTime ()),
                                                                                        aEndpoint.getServiceDescription (),
-                                                                                       toTimestamp (aEndpoint.getServiceExpirationDateTime ()),
+                                                                                       DBValueHelper.toTimestamp (aEndpoint.getServiceExpirationDateTime ()),
                                                                                        aEndpoint.getTechnicalContactUrl (),
                                                                                        aEndpoint.getTechnicalInformationUrl (),
                                                                                        aEndpoint.getTransportProfile (),

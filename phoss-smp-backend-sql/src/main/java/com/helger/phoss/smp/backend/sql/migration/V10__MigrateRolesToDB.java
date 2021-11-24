@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
-import com.helger.phoss.smp.backend.sql.security.RoleManagerJDBC;
 import com.helger.photon.app.io.WebFileIO;
+import com.helger.photon.jdbc.security.RoleManagerJDBC;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRole;
 import com.helger.photon.security.role.Role;
@@ -59,7 +59,7 @@ public final class V10__MigrateRolesToDB extends BaseJavaMigration
         final ICommonsList <IRole> aRoles = aMgrXML.getAll ();
         if (aRoles.isNotEmpty ())
         {
-          final RoleManagerJDBC aMgrNew = new RoleManagerJDBC (SMPDBExecutor::new);
+          final RoleManagerJDBC aMgrNew = new RoleManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
           for (final IRole aRole : aRoles)
           {
             // Don't run the callback here

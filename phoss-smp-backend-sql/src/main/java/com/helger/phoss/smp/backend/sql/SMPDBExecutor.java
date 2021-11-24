@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
+import java.util.function.Function;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,7 @@ import com.helger.settings.exchange.configfile.ConfigFile;
  */
 public final class SMPDBExecutor extends DBExecutor
 {
+  public static final Function <String, String> TABLE_NAME_CUSTOMIZER = x -> "smp_" + x;
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPDBExecutor.class);
 
   public SMPDBExecutor ()

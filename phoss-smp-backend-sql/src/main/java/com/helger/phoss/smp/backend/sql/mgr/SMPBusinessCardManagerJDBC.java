@@ -42,6 +42,7 @@ import com.helger.commons.state.ESuccess;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
+import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.json.IJson;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;

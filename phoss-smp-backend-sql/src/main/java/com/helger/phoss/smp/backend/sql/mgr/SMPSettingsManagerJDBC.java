@@ -37,9 +37,11 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.StringParser;
 import com.helger.commons.wrapper.Wrapper;
+import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
+import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsCallback;
@@ -85,14 +87,18 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
 
     // update
     final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_settings SET value=? WHERE id=?",
-                                                            new ConstantPreparedStatementDataProvider (getTrimmedToLength (sValue, 500),
-                                                                                                       getTrimmedToLength (sKey, 45)));
+                                                            new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sValue,
+                                                                                                                                         500),
+                                                                                                       DBValueHelper.getTrimmedToLength (sKey,
+                                                                                                                                         45)));
     if (nUpdated == 0)
     {
       // Create
       final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_settings (id, value) VALUES (?, ?)",
-                                                              new ConstantPreparedStatementDataProvider (getTrimmedToLength (sKey, 45),
-                                                                                                         getTrimmedToLength (sValue, 500)));
+                                                              new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sKey,
+                                                                                                                                           45),
+                                                                                                         DBValueHelper.getTrimmedToLength (sValue,
+                                                                                                                                           500)));
       if (nCreated != 1)
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
     }

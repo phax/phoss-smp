@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
-import com.helger.phoss.smp.backend.sql.security.UserManagerJDBC;
 import com.helger.photon.app.io.WebFileIO;
+import com.helger.photon.jdbc.security.UserManagerJDBC;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.User;
@@ -60,7 +60,7 @@ public final class V11__MigrateUsersToDB extends BaseJavaMigration
 
         if (aUsers.isNotEmpty ())
         {
-          final UserManagerJDBC aMgrNew = new UserManagerJDBC (SMPDBExecutor::new);
+          final UserManagerJDBC aMgrNew = new UserManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
           for (final IUser aUser : aUsers)
           {
             // Don't run the callback here

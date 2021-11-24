@@ -31,9 +31,11 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.wrapper.Wrapper;
+import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
+import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
@@ -69,8 +71,8 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Create new
       final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_tprofile (id, name, deprecated) VALUES (?, ?, ?)",
-                                                              new ConstantPreparedStatementDataProvider (getTrimmedToLength (ret.getID (),
-                                                                                                                             45),
+                                                              new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (ret.getID (),
+                                                                                                                                           45),
                                                                                                          ret.getName (),
                                                                                                          Boolean.valueOf (ret.isDeprecated ())));
       if (nCreated != 1)

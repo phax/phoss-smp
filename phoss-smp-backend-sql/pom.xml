@@ -66,6 +66,10 @@
       <groupId>com.helger.photon</groupId>
       <artifactId>ph-oton-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.helger.photon</groupId>
+      <artifactId>ph-oton-jdbc</artifactId>
+    </dependency>
         
     <dependency>
       <groupId>net.jodah</groupId>

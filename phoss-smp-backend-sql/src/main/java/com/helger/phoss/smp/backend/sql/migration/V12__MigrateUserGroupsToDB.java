@@ -27,10 +27,10 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
-import com.helger.phoss.smp.backend.sql.security.RoleManagerJDBC;
-import com.helger.phoss.smp.backend.sql.security.UserGroupManagerJDBC;
-import com.helger.phoss.smp.backend.sql.security.UserManagerJDBC;
 import com.helger.photon.app.io.WebFileIO;
+import com.helger.photon.jdbc.security.RoleManagerJDBC;
+import com.helger.photon.jdbc.security.UserGroupManagerJDBC;
+import com.helger.photon.jdbc.security.UserManagerJDBC;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRoleManager;
 import com.helger.photon.security.user.IUserManager;
@@ -60,15 +60,18 @@ public final class V12__MigrateUserGroupsToDB extends BaseJavaMigration
       final File aFile = WebFileIO.getDataIO ().getFile (sFilename);
       if (aFile.exists ())
       {
-        final IUserManager aUserMgr = new UserManagerJDBC (SMPDBExecutor::new);
-        final IRoleManager aRoleMgr = new RoleManagerJDBC (SMPDBExecutor::new);
+        final IUserManager aUserMgr = new UserManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
+        final IRoleManager aRoleMgr = new RoleManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
         final UserGroupManager aMgrXML = new UserGroupManager (sFilename, aUserMgr, aRoleMgr);
         final ICommonsList <IUserGroup> aUserGroups = aMgrXML.getAll ();
 
         if (aUserGroups.isNotEmpty ())
         {
-          final UserGroupManagerJDBC aMgrNew = new UserGroupManagerJDBC (SMPDBExecutor::new, aUserMgr, aRoleMgr);
+          final UserGroupManagerJDBC aMgrNew = new UserGroupManagerJDBC (SMPDBExecutor::new,
+                                                                         SMPDBExecutor.TABLE_NAME_CUSTOMIZER,
+                                                                         aUserMgr,
+                                                                         aRoleMgr);
           for (final IUserGroup aUserGroup : aUserGroups)
           {
             // Don't run the callback here

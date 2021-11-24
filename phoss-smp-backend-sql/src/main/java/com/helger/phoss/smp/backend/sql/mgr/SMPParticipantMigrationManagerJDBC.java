@@ -31,9 +31,11 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.wrapper.Wrapper;
+import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
+import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
@@ -80,7 +82,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
                                                                                                                                  .getID (),
                                                                                                          aSMPParticipantMigration.getParticipantIdentifier ()
                                                                                                                                  .getURIEncoded (),
-                                                                                                         toTimestamp (aSMPParticipantMigration.getInitiationDateTime ()),
+                                                                                                         DBValueHelper.toTimestamp (aSMPParticipantMigration.getInitiationDateTime ()),
                                                                                                          aSMPParticipantMigration.getMigrationKey ()));
       if (nCreated != 1)
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
