@@ -75,7 +75,7 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>10.1.4</version>
+        <version>10.1.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -96,28 +96,28 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css-parent-pom</artifactId>
-        <version>6.3.4</version>
+        <version>6.4.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-db-parent-pom</artifactId>
-        <version>6.7.2</version>
+        <version>6.7.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>9.6.1</version>
+        <version>9.6.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>8.3.1</version>
+        <version>8.3.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -131,7 +131,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.9.5</version>
+        <version>0.9.6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -159,7 +159,7 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.3.0</version>
+        <version>42.3.1</version>
       </dependency>
       <dependency>
         <groupId>net.jodah</groupId>
@@ -169,7 +169,7 @@
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
-        <version>8.0.2</version>
+        <version>7.15.0</version>
       </dependency>
 
       <dependency>
@@ -245,7 +245,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>6.3.4</version><!--$NO-MVN-MAN-VER$-->
+          <version>6.4.0</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>
