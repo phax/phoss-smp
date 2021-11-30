@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
-    <version>5.4.2</version>
+    <version>5.4.3-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-backend-sql</artifactId>
   <packaging>bundle</packaging>
