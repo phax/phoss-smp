@@ -43,5 +43,5 @@ rem --------------- MongoDB -----------------------
 
 docker build --pull --build-arg SMP_VERSION=%version% -t phoss-smp-release-binary-mongodb-%version% -f Dockerfile-release-binary-mongodb .
 docker tag phoss-smp-release-binary-mongodb-%version% phelger/phoss-smp-mongodb:%version%
-docker tag phoss-smp-release-binary-mongodb-$version phelger/phoss-smp-mongodb:latest
+docker tag phoss-smp-release-binary-mongodb-%version% phelger/phoss-smp-mongodb:latest
 
