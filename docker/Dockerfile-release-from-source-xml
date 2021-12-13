@@ -49,9 +49,4 @@ LABEL version=$SMP_VERSION
 # Use non-blocking random
 ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.security.egd=file:/dev/urandom"
 
-# Install vim
-RUN apt-get update \
-  && apt-get install -y vim \
-  && rm -rf /var/lib/apt/lists/*
-
 COPY --from=build /build/phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT

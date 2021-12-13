@@ -22,10 +22,10 @@ FROM tomcat:9-jdk11
 # Use non-blocking random
 ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.security.egd=file:/dev/urandom"
 
-# Install vim
+# Install wget and unzip
 RUN apt-get update \
   && apt-get upgrade -y \
-  && apt-get install -y vim wget unzip \
+  && apt-get install -y wget unzip \
   && rm -rf /var/lib/apt/lists/*
 
 # Set arguments and labels after initial cleanup was performed
