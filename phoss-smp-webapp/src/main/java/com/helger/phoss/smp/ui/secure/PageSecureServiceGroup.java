@@ -133,7 +133,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       @Override
       protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
                                 @Nonnull final BootstrapForm aForm,
-                                @Nonnull final ISMPServiceGroup aSelectedObject)
+                                @Nullable final ISMPServiceGroup aSelectedObject)
       {
         final BootstrapQuestionBox aQB = question (div ("Are you sure you want to delete the complete service group '" +
                                                         aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
@@ -147,7 +147,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPServiceGroup aSelectedObject)
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPServiceGroup aSelectedObject)
       {
         final HCNodeList aNL = new HCNodeList ();
         final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
