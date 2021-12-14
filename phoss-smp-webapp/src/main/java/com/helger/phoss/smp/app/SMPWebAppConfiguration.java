@@ -240,6 +240,26 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   /**
    * @return <code>true</code> to show the author in the public area,
    *         <code>false</code> to not show it.
+   * @since 5.5.0
+   */
+  public static boolean isPublicShowApplicationName ()
+  {
+    return getConfigFile ().getAsBoolean ("webapp.public.showappname", true);
+  }
+
+  /**
+   * @return <code>true</code> to show the author in the public area,
+   *         <code>false</code> to not show it.
+   * @since 5.5.0
+   */
+  public static boolean isPublicShowSource ()
+  {
+    return getConfigFile ().getAsBoolean ("webapp.public.showsource", true);
+  }
+
+  /**
+   * @return <code>true</code> to show the author in the public area,
+   *         <code>false</code> to not show it.
    * @since 5.2.6
    */
   public static boolean isPublicShowAuthor ()

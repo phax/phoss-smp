@@ -195,41 +195,51 @@ public final class SMPRendererPublic
   }
 
   /**
+   * @param bShowApplicationName
+   *        <code>true</code> to show the application name and version,
+   *        <code>false</code> to hide it.
+   * @param bShowSource
+   *        <code>true</code> to show the link to the source, <code>false</code>
+   *        to hide it.
    * @param bShowAuthor
    *        <code>true</code> to show the author, <code>false</code> to hide it.
-   * @return The footer to be used for /public and /secure
+   * @return The footer to be used for /public and /secure. Never
+   *         <code>null</code> but maybe empty.
    */
   @Nonnull
-  public static BootstrapContainer createDefaultFooter (final boolean bShowAuthor)
+  public static BootstrapContainer createDefaultFooter (final boolean bShowApplicationName,
+                                                        final boolean bShowSource,
+                                                        final boolean bShowAuthor)
   {
     final BootstrapContainer aContainer = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
-    aContainer.addChild (new HCP ().addChild (CSMP.getApplicationTitleAndVersion () +
-                                              " with " +
-                                              SMPServerConfiguration.getRESTType ().getDisplayName () +
-                                              " API"));
+
+    if (bShowApplicationName)
+    {
+      aContainer.addChild (new HCP ().addChild (CSMP.getApplicationTitleAndVersion () +
+                                                " with " +
+                                                SMPServerConfiguration.getRESTType ().getDisplayName () +
+                                                " API"));
+    }
 
     // By
     {
       final HCP aBy = new HCP ();
 
+      // Author
       if (bShowAuthor)
         aBy.addChild ("Created by ").addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"));
 
-      if (false)
+      // Source
+      if (bShowSource)
       {
-        // Twitter
         if (aBy.hasChildren ())
           aBy.addChild (" - ");
-        aBy.addChild (new HCA (new SimpleURL ("https://twitter.com/philiphelger")).setTargetBlank ().addChild ("@philiphelger"));
+        aBy.addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
+                                                                                   .addChild (CSMP.APPLICATION_TITLE + " on GitHub"));
       }
 
-      // Source
       if (aBy.hasChildren ())
-        aBy.addChild (" - ");
-      aBy.addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
-                                                                                 .addChild (CSMP.APPLICATION_TITLE + " on GitHub"));
-
-      aContainer.addChild (aBy);
+        aContainer.addChild (aBy);
     }
 
     // Imprint
@@ -293,24 +303,32 @@ public final class SMPRendererPublic
 
     // Footer
     {
-      final BootstrapContainer aDiv = createDefaultFooter (SMPWebAppConfiguration.isPublicShowAuthor ());
+      final BootstrapContainer aDiv = createDefaultFooter (SMPWebAppConfiguration.isPublicShowApplicationName (),
+                                                           SMPWebAppConfiguration.isPublicShowSource (),
+                                                           SMPWebAppConfiguration.isPublicShowAuthor ());
 
-      final BootstrapMenuItemRendererHorz aRenderer = new BootstrapMenuItemRendererHorz (aDisplayLocale);
-      final HCUL aUL = aDiv.addAndReturnChild (new HCUL ().addClass (CSS_CLASS_FOOTER_LINKS));
-      for (final IMenuObject aMenuObj : FOOTER_OBJECTS)
       {
-        if (aMenuObj instanceof IMenuSeparator)
-          aUL.addItem (aRenderer.renderSeparator (aLEC, (IMenuSeparator) aMenuObj));
-        else
-          if (aMenuObj instanceof IMenuItemPage)
-            aUL.addItem (aRenderer.renderMenuItemPage (aLEC, (IMenuItemPage) aMenuObj, false, false, false));
+        final BootstrapMenuItemRendererHorz aRenderer = new BootstrapMenuItemRendererHorz (aDisplayLocale);
+        final HCUL aUL = new HCUL ().addClass (CSS_CLASS_FOOTER_LINKS);
+        for (final IMenuObject aMenuObj : FOOTER_OBJECTS)
+        {
+          if (aMenuObj instanceof IMenuSeparator)
+            aUL.addItem (aRenderer.renderSeparator (aLEC, (IMenuSeparator) aMenuObj));
           else
-            if (aMenuObj instanceof IMenuItemExternal)
-              aUL.addItem (aRenderer.renderMenuItemExternal (aLEC, (IMenuItemExternal) aMenuObj, false, false, false));
+            if (aMenuObj instanceof IMenuItemPage)
+              aUL.addItem (aRenderer.renderMenuItemPage (aLEC, (IMenuItemPage) aMenuObj, false, false, false));
             else
-              throw new IllegalStateException ("Unsupported menu object type!");
+              if (aMenuObj instanceof IMenuItemExternal)
+                aUL.addItem (aRenderer.renderMenuItemExternal (aLEC, (IMenuItemExternal) aMenuObj, false, false, false));
+              else
+                throw new IllegalStateException ("Unsupported menu object type!");
+        }
+        if (aUL.hasChildren ())
+          aDiv.addChild (aUL);
       }
-      aOuterContainer.addChild (aDiv);
+
+      if (aDiv.hasChildren ())
+        aOuterContainer.addChild (aDiv);
     }
 
     return ret;

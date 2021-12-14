@@ -215,7 +215,7 @@ public final class SMPRendererSecure
       aCol2.addChild (BootstrapPageRenderer.getPageContent (aLEC));
     }
 
-    aOuterContainer.addChild (SMPRendererPublic.createDefaultFooter (true));
+    aOuterContainer.addChild (SMPRendererPublic.createDefaultFooter (true, true, true));
 
     return ret;
   }
