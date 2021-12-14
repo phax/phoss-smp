@@ -89,13 +89,13 @@ public final class SMPRendererPublic
 {
   private static final ICSSClassProvider CSS_CLASS_FOOTER_LINKS = DefaultCSSClassProvider.create ("footer-links");
 
-  private static final ICommonsList <IMenuObject> s_aFooterObjects = new CommonsArrayList <> ();
+  private static final ICommonsList <IMenuObject> FOOTER_OBJECTS = new CommonsArrayList <> ();
 
   static
   {
     PhotonGlobalState.state (CApplicationID.APP_ID_PUBLIC).getMenuTree ().iterateAllMenuObjects (aCurrentObject -> {
       if (aCurrentObject.attrs ().containsKey (CMenuPublic.FLAG_FOOTER))
-        s_aFooterObjects.add (aCurrentObject);
+        FOOTER_OBJECTS.add (aCurrentObject);
     });
   }
 
@@ -297,7 +297,7 @@ public final class SMPRendererPublic
 
       final BootstrapMenuItemRendererHorz aRenderer = new BootstrapMenuItemRendererHorz (aDisplayLocale);
       final HCUL aUL = aDiv.addAndReturnChild (new HCUL ().addClass (CSS_CLASS_FOOTER_LINKS));
-      for (final IMenuObject aMenuObj : s_aFooterObjects)
+      for (final IMenuObject aMenuObj : FOOTER_OBJECTS)
       {
         if (aMenuObj instanceof IMenuSeparator)
           aUL.addItem (aRenderer.renderSeparator (aLEC, (IMenuSeparator) aMenuObj));
