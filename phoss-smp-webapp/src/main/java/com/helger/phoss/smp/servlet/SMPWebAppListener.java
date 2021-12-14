@@ -320,6 +320,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
         // Business Card at PD
         SMPMetaManager.getServiceInformationMgr ().serviceInformationCallbacks ().add (new ISMPServiceInformationCallback ()
         {
+          @Override
           public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
           {
             final ISMPSettings aSettings = SMPMetaManager.getSettings ();
@@ -336,11 +337,13 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
             }
           }
 
+          @Override
           public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
           {
             onSMPServiceInformationCreated (aServiceInformation);
           }
 
+          @Override
           public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
           {
             onSMPServiceInformationCreated (aServiceInformation);

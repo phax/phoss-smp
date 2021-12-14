@@ -65,6 +65,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     m_eDBType = SMPDataSourceSingleton.getDatabaseType ();
   }
 
+  @Override
   public void beforeInitManagers ()
   {
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();

@@ -24,16 +24,19 @@ public class LoggingSMPRedirectCallback implements ISMPRedirectCallback
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (LoggingSMPRedirectCallback.class);
 
+  @Override
   public void onSMPRedirectCreated (@Nonnull final ISMPRedirect aRedirect)
   {
     LOGGER.info ("Successfully Created Redirect '" + aRedirect.getID () + "'");
   }
 
+  @Override
   public void onSMPRedirectUpdated (@Nonnull final ISMPRedirect aRedirect)
   {
     LOGGER.info ("Successfully Updated Redirect with ID '" + aRedirect.getID () + "'");
   }
 
+  @Override
   public void onSMPRedirectDeleted (@Nonnull final ISMPRedirect aRedirect)
   {
     LOGGER.info ("Successfully Deleted Redirect with ID '" + aRedirect.getID () + "'");

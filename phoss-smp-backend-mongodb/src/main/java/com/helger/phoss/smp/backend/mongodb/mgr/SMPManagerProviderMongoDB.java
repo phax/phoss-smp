@@ -41,6 +41,7 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
  */
 public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
 {
+  @Override
   public void beforeInitManagers ()
   {
     // Set the special PhotonSecurityManager factory

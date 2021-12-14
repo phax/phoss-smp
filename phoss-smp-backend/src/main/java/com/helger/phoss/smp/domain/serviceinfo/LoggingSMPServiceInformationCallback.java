@@ -24,6 +24,7 @@ public class LoggingSMPServiceInformationCallback implements ISMPServiceInformat
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (LoggingSMPServiceInformationCallback.class);
 
+  @Override
   public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
   {
     LOGGER.info ("Successfully Created ServiceInformation at '" +
@@ -32,6 +33,7 @@ public class LoggingSMPServiceInformationCallback implements ISMPServiceInformat
                  aServiceInformation.getDocumentTypeIdentifier ().getURIEncoded ());
   }
 
+  @Override
   public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
   {
     LOGGER.info ("Successfully Updated ServiceInformation at '" +
@@ -40,6 +42,7 @@ public class LoggingSMPServiceInformationCallback implements ISMPServiceInformat
                  aServiceInformation.getDocumentTypeIdentifier ().getURIEncoded ());
   }
 
+  @Override
   public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
   {
     LOGGER.info ("Successfully Deleted ServiceInformation at '" +
