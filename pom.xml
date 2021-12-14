@@ -67,7 +67,7 @@
   </developers>
 
   <properties>
-    <log4j.version>2.15.0</log4j.version>
+    <log4j.version>2.16.0</log4j.version>
   </properties>
   
   <dependencyManagement>
@@ -89,7 +89,7 @@
       <dependency>
         <groupId>com.helger.masterdata</groupId>
         <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>6.2.1</version>
+        <version>6.2.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -117,7 +117,7 @@
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>8.3.2</version>
+        <version>8.3.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -131,11 +131,16 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.9.6</version>
+        <version>0.9.7</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-core</artifactId>
@@ -144,6 +149,11 @@
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-slf4j-impl</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-web</artifactId>
         <version>${log4j.version}</version>
       </dependency>
       <dependency>
