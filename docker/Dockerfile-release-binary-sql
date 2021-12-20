@@ -48,3 +48,4 @@ LABEL vendor="Philip Helger"
 LABEL version=$SMP_VERSION
 
 COPY --from=build /smp $CATALINA_HOME/webapps/ROOT
+WORKDIR /home/git
