@@ -1,5 +1,7 @@
 ![Logo](https://github.com/phax/phoss-smp/blob/master/docs/logo/phoss-smp-272-100.png)
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.helger/phoss-smp-parent-pom/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.helger/phoss-smp-parent-pom) 
+
 phoss SMP is a complete SMP server that supports both the PEPPOL SMP specification as well as the OASIS BDXR SMP 1.0 specification.
 It comes with a management GUI and an XML backend for simplified operations.  
 It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/OASIS+SMP+conformant+solutions).
