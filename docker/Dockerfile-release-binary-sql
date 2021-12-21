@@ -25,7 +25,7 @@ RUN apt-get update \
 
 ARG SMP_VERSION
 # Set to environment to be persistent
-ENV SMP_VERSION=${SMP_VERSION:-5.4.4}
+ENV SMP_VERSION=${SMP_VERSION:-5.4.5}
 
 # Download, unzip and copy result to Tomcat webapps dir
 RUN echo Downloading phoss SMP $SMP_VERSION \
@@ -43,7 +43,7 @@ ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_EN
 # Set arguments and labels after initial cleanup was performed
 ARG SMP_VERSION
 # Set to environment to be persistent
-ENV SMP_VERSION=${SMP_VERSION:-5.4.4}
+ENV SMP_VERSION=${SMP_VERSION:-5.4.5}
 LABEL vendor="Philip Helger"
 LABEL version=$SMP_VERSION
 
