@@ -19,7 +19,16 @@
 
 pushd ..\..
 call mvn clean install -DskipTests=true
+if errorlevel 1 goto error
 popd
 
 rmdir /S /Q smp-binary 
-xcopy /K /R /E /I /S /C /H /Y ..\..\phoss-smp-webapp-sql\target\phoss-smp-webapp-sql-5.5.0-SNAPSHOT\* smp-binary\
+if errorlevel 1 goto error
+xcopy /K /R /E /I /S /H /Y ..\..\phoss-smp-webapp-sql\target\phoss-smp-webapp-sql-5.5.0-SNAPSHOT\* smp-binary\
+if errorlevel 1 goto error
+
+goto end
+
+:error
+pause
+:end

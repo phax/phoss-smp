@@ -16,4 +16,5 @@ services:
     depends_on:
       - smp
     ports:
-      - "9090:9090"
+      # SMP visible at http://localhost:9091
+      - "9091:9090"
