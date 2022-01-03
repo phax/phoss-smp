@@ -1,12 +1,16 @@
 version: "3"
 
 services:
-  smp:
+  smp1:
     image: "phelger/phoss-smp-sql:snapshot"
-    # scale: 3
-    deploy:
-      mode: replicated
-      replicas: 3
+    expose:
+      - "8080"
+  smp2:
+    image: "phelger/phoss-smp-sql:snapshot"
+    expose:
+      - "8080"
+  smp3:
+    image: "phelger/phoss-smp-sql:snapshot"
     expose:
       - "8080"
   nginx:
@@ -14,7 +18,9 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - smp
+      - smp1
+      - smp2
+      - smp3
     ports:
       # SMP visible at http://localhost:9091
       - "9091:9090"
