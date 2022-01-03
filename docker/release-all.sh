@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2015-2021 Philip Helger and contributors
+# Copyright (C) 2015-2022 Philip Helger and contributors
 # philip[at]helger[dot]com
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
