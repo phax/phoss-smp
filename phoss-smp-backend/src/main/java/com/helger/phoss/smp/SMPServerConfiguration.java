@@ -134,8 +134,8 @@ public final class SMPServerConfiguration
   public static final String PATH_SMP_SERVER_PROPERTIES = "smp-server.properties";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerConfiguration.class);
-  private static final SimpleReadWriteLock s_aRWLock = new SimpleReadWriteLock ();
-  @GuardedBy ("s_aRWLock")
+  private static final SimpleReadWriteLock RW_LOCK = new SimpleReadWriteLock ();
+  @GuardedBy ("RW_LOCK")
   private static ConfigFile s_aConfigFile;
 
   static
@@ -161,7 +161,7 @@ public final class SMPServerConfiguration
                                                            .addPath (PATH_PRIVATE_SMP_SERVER_PROPERTIES)
                                                            .addPath (PATH_SMP_SERVER_PROPERTIES);
 
-    return s_aRWLock.writeLockedGet ( () -> {
+    return RW_LOCK.writeLockedGet ( () -> {
       s_aConfigFile = aCFB.build ();
       if (s_aConfigFile.isRead ())
       {
@@ -183,7 +183,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ConfigFile getConfigFile ()
   {
-    return s_aRWLock.readLockedGet ( () -> s_aConfigFile);
+    return RW_LOCK.readLockedGet ( () -> s_aConfigFile);
   }
 
   /**
