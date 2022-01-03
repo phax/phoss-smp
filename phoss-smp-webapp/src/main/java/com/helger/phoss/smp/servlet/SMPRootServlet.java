@@ -16,11 +16,18 @@
  */
 package com.helger.phoss.smp.servlet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.http.EHttpMethod;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
-import com.helger.photon.core.servlet.RootXServletHandler;
+import com.helger.servlet.StaticServerInfo;
+import com.helger.servlet.response.UnifiedResponse;
+import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.AbstractXServlet;
+import com.helger.xservlet.handler.simple.IXServletSimpleHandler;
 
 /**
  * The servlet handling the "/" URL to redirect to "/public"
@@ -29,9 +36,30 @@ import com.helger.xservlet.AbstractXServlet;
  */
 public class SMPRootServlet extends AbstractXServlet
 {
+  private static final class RootHandler implements IXServletSimpleHandler
+  {
+    private static final Logger LOGGER = LoggerFactory.getLogger (SMPRootServlet.RootHandler.class);
+
+    public void handleRequest (final IRequestWebScopeWithoutResponse aRequestScope, final UnifiedResponse aUnifiedResponse) throws Exception
+    {
+      final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
+      String sRedirectURL;
+      if (bIsForceRoot)
+        sRedirectURL = StaticServerInfo.getInstance ().getFullServerPath ();
+      else
+        sRedirectURL = StaticServerInfo.getInstance ().getFullContextPath ();
+      sRedirectURL += AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH;
+
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Sending redirect to '" + sRedirectURL + "'");
+
+      aUnifiedResponse.setRedirect (sRedirectURL);
+    }
+  }
+
   public SMPRootServlet ()
   {
-    handlerRegistry ().registerHandler (EHttpMethod.GET, new RootXServletHandler (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH));
+    handlerRegistry ().registerHandler (EHttpMethod.GET, new RootHandler ());
     handlerRegistry ().copyHandlerToAll (EHttpMethod.GET);
     if (SMPWebAppConfiguration.isHttpOptionsDisabled ())
       handlerRegistry ().unregisterHandler (EHttpMethod.OPTIONS);
