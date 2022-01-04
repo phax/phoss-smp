@@ -65,7 +65,7 @@
     <servlet-name>SecureApplicationServlet</servlet-name>
     <url-pattern>/secure/*</url-pattern>
   </servlet-mapping>
-  
+
   <servlet>
     <servlet-name>PublicApplicationServlet</servlet-name>
     <servlet-class>com.helger.phoss.smp.servlet.PublicApplicationServlet</servlet-class>
@@ -74,7 +74,7 @@
     <servlet-name>PublicApplicationServlet</servlet-name>
     <url-pattern>/public/*</url-pattern>
   </servlet-mapping>
-  
+
   <servlet>
     <servlet-name>RootServlet</servlet-name>
     <servlet-class>com.helger.phoss.smp.servlet.SMPRootServlet</servlet-class>
@@ -83,7 +83,25 @@
     <servlet-name>RootServlet</servlet-name>
     <url-pattern></url-pattern>
   </servlet-mapping>
-  
+
+  <servlet>
+    <servlet-name>LogoutServlet</servlet-name>
+    <servlet-class>com.helger.phoss.smp.servlet.SMPLogoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LogoutServlet</servlet-name>
+    <url-pattern>/logout/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>LogoutServlet</servlet-name>
+    <servlet-class>com.helger.phoss.smp.servlet.SMPLogoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LogoutServlet</servlet-name>
+    <url-pattern>/logout/*</url-pattern>
+  </servlet-mapping>
+
   <servlet>
     <servlet-name>CSPReportingServlet</servlet-name>
     <servlet-class>com.helger.phoss.smp.servlet.SMPCSPReportingServlet</servlet-class>

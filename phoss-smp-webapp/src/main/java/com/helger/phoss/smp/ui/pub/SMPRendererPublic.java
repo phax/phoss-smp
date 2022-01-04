@@ -47,6 +47,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.phoss.smp.servlet.SMPLogoutServlet;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
@@ -75,7 +76,6 @@ import com.helger.photon.core.menu.IMenuSeparator;
 import com.helger.photon.core.menu.IMenuTree;
 import com.helger.photon.core.menu.MenuItemDeterminatorCallback;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
-import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -127,7 +127,7 @@ public final class SMPRendererPublic
 
       aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.MX_2)
                                                   .setOnClick (LinkHelper.getURLWithContext (aRequestScope,
-                                                                                             LogoutServlet.SERVLET_DEFAULT_PATH))
+                                                                                             SMPLogoutServlet.SERVLET_DEFAULT_PATH))
                                                   .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
     }
     else
