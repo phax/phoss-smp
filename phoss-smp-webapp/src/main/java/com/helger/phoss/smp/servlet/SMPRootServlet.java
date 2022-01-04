@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.servlet;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +42,8 @@ public class SMPRootServlet extends AbstractXServlet
   {
     private static final Logger LOGGER = LoggerFactory.getLogger (SMPRootServlet.RootHandler.class);
 
-    public void handleRequest (final IRequestWebScopeWithoutResponse aRequestScope, final UnifiedResponse aUnifiedResponse) throws Exception
+    public void handleRequest (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                               @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
     {
       final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
       String sRedirectURL;
