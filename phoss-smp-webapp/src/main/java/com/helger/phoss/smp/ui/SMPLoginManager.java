@@ -49,6 +49,7 @@ public final class SMPLoginManager extends BootstrapLoginManager
   @Override
   protected String getPostLoginRedirectURL (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope)
   {
+    // Ensure URL is absolute
     final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
     final String ret;
     if (bIsForceRoot)
