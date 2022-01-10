@@ -96,7 +96,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css-parent-pom</artifactId>
-        <version>6.4.0</version>
+        <version>6.4.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -170,7 +170,7 @@
       <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
-        <version>4.4.0</version>
+        <version>4.4.1</version>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
@@ -261,7 +261,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>6.4.0</version><!--$NO-MVN-MAN-VER$-->
+          <version>6.4.1</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>
