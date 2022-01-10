@@ -41,6 +41,9 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
 
   private MongoClientProvider m_aProvider;
 
+  /**
+   * @deprecated Only called via reflection
+   */
   @Deprecated
   @UsedViaReflection
   public MongoClientSingleton ()

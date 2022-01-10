@@ -44,11 +44,11 @@ import com.helger.xml.microdom.serialize.MicroReader;
 public final class NiceNameHandler
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (NiceNameHandler.class);
-  private static final SimpleReadWriteLock RWLOCK = new SimpleReadWriteLock ();
-  @GuardedBy ("RWLOCK")
-  private static ICommonsOrderedMap <String, NiceNameEntry> DOCTYPE_IDS = new CommonsLinkedHashMap <> ();
-  @GuardedBy ("RWLOCK")
-  private static ICommonsOrderedMap <String, NiceNameEntry> PROCESS_IDS = new CommonsLinkedHashMap <> ();
+  private static final SimpleReadWriteLock RW_LOCK = new SimpleReadWriteLock ();
+  @GuardedBy ("RW_LOCK")
+  private static final ICommonsOrderedMap <String, NiceNameEntry> DOCTYPE_IDS = new CommonsLinkedHashMap <> ();
+  @GuardedBy ("RW_LOCK")
+  private static final ICommonsOrderedMap <String, NiceNameEntry> PROCESS_IDS = new CommonsLinkedHashMap <> ();
 
   static
   {
@@ -110,7 +110,7 @@ public final class NiceNameHandler
         aDocTypeIDRes = new ClassPathResource ("codelists/smp/doctypeid-mapping.xml");
 
       final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes, true);
-      RWLOCK.writeLocked ( () -> DOCTYPE_IDS = aDocTypeIDs);
+      RW_LOCK.writeLocked ( () -> DOCTYPE_IDS.setAll (aDocTypeIDs));
       LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document type nice name entries");
     }
 
@@ -134,7 +134,7 @@ public final class NiceNameHandler
         aProcessIDRes = new ClassPathResource ("codelists/smp/processid-mapping.xml");
 
       final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes, false);
-      RWLOCK.writeLocked ( () -> PROCESS_IDS = aProcessIDs);
+      RW_LOCK.writeLocked ( () -> PROCESS_IDS.setAll (aProcessIDs));
       LOGGER.info ("Loaded " + aProcessIDs.size () + " process nice name entries");
     }
   }
@@ -151,14 +151,14 @@ public final class NiceNameHandler
     if (StringHelper.hasNoText (sID))
       return null;
 
-    RWLOCK.readLock ().lock ();
+    RW_LOCK.readLock ().lock ();
     try
     {
       return DOCTYPE_IDS.get (sID);
     }
     finally
     {
-      RWLOCK.readLock ().unlock ();
+      RW_LOCK.readLock ().unlock ();
     }
   }
 
@@ -174,14 +174,14 @@ public final class NiceNameHandler
     if (StringHelper.hasNoText (sID))
       return null;
 
-    RWLOCK.readLock ().lock ();
+    RW_LOCK.readLock ().lock ();
     try
     {
       return PROCESS_IDS.get (sID);
     }
     finally
     {
-      RWLOCK.readLock ().unlock ();
+      RW_LOCK.readLock ().unlock ();
     }
   }
 
@@ -189,13 +189,13 @@ public final class NiceNameHandler
   @ReturnsMutableCopy
   public static ICommonsOrderedMap <String, NiceNameEntry> getAllDocumentTypeMappings ()
   {
-    return RWLOCK.readLockedGet ( () -> DOCTYPE_IDS.getClone ());
+    return RW_LOCK.readLockedGet ( () -> DOCTYPE_IDS.getClone ());
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public static ICommonsOrderedMap <String, NiceNameEntry> getAllProcessMappings ()
   {
-    return RWLOCK.readLockedGet ( () -> PROCESS_IDS.getClone ());
+    return RW_LOCK.readLockedGet ( () -> PROCESS_IDS.getClone ());
   }
 }

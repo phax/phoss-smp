@@ -38,6 +38,9 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
 {
   private PDClient m_aPDClient;
 
+  /**
+   * @deprecated Only called via reflection
+   */
   @Deprecated
   @UsedViaReflection
   public PDClientProvider ()

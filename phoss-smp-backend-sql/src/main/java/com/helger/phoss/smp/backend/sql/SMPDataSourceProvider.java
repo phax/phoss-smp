@@ -86,9 +86,4 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
       throw new IllegalStateException ("Failed to close DataSource " + m_aDataSource, ex);
     }
   }
-
-  public boolean shouldCloseConnection ()
-  {
-    return true;
-  }
 }

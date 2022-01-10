@@ -111,6 +111,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     return s_aManagerProvider;
   }
 
+  /**
+   * @deprecated Only called via reflection
+   */
   @Deprecated
   @UsedViaReflection
   public SMPMetaManager ()
@@ -349,7 +352,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
    */
   public void setBackendConnectionStateChangeCallback (@Nullable final Consumer <ETriState> aCB)
   {
-    m_aRWLock.writeLocked( () -> m_aBackendConnectionStateChangeCallback = aCB);
+    m_aRWLock.writeLocked ( () -> m_aBackendConnectionStateChangeCallback = aCB);
   }
 
   /**

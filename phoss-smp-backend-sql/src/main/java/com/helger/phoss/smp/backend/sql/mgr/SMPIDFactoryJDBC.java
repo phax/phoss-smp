@@ -28,6 +28,11 @@ import com.helger.commons.string.StringParser;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 
+/**
+ * A special ID factory tailored towards the usage with a JDBC database
+ *
+ * @author Philip Helger
+ */
 public class SMPIDFactoryJDBC extends AbstractPersistingLongIDFactory
 {
   /** The default number of values to reserve with a single IO action */
@@ -75,5 +80,19 @@ public class SMPIDFactoryJDBC extends AbstractPersistingLongIDFactory
     });
 
     return aReadValue.longValue ();
+  }
+
+  @Override
+  public boolean equals (final Object o)
+  {
+    // New member, no change
+    return super.equals (o);
+  }
+
+  @Override
+  public int hashCode ()
+  {
+    // New member, no change
+    return super.hashCode ();
   }
 }

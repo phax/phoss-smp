@@ -97,10 +97,10 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
      * @param nCerts
      *        Required depth of PKI
      */
-    private EPredefinedCert (@Nonnull @Nonempty final String sName,
-                             @Nonnull @Nonempty final String sIssuer,
-                             @Nonnegative final int nCerts,
-                             final boolean bDeprecated)
+    EPredefinedCert (@Nonnull @Nonempty final String sName,
+                     @Nonnull @Nonempty final String sIssuer,
+                     @Nonnegative final int nCerts,
+                     final boolean bDeprecated)
     {
       m_sName = sName;
       m_sIssuer = sIssuer;

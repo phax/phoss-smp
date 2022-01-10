@@ -63,6 +63,8 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   private static final String FIELD_MANAGEMENT_ADDRESS_URL = "mgmtaddrurl";
   private static final String FIELD_CLIENT_CERTIFICATE_REQUIRED = "clientcert";
 
+  private static final boolean DEFAULT_CLIENT_CERTIFICATE_REQUIRED = true;
+
   public PageSecureSMLConfiguration (@Nonnull @Nonempty final String sID)
   {
     super (sID, "SML configuration");
@@ -183,7 +185,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Client Certificate required?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_CLIENT_CERTIFICATE_REQUIRED,
                                                                                                     aSelectedObject != null ? aSelectedObject.isClientCertificateRequired ()
-                                                                                                                            : true)))
+                                                                                                                            : DEFAULT_CLIENT_CERTIFICATE_REQUIRED)))
                                                  .setHelpText ("Check this if this SML requires a client certificate for access. Both Peppol production SML and SMK require a client certificate. Only a locally running SML software may not require a client certificate.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CLIENT_CERTIFICATE_REQUIRED)));
 
@@ -201,7 +203,9 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     final String sDisplayName = aWPEC.params ().getAsString (FIELD_DISPLAY_NAME);
     final String sDNSZone = aWPEC.params ().getAsString (FIELD_DNS_ZONE);
     final String sManagementAddressURL = aWPEC.params ().getAsString (FIELD_MANAGEMENT_ADDRESS_URL);
-    final boolean bClientCertificateRequired = aWPEC.params ().isCheckBoxChecked (FIELD_CLIENT_CERTIFICATE_REQUIRED, true);
+    final boolean bClientCertificateRequired = aWPEC.params ()
+                                                    .isCheckBoxChecked (FIELD_CLIENT_CERTIFICATE_REQUIRED,
+                                                                        DEFAULT_CLIENT_CERTIFICATE_REQUIRED);
 
     // validations
     if (StringHelper.hasNoText (sDisplayName))

@@ -77,7 +77,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 
     // Count unique service groups
     final ICommonsSet <String> aServiceGroupIDs = new CommonsHashSet <> ();
-    aAllServiceInfos.findAllMapped (x -> x.getServiceGroupID (), aServiceGroupIDs::add);
+    aAllServiceInfos.findAllMapped (ISMPServiceInformation::getServiceGroupID, aServiceGroupIDs::add);
     final boolean bHideDetails = aServiceGroupIDs.size () > 1000;
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);

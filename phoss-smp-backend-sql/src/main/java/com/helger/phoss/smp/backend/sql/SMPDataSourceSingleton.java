@@ -63,6 +63,9 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
 
   private final SMPDataSourceProvider m_aDSP = new SMPDataSourceProvider ();
 
+  /**
+   * @deprecated Only called via reflection
+   */
   @Deprecated
   @UsedViaReflection
   public SMPDataSourceSingleton ()
