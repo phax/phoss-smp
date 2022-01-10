@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.http.EHttpMethod;
+import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
@@ -45,13 +46,24 @@ public class SMPRootServlet extends AbstractXServlet
     public void handleRequest (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                                @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
     {
-      final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
       String sRedirectURL;
-      if (bIsForceRoot)
-        sRedirectURL = StaticServerInfo.getInstance ().getFullServerPath ();
+      if (StaticServerInfo.isSet ())
+      {
+        final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
+        if (bIsForceRoot)
+          sRedirectURL = StaticServerInfo.getInstance ().getFullServerPath ();
+        else
+          sRedirectURL = StaticServerInfo.getInstance ().getFullContextPath ();
+        sRedirectURL += AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH;
+      }
       else
-        sRedirectURL = StaticServerInfo.getInstance ().getFullContextPath ();
-      sRedirectURL += AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH;
+      {
+        sRedirectURL = aRequestScope.getContextPath () + AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH;
+      }
+
+      final String sQueryString = aRequestScope.getQueryString ();
+      if (StringHelper.hasText (sQueryString))
+        sRedirectURL += "?" + sQueryString;
 
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Sending redirect to '" + sRedirectURL + "'");
