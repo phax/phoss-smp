@@ -18,6 +18,8 @@ package com.helger.phoss.smp.servlet;
 
 import java.util.EnumSet;
 
+import javax.annotation.Nonnull;
+
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
@@ -42,10 +44,13 @@ public final class SMPLogoutServlet extends AbstractXServlet
     handlerRegistry ().registerHandler (EHttpMethod.GET, new LogoutXServletHandler ()
     {
       @Override
-      protected ISimpleURL getRedirectURL (final IRequestWebScopeWithoutResponse aRequestScope)
+      protected ISimpleURL getRedirectURL (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope)
       {
+        if (!StaticServerInfo.isSet ())
+          return super.getRedirectURL (aRequestScope);
+
         final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
-        String sRedirectURL;
+        final String sRedirectURL;
         if (bIsForceRoot)
           sRedirectURL = StaticServerInfo.getInstance ().getFullServerPath ();
         else

@@ -94,15 +94,6 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>LogoutServlet</servlet-name>
-    <servlet-class>com.helger.phoss.smp.servlet.SMPLogoutServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>LogoutServlet</servlet-name>
-    <url-pattern>/logout/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
     <servlet-name>CSPReportingServlet</servlet-name>
     <servlet-class>com.helger.phoss.smp.servlet.SMPCSPReportingServlet</servlet-class>
   </servlet>
