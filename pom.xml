@@ -25,7 +25,7 @@
     <version>1.11.4</version>
   </parent>
   <artifactId>phoss-smp-parent-pom</artifactId>
-  <version>5.5.2-SNAPSHOT</version>
+  <version>5.5.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>phoss-smp-parent-pom</name>
   <description>Base POM to build the phoss SMP projects</description>
