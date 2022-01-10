@@ -116,7 +116,7 @@
     lineinfile: dest="{{tomcat_dir}}/conf/catalina.properties" regexp="^peppol.pd.client.properties.path=" line="peppol.pd.client.properties.path={{tomcat_dir}}/conf/pdclient.properties"    
 
   - name: Clone the phoss SMP Server in {{ sources_dir }}/phoss-smp
-    git: repo=https://github.com/phax/phoss-smp.git dest={{ sources_dir }}/phoss-smp version=phoss-smp-parent-pom-5.4.5
+    git: repo=https://github.com/phax/phoss-smp.git dest={{ sources_dir }}/phoss-smp version=phoss-smp-parent-pom-5.5.0
     register: smp_result
 
   - name: Build SMP Server from {{ sources_dir }}/phoss-smp 
@@ -127,7 +127,7 @@
       chdir: "{{ sources_dir }}/phoss-smp"
 
   - name: Deploy SMP Server to tomcat
-    copy: src="{{ sources_dir }}/phoss-smp/phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-5.4.5.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
+    copy: src="{{ sources_dir }}/phoss-smp/phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-5.5.0.war" dest="{{tomcat_dir}}/webapps/ROOT.war"
 
   - name: Copy SMP Keystore to tomcat
     copy: src="{{smp_keystore}}" dest="{{smp_keystore_path}}" mode=0600 backup=yes
