@@ -78,6 +78,9 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
     LOGGER.info ("Read " + CSMP.APPLICATION_TITLE + " UI properties from " + CONFIG_FILE.getReadResource ().getPath ());
   }
 
+  /**
+   * @deprecated Only called via reflection
+   */
   @Deprecated
   @UsedViaReflection
   private SMPWebAppConfiguration ()

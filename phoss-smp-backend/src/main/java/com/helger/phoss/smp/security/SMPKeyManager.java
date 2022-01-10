@@ -124,6 +124,9 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     _setKeyStoreValid (true);
   }
 
+  /**
+   * @deprecated Only called via reflection
+   */
   @Deprecated
   @UsedViaReflection
   public SMPKeyManager ()

@@ -76,6 +76,9 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
     _setTrustStoreValid (true);
   }
 
+  /**
+   * @deprecated Only called via reflection
+   */
   @Deprecated
   @UsedViaReflection
   public SMPTrustManager ()
