@@ -55,11 +55,13 @@ public final class V11__MigrateUsersToDB extends BaseJavaMigration
       final File aFile = WebFileIO.getDataIO ().getFile (sFilename);
       if (aFile.exists ())
       {
+        // Read the XML file
         final UserManager aMgrXML = new UserManager (sFilename);
         final ICommonsList <IUser> aUsers = aMgrXML.getAll ();
 
         if (aUsers.isNotEmpty ())
         {
+          // Create a new JDBC manager
           final UserManagerJDBC aMgrNew = new UserManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
           for (final IUser aUser : aUsers)
           {
