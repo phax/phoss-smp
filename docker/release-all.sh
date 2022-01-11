@@ -17,7 +17,7 @@
 #
 
 
-version=5.5.0
+version=5.5.2
 
 docker login --username phelger
 
