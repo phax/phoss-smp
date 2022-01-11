@@ -32,8 +32,8 @@ CREATE TABLE smp_user (
   constraint smp_user_pk PRIMARY KEY (username) using index tablespace USERS
 ) tablespace USERS;
 
-
-INSERT INTO smp_user (username, password) VALUES ('peppol_user','Test1234');
+-- Disable as per v5.5.2
+-- INSERT INTO smp_user (username, password) VALUES ('peppol_user','Test1234');
 
 /*change extension clob,*/
 

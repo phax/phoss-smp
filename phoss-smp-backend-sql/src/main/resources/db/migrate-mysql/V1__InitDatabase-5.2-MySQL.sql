@@ -22,7 +22,8 @@ CREATE TABLE `smp_user` (
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `smp_user` VALUES ('peppol_user','Test1234');
+-- Disable as per v5.5.2
+-- INSERT INTO `smp_user` VALUES ('peppol_user','Test1234');
 
 CREATE TABLE `smp_service_group` (
   `businessIdentifierScheme` varchar(25) NOT NULL,
