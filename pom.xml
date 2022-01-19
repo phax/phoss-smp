@@ -91,14 +91,14 @@
       <dependency>
         <groupId>com.helger.masterdata</groupId>
         <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>6.2.2</version>
+        <version>6.2.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css-parent-pom</artifactId>
-        <version>6.4.2</version>
+        <version>6.4.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -167,7 +167,7 @@
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.27</version>
+        <version>8.0.28</version>
       </dependency>
       <dependency>
         <groupId>org.mongodb</groupId>
@@ -263,7 +263,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>6.4.2</version><!--$NO-MVN-MAN-VER$-->
+          <version>6.4.4</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>
