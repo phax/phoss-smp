@@ -253,11 +253,12 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                  (String) null);
 
     // Create the SignedInfo.
-    // should be EXCLUSIVE for Peppol and INCLUSIVE for BDXR
-    // CIPA and this server always used INCLUSIVE, but this was changed for
+    // * Before Peppol SMP Spec 1.2.0 this was EXCLUSIVE, since 1.2.0 it is
+    // INCLUSIVE
+    // * OASIS BDXR always used INCLUSIVE
+    // * CIPA and this server always used INCLUSIVE, but this was changed for
     // 5.0.1 to EXCLUSIVE
-    final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (bBDXR ? CanonicalizationMethod.INCLUSIVE
-                                                                                                                       : CanonicalizationMethod.EXCLUSIVE,
+    final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (CanonicalizationMethod.INCLUSIVE,
                                                                                                                  (C14NMethodParameterSpec) null),
                                                                     aSignatureFactory.newSignatureMethod (bBDXR ? "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
                                                                                                                 : SignatureMethod.RSA_SHA1,
