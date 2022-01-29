@@ -19,6 +19,9 @@ package com.helger.phoss.smp.exchange;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -44,14 +47,33 @@ import com.helger.xml.microdom.convert.MicroTypeConverter;
 @Immutable
 public final class ServiceGroupExport
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (ServiceGroupExport.class);
+
   private ServiceGroupExport ()
   {}
 
+  /**
+   * Create XML export data for the provided service groups.
+   *
+   * @param aServiceGroups
+   *        The service groups to export. May not be <code>null</code> but maybe
+   *        empty.
+   * @param bIncludeBusinessCards
+   *        <code>true</code> to include Business Cards, <code>false</code> to
+   *        skip them
+   * @return The created XML document. Never <code>null</code>.
+   */
   @Nonnull
-  public static IMicroDocument createExportData (@Nonnull final ICommonsList <ISMPServiceGroup> aServiceGroups,
-                                                 final boolean bIncludeBusinessCards)
+  public static IMicroDocument createExportDataXMLVer10 (@Nonnull final ICommonsList <ISMPServiceGroup> aServiceGroups,
+                                                         final boolean bIncludeBusinessCards)
   {
     ValueEnforcer.notNull (aServiceGroups, "ServiceGroups");
+
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Start creating Service Group export data XML v1.0 for " +
+                   aServiceGroups.size () +
+                   " entries - " +
+                   (bIncludeBusinessCards ? "incl. Business Cards" : "excl. Business Cards"));
 
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
@@ -95,6 +117,10 @@ public final class ServiceGroupExport
                                                                                     true));
       }
     }
+
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("Finished creating Service Group XML data");
+
     return aDoc;
   }
 }

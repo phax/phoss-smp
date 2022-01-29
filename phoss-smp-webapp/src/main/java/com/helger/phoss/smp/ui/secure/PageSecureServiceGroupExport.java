@@ -63,7 +63,7 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
         final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
         final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
 
-        final IMicroDocument aDoc = ServiceGroupExport.createExportData (aAllServiceGroups,
+        final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups,
                                                                          aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ());
 
         // Build the XML response
