@@ -27,9 +27,11 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.photon.ajax.GlobalAjaxInvoker;
 import com.helger.photon.ajax.IAjaxRegistry;
 import com.helger.photon.ajax.decl.AjaxFunctionDeclaration;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
+import com.helger.photon.ajax.executor.IAjaxExecutor;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
@@ -49,17 +51,13 @@ public final class CAjax
   public static final IAjaxFunctionDeclaration DATATABLES_I18N = AjaxFunctionDeclaration.builder ("datatables-i18n")
                                                                                         .executor (new AjaxExecutorDataTablesI18N (CSMPServer.DEFAULT_LOCALE))
                                                                                         .build ();
-  private static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () == EHttpMethod.POST;
+  public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () == EHttpMethod.POST;
   public static final IAjaxFunctionDeclaration LOGIN = AjaxFunctionDeclaration.builder ("login")
                                                                               .filter (FILTER_HTTP_POST.and (x -> SMPWebAppConfiguration.isPublicLoginEnabled ()))
                                                                               .executor (AjaxExecutorPublicLogin.class)
                                                                               .build ();
-  private static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_LOGIN = x -> LoggedInUserManager.getInstance ()
-                                                                                                                  .isUserLoggedInInCurrentSession ();
-  public static final IAjaxFunctionDeclaration FUNCTION_EXPORT_ALL_SERVICE_GROUPS = AjaxFunctionDeclaration.builder ("exportAllServiceGroups")
-                                                                                                           .executor (AjaxExecutorSecureExportAllServiceGroups.class)
-                                                                                                           .filter (FILTER_LOGIN)
-                                                                                                           .build ();
+  public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_LOGIN = x -> LoggedInUserManager.getInstance ()
+                                                                                                                 .isUserLoggedInInCurrentSession ();
   public static final IAjaxFunctionDeclaration FUNCTION_BACKEND_CONNECTION_RESET = AjaxFunctionDeclaration.builder ("backendConnectionReset")
                                                                                                           .executor (AjaxExecutorSecureBackendConnectionReset.class)
                                                                                                           .filter (FILTER_LOGIN)
@@ -75,8 +73,16 @@ public final class CAjax
     aAjaxRegistry.registerFunction (DATATABLES);
     aAjaxRegistry.registerFunction (DATATABLES_I18N);
     aAjaxRegistry.registerFunction (LOGIN);
-    aAjaxRegistry.registerFunction (FUNCTION_EXPORT_ALL_SERVICE_GROUPS);
     aAjaxRegistry.registerFunction (FUNCTION_BACKEND_CONNECTION_RESET);
     LOGGER.info ("Successfully registered the Ajax functions");
+  }
+
+  @Nonnull
+  public static final AjaxFunctionDeclaration addAjaxWithLogin (@Nonnull final IAjaxExecutor aExecutor)
+  {
+    // random name
+    final AjaxFunctionDeclaration aFunction = AjaxFunctionDeclaration.builder ().executor (aExecutor).filter (CAjax.FILTER_LOGIN).build ();
+    GlobalAjaxInvoker.getInstance ().getRegistry ().registerFunction (aFunction);
+    return aFunction;
   }
 }

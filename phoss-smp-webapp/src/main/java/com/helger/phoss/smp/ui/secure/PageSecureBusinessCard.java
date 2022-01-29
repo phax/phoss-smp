@@ -76,8 +76,9 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
+import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
-import com.helger.photon.ajax.decl.AjaxFunctionDeclaration;
+import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
@@ -143,20 +144,20 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
   private static final String PARAM_ENTITY_ID = "entityid";
 
-  private static final AjaxFunctionDeclaration AJAX_CREATE_ENTITY;
-  private static final AjaxFunctionDeclaration AJAX_CREATE_CONTACT;
-  private static final AjaxFunctionDeclaration AJAX_CREATE_IDENTIFIER;
+  private static final IAjaxFunctionDeclaration AJAX_CREATE_ENTITY;
+  private static final IAjaxFunctionDeclaration AJAX_CREATE_CONTACT;
+  private static final IAjaxFunctionDeclaration AJAX_CREATE_IDENTIFIER;
 
   static
   {
-    AJAX_CREATE_ENTITY = addAjax ( (aRequestScope, aAjaxResponse) -> {
+    AJAX_CREATE_ENTITY = CAjax.addAjaxWithLogin ( (aRequestScope, aAjaxResponse) -> {
       final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
       final IHCNode aNode = _createEntityInputForm (aLEC, (SMPBusinessCardEntity) null, (String) null, new FormErrorList (), false);
 
       // Build the HTML response
       aAjaxResponse.html (aNode);
     });
-    AJAX_CREATE_CONTACT = addAjax ( (aRequestScope, aAjaxResponse) -> {
+    AJAX_CREATE_CONTACT = CAjax.addAjaxWithLogin ( (aRequestScope, aAjaxResponse) -> {
       final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
       final String sEntityID = aRequestScope.params ().getAsString (PARAM_ENTITY_ID);
 
@@ -165,7 +166,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       // Build the HTML response
       aAjaxResponse.html (aNode);
     });
-    AJAX_CREATE_IDENTIFIER = addAjax ( (aRequestScope, aAjaxResponse) -> {
+    AJAX_CREATE_IDENTIFIER = CAjax.addAjaxWithLogin ( (aRequestScope, aAjaxResponse) -> {
       final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
       final String sEntityID = aRequestScope.params ().getAsString (PARAM_ENTITY_ID);
 

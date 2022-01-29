@@ -19,17 +19,27 @@ package com.helger.phoss.smp.ui.secure;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.datetime.util.PDTIOHelper;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.exchange.ServiceGroupExport;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.phoss.smp.ui.ajax.AbstractSMPAjaxExecutor;
 import com.helger.phoss.smp.ui.ajax.CAjax;
+import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xml.microdom.IMicroDocument;
 
 /**
  * Class to export service groups with all contents
@@ -38,6 +48,31 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  */
 public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
 {
+  private static final IAjaxFunctionDeclaration AJAX_EXPORT_SG;
+
+  static
+  {
+    // Ensure it can only be accessed by logged in users
+    AJAX_EXPORT_SG = CAjax.addAjaxWithLogin (new AbstractSMPAjaxExecutor ()
+    {
+      @Override
+      protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
+                                        @Nonnull final PhotonUnifiedResponse aAjaxResponse) throws Exception
+      {
+        final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
+        final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+        final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+
+        final IMicroDocument aDoc = ServiceGroupExport.createExportData (aAllServiceGroups,
+                                                                         aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ());
+
+        // Build the XML response
+        aAjaxResponse.xml (aDoc);
+        aAjaxResponse.attachment ("smp-data-" + PDTIOHelper.getCurrentLocalDateTimeForFilename () + ".xml");
+      }
+    });
+  }
+
   public PageSecureServiceGroupExport (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Export");
@@ -67,10 +102,11 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
                                   " to an XML file."));
       }
 
+    // The main export logic happens in the AJAX handler
     final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
     aToolbar.addChild (new BootstrapButton ().addChild ("Export all Service Groups")
                                              .setIcon (EDefaultIcon.SAVE_ALL)
-                                             .setOnClick (CAjax.FUNCTION_EXPORT_ALL_SERVICE_GROUPS.getInvocationURL (aRequestScope))
+                                             .setOnClick (AJAX_EXPORT_SG.getInvocationURL (aRequestScope))
                                              .setDisabled (nServiceGroupCount <= 0));
   }
 }
