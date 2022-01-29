@@ -20,24 +20,14 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.datetime.util.PDTIOHelper;
-import com.helger.phoss.smp.app.CSMPExchange;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
-import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
-import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardMicroTypeConverter;
-import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
-import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.exchange.ServiceGroupExport;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.xml.microdom.IMicroDocument;
-import com.helger.xml.microdom.IMicroElement;
-import com.helger.xml.microdom.MicroDocument;
-import com.helger.xml.microdom.convert.MicroTypeConverter;
 
 /**
  * Export all service groups incl. service information and business cards (if
@@ -53,47 +43,10 @@ public final class AjaxExecutorSecureExportAllServiceGroups extends AbstractSMPA
   {
     final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
 
-    final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.appendElement (CSMPExchange.ELEMENT_SMP_DATA);
-    eRoot.setAttribute (CSMPExchange.ATTR_VERSION, CSMPExchange.VERSION_10);
-
-    // Add all service groups
-    for (final ISMPServiceGroup aServiceGroup : aAllServiceGroups.getSortedInline (ISMPServiceGroup.comparator ()))
-    {
-      final IMicroElement eServiceGroup = eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aServiceGroup,
-                                                                                                       CSMPExchange.ELEMENT_SERVICEGROUP));
-
-      // Add all service information
-      final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
-      for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos.getSortedInline (ISMPServiceInformation.comparator ()))
-      {
-        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo, CSMPExchange.ELEMENT_SERVICEINFO));
-      }
-
-      // Add all redirects
-      final ICommonsList <ISMPRedirect> aAllRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aServiceGroup);
-      for (final ISMPRedirect aServiceInfo : aAllRedirects.getSortedInline (ISMPRedirect.comparator ()))
-      {
-        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo, CSMPExchange.ELEMENT_REDIRECT));
-      }
-    }
-
-    // Add Business cards only if PD integration is enabled
-    if (aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ())
-    {
-      // Add all business cards
-      final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-      final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
-      for (final ISMPBusinessCard aBusinessCard : aAllBusinessCards.getSortedInline (ISMPBusinessCard.comparator ()))
-        eRoot.appendChild (SMPBusinessCardMicroTypeConverter.convertToMicroElement (aBusinessCard,
-                                                                                    null,
-                                                                                    CSMPExchange.ELEMENT_BUSINESSCARD,
-                                                                                    true));
-    }
+    final IMicroDocument aDoc = ServiceGroupExport.createExportData (aAllServiceGroups,
+                                                                     aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ());
 
     // Build the XML response
     aAjaxResponse.xml (aDoc);
