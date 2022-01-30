@@ -60,7 +60,6 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
-import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.photon.security.CSecurity;
 import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
