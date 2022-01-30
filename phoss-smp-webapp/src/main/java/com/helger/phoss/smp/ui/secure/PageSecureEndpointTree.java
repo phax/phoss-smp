@@ -43,7 +43,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.nicename.NiceNameUI;
-import com.helger.phoss.smp.rest2.Rest2Filter;
+import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
@@ -129,7 +129,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
               final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);
               final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
               final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
-                                                                                    Rest2Filter.PATH_SERVICES +
+                                                                                    SMPRestFilter.PATH_SERVICES +
                                                                                     aDocTypeID.getURIPercentEncoded ());
               aBodyRow.addAndReturnCell (new HCA (aViewURL).setTitle ("View endpoint")
                                                            .addChild (EDefaultIcon.MAGNIFIER.getAsNode ()),
@@ -172,7 +172,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
                                                                             false))
                                    .addChild (" ")
                                    .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
-                                                                                              Rest2Filter.PATH_SERVICES +
+                                                                                              SMPRestFilter.PATH_SERVICES +
                                                                                               aDocTypeID.getURIPercentEncoded ())).setTitle ("Perform SMP query on document type ")
                                                                                                                                   .setTargetBlank ()
                                                                                                                                   .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));

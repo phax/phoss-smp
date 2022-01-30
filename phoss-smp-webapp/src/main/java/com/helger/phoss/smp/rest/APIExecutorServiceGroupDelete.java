@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.rest2;
+package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
@@ -35,9 +35,9 @@ import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecutor
+public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceMetadataDelete.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceGroupDelete.class);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -48,23 +48,23 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn ("The writable REST API is disabled. deleteServiceRegistration will not be executed.");
+      LOGGER.warn ("The writable REST API is disabled. deleteServiceGroup will not be executed.");
       aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
     {
-      final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-      final String sDocumentTypeID = aPathVariables.get (Rest2Filter.PARAM_DOCUMENT_TYPE_ID);
-      final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
-      final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
+      final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+      final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+      final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+      final boolean bDeleteInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("delete-in-sml"));
 
       switch (SMPServerConfiguration.getRESTType ())
       {
         case PEPPOL:
-          new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
+          new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, bDeleteInSML, aBasicAuth);
           break;
         case OASIS_BDXR_V1:
-          new BDXR1ServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
+          new BDXR1ServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, bDeleteInSML, aBasicAuth);
           break;
         default:
           throw new UnsupportedOperationException ("Unsupported REST type specified!");

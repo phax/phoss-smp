@@ -36,7 +36,7 @@ import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.rest2.Rest2DataProvider;
+import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
@@ -131,7 +131,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
         {
           aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.extensions ().isNotEmpty (), aDisplayLocale));
         }
-        final Rest2DataProvider aDP = new Rest2DataProvider (aRequestScope, aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
+        final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope, aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
         aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
                                                                                                                              sDisplayName)
                                                                                                                   .setTargetBlank ()

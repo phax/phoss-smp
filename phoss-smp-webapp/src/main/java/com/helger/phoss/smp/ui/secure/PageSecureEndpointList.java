@@ -42,7 +42,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.nicename.NiceNameUI;
-import com.helger.phoss.smp.rest2.Rest2Filter;
+import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
@@ -119,7 +119,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
           final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
-                                                                                Rest2Filter.PATH_SERVICES +
+                                                                                SMPRestFilter.PATH_SERVICES +
                                                                                 aDocTypeID.getURIPercentEncoded ());
           aRow.addCell (new HCA (aViewURL).setTitle ("View endpoint").addChild (EDefaultIcon.MAGNIFIER.getAsNode ()),
                         new HCTextNode (" "),

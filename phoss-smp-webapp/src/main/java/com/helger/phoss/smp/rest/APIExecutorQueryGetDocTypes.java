@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.rest2;
+package com.helger.phoss.smp.rest;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -79,7 +79,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
-    final String sParticipantID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
+    final String sParticipantID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
     final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sParticipantID);
     if (aParticipantID == null)
       throw SMPBadRequestException.failedToParseSG (sParticipantID, null);

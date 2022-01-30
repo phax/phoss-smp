@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.rest2;
+package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,17 +27,19 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.restapi.BusinessCardServerAPI;
+import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
+import com.helger.photon.api.IAPIExecutor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-public final class APIExecutorBusinessCardDelete extends AbstractSMPAPIExecutor
+public final class APIExecutorServiceMetadataDeleteAll implements IAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardDelete.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceMetadataDeleteAll.class);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -47,26 +50,27 @@ public final class APIExecutorBusinessCardDelete extends AbstractSMPAPIExecutor
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn ("The writable REST API is disabled. deleteBusinessCard will not be executed.");
+      LOGGER.warn ("The writable REST API is disabled. deleteServiceRegistrations will not be executed.");
       aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
-      if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
-      {
-        // PD integration is disabled
-        LOGGER.warn ("The " +
-                     SMPWebAppConfiguration.getDirectoryName () +
-                     " integration is disabled. deleteBusinessCard will not be executed.");
-        aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
-      }
-      else
-      {
-        final String sServiceGroupID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
-        final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, sServiceGroupID);
-        final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    {
+      final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+      final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+      final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
-        new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID, aBasicAuth);
-        aUnifiedResponse.setStatus (CHttp.HTTP_OK);
+      switch (SMPServerConfiguration.getRESTType ())
+      {
+        case PEPPOL:
+          new SMPServerAPI (aDataProvider).deleteServiceRegistrations (sServiceGroupID, aBasicAuth);
+          break;
+        case OASIS_BDXR_V1:
+          new BDXR1ServerAPI (aDataProvider).deleteServiceRegistrations (sServiceGroupID, aBasicAuth);
+          break;
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
       }
+      aUnifiedResponse.setStatus (HttpServletResponse.SC_OK);
+    }
   }
 }

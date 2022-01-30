@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.rest2;
+package com.helger.phoss.smp.rest;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +23,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,14 +32,11 @@ import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.timing.StopWatch;
-import com.helger.httpclient.HttpClientManager;
-import com.helger.httpclient.response.ResponseHandlerByteArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.serialize.JsonWriter;
 import com.helger.json.serialize.JsonWriterSettings;
-import com.helger.pd.businesscard.generic.PDBusinessCard;
-import com.helger.pd.businesscard.helper.PDBusinessCardHelper;
 import com.helger.peppol.sml.ESMPAPIType;
+import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
@@ -49,16 +44,14 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
+import com.helger.smpclient.bdxr1.BDXRClientReadOnly;
+import com.helger.smpclient.json.SMPJsonResponse;
+import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-/**
- * Implementation of the REST API to query a BusinessCard from a remote SMP.
- *
- * @author Philip Helger
- */
-public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecutor
+public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetBusinessCard.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetServiceMetadata.class);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -69,7 +62,7 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     // Is the remote query API disabled?
     if (SMPServerConfiguration.isRestRemoteQueryAPIDisabled ())
     {
-      LOGGER.warn ("The remote query API is disabled. getRemoteBusinessCard will not be executed.");
+      LOGGER.warn ("The remote query API is disabled. getRemoteServiceInformation will not be executed.");
       aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
       return;
     }
@@ -77,54 +70,69 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
-    final String sParticipantID = aPathVariables.get (Rest2Filter.PARAM_SERVICE_GROUP_ID);
+    final String sParticipantID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
     final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sParticipantID);
     if (aParticipantID == null)
       throw SMPBadRequestException.failedToParseSG (sParticipantID, null);
 
     final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
 
+    final String sDocTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
+    final IDocumentTypeIdentifier aDocTypeID = aIF.parseDocumentTypeIdentifier (sDocTypeID);
+    if (aDocTypeID == null)
+      throw SMPBadRequestException.failedToParseDocType (sDocTypeID, null);
+
+    final boolean bXMLSchemaValidation = aRequestScope.params ().getAsBoolean ("xmlSchemaValidation", true);
+    final boolean bVerifySignature = aRequestScope.params ().getAsBoolean ("verifySignature", true);
+
     final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
     final String sLogPrefix = "[QueryAPI] ";
     LOGGER.info (sLogPrefix +
-                 "BusinessCard of '" +
+                 "Participant information of '" +
                  aParticipantID.getURIEncoded () +
                  "' is queried using SMP API '" +
                  eAPIType +
                  "' from '" +
                  aQueryParams.getSMPHostURI () +
-                 "'");
+                 "' for document type '" +
+                 aDocTypeID.getURIEncoded () +
+                 "'; XSD validation=" +
+                 bXMLSchemaValidation +
+                 "; signature verification=" +
+                 bVerifySignature);
 
     IJsonObject aJson = null;
-
-    final String sBCURL = aQueryParams.getSMPHostURI ().toString () + "/businesscard/" + aParticipantID.getURIEncoded ();
-    LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
-    byte [] aData;
-    try (HttpClientManager aHttpClientMgr = new HttpClientManager ())
+    switch (eAPIType)
     {
-      final HttpGet aGet = new HttpGet (sBCURL);
-      aData = aHttpClientMgr.execute (aGet, new ResponseHandlerByteArray ());
-    }
-    catch (final Exception ex)
-    {
-      aData = null;
-    }
-
-    if (aData == null)
-      LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
-    else
-    {
-      final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, (Charset) null);
-      if (aBC == null)
+      case PEPPOL:
       {
-        LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
+        final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (aQueryParams.getSMPHostURI ());
+        aSMPClient.setXMLSchemaValidation (bXMLSchemaValidation);
+        aSMPClient.setVerifySignature (bVerifySignature);
+
+        final com.helger.xsds.peppol.smp1.SignedServiceMetadataType aSSM = aSMPClient.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
+        if (aSSM != null)
+        {
+          final com.helger.xsds.peppol.smp1.ServiceMetadataType aSM = aSSM.getServiceMetadata ();
+          aJson = SMPJsonResponse.convert (aParticipantID, aDocTypeID, aSM);
+        }
+        break;
       }
-      else
+      case OASIS_BDXR_V1:
       {
-        // Business Card found
-        aJson = aBC.getAsJson ();
+        final BDXRClientReadOnly aBDXR1Client = new BDXRClientReadOnly (aQueryParams.getSMPHostURI ());
+        aBDXR1Client.setXMLSchemaValidation (bXMLSchemaValidation);
+        aBDXR1Client.setVerifySignature (bVerifySignature);
+
+        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType aSSM = aBDXR1Client.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
+        if (aSSM != null)
+        {
+          final com.helger.xsds.bdxr.smp1.ServiceMetadataType aSM = aSSM.getServiceMetadata ();
+          aJson = SMPJsonResponse.convert (aParticipantID, aDocTypeID, aSM);
+        }
+        break;
       }
     }
 
@@ -132,12 +140,12 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
 
     if (aJson == null)
     {
-      LOGGER.error (sLogPrefix + "Failed to perform the BusinessCard SMP lookup");
+      LOGGER.error (sLogPrefix + "Failed to perform the SMP lookup");
       aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
     }
     else
     {
-      LOGGER.info (sLogPrefix + "Succesfully finished BusinessCard lookup lookup after " + aSW.getMillis () + " milliseconds");
+      LOGGER.info (sLogPrefix + "Succesfully finished lookup lookup after " + aSW.getMillis () + " milliseconds");
 
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());

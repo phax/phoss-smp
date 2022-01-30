@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.rest2;
+package com.helger.phoss.smp.rest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,9 +44,9 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  *
  * @author Philip Helger
  */
-public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
+public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (Rest2ExceptionMapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPRestExceptionMapper.class);
 
   private static void _logRestException (@Nonnull final String sMsg, @Nonnull final Throwable t)
   {
@@ -59,12 +59,12 @@ public class Rest2ExceptionMapper extends AbstractAPIExceptionMapper
     if (bConfiguredToLog)
     {
       if (bForceNoStackTrace)
-        LOGGER.error (Rest2Filter.LOG_PREFIX + sMsg + " - " + getResponseEntityWithoutStackTrace (t));
+        LOGGER.error (SMPRestFilter.LOG_PREFIX + sMsg + " - " + getResponseEntityWithoutStackTrace (t));
       else
-        LOGGER.error (Rest2Filter.LOG_PREFIX + sMsg, t);
+        LOGGER.error (SMPRestFilter.LOG_PREFIX + sMsg, t);
     }
     else
-      LOGGER.error (Rest2Filter.LOG_PREFIX +
+      LOGGER.error (SMPRestFilter.LOG_PREFIX +
                     sMsg +
                     " - " +
                     getResponseEntityWithoutStackTrace (t) +

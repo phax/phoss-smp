@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.rest2;
+package com.helger.phoss.smp.rest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
@@ -33,9 +33,9 @@ import com.helger.phoss.smp.exception.SMPUnauthorizedException;
  * @author Philip Helger
  */
 @Immutable
-final class Rest2RequestHelper
+final class SMPRestRequestHelper
 {
-  private Rest2RequestHelper ()
+  private SMPRestRequestHelper ()
   {}
 
   /**

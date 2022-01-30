@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.rest2;
+package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
@@ -47,10 +47,10 @@ public final class APIExecutorListGet extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sUserID = aPathVariables.get (Rest2Filter.PARAM_USER_ID);
+    final String sUserID = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
     // No service group available
-    final ISMPServerAPIDataProvider aDataProvider = new Rest2DataProvider (aRequestScope, null);
-    final BasicAuthClientCredentials aBasicAuth = Rest2RequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
+    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())

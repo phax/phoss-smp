@@ -50,7 +50,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.nicename.NiceNameUI;
-import com.helger.phoss.smp.rest2.Rest2Filter;
+import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
@@ -413,7 +413,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aCurObject.getServiceGroup ()
                                                                                       .getParticipantIdentifier ()
                                                                                       .getURIPercentEncoded () +
-                                                                            Rest2Filter.PATH_SERVICES +
+                                                                            SMPRestFilter.PATH_SERVICES +
                                                                             aCurObject.getDocumentTypeIdentifier ()
                                                                                       .getURIPercentEncoded ());
       aRow.addCell (new HCA (aEditURL).setTitle ("Edit " + sDisplayName).addChild (EDefaultIcon.EDIT.getAsNode ()),

@@ -30,7 +30,7 @@ smpquery/iso6523-actori * Copyright (C) 2014-2020 Philip Helger and contributors
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.rest2;
+package com.helger.phoss.smp.rest;
 
 import java.io.IOException;
 
@@ -59,7 +59,7 @@ import com.helger.xservlet.AbstractXFilterUnifiedResponse;
  *
  * @author Philip Helger
  */
-public class Rest2Filter extends AbstractXFilterUnifiedResponse
+public class SMPRestFilter extends AbstractXFilterUnifiedResponse
 {
   public static final String PATH_BUSINESSCARD = "/businesscard/";
   public static final String PATH_COMPLETE = "/complete/";
@@ -72,11 +72,11 @@ public class Rest2Filter extends AbstractXFilterUnifiedResponse
   public static final String PARAM_DOCUMENT_TYPE_ID = "DocumentTypeId";
   static final String LOG_PREFIX = "[REST API] ";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger (Rest2Filter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPRestFilter.class);
 
-  public Rest2Filter ()
+  public SMPRestFilter ()
   {
-    final IAPIExceptionMapper aExceptionMapper = new Rest2ExceptionMapper ();
+    final IAPIExceptionMapper aExceptionMapper = new SMPRestExceptionMapper ();
     final IAPIRegistry aAPIRegistry = GlobalAPIInvoker.getInstance ().getRegistry ();
 
     // BusinessCard

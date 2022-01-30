@@ -48,7 +48,7 @@ import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.mock.MockSMPClient;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
-import com.helger.phoss.smp.rest2.Rest2Filter;
+import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.smpclient.exception.SMPClientException;
@@ -60,7 +60,7 @@ import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
 /**
- * Test class for class {@link Rest2Filter}.
+ * Test class for class {@link SMPRestFilter}.
  *
  * @author Philip Helger
  */

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.rest2;
+package com.helger.phoss.smp.rest;
 
 import java.net.URI;
 
@@ -45,7 +45,7 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  *
  * @author Philip Helger
  */
-public class Rest2DataProvider implements ISMPServerAPIDataProvider
+public class SMPRestDataProvider implements ISMPServerAPIDataProvider
 {
   enum EServerNameMode implements IHasID <String>
   {
@@ -82,7 +82,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
   private final IParticipantIdentifier m_aParticipantID;
   private final String m_sSMLZoneName;
 
-  public Rest2DataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope, @Nullable final String sServiceGroupID)
+  public SMPRestDataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope, @Nullable final String sServiceGroupID)
   {
     ValueEnforcer.notNull (aRequestScope, "RequestScope");
     m_eServerNameMode = EServerNameMode.getFromIDOrDefault (SMPServerConfiguration.getPublicServerURLMode ());
@@ -214,7 +214,7 @@ public class Rest2DataProvider implements ISMPServerAPIDataProvider
     return getBaseUriBuilder () +
            "/" +
            aServiceGroupID.getURIPercentEncoded () +
-           Rest2Filter.PATH_SERVICES +
+           SMPRestFilter.PATH_SERVICES +
            aDocTypeID.getURIPercentEncoded ();
   }
 }

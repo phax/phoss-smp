@@ -28,7 +28,7 @@
 
   <filter>
     <filter-name>RestFilter</filter-name>
-    <filter-class>com.helger.phoss.smp.rest2.Rest2Filter</filter-class>
+    <filter-class>com.helger.phoss.smp.rest.SMPRestFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>RestFilter</filter-name>
