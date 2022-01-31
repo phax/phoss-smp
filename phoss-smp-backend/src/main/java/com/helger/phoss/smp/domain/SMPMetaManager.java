@@ -46,7 +46,9 @@ import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.core.mgr.PhotonBasicManager;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
+import com.helger.smpclient.url.BDXLURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
+import com.helger.smpclient.url.PeppolURLProvider;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
@@ -191,7 +193,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_eBackendConnectionState == null)
         throw new IllegalStateException ("Failed to get default backend connection state!");
 
-      m_aSMPURLProvider = s_aManagerProvider.createSMPURLProvider ();
+      // This might become configurable in the future
+      m_aSMPURLProvider = SMPServerConfiguration.getRESTType ().isPeppol () ? PeppolURLProvider.INSTANCE : BDXLURLProvider.INSTANCE;
       if (m_aSMPURLProvider == null)
         throw new IllegalStateException ("Failed to create SMP URL Provider!");
 
