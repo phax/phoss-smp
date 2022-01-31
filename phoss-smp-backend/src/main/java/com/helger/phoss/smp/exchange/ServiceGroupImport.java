@@ -36,7 +36,8 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.collection.impl.ICommonsOrderedSet;
 import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.log.InMemoryLogger;
+import com.helger.commons.error.IError;
+import com.helger.commons.error.SingleError;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
@@ -78,13 +79,13 @@ public final class ServiceGroupImport
                                      @Nonnull final IUser aDefaultOwner,
                                      @Nonnull final ICommonsSet <String> aAllServiceGroupIDs,
                                      @Nonnull final ICommonsSet <String> aAllBusinessCardIDs,
-                                     @Nonnull final InMemoryLogger aLogger)
+                                     @Nonnull final ICommonsList <IError> aActionList)
   {
     ValueEnforcer.notNull (eRoot, "Root");
     ValueEnforcer.notNull (aDefaultOwner, "DefaultOwner");
     ValueEnforcer.notNull (aAllServiceGroupIDs, "AllServiceGroupIDs");
     ValueEnforcer.notNull (aAllBusinessCardIDs, "AllBusinessCardIDs");
-    ValueEnforcer.notNull (aLogger, "Logger");
+    ValueEnforcer.notNull (aActionList, "ActionList");
 
     LOGGER.info ("Starting import of Service Groups from XML v1.0");
 
@@ -97,19 +98,19 @@ public final class ServiceGroupImport
     final String sLogPrefix = "[SG-IMPORT-" + COUNTER.incrementAndGet () + "] ";
     final Consumer <String> aLoggerSuccess = s -> {
       LOGGER.info (sLogPrefix + s);
-      aLogger.success (s);
+      aActionList.add (SingleError.builderSuccess ().errorText (s).build ());
     };
     final Consumer <String> aLoggerInfo = s -> {
       LOGGER.info (sLogPrefix + s);
-      aLogger.info (s);
+      aActionList.add (SingleError.builderInfo ().errorText (s).build ());
     };
     final Consumer <String> aLoggerWarn = s -> {
       LOGGER.warn (sLogPrefix + s);
-      aLogger.warn (s);
+      aActionList.add (SingleError.builderWarn ().errorText (s).build ());
     };
     final BiConsumer <String, Throwable> aLoggerError = (s, e) -> {
       LOGGER.error (sLogPrefix + s, e);
-      aLogger.error (s, e);
+      aActionList.add (SingleError.builderError ().errorText (s).linkedException (e).build ());
     };
 
     // First read all service groups as they are dependents of the
@@ -249,7 +250,7 @@ public final class ServiceGroupImport
         aLoggerWarn.accept ("Found no service group to import.");
     }
     else
-      if (aLogger.containsAtLeastOneError ())
+      if (aActionList.containsAny (IError::isError))
       {
         aLoggerError.accept ("Nothing will be imported because of the previous errors!", null);
       }

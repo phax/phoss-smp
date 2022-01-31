@@ -21,11 +21,12 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsSet;
+import com.helger.commons.error.IError;
 import com.helger.commons.error.level.EErrorLevel;
 import com.helger.commons.error.level.IErrorLevel;
-import com.helger.commons.log.InMemoryLogger;
-import com.helger.commons.log.LogMessage;
 import com.helger.commons.string.StringHelper;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.grouping.HCUL;
@@ -125,16 +126,16 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
           if (CSMPExchange.VERSION_10.equals (sVersion))
           {
             // Version 1.0
-            final InMemoryLogger aLogger = new InMemoryLogger ();
+            final ICommonsList <IError> aActionList = new CommonsArrayList <> ();
             ServiceGroupImport.importXMLVer10 (aDoc.getDocumentElement (),
                                                bOverwriteExisting,
                                                aDefaultOwner,
                                                aAllServiceGroupIDs,
                                                aAllBusinessCardIDs,
-                                               aLogger);
-            for (final LogMessage aLogMsg : aLogger)
+                                               aActionList);
+            for (final IError aError : aActionList)
             {
-              final IErrorLevel aErrorLevel = aLogMsg.getErrorLevel ();
+              final IErrorLevel aErrorLevel = aError.getErrorLevel ();
               final EBootstrapBadgeType eBadgeType;
               if (aErrorLevel.isGE (EErrorLevel.ERROR))
                 eBadgeType = EBootstrapBadgeType.DANGER;
@@ -148,8 +149,8 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
                     eBadgeType = EBootstrapBadgeType.SUCCESS;
 
               // By default is is centered
-              aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild (aLogMsg.getMessage ().toString ())
-                                                                      .addChild (SMPCommonUI.getTechnicalDetailsUI (aLogMsg.getThrowable ()))
+              aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild (aError.getErrorText (aDisplayLocale))
+                                                                      .addChild (SMPCommonUI.getTechnicalDetailsUI (aError.getLinkedException ()))
                                                                       .addClass (CBootstrapCSS.TEXT_LEFT));
             }
           }
