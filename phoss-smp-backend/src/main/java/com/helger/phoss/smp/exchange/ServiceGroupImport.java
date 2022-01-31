@@ -87,7 +87,8 @@ public final class ServiceGroupImport
     ValueEnforcer.notNull (aAllBusinessCardIDs, "AllBusinessCardIDs");
     ValueEnforcer.notNull (aActionList, "ActionList");
 
-    LOGGER.info ("Starting import of Service Groups from XML v1.0");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Starting import of Service Groups from XML v1.0, overwrite is " + (bOverwriteExisting ? "enabled" : "disabled"));
 
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();

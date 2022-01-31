@@ -26,20 +26,20 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
+import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
-import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerCompleteServiceGroupType;
-import com.helger.smpclient.peppol.marshal.SMPMarshallerCompleteServiceGroupType;
+import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupReferenceListType;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupReferenceListType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xml.serialize.write.XMLWriterSettings;
 
-public final class APIExecutorCompleteServiceGroupGet extends AbstractSMPAPIExecutor
+public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorCompleteServiceGroupGet.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorUserListGet.class);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -47,8 +47,11 @@ public final class APIExecutorCompleteServiceGroupGet extends AbstractSMPAPIExec
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+    final String sPathUserID = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
+    // No service group available
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
+
+    final BasicAuthClientCredentials aCredentials = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())
@@ -56,15 +59,17 @@ public final class APIExecutorCompleteServiceGroupGet extends AbstractSMPAPIExec
       case PEPPOL:
       {
         // Unspecified extension
-        final com.helger.xsds.peppol.smp1.CompleteServiceGroupType ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
-        aBytes = new SMPMarshallerCompleteServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        final com.helger.xsds.peppol.smp1.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID,
+                                                                                                                                             aCredentials);
+        aBytes = new SMPMarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       case OASIS_BDXR_V1:
       {
         // Unspecified extension
-        final com.helger.xsds.bdxr.smp1.CompleteServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
-        aBytes = new BDXR1MarshallerCompleteServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID,
+                                                                                                                                             aCredentials);
+        aBytes = new BDXR1MarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       default:
@@ -79,7 +84,7 @@ public final class APIExecutorCompleteServiceGroupGet extends AbstractSMPAPIExec
     }
     else
     {
-      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML);
     }
   }
 }

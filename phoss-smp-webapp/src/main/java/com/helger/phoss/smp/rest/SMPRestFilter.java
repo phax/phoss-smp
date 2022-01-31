@@ -102,13 +102,13 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     // CompleteServiceGroup
     {
       final APIDescriptor aGetCompleteServiceGroup = new APIDescriptor (APIPath.get (PATH_COMPLETE + "{" + PARAM_SERVICE_GROUP_ID + "}"),
-                                                                        new APIExecutorCompleteServiceGroupGet ());
+                                                                        new APIExecutorServiceGroupCompleteGet ());
       aGetCompleteServiceGroup.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetCompleteServiceGroup);
     }
     // List
     {
-      final APIDescriptor aGetList = new APIDescriptor (APIPath.get (PATH_LIST + "{" + PARAM_USER_ID + "}"), new APIExecutorListGet ());
+      final APIDescriptor aGetList = new APIDescriptor (APIPath.get (PATH_LIST + "{" + PARAM_USER_ID + "}"), new APIExecutorUserListGet ());
       aGetList.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetList);
     }
@@ -208,19 +208,24 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
 
     // Exchange API since 6.0.0
     {
-      final APIDescriptor aSMPQueryBusinessCard = new APIDescriptor (APIPath.get ("/exchange/export/all/xml/v1"),
-                                                                     new APIExecutorExportAllXMLVer1 ());
-      aSMPQueryBusinessCard.setExceptionMapper (aExceptionMapper);
-      aAPIRegistry.registerAPI (aSMPQueryBusinessCard);
+      final APIDescriptor aSMPExportAll = new APIDescriptor (APIPath.get ("/exchange/export/all/xml/v1"),
+                                                             new APIExecutorExportAllXMLVer1 ());
+      aSMPExportAll.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPExportAll);
     }
 
     {
-      final APIDescriptor aSMPQueryBusinessCard = new APIDescriptor (APIPath.get ("/exchange/export/byowner/{" +
-                                                                                  PARAM_USER_ID +
-                                                                                  "}/xml/v1"),
-                                                                     new APIExecutorExportByOwnerXMLVer1 ());
-      aSMPQueryBusinessCard.setExceptionMapper (aExceptionMapper);
-      aAPIRegistry.registerAPI (aSMPQueryBusinessCard);
+      final APIDescriptor aSMPExportByOwner = new APIDescriptor (APIPath.get ("/exchange/export/byowner/{" + PARAM_USER_ID + "}/xml/v1"),
+                                                                 new APIExecutorExportByOwnerXMLVer1 ());
+      aSMPExportByOwner.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPExportByOwner);
+    }
+
+    {
+      final APIDescriptor aSMPImportAll = new APIDescriptor (APIPath.put ("/exchange/import/xml/v1/{" + PARAM_USER_ID + "}"),
+                                                             new APIExecutorImportXMLVer1 ());
+      aSMPImportAll.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPImportAll);
     }
   }
 
