@@ -42,7 +42,7 @@ import com.helger.xml.microdom.convert.MicroTypeConverter;
  * Export Service Groups to XML.
  *
  * @author Philip Helger
- * @since 6.0.0
+ * @since 5.6.0
  */
 @Immutable
 public final class ServiceGroupExport

@@ -49,7 +49,7 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
  * REST API to export all Service Groups of one owner into XML v1
  *
  * @author Philip Helger
- * @since 6.0.0
+ * @since 5.6.0
  */
 public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecutor
 {

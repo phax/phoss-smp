@@ -81,7 +81,7 @@ public interface ISMPBusinessCardManager
   /**
    * @return All contained SMP business card IDs. Never <code>null</code> but
    *         maybe empty.
-   * @since 6.0.0
+   * @since 5.6.0
    */
   @Nonnull
   @ReturnsMutableCopy

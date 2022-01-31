@@ -67,7 +67,7 @@ import com.helger.xml.microdom.serialize.MicroReader;
  * REST API to import Service Groups from XML v1
  *
  * @author Philip Helger
- * @since 6.0.0
+ * @since 5.6.0
  */
 public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
 {

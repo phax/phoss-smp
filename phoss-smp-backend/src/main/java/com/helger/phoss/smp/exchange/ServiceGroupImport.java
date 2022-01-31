@@ -63,7 +63,7 @@ import com.helger.xml.microdom.IMicroElement;
  * Import Service Groups from XML.
  *
  * @author Philip Helger
- * @since 6.0.0
+ * @since 5.6.0
  */
 @Immutable
 public final class ServiceGroupImport

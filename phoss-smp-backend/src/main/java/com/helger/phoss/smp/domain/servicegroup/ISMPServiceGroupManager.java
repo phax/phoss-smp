@@ -167,7 +167,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   /**
    * @return A non-<code>null</code> but maybe empty set of all contained
    *         service group IDs.
-   * @since 6.0.0
+   * @since 5.6.0
    */
   @Nonnull
   @ReturnsMutableCopy

@@ -46,7 +46,7 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
  * REST API to export all Service Groups into XML v1
  *
  * @author Philip Helger
- * @since 6.0.0
+ * @since 5.6.0
  */
 public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
 {

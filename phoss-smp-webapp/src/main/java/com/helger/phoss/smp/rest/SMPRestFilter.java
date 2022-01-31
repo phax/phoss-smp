@@ -206,7 +206,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aSMPQueryBusinessCard);
     }
 
-    // Exchange API since 6.0.0
+    // Exchange API since 5.6.0
     {
       final APIDescriptor aSMPExportAll = new APIDescriptor (APIPath.get ("/exchange/export/all/xml/v1"),
                                                              new APIExecutorExportAllXMLVer1 ());
