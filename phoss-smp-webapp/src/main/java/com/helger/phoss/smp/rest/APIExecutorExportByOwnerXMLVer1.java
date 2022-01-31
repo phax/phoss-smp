@@ -68,13 +68,14 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
     final String sLogPrefix = "[Export-ByOwner-XML-V1] ";
     LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");
 
-    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
-
     // Only authenticated user may do so
     final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
     final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+
+    // Start action after authentication
+    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
 
     if (!aBasicAuth.getUserName ().equals (sPathUserLoginName))
     {

@@ -63,12 +63,13 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
     final String sLogPrefix = "[Export-All-XML-V1] ";
     LOGGER.info (sLogPrefix + "Starting Export");
 
-    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-
     // Only authenticated user may do so
     final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+
+    // Start action after authentication
+    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
     // Now get all relevant service groups
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
