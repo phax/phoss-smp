@@ -20,6 +20,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -162,6 +163,15 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   @Nonnull
   @ReturnsMutableCopy
   ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ();
+
+  /**
+   * @return A non-<code>null</code> but maybe empty set of all contained
+   *         service group IDs.
+   * @since 6.0.0
+   */
+  @Nonnull
+  @ReturnsMutableCopy
+  ICommonsSet <String> getAllSMPServiceGroupIDs ();
 
   /**
    * Get all service groups that belong to the passed owner ID.

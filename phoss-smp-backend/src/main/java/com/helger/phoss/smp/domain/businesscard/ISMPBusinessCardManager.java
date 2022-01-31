@@ -20,6 +20,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
@@ -78,6 +79,15 @@ public interface ISMPBusinessCardManager
   ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ();
 
   /**
+   * @return All contained SMP business card IDs. Never <code>null</code> but
+   *         maybe empty.
+   * @since 6.0.0
+   */
+  @Nonnull
+  @ReturnsMutableCopy
+  ICommonsSet <String> getAllSMPBusinessCardIDs ();
+
+  /**
    * Get the business card of the passed service group.
    *
    * @param aServiceGroup
@@ -86,7 +96,13 @@ public interface ISMPBusinessCardManager
    *         assigned.
    */
   @Nullable
-  ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  default ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  {
+    if (aServiceGroup == null)
+      return null;
+
+    return getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
+  }
 
   /**
    * Check if a business card of the passed service group exists.

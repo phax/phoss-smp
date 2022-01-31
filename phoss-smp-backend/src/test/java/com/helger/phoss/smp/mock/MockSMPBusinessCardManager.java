@@ -17,13 +17,13 @@ import javax.annotation.Nonnull;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**
  * Mock implementation of {@link ISMPBusinessCardManager}.
@@ -41,7 +41,23 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
     return m_aCBs;
   }
 
-  public ISMPBusinessCard getSMPBusinessCardOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public ISMPBusinessCard createOrUpdateSMPBusinessCard (final IParticipantIdentifier aParticipantID,
+                                                         final Collection <SMPBusinessCardEntity> aEntities)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public EChange deleteSMPBusinessCard (final ISMPBusinessCard aSMPBusinessCard)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public ICommonsSet <String> getAllSMPBusinessCardIDs ()
   {
     throw new UnsupportedOperationException ();
   }
@@ -54,21 +70,5 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
   public long getSMPBusinessCardCount ()
   {
     return 0;
-  }
-
-  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
-  {
-    throw new UnsupportedOperationException ();
-  }
-
-  public EChange deleteSMPBusinessCard (final ISMPBusinessCard aSMPBusinessCard)
-  {
-    throw new UnsupportedOperationException ();
-  }
-
-  public ISMPBusinessCard createOrUpdateSMPBusinessCard (final IParticipantIdentifier aParticipantID,
-                                                         final Collection <SMPBusinessCardEntity> aEntities)
-  {
-    throw new UnsupportedOperationException ();
   }
 }

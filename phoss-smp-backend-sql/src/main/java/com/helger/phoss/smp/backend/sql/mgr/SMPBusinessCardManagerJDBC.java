@@ -34,8 +34,10 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsHashMap;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsMap;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
@@ -61,7 +63,6 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardContact;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.photon.audit.AuditHelper;
 
 /**
@@ -315,13 +316,16 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  @Nullable
-  public ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  @Nonnull
+  @ReturnsMutableCopy
+  public ICommonsSet <String> getAllSMPBusinessCardIDs ()
   {
-    if (aServiceGroup == null)
-      return null;
-
-    return getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
+    final ICommonsSet <String> ret = new CommonsHashSet <> ();
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT pid" + " FROM smp_bce");
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
+        ret.add (aRow.getAsString (0));
+    return ret;
   }
 
   @Nullable

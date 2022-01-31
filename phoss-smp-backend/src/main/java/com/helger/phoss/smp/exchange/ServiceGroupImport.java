@@ -76,14 +76,14 @@ public final class ServiceGroupImport
   public static void importXMLVer10 (@Nonnull final IMicroElement eRoot,
                                      final boolean bOverwriteExisting,
                                      @Nonnull final IUser aDefaultOwner,
-                                     @Nonnull final ICommonsList <ISMPServiceGroup> aAllServiceGroups,
-                                     @Nonnull final ICommonsList <ISMPBusinessCard> aAllBusinessCards,
+                                     @Nonnull final ICommonsSet <String> aAllServiceGroupIDs,
+                                     @Nonnull final ICommonsSet <String> aAllBusinessCardIDs,
                                      @Nonnull final InMemoryLogger aLogger)
   {
     ValueEnforcer.notNull (eRoot, "Root");
     ValueEnforcer.notNull (aDefaultOwner, "DefaultOwner");
-    ValueEnforcer.notNull (aAllServiceGroups, "AllServiceGroups");
-    ValueEnforcer.notNull (aAllBusinessCards, "AllBusinessCards");
+    ValueEnforcer.notNull (aAllServiceGroupIDs, "AllServiceGroupIDs");
+    ValueEnforcer.notNull (aAllBusinessCardIDs, "AllBusinessCardIDs");
     ValueEnforcer.notNull (aLogger, "Logger");
 
     LOGGER.info ("Starting import of Service Groups from XML v1.0");
@@ -138,7 +138,7 @@ public final class ServiceGroupImport
         continue;
       }
       final String sServiceGroupID = aServiceGroup.getID ();
-      final boolean bIsServiceGroupContained = aAllServiceGroups.containsAny (x -> x.getID ().equals (sServiceGroupID));
+      final boolean bIsServiceGroupContained = aAllServiceGroupIDs.contains (sServiceGroupID);
       if (!bIsServiceGroupContained || bOverwriteExisting)
       {
         if (aImportServiceGroups.containsKey (aServiceGroup))
@@ -217,7 +217,7 @@ public final class ServiceGroupImport
         else
         {
           final String sBusinessCardID = aBusinessCard.getID ();
-          final boolean bIsBusinessCardContained = aAllBusinessCards.containsAny (x -> x.getID ().equals (sBusinessCardID));
+          final boolean bIsBusinessCardContained = aAllBusinessCardIDs.contains (sBusinessCardID);
           if (!bIsBusinessCardContained || bOverwriteExisting)
           {
             if (aImportBusinessCards.removeIf (x -> x.getID ().equals (sBusinessCardID)))

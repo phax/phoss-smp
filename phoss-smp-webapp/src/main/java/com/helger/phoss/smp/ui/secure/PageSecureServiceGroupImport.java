@@ -21,7 +21,7 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.error.level.EErrorLevel;
 import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.log.InMemoryLogger;
@@ -32,9 +32,7 @@ import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.exchange.CSMPExchange;
 import com.helger.phoss.smp.exchange.ServiceGroupImport;
@@ -91,8 +89,8 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
-    final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
-    final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
+    final ICommonsSet <String> aAllServiceGroupIDs = aServiceGroupMgr.getAllSMPServiceGroupIDs ();
+    final ICommonsSet <String> aAllBusinessCardIDs = aBusinessCardMgr.getAllSMPBusinessCardIDs ();
     final FormErrorList aFormErrors = new FormErrorList ();
 
     final HCUL aImportResultUL = new HCUL ();
@@ -131,8 +129,8 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
             ServiceGroupImport.importXMLVer10 (aDoc.getDocumentElement (),
                                                bOverwriteExisting,
                                                aDefaultOwner,
-                                               aAllServiceGroups,
-                                               aAllBusinessCards,
+                                               aAllServiceGroupIDs,
+                                               aAllBusinessCardIDs,
                                                aLogger);
             for (final LogMessage aLogMsg : aLogger)
             {

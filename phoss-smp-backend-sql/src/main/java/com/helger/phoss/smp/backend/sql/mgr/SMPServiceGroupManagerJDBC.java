@@ -33,7 +33,9 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
@@ -44,6 +46,7 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
+import com.helger.peppolid.CIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
@@ -383,6 +386,23 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
         ret.add (new SMPServiceGroup (aRow.getAsString (3),
                                       new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
                                       aRow.getAsString (2)));
+    return ret;
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public ICommonsSet <String> getAllSMPServiceGroupIDs ()
+  {
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getAllSMPServiceGroupIDs()");
+
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier" +
+                                                                          " FROM smp_service_group sg");
+
+    final ICommonsSet <String> ret = new CommonsHashSet <> ();
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
+        ret.add (CIdentifier.getURIEncoded (aRow.getAsString (0), aRow.getAsString (1)));
     return ret;
   }
 

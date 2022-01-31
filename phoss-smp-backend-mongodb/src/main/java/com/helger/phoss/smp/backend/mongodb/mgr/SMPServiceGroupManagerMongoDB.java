@@ -30,7 +30,9 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -282,6 +284,15 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   {
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
+    return ret;
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public ICommonsSet <String> getAllSMPServiceGroupIDs ()
+  {
+    final ICommonsSet <String> ret = new CommonsHashSet <> ();
+    getCollection ().find ().forEach (x -> ret.add (x.getString (BSON_OWNER_ID)));
     return ret;
   }
 

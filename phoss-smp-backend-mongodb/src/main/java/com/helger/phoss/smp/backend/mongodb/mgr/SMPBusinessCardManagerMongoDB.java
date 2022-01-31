@@ -36,7 +36,9 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.state.EChange;
 import com.helger.commons.typeconvert.TypeConverter;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -49,7 +51,6 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardContact;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.photon.audit.AuditHelper;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
@@ -350,13 +351,13 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nullable
-  public ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  @Nonnull
+  @ReturnsMutableCopy
+  public ICommonsSet <String> getAllSMPBusinessCardIDs ()
   {
-    if (aServiceGroup == null)
-      return null;
-
-    return getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
+    final ICommonsSet <String> ret = new CommonsHashSet <> ();
+    getCollection ().find ().forEach (x -> ret.add (x.getString (BSON_SERVICE_GROUP_ID)));
+    return ret;
   }
 
   @Nullable

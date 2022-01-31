@@ -33,6 +33,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.state.EChange;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -41,7 +42,6 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
 
@@ -171,14 +171,11 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     return getAll ();
   }
 
-  @Nullable
-  public ISMPBusinessCard getSMPBusinessCardOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  @Nonnull
+  @ReturnsMutableCopy
+  public ICommonsSet <String> getAllSMPBusinessCardIDs ()
   {
-
-    if (aServiceGroup == null)
-      return null;
-
-    return getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
+    return getAllIDs ();
   }
 
   @Nullable

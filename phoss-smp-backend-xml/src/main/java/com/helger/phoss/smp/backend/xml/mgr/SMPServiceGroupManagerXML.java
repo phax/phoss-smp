@@ -29,6 +29,7 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
@@ -334,6 +335,13 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     return getAll ();
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  public ICommonsSet <String> getAllSMPServiceGroupIDs ()
+  {
+    return getAllIDs ();
   }
 
   @Nonnull
