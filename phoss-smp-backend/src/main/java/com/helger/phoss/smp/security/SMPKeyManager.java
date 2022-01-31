@@ -16,6 +16,8 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
@@ -48,6 +50,7 @@ import org.w3c.dom.Element;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
@@ -68,6 +71,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPKeyManager.class);
 
+  private static final LocalDate PEPPOL_USING_C18N_INCLUSIVE = PDTFactory.createLocalDate (2022, Month.MAY, 1);
   private static final AtomicBoolean KEY_STORE_VALID = new AtomicBoolean (false);
   private static EKeyStoreLoadError s_eInitError;
   private static String s_sInitError;
@@ -254,11 +258,14 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
     // Create the SignedInfo.
     // * Before Peppol SMP Spec 1.2.0 this was EXCLUSIVE, since 1.2.0 it is
-    // INCLUSIVE
+    // INCLUSIVE as of May 1st, 2022
     // * OASIS BDXR always used INCLUSIVE
     // * CIPA and this server always used INCLUSIVE, but this was changed for
     // 5.0.1 to EXCLUSIVE
-    final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (CanonicalizationMethod.INCLUSIVE,
+    // TODO after 01/05/2022 remove code
+    final boolean bUseInclusive = bBDXR || PDTFactory.getCurrentLocalDate ().compareTo (PEPPOL_USING_C18N_INCLUSIVE) >= 0;
+    final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (bUseInclusive ? CanonicalizationMethod.INCLUSIVE
+                                                                                                                               : CanonicalizationMethod.EXCLUSIVE,
                                                                                                                  (C14NMethodParameterSpec) null),
                                                                     aSignatureFactory.newSignatureMethod (bBDXR ? "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
                                                                                                                 : SignatureMethod.RSA_SHA1,
