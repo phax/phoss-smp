@@ -47,10 +47,11 @@ public final class APIExecutorListGet extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sUserID = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
+    final String sPathUserID = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
     // No service group available
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+
+    final BasicAuthClientCredentials aCredentials = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
 
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())
@@ -58,16 +59,16 @@ public final class APIExecutorListGet extends AbstractSMPAPIExecutor
       case PEPPOL:
       {
         // Unspecified extension
-        final com.helger.xsds.peppol.smp1.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
-                                                                                                                                             aBasicAuth);
+        final com.helger.xsds.peppol.smp1.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID,
+                                                                                                                                             aCredentials);
         aBytes = new SMPMarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       case OASIS_BDXR_V1:
       {
         // Unspecified extension
-        final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sUserID,
-                                                                                                                                             aBasicAuth);
+        final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID,
+                                                                                                                                             aCredentials);
         aBytes = new BDXR1MarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }

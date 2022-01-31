@@ -205,6 +205,23 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aSMPQueryBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPQueryBusinessCard);
     }
+
+    // Exchange API since 6.0.0
+    {
+      final APIDescriptor aSMPQueryBusinessCard = new APIDescriptor (APIPath.get ("/exchange/export/all/xml/v1"),
+                                                                     new APIExecutorExportAllXMLVer1 ());
+      aSMPQueryBusinessCard.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPQueryBusinessCard);
+    }
+
+    {
+      final APIDescriptor aSMPQueryBusinessCard = new APIDescriptor (APIPath.get ("/exchange/export/byowner/{" +
+                                                                                  PARAM_USER_ID +
+                                                                                  "}/xml/v1"),
+                                                                     new APIExecutorExportByOwnerXMLVer1 ());
+      aSMPQueryBusinessCard.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPQueryBusinessCard);
+    }
   }
 
   @Override

@@ -32,9 +32,12 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
+import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
+import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.api.IAPIDescriptor;
+import com.helger.photon.security.user.IUser;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
@@ -43,16 +46,16 @@ import com.helger.xml.serialize.write.IXMLWriterSettings;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 
 /**
- * REST API to export all Service Groups into XML v1
+ * REST API to export all Service Groups of one owner into XML v1
  *
  * @author Philip Helger
  * @since 6.0.0
  */
-public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
+public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecutor
 {
   public static final String PARAM_INCLUDE_BUSINESS_CARDS = "include-business-cards";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorExportAllXMLVer1.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorExportByOwnerXMLVer1.class);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -60,18 +63,31 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sLogPrefix = "[Export-All-XML-V1] ";
-    LOGGER.info (sLogPrefix + "Starting Export");
+    final String sPathUserLoginName = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
+
+    final String sLogPrefix = "[Export-ByOwner-XML-V1] ";
+    LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");
 
     final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
 
     // Only authenticated user may do so
     final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
-    SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+    final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+
+    if (!aBasicAuth.getUserName ().equals (sPathUserLoginName))
+    {
+      throw new SMPUnauthorizedException ("URL user '" +
+                                          sPathUserLoginName +
+                                          "' does not match HTTP Basic Auth user name '" +
+                                          aBasicAuth.getUserName () +
+                                          "'",
+                                          aDataProvider.getCurrentURI ());
+    }
 
     // Now get all relevant service groups
-    final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+    final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroupsOfOwner (aUser.getID ());
 
     final boolean bIncludeBusinessCards = aRequestScope.params ()
                                                        .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
