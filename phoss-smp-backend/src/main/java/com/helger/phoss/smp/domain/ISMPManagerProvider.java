@@ -23,8 +23,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
-import com.helger.smpclient.url.ISMPURLProvider;
-import com.helger.smpclient.url.PeppolURLProvider;
 
 /**
  * An abstract manager provider interface. This must be implemented for each
@@ -51,15 +49,6 @@ public interface ISMPManagerProvider
    */
   default void afterInitManagers ()
   {}
-
-  /**
-   * @return The SMP URL provider to be used. May not be <code>null</code>.
-   */
-  @Nonnull
-  default ISMPURLProvider createSMPURLProvider ()
-  {
-    return PeppolURLProvider.INSTANCE;
-  }
 
   /**
    * @return The default backend connection state (e.g. to a database). For XML
