@@ -46,12 +46,12 @@ public final class SMPUserManagerPhoton
     final IUser aUser = aUserMgr.getUserOfLoginName (aCredentials.getUserName ());
     if (aUser == null)
     {
-      LOGGER.info ("Invalid login name provided: '" + aCredentials.getUserName () + "'");
+      LOGGER.warn ("Invalid login name provided: '" + aCredentials.getUserName () + "'");
       throw new SMPUnknownUserException (aCredentials.getUserName ());
     }
     if (!aUserMgr.areUserIDAndPasswordValid (aUser.getID (), aCredentials.getPassword ()))
     {
-      LOGGER.info ("Invalid password provided for '" + aCredentials.getUserName () + "'");
+      LOGGER.warn ("Invalid password provided for '" + aCredentials.getUserName () + "'");
       throw new SMPUnauthorizedException ("Username and/or password are invalid!");
     }
     return aUser;
