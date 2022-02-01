@@ -28,11 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
-import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.CommonsLinkedHashMap;
 import com.helger.commons.collection.impl.CommonsLinkedHashSet;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.collection.impl.ICommonsOrderedSet;
 import com.helger.commons.collection.impl.ICommonsSet;
@@ -87,15 +88,6 @@ public final class ServiceGroupImport
     ValueEnforcer.notNull (aAllBusinessCardIDs, "AllBusinessCardIDs");
     ValueEnforcer.notNull (aActionList, "ActionList");
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Starting import of Service Groups from XML v1.0, overwrite is " + (bOverwriteExisting ? "enabled" : "disabled"));
-
-    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-    final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
-
-    final ICommonsOrderedMap <ISMPServiceGroup, ServiceGroupImportData> aImportServiceGroups = new CommonsLinkedHashMap <> ();
-    final ICommonsList <ISMPServiceGroup> aDeleteServiceGroups = new CommonsArrayList <> ();
-
     final String sLogPrefix = "[SG-IMPORT-" + COUNTER.incrementAndGet () + "] ";
     final Consumer <String> aLoggerSuccess = s -> {
       LOGGER.info (sLogPrefix + s);
@@ -114,6 +106,15 @@ public final class ServiceGroupImport
       aActionList.add (SingleError.builderError ().errorText (s).linkedException (e).build ());
     };
 
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Starting import of Service Groups from XML v1.0, overwrite is " + (bOverwriteExisting ? "enabled" : "disabled"));
+
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
+
+    final ICommonsOrderedMap <ISMPServiceGroup, ServiceGroupImportData> aImportServiceGroups = new CommonsLinkedHashMap <> ();
+    final ICommonsMap <String, ISMPServiceGroup> aDeleteServiceGroups = new CommonsHashMap <> ();
+
     // First read all service groups as they are dependents of the
     // business cards
     int nSGIndex = 0;
@@ -124,14 +125,14 @@ public final class ServiceGroupImport
       try
       {
         aServiceGroup = SMPServiceGroupMicroTypeConverter.convertToNative (eServiceGroup, x -> {
-          IUser ret = aUserMgr.getUserOfID (x);
-          if (ret == null)
+          IUser aOwner = aUserMgr.getUserOfID (x);
+          if (aOwner == null)
           {
             // Select the default owner if an unknown user is contained
-            ret = aDefaultOwner;
+            aOwner = aDefaultOwner;
             LOGGER.warn ("Failed to resolve stored owner '" + x + "' - using default owner '" + aDefaultOwner.getID () + "'");
           }
-          return ret;
+          return aOwner;
         });
       }
       catch (final RuntimeException ex)
@@ -157,7 +158,7 @@ public final class ServiceGroupImport
         final ServiceGroupImportData aSGInfo = new ServiceGroupImportData ();
         aImportServiceGroups.put (aServiceGroup, aSGInfo);
         if (bIsServiceGroupContained)
-          aDeleteServiceGroups.add (aServiceGroup);
+          aDeleteServiceGroups.put (sServiceGroupID, aServiceGroup);
         aLoggerSuccess.accept ("Will " + (bIsServiceGroupContained ? "overwrite" : "import") + " service group " + sServiceGroupID);
 
         // read all contained service information
@@ -194,7 +195,7 @@ public final class ServiceGroupImport
 
     // Now read the business cards
     final ICommonsOrderedSet <ISMPBusinessCard> aImportBusinessCards = new CommonsLinkedHashSet <> ();
-    final ICommonsList <ISMPBusinessCard> aDeleteBusinessCards = new CommonsArrayList <> ();
+    final ICommonsMap <String, ISMPBusinessCard> aDeleteBusinessCards = new CommonsHashMap <> ();
     if (aSettings.isDirectoryIntegrationEnabled ())
     {
       // Read them only if the Peppol Directory integration is enabled
@@ -231,7 +232,7 @@ public final class ServiceGroupImport
             }
             aImportBusinessCards.add (aBusinessCard);
             if (bIsBusinessCardContained)
-              aDeleteBusinessCards.add (aBusinessCard);
+              aDeleteBusinessCards.put (sBusinessCardID, aBusinessCard);
             aLoggerSuccess.accept ("Will " + (bIsBusinessCardContained ? "overwrite" : "import") + " business card for " + sBusinessCardID);
           }
           else
@@ -268,22 +269,25 @@ public final class ServiceGroupImport
         // 1. delete all existing service groups to be imported (if overwrite);
         // this may implicitly delete business cards
         final ICommonsSet <IParticipantIdentifier> aDeletedServiceGroups = new CommonsHashSet <> ();
-        for (final ISMPServiceGroup aDeleteServiceGroup : aDeleteServiceGroups)
+        for (final Map.Entry <String, ISMPServiceGroup> aEntry : aDeleteServiceGroups.entrySet ())
         {
+          final String sServiceGroupID = aEntry.getKey ();
+          final ISMPServiceGroup aDeleteServiceGroup = aEntry.getValue ();
           final IParticipantIdentifier aPI = aDeleteServiceGroup.getParticipantIdentifier ();
           try
           {
-            if (aServiceGroupMgr.deleteSMPServiceGroup (aPI, true).isChanged ())
+            // Delete locally only
+            if (aServiceGroupMgr.deleteSMPServiceGroup (aPI, false).isChanged ())
             {
-              aLoggerSuccess.accept ("Successfully deleted service group " + aDeleteServiceGroup.getID ());
+              aLoggerSuccess.accept ("Successfully deleted service group " + sServiceGroupID);
               aDeletedServiceGroups.add (aPI);
             }
             else
-              aLoggerError.accept ("Failed to delete service group " + aDeleteServiceGroup.getID (), null);
+              aLoggerError.accept ("Failed to delete service group " + sServiceGroupID, null);
           }
           catch (final SMPServerException ex)
           {
-            aLoggerError.accept ("Failed to delete service group " + aDeleteServiceGroup.getID (), ex);
+            aLoggerError.accept ("Failed to delete service group " + sServiceGroupID, ex);
           }
         }
 
@@ -294,10 +298,13 @@ public final class ServiceGroupImport
           ISMPServiceGroup aNewServiceGroup = null;
           try
           {
+            final boolean bIsOverwrite = aDeleteServiceGroups.containsKey (aImportServiceGroup.getID ());
+
+            // Create in SML only for newly created entries
             aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
                                                                        aImportServiceGroup.getParticipantIdentifier (),
                                                                        aImportServiceGroup.getExtensionsAsString (),
-                                                                       true);
+                                                                       !bIsOverwrite);
             aLoggerSuccess.accept ("Successfully created service group " + aImportServiceGroup.getID ());
           }
           catch (final Exception ex)
@@ -308,10 +315,12 @@ public final class ServiceGroupImport
             // Delete Business Card again, if already present
             aImportBusinessCards.removeIf (x -> x.getID ().equals (aImportServiceGroup.getID ()));
           }
+
           if (aNewServiceGroup != null)
           {
             // 3a. create all endpoints
             for (final ISMPServiceInformation aImportServiceInfo : aEntry.getValue ().getServiceInfo ())
+            {
               try
               {
                 if (aServiceInfoMgr.mergeSMPServiceInformation (aImportServiceInfo).isSuccess ())
@@ -321,9 +330,11 @@ public final class ServiceGroupImport
               {
                 aLoggerError.accept ("Error creating the new service information for " + aImportServiceGroup.getID (), ex);
               }
+            }
 
             // 3b. create all redirects
             for (final ISMPRedirect aImportRedirect : aEntry.getValue ().getRedirects ())
+            {
               try
               {
                 if (aRedirectMgr.createOrUpdateSMPRedirect (aNewServiceGroup,
@@ -338,43 +349,53 @@ public final class ServiceGroupImport
               {
                 aLoggerError.accept ("Error creating the new redirect for " + aImportServiceGroup.getID (), ex);
               }
+            }
           }
         }
 
         // 4. delete all existing business cards to be imported (if overwrite)
         // Note: if PD integration is disabled, the list is empty
-        for (final ISMPBusinessCard aDeleteBusinessCard : aDeleteBusinessCards)
+        for (final Map.Entry <String, ISMPBusinessCard> aEntry : aDeleteBusinessCards.entrySet ())
+        {
+          final String sServiceGroupID = aEntry.getKey ();
+          final ISMPBusinessCard aDeleteBusinessCard = aEntry.getValue ();
+
           try
           {
             if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard).isChanged ())
-              aLoggerSuccess.accept ("Successfully deleted business card " + aDeleteBusinessCard.getID ());
+              aLoggerSuccess.accept ("Successfully deleted business card " + sServiceGroupID);
             else
             {
               // If the service group to which the business card belongs was
               // already deleted, don't display an error, as the business card
               // was automatically deleted afterwards
               if (!aDeletedServiceGroups.contains (aDeleteBusinessCard.getParticipantIdentifier ()))
-                aLoggerError.accept ("Failed to delete business card " + aDeleteBusinessCard.getID (), null);
+                aLoggerError.accept ("Failed to delete business card " + sServiceGroupID, null);
             }
           }
           catch (final Exception ex)
           {
-            aLoggerError.accept ("Failed to delete business card " + aDeleteBusinessCard.getID (), ex);
+            aLoggerError.accept ("Failed to delete business card " + sServiceGroupID, ex);
           }
+        }
 
         // 5. create all new business cards
         // Note: if PD integration is disabled, the list is empty
         for (final ISMPBusinessCard aImportBusinessCard : aImportBusinessCards)
+        {
+          final String sBusinessCardID = aImportBusinessCard.getID ();
+
           try
           {
             if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getParticipantIdentifier (),
                                                                 aImportBusinessCard.getAllEntities ()) != null)
-              aLoggerSuccess.accept ("Successfully created business card " + aImportBusinessCard.getID ());
+              aLoggerSuccess.accept ("Successfully created business card " + sBusinessCardID);
           }
           catch (final Exception ex)
           {
-            aLoggerError.accept ("Failed to create business card " + aImportBusinessCard.getID (), ex);
+            aLoggerError.accept ("Failed to create business card " + sBusinessCardID, ex);
           }
+        }
       }
   }
 }
