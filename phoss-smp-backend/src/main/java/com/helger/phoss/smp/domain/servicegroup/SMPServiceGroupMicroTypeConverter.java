@@ -54,10 +54,10 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
 
   @Nonnull
   public static SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement,
-                                                 @Nonnull final Function <String, IUser> aUserProvider)
+                                                 @Nonnull final Function <String, IUser> aOwningUserProvider)
   {
     final String sOwnerID = aElement.getAttributeValue (ATTR_OWNER_ID);
-    final IUser aOwner = aUserProvider.apply (sOwnerID);
+    final IUser aOwner = aOwningUserProvider.apply (sOwnerID);
     if (aOwner == null)
       throw new IllegalStateException ("Failed to resolve user ID '" + sOwnerID + "'");
 
