@@ -19,7 +19,6 @@ package com.helger.phoss.smp.rest;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -33,11 +32,11 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.error.IError;
 import com.helger.commons.error.level.EErrorLevel;
 import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.io.stream.StreamHelper;
+import com.helger.commons.lang.StackTraceHelper;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.timing.StopWatch;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
@@ -47,13 +46,13 @@ import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonWriter;
 import com.helger.json.serialize.JsonWriterSettings;
-import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exchange.CSMPExchange;
 import com.helger.phoss.smp.exchange.ServiceGroupImport;
+import com.helger.phoss.smp.exchange.ServiceGroupImport.ImportActionItem;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -112,7 +111,6 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
       // Start action after authentication
-      final Locale aDisplayLocale = CSMPServer.DEFAULT_LOCALE;
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
@@ -163,7 +161,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
             final StopWatch aSW = StopWatch.createdStarted ();
 
             // Start the import
-            final ICommonsList <IError> aActionList = new CommonsArrayList <> ();
+            final ICommonsList <ImportActionItem> aActionList = new CommonsArrayList <> ();
             ServiceGroupImport.importXMLVer10 (aDoc.getDocumentElement (),
                                                bOverwriteExisting,
                                                aDefaultOwner,
@@ -183,10 +181,15 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
                                         .add ("defaultOwnerID", aDefaultOwner.getID ())
                                         .add ("defaultOwnerLoginName", aDefaultOwner.getLoginName ()));
             final IJsonArray aActions = new JsonArray ();
-            for (final IError aError : aActionList)
+            for (final ImportActionItem aAction : aActionList)
             {
-              aActions.add (new JsonObject ().add ("level", _getErrorLevelName (aError.getErrorLevel ()))
-                                             .add ("message", aError.getErrorText (aDisplayLocale)));
+              aActions.add (new JsonObject ().add ("datetime", aAction.getDateTime ().toString ())
+                                             .add ("level", _getErrorLevelName (aAction.getErrorLevel ()))
+                                             .add ("participantid", aAction.getParticipantID ())
+                                             .add ("message", aAction.getMessage ())
+                                             .addIfNotNull ("exception",
+                                                            aAction.hasLinkedException () ? StackTraceHelper.getStackAsString (aAction.getLinkedException ())
+                                                                                          : null));
             }
             aJson.add ("actions", aActions);
 

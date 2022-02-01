@@ -24,7 +24,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.error.IError;
 import com.helger.commons.error.level.EErrorLevel;
 import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.string.StringHelper;
@@ -37,6 +36,7 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.exchange.CSMPExchange;
 import com.helger.phoss.smp.exchange.ServiceGroupImport;
+import com.helger.phoss.smp.exchange.ServiceGroupImport.ImportActionItem;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
@@ -126,16 +126,16 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
           if (CSMPExchange.VERSION_10.equals (sVersion))
           {
             // Version 1.0
-            final ICommonsList <IError> aActionList = new CommonsArrayList <> ();
+            final ICommonsList <ImportActionItem> aActionList = new CommonsArrayList <> ();
             ServiceGroupImport.importXMLVer10 (aDoc.getDocumentElement (),
                                                bOverwriteExisting,
                                                aDefaultOwner,
                                                aAllServiceGroupIDs,
                                                aAllBusinessCardIDs,
                                                aActionList);
-            for (final IError aError : aActionList)
+            for (final ImportActionItem aAction : aActionList)
             {
-              final IErrorLevel aErrorLevel = aError.getErrorLevel ();
+              final IErrorLevel aErrorLevel = aAction.getErrorLevel ();
               final EBootstrapBadgeType eBadgeType;
               if (aErrorLevel.isGE (EErrorLevel.ERROR))
                 eBadgeType = EBootstrapBadgeType.DANGER;
@@ -149,8 +149,12 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
                     eBadgeType = EBootstrapBadgeType.SUCCESS;
 
               // By default is is centered
-              aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild (aError.getErrorText (aDisplayLocale))
-                                                                      .addChild (SMPCommonUI.getTechnicalDetailsUI (aError.getLinkedException ()))
+              aImportResultUL.addItem (new BootstrapBadge (eBadgeType).addChild ((aAction.hasParticipantID () ? "[" +
+                                                                                                                aAction.getParticipantID () +
+                                                                                                                "] "
+                                                                                                              : "") +
+                                                                                 aAction.getMessage ())
+                                                                      .addChild (SMPCommonUI.getTechnicalDetailsUI (aAction.getLinkedException ()))
                                                                       .addClass (CBootstrapCSS.TEXT_LEFT));
             }
           }
