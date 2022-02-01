@@ -131,6 +131,7 @@ public final class ServiceGroupImport
             ret = aDefaultOwner;
             LOGGER.warn ("Failed to resolve stored owner '" + x + "' - using default owner '" + aDefaultOwner.getID () + "'");
           }
+          // If the user is deleted, but existing - keep the deleted user
           return ret;
         });
       }
