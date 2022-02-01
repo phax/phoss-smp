@@ -185,7 +185,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
             {
               aActions.add (new JsonObject ().add ("datetime", aAction.getDateTime ().toString ())
                                              .add ("level", _getErrorLevelName (aAction.getErrorLevel ()))
-                                             .add ("participantid", aAction.getParticipantID ())
+                                             .addIfNotNull ("participantID", aAction.getParticipantID ())
                                              .add ("message", aAction.getMessage ())
                                              .addIfNotNull ("exception",
                                                             aAction.hasLinkedException () ? StackTraceHelper.getStackAsString (aAction.getLinkedException ())
