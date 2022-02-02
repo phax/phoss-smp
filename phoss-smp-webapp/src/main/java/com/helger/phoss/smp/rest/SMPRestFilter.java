@@ -234,6 +234,16 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aSMPImportAll.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPImportAll);
     }
+
+    // Migration API since 5.6.0
+    {
+      final APIDescriptor aSMPMigrateOutboundStart = new APIDescriptor (APIPath.put ("/migration/outbound/start/{" +
+                                                                                     PARAM_SERVICE_GROUP_ID +
+                                                                                     "}"),
+                                                                        new APIExecutorMigrationOutboundStartPut ());
+      aSMPMigrateOutboundStart.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPMigrateOutboundStart);
+    }
   }
 
   @Override
