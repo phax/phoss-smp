@@ -363,7 +363,8 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
           final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSettings.getSMLInfo ());
           aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
 
-          // SML call
+          // Create a random migration key,
+          // Than call SML
           sMigrationKey = aCaller.prepareToMigrate (aParticipantID, SMPServerConfiguration.getSMLSMPID ());
           LOGGER.info ("Successfully called prepareToMigrate on SML. Created migration key is '" + sMigrationKey + "'");
         }
