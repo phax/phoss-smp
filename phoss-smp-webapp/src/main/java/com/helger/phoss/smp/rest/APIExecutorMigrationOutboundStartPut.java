@@ -38,6 +38,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
@@ -142,7 +143,9 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
       }
 
       // Remember internally
-      if (aParticipantMigrationMgr.createOutboundParticipantMigration (aServiceGroupID, sMigrationKey) == null)
+      final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.createOutboundParticipantMigration (aServiceGroupID,
+                                                                                                               sMigrationKey);
+      if (aMigration == null)
         throw new SMPInternalErrorException ("Failed to create outbound participant migration for '" + sServiceGroupID + "' internally");
 
       LOGGER.info ("Successfully created outbound participant migration internally.");
@@ -150,6 +153,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
       final IMicroDocument aResponseDoc = new MicroDocument ();
       final IMicroElement eRoot = aResponseDoc.appendElement ("migrationOutboundStartResponse");
       eRoot.setAttribute ("success", true);
+      eRoot.appendElement ("migrationID", aMigration.getID ());
       eRoot.appendElement ("migrationKey").appendText (sMigrationKey);
 
       final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);

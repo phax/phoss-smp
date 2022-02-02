@@ -70,6 +70,8 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   public static final String PARAM_SERVICE_GROUP_ID = "ServiceGroupId";
   public static final String PARAM_USER_ID = "UserId";
   public static final String PARAM_DOCUMENT_TYPE_ID = "DocumentTypeId";
+  public static final String PARAM_MIGRATION_ID = "MigrationId";
+
   static final String LOG_PREFIX = "[REST API] ";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRestFilter.class);
@@ -243,6 +245,14 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                         new APIExecutorMigrationOutboundStartPut ());
       aSMPMigrateOutboundStart.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPMigrateOutboundStart);
+    }
+    {
+      final APIDescriptor aSMPMigrateOutboundCancel = new APIDescriptor (APIPath.put ("/migration/outbound/cancel/{" +
+                                                                                     PARAM_MIGRATION_ID +
+                                                                                     "}"),
+                                                                        new APIExecutorMigrationOutboundCancelPut ());
+      aSMPMigrateOutboundCancel.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPMigrateOutboundCancel);
     }
   }
 
