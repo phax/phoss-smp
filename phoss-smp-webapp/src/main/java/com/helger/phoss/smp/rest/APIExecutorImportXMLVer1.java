@@ -186,7 +186,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
             {
               // Create XML version
               final IMicroDocument aResponseDoc = new MicroDocument ();
-              final IMicroElement eRoot = aResponseDoc.appendElement ("import-result");
+              final IMicroElement eRoot = aResponseDoc.appendElement ("importResult");
               eRoot.setAttribute ("importStartDateTime", PDTWebDateHelper.getAsStringXSD (aQueryDT));
               final IMicroElement eSettings = eRoot.appendElement ("settings");
               eSettings.setAttribute ("overwriteExisting", bOverwriteExisting);
