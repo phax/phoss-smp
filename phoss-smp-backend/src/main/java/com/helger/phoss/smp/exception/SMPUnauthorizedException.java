@@ -33,11 +33,11 @@ public class SMPUnauthorizedException extends SMPServerException
     this (sMessage, null);
   }
 
-  public SMPUnauthorizedException (@Nonnull final String sMessage, @Nullable final URI aNotFoundURI)
+  public SMPUnauthorizedException (@Nonnull final String sMessage, @Nullable final URI aEffectedURI)
   {
-    super (sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
+    super (sMessage + (aEffectedURI == null ? "" : " at " + aEffectedURI));
 
     // Always log!
-    LOGGER.warn (sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
+    LOGGER.warn (sMessage + (aEffectedURI == null ? "" : " at " + aEffectedURI));
   }
 }

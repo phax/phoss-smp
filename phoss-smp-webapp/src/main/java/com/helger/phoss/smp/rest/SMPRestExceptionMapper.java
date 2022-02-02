@@ -30,6 +30,7 @@ import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
+import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
@@ -137,6 +138,13 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
       // Forcing no stack trace, because the context should be self-explanatory
       _logRestException ("Bad request", aThrowable, true);
       _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_BAD_REQUEST, getResponseEntityWithoutStackTrace (aThrowable));
+      return EHandled.HANDLED;
+    }
+    if (aThrowable instanceof SMPPreconditionFailedException)
+    {
+      // Forcing no stack trace, because the context should be self-explanatory
+      _logRestException ("Precondition failed", aThrowable, true);
+      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_PRECONDITION_FAILED, getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPServerException)

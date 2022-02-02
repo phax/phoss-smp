@@ -28,23 +28,23 @@ public class SMPBadRequestException extends SMPServerException
    *
    * @param sMessage
    *        the String that is the entity of the HTTP response.
-   * @param aNotFoundURI
+   * @param aEffectedURI
    *        The URI that was not found.
    */
-  public SMPBadRequestException (@Nonnull final String sMessage, @Nullable final URI aNotFoundURI)
+  public SMPBadRequestException (@Nonnull final String sMessage, @Nullable final URI aEffectedURI)
   {
-    super ("Bad request: " + sMessage + (aNotFoundURI == null ? "" : " at '" + aNotFoundURI.toString () + "'"));
+    super ("Bad request: " + sMessage + (aEffectedURI == null ? "" : " at '" + aEffectedURI.toString () + "'"));
   }
 
   @Nonnull
-  public static SMPBadRequestException failedToParseSG (@Nonnull final String sServiceGroupID, @Nullable final URI aNotFoundURI)
+  public static SMPBadRequestException failedToParseSG (@Nonnull final String sServiceGroupID, @Nullable final URI aEffectedURI)
   {
-    return new SMPBadRequestException ("Failed to parse Service Group ID '" + sServiceGroupID + "'", aNotFoundURI);
+    return new SMPBadRequestException ("Failed to parse Service Group ID '" + sServiceGroupID + "'", aEffectedURI);
   }
 
   @Nonnull
-  public static SMPBadRequestException failedToParseDocType (@Nonnull final String sDocTypeID, @Nullable final URI aNotFoundURI)
+  public static SMPBadRequestException failedToParseDocType (@Nonnull final String sDocTypeID, @Nullable final URI aEffectedURI)
   {
-    return new SMPBadRequestException ("Failed to parse Document Type ID '" + sDocTypeID + "'", aNotFoundURI);
+    return new SMPBadRequestException ("Failed to parse Document Type ID '" + sDocTypeID + "'", aEffectedURI);
   }
 }

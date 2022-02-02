@@ -12,8 +12,6 @@ package com.helger.phoss.smp.exception;
 
 import javax.annotation.Nonnull;
 
-import com.helger.phoss.smp.smlhook.RegistrationHookException;
-
 /**
  * This exception is thrown if an error occurred communicating with the SML
  *
@@ -22,7 +20,7 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
  */
 public class SMPSMLException extends SMPServerException
 {
-  public SMPSMLException (@Nonnull final String sMsg, @Nonnull final RegistrationHookException aCause)
+  public SMPSMLException (@Nonnull final String sMsg, @Nonnull final Exception aCause)
   {
     super (sMsg, aCause);
   }

@@ -38,7 +38,7 @@ public class SMPUnknownUserException extends SMPServerException
    * @return The user name which was not found. May be <code>null</code>.
    */
   @Nullable
-  public String getUserName ()
+  public final String getUserName ()
   {
     return m_sUserName;
   }
