@@ -26,18 +26,22 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.CGlobal;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.CommonsTreeMap;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.commons.datetime.PDTWebDateHelper;
 import com.helger.commons.error.level.EErrorLevel;
 import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.lang.StackTraceHelper;
 import com.helger.commons.mime.CMimeType;
+import com.helger.commons.mime.MimeType;
+import com.helger.commons.mutable.MutableInt;
 import com.helger.commons.timing.StopWatch;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.json.IJsonArray;
@@ -60,7 +64,12 @@ import com.helger.photon.security.user.IUserManager;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
+import com.helger.xml.microdom.IMicroElement;
+import com.helger.xml.microdom.MicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
+import com.helger.xml.microdom.serialize.MicroWriter;
+import com.helger.xml.serialize.write.EXMLSerializeIndent;
+import com.helger.xml.serialize.write.XMLWriterSettings;
 
 /**
  * REST API to import Service Groups from XML v1
@@ -173,30 +182,86 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
             LOGGER.info (sLogPrefix + "Finished import after " + aSW.getMillis () + " milliseconds");
 
             // Everything added to the action list is already logged
-            final IJsonObject aJson = new JsonObject ();
-            aJson.add ("importStartDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
-            aJson.add ("durationMillis", aSW.getMillis ());
-            aJson.add ("settings",
-                       new JsonObject ().add ("overwriteExisting", bOverwriteExisting)
-                                        .add ("defaultOwnerID", aDefaultOwner.getID ())
-                                        .add ("defaultOwnerLoginName", aDefaultOwner.getLoginName ()));
-            final IJsonArray aActions = new JsonArray ();
-            for (final ImportActionItem aAction : aActionList)
+            if (true)
             {
-              aActions.add (new JsonObject ().add ("datetime", aAction.getDateTime ().toString ())
-                                             .add ("level", _getErrorLevelName (aAction.getErrorLevel ()))
-                                             .addIfNotNull ("participantID", aAction.getParticipantID ())
-                                             .add ("message", aAction.getMessage ())
-                                             .addIfNotNull ("exception",
-                                                            aAction.hasLinkedException () ? StackTraceHelper.getStackAsString (aAction.getLinkedException ())
-                                                                                          : null));
-            }
-            aJson.add ("actions", aActions);
+              // Create XML version
+              final IMicroDocument aResponseDoc = new MicroDocument ();
+              final IMicroElement eRoot = aResponseDoc.appendElement ("import-result");
+              eRoot.setAttribute ("importStartDateTime", PDTWebDateHelper.getAsStringXSD (aQueryDT));
+              final IMicroElement eSettings = eRoot.appendElement ("settings");
+              eSettings.setAttribute ("overwriteExisting", bOverwriteExisting);
+              eSettings.setAttribute ("defaultOwnerID", aDefaultOwner.getID ());
+              eSettings.setAttribute ("defaultOwnerLoginName", aDefaultOwner.getLoginName ());
 
-            final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
-            aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8)
-                            .setMimeType (CMimeType.APPLICATION_JSON)
-                            .enableCaching (3 * CGlobal.SECONDS_PER_HOUR);
+              final ICommonsMap <String, MutableInt> aLevelCount = new CommonsTreeMap <> ();
+              for (final ImportActionItem aAction : aActionList)
+              {
+                final String sLevelName = _getErrorLevelName (aAction.getErrorLevel ());
+
+                final IMicroElement eAction = eRoot.appendElement ("action");
+                eAction.setAttribute ("datetime", PDTWebDateHelper.getAsStringXSD (aAction.getDateTime ()));
+                eAction.setAttribute ("level", sLevelName);
+                eAction.setAttribute ("participantID", aAction.getParticipantID ());
+                eAction.appendElement ("message").appendText (aAction.getMessage ());
+                if (aAction.hasLinkedException ())
+                  eAction.appendElement ("exception").appendText (StackTraceHelper.getStackAsString (aAction.getLinkedException ()));
+
+                aLevelCount.computeIfAbsent (sLevelName, k -> new MutableInt (0)).inc ();
+              }
+
+              {
+                final IMicroElement eSummary = eRoot.appendElement ("summary");
+                eSummary.setAttribute ("durationMillis", aSW.getMillis ());
+                for (final Map.Entry <String, MutableInt> aEntry : aLevelCount.entrySet ())
+                  eSummary.appendElement ("level")
+                          .setAttribute ("id", aEntry.getKey ())
+                          .setAttribute ("count", aEntry.getValue ().intValue ());
+              }
+
+              final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
+              aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aResponseDoc, aXWS), aXWS.getCharset ())
+                              .setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
+                                                                                                   aXWS.getCharset ().name ()));
+            }
+            else
+            {
+              // Create JSON version
+              final IJsonObject aJson = new JsonObject ();
+              aJson.add ("importStartDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
+              aJson.addJson ("settings",
+                             new JsonObject ().add ("overwriteExisting", bOverwriteExisting)
+                                              .add ("defaultOwnerID", aDefaultOwner.getID ())
+                                              .add ("defaultOwnerLoginName", aDefaultOwner.getLoginName ()));
+              final IJsonArray aActions = new JsonArray ();
+              final ICommonsMap <String, MutableInt> aLevelCount = new CommonsTreeMap <> ();
+              for (final ImportActionItem aAction : aActionList)
+              {
+                final String sLevelName = _getErrorLevelName (aAction.getErrorLevel ());
+
+                aActions.add (new JsonObject ().add ("datetime", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format (aAction.getDateTime ()))
+                                               .add ("level", sLevelName)
+                                               .addIfNotNull ("participantID", aAction.getParticipantID ())
+                                               .add ("message", aAction.getMessage ())
+                                               .addIfNotNull ("exception",
+                                                              aAction.hasLinkedException () ? StackTraceHelper.getStackAsString (aAction.getLinkedException ())
+                                                                                            : null));
+                aLevelCount.computeIfAbsent (sLevelName, k -> new MutableInt (0)).inc ();
+              }
+              aJson.addJson ("actions", aActions);
+
+              {
+                final IJsonObject aSummary = new JsonObject ();
+                aSummary.add ("durationMillis", aSW.getMillis ());
+                final IJsonArray aLevels = new JsonArray ();
+                for (final Map.Entry <String, MutableInt> aEntry : aLevelCount.entrySet ())
+                  aLevels.add (new JsonObject ().add ("id", aEntry.getKey ()).add ("count", aEntry.getValue ().intValue ()));
+                aSummary.addJson ("levels", aLevels);
+                aJson.addJson ("summary", aSummary);
+              }
+
+              final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
+              aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8).setMimeType (CMimeType.APPLICATION_JSON);
+            }
           }
         }
       }
