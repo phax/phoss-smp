@@ -321,7 +321,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
                                                    .setCtrl (aSGSelect)
-                                                   .setHelpText ("Select the Service Group to migrate to another SMP. Each Service Group can only be migrated once.")
+                                                   .setHelpText ("Select the Service Group to migrate to another SMP. Each Service Group can only be migrated once from this SMP. Only Service Groups registered to the SML can be migrated.")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_PARTICIPANT_ID)));
     }
   }

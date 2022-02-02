@@ -207,6 +207,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           aNodeList.addChild (info ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
         }
 
+        aNodeList.addChild (warn ("Please note that this page can only be used with Peppol and standard CEF BDMSL entries. Other entries, like BPC ones, will not be resolved correctly!"));
+
         final String sSMLZoneName = aSettings.getSMLDNSZone ();
         final ISMPURLProvider aURLProvider = SMPMetaManager.getSMPURLProvider ();
 
