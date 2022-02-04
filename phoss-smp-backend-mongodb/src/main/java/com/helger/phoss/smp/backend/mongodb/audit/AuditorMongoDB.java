@@ -26,6 +26,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
@@ -56,6 +58,8 @@ import com.mongodb.client.MongoCollection;
  */
 public class AuditorMongoDB implements IAuditor
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (AuditorMongoDB.class);
+
   /** The default collection name if none is provided */
   public static final String DEFAULT_COLLECTION_NAME = "smp-audit";
 
@@ -138,10 +142,15 @@ public class AuditorMongoDB implements IAuditor
     final String sUserID = StringHelper.getNotEmpty (m_aCurrentUserIDProvider.getCurrentUserID (), CUserID.USER_ID_GUEST);
     final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType.getName () : sAction,
                                                                       aArgs);
-
     final IAuditItem aAuditItem = new AuditItem (sUserID, eActionType, eSuccess, sFullAction);
-    if (!m_aCollection.insertOne (toBson (aAuditItem)).wasAcknowledged ())
-      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+
+    if (MongoClientSingleton.getClientProvider ().isDBWritable ())
+    {
+      if (!m_aCollection.insertOne (toBson (aAuditItem)).wasAcknowledged ())
+        throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+    }
+    else
+      LOGGER.warn ("Dropping audit item, because MongoDB is in non-writable state");
   }
 
   @Nonnull

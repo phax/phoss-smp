@@ -84,7 +84,13 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
   }
 
   @Nonnull
-  public MongoCollection <Document> getCollection (@Nonnull @Nonempty final String sCollectionName)
+  public static final MongoClientProvider getClientProvider ()
+  {
+    return getInstance ().m_aProvider;
+  }
+
+  @Nonnull
+  public final MongoCollection <Document> getCollection (@Nonnull @Nonempty final String sCollectionName)
   {
     return m_aProvider.getCollection (sCollectionName);
   }
