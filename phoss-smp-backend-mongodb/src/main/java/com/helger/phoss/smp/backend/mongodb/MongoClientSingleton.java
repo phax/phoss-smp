@@ -89,6 +89,19 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
     return getInstance ().m_aProvider;
   }
 
+  public static boolean isDBWritable ()
+  {
+    try
+    {
+      return getClientProvider ().isDBWritable ();
+    }
+    catch (final IllegalStateException ex)
+    {
+      // On shutdown
+      return false;
+    }
+  }
+
   @Nonnull
   public final MongoCollection <Document> getCollection (@Nonnull @Nonempty final String sCollectionName)
   {

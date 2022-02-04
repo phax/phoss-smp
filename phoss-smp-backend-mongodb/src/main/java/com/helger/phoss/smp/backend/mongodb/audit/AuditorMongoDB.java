@@ -144,7 +144,7 @@ public class AuditorMongoDB implements IAuditor
                                                                       aArgs);
     final IAuditItem aAuditItem = new AuditItem (sUserID, eActionType, eSuccess, sFullAction);
 
-    if (MongoClientSingleton.getClientProvider ().isDBWritable ())
+    if (MongoClientSingleton.isDBWritable ())
     {
       if (!m_aCollection.insertOne (toBson (aAuditItem)).wasAcknowledged ())
         throw new IllegalStateException ("Failed to insert into MongoDB Collection");

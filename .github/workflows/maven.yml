@@ -45,6 +45,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
  
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.7.0
+      with:
+        mongodb-version: '4.4'
+        
     - name: Build and deploy with Maven
       run: mvn --batch-mode --update-snapshots deploy
       env:
