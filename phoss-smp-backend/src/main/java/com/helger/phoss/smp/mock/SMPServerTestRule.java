@@ -51,6 +51,7 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
   public void before ()
   {
     super.before ();
+
     SMPMetaManager.initBackendFromConfiguration ();
     // Add some logging
     if (false)
