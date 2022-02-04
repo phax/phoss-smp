@@ -50,6 +50,14 @@ jobs:
       with:
         mongodb-version: '4.4'
         
+    - name: Start MySQL
+      uses: mirromutth/mysql-action@v1.1
+      with:
+        mysql version: '8.0'
+        mysql database: 'smp'
+        mysql user: 'smp'
+        mysql password: 'smp'
+          
     - name: Build and deploy with Maven
       run: mvn --batch-mode --update-snapshots deploy
       env:
