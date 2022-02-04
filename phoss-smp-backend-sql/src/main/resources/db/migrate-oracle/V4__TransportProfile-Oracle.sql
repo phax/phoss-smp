@@ -17,7 +17,7 @@
 
 CREATE TABLE smp_tprofile (
   id         varchar(45) NOT NULL,
-  name       text        NOT NULL,
+  name       clob        NOT NULL,
   deprecated boolean     NOT NULL,
   CONSTRAINT smp_tprofile_pk PRIMARY KEY (id) USING INDEX tablespace USERS
 );

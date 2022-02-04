@@ -23,10 +23,10 @@ CREATE TABLE smp_secusergroup (
   lastmoduserid  varchar(20),
   deletedt       timestamp,
   deleteuserid   varchar(20),
-  attrs          text,
+  attrs          clob,
   name           varchar(255) NOT NULL,
-  description    text,
-  userids        text,
-  roleids        text,
+  description    clob,
+  userids        clob,
+  roleids        clob,
   CONSTRAINT smp_secusergroup_pk PRIMARY KEY (id) USING INDEX tablespace USERS
 );

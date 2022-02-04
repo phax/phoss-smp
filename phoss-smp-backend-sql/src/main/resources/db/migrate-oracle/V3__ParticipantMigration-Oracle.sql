@@ -22,7 +22,7 @@ CREATE TABLE smp_pmigration (
   pid       varchar(255) NOT NULL,
   initdt    timestamp    NOT NULL,
   migkey    varchar(45)  NOT NULL,
-  constraint smp_pmigration_pk PRIMARY KEY  (id)  using index tablespace USERS
+  constraint smp_pmigration_pk PRIMARY KEY (id)  using index tablespace USERS
 ) tablespace USERS;
 
 
