@@ -150,50 +150,80 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                         {
                           final HCNodeList aNL = new HCNodeList ();
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
-                          boolean bDeletedServiceGroup = false;
+                          final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+                          final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
-                          try
+                          // Remember the old state
+                          final EParticipantMigrationState eOldState = aSelectedObject.getState ();
+
+                          boolean bSetStateToMigrated = false;
+
+                          // First set the state
+                          if (aParticipantMigrationMgr.setParticipantMigrationState (aSelectedObject.getID (),
+                                                                                     EParticipantMigrationState.MIGRATED)
+                                                      .isChanged ())
                           {
-                            // Delete the service group only locally but not in
-                            // the SML
-                            final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-                            if (aServiceGroupMgr.deleteSMPServiceGroup (aParticipantID, false).isChanged ())
-                            {
-                              aNL.addChild (success ("The SMP ServiceGroup for participant '" +
-                                                     aParticipantID.getURIEncoded () +
-                                                     "' was successfully deleted from this SMP!"));
-                              bDeletedServiceGroup = true;
-                            }
-                            else
-                            {
-                              aNL.addChild (error ("The SMP ServiceGroup for participant '" +
+                            aNL.addChild (success ("The outbound Participant Migration for '" +
                                                    aParticipantID.getURIEncoded () +
-                                                   "' could not be deleted! Please check the logs."));
-                            }
+                                                   "' was successfully performed!"));
+                            bSetStateToMigrated = true;
                           }
-                          catch (final Exception ex)
+                          else
                           {
-                            aNL.addChild (error ("Error deleting the SMP ServiceGroup for participant '" +
+                            aNL.addChild (error ("Failed to perform outbound Participant Migration for '" +
                                                  aParticipantID.getURIEncoded () +
-                                                 "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+                                                 "'!"));
                           }
 
-                          if (bDeletedServiceGroup)
+                          if (bSetStateToMigrated)
                           {
-                            final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
-                            if (aParticipantMigrationMgr.setParticipantMigrationState (aSelectedObject.getID (),
-                                                                                       EParticipantMigrationState.MIGRATED)
-                                                        .isChanged ())
+                            boolean bDeletedSG = false;
+                            try
                             {
-                              aNL.addChild (success ("The outbound Participant Migration for '" +
+                              // Delete the service group only locally but not
+                              // in the SML
+                              if (aServiceGroupMgr.deleteSMPServiceGroup (aParticipantID, false).isChanged ())
+                              {
+                                aNL.addChild (success ("The SMP ServiceGroup for participant '" +
+                                                       aParticipantID.getURIEncoded () +
+                                                       "' was successfully deleted from this SMP!"));
+                                bDeletedSG = true;
+                              }
+                              else
+                              {
+                                aNL.addChild (error ("The SMP ServiceGroup for participant '" +
                                                      aParticipantID.getURIEncoded () +
-                                                     "' was successfully performed!"));
+                                                     "' could not be deleted! Please check the logs."));
+                              }
                             }
-                            else
+                            catch (final Exception ex)
                             {
-                              aNL.addChild (error ("Failed to perform outbound Participant Migration for '" +
+                              aNL.addChild (error ("Error deleting the SMP ServiceGroup for participant '" +
                                                    aParticipantID.getURIEncoded () +
-                                                   "'!"));
+                                                   "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+                            }
+
+                            if (!bDeletedSG)
+                            {
+                              // Restore old state in participant migration
+                              // manager
+                              if (aParticipantMigrationMgr.setParticipantMigrationState (aSelectedObject.getID (), eOldState).isChanged ())
+                              {
+                                aNL.addChild (success ("Successfully reverted the state of the outbound Participant Migration for '" +
+                                                       aParticipantID.getURIEncoded () +
+                                                       "' to " +
+                                                       eOldState +
+                                                       "!"));
+                                bSetStateToMigrated = true;
+                              }
+                              else
+                              {
+                                aNL.addChild (error ("Failed to revert the state of the outbound Participant Migration for '" +
+                                                     aParticipantID.getURIEncoded () +
+                                                     "' to " +
+                                                     eOldState +
+                                                     "!"));
+                              }
                             }
                           }
                           aWPEC.postRedirectGetInternal (aNL);

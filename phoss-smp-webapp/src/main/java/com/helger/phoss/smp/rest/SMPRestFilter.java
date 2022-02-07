@@ -248,11 +248,19 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
     {
       final APIDescriptor aSMPMigrateOutboundCancel = new APIDescriptor (APIPath.put ("/migration/outbound/cancel/{" +
-                                                                                     PARAM_MIGRATION_ID +
-                                                                                     "}"),
-                                                                        new APIExecutorMigrationOutboundCancelPut ());
+                                                                                      PARAM_MIGRATION_ID +
+                                                                                      "}"),
+                                                                         new APIExecutorMigrationOutboundCancelPut ());
       aSMPMigrateOutboundCancel.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPMigrateOutboundCancel);
+    }
+    {
+      final APIDescriptor aSMPMigrateOutboundFinalize = new APIDescriptor (APIPath.put ("/migration/outbound/finalize/{" +
+                                                                                        PARAM_MIGRATION_ID +
+                                                                                        "}"),
+                                                                           new APIExecutorMigrationOutboundFinalizePut ());
+      aSMPMigrateOutboundFinalize.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPMigrateOutboundFinalize);
     }
   }
 
