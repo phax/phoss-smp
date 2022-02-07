@@ -190,18 +190,20 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
       return false;
 
     return getCollection ().find (Filters.and (new Document (BSON_DIRECTION, EParticipantMigrationDirection.OUTBOUND.getID ()),
-                                               new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
+                                               new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID)),
+                                               new Document (BSON_STATE, EParticipantMigrationState.IN_PROGRESS.getID ())))
                            .iterator ()
                            .hasNext ();
   }
 
-  public boolean containsInboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
+  public boolean containsInboundMigration (@Nullable final IParticipantIdentifier aParticipantID)
   {
     if (aParticipantID == null)
       return false;
 
     return getCollection ().find (Filters.and (new Document (BSON_DIRECTION, EParticipantMigrationDirection.INBOUND.getID ()),
-                                               new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
+                                               new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID)),
+                                               new Document (BSON_STATE, EParticipantMigrationState.MIGRATED.getID ())))
                            .iterator ()
                            .hasNext ();
   }

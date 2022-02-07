@@ -236,25 +236,26 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     return _getAllParticipantMigrations (EParticipantMigrationDirection.INBOUND, eState);
   }
 
-  private boolean _containsMigrationInProgress (@Nonnull final EParticipantMigrationDirection eDirection,
-                                                @Nullable final IParticipantIdentifier aParticipantID)
+  private boolean _containsMigration (@Nonnull final EParticipantMigrationDirection eDirection,
+                                      @Nonnull final EParticipantMigrationState eState,
+                                      @Nullable final IParticipantIdentifier aParticipantID)
   {
     if (aParticipantID == null)
       return false;
 
     return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_pmigration WHERE direction=? AND state=? AND pid=?",
                                       new ConstantPreparedStatementDataProvider (eDirection.getID (),
-                                                                                 EParticipantMigrationState.IN_PROGRESS.getID (),
+                                                                                 eState.getID (),
                                                                                  aParticipantID.getURIEncoded ())) > 0;
   }
 
   public boolean containsOutboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    return _containsMigrationInProgress (EParticipantMigrationDirection.OUTBOUND, aParticipantID);
+    return _containsMigration (EParticipantMigrationDirection.OUTBOUND, EParticipantMigrationState.IN_PROGRESS, aParticipantID);
   }
 
-  public boolean containsInboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
+  public boolean containsInboundMigration (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    return _containsMigrationInProgress (EParticipantMigrationDirection.INBOUND, aParticipantID);
+    return _containsMigration (EParticipantMigrationDirection.INBOUND, EParticipantMigrationState.MIGRATED, aParticipantID);
   }
 }

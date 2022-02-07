@@ -184,11 +184,11 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
                              x.getParticipantIdentifier ().hasSameContent (aParticipantID));
   }
 
-  public boolean containsInboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
+  public boolean containsInboundMigration (@Nullable final IParticipantIdentifier aParticipantID)
   {
     return aParticipantID != null &&
            containsAny (x -> x.getDirection ().isInbound () &&
-                             x.getState ().isInProgress () &&
+                             x.getState () == EParticipantMigrationState.MIGRATED &&
                              x.getParticipantIdentifier ().hasSameContent (aParticipantID));
   }
 }

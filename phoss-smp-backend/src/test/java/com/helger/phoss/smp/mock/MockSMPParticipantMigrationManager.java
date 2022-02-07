@@ -67,7 +67,7 @@ final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrati
     return false;
   }
 
-  public boolean containsInboundMigrationInProgress (final IParticipantIdentifier aParticipantID)
+  public boolean containsInboundMigration (final IParticipantIdentifier aParticipantID)
   {
     return false;
   }

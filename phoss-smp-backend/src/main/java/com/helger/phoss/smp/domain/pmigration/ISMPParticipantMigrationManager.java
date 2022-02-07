@@ -122,12 +122,12 @@ public interface ISMPParticipantMigrationManager
 
   /**
    * Check if an inbound migration for the provided participant identifier is
-   * already running.
+   * already contained.
    *
    * @param aParticipantID
    *        The participant ID to check. May be <code>null</code>.
-   * @return <code>true</code> if an inbound migration is already running,
+   * @return <code>true</code> if an inbound migration is already contained,
    *         <code>false</code> if not.
    */
-  boolean containsInboundMigrationInProgress (@Nullable IParticipantIdentifier aParticipantID);
+  boolean containsInboundMigration (@Nullable IParticipantIdentifier aParticipantID);
 }
