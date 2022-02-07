@@ -78,12 +78,12 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
       final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
-      // Remember the old state
       final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.getParticipantMigrationOfID (sMigrationID);
       if (aMigration == null)
         throw new SMPBadRequestException ("Failed to resolve participant migration with ID '" + sMigrationID + "'",
                                           aDataProvider.getCurrentURI ());
 
+      // Remember the old state
       final EParticipantMigrationState eOldState = aMigration.getState ();
       final IParticipantIdentifier aParticipantID = aMigration.getParticipantIdentifier ();
 

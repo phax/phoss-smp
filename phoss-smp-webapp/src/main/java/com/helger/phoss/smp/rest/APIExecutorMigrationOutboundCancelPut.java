@@ -28,6 +28,7 @@ import com.helger.commons.http.CHttp;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
@@ -71,6 +72,12 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
 
       final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
       final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+
+      // Check if ID is valid
+      final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.getParticipantMigrationOfID (sMigrationID);
+      if (aMigration == null)
+        throw new SMPBadRequestException ("Failed to resolve participant migration with ID '" + sMigrationID + "'",
+                                          aDataProvider.getCurrentURI ());
 
       if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.CANCELLED).isChanged ())
       {
