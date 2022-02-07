@@ -93,11 +93,18 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
       SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
       final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
-      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
       final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+      final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
-      final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
+
+      if (aSMLInfo == null)
+        throw new SMPPreconditionFailedException ("Currently no SML is available. Please select it in the UI at the 'SMP Settings' page.",
+                                                  aDataProvider.getCurrentURI ());
+      if (!aSettings.isSMLEnabled ())
+        throw new SMPPreconditionFailedException ("SML Connection is not enabled hence no participant can be migrated.",
+                                                  aDataProvider.getCurrentURI ());
 
       final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       if (aServiceGroupID == null)
@@ -118,13 +125,6 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
         throw new SMPBadRequestException ("The migration of the Service Group '" + sServiceGroupID + "' is already in progress.",
                                           aDataProvider.getCurrentURI ());
       }
-
-      if (aSMLInfo == null)
-        throw new SMPPreconditionFailedException ("Currently no SML is available. Please select it in the UI at the 'SMP Settings' page.",
-                                                  aDataProvider.getCurrentURI ());
-      if (!aSettings.isSMLEnabled ())
-        throw new SMPPreconditionFailedException ("SML Connection is not enabled hence no participant can be migrated.",
-                                                  aDataProvider.getCurrentURI ());
 
       String sMigrationKey = null;
       try
