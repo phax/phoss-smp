@@ -20,7 +20,6 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
-import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exception.SMPUnknownUserException;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -39,8 +38,23 @@ public final class SMPUserManagerPhoton
   private SMPUserManagerPhoton ()
   {}
 
+  /**
+   * Check if the provided credentials are valid. This checks if the user
+   * exists, if it is not deleted, if the password matches and if the user is
+   * not disabled. If valid, the resolved user is returned.
+   *
+   * @param aCredentials
+   *        The credentials to check. May not be <code>null</code>.
+   * @return <code>null</code> if something does wrong, the user on success
+   *         only.
+   * @throws SMPUnknownUserException
+   *         if the user does not exist or if the user is marked as deleted.
+   * @throws SMPUnauthorizedException
+   *         If the password is invalid or if the user is marked as disabled
+   */
   @Nonnull
-  public static IUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+  public static IUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnknownUserException,
+                                                                                                       SMPUnauthorizedException
   {
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final IUser aUser = aUserMgr.getUserOfLoginName (aCredentials.getUserName ());
@@ -64,7 +78,7 @@ public final class SMPUserManagerPhoton
   }
 
   public static void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                      @Nonnull final IUser aCurrentUser) throws SMPServerException
+                                      @Nonnull final IUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
   {
     // Resolve service group
     final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
