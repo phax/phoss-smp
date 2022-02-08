@@ -16,14 +16,13 @@
 --
 
 -- DROP database IF EXISTS `smp`;
-alter session set "_ORACLE_SCRIPT"=true;
-CREATE USER peppol_user IDENTIFIED BY Test1234;
-GRANT CONNECT TO peppol_user;
-GRANT CONNECT, RESOURCE to peppol_user;
-GRANT CREATE SESSION  TO peppol_user;
-GRANT ALL PRIVILEGES TO peppol_user;
-
-alter user peppol_user quota unlimited on users;
+-- alter session set "_ORACLE_SCRIPT"=true;
+-- CREATE USER peppol_user IDENTIFIED BY Test1234;
+-- GRANT CONNECT TO peppol_user;
+-- GRANT CONNECT, RESOURCE to peppol_user;
+-- GRANT CREATE SESSION  TO peppol_user;
+-- GRANT ALL PRIVILEGES TO peppol_user;
+-- alter user peppol_user quota unlimited on users;
 
 -- DROP TABLE smp_user;
 CREATE TABLE smp_user (
