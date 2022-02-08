@@ -11,6 +11,7 @@
 package com.helger.phoss.smp.exchange;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
@@ -38,9 +39,14 @@ import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.collection.impl.ICommonsOrderedSet;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.datetime.PDTFactory;
+import com.helger.commons.datetime.PDTWebDateHelper;
 import com.helger.commons.error.level.EErrorLevel;
+import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.error.level.IHasErrorLevel;
+import com.helger.commons.lang.StackTraceHelper;
 import com.helger.commons.string.StringHelper;
+import com.helger.json.IJsonObject;
+import com.helger.json.JsonObject;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
@@ -61,6 +67,7 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.xml.microdom.IMicroElement;
+import com.helger.xml.microdom.MicroElement;
 
 /**
  * Import Service Groups from XML.
@@ -168,6 +175,48 @@ public final class ServiceGroupImport
     public boolean hasLinkedException ()
     {
       return m_aLinkedException != null;
+    }
+
+    @Nonnull
+    @Nonempty
+    private static String _getErrorLevelName (@Nonnull final IErrorLevel aErrorLevel)
+    {
+      if (aErrorLevel.isGE (EErrorLevel.ERROR))
+        return "error";
+      if (aErrorLevel.isGE (EErrorLevel.WARN))
+        return "warning";
+      return "info";
+    }
+
+    @Nonnull
+    @Nonempty
+    public String getErrorLevelName ()
+    {
+      return _getErrorLevelName (m_eLevel);
+    }
+
+    @Nonnull
+    public IMicroElement getAsMicroElement (@Nonnull @Nonempty final String sElementName)
+    {
+      final IMicroElement eAction = new MicroElement (sElementName);
+      eAction.setAttribute ("datetime", PDTWebDateHelper.getAsStringXSD (m_aDT));
+      eAction.setAttribute ("level", getErrorLevelName ());
+      eAction.setAttribute ("participantID", m_sPI);
+      eAction.appendElement ("message").appendText (m_sMsg);
+      if (m_aLinkedException != null)
+        eAction.appendElement ("exception").appendText (StackTraceHelper.getStackAsString (m_aLinkedException));
+      return eAction;
+    }
+
+    @Nonnull
+    public IJsonObject getAsJsonObject ()
+    {
+      return new JsonObject ().add ("datetime", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format (m_aDT))
+                              .add ("level", getErrorLevelName ())
+                              .addIfNotNull ("participantID", m_sPI)
+                              .add ("message", m_sMsg)
+                              .addIfNotNull ("exception",
+                                             m_aLinkedException != null ? StackTraceHelper.getStackAsString (m_aLinkedException) : null);
     }
 
     @Nonnull

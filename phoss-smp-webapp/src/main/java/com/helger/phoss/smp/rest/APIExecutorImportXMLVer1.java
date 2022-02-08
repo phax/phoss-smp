@@ -34,10 +34,7 @@ import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTWebDateHelper;
-import com.helger.commons.error.level.EErrorLevel;
-import com.helger.commons.error.level.IErrorLevel;
 import com.helger.commons.io.stream.StreamHelper;
-import com.helger.commons.lang.StackTraceHelper;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
 import com.helger.commons.mutable.MutableInt;
@@ -86,17 +83,6 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
   public static final String PARAM_OVERVWRITE_EXISTING = "overwrite-existing";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorImportXMLVer1.class);
-
-  @Nonnull
-  @Nonempty
-  private static String _getErrorLevelName (@Nonnull final IErrorLevel aErrorLevel)
-  {
-    if (aErrorLevel.isGE (EErrorLevel.ERROR))
-      return "error";
-    if (aErrorLevel.isGE (EErrorLevel.WARN))
-      return "warning";
-    return "info";
-  }
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -158,7 +144,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     final String sVersion = aDoc.getDocumentElement ().getAttributeValue (CSMPExchange.ATTR_VERSION);
     if (!CSMPExchange.VERSION_10.equals (sVersion))
     {
-      throw new SMPBadRequestException ("The provided payload is not an XML file version 1.0.", aDataProvider.getCurrentURI ());
+      throw new SMPBadRequestException ("The provided payload is not an XML file version 1.0", aDataProvider.getCurrentURI ());
     }
 
     // Version 1.0
@@ -186,8 +172,9 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       // Create XML version
       final IMicroDocument aResponseDoc = new MicroDocument ();
       final IMicroElement eRoot = aResponseDoc.appendElement ("importResult");
-      eRoot.setAttribute ("importStartDateTime", PDTWebDateHelper.getAsStringXSD (aQueryDT));
       eRoot.setAttribute ("version", "1");
+      eRoot.setAttribute ("importStartDateTime", PDTWebDateHelper.getAsStringXSD (aQueryDT));
+
       final IMicroElement eSettings = eRoot.appendElement ("settings");
       eSettings.setAttribute ("overwriteExisting", bOverwriteExisting);
       eSettings.setAttribute ("defaultOwnerID", aDefaultOwner.getID ());
@@ -196,17 +183,8 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       final ICommonsMap <String, MutableInt> aLevelCount = new CommonsTreeMap <> ();
       for (final ImportActionItem aAction : aActionList)
       {
-        final String sLevelName = _getErrorLevelName (aAction.getErrorLevel ());
-
-        final IMicroElement eAction = eRoot.appendElement ("action");
-        eAction.setAttribute ("datetime", PDTWebDateHelper.getAsStringXSD (aAction.getDateTime ()));
-        eAction.setAttribute ("level", sLevelName);
-        eAction.setAttribute ("participantID", aAction.getParticipantID ());
-        eAction.appendElement ("message").appendText (aAction.getMessage ());
-        if (aAction.hasLinkedException ())
-          eAction.appendElement ("exception").appendText (StackTraceHelper.getStackAsString (aAction.getLinkedException ()));
-
-        aLevelCount.computeIfAbsent (sLevelName, k -> new MutableInt (0)).inc ();
+        eRoot.appendChild (aAction.getAsMicroElement ("action"));
+        aLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
       }
 
       {
@@ -235,16 +213,8 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       final ICommonsMap <String, MutableInt> aLevelCount = new CommonsTreeMap <> ();
       for (final ImportActionItem aAction : aActionList)
       {
-        final String sLevelName = _getErrorLevelName (aAction.getErrorLevel ());
-
-        aActions.add (new JsonObject ().add ("datetime", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format (aAction.getDateTime ()))
-                                       .add ("level", sLevelName)
-                                       .addIfNotNull ("participantID", aAction.getParticipantID ())
-                                       .add ("message", aAction.getMessage ())
-                                       .addIfNotNull ("exception",
-                                                      aAction.hasLinkedException () ? StackTraceHelper.getStackAsString (aAction.getLinkedException ())
-                                                                                    : null));
-        aLevelCount.computeIfAbsent (sLevelName, k -> new MutableInt (0)).inc ();
+        aActions.add (aAction.getAsJsonObject ());
+        aLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
       }
       aJson.addJson ("actions", aActions);
 
