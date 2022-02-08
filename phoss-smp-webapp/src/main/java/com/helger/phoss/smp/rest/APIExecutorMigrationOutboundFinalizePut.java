@@ -27,7 +27,9 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
@@ -67,9 +69,9 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
     }
     else
     {
-      final String sMigrationID = aPathVariables.get (SMPRestFilter.PARAM_MIGRATION_ID);
+      final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
 
-      LOGGER.info (sLogPrefix + "Finalizing outbound migration for migration ID '" + sMigrationID + "'");
+      LOGGER.info (sLogPrefix + "Finalizing outbound migration for Service Group ID '" + sServiceGroupID + "'");
 
       // Only authenticated user may do so
       final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
@@ -78,42 +80,52 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
       final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
       final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-      final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.getParticipantMigrationOfID (sMigrationID);
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      if (aServiceGroupID == null)
+      {
+        // Invalid identifier
+        throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
+      }
+
+      // Find matching migration object
+      final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.getParticipantMigrationOfParticipantID (EParticipantMigrationDirection.OUTBOUND,
+                                                                                                                   aServiceGroupID);
       if (aMigration == null)
-        throw new SMPBadRequestException ("Failed to resolve participant migration with ID '" + sMigrationID + "'",
+        throw new SMPBadRequestException ("Failed to resolve outbound participant migration for Service Group ID '" + sServiceGroupID + "'",
                                           aDataProvider.getCurrentURI ());
 
       // Remember the old state
+      final String sMigrationID = aMigration.getID ();
       final EParticipantMigrationState eOldState = aMigration.getState ();
-      final IParticipantIdentifier aParticipantID = aMigration.getParticipantIdentifier ();
 
       // Migrate state
-      if (aParticipantMigrationMgr.setParticipantMigrationState (aMigration.getID (), EParticipantMigrationState.MIGRATED).isUnchanged ())
+      if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.MIGRATED).isUnchanged ())
         throw new SMPBadRequestException ("The participant migration with ID '" + sMigrationID + "' is already finalized",
                                           aDataProvider.getCurrentURI ());
       LOGGER.info (sLogPrefix +
                    "The outbound Participant Migration with ID '" +
                    sMigrationID +
                    "' for '" +
-                   aParticipantID.getURIEncoded () +
+                   sServiceGroupID +
                    "' was successfully finalized!");
 
       try
       {
         // Delete the service group only locally but not
         // in the SML
-        if (aServiceGroupMgr.deleteSMPServiceGroup (aParticipantID, false).isChanged ())
+        if (aServiceGroupMgr.deleteSMPServiceGroup (aServiceGroupID, false).isChanged ())
         {
           LOGGER.info (sLogPrefix +
                        "The SMP ServiceGroup for participant '" +
-                       aParticipantID.getURIEncoded () +
+                       sServiceGroupID +
                        "' was successfully deleted from this SMP (without SML)!");
         }
         else
         {
           throw new SMPBadRequestException ("The SMP ServiceGroup for participant '" +
-                                            aParticipantID.getURIEncoded () +
+                                            sServiceGroupID +
                                             "' could not be deleted! Please check the logs.",
                                             aDataProvider.getCurrentURI ());
         }
@@ -122,11 +134,11 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
       {
         // Restore old state in participant migration
         // manager
-        if (aParticipantMigrationMgr.setParticipantMigrationState (aMigration.getID (), eOldState).isChanged ())
+        if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, eOldState).isChanged ())
         {
           LOGGER.warn (sLogPrefix +
                        "Successfully reverted the state of the outbound Participant Migration for '" +
-                       aParticipantID.getURIEncoded () +
+                       sServiceGroupID +
                        "' to " +
                        eOldState +
                        "!");
@@ -136,7 +148,7 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
           // Error in error handling. Yeah
           LOGGER.error (sLogPrefix +
                         "Failed to revert the state of the outbound Participant Migration for '" +
-                        aParticipantID.getURIEncoded () +
+                        sServiceGroupID +
                         "' to " +
                         eOldState +
                         "!");

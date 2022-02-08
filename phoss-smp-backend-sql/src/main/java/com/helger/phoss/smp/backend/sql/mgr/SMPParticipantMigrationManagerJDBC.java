@@ -177,6 +177,31 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     return new SMPParticipantMigration (sID, eDirection, eState, aPI, aRow.getAsLocalDateTime (3), aRow.getAsString (4));
   }
 
+  @Nullable
+  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
+                                                                          @Nullable final IParticipantIdentifier aParticipantID)
+  {
+    ValueEnforcer.notNull (eDirection, "Direction");
+    if (aParticipantID == null)
+      return null;
+
+    final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
+    newExecutor ().querySingle ("SELECT id, state, initdt, migkey FROM smp_pmigration WHERE direction=? AND pid=?",
+                                new ConstantPreparedStatementDataProvider (eDirection.getID (), aParticipantID.getURIEncoded ()),
+                                aDBResult::set);
+    if (aDBResult.isNotSet ())
+      return null;
+
+    final DBResultRow aRow = aDBResult.get ();
+    final EParticipantMigrationState eState = EParticipantMigrationState.getFromIDOrNull (aRow.getAsString (1));
+    return new SMPParticipantMigration (aRow.getAsString (0),
+                                        eDirection,
+                                        eState,
+                                        aParticipantID,
+                                        aRow.getAsLocalDateTime (2),
+                                        aRow.getAsString (3));
+  }
+
   @Nonnull
   @ReturnsMutableCopy
   private ICommonsList <ISMPParticipantMigration> _getAllParticipantMigrations (@Nonnull final EParticipantMigrationDirection eDirection,

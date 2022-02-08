@@ -67,6 +67,8 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
  */
 public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIExecutor
 {
+  public static final String XML_ELEMENT_PARTICIPANT_ID = "participantID";
+  public static final String XML_ELEMENT_MIGRATION_KEY = "migrationKey";
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorMigrationOutboundStartPut.class);
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
@@ -153,11 +155,10 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
 
       // Build result
       final IMicroDocument aResponseDoc = new MicroDocument ();
-      final IMicroElement eRoot = aResponseDoc.appendElement ("migrationOutboundStartResponse");
+      final IMicroElement eRoot = aResponseDoc.appendElement ("migrationOutboundResponse");
       eRoot.setAttribute ("success", true);
-      eRoot.appendElement ("participantID").appendText (sServiceGroupID);
-      eRoot.appendElement ("migrationID").appendText (aMigration.getID ());
-      eRoot.appendElement ("migrationKey").appendText (sMigrationKey);
+      eRoot.appendElement (XML_ELEMENT_PARTICIPANT_ID).appendText (sServiceGroupID);
+      eRoot.appendElement (XML_ELEMENT_MIGRATION_KEY).appendText (sMigrationKey);
 
       final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
       aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aResponseDoc, aXWS), aXWS.getCharset ())

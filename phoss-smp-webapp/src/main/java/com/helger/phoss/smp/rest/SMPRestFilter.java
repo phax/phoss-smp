@@ -249,7 +249,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
     {
       final APIDescriptor aSMPMigrateOutboundCancel = new APIDescriptor (APIPath.put ("/migration/outbound/cancel/{" +
-                                                                                      PARAM_MIGRATION_ID +
+                                                                                      PARAM_SERVICE_GROUP_ID +
                                                                                       "}"),
                                                                          new APIExecutorMigrationOutboundCancelPut ());
       aSMPMigrateOutboundCancel.setExceptionMapper (aExceptionMapper);
@@ -257,7 +257,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
     {
       final APIDescriptor aSMPMigrateOutboundFinalize = new APIDescriptor (APIPath.put ("/migration/outbound/finalize/{" +
-                                                                                        PARAM_MIGRATION_ID +
+                                                                                        PARAM_SERVICE_GROUP_ID +
                                                                                         "}"),
                                                                            new APIExecutorMigrationOutboundFinalizePut ());
       aSMPMigrateOutboundFinalize.setExceptionMapper (aExceptionMapper);
@@ -269,7 +269,13 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                                "}/{" +
                                                                                PARAM_MIGRATION_KEY +
                                                                                "}"),
-                                                                  new APIExecutorMigrationInboundPut ());
+                                                                  new APIExecutorMigrationInboundFromPathPut ());
+      aSMPMigrateInbound.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPMigrateInbound);
+    }
+    {
+      final APIDescriptor aSMPMigrateInbound = new APIDescriptor (APIPath.put ("/migration/inbound"),
+                                                                  new APIExecutorMigrationInboundFromXMLPut ());
       aSMPMigrateInbound.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPMigrateInbound);
     }

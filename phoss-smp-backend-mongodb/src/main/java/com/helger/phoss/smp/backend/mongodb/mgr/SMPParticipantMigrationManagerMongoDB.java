@@ -158,6 +158,22 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return toDomain (aMatch);
   }
 
+  @Nullable
+  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
+                                                                          @Nullable final IParticipantIdentifier aParticipantID)
+  {
+    ValueEnforcer.notNull (eDirection, "Direction");
+    if (aParticipantID == null)
+      return null;
+
+    final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_DIRECTION, eDirection.getID ()),
+                                                                new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
+                                            .first ();
+    if (aMatch == null)
+      return null;
+    return toDomain (aMatch);
+  }
+
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)

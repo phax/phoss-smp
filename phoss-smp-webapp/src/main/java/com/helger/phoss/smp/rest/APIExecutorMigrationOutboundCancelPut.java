@@ -26,7 +26,10 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
@@ -63,9 +66,9 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
     }
     else
     {
-      final String sMigrationID = aPathVariables.get (SMPRestFilter.PARAM_MIGRATION_ID);
+      final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
 
-      LOGGER.info (sLogPrefix + "Cancelling outbound migration with ID '" + sMigrationID + "'");
+      LOGGER.info (sLogPrefix + "Cancelling outbound migration for Service Groups ID '" + sServiceGroupID + "'");
 
       // Only authenticated user may do so
       final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
@@ -73,23 +76,33 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
 
       final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
       final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-      // Check if ID is valid
-      final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.getParticipantMigrationOfID (sMigrationID);
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      if (aServiceGroupID == null)
+      {
+        // Invalid identifier
+        throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
+      }
+
+      // Find matching migration object
+      final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.getParticipantMigrationOfParticipantID (EParticipantMigrationDirection.OUTBOUND,
+                                                                                                                   aServiceGroupID);
       if (aMigration == null)
-        throw new SMPBadRequestException ("Failed to resolve participant migration with ID '" + sMigrationID + "'",
+        throw new SMPBadRequestException ("Failed to resolve outbound participant migration for Service Group ID '" + sServiceGroupID + "'",
                                           aDataProvider.getCurrentURI ());
 
-      if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.CANCELLED).isChanged ())
-      {
-        LOGGER.info (sLogPrefix + "The outbound Participant Migration with ID '" + sMigrationID + "' was successfully cancelled!");
-        aUnifiedResponse.setStatus (CHttp.HTTP_OK);
-      }
-      else
+      final String sMigrationID = aMigration.getID ();
+
+      // Change migration state
+      if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.CANCELLED).isUnchanged ())
       {
         throw new SMPBadRequestException ("Failed to cancel the outbound Participant Migration with ID '" + sMigrationID + "'",
                                           aDataProvider.getCurrentURI ());
       }
+
+      LOGGER.info (sLogPrefix + "The outbound Participant Migration with ID '" + sMigrationID + "' was successfully cancelled!");
+      aUnifiedResponse.setStatus (CHttp.HTTP_OK);
     }
   }
 }

@@ -86,6 +86,20 @@ public interface ISMPParticipantMigrationManager
   ISMPParticipantMigration getParticipantMigrationOfID (@Nullable String sID);
 
   /**
+   * Find the participant migration of the provided ID.
+   *
+   * @param eDirection
+   *        The direction to query. May not be <code>null</code>.
+   * @param aParticipantID
+   *        The participant ID to check. May be <code>null</code> in which case
+   *        the result is always <code>null</code>.
+   * @return <code>null</code> if no such participant migration is contained.
+   */
+  @Nullable
+  ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull EParticipantMigrationDirection eDirection,
+                                                                   @Nullable IParticipantIdentifier aParticipantID);
+
+  /**
    * Get all outbound participant migrations that have the provided state.
    *
    * @param eState
@@ -114,7 +128,8 @@ public interface ISMPParticipantMigrationManager
    * already running.
    *
    * @param aParticipantID
-   *        The participant ID to check. May be <code>null</code>.
+   *        The participant ID to check. May be <code>null</code> in which case
+   *        the result is always <code>false</code>.
    * @return <code>true</code> if an outbound migration is already running,
    *         <code>false</code> if not.
    */
@@ -125,7 +140,8 @@ public interface ISMPParticipantMigrationManager
    * already contained.
    *
    * @param aParticipantID
-   *        The participant ID to check. May be <code>null</code>.
+   *        The participant ID to check. May be <code>null</code> in which case
+   *        the result is always <code>false</code>.
    * @return <code>true</code> if an inbound migration is already contained,
    *         <code>false</code> if not.
    */

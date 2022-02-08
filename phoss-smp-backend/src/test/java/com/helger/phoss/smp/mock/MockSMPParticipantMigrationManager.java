@@ -17,6 +17,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
@@ -48,6 +49,12 @@ final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrati
   }
 
   public ISMPParticipantMigration getParticipantMigrationOfID (final String sID)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
+                                                                          @Nullable final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();
   }

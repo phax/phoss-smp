@@ -162,6 +162,17 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
     return getOfID (sID);
   }
 
+  @Nullable
+  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
+                                                                          @Nullable final IParticipantIdentifier aParticipantID)
+  {
+    ValueEnforcer.notNull (eDirection, "Direction");
+    if (aParticipantID == null)
+      return null;
+
+    return findFirst (x -> x.getDirection ().equals (eDirection) && x.getParticipantIdentifier ().hasSameContent (aParticipantID));
+  }
+
   @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
