@@ -47,6 +47,8 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
+import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
+import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -66,21 +68,24 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+
     // Is the remote query API disabled?
     if (SMPServerConfiguration.isRestRemoteQueryAPIDisabled ())
     {
-      LOGGER.warn ("The remote query API is disabled. getRemoteBusinessCard will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
-      return;
+      throw new SMPPreconditionFailedException ("The remote query API is disabled. getRemoteBusinessCard will not be executed",
+                                                aDataProvider.getCurrentURI ());
     }
 
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
-    final String sParticipantID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-    final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sParticipantID);
+    final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sServiceGroupID);
     if (aParticipantID == null)
-      throw SMPBadRequestException.failedToParseSG (sParticipantID, null);
+    {
+      throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
+    }
 
     final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
 

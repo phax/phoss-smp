@@ -95,13 +95,13 @@ public final class BusinessCardServerAPI
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr == null)
       {
-        throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("This SMP server does not support the Business Card API", m_aAPIProvider.getCurrentURI ());
       }
       final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aServiceGroup);
       if (aBusinessCard == null)
       {
         // No such business card
-        throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" + sServiceGroupID + "'",
+        throw new SMPNotFoundException ("No Business Card assigned to Service Group '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 
@@ -149,10 +149,11 @@ public final class BusinessCardServerAPI
       if (!aServiceGroupID.hasSameContent (aPayloadServiceGroupID))
       {
         // Business identifiers must be equal
-        throw new SMPBadRequestException ("Participant Inconsistency. The URL points to " +
+        throw new SMPBadRequestException ("Participant Inconsistency. The URL points to '" +
                                           aServiceGroupID.getURIEncoded () +
-                                          " whereas the BusinessCard contains " +
-                                          aPayloadServiceGroupID.getURIEncoded (),
+                                          "' whereas the BusinessCard contains '" +
+                                          aPayloadServiceGroupID.getURIEncoded () +
+                                          "'",
                                           m_aAPIProvider.getCurrentURI ());
       }
 
@@ -237,13 +238,13 @@ public final class BusinessCardServerAPI
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr == null)
       {
-        throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("This SMP server does not support the Business Card API", m_aAPIProvider.getCurrentURI ());
       }
       final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroupID);
       if (aBusinessCard == null)
       {
         // No such business card
-        throw new SMPNotFoundException ("No BusinessCard assigned to serviceGroup '" + sServiceGroupID + "'",
+        throw new SMPNotFoundException ("No Business Card assigned to Service Group '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
 

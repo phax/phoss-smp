@@ -21,9 +21,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.io.stream.StreamHelper;
@@ -33,6 +30,8 @@ import com.helger.pd.businesscard.generic.PDBusinessCard;
 import com.helger.pd.businesscard.helper.PDBusinessCardHelper;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.exception.SMPBadRequestException;
+import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BusinessCardServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
@@ -41,52 +40,45 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardPut.class);
-
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
                          @Nonnull final Map <String, String> aPathVariables,
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn ("The writable REST API is disabled. saveBusinessCard will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. saveBusinessCard will not be executed",
+                                                aDataProvider.getCurrentURI ());
     }
-    else
-      if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
-      {
-        // PD integration is disabled
-        LOGGER.warn ("The " +
-                     SMPWebAppConfiguration.getDirectoryName () +
-                     " integration is disabled. saveBusinessCard will not be executed.");
-        aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
-      }
-      else
-      {
-        // Parse main payload
-        final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
-        final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aPayload, (Charset) null);
-        if (aBC == null)
-        {
-          // Cannot parse
-          LOGGER.warn ("Failed to parse XML payload as BusinessCard.");
-          aUnifiedResponse.setStatus (CHttp.HTTP_BAD_REQUEST);
-        }
-        else
-        {
-          final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-          final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
-          final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
+    {
+      // PD integration is disabled
+      throw new SMPPreconditionFailedException ("The " +
+                                                SMPWebAppConfiguration.getDirectoryName () +
+                                                " integration is disabled. saveBusinessCard will not be executed",
+                                                aDataProvider.getCurrentURI ());
+    }
 
-          final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID, aBC, aBasicAuth);
-          if (eSuccess.isFailure ())
-            aUnifiedResponse.setStatus (CHttp.HTTP_INTERNAL_SERVER_ERROR);
-          else
-            aUnifiedResponse.setStatus (CHttp.HTTP_OK);
-        }
-      }
+    // Parse main payload
+    final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
+    final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aPayload, (Charset) null);
+    if (aBC == null)
+    {
+      // Cannot parse
+      throw new SMPBadRequestException ("Failed to parse XML payload as BusinessCard.", aDataProvider.getCurrentURI ());
+    }
+
+    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+
+    final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID, aBC, aBasicAuth);
+    if (eSuccess.isFailure ())
+      aUnifiedResponse.setStatus (CHttp.HTTP_INTERNAL_SERVER_ERROR);
+    else
+      aUnifiedResponse.setStatus (CHttp.HTTP_OK);
   }
 }

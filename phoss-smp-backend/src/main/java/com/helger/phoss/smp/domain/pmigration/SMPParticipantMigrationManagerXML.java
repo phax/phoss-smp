@@ -164,13 +164,17 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
 
   @Nullable
   public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
+                                                                          @Nonnull final EParticipantMigrationState eState,
                                                                           @Nullable final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (eDirection, "Direction");
+    ValueEnforcer.notNull (eState, "State");
     if (aParticipantID == null)
       return null;
 
-    return findFirst (x -> x.getDirection ().equals (eDirection) && x.getParticipantIdentifier ().hasSameContent (aParticipantID));
+    return findFirst (x -> x.getDirection ().equals (eDirection) &&
+                           x.getState ().equals (eState) &&
+                           x.getParticipantIdentifier ().hasSameContent (aParticipantID));
   }
 
   @Nonnull

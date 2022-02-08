@@ -90,13 +90,19 @@ public interface ISMPParticipantMigrationManager
    *
    * @param eDirection
    *        The direction to query. May not be <code>null</code>.
+   * @param eState
+   *        The state the entry must have. May not be <code>null</code>. If this
+   *        state is "cancelled" the result could be a list, so it's not
+   *        advisable to use this URL.
    * @param aParticipantID
    *        The participant ID to check. May be <code>null</code> in which case
    *        the result is always <code>null</code>.
    * @return <code>null</code> if no such participant migration is contained.
+   *         The first matching participant otherwise.
    */
   @Nullable
   ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull EParticipantMigrationDirection eDirection,
+                                                                   @Nonnull EParticipantMigrationState eState,
                                                                    @Nullable IParticipantIdentifier aParticipantID);
 
   /**

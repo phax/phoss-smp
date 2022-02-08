@@ -19,10 +19,6 @@ package com.helger.phoss.smp.rest;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
@@ -30,6 +26,7 @@ import com.helger.pd.businesscard.v3.PD3BusinessCardMarshaller;
 import com.helger.pd.businesscard.v3.PD3BusinessCardType;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BusinessCardServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
@@ -39,31 +36,28 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
 
 public final class APIExecutorBusinessCardGet extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardGet.class);
-
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
                          @Nonnull final Map <String, String> aPathVariables,
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+
     if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
     {
       // PD integration is disabled
-      LOGGER.warn ("The " + SMPWebAppConfiguration.getDirectoryName () + " integration is disabled. getBusinessCard will not be executed.");
-      aUnifiedResponse.setStatus (HttpServletResponse.SC_NOT_FOUND);
+      throw new SMPPreconditionFailedException ("The " +
+                                                SMPWebAppConfiguration.getDirectoryName () +
+                                                " integration is disabled. getBusinessCard will not be executed",
+                                                aDataProvider.getCurrentURI ());
     }
-    else
-    {
-      final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-      final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
-      /*
-       * getBusinessCard throws an exception if non is found
-       */
-      final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
-      final byte [] aBytes = new PD3BusinessCardMarshaller ().getAsBytes (ret);
 
-      aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
-    }
+    // getBusinessCard throws an exception if non is found
+    final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
+    final byte [] aBytes = new PD3BusinessCardMarshaller ().getAsBytes (ret);
+
+    aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
   }
 }

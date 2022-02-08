@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
@@ -58,6 +57,7 @@ import com.helger.xml.microdom.MicroDocument;
 import com.helger.xml.microdom.serialize.MicroWriter;
 import com.helger.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.xml.serialize.write.XMLWriterSettings;
+import com.sun.xml.ws.client.ClientTransportException;
 
 /**
  * REST API to start an outbound migration for a participant
@@ -77,93 +77,98 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sLogPrefix = "[Migration-Outbound-Start] ";
+    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn (sLogPrefix + "The writable REST API is disabled. migrationOutboundStart will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. migrationOutboundStart will not be executed",
+                                                aDataProvider.getCurrentURI ());
     }
-    else
+
+    final String sLogPrefix = "[REST API Migration-Outbound-Start] ";
+    LOGGER.info (sLogPrefix + "Starting outbound migration for Service Group ID '" + sServiceGroupID + "'");
+
+    // Only authenticated user may do so
+    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+
+    if (aSMLInfo == null)
     {
-      final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-
-      LOGGER.info (sLogPrefix + "Starting outbound migration for Service Group ID '" + sServiceGroupID + "'");
-
-      // Only authenticated user may do so
-      final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
-      SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
-
-      final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
-      final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-      final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
-      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
-
-      if (aSMLInfo == null)
-        throw new SMPPreconditionFailedException ("Currently no SML is available. Please select it in the UI at the 'SMP Settings' page.",
-                                                  aDataProvider.getCurrentURI ());
-      if (!aSettings.isSMLEnabled ())
-        throw new SMPPreconditionFailedException ("SML Connection is not enabled hence no participant can be migrated.",
-                                                  aDataProvider.getCurrentURI ());
-
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
-      {
-        // Invalid identifier
-        throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
-      }
-
-      // Check that service group exists
-      if (!aServiceGroupMgr.containsSMPServiceGroupWithID (aServiceGroupID))
-      {
-        throw new SMPBadRequestException ("The Service Group '" + sServiceGroupID + "' does not exist.", aDataProvider.getCurrentURI ());
-      }
-
-      // Ensure no existing migration is in process
-      if (aParticipantMigrationMgr.containsOutboundMigrationInProgress (aServiceGroupID))
-      {
-        throw new SMPBadRequestException ("The outbound migration of the Service Group '" + sServiceGroupID + "' is already in progress.",
-                                          aDataProvider.getCurrentURI ());
-      }
-
-      String sMigrationKey = null;
-      try
-      {
-        final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSMLInfo);
-        aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
-
-        // Create a random migration key,
-        // Than call SML
-        sMigrationKey = aCaller.prepareToMigrate (aServiceGroupID, SMPServerConfiguration.getSMLSMPID ());
-        LOGGER.info (sLogPrefix + "Successfully called prepareToMigrate on SML. Created migration key is '" + sMigrationKey + "'");
-      }
-      catch (final BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault ex)
-      {
-        throw new SMPSMLException ("Failed to call prepareToMigrate on SML for Service Group '" + sServiceGroupID + "'", ex);
-      }
-
-      // Remember internally
-      final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.createOutboundParticipantMigration (aServiceGroupID,
-                                                                                                               sMigrationKey);
-      if (aMigration == null)
-        throw new SMPInternalErrorException ("Failed to create outbound participant migration for '" + sServiceGroupID + "' internally");
-
-      LOGGER.info (sLogPrefix + "Successfully created outbound participant migration with ID '" + aMigration.getID () + "' internally.");
-
-      // Build result
-      final IMicroDocument aResponseDoc = new MicroDocument ();
-      final IMicroElement eRoot = aResponseDoc.appendElement ("migrationOutboundResponse");
-      eRoot.setAttribute ("success", true);
-      eRoot.appendElement (XML_ELEMENT_PARTICIPANT_ID).appendText (sServiceGroupID);
-      eRoot.appendElement (XML_ELEMENT_MIGRATION_KEY).appendText (sMigrationKey);
-
-      final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
-      aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aResponseDoc, aXWS), aXWS.getCharset ())
-                      .setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
-                                                                                           aXWS.getCharset ().name ()));
+      throw new SMPPreconditionFailedException ("Currently no SML is available. Please select it in the UI at the 'SMP Settings' page",
+                                                aDataProvider.getCurrentURI ());
     }
+    if (!aSettings.isSMLEnabled ())
+    {
+      throw new SMPPreconditionFailedException ("SML Connection is not enabled hence no participant can be migrated",
+                                                aDataProvider.getCurrentURI ());
+    }
+
+    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+    if (aServiceGroupID == null)
+    {
+      // Invalid identifier
+      throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
+    }
+
+    // Check that service group exists
+    if (!aServiceGroupMgr.containsSMPServiceGroupWithID (aServiceGroupID))
+    {
+      throw new SMPBadRequestException ("The Service Group '" + sServiceGroupID + "' does not exist", aDataProvider.getCurrentURI ());
+    }
+
+    // Ensure no existing migration is in process
+    if (aParticipantMigrationMgr.containsOutboundMigrationInProgress (aServiceGroupID))
+    {
+      throw new SMPBadRequestException ("The outbound Participant Migration of the Service Group '" +
+                                        sServiceGroupID +
+                                        "' is already in progress",
+                                        aDataProvider.getCurrentURI ());
+    }
+
+    String sMigrationKey = null;
+    try
+    {
+      final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSMLInfo);
+      aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
+
+      // Create a random migration key,
+      // Than call SML
+      sMigrationKey = aCaller.prepareToMigrate (aServiceGroupID, SMPServerConfiguration.getSMLSMPID ());
+      LOGGER.info (sLogPrefix + "Successfully called prepareToMigrate on SML. Created migration key is '" + sMigrationKey + "'");
+    }
+    catch (final BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault | ClientTransportException ex)
+    {
+      throw new SMPSMLException ("Failed to call prepareToMigrate on SML for Service Group '" + sServiceGroupID + "'", ex);
+    }
+
+    // Remember internally
+    final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.createOutboundParticipantMigration (aServiceGroupID,
+                                                                                                             sMigrationKey);
+    if (aMigration == null)
+    {
+      throw new SMPInternalErrorException ("Failed to create outbound Participant Migration for '" + sServiceGroupID + "' internally");
+    }
+
+    LOGGER.info (sLogPrefix + "Successfully created outbound Participant Migration with ID '" + aMigration.getID () + "' internally.");
+
+    // Build result
+    final IMicroDocument aResponseDoc = new MicroDocument ();
+    final IMicroElement eRoot = aResponseDoc.appendElement ("migrationOutboundResponse");
+    eRoot.setAttribute ("success", true);
+    eRoot.appendElement (XML_ELEMENT_PARTICIPANT_ID).appendText (sServiceGroupID);
+    eRoot.appendElement (XML_ELEMENT_MIGRATION_KEY).appendText (sMigrationKey);
+
+    final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
+    aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aResponseDoc, aXWS), aXWS.getCharset ())
+                    .setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
+                                                                                         aXWS.getCharset ().name ()));
   }
 }

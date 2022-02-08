@@ -160,13 +160,16 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
 
   @Nullable
   public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
+                                                                          @Nonnull final EParticipantMigrationState eState,
                                                                           @Nullable final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (eDirection, "Direction");
+    ValueEnforcer.notNull (eState, "State");
     if (aParticipantID == null)
       return null;
 
     final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_DIRECTION, eDirection.getID ()),
+                                                                new Document (BSON_STATE, eState.getID ()),
                                                                 new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
                                             .first ();
     if (aMatch == null)
@@ -206,8 +209,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
       return false;
 
     return getCollection ().find (Filters.and (new Document (BSON_DIRECTION, EParticipantMigrationDirection.OUTBOUND.getID ()),
-                                               new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID)),
-                                               new Document (BSON_STATE, EParticipantMigrationState.IN_PROGRESS.getID ())))
+                                               new Document (BSON_STATE, EParticipantMigrationState.IN_PROGRESS.getID ()),
+                                               new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
                            .iterator ()
                            .hasNext ();
   }

@@ -20,14 +20,12 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
@@ -37,39 +35,36 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceGroupDelete.class);
-
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
                          @Nonnull final Map <String, String> aPathVariables,
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn ("The writable REST API is disabled. deleteServiceGroup will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. deleteServiceGroup will not be executed",
+                                                aDataProvider.getCurrentURI ());
     }
-    else
-    {
-      final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-      final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
-      final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
-      final boolean bDeleteInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("delete-in-sml"));
 
-      switch (SMPServerConfiguration.getRESTType ())
-      {
-        case PEPPOL:
-          new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, bDeleteInSML, aBasicAuth);
-          break;
-        case OASIS_BDXR_V1:
-          new BDXR1ServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, bDeleteInSML, aBasicAuth);
-          break;
-        default:
-          throw new UnsupportedOperationException ("Unsupported REST type specified!");
-      }
-      aUnifiedResponse.setStatus (CHttp.HTTP_OK);
+    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final boolean bDeleteInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("delete-in-sml"));
+
+    switch (SMPServerConfiguration.getRESTType ())
+    {
+      case PEPPOL:
+        new SMPServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, bDeleteInSML, aBasicAuth);
+        break;
+      case OASIS_BDXR_V1:
+        new BDXR1ServerAPI (aDataProvider).deleteServiceGroup (sServiceGroupID, bDeleteInSML, aBasicAuth);
+        break;
+      default:
+        throw new UnsupportedOperationException ("Unsupported REST type specified!");
     }
+    aUnifiedResponse.setStatus (CHttp.HTTP_OK);
   }
 }

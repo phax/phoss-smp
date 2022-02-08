@@ -35,6 +35,7 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
+import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -56,53 +57,67 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sLogPrefix = "[Migration-Outbound-Cancel] ";
+    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn (sLogPrefix + "The writable REST API is disabled. migrationOutboundCancel will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. migrationOutboundCancel will not be executed",
+                                                aDataProvider.getCurrentURI ());
     }
-    else
+
+    final String sLogPrefix = "[REST API Migration-Outbound-Cancel] ";
+
+    LOGGER.info (sLogPrefix + "Cancelling outbound Participant Migration for Service Group ID '" + sServiceGroupID + "'");
+
+    // Only authenticated user may do so
+    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+
+    final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+
+    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+    if (aServiceGroupID == null)
     {
-      final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-
-      LOGGER.info (sLogPrefix + "Cancelling outbound migration for Service Groups ID '" + sServiceGroupID + "'");
-
-      // Only authenticated user may do so
-      final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
-      SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
-
-      final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
-      final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
-      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-      if (aServiceGroupID == null)
-      {
-        // Invalid identifier
-        throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
-      }
-
-      // Find matching migration object
-      final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.getParticipantMigrationOfParticipantID (EParticipantMigrationDirection.OUTBOUND,
-                                                                                                                   aServiceGroupID);
-      if (aMigration == null)
-        throw new SMPBadRequestException ("Failed to resolve outbound participant migration for Service Group ID '" + sServiceGroupID + "'",
-                                          aDataProvider.getCurrentURI ());
-
-      final String sMigrationID = aMigration.getID ();
-
-      // Change migration state
-      if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.CANCELLED).isUnchanged ())
-      {
-        throw new SMPBadRequestException ("Failed to cancel the outbound Participant Migration with ID '" + sMigrationID + "'",
-                                          aDataProvider.getCurrentURI ());
-      }
-
-      LOGGER.info (sLogPrefix + "The outbound Participant Migration with ID '" + sMigrationID + "' was successfully cancelled!");
-      aUnifiedResponse.setStatus (CHttp.HTTP_OK);
+      // Invalid identifier
+      throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
     }
+
+    // Find matching migration object
+    final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.getParticipantMigrationOfParticipantID (EParticipantMigrationDirection.OUTBOUND,
+                                                                                                                 EParticipantMigrationState.IN_PROGRESS,
+                                                                                                                 aServiceGroupID);
+    if (aMigration == null)
+    {
+      throw new SMPBadRequestException ("Failed to resolve outbound Participant Migration for Service Group ID '" + sServiceGroupID + "'",
+                                        aDataProvider.getCurrentURI ());
+    }
+
+    final String sMigrationID = aMigration.getID ();
+    LOGGER.info (sLogPrefix +
+                 "Found the outbound Participant Migration ID '" +
+                 sMigrationID +
+                 "' with state " +
+                 aMigration.getState () +
+                 " for the Service Group ID '" +
+                 sServiceGroupID +
+                 "'");
+
+    // Change migration state
+    if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.CANCELLED).isUnchanged ())
+    {
+      throw new SMPBadRequestException ("Failed to cancel the outbound Participant Migration with ID '" + sMigrationID + "'",
+                                        aDataProvider.getCurrentURI ());
+    }
+
+    LOGGER.info (sLogPrefix +
+                 "The outbound Participant Migration with ID '" +
+                 sMigrationID +
+                 "' on Service Group ID '" +
+                 sServiceGroupID +
+                 "' was successfully cancelled!");
+    aUnifiedResponse.setStatus (CHttp.HTTP_OK);
   }
 }

@@ -179,27 +179,30 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
 
   @Nullable
   public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
+                                                                          @Nonnull final EParticipantMigrationState eState,
                                                                           @Nullable final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (eDirection, "Direction");
+    ValueEnforcer.notNull (eState, "State");
     if (aParticipantID == null)
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    newExecutor ().querySingle ("SELECT id, state, initdt, migkey FROM smp_pmigration WHERE direction=? AND pid=?",
-                                new ConstantPreparedStatementDataProvider (eDirection.getID (), aParticipantID.getURIEncoded ()),
+    newExecutor ().querySingle ("SELECT id, initdt, migkey FROM smp_pmigration WHERE direction=? AND state=? AND pid=?",
+                                new ConstantPreparedStatementDataProvider (eDirection.getID (),
+                                                                           eState.getID (),
+                                                                           aParticipantID.getURIEncoded ()),
                                 aDBResult::set);
     if (aDBResult.isNotSet ())
       return null;
 
     final DBResultRow aRow = aDBResult.get ();
-    final EParticipantMigrationState eState = EParticipantMigrationState.getFromIDOrNull (aRow.getAsString (1));
     return new SMPParticipantMigration (aRow.getAsString (0),
                                         eDirection,
                                         eState,
                                         aParticipantID,
-                                        aRow.getAsLocalDateTime (2),
-                                        aRow.getAsString (3));
+                                        aRow.getAsLocalDateTime (1),
+                                        aRow.getAsString (2));
   }
 
   @Nonnull

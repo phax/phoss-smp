@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
@@ -61,6 +60,7 @@ import com.helger.xml.microdom.MicroDocument;
 import com.helger.xml.microdom.serialize.MicroWriter;
 import com.helger.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.xml.serialize.write.XMLWriterSettings;
+import com.sun.xml.ws.client.ClientTransportException;
 
 /**
  * REST API to perform an inbound migration for a participant
@@ -97,11 +97,15 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
 
     if (aSMLInfo == null)
-      throw new SMPPreconditionFailedException ("Currently no SML is available. Please select it in the UI at the 'SMP Settings' page.",
+    {
+      throw new SMPPreconditionFailedException ("Currently no SML is available. Please select it in the UI at the 'SMP Settings' page",
                                                 aDataProvider.getCurrentURI ());
+    }
     if (!aSettings.isSMLEnabled ())
-      throw new SMPPreconditionFailedException ("SML Connection is not enabled hence no participant can be migrated.",
+    {
+      throw new SMPPreconditionFailedException ("SML Connection is not enabled hence no participant can be migrated",
                                                 aDataProvider.getCurrentURI ());
+    }
 
     final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
     if (aParticipantID == null)
@@ -139,7 +143,7 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
                    sMigrationKey +
                    "'");
     }
-    catch (final BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault ex)
+    catch (final BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault | ClientTransportException ex)
     {
       throw new SMPSMLException ("Failed to confirm the migration for participant '" +
                                  aParticipantID.getURIEncoded () +
@@ -172,6 +176,7 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     }
     else
     {
+      // No exception here
       LOGGER.error (sLogPrefix + "Error creating the new SMP Service Group for participant '" + aParticipantID.getURIEncoded () + "'.",
                     aCaughtEx);
     }
@@ -189,7 +194,8 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     }
     else
     {
-      LOGGER.error ("Failed to store the participant migration for '" + aParticipantID.getURIEncoded () + "'.");
+      // No exception here
+      LOGGER.error (sLogPrefix + "Failed to store the participant migration for '" + aParticipantID.getURIEncoded () + "'.");
     }
 
     final IMicroDocument aResponseDoc = new MicroDocument ();
@@ -210,20 +216,19 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sLogPrefix = "[Migration-Inbound] ";
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn (sLogPrefix + "The writable REST API is disabled. migrationInbound will not be executed.");
-      aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. migrationInbound will not be executed",
+                                                aDataProvider.getCurrentURI ());
     }
-    else
-    {
-      final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-      final String sMigrationKey = aPathVariables.get (SMPRestFilter.PARAM_MIGRATION_KEY);
 
-      migrationInbound (sServiceGroupID, sMigrationKey, sLogPrefix, aRequestScope, aUnifiedResponse);
-    }
+    final String sLogPrefix = "[REST API Migration-Inbound] ";
+    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final String sMigrationKey = aPathVariables.get (SMPRestFilter.PARAM_MIGRATION_KEY);
+
+    migrationInbound (sServiceGroupID, sMigrationKey, sLogPrefix, aRequestScope, aUnifiedResponse);
   }
 }

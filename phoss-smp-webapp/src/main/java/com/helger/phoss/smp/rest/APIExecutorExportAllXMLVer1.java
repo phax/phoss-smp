@@ -60,7 +60,7 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sLogPrefix = "[Export-All-XML-V1] ";
+    final String sLogPrefix = "[REST API Export-All-XML-V1] ";
     LOGGER.info (sLogPrefix + "Starting Export");
 
     // Only authenticated user may do so

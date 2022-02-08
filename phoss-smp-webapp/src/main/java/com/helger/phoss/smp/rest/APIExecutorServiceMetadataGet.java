@@ -32,6 +32,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.mime.CMimeType;
 import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
@@ -100,7 +101,7 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     }
     catch (final Exception ex)
     {
-      throw new IllegalStateException ("Error in signing the response XML", ex);
+      throw new SMPInternalErrorException ("Error in signing the response XML", ex);
     }
 
     // Serialize the signed document

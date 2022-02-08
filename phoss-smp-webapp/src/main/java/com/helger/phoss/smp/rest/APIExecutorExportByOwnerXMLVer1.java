@@ -65,7 +65,7 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
   {
     final String sPathUserLoginName = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
 
-    final String sLogPrefix = "[Export-ByOwner-XML-V1] ";
+    final String sLogPrefix = "[REST API Export-ByOwner-XML-V1] ";
     LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");
 
     // Only authenticated user may do so

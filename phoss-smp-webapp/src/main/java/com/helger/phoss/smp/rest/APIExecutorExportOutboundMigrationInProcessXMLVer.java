@@ -65,7 +65,7 @@ public final class APIExecutorExportOutboundMigrationInProcessXMLVer extends Abs
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sLogPrefix = "[Export-OutboundMigrationInProcess-XML-V1] ";
+    final String sLogPrefix = "[REST API Export-OutboundMigrationInProcess-XML-V1] ";
     LOGGER.info (sLogPrefix + "Starting Export for all with outbound migration state 'in progress'");
 
     // Only authenticated user may do so
