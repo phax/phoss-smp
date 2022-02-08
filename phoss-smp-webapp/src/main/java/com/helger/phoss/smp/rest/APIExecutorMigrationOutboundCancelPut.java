@@ -53,18 +53,19 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sLogPrefix = "[Migration-Outbound-Cancel] ";
+
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn ("The writable REST API is disabled. migrationOutboundCancel will not be executed.");
+      LOGGER.warn (sLogPrefix + "The writable REST API is disabled. migrationOutboundCancel will not be executed.");
       aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
     {
       final String sMigrationID = aPathVariables.get (SMPRestFilter.PARAM_MIGRATION_ID);
 
-      final String sLogPrefix = "[Migration-Outbound-Cancel] ";
-      LOGGER.info (sLogPrefix + "Cancelling outbound migration");
+      LOGGER.info (sLogPrefix + "Cancelling outbound migration with ID '" + sMigrationID + "'");
 
       // Only authenticated user may do so
       final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
@@ -81,7 +82,7 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
 
       if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.CANCELLED).isChanged ())
       {
-        LOGGER.info ("The outbound Participant Migration with ID '" + sMigrationID + "' was successfully cancelled!");
+        LOGGER.info (sLogPrefix + "The outbound Participant Migration with ID '" + sMigrationID + "' was successfully cancelled!");
         aUnifiedResponse.setStatus (CHttp.HTTP_OK);
       }
       else

@@ -102,17 +102,18 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sLogPrefix = "[Import-XML-V1] ";
+
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn ("The writable REST API is disabled. importServiceGroups will not be executed.");
+      LOGGER.warn (sLogPrefix + "The writable REST API is disabled. importServiceGroups will not be executed.");
       aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
     {
       final String sPathUserLoginName = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
 
-      final String sLogPrefix = "[Import-XML-V1] ";
       LOGGER.info (sLogPrefix + "Starting Import");
 
       // Only authenticated user may do so

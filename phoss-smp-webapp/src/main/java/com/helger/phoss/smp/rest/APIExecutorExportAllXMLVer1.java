@@ -79,6 +79,8 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
                                                                       aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ());
     final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards);
 
+    LOGGER.info (sLogPrefix + "Finished creating Export data");
+
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();
     aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aDoc, aXWS), aXWS.getCharset ());

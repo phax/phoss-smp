@@ -57,6 +57,8 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sLogPrefix = "[Migration-Outbound-Finalize] ";
+
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
@@ -67,8 +69,7 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
     {
       final String sMigrationID = aPathVariables.get (SMPRestFilter.PARAM_MIGRATION_ID);
 
-      final String sLogPrefix = "[Migration-Outbound-Finalize] ";
-      LOGGER.info (sLogPrefix + "Finalizing outbound migration");
+      LOGGER.info (sLogPrefix + "Finalizing outbound migration for migration ID '" + sMigrationID + "'");
 
       // Only authenticated user may do so
       final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
@@ -91,7 +92,8 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
       if (aParticipantMigrationMgr.setParticipantMigrationState (aMigration.getID (), EParticipantMigrationState.MIGRATED).isUnchanged ())
         throw new SMPBadRequestException ("The participant migration with ID '" + sMigrationID + "' is already finalized",
                                           aDataProvider.getCurrentURI ());
-      LOGGER.info ("The outbound Participant Migration with ID '" +
+      LOGGER.info (sLogPrefix +
+                   "The outbound Participant Migration with ID '" +
                    sMigrationID +
                    "' for '" +
                    aParticipantID.getURIEncoded () +
@@ -103,7 +105,8 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
         // in the SML
         if (aServiceGroupMgr.deleteSMPServiceGroup (aParticipantID, false).isChanged ())
         {
-          LOGGER.info ("The SMP ServiceGroup for participant '" +
+          LOGGER.info (sLogPrefix +
+                       "The SMP ServiceGroup for participant '" +
                        aParticipantID.getURIEncoded () +
                        "' was successfully deleted from this SMP (without SML)!");
         }
@@ -121,7 +124,8 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
         // manager
         if (aParticipantMigrationMgr.setParticipantMigrationState (aMigration.getID (), eOldState).isChanged ())
         {
-          LOGGER.info ("Successfully reverted the state of the outbound Participant Migration for '" +
+          LOGGER.warn (sLogPrefix +
+                       "Successfully reverted the state of the outbound Participant Migration for '" +
                        aParticipantID.getURIEncoded () +
                        "' to " +
                        eOldState +
@@ -130,7 +134,8 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
         else
         {
           // Error in error handling. Yeah
-          LOGGER.error ("Failed to revert the state of the outbound Participant Migration for '" +
+          LOGGER.error (sLogPrefix +
+                        "Failed to revert the state of the outbound Participant Migration for '" +
                         aParticipantID.getURIEncoded () +
                         "' to " +
                         eOldState +

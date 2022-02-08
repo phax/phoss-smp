@@ -75,18 +75,19 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sLogPrefix = "[Migration-Outbound-Start] ";
+
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      LOGGER.warn ("The writable REST API is disabled. migrationOutboundStart will not be executed.");
+      LOGGER.warn (sLogPrefix + "The writable REST API is disabled. migrationOutboundStart will not be executed.");
       aUnifiedResponse.setStatus (CHttp.HTTP_PRECONDITION_FAILED);
     }
     else
     {
       final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
 
-      final String sLogPrefix = "[Migration-Outbound-Start] ";
-      LOGGER.info (sLogPrefix + "Starting outbound migration");
+      LOGGER.info (sLogPrefix + "Starting outbound migration for Service Group ID '" + sServiceGroupID + "'");
 
       // Only authenticated user may do so
       final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
@@ -122,7 +123,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
       // Ensure no existing migration is in process
       if (aParticipantMigrationMgr.containsOutboundMigrationInProgress (aServiceGroupID))
       {
-        throw new SMPBadRequestException ("The migration of the Service Group '" + sServiceGroupID + "' is already in progress.",
+        throw new SMPBadRequestException ("The outbound migration of the Service Group '" + sServiceGroupID + "' is already in progress.",
                                           aDataProvider.getCurrentURI ());
       }
 
@@ -135,7 +136,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
         // Create a random migration key,
         // Than call SML
         sMigrationKey = aCaller.prepareToMigrate (aServiceGroupID, SMPServerConfiguration.getSMLSMPID ());
-        LOGGER.info ("Successfully called prepareToMigrate on SML. Created migration key is '" + sMigrationKey + "'");
+        LOGGER.info (sLogPrefix + "Successfully called prepareToMigrate on SML. Created migration key is '" + sMigrationKey + "'");
       }
       catch (final BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault ex)
       {
@@ -148,12 +149,14 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
       if (aMigration == null)
         throw new SMPInternalErrorException ("Failed to create outbound participant migration for '" + sServiceGroupID + "' internally");
 
-      LOGGER.info ("Successfully created outbound participant migration internally.");
+      LOGGER.info (sLogPrefix + "Successfully created outbound participant migration with ID '" + aMigration.getID () + "' internally.");
 
+      // Build result
       final IMicroDocument aResponseDoc = new MicroDocument ();
       final IMicroElement eRoot = aResponseDoc.appendElement ("migrationOutboundStartResponse");
       eRoot.setAttribute ("success", true);
-      eRoot.appendElement ("migrationID", aMigration.getID ());
+      eRoot.appendElement ("participantID").appendText (sServiceGroupID);
+      eRoot.appendElement ("migrationID").appendText (aMigration.getID ());
       eRoot.appendElement ("migrationKey").appendText (sMigrationKey);
 
       final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
