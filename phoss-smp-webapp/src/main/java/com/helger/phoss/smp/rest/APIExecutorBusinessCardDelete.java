@@ -59,7 +59,7 @@ public final class APIExecutorBusinessCardDelete extends AbstractSMPAPIExecutor
                                                 aDataProvider.getCurrentURI ());
     }
 
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
 
     new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID, aBasicAuth);
     aUnifiedResponse.setStatus (CHttp.HTTP_OK);

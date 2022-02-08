@@ -46,7 +46,7 @@ public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
     // No service group available
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
 
-    final BasicAuthClientCredentials aCredentials = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())

@@ -73,7 +73,7 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
       throw new SMPBadRequestException ("Failed to parse XML payload as BusinessCard.", aDataProvider.getCurrentURI ());
     }
 
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
 
     final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID, aBC, aBasicAuth);
     if (eSuccess.isFailure ())

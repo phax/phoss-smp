@@ -91,7 +91,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     LOGGER.info (sLogPrefix + "Starting outbound migration for Service Group ID '" + sServiceGroupID + "'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
@@ -169,6 +169,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
     aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aResponseDoc, aXWS), aXWS.getCharset ())
                     .setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
-                                                                                         aXWS.getCharset ().name ()));
+                                                                                         aXWS.getCharset ().name ()))
+                    .disableCaching ();
   }
 }

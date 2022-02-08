@@ -67,7 +67,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
       throw new SMPBadRequestException ("Failed to parse provided payload as XML", aDataProvider.getCurrentURI ());
     }
 
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     final boolean bCreateInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("create-in-sml"));
 
     ESuccess eSuccess = ESuccess.FAILURE;
@@ -99,6 +99,6 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
     if (eSuccess.isFailure ())
       aUnifiedResponse.setStatus (CHttp.HTTP_INTERNAL_SERVER_ERROR);
     else
-      aUnifiedResponse.setStatus (CHttp.HTTP_OK);
+      aUnifiedResponse.setStatus (CHttp.HTTP_OK).disableCaching ();
   }
 }

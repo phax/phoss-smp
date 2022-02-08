@@ -74,7 +74,7 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
     LOGGER.info (sLogPrefix + "Finalizing outbound migration for Service Group ID '" + sServiceGroupID + "'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
@@ -160,6 +160,6 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
       throw ex;
     }
 
-    aUnifiedResponse.setStatus (CHttp.HTTP_OK);
+    aUnifiedResponse.setStatus (CHttp.HTTP_OK).disableCaching ();
   }
 }

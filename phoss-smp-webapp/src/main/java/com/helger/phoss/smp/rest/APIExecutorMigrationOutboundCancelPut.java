@@ -72,7 +72,7 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
     LOGGER.info (sLogPrefix + "Cancelling outbound Participant Migration for Service Group ID '" + sServiceGroupID + "'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
@@ -118,6 +118,6 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
                  "' on Service Group ID '" +
                  sServiceGroupID +
                  "' was successfully cancelled!");
-    aUnifiedResponse.setStatus (CHttp.HTTP_OK);
+    aUnifiedResponse.setStatus (CHttp.HTTP_OK).disableCaching ();
   }
 }

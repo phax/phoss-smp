@@ -51,7 +51,7 @@ public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
                                                 aDataProvider.getCurrentURI ());
     }
 
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     final boolean bDeleteInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("delete-in-sml"));
 
     switch (SMPServerConfiguration.getRESTType ())
@@ -65,6 +65,6 @@ public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");
     }
-    aUnifiedResponse.setStatus (CHttp.HTTP_OK);
+    aUnifiedResponse.setStatus (CHttp.HTTP_OK).disableCaching ();
   }
 }

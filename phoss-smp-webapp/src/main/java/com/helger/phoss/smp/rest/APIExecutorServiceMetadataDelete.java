@@ -52,7 +52,7 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
     }
 
     final String sDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
 
     switch (SMPServerConfiguration.getRESTType ())
     {
@@ -65,6 +65,6 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");
     }
-    aUnifiedResponse.setStatus (CHttp.HTTP_OK);
+    aUnifiedResponse.setStatus (CHttp.HTTP_OK).disableCaching ();
   }
 }

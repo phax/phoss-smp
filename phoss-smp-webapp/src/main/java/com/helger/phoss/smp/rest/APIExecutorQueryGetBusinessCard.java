@@ -58,7 +58,7 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  *
  * @author Philip Helger
  */
-public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecutor
+public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecutorQuery
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetBusinessCard.class);
 
@@ -150,7 +150,7 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
       final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
       aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8)
                       .setMimeType (CMimeType.APPLICATION_JSON)
-                      .enableCaching (3 * CGlobal.SECONDS_PER_HOUR);
+                      .enableCaching (1 * CGlobal.SECONDS_PER_HOUR);
     }
   }
 }

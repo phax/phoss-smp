@@ -86,7 +86,7 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
                  "'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     final IUser aOwningUser = SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
@@ -207,7 +207,8 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
     aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aResponseDoc, aXWS), aXWS.getCharset ())
                     .setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
-                                                                                         aXWS.getCharset ().name ()));
+                                                                                         aXWS.getCharset ().name ()))
+                    .disableCaching ();
   }
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,

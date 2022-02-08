@@ -68,7 +68,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
     }
 
     final String sDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
 
     ESuccess eSuccess = ESuccess.FAILURE;
     switch (SMPServerConfiguration.getRESTType ())
@@ -104,6 +104,6 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
     if (eSuccess.isFailure ())
       aUnifiedResponse.setStatus (CHttp.HTTP_INTERNAL_SERVER_ERROR);
     else
-      aUnifiedResponse.setStatus (CHttp.HTTP_OK);
+      aUnifiedResponse.setStatus (CHttp.HTTP_OK).disableCaching ();
   }
 }

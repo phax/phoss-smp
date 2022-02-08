@@ -119,7 +119,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     LOGGER.info (sLogPrefix + "Starting Import");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     // Start action after authentication
@@ -261,5 +261,6 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
       aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8).setMimeType (CMimeType.APPLICATION_JSON);
     }
+    aUnifiedResponse.disableCaching ();
   }
 }

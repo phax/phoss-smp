@@ -69,7 +69,7 @@ public final class APIExecutorExportOutboundMigrationInProcessXMLVer extends Abs
     LOGGER.info (sLogPrefix + "Starting Export for all with outbound migration state 'in progress'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = SMPRestRequestHelper.getMandatoryAuth (aRequestScope.headers ());
+    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     // Start action after authentication
@@ -102,8 +102,9 @@ public final class APIExecutorExportOutboundMigrationInProcessXMLVer extends Abs
 
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();
-    aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aDoc, aXWS), aXWS.getCharset ());
-    aUnifiedResponse.setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
-                                                                                         aXWS.getCharset ().name ()));
+    aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aDoc, aXWS), aXWS.getCharset ())
+                    .setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
+                                                                                         aXWS.getCharset ().name ()))
+                    .disableCaching ();
   }
 }

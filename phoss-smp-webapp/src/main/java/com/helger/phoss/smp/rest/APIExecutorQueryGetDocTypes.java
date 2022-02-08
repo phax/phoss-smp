@@ -60,7 +60,7 @@ import com.helger.smpclient.json.SMPJsonResponse;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
+public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQuery
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetDocTypes.class);
 
@@ -213,7 +213,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutor
       final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
       aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8)
                       .setMimeType (CMimeType.APPLICATION_JSON)
-                      .enableCaching (3 * CGlobal.SECONDS_PER_HOUR);
+                      .enableCaching (1 * CGlobal.SECONDS_PER_HOUR);
     }
   }
 }
