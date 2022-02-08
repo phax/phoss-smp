@@ -71,6 +71,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   public static final String PARAM_USER_ID = "UserId";
   public static final String PARAM_DOCUMENT_TYPE_ID = "DocumentTypeId";
   public static final String PARAM_MIGRATION_ID = "MigrationId";
+  public static final String PARAM_MIGRATION_KEY = "MigrationKey";
 
   static final String LOG_PREFIX = "[REST API] ";
 
@@ -261,6 +262,16 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                            new APIExecutorMigrationOutboundFinalizePut ());
       aSMPMigrateOutboundFinalize.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPMigrateOutboundFinalize);
+    }
+    {
+      final APIDescriptor aSMPMigrateInbound = new APIDescriptor (APIPath.put ("/migration/inbound/{" +
+                                                                               PARAM_SERVICE_GROUP_ID +
+                                                                               "}/{" +
+                                                                               PARAM_MIGRATION_KEY +
+                                                                               "}"),
+                                                                  new APIExecutorMigrationInboundPut ());
+      aSMPMigrateInbound.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPMigrateInbound);
     }
   }
 
