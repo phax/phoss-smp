@@ -126,7 +126,8 @@ CREATE INDEX smp_ownership_id_fk ON smp_ownership (businessIdentifierScheme, bus
 
 /*  extension longtext,
   certificate longtext,*/
--- DROP TABLE smp_service_metadata_redirection;
+-- name "smp_service_metadata_redirection" is too long for Oracle
+-- DROP TABLE smp_service_metadata_red;
 CREATE TABLE smp_service_metadata_red (
   businessIdentifierScheme varchar(25)  NOT NULL,
   businessIdentifier       varchar(50)  NOT NULL,

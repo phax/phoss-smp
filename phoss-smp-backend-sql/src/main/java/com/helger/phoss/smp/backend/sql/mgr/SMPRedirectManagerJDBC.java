@@ -113,7 +113,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       if (aDBRedirect == null)
       {
         // Create new
-        final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_service_metadata_redirection (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_service_metadata_red (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                                                                 new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                            aParticipantID.getValue (),
                                                                                                            aDocTypeID.getScheme (),
@@ -129,7 +129,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       else
       {
         // Update existing
-        final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_service_metadata_redirection" +
+        final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_service_metadata_red" +
                                                                 " SET redirectionUrl=?, certificateUID=?, certificate=?, extension=?" +
                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
                                                                 new ConstantPreparedStatementDataProvider (sRedirectUrl,
@@ -196,7 +196,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     final IParticipantIdentifier aParticipantID = aSMPRedirect.getServiceGroup ().getParticipantIdentifier ();
     final IDocumentTypeIdentifier aDocTypeID = aSMPRedirect.getDocumentTypeIdentifier ();
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_redirection" +
+    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_red" +
                                                                  " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
                                                                  new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                             aParticipantID.getValue (),
@@ -227,7 +227,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     // Now delete
     final IParticipantIdentifier aParticipantID = aServiceGroup.getParticipantIdentifier ();
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_redirection" +
+    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_red" +
                                                                  " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                                  new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                             aParticipantID.getValue ()));
@@ -263,7 +263,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
-                                                                          " FROM smp_service_metadata_redirection");
+                                                                          " FROM smp_service_metadata_red");
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
@@ -290,7 +290,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     {
       final IParticipantIdentifier aParticipantID = aServiceGroup.getParticipantIdentifier ();
       final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
-                                                                            " FROM smp_service_metadata_redirection" +
+                                                                            " FROM smp_service_metadata_red" +
                                                                             " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                                        aParticipantID.getValue ()));
@@ -312,7 +312,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   @Nonnegative
   public long getSMPRedirectCount ()
   {
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_service_metadata_redirection");
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_service_metadata_red");
   }
 
   @Nullable
@@ -327,7 +327,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     final IParticipantIdentifier aParticipantID = aServiceGroup.getParticipantIdentifier ();
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
     newExecutor ().querySingle ("SELECT redirectionUrl, certificateUID, certificate, extension" +
-                                " FROM smp_service_metadata_redirection" +
+                                " FROM smp_service_metadata_red" +
                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
                                 new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                            aParticipantID.getValue (),
