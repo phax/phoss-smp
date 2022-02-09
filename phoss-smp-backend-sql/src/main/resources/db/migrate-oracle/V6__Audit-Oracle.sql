@@ -20,7 +20,7 @@ CREATE TABLE smp_audit (
   dt         timestamp    NOT NULL,
   userid     varchar(20)  NOT NULL,
   actiontype varchar(10)  NOT NULL,
-  success    boolean      NOT NULL,
+  success    number(1)    NOT NULL,
   action     clob,
   CONSTRAINT smp_audit_pk PRIMARY KEY (id) USING INDEX tablespace USERS
 );
