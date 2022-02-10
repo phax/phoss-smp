@@ -241,9 +241,12 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       if (!EqualsHelper.equals (sNewOwnerID, aDBServiceGroup.getOwnerID ()))
       {
         // Update ownership
-        final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE username=?",
+        final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (sNewOwnerID,
-                                                                                                         aDBServiceGroup.getOwnerID ()));
+                                                                                                         aDBServiceGroup.getParticipantIdentifier ()
+                                                                                                                        .getScheme (),
+                                                                                                         aDBServiceGroup.getParticipantIdentifier ()
+                                                                                                                        .getValue ()));
         if (nCount != 1)
           throw new IllegalStateException ("Failed to update the ownership username to '" + sNewOwnerID + "'");
         aWrappedChange.set (EChange.CHANGED);
