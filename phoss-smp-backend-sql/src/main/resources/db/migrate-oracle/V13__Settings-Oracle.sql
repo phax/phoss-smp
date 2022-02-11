@@ -18,7 +18,7 @@
 CREATE TABLE smp_settings (
   id    varchar(45)  NOT NULL,
   value varchar(500),
-  CONSTRAINT smp_audit_pk PRIMARY KEY (id) USING INDEX tablespace USERS
+  CONSTRAINT smp_settings_pk PRIMARY KEY (id) USING INDEX tablespace USERS
 );
 
 COMMENT ON COLUMN smp_settings.id     IS 'Internal ID';
