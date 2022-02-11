@@ -18,6 +18,7 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -34,6 +35,7 @@ import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.timing.StopWatch;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
 import com.helger.dns.ip.IPV4Addr;
@@ -217,8 +219,15 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                             new DTCol ("IP address").setDataSort (2, 0),
                                             new DTCol ("Nice name"),
                                             new DTCol ("Action")).setID (getID () + "_checkdns");
-        for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
+
+        final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+        final StopWatch aSW = StopWatch.createdStarted ();
+        for (final ISMPServiceGroup aServiceGroup : aAllServiceGroups)
         {
+          // Avoid endless actions
+          final Duration aDuration = aSW.getLapDuration ();
+          final boolean bTookTooLong = aDuration.compareTo (Duration.ofSeconds (30)) > 0;
+
           String sDNSName = null;
           try
           {
@@ -245,27 +254,36 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           }
 
           InetAddress aInetAddress = null;
-          // Avoid that the loopback interface is returned
-          if (sDNSName != null)
-            try
-            {
-              aInetAddress = InetAddress.getByName (sDNSName);
-            }
-            catch (final UnknownHostException ex)
-            {
-              // Ignore
-            }
-
           InetAddress aNice = null;
-          if (aInetAddress != null)
-            try
-            {
-              aNice = InetAddress.getByAddress (aInetAddress.getAddress ());
-            }
-            catch (final UnknownHostException ex)
-            {
-              // Ignore
-            }
+          if (bTookTooLong)
+          {
+            // We ignore this participant, because we're already running some
+            // time
+          }
+          else
+          {
+            // This is what I think takes forever
+            // Avoid that the loopback interface is returned
+            if (sDNSName != null)
+              try
+              {
+                aInetAddress = InetAddress.getByName (sDNSName);
+              }
+              catch (final UnknownHostException ex)
+              {
+                // Ignore
+              }
+
+            if (aInetAddress != null)
+              try
+              {
+                aNice = InetAddress.getByAddress (aInetAddress.getAddress ());
+              }
+              catch (final UnknownHostException ex)
+              {
+                // Ignore
+              }
+          }
 
           final HCRow aRow = aTable.addBodyRow ();
           aRow.addCell (aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
@@ -288,15 +306,23 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           }
           else
           {
-            aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("is not registered in SML"));
-            aRow.addCell ();
-            aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).addChild ("Register in SML")
-                                                                          .setOnClick (aWPEC.getSelfHref ()
-                                                                                            .add (CPageParam.PARAM_ACTION,
-                                                                                                  ACTION_REGISTER_TO_SML)
-                                                                                            .add (CPageParam.PARAM_OBJECT,
-                                                                                                  aServiceGroup.getID ()))
-                                                                          .setDisabled (bOffline || !aSettings.isSMLEnabled ()));
+            if (bTookTooLong)
+            {
+              aRow.addAndReturnCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Was not checked - took too long"))
+                  .setColspan (3);
+            }
+            else
+            {
+              aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("is not registered in SML"));
+              aRow.addCell ();
+              aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).addChild ("Register in SML")
+                                                                            .setOnClick (aWPEC.getSelfHref ()
+                                                                                              .add (CPageParam.PARAM_ACTION,
+                                                                                                    ACTION_REGISTER_TO_SML)
+                                                                                              .add (CPageParam.PARAM_OBJECT,
+                                                                                                    aServiceGroup.getID ()))
+                                                                            .setDisabled (bOffline || !aSettings.isSMLEnabled ()));
+            }
           }
         }
 
