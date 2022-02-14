@@ -31,7 +31,6 @@ import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.error.SingleError;
 import com.helger.commons.state.EValidity;
-import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.IHCNode;
@@ -59,6 +58,7 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
+import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
@@ -104,43 +104,21 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
   }
 
   @Override
-  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
-  {
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-    if (aSettings.getSMLInfo () == null)
-    {
-      aNodeList.addChild (warn ("No valid SML Configuration is selected hence no participant can be migrated."));
-      aNodeList.addChild (new BootstrapButton ().addChild ("Select SML Configuration in the Settings")
-                                                .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
-                                                .setIcon (EDefaultIcon.EDIT));
-      if (aSettings.isSMLEnabled () || aSettings.isSMLRequired ())
-      {
-        aNodeList.addChild (new BootstrapButton ().addChild ("Create a new SML Configuration")
-                                                  .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SML_CONFIGURATION))
-                                                  .setIcon (EDefaultIcon.YES));
-      }
-      return EValidity.INVALID;
-    }
-    if (!aSettings.isSMLEnabled ())
-    {
-      aNodeList.addChild (warn ("SML Connection is not enabled hence no participant can be migrated."));
-      aNodeList.addChild (new BootstrapButton ().addChild ("Enable SML in the Settings")
-                                                .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
-                                                .setIcon (EDefaultIcon.EDIT));
-      return EValidity.INVALID;
-    }
-
-    return super.isValidToDisplayPage (aWPEC);
-  }
-
-  @Override
   protected boolean isActionAllowed (@Nonnull final WebPageExecutionContext aWPEC,
                                      @Nonnull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMPParticipantMigration aSelectedObject)
   {
     if (eFormAction.isEdit ())
       return false;
+
+    if (eFormAction.isCreating ())
+    {
+      final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+      if (aSettings.getSMLInfo () == null)
+        return false;
+      if (!aSettings.isSMLEnabled ())
+        return false;
+    }
 
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
   }
@@ -411,6 +389,7 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
     {
       final HCOL aOL = new HCOL ();
@@ -422,10 +401,36 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
                                  .addChild (div ("If a Migration is unsuccessful, it can be retried later.")));
     }
 
+    EValidity eCanMigrate = EValidity.VALID;
+    if (aSettings.getSMLInfo () == null)
+    {
+      final BootstrapWarnBox aWarnBox = aNodeList.addAndReturnChild (warn ().addChild (div ("No valid SML Configuration is selected hence no participant can be migrated."))
+                                                                            .addChild (new BootstrapButton ().addChild ("Select SML Configuration in the Settings")
+                                                                                                             .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
+                                                                                                             .setIcon (EDefaultIcon.EDIT)));
+      if (aSettings.isSMLEnabled () || aSettings.isSMLRequired ())
+      {
+        aWarnBox.addChild (div (new BootstrapButton ().addChild ("Create a new SML Configuration")
+                                                      .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SML_CONFIGURATION))
+                                                      .setIcon (EDefaultIcon.YES)));
+      }
+      eCanMigrate = EValidity.INVALID;
+    }
+    else
+      if (!aSettings.isSMLEnabled ())
+      {
+        aNodeList.addChild (warn ().addChild (div ("SML Connection is not enabled hence no participant can be migrated."))
+                                   .addChild (div (new BootstrapButton ().addChild ("Enable SML in the Settings")
+                                                                         .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
+                                                                         .setIcon (EDefaultIcon.EDIT))));
+        eCanMigrate = EValidity.INVALID;
+      }
+
     {
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
       aToolbar.addChild (new BootstrapButton ().addChild ("Start Participant Migration")
                                                .setOnClick (createCreateURL (aWPEC))
+                                               .setDisabled (eCanMigrate.isInvalid ())
                                                .setIcon (EDefaultIcon.NEW));
       aNodeList.addChild (aToolbar);
     }

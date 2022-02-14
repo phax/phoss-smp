@@ -32,7 +32,6 @@ import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.state.EValidity;
-import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.IHCNode;
@@ -56,6 +55,7 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
+import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
@@ -232,52 +232,25 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   }
 
   @Override
-  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
-  {
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-    if (aSettings.getSMLInfo () == null)
-    {
-      aNodeList.addChild (warn ("No valid SML Configuration is selected hence no participant can be migrated."));
-      aNodeList.addChild (new BootstrapButton ().addChild ("Select SML Configuration in the Settings")
-                                                .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
-                                                .setIcon (EDefaultIcon.EDIT));
-      if (aSettings.isSMLEnabled () || aSettings.isSMLRequired ())
-      {
-        aNodeList.addChild (new BootstrapButton ().addChild ("Create a new SML Configuration")
-                                                  .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SML_CONFIGURATION))
-                                                  .setIcon (EDefaultIcon.YES));
-      }
-      return EValidity.INVALID;
-    }
-    if (!aSettings.isSMLEnabled ())
-    {
-      aNodeList.addChild (warn ("SML Connection is not enabled hence no participant can be migrated."));
-      aNodeList.addChild (new BootstrapButton ().addChild ("Enable SML in the Settings")
-                                                .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
-                                                .setIcon (EDefaultIcon.EDIT));
-      return EValidity.INVALID;
-    }
-
-    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
-    {
-      aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to migrate it."));
-      // Note: makes no to allow to create a new Service Group here and than
-      // directly migrate it away
-      return EValidity.INVALID;
-    }
-
-    return super.isValidToDisplayPage (aWPEC);
-  }
-
-  @Override
   protected boolean isActionAllowed (@Nonnull final WebPageExecutionContext aWPEC,
                                      @Nonnull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMPParticipantMigration aSelectedObject)
   {
     if (eFormAction.isEdit ())
       return false;
+
+    if (eFormAction.isCreating ())
+    {
+      final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+      if (aSettings.getSMLInfo () == null)
+        return false;
+      if (!aSettings.isSMLEnabled ())
+        return false;
+
+      final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
+      if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
+        return false;
+    }
 
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
   }
@@ -484,6 +457,8 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
 
     {
       final HCOL aOL = new HCOL ();
@@ -496,10 +471,46 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                  " If a Migration is cancelled, it can be retried later.")));
     }
 
+    EValidity eCanStartMigration = EValidity.VALID;
+    if (aSettings.getSMLInfo () == null)
+    {
+      final BootstrapWarnBox aWarn = aNodeList.addAndReturnChild (warn ().addChild (div ("No valid SML Configuration is selected hence no participant can be migrated."))
+                                                                         .addChild (div (new BootstrapButton ().addChild ("Select SML Configuration in the Settings")
+                                                                                                               .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
+                                                                                                               .setIcon (EDefaultIcon.EDIT))));
+      if (aSettings.isSMLEnabled () || aSettings.isSMLRequired ())
+      {
+        aWarn.addChild (div (new BootstrapButton ().addChild ("Create a new SML Configuration")
+                                                   .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SML_CONFIGURATION))
+                                                   .setIcon (EDefaultIcon.YES)));
+      }
+      eCanStartMigration = EValidity.INVALID;
+    }
+    else
+      if (!aSettings.isSMLEnabled ())
+      {
+        aNodeList.addChild (warn ().addChild (div ("SML Connection is not enabled hence no participant can be migrated."))
+                                   .addChild (div (new BootstrapButton ().addChild ("Enable SML in the Settings")
+                                                                         .setOnClick (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS))
+                                                                         .setIcon (EDefaultIcon.EDIT))));
+        eCanStartMigration = EValidity.INVALID;
+      }
+      else
+      {
+        if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
+        {
+          aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to migrate it."));
+          // Note: makes no to allow to create a new Service Group here and than
+          // directly migrate it away
+          eCanStartMigration = EValidity.INVALID;
+        }
+      }
+
     {
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
       aToolbar.addChild (new BootstrapButton ().addChild ("Start Participant Migration")
                                                .setOnClick (createCreateURL (aWPEC))
+                                               .setDisabled (eCanStartMigration.isInvalid ())
                                                .setIcon (EDefaultIcon.NEW));
       aNodeList.addChild (aToolbar);
     }
