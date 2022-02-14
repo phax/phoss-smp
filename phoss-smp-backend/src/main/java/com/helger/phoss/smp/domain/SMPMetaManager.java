@@ -129,6 +129,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     {
       // If service group is deleted, also delete respective business card
       m_aServiceGroupMgr.serviceGroupCallbacks ().add (new BusinessCardSMPServiceGroupCallback (m_aBusinessCardMgr));
+      m_aServiceGroupMgr.serviceGroupCallbacks ().add (new ParticipantMigrationSMPServiceGroupCallback (m_aParticipantMigrationMgr));
       m_aBusinessCardMgr.bcCallbacks ().add (new LoggingSMPBusinessCardCallback ());
     }
   }

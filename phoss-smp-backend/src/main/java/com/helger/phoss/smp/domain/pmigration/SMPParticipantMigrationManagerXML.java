@@ -96,34 +96,16 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
   }
 
   @Nonnull
-  public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
-                                               @Nonnull final EParticipantMigrationState eNewState)
+  public EChange deleteParticipantMigrations (@Nonnull final IParticipantIdentifier aParticipantID)
   {
-    ValueEnforcer.notNull (eNewState, "NewState");
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
-    final SMPParticipantMigration aPM = getOfID (sParticipantMigrationID);
-    if (aPM == null)
-    {
-      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, "no-such-id");
-      return EChange.UNCHANGED;
-    }
-
-    m_aRWLock.writeLock ().lock ();
-    try
-    {
-      EChange eChange = EChange.UNCHANGED;
-      eChange = eChange.or (aPM.setState (eNewState));
-      if (eChange.isUnchanged ())
-        return EChange.UNCHANGED;
-
-      internalUpdateItem (aPM);
-    }
-    finally
-    {
-      m_aRWLock.writeLock ().unlock ();
-    }
-    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, eNewState);
-    return EChange.CHANGED;
+    final ICommonsList <SMPParticipantMigration> aAllMatching = internalGetAll (x -> x.getParticipantIdentifier ()
+                                                                                      .hasSameContent (aParticipantID));
+    EChange ret = EChange.UNCHANGED;
+    for (final SMPParticipantMigration aItem : aAllMatching)
+      ret = ret.or (deleteParticipantMigration (aItem.getID ()));
+    return ret;
   }
 
   @Nonnull
@@ -156,10 +138,41 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
     return EChange.CHANGED;
   }
 
-  @Nullable
-  public ISMPParticipantMigration getParticipantMigrationOfID (@Nullable final String sID)
+  @Nonnull
+  public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
+                                               @Nonnull final EParticipantMigrationState eNewState)
   {
-    return getOfID (sID);
+    ValueEnforcer.notNull (eNewState, "NewState");
+
+    final SMPParticipantMigration aPM = getOfID (sParticipantMigrationID);
+    if (aPM == null)
+    {
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    m_aRWLock.writeLock ().lock ();
+    try
+    {
+      EChange eChange = EChange.UNCHANGED;
+      eChange = eChange.or (aPM.setState (eNewState));
+      if (eChange.isUnchanged ())
+        return EChange.UNCHANGED;
+
+      internalUpdateItem (aPM);
+    }
+    finally
+    {
+      m_aRWLock.writeLock ().unlock ();
+    }
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, eNewState);
+    return EChange.CHANGED;
+  }
+
+  @Nullable
+  public ISMPParticipantMigration getParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
+  {
+    return getOfID (sParticipantMigrationID);
   }
 
   @Nullable

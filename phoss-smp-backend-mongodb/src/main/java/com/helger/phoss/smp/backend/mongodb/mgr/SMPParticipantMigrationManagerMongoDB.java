@@ -42,6 +42,7 @@ import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
 import com.helger.photon.audit.AuditHelper;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.result.DeleteResult;
 
 /**
  * Implementation of {@link ISMPParticipantMigrationManager} for MongoDB
@@ -119,6 +120,22 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createInbound (aParticipantID, sMigrationKey);
     _createParticipantMigration (aSMPParticipantMigration);
     return aSMPParticipantMigration;
+  }
+
+  @Nonnull
+  public EChange deleteParticipantMigrations (@Nonnull final IParticipantIdentifier aParticipantID)
+  {
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+
+    final DeleteResult aDR = getCollection ().deleteMany (new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID)));
+    if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
+    {
+      AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT, aParticipantID.getURIEncoded (), "no-such-participant-id");
+      return EChange.UNCHANGED;
+    }
+
+    AuditHelper.onAuditDeleteSuccess (SMPParticipantMigration.OT, aParticipantID.getURIEncoded ());
+    return EChange.CHANGED;
   }
 
   @Nonnull

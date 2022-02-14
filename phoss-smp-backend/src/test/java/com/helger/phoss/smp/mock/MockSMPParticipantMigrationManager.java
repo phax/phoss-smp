@@ -42,6 +42,12 @@ final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrati
     throw new UnsupportedOperationException ();
   }
 
+  @Nonnull
+  public EChange deleteParticipantMigrations (@Nonnull final IParticipantIdentifier aParticipantID)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
                                                @Nonnull final EParticipantMigrationState eNewState)
   {

@@ -62,6 +62,16 @@ public interface ISMPParticipantMigrationManager
                                                               @Nonnull @Nonempty String sMigrationKey);
 
   /**
+   * Delete all participant migrations of the provided participant identifier.
+   *
+   * @param aParticipantID
+   *        The participant identifier to delete. May not be <code>null</code>.
+   * @return {@link EChange} and never <code>null</code>.
+   */
+  @Nonnull
+  EChange deleteParticipantMigrations (@Nonnull IParticipantIdentifier aParticipantID);
+
+  /**
    * Change the participant migration state of the provided participant ID.
    *
    * @param sParticipantMigrationID
@@ -78,12 +88,12 @@ public interface ISMPParticipantMigrationManager
   /**
    * Find the participant migration with the provided ID.
    *
-   * @param sID
+   * @param sParticipantMigrationID
    *        The ID to lookup. May be <code>null</code>.
    * @return <code>null</code> if no such participant migration is contained.
    */
   @Nullable
-  ISMPParticipantMigration getParticipantMigrationOfID (@Nullable String sID);
+  ISMPParticipantMigration getParticipantMigrationOfID (@Nullable String sParticipantMigrationID);
 
   /**
    * Find the participant migration of the provided ID.
