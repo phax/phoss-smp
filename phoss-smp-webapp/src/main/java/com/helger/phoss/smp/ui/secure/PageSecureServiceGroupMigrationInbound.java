@@ -39,6 +39,7 @@ import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
+import com.helger.html.hc.html.tabular.IHCCell;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
@@ -66,6 +67,8 @@ import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
 import com.helger.photon.bootstrap4.grid.BootstrapRow;
 import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapTechnicalUI;
 import com.helger.photon.core.form.FormErrorList;
@@ -101,6 +104,29 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
   public PageSecureServiceGroupMigrationInbound (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Migrate to this SMP");
+
+    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPParticipantMigration, WebPageExecutionContext> ()
+    {
+      @Override
+      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                @Nonnull final BootstrapForm aForm,
+                                @Nullable final ISMPParticipantMigration aSelectedObject)
+      {
+        aForm.addChild (question ("Are you sure you want to delete the inbound Participant Migration for participant '" +
+                                  aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                                  "'?"));
+      }
+
+      @Override
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPParticipantMigration aSelectedObject)
+      {
+        final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+        if (aParticipantMigrationMgr.deleteParticipantMigrationOfID (aSelectedObject.getID ()).isChanged ())
+          aWPEC.postRedirectGetInternal (success ("The selected Participant Migration was successfully deleted!"));
+        else
+          aWPEC.postRedirectGetInternal (error ("Failed to delete the selected Participant Migration!"));
+      }
+    });
   }
 
   @Override
@@ -367,7 +393,8 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
     final HCTable aTable = new HCTable (new DTCol ("ID").setVisible (false),
                                         new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Migration").setDisplayType (EDTColType.DATETIME, aDisplayLocale),
-                                        new DTCol ("Migration Key")).setID (getID () + eState.getID ());
+                                        new DTCol ("Migration Key"),
+                                        new BootstrapDTColAction (aDisplayLocale)).setID (getID () + eState.getID ());
     for (final ISMPParticipantMigration aCurObject : aMigs)
     {
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
@@ -378,6 +405,9 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       aRow.addCell (a (aViewLink).addChild (sParticipantID));
       aRow.addCell (PDTToString.getAsString (aCurObject.getInitiationDateTime (), aDisplayLocale));
       aRow.addCell (code (aCurObject.getMigrationKey ()));
+
+      final IHCCell <?> aActionCell = aRow.addCell ();
+      aActionCell.addChild (createDeleteLink (aWPEC, aCurObject, "Delete Participant Migration of '" + sParticipantID + "'"));
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
@@ -428,6 +458,7 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
 
     {
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+      aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
       aToolbar.addChild (new BootstrapButton ().addChild ("Start Participant Migration")
                                                .setOnClick (createCreateURL (aWPEC))
                                                .setDisabled (eCanMigrate.isInvalid ())

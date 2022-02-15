@@ -62,6 +62,7 @@ import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
 import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
+import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerWithQuery;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
@@ -93,6 +94,28 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   public PageSecureServiceGroupMigrationOutbound (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Migrate to another SMP");
+    setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPParticipantMigration, WebPageExecutionContext> ()
+    {
+      @Override
+      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
+                                @Nonnull final BootstrapForm aForm,
+                                @Nullable final ISMPParticipantMigration aSelectedObject)
+      {
+        aForm.addChild (question ("Are you sure you want to delete the outbound Participant Migration for participant '" +
+                                  aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                                  "'?"));
+      }
+
+      @Override
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPParticipantMigration aSelectedObject)
+      {
+        final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+        if (aParticipantMigrationMgr.deleteParticipantMigrationOfID (aSelectedObject.getID ()).isChanged ())
+          aWPEC.postRedirectGetInternal (success ("The selected Participant Migration was successfully deleted!"));
+        else
+          aWPEC.postRedirectGetInternal (error ("Failed to delete the selected Participant Migration!"));
+      }
+    });
     addCustomHandler (ACTION_CANCEL_MIGRATION,
                       new AbstractBootstrapWebPageActionHandlerWithQuery <ISMPParticipantMigration, WebPageExecutionContext> (true,
                                                                                                                               ACTION_CANCEL_MIGRATION,
@@ -446,6 +469,8 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                                                                                                   "'")
                                                                                                                        .addChild (EDefaultIcon.NO.getAsNode ())
                                                    : createEmptyAction ());
+      aActionCell.addChild (" ");
+      aActionCell.addChild (createDeleteLink (aWPEC, aCurObject, "Delete Participant Migration of '" + sParticipantID + "'"));
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
@@ -508,6 +533,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 
     {
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+      aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
       aToolbar.addChild (new BootstrapButton ().addChild ("Start Participant Migration")
                                                .setOnClick (createCreateURL (aWPEC))
                                                .setDisabled (eCanStartMigration.isInvalid ())
