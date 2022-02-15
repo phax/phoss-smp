@@ -123,7 +123,24 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   }
 
   @Nonnull
-  public EChange deleteParticipantMigrations (@Nonnull final IParticipantIdentifier aParticipantID)
+  public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
+  {
+    if (StringHelper.hasNoText (sParticipantMigrationID))
+      return EChange.UNCHANGED;
+
+    final DeleteResult aDR = getCollection ().deleteMany (new Document (BSON_ID, sParticipantMigrationID));
+    if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
+    {
+      AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT, sParticipantMigrationID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    AuditHelper.onAuditDeleteSuccess (SMPParticipantMigration.OT, sParticipantMigrationID);
+    return EChange.CHANGED;
+  }
+
+  @Nonnull
+  public EChange deleteAllParticipantMigrationsOfParticipant (@Nonnull final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 

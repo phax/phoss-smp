@@ -96,7 +96,7 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
   }
 
   @Nonnull
-  public EChange deleteParticipantMigrations (@Nonnull final IParticipantIdentifier aParticipantID)
+  public EChange deleteAllParticipantMigrationsOfParticipant (@Nonnull final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
@@ -104,12 +104,12 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
                                                                                       .hasSameContent (aParticipantID));
     EChange ret = EChange.UNCHANGED;
     for (final SMPParticipantMigration aItem : aAllMatching)
-      ret = ret.or (deleteParticipantMigration (aItem.getID ()));
+      ret = ret.or (deleteParticipantMigrationOfID (aItem.getID ()));
     return ret;
   }
 
   @Nonnull
-  public EChange deleteParticipantMigration (@Nullable final String sParticipantMigrationID)
+  public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
   {
     if (StringHelper.hasNoText (sParticipantMigrationID))
       return EChange.UNCHANGED;

@@ -120,7 +120,25 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   }
 
   @Nonnull
-  public EChange deleteParticipantMigrations (@Nonnull final IParticipantIdentifier aParticipantID)
+  public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
+  {
+    if (StringHelper.hasNoText (sParticipantMigrationID))
+      return EChange.UNCHANGED;
+
+    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_pmigration" + " WHERE id=?",
+                                                                 new ConstantPreparedStatementDataProvider (sParticipantMigrationID));
+    if (nDeleted == 0)
+    {
+      AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT, sParticipantMigrationID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    AuditHelper.onAuditDeleteSuccess (SMPParticipantMigration.OT, sParticipantMigrationID);
+    return EChange.CHANGED;
+  }
+
+  @Nonnull
+  public EChange deleteAllParticipantMigrationsOfParticipant (@Nonnull final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 

@@ -51,7 +51,7 @@ public class ParticipantMigrationSMPServiceGroupCallback implements ISMPServiceG
   {
     // If service group is deleted, also delete respective participant
     // migrations
-    final EChange eChange = m_aParticipantMigrationMgr.deleteParticipantMigrations (aParticipantID);
+    final EChange eChange = m_aParticipantMigrationMgr.deleteAllParticipantMigrationsOfParticipant (aParticipantID);
     if (eChange.isChanged ())
       LOGGER.info ("Deleted all participant migrations for participant ID '" + aParticipantID.getURIEncoded () + "'");
     else
