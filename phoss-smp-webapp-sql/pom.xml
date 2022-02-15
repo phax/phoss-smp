@@ -75,11 +75,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>com.oracle.database.jdbc.debug</groupId>
-        <artifactId>ojdbc8-debug</artifactId>
-        <version>${oracle.version}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   
