@@ -76,8 +76,10 @@ public final class ServiceGroupExport
     final IMicroElement eRoot = aDoc.appendElement (CSMPExchange.ELEMENT_SMP_DATA);
     eRoot.setAttribute (CSMPExchange.ATTR_VERSION, CSMPExchange.VERSION_10);
 
+    final ICommonsList <ISMPServiceGroup> aSortedServiceGroups = aServiceGroups.getSorted (ISMPServiceGroup.comparator ());
+
     // Add all service groups
-    for (final ISMPServiceGroup aServiceGroup : aServiceGroups.getSorted (ISMPServiceGroup.comparator ()))
+    for (final ISMPServiceGroup aServiceGroup : aSortedServiceGroups)
     {
       final IMicroElement eServiceGroup = eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aServiceGroup,
                                                                                                        CSMPExchange.ELEMENT_SERVICEGROUP));
@@ -102,13 +104,16 @@ public final class ServiceGroupExport
     {
       // Add all business cards
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-      final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
-      for (final ISMPBusinessCard aBusinessCard : aAllBusinessCards.getSortedInline (ISMPBusinessCard.comparator ()))
+      for (final ISMPServiceGroup aServiceGroup : aSortedServiceGroups)
       {
-        eRoot.appendChild (SMPBusinessCardMicroTypeConverter.convertToMicroElement (aBusinessCard,
-                                                                                    null,
-                                                                                    CSMPExchange.ELEMENT_BUSINESSCARD,
-                                                                                    true));
+        final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
+        if (aBusinessCard != null)
+        {
+          eRoot.appendChild (SMPBusinessCardMicroTypeConverter.convertToMicroElement (aBusinessCard,
+                                                                                      null,
+                                                                                      CSMPExchange.ELEMENT_BUSINESSCARD,
+                                                                                      true));
+        }
       }
     }
 
