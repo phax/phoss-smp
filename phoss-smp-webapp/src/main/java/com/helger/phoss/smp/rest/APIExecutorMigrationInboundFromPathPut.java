@@ -120,11 +120,16 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
       throw new SMPBadRequestException ("The Service Group '" + sServiceGroupID + "' already exists.", aDataProvider.getCurrentURI ());
     }
 
-    // Ensure no existing migration is in process
-    if (aParticipantMigrationMgr.containsInboundMigration (aParticipantID))
+    if (false)
     {
-      throw new SMPBadRequestException ("The inbound migration of the Service Group '" + sServiceGroupID + "' is already contained.",
-                                        aDataProvider.getCurrentURI ());
+      // Ensure no existing migration is in process
+      // This does not make sense, except in test scenarios, but there it is
+      // valid
+      if (aParticipantMigrationMgr.containsInboundMigration (aParticipantID))
+      {
+        throw new SMPBadRequestException ("The inbound migration of the Service Group '" + sServiceGroupID + "' is already contained.",
+                                          aDataProvider.getCurrentURI ());
+      }
     }
 
     // First get the SMK/SML migration result and if that was successful,
