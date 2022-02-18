@@ -225,6 +225,15 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     {
+      final APIDescriptor aSMPExportByOwner = new APIDescriptor (APIPath.get ("/exchange/export/specific/{" +
+                                                                              PARAM_SERVICE_GROUP_ID +
+                                                                              "}/xml/v1"),
+                                                                 new APIExecutorExportSpecificXMLVer1 ());
+      aSMPExportByOwner.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPExportByOwner);
+    }
+
+    {
       final APIDescriptor aSMPExportOMIP = new APIDescriptor (APIPath.get ("/exchange/export/outboundmigip/xml/v1"),
                                                               new APIExecutorExportOutboundMigrationInProcessXMLVer ());
       aSMPExportOMIP.setExceptionMapper (aExceptionMapper);
