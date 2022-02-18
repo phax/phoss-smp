@@ -42,8 +42,8 @@ public final class APIExecutorServiceGroupCompleteGet extends AbstractSMPAPIExec
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+    final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sPathServiceGroupID);
 
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())
@@ -51,14 +51,14 @@ public final class APIExecutorServiceGroupCompleteGet extends AbstractSMPAPIExec
       case PEPPOL:
       {
         // Unspecified extension
-        final com.helger.xsds.peppol.smp1.CompleteServiceGroupType ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
+        final com.helger.xsds.peppol.smp1.CompleteServiceGroupType ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sPathServiceGroupID);
         aBytes = new SMPMarshallerCompleteServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       case OASIS_BDXR_V1:
       {
         // Unspecified extension
-        final com.helger.xsds.bdxr.smp1.CompleteServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getCompleteServiceGroup (sServiceGroupID);
+        final com.helger.xsds.bdxr.smp1.CompleteServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getCompleteServiceGroup (sPathServiceGroupID);
         aBytes = new BDXR1MarshallerCompleteServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }

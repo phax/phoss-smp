@@ -41,8 +41,8 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+    final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sPathServiceGroupID);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
@@ -57,10 +57,10 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:
-        new SMPServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
+        new SMPServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID, sDocumentTypeID, aBasicAuth);
         break;
       case OASIS_BDXR_V1:
-        new BDXR1ServerAPI (aDataProvider).deleteServiceRegistration (sServiceGroupID, sDocumentTypeID, aBasicAuth);
+        new BDXR1ServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID, sDocumentTypeID, aBasicAuth);
         break;
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");

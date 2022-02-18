@@ -57,9 +57,9 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-    final String sDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+    final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final String sPathDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sPathServiceGroupID);
 
     // Create the unsigned response document
     final Document aDoc;
@@ -67,8 +67,8 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     {
       case PEPPOL:
       {
-        final com.helger.xsds.peppol.smp1.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
-                                                                                                                                   sDocumentTypeID);
+        final com.helger.xsds.peppol.smp1.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sPathServiceGroupID,
+                                                                                                                                   sPathDocumentTypeID);
 
         // Convert to DOM document
         // Disable XSD check, because Signature is added later
@@ -78,8 +78,8 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
       }
       case OASIS_BDXR_V1:
       {
-        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType ret = new BDXR1ServerAPI (aDataProvider).getServiceRegistration (sServiceGroupID,
-                                                                                                                                   sDocumentTypeID);
+        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType ret = new BDXR1ServerAPI (aDataProvider).getServiceRegistration (sPathServiceGroupID,
+                                                                                                                                   sPathDocumentTypeID);
 
         // Convert to DOM document
         // Disable XSD check, because Signature is added later

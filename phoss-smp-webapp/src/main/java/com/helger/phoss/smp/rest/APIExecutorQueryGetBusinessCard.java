@@ -68,8 +68,8 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+    final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sPathServiceGroupID);
 
     // Is the remote query API disabled?
     if (SMPServerConfiguration.isRestRemoteQueryAPIDisabled ())
@@ -81,10 +81,10 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
-    final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sServiceGroupID);
+    final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sPathServiceGroupID);
     if (aParticipantID == null)
     {
-      throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
+      throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
 
     final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);

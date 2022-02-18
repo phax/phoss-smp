@@ -49,8 +49,8 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+    final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sPathServiceGroupID);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
@@ -78,7 +78,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
         final com.helger.xsds.peppol.smp1.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
         if (aServiceGroup != null)
         {
-          new SMPServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, bCreateInSML, aBasicAuth);
+          new SMPServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID, aServiceGroup, bCreateInSML, aBasicAuth);
           eSuccess = ESuccess.SUCCESS;
         }
         break;
@@ -88,7 +88,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
         final com.helger.xsds.bdxr.smp1.ServiceGroupType aServiceGroup = new BDXR1MarshallerServiceGroupType (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
         if (aServiceGroup != null)
         {
-          new BDXR1ServerAPI (aDataProvider).saveServiceGroup (sServiceGroupID, aServiceGroup, bCreateInSML, aBasicAuth);
+          new BDXR1ServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID, aServiceGroup, bCreateInSML, aBasicAuth);
           eSuccess = ESuccess.SUCCESS;
         }
         break;

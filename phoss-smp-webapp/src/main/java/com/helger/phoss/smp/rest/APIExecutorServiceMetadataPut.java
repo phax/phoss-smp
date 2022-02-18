@@ -49,8 +49,8 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+    final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sPathServiceGroupID);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
@@ -78,7 +78,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
         final com.helger.xsds.peppol.smp1.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
         if (aServiceMetadata != null)
         {
-          eSuccess = new SMPServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
+          eSuccess = new SMPServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
                                                                                sDocumentTypeID,
                                                                                aServiceMetadata,
                                                                                aBasicAuth);
@@ -90,7 +90,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
         final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
         if (aServiceMetadata != null)
         {
-          eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sServiceGroupID,
+          eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
                                                                                  sDocumentTypeID,
                                                                                  aServiceMetadata,
                                                                                  aBasicAuth);
