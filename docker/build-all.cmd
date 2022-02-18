@@ -17,7 +17,7 @@
 
 @echo off
 
-set version=5.5.3
+set version=5.5.4
 
 rem --------------- XML -----------------------
 
