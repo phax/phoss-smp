@@ -46,6 +46,9 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
     if (aHeaders.isEmpty ())
       throw new SMPUnauthorizedException ("Missing required HTTP header '" + CHttpHeader.AUTHORIZATION + "' for user authentication");
 
-    return HttpBasicAuth.getBasicAuthClientCredentials (aHeaders.getFirst ());
+    final BasicAuthClientCredentials ret = HttpBasicAuth.getBasicAuthClientCredentials (aHeaders.getFirst ());
+    if (ret == null)
+      throw new SMPUnauthorizedException ("The HTTP header '" + CHttpHeader.AUTHORIZATION + "' is malformed");
+    return ret;
   }
 }
