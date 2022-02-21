@@ -21,6 +21,9 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.CommonsArrayList;
@@ -44,6 +47,8 @@ import com.helger.phoss.smp.backend.sql.domain.DBUser;
 final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
 {
   public static final ObjectType OT = new ObjectType ("smpuser");
+
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerJDBC.class);
 
   /**
    * Constructor
@@ -86,7 +91,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
             aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
             break;
           case ORACLE:
-            aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT smp_ownership_username_fk;");
+            // No such constraint
             break;
           case POSTGRESQL:
             aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
@@ -97,7 +102,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
       }
       catch (final RuntimeException ex)
       {
-        // Ignore
+        LOGGER.warn ("Error in droping constraints", ex);
       }
 
       // Update user names
@@ -115,7 +120,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
       }
       catch (final RuntimeException ex)
       {
-        // Ignore
+        LOGGER.warn ("Error in droping table smp_user", ex);
       }
     });
   }
