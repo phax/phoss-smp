@@ -53,8 +53,9 @@ import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.exchange.CSMPExchange;
+import com.helger.phoss.smp.exchange.ImportActionItem;
+import com.helger.phoss.smp.exchange.ImportSummary;
 import com.helger.phoss.smp.exchange.ServiceGroupImport;
-import com.helger.phoss.smp.exchange.ServiceGroupImport.ImportActionItem;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -155,12 +156,14 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
 
     // Start the import
     final ICommonsList <ImportActionItem> aActionList = new CommonsArrayList <> ();
+    final ImportSummary aImportSummary = new ImportSummary ();
     ServiceGroupImport.importXMLVer10 (aDoc.getDocumentElement (),
                                        bOverwriteExisting,
                                        aDefaultOwner,
                                        aAllServiceGroupIDs,
                                        aAllBusinessCardIDs,
-                                       aActionList);
+                                       aActionList,
+                                       aImportSummary);
 
     aSW.stop ();
     LOGGER.info (sLogPrefix + "Finished import after " + aSW.getMillis () + " milliseconds");
@@ -180,18 +183,22 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       eSettings.setAttribute ("defaultOwnerID", aDefaultOwner.getID ());
       eSettings.setAttribute ("defaultOwnerLoginName", aDefaultOwner.getLoginName ());
 
-      final ICommonsMap <String, MutableInt> aLevelCount = new CommonsTreeMap <> ();
+      final ICommonsMap <String, MutableInt> aErrorLevelCount = new CommonsTreeMap <> ();
       for (final ImportActionItem aAction : aActionList)
       {
         eRoot.appendChild (aAction.getAsMicroElement ("action"));
-        aLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
+        aErrorLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
       }
 
       {
         final IMicroElement eSummary = eRoot.appendElement ("summary");
         eSummary.setAttribute ("durationMillis", aSW.getMillis ());
-        for (final Map.Entry <String, MutableInt> aEntry : aLevelCount.entrySet ())
-          eSummary.appendElement ("level").setAttribute ("id", aEntry.getKey ()).setAttribute ("count", aEntry.getValue ().intValue ());
+        for (final Map.Entry <String, MutableInt> aEntry : aErrorLevelCount.entrySet ())
+          eSummary.appendElement ("errorlevel")
+                  .setAttribute ("id", aEntry.getKey ())
+                  .setAttribute ("count", aEntry.getValue ().intValue ());
+
+        aImportSummary.appendTo (eSummary);
       }
 
       final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
@@ -224,7 +231,10 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
         final IJsonArray aLevels = new JsonArray ();
         for (final Map.Entry <String, MutableInt> aEntry : aLevelCount.entrySet ())
           aLevels.add (new JsonObject ().add ("id", aEntry.getKey ()).add ("count", aEntry.getValue ().intValue ()));
-        aSummary.addJson ("levels", aLevels);
+        aSummary.addJson ("errorlevels", aLevels);
+
+        aImportSummary.appendTo (aSummary);
+
         aJson.addJson ("summary", aSummary);
       }
 

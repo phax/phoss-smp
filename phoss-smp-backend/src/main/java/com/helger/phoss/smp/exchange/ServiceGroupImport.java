@@ -10,15 +10,12 @@
  */
 package com.helger.phoss.smp.exchange;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -26,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.CommonsHashSet;
@@ -38,15 +34,6 @@ import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.collection.impl.ICommonsOrderedSet;
 import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.datetime.PDTWebDateHelper;
-import com.helger.commons.error.level.EErrorLevel;
-import com.helger.commons.error.level.IErrorLevel;
-import com.helger.commons.error.level.IHasErrorLevel;
-import com.helger.commons.lang.StackTraceHelper;
-import com.helger.commons.string.StringHelper;
-import com.helger.json.IJsonObject;
-import com.helger.json.JsonObject;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
@@ -67,7 +54,6 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.xml.microdom.IMicroElement;
-import com.helger.xml.microdom.MicroElement;
 
 /**
  * Import Service Groups from XML.
@@ -79,7 +65,7 @@ import com.helger.xml.microdom.MicroElement;
 public final class ServiceGroupImport
 {
   @NotThreadSafe
-  private static final class ImportData
+  private static final class InternalImportData
   {
     private final ICommonsList <ISMPServiceInformation> m_aServiceInfos = new CommonsArrayList <> ();
     private final ICommonsList <ISMPRedirect> m_aRedirects = new CommonsArrayList <> ();
@@ -107,162 +93,31 @@ public final class ServiceGroupImport
     }
   }
 
+  private interface ITriConsumer <T, U, V>
+  {
+    void accept (T t, U u, V v);
+  }
+
   private static final Logger LOGGER = LoggerFactory.getLogger (ServiceGroupImport.class);
   private static final AtomicInteger COUNTER = new AtomicInteger (0);
 
   private ServiceGroupImport ()
   {}
 
-  @Immutable
-  public static final class ImportActionItem implements IHasErrorLevel
-  {
-    private final LocalDateTime m_aDT;
-    private final EErrorLevel m_eLevel;
-    private final String m_sPI;
-    private final String m_sMsg;
-    private final Exception m_aLinkedException;
-
-    private ImportActionItem (@Nonnull final EErrorLevel eLevel,
-                              @Nullable final String sPI,
-                              @Nonnull @Nonempty final String sMsg,
-                              @Nullable final Exception aLinkedException)
-    {
-      ValueEnforcer.notNull (eLevel, "Level");
-      ValueEnforcer.notEmpty (sMsg, "Message");
-      m_aDT = PDTFactory.getCurrentLocalDateTime ();
-      m_eLevel = eLevel;
-      m_sPI = sPI;
-      m_sMsg = sMsg;
-      m_aLinkedException = aLinkedException;
-    }
-
-    @Nonnull
-    public LocalDateTime getDateTime ()
-    {
-      return m_aDT;
-    }
-
-    @Nonnull
-    public EErrorLevel getErrorLevel ()
-    {
-      return m_eLevel;
-    }
-
-    @Nullable
-    public String getParticipantID ()
-    {
-      return m_sPI;
-    }
-
-    public boolean hasParticipantID ()
-    {
-      return StringHelper.hasText (m_sPI);
-    }
-
-    @Nonnull
-    @Nonempty
-    public String getMessage ()
-    {
-      return m_sMsg;
-    }
-
-    @Nullable
-    public Exception getLinkedException ()
-    {
-      return m_aLinkedException;
-    }
-
-    public boolean hasLinkedException ()
-    {
-      return m_aLinkedException != null;
-    }
-
-    @Nonnull
-    @Nonempty
-    private static String _getErrorLevelName (@Nonnull final IErrorLevel aErrorLevel)
-    {
-      if (aErrorLevel.isGE (EErrorLevel.ERROR))
-        return "error";
-      if (aErrorLevel.isGE (EErrorLevel.WARN))
-        return "warning";
-      return "info";
-    }
-
-    @Nonnull
-    @Nonempty
-    public String getErrorLevelName ()
-    {
-      return _getErrorLevelName (m_eLevel);
-    }
-
-    @Nonnull
-    public IMicroElement getAsMicroElement (@Nonnull @Nonempty final String sElementName)
-    {
-      final IMicroElement eAction = new MicroElement (sElementName);
-      eAction.setAttribute ("datetime", PDTWebDateHelper.getAsStringXSD (m_aDT));
-      eAction.setAttribute ("level", getErrorLevelName ());
-      eAction.setAttribute ("participantID", m_sPI);
-      eAction.appendElement ("message").appendText (m_sMsg);
-      if (m_aLinkedException != null)
-        eAction.appendElement ("exception").appendText (StackTraceHelper.getStackAsString (m_aLinkedException));
-      return eAction;
-    }
-
-    @Nonnull
-    public IJsonObject getAsJsonObject ()
-    {
-      return new JsonObject ().add ("datetime", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format (m_aDT))
-                              .add ("level", getErrorLevelName ())
-                              .addIfNotNull ("participantID", m_sPI)
-                              .add ("message", m_sMsg)
-                              .addIfNotNull ("exception",
-                                             m_aLinkedException != null ? StackTraceHelper.getStackAsString (m_aLinkedException) : null);
-    }
-
-    @Nonnull
-    public static ImportActionItem createSuccess (@Nonnull @Nonempty final String sPI, @Nonnull @Nonempty final String sMsg)
-    {
-      return new ImportActionItem (EErrorLevel.SUCCESS, sPI, sMsg, null);
-    }
-
-    @Nonnull
-    public static ImportActionItem createInfo (@Nullable final String sPI, @Nonnull @Nonempty final String sMsg)
-    {
-      return new ImportActionItem (EErrorLevel.INFO, sPI, sMsg, null);
-    }
-
-    @Nonnull
-    public static ImportActionItem createWarning (@Nullable final String sPI, @Nonnull @Nonempty final String sMsg)
-    {
-      return new ImportActionItem (EErrorLevel.WARN, sPI, sMsg, null);
-    }
-
-    @Nonnull
-    public static ImportActionItem createError (@Nullable final String sPI,
-                                                @Nonnull @Nonempty final String sMsg,
-                                                @Nullable final Exception ex)
-    {
-      return new ImportActionItem (EErrorLevel.ERROR, sPI, sMsg, ex);
-    }
-  }
-
-  private interface ITriConsumer <T, U, V>
-  {
-    void accept (T t, U u, V v);
-  }
-
   public static void importXMLVer10 (@Nonnull final IMicroElement eRoot,
                                      final boolean bOverwriteExisting,
                                      @Nonnull final IUser aDefaultOwner,
                                      @Nonnull final ICommonsSet <String> aAllServiceGroupIDs,
                                      @Nonnull final ICommonsSet <String> aAllBusinessCardIDs,
-                                     @Nonnull final ICommonsList <ImportActionItem> aActionList)
+                                     @Nonnull final ICommonsList <ImportActionItem> aActionList,
+                                     @Nonnull final ImportSummary aSummary)
   {
     ValueEnforcer.notNull (eRoot, "Root");
     ValueEnforcer.notNull (aDefaultOwner, "DefaultOwner");
     ValueEnforcer.notNull (aAllServiceGroupIDs, "AllServiceGroupIDs");
     ValueEnforcer.notNull (aAllBusinessCardIDs, "AllBusinessCardIDs");
     ValueEnforcer.notNull (aActionList, "ActionList");
+    ValueEnforcer.notNull (aSummary, "Summary");
 
     final String sLogPrefix = "[SG-IMPORT-" + COUNTER.incrementAndGet () + "] ";
     final BiConsumer <String, String> aLoggerSuccess = (pi, msg) -> {
@@ -300,7 +155,7 @@ public final class ServiceGroupImport
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
 
-    final ICommonsOrderedMap <ISMPServiceGroup, ImportData> aImportServiceGroups = new CommonsLinkedHashMap <> ();
+    final ICommonsOrderedMap <ISMPServiceGroup, InternalImportData> aImportServiceGroups = new CommonsLinkedHashMap <> ();
     final ICommonsMap <String, ISMPServiceGroup> aDeleteServiceGroups = new CommonsHashMap <> ();
 
     // First read all service groups as they are dependents of the
@@ -343,8 +198,8 @@ public final class ServiceGroupImport
         }
 
         // Remember to create/overwrite the service group
-        final ImportData aSGInfo = new ImportData ();
-        aImportServiceGroups.put (aServiceGroup, aSGInfo);
+        final InternalImportData aImportData = new InternalImportData ();
+        aImportServiceGroups.put (aServiceGroup, aImportData);
         if (bIsServiceGroupContained)
           aDeleteServiceGroups.put (sServiceGroupID, aServiceGroup);
         aLoggerSuccess.accept (sServiceGroupID, "Will " + (bIsServiceGroupContained ? "overwrite" : "import") + " Service Group");
@@ -356,7 +211,7 @@ public final class ServiceGroupImport
           {
             final ISMPServiceInformation aServiceInfo = SMPServiceInformationMicroTypeConverter.convertToNative (eServiceInfo,
                                                                                                                  x -> aServiceGroup);
-            aSGInfo.addServiceInfo (aServiceInfo);
+            aImportData.addServiceInfo (aServiceInfo);
             ++nSICount;
           }
           aLoggerInfo.accept (sServiceGroupID, "Read " + nSICount + " Service Information elements of Service Group");
@@ -368,7 +223,7 @@ public final class ServiceGroupImport
           for (final IMicroElement eRedirect : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_REDIRECT))
           {
             final ISMPRedirect aRedirect = SMPRedirectMicroTypeConverter.convertToNative (eRedirect, x -> aServiceGroup);
-            aSGInfo.addRedirect (aRedirect);
+            aImportData.addRedirect (aRedirect);
             ++nRDCount;
           }
           aLoggerInfo.accept (sServiceGroupID, "Read " + nRDCount + " Redirects of Service Group");
@@ -466,18 +321,23 @@ public final class ServiceGroupImport
             {
               aLoggerSuccess.accept (sServiceGroupID, "Successfully deleted Service Group");
               aDeletedServiceGroups.add (aPI);
+              aSummary.onSuccess (EImportSummaryAction.DELETE_SG);
             }
             else
+            {
               aLoggerErrorPI.accept (sServiceGroupID, "Failed to delete Service Group");
+              aSummary.onError (EImportSummaryAction.DELETE_SG);
+            }
           }
           catch (final SMPServerException ex)
           {
             aLoggerErrorPIEx.accept (sServiceGroupID, "Failed to delete Service Group", ex);
+            aSummary.onError (EImportSummaryAction.DELETE_SG);
           }
         }
 
         // 2. create all service groups
-        for (final Map.Entry <ISMPServiceGroup, ImportData> aEntry : aImportServiceGroups.entrySet ())
+        for (final Map.Entry <ISMPServiceGroup, InternalImportData> aEntry : aImportServiceGroups.entrySet ())
         {
           final ISMPServiceGroup aImportServiceGroup = aEntry.getKey ();
           final String sServiceGroupID = aImportServiceGroup.getID ();
@@ -493,6 +353,7 @@ public final class ServiceGroupImport
                                                                        aImportServiceGroup.getExtensionsAsString (),
                                                                        !bIsOverwrite);
             aLoggerSuccess.accept (sServiceGroupID, "Successfully created Service Group");
+            aSummary.onSuccess (EImportSummaryAction.CREATE_SG);
           }
           catch (final Exception ex)
           {
@@ -501,6 +362,7 @@ public final class ServiceGroupImport
 
             // Delete Business Card again, if already present
             aImportBusinessCards.removeIf (x -> x.getID ().equals (sServiceGroupID));
+            aSummary.onError (EImportSummaryAction.CREATE_SG);
           }
 
           if (aNewServiceGroup != null)
@@ -513,15 +375,18 @@ public final class ServiceGroupImport
                 if (aServiceInfoMgr.mergeSMPServiceInformation (aImportServiceInfo).isSuccess ())
                 {
                   aLoggerSuccess.accept (sServiceGroupID, "Successfully created Service Information");
+                  aSummary.onSuccess (EImportSummaryAction.CREATE_SI);
                 }
                 else
                 {
                   aLoggerErrorPI.accept (sServiceGroupID, "Error creating the new Service Information");
+                  aSummary.onError (EImportSummaryAction.CREATE_SI);
                 }
               }
               catch (final Exception ex)
               {
                 aLoggerErrorPIEx.accept (sServiceGroupID, "Error creating the new Service Information", ex);
+                aSummary.onError (EImportSummaryAction.CREATE_SI);
               }
             }
 
@@ -538,15 +403,18 @@ public final class ServiceGroupImport
                                                             aImportRedirect.getExtensionsAsString ()) != null)
                 {
                   aLoggerSuccess.accept (sServiceGroupID, "Successfully created Redirect");
+                  aSummary.onSuccess (EImportSummaryAction.CREATE_REDIRECT);
                 }
                 else
                 {
                   aLoggerErrorPI.accept (sServiceGroupID, "Error creating the new Redirect");
+                  aSummary.onError (EImportSummaryAction.CREATE_REDIRECT);
                 }
               }
               catch (final Exception ex)
               {
                 aLoggerErrorPIEx.accept (sServiceGroupID, "Error creating the new Redirect", ex);
+                aSummary.onError (EImportSummaryAction.CREATE_REDIRECT);
               }
             }
           }
@@ -562,9 +430,14 @@ public final class ServiceGroupImport
           try
           {
             if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard).isChanged ())
+            {
               aLoggerSuccess.accept (sServiceGroupID, "Successfully deleted Business Card");
+              aSummary.onSuccess (EImportSummaryAction.DELETE_SG);
+            }
             else
             {
+              aSummary.onError (EImportSummaryAction.DELETE_SG);
+
               // If the service group to which the business card belongs was
               // already deleted, don't display an error, as the business card
               // was automatically deleted afterwards
@@ -575,6 +448,7 @@ public final class ServiceGroupImport
           catch (final Exception ex)
           {
             aLoggerErrorPIEx.accept (sServiceGroupID, "Failed to delete Business Card", ex);
+            aSummary.onError (EImportSummaryAction.DELETE_SG);
           }
         }
 
@@ -590,15 +464,18 @@ public final class ServiceGroupImport
                                                                 aImportBusinessCard.getAllEntities ()) != null)
             {
               aLoggerSuccess.accept (sBusinessCardID, "Successfully created Business Card");
+              aSummary.onSuccess (EImportSummaryAction.CREATE_SG);
             }
             else
             {
               aLoggerErrorPI.accept (sBusinessCardID, "Failed to create Business Card");
+              aSummary.onError (EImportSummaryAction.CREATE_SG);
             }
           }
           catch (final Exception ex)
           {
             aLoggerErrorPIEx.accept (sBusinessCardID, "Failed to create Business Card", ex);
+            aSummary.onError (EImportSummaryAction.CREATE_SG);
           }
         }
       }

@@ -35,8 +35,9 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.exchange.CSMPExchange;
+import com.helger.phoss.smp.exchange.ImportActionItem;
+import com.helger.phoss.smp.exchange.ImportSummary;
 import com.helger.phoss.smp.exchange.ServiceGroupImport;
-import com.helger.phoss.smp.exchange.ServiceGroupImport.ImportActionItem;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
@@ -127,12 +128,14 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
           {
             // Version 1.0
             final ICommonsList <ImportActionItem> aActionList = new CommonsArrayList <> ();
+            final ImportSummary aImportSummary = new ImportSummary ();
             ServiceGroupImport.importXMLVer10 (aDoc.getDocumentElement (),
                                                bOverwriteExisting,
                                                aDefaultOwner,
                                                aAllServiceGroupIDs,
                                                aAllBusinessCardIDs,
-                                               aActionList);
+                                               aActionList,
+                                               aImportSummary);
             for (final ImportActionItem aAction : aActionList)
             {
               final IErrorLevel aErrorLevel = aAction.getErrorLevel ();
