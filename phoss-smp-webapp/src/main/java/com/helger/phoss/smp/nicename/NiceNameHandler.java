@@ -189,13 +189,13 @@ public final class NiceNameHandler
   @ReturnsMutableCopy
   public static ICommonsOrderedMap <String, NiceNameEntry> getAllDocumentTypeMappings ()
   {
-    return RW_LOCK.readLockedGet ( () -> DOCTYPE_IDS.getClone ());
+    return RW_LOCK.readLockedGet (DOCTYPE_IDS::getClone);
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public static ICommonsOrderedMap <String, NiceNameEntry> getAllProcessMappings ()
   {
-    return RW_LOCK.readLockedGet ( () -> PROCESS_IDS.getClone ());
+    return RW_LOCK.readLockedGet (PROCESS_IDS::getClone);
   }
 }

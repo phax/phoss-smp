@@ -237,7 +237,6 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                        "' to " +
                                                        eOldState +
                                                        "!"));
-                                bSetStateToMigrated = true;
                               }
                               else
                               {

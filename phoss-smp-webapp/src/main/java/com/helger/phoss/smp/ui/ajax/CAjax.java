@@ -45,22 +45,24 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 @Immutable
 public final class CAjax
 {
+  public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () == EHttpMethod.POST;
+  public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_IS_USER_LOGGED_IN = x -> LoggedInUserManager.getInstance ()
+                                                                                                                             .isUserLoggedInInCurrentSession ();
+
   public static final IAjaxFunctionDeclaration DATATABLES = AjaxFunctionDeclaration.builder ("dataTables")
                                                                                    .executor (AjaxExecutorDataTables.class)
                                                                                    .build ();
   public static final IAjaxFunctionDeclaration DATATABLES_I18N = AjaxFunctionDeclaration.builder ("datatables-i18n")
                                                                                         .executor (new AjaxExecutorDataTablesI18N (CSMPServer.DEFAULT_LOCALE))
                                                                                         .build ();
-  public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () == EHttpMethod.POST;
   public static final IAjaxFunctionDeclaration LOGIN = AjaxFunctionDeclaration.builder ("login")
                                                                               .filter (FILTER_HTTP_POST.and (x -> SMPWebAppConfiguration.isPublicLoginEnabled ()))
                                                                               .executor (AjaxExecutorPublicLogin.class)
                                                                               .build ();
-  public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_LOGIN = x -> LoggedInUserManager.getInstance ()
-                                                                                                                 .isUserLoggedInInCurrentSession ();
+
   public static final IAjaxFunctionDeclaration FUNCTION_BACKEND_CONNECTION_RESET = AjaxFunctionDeclaration.builder ("backendConnectionReset")
                                                                                                           .executor (AjaxExecutorSecureBackendConnectionReset.class)
-                                                                                                          .filter (FILTER_LOGIN)
+                                                                                                          .filter (FILTER_IS_USER_LOGGED_IN)
                                                                                                           .build ();
 
   private static final Logger LOGGER = LoggerFactory.getLogger (CAjax.class);
@@ -78,10 +80,13 @@ public final class CAjax
   }
 
   @Nonnull
-  public static final AjaxFunctionDeclaration addAjaxWithLogin (@Nonnull final IAjaxExecutor aExecutor)
+  public static AjaxFunctionDeclaration addAjaxWithLogin (@Nonnull final IAjaxExecutor aExecutor)
   {
     // random name
-    final AjaxFunctionDeclaration aFunction = AjaxFunctionDeclaration.builder ().executor (aExecutor).filter (CAjax.FILTER_LOGIN).build ();
+    final AjaxFunctionDeclaration aFunction = AjaxFunctionDeclaration.builder ()
+                                                                     .executor (aExecutor)
+                                                                     .filter (CAjax.FILTER_IS_USER_LOGGED_IN)
+                                                                     .build ();
     GlobalAjaxInvoker.getInstance ().getRegistry ().registerFunction (aFunction);
     return aFunction;
   }
