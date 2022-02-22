@@ -34,6 +34,7 @@ import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.collection.impl.ICommonsOrderedSet;
 import com.helger.commons.collection.impl.ICommonsSet;
+import com.helger.commons.functional.ITriConsumer;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
@@ -93,11 +94,6 @@ public final class ServiceGroupImport
     }
   }
 
-  private interface ITriConsumer <T, U, V>
-  {
-    void accept (T t, U u, V v);
-  }
-
   private static final Logger LOGGER = LoggerFactory.getLogger (ServiceGroupImport.class);
   private static final AtomicInteger COUNTER = new AtomicInteger (0);
 
@@ -107,15 +103,15 @@ public final class ServiceGroupImport
   public static void importXMLVer10 (@Nonnull final IMicroElement eRoot,
                                      final boolean bOverwriteExisting,
                                      @Nonnull final IUser aDefaultOwner,
-                                     @Nonnull final ICommonsSet <String> aAllServiceGroupIDs,
-                                     @Nonnull final ICommonsSet <String> aAllBusinessCardIDs,
+                                     @Nonnull final ICommonsSet <String> aAllExistingServiceGroupIDs,
+                                     @Nonnull final ICommonsSet <String> aAllExistingBusinessCardIDs,
                                      @Nonnull final ICommonsList <ImportActionItem> aActionList,
                                      @Nonnull final ImportSummary aSummary)
   {
     ValueEnforcer.notNull (eRoot, "Root");
     ValueEnforcer.notNull (aDefaultOwner, "DefaultOwner");
-    ValueEnforcer.notNull (aAllServiceGroupIDs, "AllServiceGroupIDs");
-    ValueEnforcer.notNull (aAllBusinessCardIDs, "AllBusinessCardIDs");
+    ValueEnforcer.notNull (aAllExistingServiceGroupIDs, "AllExistingServiceGroupIDs");
+    ValueEnforcer.notNull (aAllExistingBusinessCardIDs, "AllExistingBusinessCardIDs");
     ValueEnforcer.notNull (aActionList, "ActionList");
     ValueEnforcer.notNull (aSummary, "Summary");
 
@@ -186,7 +182,7 @@ public final class ServiceGroupImport
       }
 
       final String sServiceGroupID = aServiceGroup.getID ();
-      final boolean bIsServiceGroupContained = aAllServiceGroupIDs.contains (sServiceGroupID);
+      final boolean bIsServiceGroupContained = aAllExistingServiceGroupIDs.contains (sServiceGroupID);
       if (!bIsServiceGroupContained || bOverwriteExisting)
       {
         if (aImportServiceGroups.containsKey (aServiceGroup))
@@ -214,7 +210,12 @@ public final class ServiceGroupImport
             aImportData.addServiceInfo (aServiceInfo);
             ++nSICount;
           }
-          aLoggerInfo.accept (sServiceGroupID, "Read " + nSICount + " Service Information elements of Service Group");
+          aLoggerInfo.accept (sServiceGroupID,
+                              "Read " +
+                                               nSICount +
+                                               " Service Information " +
+                                               (nSICount == 1 ? "element" : "elements") +
+                                               " of Service Group");
         }
 
         // read all contained redirects
@@ -226,7 +227,8 @@ public final class ServiceGroupImport
             aImportData.addRedirect (aRedirect);
             ++nRDCount;
           }
-          aLoggerInfo.accept (sServiceGroupID, "Read " + nRDCount + " Redirects of Service Group");
+          aLoggerInfo.accept (sServiceGroupID,
+                              "Read " + nRDCount + " Redirect " + (nRDCount == 1 ? "element" : "elements") + " of Service Group");
         }
       }
       else
@@ -251,7 +253,7 @@ public final class ServiceGroupImport
         {
           aBusinessCard = new SMPBusinessCardMicroTypeConverter ().convertToNative (eBusinessCard);
         }
-        catch (final IllegalStateException ex)
+        catch (final RuntimeException ex)
         {
           // Service group not found
           aLoggerError.accept ("Business Card at index " + nBCIndex + " contains an invalid/unknown Service Group!");
@@ -263,7 +265,7 @@ public final class ServiceGroupImport
         else
         {
           final String sBusinessCardID = aBusinessCard.getID ();
-          final boolean bIsBusinessCardContained = aAllBusinessCardIDs.contains (sBusinessCardID);
+          final boolean bIsBusinessCardContained = aAllExistingBusinessCardIDs.contains (sBusinessCardID);
           if (!bIsBusinessCardContained || bOverwriteExisting)
           {
             if (aImportBusinessCards.removeIf (x -> x.getID ().equals (sBusinessCardID)))
@@ -273,7 +275,11 @@ public final class ServiceGroupImport
             }
             aImportBusinessCards.add (aBusinessCard);
             if (bIsBusinessCardContained)
-              aDeleteBusinessCards.put (sBusinessCardID, aBusinessCard);
+            {
+              // BCs are deleted when the SGs are deleted
+              if (!aDeleteServiceGroups.containsKey (sBusinessCardID))
+                aDeleteBusinessCards.put (sBusinessCardID, aBusinessCard);
+            }
             aLoggerSuccess.accept (sBusinessCardID, "Will " + (bIsBusinessCardContained ? "overwrite" : "import") + " Business Card");
           }
           else
@@ -432,11 +438,11 @@ public final class ServiceGroupImport
             if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard).isChanged ())
             {
               aLoggerSuccess.accept (sServiceGroupID, "Successfully deleted Business Card");
-              aSummary.onSuccess (EImportSummaryAction.DELETE_SG);
+              aSummary.onSuccess (EImportSummaryAction.DELETE_BC);
             }
             else
             {
-              aSummary.onError (EImportSummaryAction.DELETE_SG);
+              aSummary.onError (EImportSummaryAction.DELETE_BC);
 
               // If the service group to which the business card belongs was
               // already deleted, don't display an error, as the business card
@@ -448,7 +454,7 @@ public final class ServiceGroupImport
           catch (final Exception ex)
           {
             aLoggerErrorPIEx.accept (sServiceGroupID, "Failed to delete Business Card", ex);
-            aSummary.onError (EImportSummaryAction.DELETE_SG);
+            aSummary.onError (EImportSummaryAction.DELETE_BC);
           }
         }
 
@@ -464,18 +470,18 @@ public final class ServiceGroupImport
                                                                 aImportBusinessCard.getAllEntities ()) != null)
             {
               aLoggerSuccess.accept (sBusinessCardID, "Successfully created Business Card");
-              aSummary.onSuccess (EImportSummaryAction.CREATE_SG);
+              aSummary.onSuccess (EImportSummaryAction.CREATE_BC);
             }
             else
             {
               aLoggerErrorPI.accept (sBusinessCardID, "Failed to create Business Card");
-              aSummary.onError (EImportSummaryAction.CREATE_SG);
+              aSummary.onError (EImportSummaryAction.CREATE_BC);
             }
           }
           catch (final Exception ex)
           {
             aLoggerErrorPIEx.accept (sBusinessCardID, "Failed to create Business Card", ex);
-            aSummary.onError (EImportSummaryAction.CREATE_SG);
+            aSummary.onError (EImportSummaryAction.CREATE_BC);
           }
         }
       }
