@@ -15,5 +15,6 @@
 -- limitations under the License.
 --
 
-ALTER TABLE smp_secuser ALTER COLUMN loginname TYPE varchar(200) NOT NULL;
+ALTER TABLE smp_secuser ALTER COLUMN loginname TYPE varchar(200);
+ALTER TABLE smp_secuser ALTER COLUMN loginname SET NOT NULL;
 ALTER TABLE smp_secuser ALTER COLUMN email TYPE varchar(200);
