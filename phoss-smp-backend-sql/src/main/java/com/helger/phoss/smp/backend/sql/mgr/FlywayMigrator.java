@@ -74,7 +74,7 @@ final class FlywayMigrator
   {
     ValueEnforcer.notNull (eDBType, "DBType");
 
-    LOGGER.info ("Starting to run Flyway");
+    LOGGER.info ("Starting to run Flyway for DB type " + eDBType);
 
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
     final Callback aCallbackLogging = new BaseCallback ()

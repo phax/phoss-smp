@@ -90,11 +90,11 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
           case MYSQL:
             aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
             break;
-          case ORACLE:
-            // No such constraint
-            break;
           case POSTGRESQL:
             aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
+            break;
+          case ORACLE:
+            // No such constraint
             break;
           default:
             throw new IllegalStateException ("The migration code for DB type " + eDBType + " is missing");
