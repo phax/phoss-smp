@@ -69,7 +69,6 @@
 
   <properties>
     <log4j.version>2.17.1</log4j.version>
-    <oracle.version>21.5.0.0</oracle.version>
     <protobuf.version>3.19.4</protobuf.version>
   </properties>
   
@@ -134,14 +133,9 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.9.9</version>
+        <version>0.9.10</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.helger.photon</groupId>
-        <artifactId>ph-oton-jdbc</artifactId>
-        <version>1.0.2</version>
       </dependency>
       
       <dependency>
@@ -163,32 +157,6 @@
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-web</artifactId>
         <version>${log4j.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.28</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mongodb</groupId>
-        <artifactId>mongodb-driver-sync</artifactId>
-        <version>4.4.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>42.3.3</version>
-      </dependency>
-      <dependency>
-        <groupId>net.jodah</groupId>
-        <artifactId>expiringmap</artifactId>
-        <version>0.5.10</version>
-      </dependency>
-      <dependency>
-        <groupId>org.flywaydb</groupId>
-        <artifactId>flyway-core</artifactId>
-        <version>7.15.0</version>
       </dependency>
 
       <dependency>

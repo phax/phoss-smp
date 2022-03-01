@@ -33,8 +33,11 @@ public enum EDatabaseType implements IHasID <String>, IHasDisplayName
 {
   // IDs must be lowercase because they are used in directory names
   MYSQL ("mysql", "MySQL"),
+  POSTGRESQL ("postgresql", "PostgreSQL"),
+  /** Added in v5.6.0 */
   ORACLE ("oracle", "Oracle"),
-  POSTGRESQL ("postgresql", "PostgreSQL");
+  /** Added in v5.7.0 */
+  DB2 ("db2", "IBM DB2");
 
   private final String m_sID;
   private final String m_sDisplayName;
