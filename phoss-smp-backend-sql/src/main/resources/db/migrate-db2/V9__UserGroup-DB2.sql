@@ -15,18 +15,19 @@
 -- limitations under the License.
 --
 
-CREATE TABLE `smp_secusergroup` (
-  `id`             varchar(45)  NOT NULL,
-  `creationdt`     datetime,
-  `creationuserid` varchar(20),
-  `lastmoddt`      datetime,
-  `lastmoduserid`  varchar(20),
-  `deletedt`       datetime,
-  `deleteuserid`   varchar(20),
-  `attrs`          text,
-  `name`           varchar(255) NOT NULL,
-  `description`    text,
-  `userids`        text,
-  `roleids`        text,
- PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SMP User Groups';
+CREATE TABLE "smp_secusergroup" (
+    "id"             varchar(45)  NOT NULL,
+    "creationdt"     timestamp,
+    "creationuserid" varchar(20),
+    "lastmoddt"      timestamp,
+    "lastmoduserid"  varchar(20),
+    "deletedt"       timestamp,
+    "deleteuserid"   varchar(20),
+    "attrs"          clob,
+    "name"           varchar(255) NOT NULL,
+    "description"    clob,
+    "userids"        clob,
+    "roleids"        clob,
+    CONSTRAINT "pk_smp_secusergroup" PRIMARY KEY
+      ("id")
+  );

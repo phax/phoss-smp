@@ -15,27 +15,30 @@
 -- limitations under the License.
 --
 
-CREATE TABLE `smp_secuser` (
-  `id`             varchar(45)  NOT NULL,
-  `creationdt`     datetime,
-  `creationuserid` varchar(20),
-  `lastmoddt`      datetime,
-  `lastmoduserid`  varchar(20),
-  `deletedt`       datetime,
-  `deleteuserid`   varchar(20),
-  `attrs`          text,
-  `loginname`      text         NOT NULL,
-  `email`          text,
-  `pwalgo`         varchar(100) NOT NULL,
-  `pwsalt`         text         NOT NULL,
-  `pwhash`         text         NOT NULL,
-  `firstname`      text,
-  `lastname`       text,
-  `description`    text,
-  `locale`         varchar(20),
-  `lastlogindt`    datetime,
-  `logincount`     integer,
-  `failedlogins`   integer,
-  `disabled`       tinyint(1)   NOT NULL,
- PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SMP Users';
+CREATE TABLE "smp_secuser" (
+    "id"             varchar(45)  NOT NULL,
+    "creationdt"     timestamp,
+    "creationuserid" varchar(20),
+    "lastmoddt"      timestamp,
+    "lastmoduserid"  varchar(20),
+    "deletedt"       timestamp,
+    "deleteuserid"   varchar(20),
+    "attrs"          clob,
+    "loginname"      varchar(200) NOT NULL,
+    "email"          varchar(200),
+    "pwalgo"         varchar(100) NOT NULL,
+    "pwsalt"         clob         NOT NULL,
+    "pwhash"         clob         NOT NULL,
+    "firstname"      clob,
+    "lastname"       clob,
+    "description"    clob,
+    "locale"         varchar(20),
+    "lastlogindt"    timestamp,
+    "logincount"     integer,
+    "failedlogins"   integer,
+    "disabled"       SMALLINT   NOT NULL,
+    CONSTRAINT "pk_smp_secuser" PRIMARY KEY
+      ("id")
+  );
+
+CREATE INDEX "idx_smp_secuser_loginname" ON "smp_secuser" ("loginname" ASC);

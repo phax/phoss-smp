@@ -15,12 +15,13 @@
 -- limitations under the License.
 --
 
-CREATE TABLE `smp_audit` (
-  `id`         int          NOT NULL AUTO_INCREMENT COMMENT 'Ensure order of entry',
-  `dt`         datetime     NOT NULL                COMMENT 'The date and time of the execution',
-  `userid`     varchar(20)  NOT NULL                COMMENT 'The executing user ID',
-  `actiontype` varchar(10)  NOT NULL                COMMENT 'The object type',
-  `success`    tinyint(1)   NOT NULL                COMMENT 'Was the action successful or not?',
-  `action`     text                                 COMMENT 'The action and arguments that were performed',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SMP Audit';
+CREATE TABLE "smp_audit" (
+    "id"         int         NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+    "dt"         timestamp   NOT NULL,
+    "userid"     varchar(20) NOT NULL,
+    "actiontype" varchar(10) NOT NULL,
+    "success"    SMALLINT    NOT NULL,
+    "action"     CLOB,
+    CONSTRAINT "pk_smp_audit" PRIMARY KEY
+      ("id")
+  );

@@ -94,6 +94,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
             aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
             break;
           case ORACLE:
+          case DB2:
             // No such constraint
             break;
           default:

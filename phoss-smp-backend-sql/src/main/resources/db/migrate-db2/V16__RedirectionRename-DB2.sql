@@ -15,4 +15,4 @@
 -- limitations under the License.
 --
 
-RENAME TABLE smp_service_metadata_redirection TO smp_service_metadata_red;
+-- Already done in V1

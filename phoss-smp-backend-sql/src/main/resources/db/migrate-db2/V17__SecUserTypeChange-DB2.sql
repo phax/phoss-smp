@@ -15,5 +15,4 @@
 -- limitations under the License.
 --
 
-ALTER TABLE `smp_secuser` MODIFY `loginname` varchar(200) NOT NULL;
-ALTER TABLE `smp_secuser` MODIFY `email` varchar(200);
+-- Already done in V1
