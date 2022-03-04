@@ -19,7 +19,11 @@ package com.helger.phoss.smp.backend.sql;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.annotation.UsedViaReflection;
+import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.SMPServerConfiguration;
@@ -34,6 +38,7 @@ import com.helger.scope.singleton.AbstractGlobalSingleton;
 @ThreadSafe
 public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPDataSourceSingleton.class);
   private static final EDatabaseType DB_TYPE;
 
   static
@@ -49,6 +54,13 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
                                        " - provided value is '" +
                                        sDBType +
                                        "'");
+    if (DB_TYPE == EDatabaseType.DB2)
+    {
+      // TODO DB2
+      if (GlobalDebug.isProductionMode ())
+        throw new IllegalStateException ("DB2 is not yet ready for production");
+      LOGGER.warn ("The DB2 version is NOT YET ready for use!");
+    }
   }
 
   /**

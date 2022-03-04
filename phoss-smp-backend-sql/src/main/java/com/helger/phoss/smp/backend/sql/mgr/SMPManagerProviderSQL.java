@@ -71,7 +71,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
 
     // Set the special PhotonSecurityManager factory
-    // Must be before Flyway, so that auditing of Flyway actions work
+    // Must be before Flyway, so that auditing of Flyway actions (may) work
     PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
     // Flyway migration is enabled by default

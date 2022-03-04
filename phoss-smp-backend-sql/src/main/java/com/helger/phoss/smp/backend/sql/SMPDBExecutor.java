@@ -21,6 +21,8 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.regex.RegExHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.settings.exchange.configfile.ConfigFile;
@@ -33,7 +35,16 @@ import com.helger.settings.exchange.configfile.ConfigFile;
  */
 public final class SMPDBExecutor extends DBExecutor
 {
-  public static final Function <String, String> TABLE_NAME_CUSTOMIZER = x -> "smp_" + x;
+  public static final Function <String, String> TABLE_NAME_CUSTOMIZER;
+  static
+  {
+    final String sSchemaName = SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
+    if (StringHelper.hasText (sSchemaName) && RegExHelper.stringMatchesPattern ("[0-9a-zA-Z]+", sSchemaName))
+      TABLE_NAME_CUSTOMIZER = x -> sSchemaName + ".smp_" + x;
+    else
+      TABLE_NAME_CUSTOMIZER = x -> "smp_" + x;
+  }
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPDBExecutor.class);
 
   public SMPDBExecutor ()

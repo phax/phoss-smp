@@ -199,7 +199,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_eBackendConnectionState == null)
         throw new IllegalStateException ("Failed to get default backend connection state!");
 
-      // This might become configurable in the future
+      // TODO This might become configurable in the future
       m_aSMPURLProvider = SMPServerConfiguration.getRESTType ().isPeppol () ? PeppolURLProvider.INSTANCE : BDXLURLProvider.INSTANCE;
       if (m_aSMPURLProvider == null)
         throw new IllegalStateException ("Failed to create SMP URL Provider!");
