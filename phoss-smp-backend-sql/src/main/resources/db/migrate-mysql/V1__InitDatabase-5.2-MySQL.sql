@@ -77,6 +77,7 @@ CREATE TABLE `smp_endpoint` (
   `transportProfile`              varchar(256) NOT NULL,
   `extension`                     longtext,
   PRIMARY KEY (`businessIdentifierScheme`,`businessIdentifier`,`documentIdentifierScheme`,`documentIdentifier`,`processIdentifierType`,`processIdentifier`,`transportProfile`),
+  KEY `FK_smp_endpoint_id` (`businessIdentifierScheme`,`businessIdentifier`,`documentIdentifierScheme`,`documentIdentifier`,`processIdentifierType`,`processIdentifier`),
   CONSTRAINT `FK_smp_endpoint_documentIdentifierScheme` FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`) REFERENCES `smp_process` (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
