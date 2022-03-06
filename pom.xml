@@ -126,14 +126,14 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>8.7.1</version>
+        <version>8.7.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.9.10</version>
+        <version>0.10.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
