@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
@@ -67,7 +68,9 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
 
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
-    throw new UnsupportedOperationException ();
+    // Avoid exceptions in test for system migration
+    // "ensure-transport-profiles-128"
+    return new CommonsArrayList <> ();
   }
 
   public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (final ISMPServiceGroup aServiceGroup)
