@@ -24,7 +24,7 @@ popd
 
 rmdir /S /Q smp-binary 
 if errorlevel 1 goto error
-xcopy /K /R /E /I /S /H /Y ..\..\phoss-smp-webapp-sql\target\phoss-smp-webapp-sql-5.6.1\* smp-binary\
+xcopy /K /R /E /I /S /H /Y ..\..\phoss-smp-webapp-sql\target\phoss-smp-webapp-sql-5.6.2\* smp-binary\
 if errorlevel 1 goto error
 
 goto end
