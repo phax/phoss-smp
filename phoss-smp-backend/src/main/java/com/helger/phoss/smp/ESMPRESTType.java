@@ -84,7 +84,7 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
 
   public boolean isPathConstraint ()
   {
-    return this == PEPPOL || this == OASIS_BDXR_V1;
+    return this == PEPPOL;
   }
 
   @Nullable
