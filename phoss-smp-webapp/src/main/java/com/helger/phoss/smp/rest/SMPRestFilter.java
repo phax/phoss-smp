@@ -44,6 +44,7 @@ import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.state.EContinue;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.photon.api.APIDescriptor;
 import com.helger.photon.api.APIPath;
 import com.helger.photon.api.GlobalAPIInvoker;
@@ -82,42 +83,61 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     final IAPIExceptionMapper aExceptionMapper = new SMPRestExceptionMapper ();
     final IAPIRegistry aAPIRegistry = GlobalAPIInvoker.getInstance ().getRegistry ();
 
+    final String sQueryPathPrefix = SMPServerConfiguration.getRESTType ().getQueryPathPrefix ();
+
     // BusinessCard
     {
-      final APIDescriptor aGetBusinessCard = new APIDescriptor (APIPath.get (PATH_BUSINESSCARD + "{" + PARAM_SERVICE_GROUP_ID + "}"),
+      final APIDescriptor aGetBusinessCard = new APIDescriptor (APIPath.get (PATH_BUSINESSCARD +
+                                                                             "{" +
+                                                                             PARAM_SERVICE_GROUP_ID +
+                                                                             "}"),
                                                                 new APIExecutorBusinessCardGet ());
       aGetBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetBusinessCard);
     }
     {
-      final APIDescriptor aPutBusinessCard = new APIDescriptor (APIPath.put (PATH_BUSINESSCARD + "{" + PARAM_SERVICE_GROUP_ID + "}"),
+      final APIDescriptor aPutBusinessCard = new APIDescriptor (APIPath.put (PATH_BUSINESSCARD +
+                                                                             "{" +
+                                                                             PARAM_SERVICE_GROUP_ID +
+                                                                             "}"),
                                                                 new APIExecutorBusinessCardPut ());
-      aPutBusinessCard.allowedMimeTypes ().addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+      aPutBusinessCard.allowedMimeTypes ()
+                      .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
       aPutBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutBusinessCard);
     }
     {
-      final APIDescriptor aDeleteBusinessCard = new APIDescriptor (APIPath.delete (PATH_BUSINESSCARD + "{" + PARAM_SERVICE_GROUP_ID + "}"),
+      final APIDescriptor aDeleteBusinessCard = new APIDescriptor (APIPath.delete (PATH_BUSINESSCARD +
+                                                                                   "{" +
+                                                                                   PARAM_SERVICE_GROUP_ID +
+                                                                                   "}"),
                                                                    new APIExecutorBusinessCardDelete ());
       aDeleteBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteBusinessCard);
     }
     // CompleteServiceGroup
     {
-      final APIDescriptor aGetCompleteServiceGroup = new APIDescriptor (APIPath.get (PATH_COMPLETE + "{" + PARAM_SERVICE_GROUP_ID + "}"),
+      final APIDescriptor aGetCompleteServiceGroup = new APIDescriptor (APIPath.get (PATH_COMPLETE +
+                                                                                     "{" +
+                                                                                     PARAM_SERVICE_GROUP_ID +
+                                                                                     "}"),
                                                                         new APIExecutorServiceGroupCompleteGet ());
       aGetCompleteServiceGroup.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetCompleteServiceGroup);
     }
     // List
     {
-      final APIDescriptor aGetList = new APIDescriptor (APIPath.get (PATH_LIST + "{" + PARAM_USER_ID + "}"), new APIExecutorUserListGet ());
+      final APIDescriptor aGetList = new APIDescriptor (APIPath.get (PATH_LIST + "{" + PARAM_USER_ID + "}"),
+                                                        new APIExecutorUserListGet ());
       aGetList.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetList);
     }
     // ServiceGroup
     {
-      final APIDescriptor aGetServiceGroup = new APIDescriptor (APIPath.get ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
+      final APIDescriptor aGetServiceGroup = new APIDescriptor (APIPath.get (sQueryPathPrefix +
+                                                                             "/{" +
+                                                                             PARAM_SERVICE_GROUP_ID +
+                                                                             "}"),
                                                                 new APIExecutorServiceGroupGet ());
       aGetServiceGroup.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetServiceGroup);
@@ -125,7 +145,8 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     {
       final APIDescriptor aPutServiceGroup = new APIDescriptor (APIPath.put ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                 new APIExecutorServiceGroupPut ());
-      aPutServiceGroup.allowedMimeTypes ().addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+      aPutServiceGroup.allowedMimeTypes ()
+                      .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
       aPutServiceGroup.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutServiceGroup);
     }
@@ -137,7 +158,8 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
     // ServiceMetadata
     {
-      final APIDescriptor aGetServiceMetadata = new APIDescriptor (APIPath.get ("/{" +
+      final APIDescriptor aGetServiceMetadata = new APIDescriptor (APIPath.get (sQueryPathPrefix +
+                                                                                "/{" +
                                                                                 PARAM_SERVICE_GROUP_ID +
                                                                                 "}" +
                                                                                 PATH_SERVICES +
@@ -157,7 +179,8 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                                 PARAM_DOCUMENT_TYPE_ID +
                                                                                 "}"),
                                                                    new APIExecutorServiceMetadataPut ());
-      aPutServiceMetadata.allowedMimeTypes ().addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+      aPutServiceMetadata.allowedMimeTypes ()
+                         .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
       aPutServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutServiceMetadata);
     }
@@ -196,14 +219,18 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     {
-      final APIDescriptor aSMPQueryDocTypes = new APIDescriptor (APIPath.get ("/smpquery/{" + PARAM_SERVICE_GROUP_ID + "}"),
+      final APIDescriptor aSMPQueryDocTypes = new APIDescriptor (APIPath.get ("/smpquery/{" +
+                                                                              PARAM_SERVICE_GROUP_ID +
+                                                                              "}"),
                                                                  new APIExecutorQueryGetDocTypes ());
       aSMPQueryDocTypes.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPQueryDocTypes);
     }
 
     {
-      final APIDescriptor aSMPQueryBusinessCard = new APIDescriptor (APIPath.get ("/businesscardquery/{" + PARAM_SERVICE_GROUP_ID + "}"),
+      final APIDescriptor aSMPQueryBusinessCard = new APIDescriptor (APIPath.get ("/businesscardquery/{" +
+                                                                                  PARAM_SERVICE_GROUP_ID +
+                                                                                  "}"),
                                                                      new APIExecutorQueryGetBusinessCard ());
       aSMPQueryBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPQueryBusinessCard);
@@ -218,7 +245,9 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     {
-      final APIDescriptor aSMPExportByOwner = new APIDescriptor (APIPath.get ("/exchange/export/byowner/{" + PARAM_USER_ID + "}/xml/v1"),
+      final APIDescriptor aSMPExportByOwner = new APIDescriptor (APIPath.get ("/exchange/export/byowner/{" +
+                                                                              PARAM_USER_ID +
+                                                                              "}/xml/v1"),
                                                                  new APIExecutorExportByOwnerXMLVer1 ());
       aSMPExportByOwner.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPExportByOwner);
@@ -241,7 +270,9 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     {
-      final APIDescriptor aSMPImportAll = new APIDescriptor (APIPath.put ("/exchange/import/xml/v1/{" + PARAM_USER_ID + "}"),
+      final APIDescriptor aSMPImportAll = new APIDescriptor (APIPath.put ("/exchange/import/xml/v1/{" +
+                                                                          PARAM_USER_ID +
+                                                                          "}"),
                                                              new APIExecutorImportXMLVer1 ());
       aSMPImportAll.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPImportAll);
@@ -293,7 +324,8 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   @Override
   @Nonnull
   protected EContinue onFilterBefore (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                                      @Nonnull final UnifiedResponse aUnifiedResponse) throws IOException, ServletException
+                                      @Nonnull final UnifiedResponse aUnifiedResponse) throws IOException,
+                                                                                       ServletException
   {
     if (LOGGER.isDebugEnabled ())
     {
@@ -313,7 +345,10 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     {
       // Explicitly other servlet
       if (LOGGER.isDebugEnabled ())
-        LOGGER.debug (LOG_PREFIX + "Ignoring '" + aAPIPath.getPath () + "' because it is an application internal path.");
+        LOGGER.debug (LOG_PREFIX +
+                      "Ignoring '" +
+                      aAPIPath.getPath () +
+                      "' because it is an application internal path.");
       return EContinue.CONTINUE;
     }
 

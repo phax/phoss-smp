@@ -58,11 +58,18 @@ public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension
   com.helger.xsds.peppol.smp1.ServiceGroupType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This service information object as a BDXR SMP JAXB object for the
-   *         REST interface. Never <code>null</code>.
+   * @return This service information object as a BDXR SMP v1 JAXB object for
+   *         the REST interface. Never <code>null</code>.
    */
   @Nonnull
   com.helger.xsds.bdxr.smp1.ServiceGroupType getAsJAXBObjectBDXR1 ();
+
+  /**
+   * @return This service information object as a BDXR SMP v2 JAXB object for
+   *         the REST interface. Never <code>null</code>.
+   */
+  @Nonnull
+  com.helger.xsds.bdxr.smp2.ServiceGroupType getAsJAXBObjectBDXR2 ();
 
   @Nonnull
   static Comparator <ISMPServiceGroup> comparator ()

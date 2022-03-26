@@ -30,13 +30,16 @@ import com.helger.peppol.sml.ESMPAPIType;
 public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
 {
   PEPPOL ("peppol", "Peppol", ESMPAPIType.PEPPOL),
-  OASIS_BDXR_V1 ("bdxr", "OASIS BDXR SMP v1", ESMPAPIType.OASIS_BDXR_V1);
+  OASIS_BDXR_V1 ("bdxr", "OASIS BDXR SMP v1", ESMPAPIType.OASIS_BDXR_V1),
+  OASIS_BDXR_V2 ("bdxr2", "OASIS BDXR SMP v2", ESMPAPIType.OASIS_BDXR_V2);
 
   private final String m_sID;
   private final String m_sDisplayName;
   private final ESMPAPIType m_eAPIType;
 
-  ESMPRESTType (@Nonnull @Nonempty final String sID, @Nonnull @Nonempty final String sDisplayName, @Nonnull final ESMPAPIType eAPIType)
+  ESMPRESTType (@Nonnull @Nonempty final String sID,
+                @Nonnull @Nonempty final String sDisplayName,
+                @Nonnull final ESMPAPIType eAPIType)
   {
     m_sID = sID;
     m_sDisplayName = sDisplayName;
@@ -79,12 +82,24 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
 
   public boolean isBDXR ()
   {
-    return this == OASIS_BDXR_V1;
+    return this == OASIS_BDXR_V1 || this == OASIS_BDXR_V2;
   }
 
   public boolean isPathConstraint ()
   {
     return this == PEPPOL;
+  }
+
+  /**
+   * @return The query path prefix for the particular REST type. This was
+   *         introduced for OASIS BDXR SMP v2 support. Never <code>null</code>
+   *         but maybe empty. If a path is returned, it must end with a slash.
+   * @since 5.7.0
+   */
+  @Nonnull
+  public String getQueryPathPrefix ()
+  {
+    return this == OASIS_BDXR_V2 ? "bdxr-smp-2/" : "";
   }
 
   @Nullable

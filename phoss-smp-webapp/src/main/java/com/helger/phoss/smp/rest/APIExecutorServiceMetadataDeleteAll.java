@@ -27,6 +27,7 @@ import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
+import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
@@ -60,6 +61,9 @@ public final class APIExecutorServiceMetadataDeleteAll extends AbstractSMPAPIExe
         break;
       case OASIS_BDXR_V1:
         new BDXR1ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aBasicAuth);
+        break;
+      case OASIS_BDXR_V2:
+        new BDXR2ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aBasicAuth);
         break;
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");

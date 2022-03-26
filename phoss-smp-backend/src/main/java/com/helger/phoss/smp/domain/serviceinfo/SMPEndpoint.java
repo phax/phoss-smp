@@ -10,12 +10,15 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
+import java.security.cert.X509Certificate;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
@@ -219,6 +222,29 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
     ret.setExtension (getAsBDXRExtension ());
     ret.setTransportProfile (m_sTransportProfile);
+    return ret;
+  }
+
+  @Nonnull
+  public com.helger.xsds.bdxr.smp2.ac.EndpointType getAsJAXBObjectBDXR2 ()
+  {
+    final com.helger.xsds.bdxr.smp2.ac.EndpointType ret = new com.helger.xsds.bdxr.smp2.ac.EndpointType ();
+    ret.setSMPExtensions (getAsBDXR2Extension ());
+    ret.setTransportProfileID (m_sTransportProfile);
+    ret.setDescription (m_sServiceDescription);
+    ret.setContact (m_sTechnicalContactUrl);
+    ret.setAddressURI (m_sEndpointReference);
+    ret.setActivationDate (m_aServiceActivationDT == null ? null : m_aServiceActivationDT.toLocalDate ());
+    ret.setExpirationDate (m_aServiceExpirationDT == null ? null : m_aServiceExpirationDT.toLocalDate ());
+    final X509Certificate aX509Cert = CertificateHelper.convertStringToCertficateOrNull (m_sCertificate);
+    if (aX509Cert != null)
+    {
+      final com.helger.xsds.bdxr.smp2.ac.CertificateType aCert = new com.helger.xsds.bdxr.smp2.ac.CertificateType ();
+      aCert.setActivationDate (PDTFactory.createXMLOffsetDate (aX509Cert.getNotBefore ()));
+      aCert.setExpirationDate (PDTFactory.createXMLOffsetDate (aX509Cert.getNotAfter ()));
+      aCert.setContentBinaryObject (CertificateHelper.getEncodedCertificate (aX509Cert));
+      ret.addCertificate (aCert);
+    }
     return ret;
   }
 

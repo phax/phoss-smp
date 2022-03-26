@@ -67,6 +67,7 @@ public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
         aBytes = new BDXR1MarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
+      // Not available in OASIS BDXR v2
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");
     }

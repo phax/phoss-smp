@@ -34,12 +34,14 @@ import com.helger.commons.mime.CMimeType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
+import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerSignedServiceMetadataType;
+import com.helger.smpclient.bdxr2.marshal.BDXR2ServiceMetadataMarshaller;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerSignedServiceMetadataType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.write.IXMLWriterSettings;
@@ -87,6 +89,17 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
+      case OASIS_BDXR_V2:
+      {
+        final com.helger.xsds.bdxr.smp2.ServiceMetadataType ret = new BDXR2ServerAPI (aDataProvider).getServiceRegistration (sPathServiceGroupID,
+                                                                                                                             sPathDocumentTypeID);
+
+        // Convert to DOM document
+        // Disable XSD check, because Signature is added later
+        final BDXR2ServiceMetadataMarshaller aMarshaller = new BDXR2ServiceMetadataMarshaller (false);
+        aDoc = aMarshaller.getAsDocument (ret);
+        break;
+      }
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");
     }
@@ -96,7 +109,8 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     // Sign the document
     try
     {
-      SMPKeyManager.getInstance ().signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
+      SMPKeyManager.getInstance ()
+                   .signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
       LOGGER.info ("Successfully signed response XML");
     }
     catch (final Exception ex)

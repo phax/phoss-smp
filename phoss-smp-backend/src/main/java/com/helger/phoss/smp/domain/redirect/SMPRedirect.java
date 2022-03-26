@@ -18,12 +18,16 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.bdxr.smp2.doctype.BDXR2DocumentTypeIdentifier;
+import com.helger.peppolid.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.security.certificate.CertificateHelper;
 
 /**
  * Default implementation of the {@link ISMPRedirect} interface.
@@ -152,6 +156,36 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
 
     final com.helger.xsds.bdxr.smp1.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp1.ServiceMetadataType ();
     ret.setRedirect (aRedirect);
+    return ret;
+  }
+
+  @Nonnull
+  public com.helger.xsds.bdxr.smp2.ServiceMetadataType getAsJAXBObjectBDXR2 ()
+  {
+    final com.helger.xsds.bdxr.smp2.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp2.ServiceMetadataType ();
+    ret.setSMPExtensions (getAsBDXR2Extension ());
+    ret.setSMPVersionID ("2.0");
+    // It's okay to use the constructor directly
+    ret.setID (new BDXR2DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
+    // Explicit constructor call is needed here!
+    ret.setParticipantID (new BDXR2ParticipantIdentifier (m_aServiceGroup.getParticipantIdentifier ()));
+
+    final com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType aProc = new com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType ();
+    {
+      final com.helger.xsds.bdxr.smp2.ac.RedirectType aRedirect = new com.helger.xsds.bdxr.smp2.ac.RedirectType ();
+      aRedirect.setPublisherURI (m_sTargetHref);
+      if (m_aCertificate != null)
+      {
+        final com.helger.xsds.bdxr.smp2.ac.CertificateType aCert = new com.helger.xsds.bdxr.smp2.ac.CertificateType ();
+        aCert.setActivationDate (PDTFactory.createXMLOffsetDate (m_aCertificate.getNotBefore ()));
+        aCert.setExpirationDate (PDTFactory.createXMLOffsetDate (m_aCertificate.getNotAfter ()));
+        aCert.setContentBinaryObject (CertificateHelper.getEncodedCertificate (m_aCertificate));
+        aRedirect.addCertificate (aCert);
+      }
+      aProc.setRedirect (aRedirect);
+    }
+    ret.addProcessMetadata (aProc);
+
     return ret;
   }
 

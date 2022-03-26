@@ -62,6 +62,7 @@ public final class APIExecutorServiceGroupCompleteGet extends AbstractSMPAPIExec
         aBytes = new BDXR1MarshallerCompleteServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
+      // Not supported with OASIS BDXR v2
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");
     }
@@ -72,6 +73,8 @@ public final class APIExecutorServiceGroupCompleteGet extends AbstractSMPAPIExec
       throw new SMPInternalErrorException ("Failed to convert the returned CompleteServiceGroup to XML");
     }
 
-    aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+    aUnifiedResponse.setContent (aBytes)
+                    .setMimeType (CMimeType.TEXT_XML)
+                    .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
   }
 }

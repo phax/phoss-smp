@@ -32,11 +32,13 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
+import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceMetadataType;
+import com.helger.smpclient.bdxr2.marshal.BDXR2ServiceMetadataMarshaller;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.read.DOMReader;
@@ -91,6 +93,18 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
         if (aServiceMetadata != null)
         {
           eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
+                                                                                 sDocumentTypeID,
+                                                                                 aServiceMetadata,
+                                                                                 aBasicAuth);
+        }
+        break;
+      }
+      case OASIS_BDXR_V2:
+      {
+        final com.helger.xsds.bdxr.smp2.ServiceMetadataType aServiceMetadata = new BDXR2ServiceMetadataMarshaller (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
+        if (aServiceMetadata != null)
+        {
+          eSuccess = new BDXR2ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
                                                                                  sDocumentTypeID,
                                                                                  aServiceMetadata,
                                                                                  aBasicAuth);

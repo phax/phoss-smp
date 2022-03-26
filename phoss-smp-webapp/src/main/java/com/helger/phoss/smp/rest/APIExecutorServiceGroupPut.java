@@ -32,11 +32,13 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
+import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
+import com.helger.smpclient.bdxr2.marshal.BDXR2ServiceGroupMarshaller;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.read.DOMReader;
@@ -78,7 +80,10 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
         final com.helger.xsds.peppol.smp1.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
         if (aServiceGroup != null)
         {
-          new SMPServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID, aServiceGroup, bCreateInSML, aBasicAuth);
+          new SMPServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID,
+                                                             aServiceGroup,
+                                                             bCreateInSML,
+                                                             aBasicAuth);
           eSuccess = ESuccess.SUCCESS;
         }
         break;
@@ -88,7 +93,23 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
         final com.helger.xsds.bdxr.smp1.ServiceGroupType aServiceGroup = new BDXR1MarshallerServiceGroupType (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
         if (aServiceGroup != null)
         {
-          new BDXR1ServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID, aServiceGroup, bCreateInSML, aBasicAuth);
+          new BDXR1ServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID,
+                                                               aServiceGroup,
+                                                               bCreateInSML,
+                                                               aBasicAuth);
+          eSuccess = ESuccess.SUCCESS;
+        }
+        break;
+      }
+      case OASIS_BDXR_V2:
+      {
+        final com.helger.xsds.bdxr.smp2.ServiceGroupType aServiceGroup = new BDXR2ServiceGroupMarshaller (XML_SCHEMA_VALIDATION).read (aServiceGroupDoc);
+        if (aServiceGroup != null)
+        {
+          new BDXR2ServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID,
+                                                               aServiceGroup,
+                                                               bCreateInSML,
+                                                               aBasicAuth);
           eSuccess = ESuccess.SUCCESS;
         }
         break;

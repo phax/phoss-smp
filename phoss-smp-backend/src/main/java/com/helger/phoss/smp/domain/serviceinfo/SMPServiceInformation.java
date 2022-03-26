@@ -33,6 +33,8 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.bdxr.smp1.doctype.BDXR1DocumentTypeIdentifier;
 import com.helger.peppolid.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
+import com.helger.peppolid.bdxr.smp2.doctype.BDXR2DocumentTypeIdentifier;
+import com.helger.peppolid.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
@@ -244,6 +246,38 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
 
     final com.helger.xsds.bdxr.smp1.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp1.ServiceMetadataType ();
     ret.setServiceInformation (aSI);
+    return ret;
+  }
+
+  @Nullable
+  public com.helger.xsds.bdxr.smp2.ServiceMetadataType getAsJAXBObjectBDXR2 ()
+  {
+    if (m_aProcesses.isEmpty ())
+    {
+      // "ProcessList" is mandatory and MUST contain at least 1 value
+      return null;
+    }
+
+    final com.helger.xsds.bdxr.smp2.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp2.ServiceMetadataType ();
+    ret.setSMPExtensions (getAsBDXR2Extension ());
+    ret.setSMPVersionID ("2.0");
+    // It's okay to use the constructor directly
+    ret.setID (new BDXR2DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
+    // Explicit constructor call is needed here!
+    ret.setParticipantID (new BDXR2ParticipantIdentifier (m_aServiceGroup.getParticipantIdentifier ()));
+
+    for (final ISMPProcess aProcess : m_aProcesses.values ())
+    {
+      final com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType aJAXBProcess = aProcess.getAsJAXBObjectBDXR2 ();
+      if (aJAXBProcess != null)
+        ret.addProcessMetadata (aJAXBProcess);
+    }
+    if (ret.hasNoProcessMetadataEntries ())
+    {
+      // "ProcessList" is mandatory and MUST contain at least 1 value
+      return null;
+    }
+
     return ret;
   }
 

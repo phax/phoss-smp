@@ -203,11 +203,18 @@ public interface ISMPEndpoint extends ISMPHasExtension
   com.helger.xsds.peppol.smp1.EndpointType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This service information object as a BDXR SMP JAXB object for the
-   *         REST interface. Never <code>null</code>.
+   * @return This service information object as a BDXR SMP v1 JAXB object for
+   *         the REST interface. Never <code>null</code>.
    */
   @Nonnull
   com.helger.xsds.bdxr.smp1.EndpointType getAsJAXBObjectBDXR1 ();
+
+  /**
+   * @return This service information object as a BDXR SMP v2 JAXB object for
+   *         the REST interface. Never <code>null</code>.
+   */
+  @Nonnull
+  com.helger.xsds.bdxr.smp2.ac.EndpointType getAsJAXBObjectBDXR2 ();
 
   @Nonnull
   static IComparator <ISMPEndpoint> comparator ()

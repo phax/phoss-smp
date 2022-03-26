@@ -132,12 +132,20 @@ public interface ISMPServiceInformation extends ISMPHasExtension, IHasID <String
   com.helger.xsds.peppol.smp1.ServiceMetadataType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This service information object as a BDXR SMP JAXB object for the
-   *         REST interface. May be <code>null</code> if invalid XML would be
-   *         created.
+   * @return This service information object as a BDXR SMP v1 JAXB object for
+   *         the REST interface. May be <code>null</code> if invalid XML would
+   *         be created.
    */
   @Nullable
   com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ();
+
+  /**
+   * @return This service information object as a BDXR SMP v2 JAXB object for
+   *         the REST interface. May be <code>null</code> if invalid XML would
+   *         be created.
+   */
+  @Nullable
+  com.helger.xsds.bdxr.smp2.ServiceMetadataType getAsJAXBObjectBDXR2 ();
 
   @Nonnull
   static IComparator <ISMPServiceInformation> comparator ()

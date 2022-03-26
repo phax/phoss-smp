@@ -79,7 +79,8 @@ public final class SMPServiceGroupTest
     // Must be an array!
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID,
                                                      aPI,
-                                                     BDXR1ExtensionConverter.convertToString (new CommonsArrayList <> (aExt, aExt2)));
+                                                     BDXR1ExtensionConverter.convertToJsonString (new CommonsArrayList <> (aExt,
+                                                                                                                           aExt2)));
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticipantIdentifier ());

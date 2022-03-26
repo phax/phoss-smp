@@ -115,12 +115,20 @@ public interface ISMPProcess extends ISMPHasExtension
   com.helger.xsds.peppol.smp1.ProcessType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This service information object as a BDXR SMP JAXB object for the
-   *         REST interface. May be <code>null</code> if no endpoint is
+   * @return This service information object as a BDXR SMP v1 JAXB object for
+   *         the REST interface. May be <code>null</code> if no endpoint is
    *         contained.
    */
   @Nullable
   com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR1 ();
+
+  /**
+   * @return This service information object as a BDXR SMP v2 JAXB object for
+   *         the REST interface. May be <code>null</code> if no endpoint is
+   *         contained.
+   */
+  @Nullable
+  com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType getAsJAXBObjectBDXR2 ();
 
   @Nonnull
   static IComparator <ISMPProcess> comparator ()

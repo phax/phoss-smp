@@ -60,7 +60,10 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier ret = aIdentifierFactory.getClone (aParticipantIdentifier);
     if (ret == null)
-      throw new IllegalStateException ("Failed to clone " + aParticipantIdentifier + " with identifier factory " + aIdentifierFactory);
+      throw new IllegalStateException ("Failed to clone " +
+                                       aParticipantIdentifier +
+                                       " with identifier factory " +
+                                       aIdentifierFactory);
     return ret;
   }
 
@@ -155,6 +158,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
       // This is set by the REST server
       ret.setServiceReference (null);
     }
+    // An eventually present Signature is not applied here
     return ret;
   }
 

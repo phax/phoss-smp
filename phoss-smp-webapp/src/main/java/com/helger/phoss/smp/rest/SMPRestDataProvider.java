@@ -81,14 +81,17 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   private final IRequestWebScopeWithoutResponse m_aRequestScope;
   private final IParticipantIdentifier m_aParticipantID;
   private final String m_sSMLZoneName;
+  private final String m_sQueryPathPrefix;
 
-  public SMPRestDataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope, @Nullable final String sServiceGroupID)
+  public SMPRestDataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                              @Nullable final String sServiceGroupID)
   {
     ValueEnforcer.notNull (aRequestScope, "RequestScope");
     m_eServerNameMode = EServerNameMode.getFromIDOrDefault (SMPServerConfiguration.getPublicServerURLMode ());
     m_aRequestScope = aRequestScope;
     m_aParticipantID = SMPMetaManager.getIdentifierFactory ().parseParticipantIdentifier (sServiceGroupID);
     m_sSMLZoneName = SMPMetaManager.getSettings ().getSMLDNSZone ();
+    m_sQueryPathPrefix = SMPServerConfiguration.getRESTType ().getQueryPathPrefix ();
   }
 
   @Nonnull
@@ -157,7 +160,10 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
         ret = m_aRequestScope.getRequestURLEncoded ().toString ();
         break;
       case DYNAMIC_PARTICIPANT_URL:
-        ret = m_aRequestScope.getScheme () + "://" + _getDynamicParticipantURLHostName () + m_aRequestScope.getRequestURIEncoded ();
+        ret = m_aRequestScope.getScheme () +
+              "://" +
+              _getDynamicParticipantURLHostName () +
+              m_aRequestScope.getRequestURIEncoded ();
         break;
       default:
         throw new IllegalStateException ("Unhandled server name mode");
@@ -204,7 +210,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   @Nonnull
   public String getServiceGroupHref (@Nonnull final IParticipantIdentifier aServiceGroupID)
   {
-    return getBaseUriBuilder () + "/" + aServiceGroupID.getURIPercentEncoded ();
+    return getBaseUriBuilder () + "/" + m_sQueryPathPrefix + aServiceGroupID.getURIPercentEncoded ();
   }
 
   @Nonnull
@@ -213,6 +219,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   {
     return getBaseUriBuilder () +
            "/" +
+           m_sQueryPathPrefix +
            aServiceGroupID.getURIPercentEncoded () +
            SMPRestFilter.PATH_SERVICES +
            aDocTypeID.getURIPercentEncoded ();

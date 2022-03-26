@@ -101,11 +101,18 @@ public interface ISMPRedirect extends IHasID <String>, ISMPHasExtension
   com.helger.xsds.peppol.smp1.ServiceMetadataType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This redirect object as a BDXR SMP JAXB object for the REST
+   * @return This redirect object as a BDXR SMP v1 JAXB object for the REST
    *         interface. Never <code>null</code>.
    */
   @Nonnull
   com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ();
+
+  /**
+   * @return This redirect object as a BDXR SMP v2 JAXB object for the REST
+   *         interface. Never <code>null</code>.
+   */
+  @Nonnull
+  com.helger.xsds.bdxr.smp2.ServiceMetadataType getAsJAXBObjectBDXR2 ();
 
   @Nonnull
   static IComparator <ISMPRedirect> comparator ()
