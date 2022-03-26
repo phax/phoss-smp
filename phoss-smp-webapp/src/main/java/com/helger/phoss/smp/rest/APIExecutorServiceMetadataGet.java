@@ -41,7 +41,7 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerSignedServiceMetadataType;
-import com.helger.smpclient.bdxr2.marshal.BDXR2ServiceMetadataMarshaller;
+import com.helger.smpclient.bdxr2.marshal.BDXR2MarshallerServiceMetadata;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerSignedServiceMetadataType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.write.IXMLWriterSettings;
@@ -96,7 +96,7 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
 
         // Convert to DOM document
         // Disable XSD check, because Signature is added later
-        final BDXR2ServiceMetadataMarshaller aMarshaller = new BDXR2ServiceMetadataMarshaller (false);
+        final BDXR2MarshallerServiceMetadata aMarshaller = new BDXR2MarshallerServiceMetadata (false);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }

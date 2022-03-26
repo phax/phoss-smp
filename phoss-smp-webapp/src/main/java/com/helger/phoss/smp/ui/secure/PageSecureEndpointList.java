@@ -27,6 +27,7 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.url.ISimpleURL;
+import com.helger.commons.url.SimpleURL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -42,8 +43,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.nicename.NiceNameUI;
-import com.helger.phoss.smp.rest.SMPRestFilter;
-import com.helger.photon.app.url.LinkHelper;
+import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
@@ -52,6 +52,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
  * Class to manage endpoints that belong to a service group. To use this page at
@@ -69,6 +70,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
   @Override
   protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
   {
+    final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -84,10 +86,13 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
     if (!bHideDetails)
-      aToolbar.addButton ("Tree view", aWPEC.getLinkToMenuItem (CMenuSecure.MENU_ENDPOINT_TREE), EDefaultIcon.MAGNIFIER);
+      aToolbar.addButton ("Tree view",
+                          aWPEC.getLinkToMenuItem (CMenuSecure.MENU_ENDPOINT_TREE),
+                          EDefaultIcon.MAGNIFIER);
     aNodeList.addChild (aToolbar);
 
-    final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING).setDataSort (0, 1, 2, 3),
+    final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING)
+                                                                   .setDataSort (0, 1, 2, 3),
                                         new DTCol ("Document type ID").setDataSort (1, 0, 2, 3),
                                         new DTCol ("Process ID").setDataSort (2, 0, 1, 3),
                                         new DTCol ("Transport profile").setDataSort (3, 0, 1, 2),
@@ -97,6 +102,8 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
       final ISMPServiceGroup aServiceGroup = aServiceInfo.getServiceGroup ();
       final IParticipantIdentifier aParticipantID = aServiceGroup.getParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aServiceInfo.getDocumentTypeIdentifier ();
+      final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope, aParticipantID.getURIEncoded ());
+
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
       {
         final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
@@ -113,14 +120,14 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
           final String sTransportProfile = aEndpoint.getTransportProfile ();
           aRow.addCell (new HCA (createViewURL (aWPEC,
                                                 CMenuSecure.MENU_TRANSPORT_PROFILES,
-                                                sTransportProfile)).addChild (NiceNameUI.getTransportProfile (sTransportProfile, false)));
+                                                sTransportProfile)).addChild (NiceNameUI.getTransportProfile (sTransportProfile,
+                                                                                                              false)));
 
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
-          final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
-                                                                                SMPRestFilter.PATH_SERVICES +
-                                                                                aDocTypeID.getURIPercentEncoded ());
+          final ISimpleURL aPreviewURL = new SimpleURL (aDP.getServiceMetadataReferenceHref (aParticipantID,
+                                                                                             aDocTypeID));
           aRow.addCell (new HCA (aViewURL).setTitle ("View endpoint").addChild (EDefaultIcon.MAGNIFIER.getAsNode ()),
                         new HCTextNode (" "),
                         new HCA (aEditURL).setTitle ("Edit endpoint").addChild (EDefaultIcon.EDIT.getAsNode ()),

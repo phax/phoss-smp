@@ -38,7 +38,7 @@ import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceMetadataType;
-import com.helger.smpclient.bdxr2.marshal.BDXR2ServiceMetadataMarshaller;
+import com.helger.smpclient.bdxr2.marshal.BDXR2MarshallerServiceMetadata;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.read.DOMReader;
@@ -101,7 +101,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
       }
       case OASIS_BDXR_V2:
       {
-        final com.helger.xsds.bdxr.smp2.ServiceMetadataType aServiceMetadata = new BDXR2ServiceMetadataMarshaller (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
+        final com.helger.xsds.bdxr.smp2.ServiceMetadataType aServiceMetadata = new BDXR2MarshallerServiceMetadata (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
         if (aServiceMetadata != null)
         {
           eSuccess = new BDXR2ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,

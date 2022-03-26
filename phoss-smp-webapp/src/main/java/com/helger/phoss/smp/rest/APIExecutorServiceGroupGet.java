@@ -31,7 +31,7 @@ import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
-import com.helger.smpclient.bdxr2.marshal.BDXR2ServiceGroupMarshaller;
+import com.helger.smpclient.bdxr2.marshal.BDXR2MarshallerServiceGroup;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.write.XMLWriterSettings;
@@ -65,7 +65,7 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
       case OASIS_BDXR_V2:
       {
         final com.helger.xsds.bdxr.smp2.ServiceGroupType ret = new BDXR2ServerAPI (aDataProvider).getServiceGroup (sPathServiceGroupID);
-        aBytes = new BDXR2ServiceGroupMarshaller (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        aBytes = new BDXR2MarshallerServiceGroup (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       default:

@@ -234,8 +234,10 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     ret.setDescription (m_sServiceDescription);
     ret.setContact (m_sTechnicalContactUrl);
     ret.setAddressURI (m_sEndpointReference);
-    ret.setActivationDate (m_aServiceActivationDT == null ? null : m_aServiceActivationDT.toLocalDate ());
-    ret.setExpirationDate (m_aServiceExpirationDT == null ? null : m_aServiceExpirationDT.toLocalDate ());
+    if (m_aServiceActivationDT != null)
+      ret.setActivationDate (m_aServiceActivationDT.toLocalDate ());
+    if (m_aServiceExpirationDT != null)
+      ret.setExpirationDate (m_aServiceExpirationDT.toLocalDate ());
     final X509Certificate aX509Cert = CertificateHelper.convertStringToCertficateOrNull (m_sCertificate);
     if (aX509Cert != null)
     {
