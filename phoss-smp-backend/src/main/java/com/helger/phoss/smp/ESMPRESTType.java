@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.annotation.Since;
 import com.helger.commons.id.IHasID;
 import com.helger.commons.lang.EnumHelper;
 import com.helger.commons.name.IHasDisplayName;
@@ -31,7 +32,8 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
 {
   PEPPOL ("peppol", "Peppol", ESMPAPIType.PEPPOL),
   OASIS_BDXR_V1 ("bdxr", "OASIS BDXR SMP v1", ESMPAPIType.OASIS_BDXR_V1),
-  OASIS_BDXR_V2 ("bdxr2", "OASIS BDXR SMP v2", ESMPAPIType.OASIS_BDXR_V2);
+  @Since ("5.7.0")
+  OASIS_BDXR_V2("bdxr2", "OASIS BDXR SMP v2", ESMPAPIType.OASIS_BDXR_V2);
 
   private final String m_sID;
   private final String m_sDisplayName;
