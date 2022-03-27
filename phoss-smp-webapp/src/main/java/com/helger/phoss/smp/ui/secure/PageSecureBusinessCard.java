@@ -152,7 +152,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   {
     AJAX_CREATE_ENTITY = CAjax.addAjaxWithLogin ( (aRequestScope, aAjaxResponse) -> {
       final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
-      final IHCNode aNode = _createEntityInputForm (aLEC, (SMPBusinessCardEntity) null, (String) null, new FormErrorList (), false);
+      final IHCNode aNode = _createEntityInputForm (aLEC,
+                                                    (SMPBusinessCardEntity) null,
+                                                    (String) null,
+                                                    new FormErrorList (),
+                                                    false);
 
       // Build the HTML response
       aAjaxResponse.html (aNode);
@@ -161,7 +165,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
       final String sEntityID = aRequestScope.params ().getAsString (PARAM_ENTITY_ID);
 
-      final IHCNode aNode = _createContactInputForm (aLEC, sEntityID, (SMPBusinessCardContact) null, (String) null, new FormErrorList ());
+      final IHCNode aNode = _createContactInputForm (aLEC,
+                                                     sEntityID,
+                                                     (SMPBusinessCardContact) null,
+                                                     (String) null,
+                                                     new FormErrorList ());
 
       // Build the HTML response
       aAjaxResponse.html (aNode);
@@ -197,7 +205,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPBusinessCard aSelectedObject)
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nullable final ISMPBusinessCard aSelectedObject)
       {
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
         if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
@@ -302,7 +311,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                               final BootstrapSuccessBox aBox = success ();
                               for (final String sPI : aSuccess)
                               {
-                                aBox.addChild (div ("Successfully notified the " + sDirectoryName + " to index '" + sPI + "'"));
+                                aBox.addChild (div ("Successfully notified the " +
+                                                    sDirectoryName +
+                                                    " to index '" +
+                                                    sPI +
+                                                    "'"));
                               }
                               aResultNodes.addChild (aBox);
                             }
@@ -311,7 +324,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                               final BootstrapErrorBox aBox = error ();
                               for (final String sPI : aFailure)
                               {
-                                aBox.addChild (div ("Error notifying the " + sDirectoryName + " to index '" + sPI + "'"));
+                                aBox.addChild (div ("Error notifying the " +
+                                                    sDirectoryName +
+                                                    " to index '" +
+                                                    sPI +
+                                                    "'"));
                               }
                               aResultNodes.addChild (aBox);
                             }
@@ -356,7 +373,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
   @Override
   @Nullable
-  protected ISMPBusinessCard getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
+  protected ISMPBusinessCard getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+                                                @Nullable final String sID)
   {
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -427,13 +445,15 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     if (aEntity.hasRegistrationDate ())
     {
       aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Registration date")
-                                                    .setCtrl (PDTToString.getAsString (aEntity.getRegistrationDate (), aDisplayLocale)));
+                                                    .setCtrl (PDTToString.getAsString (aEntity.getRegistrationDate (),
+                                                                                       aDisplayLocale)));
     }
     return aPanel;
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPBusinessCard aSelectedObject)
+  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+                                     @Nonnull final ISMPBusinessCard aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -471,7 +491,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
 
-    final String sServiceGroupID = bEdit ? aSelectedObject.getID () : aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
+    final String sServiceGroupID = bEdit ? aSelectedObject.getID ()
+                                         : aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
     final ICommonsList <SMPBusinessCardEntity> aSMPEntities = new CommonsArrayList <> ();
 
@@ -488,7 +509,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         {
           final ISMPBusinessCard aExistingBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
           if (aExistingBusinessCard != null)
-            aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The selected Service Group already has a Business Card assigned!");
+            aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID,
+                                       "The selected Service Group already has a Business Card assigned!");
         }
     }
 
@@ -506,7 +528,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
           aFormErrors.addFieldError (sFieldName, "The Name of the Entity must be provided!");
 
         // Entity country code
-        final String sFieldCountryCode = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityRowID, SUFFIX_COUNTRY_CODE);
+        final String sFieldCountryCode = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                                       sEntityRowID,
+                                                                       SUFFIX_COUNTRY_CODE);
         final String sCountryCode = aEntityRow.get (SUFFIX_COUNTRY_CODE);
         if (StringHelper.hasNoText (sCountryCode))
           aFormErrors.addFieldError (sFieldCountryCode, "The Country Code of the Entity must be provided!");
@@ -547,7 +571,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
             {
               final boolean bIsNewIdentifier = sIdentifierRowID.startsWith (TMP_ID_PREFIX);
               aSMPIdentifiers.add (bIsNewIdentifier ? new SMPBusinessCardIdentifier (sScheme, sValue)
-                                                    : new SMPBusinessCardIdentifier (sIdentifierRowID, sScheme, sValue));
+                                                    : new SMPBusinessCardIdentifier (sIdentifierRowID,
+                                                                                     sScheme,
+                                                                                     sValue));
             }
           }
 
@@ -559,7 +585,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         });
 
         // Entity Website URIs
-        final String sFieldWebsiteURIs = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityRowID, SUFFIX_WEBSITE_URIS);
+        final String sFieldWebsiteURIs = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                                       sEntityRowID,
+                                                                       SUFFIX_WEBSITE_URIS);
         final String sWebsiteURIs = aEntityRow.get (SUFFIX_WEBSITE_URIS);
         final ICommonsList <String> aWebsiteURIs = new CommonsArrayList <> ();
         for (final String sWebsiteURI : RegExHelper.getSplitToArray (sWebsiteURIs, "\\n"))
@@ -604,7 +632,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
             {
               final boolean bIsNewContact = sContactRowID.startsWith (TMP_ID_PREFIX);
               aSMPContacts.add (bIsNewContact ? new SMPBusinessCardContact (sType, sName, sPhoneNumber, sEmail)
-                                              : new SMPBusinessCardContact (sContactRowID, sType, sName, sPhoneNumber, sEmail));
+                                              : new SMPBusinessCardContact (sContactRowID,
+                                                                            sType,
+                                                                            sName,
+                                                                            sPhoneNumber,
+                                                                            sEmail));
             }
           }
 
@@ -637,7 +669,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         {
           // Add to list
           final boolean bIsNewEntity = sEntityRowID.startsWith (TMP_ID_PREFIX);
-          final SMPBusinessCardEntity aEntity = bIsNewEntity ? new SMPBusinessCardEntity () : new SMPBusinessCardEntity (sEntityRowID);
+          final SMPBusinessCardEntity aEntity = bIsNewEntity ? new SMPBusinessCardEntity ()
+                                                             : new SMPBusinessCardEntity (sEntityRowID);
           aEntity.names ().add (new SMPBusinessCardName (sEntityName, null));
           aEntity.setCountryCode (sCountryCode);
           aEntity.setGeographicalInformation (sGeoInfo);
@@ -657,8 +690,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     if (aFormErrors.isEmpty ())
     {
       // Store in a consistent manner
-      aSMPEntities.sort ( (o1, o2) -> o1.names ().getFirst ().getName ().compareToIgnoreCase (o2.names ().getFirst ().getName ()));
-      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (), aSMPEntities) != null)
+      aSMPEntities.sort ( (o1, o2) -> o1.names ()
+                                        .getFirst ()
+                                        .getName ()
+                                        .compareToIgnoreCase (o2.names ().getFirst ().getName ()));
+      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (),
+                                                          aSMPEntities) != null)
       {
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
         aWPEC.postRedirectGetInternal (success ("The Business Card for Service Group '" +
@@ -668,7 +705,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                  aSettings.isDirectoryIntegrationAutoUpdate () ? " " + SMPWebAppConfiguration.getDirectoryName () + " server should have been updated." : "")));
       }
       else
-        aWPEC.postRedirectGetInternal (error ("Error creating the Business Card for Service Group '" + aServiceGroup.getID () + "'"));
+        aWPEC.postRedirectGetInternal (error ("Error creating the Business Card for Service Group '" +
+                                              aServiceGroup.getID () +
+                                              "'"));
     }
   }
 
@@ -681,28 +720,41 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sIdentifierID = StringHelper.hasText (sExistingID) ? sExistingID
-                                                                    : TMP_ID_PREFIX + Integer.toString (GlobalIDFactory.getNewIntID ());
+                                                                    : TMP_ID_PREFIX +
+                                                                      Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final HCRow aRow = new HCRow ();
 
     // Identifier scheme
     {
-      final String sFieldScheme = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, PREFIX_IDENTIFIER, sIdentifierID, SUFFIX_SCHEME);
+      final String sFieldScheme = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                                sEntityID,
+                                                                PREFIX_IDENTIFIER,
+                                                                sIdentifierID,
+                                                                SUFFIX_SCHEME);
       final HCEdit aCtrl = new HCEdit (new RequestField (sFieldScheme,
-                                                         aExistingIdentifier == null ? null : aExistingIdentifier.getScheme ()))
-                                                                                                                                .setPlaceholder ("Identifier scheme");
+                                                         aExistingIdentifier == null ? null
+                                                                                     : aExistingIdentifier.getScheme ())).setPlaceholder ("Identifier scheme");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
-      aRow.addCell (aCtrl, BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldScheme), aDisplayLocale));
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldScheme),
+                                                                aDisplayLocale));
     }
 
     // Identifier Value
     {
-      final String sFieldValue = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, PREFIX_IDENTIFIER, sIdentifierID, SUFFIX_VALUE);
+      final String sFieldValue = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                               sEntityID,
+                                                               PREFIX_IDENTIFIER,
+                                                               sIdentifierID,
+                                                               SUFFIX_VALUE);
       final HCEdit aCtrl = new HCEdit (new RequestField (sFieldValue,
-                                                         aExistingIdentifier == null ? null : aExistingIdentifier.getValue ()))
-                                                                                                                               .setPlaceholder ("Identifier value");
+                                                         aExistingIdentifier == null ? null
+                                                                                     : aExistingIdentifier.getValue ())).setPlaceholder ("Identifier value");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
-      aRow.addCell (aCtrl, BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldValue), aDisplayLocale));
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldValue),
+                                                                aDisplayLocale));
     }
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).setIcon (EDefaultIcon.DELETE)
@@ -720,48 +772,73 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sContactID = StringHelper.hasText (sExistingID) ? sExistingID
-                                                                 : TMP_ID_PREFIX + Integer.toString (GlobalIDFactory.getNewIntID ());
+                                                                 : TMP_ID_PREFIX +
+                                                                   Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final HCRow aRow = new HCRow ();
 
     // Type
     {
-      final String sFieldType = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, PREFIX_CONTACT, sContactID, SUFFIX_TYPE);
+      final String sFieldType = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                              sEntityID,
+                                                              PREFIX_CONTACT,
+                                                              sContactID,
+                                                              SUFFIX_TYPE);
       final HCEdit aCtrl = new HCEdit (new RequestField (sFieldType,
                                                          aExistingContact == null ? null : aExistingContact.getType ()))
                                                                                                                         .setPlaceholder ("Contact type");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
-      aRow.addCell (aCtrl, BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldType), aDisplayLocale));
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldType),
+                                                                aDisplayLocale));
     }
 
     // Name
     {
-      final String sFieldName = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, PREFIX_CONTACT, sContactID, SUFFIX_NAME);
+      final String sFieldName = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                              sEntityID,
+                                                              PREFIX_CONTACT,
+                                                              sContactID,
+                                                              SUFFIX_NAME);
       final HCEdit aCtrl = new HCEdit (new RequestField (sFieldName,
                                                          aExistingContact == null ? null : aExistingContact.getName ()))
                                                                                                                         .setPlaceholder ("Contact name");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
-      aRow.addCell (aCtrl, BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldName), aDisplayLocale));
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldName),
+                                                                aDisplayLocale));
     }
 
     // Phone number
     {
-      final String sFieldPhone = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, PREFIX_CONTACT, sContactID, SUFFIX_PHONE);
+      final String sFieldPhone = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                               sEntityID,
+                                                               PREFIX_CONTACT,
+                                                               sContactID,
+                                                               SUFFIX_PHONE);
       final HCEdit aCtrl = new HCEdit (new RequestField (sFieldPhone,
-                                                         aExistingContact == null ? null : aExistingContact.getPhoneNumber ()))
-                                                                                                                               .setPlaceholder ("Contact phone number");
+                                                         aExistingContact == null ? null
+                                                                                  : aExistingContact.getPhoneNumber ())).setPlaceholder ("Contact phone number");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
-      aRow.addCell (aCtrl, BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldPhone), aDisplayLocale));
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldPhone),
+                                                                aDisplayLocale));
     }
 
     // Email address
     {
-      final String sFieldEmail = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityID, PREFIX_CONTACT, sContactID, SUFFIX_EMAIL);
+      final String sFieldEmail = RequestParamMap.getFieldName (PREFIX_ENTITY,
+                                                               sEntityID,
+                                                               PREFIX_CONTACT,
+                                                               sContactID,
+                                                               SUFFIX_EMAIL);
       final HCEdit aCtrl = new HCEdit (new RequestField (sFieldEmail,
-                                                         aExistingContact == null ? null : aExistingContact.getEmail ()))
-                                                                                                                         .setPlaceholder ("Contact email address");
+                                                         aExistingContact == null ? null
+                                                                                  : aExistingContact.getEmail ())).setPlaceholder ("Contact email address");
       aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
-      aRow.addCell (aCtrl, BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldEmail), aDisplayLocale));
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldEmail),
+                                                                aDisplayLocale));
     }
 
     aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).setIcon (EDefaultIcon.DELETE)
@@ -780,7 +857,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final String sEntityID = StringHelper.hasText (sExistingID) ? sExistingID
-                                                                : TMP_ID_PREFIX + Integer.toString (GlobalIDFactory.getNewIntID ());
+                                                                : TMP_ID_PREFIX +
+                                                                  Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final BootstrapCard aPanel = new BootstrapCard ().setID (sEntityID);
     aPanel.createAndAddHeader ().addChild ("Business Entity");
@@ -822,11 +900,14 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     {
       final String sBodyID = sEntityID + PREFIX_IDENTIFIER;
       final HCNodeList aNL = new HCNodeList ();
-      final BootstrapTable aTable = aNL.addAndReturnChild (new BootstrapTable (HCCol.star (), HCCol.star (), HCCol.star ()));
+      final BootstrapTable aTable = aNL.addAndReturnChild (new BootstrapTable (HCCol.star (),
+                                                                               HCCol.star (),
+                                                                               HCCol.star ()));
       aTable.addHeaderRow ().addCells ("Scheme", "Value", "");
       aTable.setBodyID (sBodyID);
 
-      final IRequestParamMap aIdentifiers = aLEC.getRequestParamMap ().getMap (PREFIX_ENTITY, sEntityID, PREFIX_IDENTIFIER);
+      final IRequestParamMap aIdentifiers = aLEC.getRequestParamMap ()
+                                                .getMap (PREFIX_ENTITY, sEntityID, PREFIX_IDENTIFIER);
       if (bFormSubmitted)
       {
         // Re-show of form
@@ -847,15 +928,20 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
         final JSVar aJSAppendData = aJSAppend.param ("data");
-        aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
+        aJSAppend.body ()
+                 .add (JQuery.idRef (sBodyID)
+                             .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (AJAX_CREATE_IDENTIFIER.getInvocationURL (aRequestScope).add (PARAM_ENTITY_ID, sEntityID))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (AJAX_CREATE_IDENTIFIER.getInvocationURL (aRequestScope)
+                                                                        .add (PARAM_ENTITY_ID, sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());
 
-        aNL.addChild (new BootstrapButton ().setIcon (EDefaultIcon.PLUS).addChild ("Add Identifier").setOnClick (aOnAdd));
+        aNL.addChild (new BootstrapButton ().setIcon (EDefaultIcon.PLUS)
+                                            .addChild ("Add Identifier")
+                                            .setOnClick (aOnAdd));
       }
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Identifiers").setCtrl (aNL));
@@ -904,10 +990,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
         final JSVar aJSAppendData = aJSAppend.param ("data");
-        aJSAppend.body ().add (JQuery.idRef (sBodyID).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
+        aJSAppend.body ()
+                 .add (JQuery.idRef (sBodyID)
+                             .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
         final JSPackage aOnAdd = new JSPackage ();
-        aOnAdd.add (new JQueryAjaxBuilder ().url (AJAX_CREATE_CONTACT.getInvocationURL (aRequestScope).add (PARAM_ENTITY_ID, sEntityID))
+        aOnAdd.add (new JQueryAjaxBuilder ().url (AJAX_CREATE_CONTACT.getInvocationURL (aRequestScope)
+                                                                     .add (PARAM_ENTITY_ID, sEntityID))
                                             .data (new JSAssocArray ())
                                             .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
                                             .build ());
@@ -988,14 +1077,20 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       {
         // add all existing stored entities
         for (final SMPBusinessCardEntity aEntity : aSelectedObject.getAllEntities ())
-          aEntityContainer.addChild (_createEntityInputForm (aWPEC, aEntity, (String) null, aFormErrors, bFormSubmitted));
+          aEntityContainer.addChild (_createEntityInputForm (aWPEC,
+                                                             aEntity,
+                                                             (String) null,
+                                                             aFormErrors,
+                                                             bFormSubmitted));
       }
     }
 
     {
       final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
       final JSVar aJSAppendData = aJSAppend.param ("data");
-      aJSAppend.body ().add (JQuery.idRef (aEntityContainer).append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
+      aJSAppend.body ()
+               .add (JQuery.idRef (aEntityContainer)
+                           .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
 
       final JSPackage aOnAdd = new JSPackage ();
       aOnAdd.add (new JQueryAjaxBuilder ().url (AJAX_CREATE_ENTITY.getInvocationURL (aRequestScope))
@@ -1008,7 +1103,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Nonnull
-  private IHCNode _createActionCell (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPBusinessCard aCurObject)
+  private IHCNode _createActionCell (@Nonnull final WebPageExecutionContext aWPEC,
+                                     @Nonnull final ISMPBusinessCard aCurObject)
   {
     final String sDisplayName = aCurObject.getID ();
     final HCNodeList ret = new HCNodeList ();
@@ -1030,12 +1126,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     else
       ret.addChild (createEmptyAction ());
     ret.addChild (new HCTextNode (" "));
+
     ret.addChild (new HCA (LinkHelper.getURLWithServerAndContext ("businesscard/" +
-                                                                  aCurObject.getParticipantIdentifier ().getURIPercentEncoded ()))
-                                                                                                                                  .setTitle ("Perform SMP query on " +
-                                                                                                                                             sDisplayName)
-                                                                                                                                  .setTargetBlank ()
-                                                                                                                                  .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                                                                  aCurObject.getParticipantIdentifier ()
+                                                                            .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
+                                                                                                                 sDisplayName)
+                                                                                                      .setTargetBlank ()
+                                                                                                      .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
 
     // When auto update is enabled, there is no need for a manual update
     // Change: update possibility always, in case document type was changed
@@ -1064,13 +1161,17 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Business Card", createCreateURL (aWPEC), EDefaultIcon.NEW);
-    aToolbar.addChild (new BootstrapButton ().setOnClick (aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_PUBLISH_ALL_TO_INDEXER))
+    aToolbar.addChild (new BootstrapButton ().setOnClick (aWPEC.getSelfHref ()
+                                                               .add (CPageParam.PARAM_ACTION,
+                                                                     ACTION_PUBLISH_ALL_TO_INDEXER))
                                              .setIcon (EFamFamIcon.ARROW_REDO)
-                                             .addChild ("Update all Business Cards in " + SMPWebAppConfiguration.getDirectoryName ())
+                                             .addChild ("Update all Business Cards in " +
+                                                        SMPWebAppConfiguration.getDirectoryName ())
                                              .setDisabled (aAllBusinessCards.isEmpty ()));
     aNodeList.addChild (aToolbar);
 
-    final HCTable aTable = new HCTable (new DTCol ("Service Group").setDataSort (0, 1).setInitialSorting (ESortOrder.ASCENDING),
+    final HCTable aTable = new HCTable (new DTCol ("Service Group").setDataSort (0, 1)
+                                                                   .setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Name"),
                                         new DTCol ("Country"),
                                         new DTCol ("GeoInfo"),
@@ -1108,7 +1209,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
           {
             final HCNodeList aIdentifiers = new HCNodeList ();
             for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
-              aIdentifiers.addChild (div (aIdentifier.getScheme ()).addChild (" - ").addChild (aIdentifier.getValue ()));
+              aIdentifiers.addChild (div (aIdentifier.getScheme ()).addChild (" - ")
+                                                                   .addChild (aIdentifier.getValue ()));
             aRow.addCell (aIdentifiers);
           }
           aRow.addCell (_createActionCell (aWPEC, aCurObject));

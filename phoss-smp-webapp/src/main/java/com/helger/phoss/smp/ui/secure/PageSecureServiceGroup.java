@@ -692,7 +692,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceGroup aCurObject : aAllServiceGroups)
     {
-
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
       final String sDisplayName = aCurObject.getParticipantIdentifier ().getURIEncoded ();
 
