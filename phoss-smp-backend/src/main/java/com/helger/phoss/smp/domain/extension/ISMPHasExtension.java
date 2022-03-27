@@ -11,10 +11,8 @@
 package com.helger.phoss.smp.domain.extension;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.smpclient.extension.SMPExtensionList;
 
 /**
  * Base interface for objects having an extension (service group, redirect,
@@ -25,21 +23,5 @@ import com.helger.commons.collection.impl.ICommonsList;
 public interface ISMPHasExtension
 {
   @Nonnull
-  @ReturnsMutableCopy
-  ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> extensions ();
-
-  /**
-   * @return The string representation of all extension elements together (like
-   *         a CLOB). May be <code>null</code>. If an extension is present it
-   *         must be well-formed JSON content.
-   */
-  @Nullable
-  String getExtensionsAsString ();
-
-  /**
-   * @return The XML content of the first extension or <code>null</code> if no
-   *         extension is present.
-   */
-  @Nullable
-  String getFirstExtensionXML ();
+  SMPExtensionList getExtensions ();
 }

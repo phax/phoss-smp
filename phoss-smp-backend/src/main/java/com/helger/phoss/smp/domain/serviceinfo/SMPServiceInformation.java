@@ -78,7 +78,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     if (aProcesses != null)
       for (final SMPProcess aProcess : aProcesses)
         addProcess (aProcess);
-    setExtensionAsString (sExtension);
+    getExtensions ().setExtensionAsString (sExtension);
     m_sID = aServiceGroup.getID () + "-" + aDocumentTypeIdentifier.getURIEncoded ();
   }
 
@@ -208,7 +208,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
       return null;
     }
     aSI.setProcessList (aProcesses);
-    aSI.setExtension (getAsPeppolExtension ());
+    aSI.setExtension (getExtensions ().getAsPeppolExtension ());
 
     final com.helger.xsds.peppol.smp1.ServiceMetadataType ret = new com.helger.xsds.peppol.smp1.ServiceMetadataType ();
     ret.setServiceInformation (aSI);
@@ -242,7 +242,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     }
 
     aSI.setProcessList (aProcesses);
-    aSI.setExtension (getAsBDXRExtension ());
+    aSI.setExtension (getExtensions ().getAsBDXRExtensions ());
 
     final com.helger.xsds.bdxr.smp1.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp1.ServiceMetadataType ();
     ret.setServiceInformation (aSI);
@@ -259,7 +259,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     }
 
     final com.helger.xsds.bdxr.smp2.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp2.ServiceMetadataType ();
-    ret.setSMPExtensions (getAsBDXR2Extension ());
+    ret.setSMPExtensions (getExtensions ().getAsBDXR2Extensions ());
     ret.setSMPVersionID ("2.0");
     // It's okay to use the constructor directly
     ret.setID (new BDXR2DocumentTypeIdentifier (m_aDocumentTypeIdentifier));

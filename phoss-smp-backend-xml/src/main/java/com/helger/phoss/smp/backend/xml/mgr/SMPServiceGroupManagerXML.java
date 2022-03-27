@@ -183,7 +183,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     {
       EChange eChange = EChange.UNCHANGED;
       eChange = eChange.or (aSMPServiceGroup.setOwnerID (sNewOwnerID));
-      eChange = eChange.or (aSMPServiceGroup.setExtensionAsString (sExtension));
+      eChange = eChange.or (aSMPServiceGroup.getExtensions ().setExtensionAsString (sExtension));
       if (eChange.isUnchanged ())
       {
         if (LOGGER.isDebugEnabled ())
@@ -293,7 +293,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                                                   aOldRedirect.getTargetHref (),
                                                   aOldRedirect.getSubjectUniqueIdentifier (),
                                                   aOldRedirect.getCertificate (),
-                                                  aOldRedirect.getExtensionsAsString ());
+                                                  aOldRedirect.getExtensions ().getExtensionsAsJsonString ());
         }
 
       // Restore service information (if any)

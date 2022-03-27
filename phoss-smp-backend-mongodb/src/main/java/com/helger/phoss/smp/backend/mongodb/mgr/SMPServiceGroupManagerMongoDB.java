@@ -89,8 +89,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     final Document ret = new Document ().append (BSON_ID, aValue.getID ())
                                         .append (BSON_OWNER_ID, aValue.getOwnerID ())
                                         .append (BSON_PARTICIPANT_ID, toBson (aValue.getParticipantIdentifier ()));
-    if (aValue.extensions ().isNotEmpty ())
-      ret.append (BSON_EXTENSION, aValue.getExtensionsAsString ());
+    if (aValue.getExtensions ().extensions ().isNotEmpty ())
+      ret.append (BSON_EXTENSION, aValue.getExtensions ().getExtensionsAsJsonString ());
     return ret;
   }
 
@@ -99,7 +99,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   public static SMPServiceGroup toDomain (@Nonnull final Document aDoc)
   {
     final String sOwnerID = aDoc.getString (BSON_OWNER_ID);
-    final IParticipantIdentifier aParticipantIdentifier = toParticipantID (aDoc.get (BSON_PARTICIPANT_ID, Document.class));
+    final IParticipantIdentifier aParticipantIdentifier = toParticipantID (aDoc.get (BSON_PARTICIPANT_ID,
+                                                                                     Document.class));
     final String sExtension = aDoc.getString (BSON_EXTENSION);
     return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
   }
@@ -192,8 +193,10 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sServiceGroupID),
-                                                                Updates.combine (Updates.set (BSON_OWNER_ID, sNewOwnerID),
-                                                                                 Updates.set (BSON_EXTENSION, sExtension)));
+                                                                Updates.combine (Updates.set (BSON_OWNER_ID,
+                                                                                              sNewOwnerID),
+                                                                                 Updates.set (BSON_EXTENSION,
+                                                                                              sExtension)));
     if (aOldDoc == null)
     {
       AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "set-all", sServiceGroupID, "no-such-id");

@@ -146,7 +146,8 @@ public final class ServiceGroupImport
     };
 
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Starting import of Service Groups from XML v1.0, overwrite is " + (bOverwriteExisting ? "enabled" : "disabled"));
+      LOGGER.info ("Starting import of Service Groups from XML v1.0, overwrite is " +
+                   (bOverwriteExisting ? "enabled" : "disabled"));
 
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
@@ -169,7 +170,11 @@ public final class ServiceGroupImport
           {
             // Select the default owner if an unknown user is contained
             aOwner = aDefaultOwner;
-            LOGGER.warn ("Failed to resolve stored owner '" + x + "' - using default owner '" + aDefaultOwner.getID () + "'");
+            LOGGER.warn ("Failed to resolve stored owner '" +
+                         x +
+                         "' - using default owner '" +
+                         aDefaultOwner.getID () +
+                         "'");
           }
           // If the user is deleted, but existing - keep the deleted user
           return aOwner;
@@ -177,7 +182,10 @@ public final class ServiceGroupImport
       }
       catch (final RuntimeException ex)
       {
-        aLoggerErrorEx.accept ("Error parsing the Service Group at index " + nSGIndex + ". Ignoring this Service Group.", ex);
+        aLoggerErrorEx.accept ("Error parsing the Service Group at index " +
+                               nSGIndex +
+                               ". Ignoring this Service Group.",
+                               ex);
         continue;
       }
 
@@ -198,7 +206,8 @@ public final class ServiceGroupImport
         aImportServiceGroups.put (aServiceGroup, aImportData);
         if (bIsServiceGroupContained)
           aDeleteServiceGroups.put (sServiceGroupID, aServiceGroup);
-        aLoggerSuccess.accept (sServiceGroupID, "Will " + (bIsServiceGroupContained ? "overwrite" : "import") + " Service Group");
+        aLoggerSuccess.accept (sServiceGroupID,
+                               "Will " + (bIsServiceGroupContained ? "overwrite" : "import") + " Service Group");
 
         // read all contained service information
         {
@@ -223,12 +232,17 @@ public final class ServiceGroupImport
           int nRDCount = 0;
           for (final IMicroElement eRedirect : eServiceGroup.getAllChildElements (CSMPExchange.ELEMENT_REDIRECT))
           {
-            final ISMPRedirect aRedirect = SMPRedirectMicroTypeConverter.convertToNative (eRedirect, x -> aServiceGroup);
+            final ISMPRedirect aRedirect = SMPRedirectMicroTypeConverter.convertToNative (eRedirect,
+                                                                                          x -> aServiceGroup);
             aImportData.addRedirect (aRedirect);
             ++nRDCount;
           }
           aLoggerInfo.accept (sServiceGroupID,
-                              "Read " + nRDCount + " Redirect " + (nRDCount == 1 ? "element" : "elements") + " of Service Group");
+                              "Read " +
+                                               nRDCount +
+                                               " Redirect " +
+                                               (nRDCount == 1 ? "element" : "elements") +
+                                               " of Service Group");
         }
       }
       else
@@ -280,7 +294,8 @@ public final class ServiceGroupImport
               if (!aDeleteServiceGroups.containsKey (sBusinessCardID))
                 aDeleteBusinessCards.put (sBusinessCardID, aBusinessCard);
             }
-            aLoggerSuccess.accept (sBusinessCardID, "Will " + (bIsBusinessCardContained ? "overwrite" : "import") + " Business Card");
+            aLoggerSuccess.accept (sBusinessCardID,
+                                   "Will " + (bIsBusinessCardContained ? "overwrite" : "import") + " Business Card");
           }
           else
           {
@@ -356,7 +371,8 @@ public final class ServiceGroupImport
             // Create in SML only for newly created entries
             aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
                                                                        aImportServiceGroup.getParticipantIdentifier (),
-                                                                       aImportServiceGroup.getExtensionsAsString (),
+                                                                       aImportServiceGroup.getExtensions ()
+                                                                                          .getExtensionsAsJsonString (),
                                                                        !bIsOverwrite);
             aLoggerSuccess.accept (sServiceGroupID, "Successfully created Service Group");
             aSummary.onSuccess (EImportSummaryAction.CREATE_SG);
@@ -406,7 +422,8 @@ public final class ServiceGroupImport
                                                             aImportRedirect.getTargetHref (),
                                                             aImportRedirect.getSubjectUniqueIdentifier (),
                                                             aImportRedirect.getCertificate (),
-                                                            aImportRedirect.getExtensionsAsString ()) != null)
+                                                            aImportRedirect.getExtensions ()
+                                                                           .getExtensionsAsJsonString ()) != null)
                 {
                   aLoggerSuccess.accept (sServiceGroupID, "Successfully created Redirect");
                   aSummary.onSuccess (EImportSummaryAction.CREATE_REDIRECT);

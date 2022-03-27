@@ -67,8 +67,9 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
       aElement.setAttribute (ATTR_TECHNICAL_CONTACT_URL, aValue.getTechnicalContactUrl ());
     if (aValue.hasTechnicalInformationUrl ())
       aElement.setAttribute (ATTR_TECHNICAL_INFORMATION_URL, aValue.getTechnicalInformationUrl ());
-    if (aValue.extensions ().isNotEmpty ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionsAsString ());
+    if (aValue.getExtensions ().extensions ().isNotEmpty ())
+      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION)
+              .appendText (aValue.getExtensions ().getExtensionsAsJsonString ());
     return aElement;
   }
 

@@ -25,9 +25,9 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.photon.security.CSecurity;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
-import com.helger.smpclient.bdxr1.utils.BDXR1ExtensionConverter;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.xml.serialize.read.DOMReader;
 import com.helger.xsds.bdxr.smp1.ExtensionType;
@@ -52,7 +52,7 @@ public final class SMPServiceGroupTest
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticipantIdentifier ());
-    assertEquals ("[{\"Any\":\"<foobar />\"}]", aSG.getExtensionsAsString ());
+    assertEquals ("[{\"Any\":\"<foobar />\"}]", aSG.getExtensions ().getExtensionsAsJsonString ());
 
     final com.helger.xsds.peppol.smp1.ServiceGroupType aSGPeppol = aSG.getAsJAXBObjectPeppol ();
     assertNotNull (aSGPeppol.getExtension ());
@@ -79,12 +79,12 @@ public final class SMPServiceGroupTest
     // Must be an array!
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID,
                                                      aPI,
-                                                     BDXR1ExtensionConverter.convertToJsonString (new CommonsArrayList <> (aExt,
-                                                                                                                           aExt2)));
+                                                     BDXR1ServerAPI.convertToJsonString (new CommonsArrayList <> (aExt,
+                                                                                                                  aExt2)));
     assertTrue (StringHelper.hasText (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticipantIdentifier ());
-    assertNotNull (aSG.getExtensionsAsString ());
+    assertNotNull (aSG.getExtensions ().getExtensionsAsJsonString ());
 
     final com.helger.xsds.bdxr.smp1.ServiceGroupType aSGBDXR = aSG.getAsJAXBObjectBDXR1 ();
     aSGBDXR.setServiceMetadataReferenceCollection (new com.helger.xsds.bdxr.smp1.ServiceMetadataReferenceCollectionType ());

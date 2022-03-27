@@ -57,7 +57,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     if (aEndpoints != null)
       for (final SMPEndpoint aEndpoint : aEndpoints)
         addEndpoint (aEndpoint);
-    setExtensionAsString (sExtension);
+    getExtensions ().setExtensionAsString (sExtension);
   }
 
   @Nonnull
@@ -153,7 +153,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
       aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectPeppol ());
     ret.setServiceEndpointList (aEndpointList);
-    ret.setExtension (getAsPeppolExtension ());
+    ret.setExtension (getExtensions ().getAsPeppolExtension ());
     return ret;
   }
 
@@ -173,7 +173,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
       aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectBDXR1 ());
     ret.setServiceEndpointList (aEndpointList);
-    ret.setExtension (getAsBDXRExtension ());
+    ret.setExtension (getExtensions ().getAsBDXRExtensions ());
     return ret;
   }
 
@@ -187,7 +187,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     }
 
     final com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType ret = new com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType ();
-    ret.setSMPExtensions (getAsBDXR2Extension ());
+    ret.setSMPExtensions (getExtensions ().getAsBDXR2Extensions ());
 
     {
       final com.helger.xsds.bdxr.smp2.ac.ProcessType p = new com.helger.xsds.bdxr.smp2.ac.ProcessType ();

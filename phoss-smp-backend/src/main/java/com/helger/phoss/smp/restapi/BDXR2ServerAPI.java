@@ -14,6 +14,7 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.photon.security.user.IUser;
-import com.helger.smpclient.bdxr2.utils.BDXR2ExtensionConverter;
+import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.xsds.bdxr.smp2.ServiceGroupType;
 import com.helger.xsds.bdxr.smp2.ServiceMetadataType;
 import com.helger.xsds.bdxr.smp2.ac.EndpointType;
@@ -83,6 +84,13 @@ public final class BDXR2ServerAPI
   public BDXR2ServerAPI (@Nonnull final ISMPServerAPIDataProvider aDataProvider)
   {
     m_aAPIDataProvider = ValueEnforcer.notNull (aDataProvider, "DataProvider");
+  }
+
+  @Nullable
+  public static String convertToJsonString (@Nullable final com.helger.xsds.bdxr.smp2.ec.SMPExtensionsType aExtensions)
+  {
+    final SMPExtensionList ret = SMPExtensionList.ofBDXR2 (aExtensions);
+    return ret == null ? null : ret.getExtensionsAsJsonString ();
   }
 
   @Nonnull
@@ -207,7 +215,7 @@ public final class BDXR2ServerAPI
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final String sExtension = BDXR2ExtensionConverter.convertToJsonString (aServiceGroup.getSMPExtensions ());
+      final String sExtension = convertToJsonString (aServiceGroup.getSMPExtensions ());
       if (aServiceGroupMgr.containsSMPServiceGroupWithID (aPathServiceGroupID))
         aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension);
       else
@@ -468,8 +476,8 @@ public final class BDXR2ServerAPI
                                                       aPM.getRedirect ().getPublisherURI ().getValue (),
                                                       sCertificateUID,
                                                       aCertificate,
-                                                      BDXR2ExtensionConverter.convertToJsonString (aPM.getRedirect ()
-                                                                                                      .getSMPExtensions ())) == null)
+                                                      convertToJsonString (aPM.getRedirect ()
+                                                                              .getSMPExtensions ())) == null)
           {
             if (LOGGER.isErrorEnabled ())
               LOGGER.error (sLog + " - ERROR - Redirect");
@@ -493,7 +501,7 @@ public final class BDXR2ServerAPI
               final IProcessIdentifier aProcID = aIdentifierFactory.createProcessIdentifier (aSrcID.getSchemeID (),
                                                                                              aSrcID.getValue ());
               if (aProcID != null)
-                aProcIDs.put (aProcID, BDXR2ExtensionConverter.convertToJsonString (aProc.getSMPExtensions ()));
+                aProcIDs.put (aProcID, convertToJsonString (aProc.getSMPExtensions ()));
               else
                 LOGGER.warn ("Failed to parse process identifier '" +
                              aSrcID.getSchemeID () +
@@ -529,7 +537,7 @@ public final class BDXR2ServerAPI
                                                                aJAXBEndpoint.getDescriptionValue (),
                                                                aJAXBEndpoint.getContactValue (),
                                                                null,
-                                                               BDXR2ExtensionConverter.convertToJsonString (aJAXBEndpoint.getSMPExtensions ()));
+                                                               convertToJsonString (aJAXBEndpoint.getSMPExtensions ()));
                 aEndpoints.add (aEndpoint);
               }
               final SMPProcess aProcess = new SMPProcess (aProcIDEntry.getKey (), aEndpoints, aProcIDEntry.getValue ());
@@ -537,7 +545,7 @@ public final class BDXR2ServerAPI
             }
 
             final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-            final String sExtensionXML = BDXR2ExtensionConverter.convertToJsonString (aServiceMetadata.getSMPExtensions ());
+            final String sExtensionXML = convertToJsonString (aServiceMetadata.getSMPExtensions ());
             if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPathServiceGroup,
                                                                                        aPathDocTypeID,
                                                                                        aProcesses,

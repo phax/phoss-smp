@@ -28,7 +28,6 @@ import javax.annotation.concurrent.Immutable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
@@ -86,8 +85,11 @@ import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
 import com.helger.photon.uictrls.datatables.plugins.DataTablesPluginSearchHighlight;
 import com.helger.photon.uictrls.prism.EPrismLanguage;
 import com.helger.photon.uictrls.prism.HCPrismJS;
+import com.helger.smpclient.extension.SMPExtension;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.xml.serialize.write.XMLWriter;
+import com.helger.xml.serialize.write.XMLWriterSettings;
 
 /**
  * Common UI helper methods
@@ -98,7 +100,10 @@ import com.helger.xml.serialize.write.XMLWriter;
 public final class SMPCommonUI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPCommonUI.class);
-  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25).addItem (50).addItem (100).addItemAll ();
+  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25)
+                                                                                     .addItem (50)
+                                                                                     .addItem (100)
+                                                                                     .addItemAll ();
 
   private SMPCommonUI ()
   {}
@@ -113,7 +118,8 @@ public final class SMPCommonUI
                                                           .data (new JSAssocArray ().add (AjaxExecutorDataTables.OBJECT_ID,
                                                                                           aTable.getID ())))
                  .setServerFilterType (EDataTablesFilterType.ALL_TERMS_PER_ROW)
-                 .setTextLoadingURL (CAjax.DATATABLES_I18N.getInvocationURL (aRequestScope), AjaxExecutorDataTablesI18N.LANGUAGE_ID)
+                 .setTextLoadingURL (CAjax.DATATABLES_I18N.getInvocationURL (aRequestScope),
+                                     AjaxExecutorDataTablesI18N.LANGUAGE_ID)
                  .addPlugin (new DataTablesPluginSearchHighlight ());
     });
 
@@ -169,7 +175,8 @@ public final class SMPCommonUI
   }
 
   @Nonnull
-  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC, @Nullable final String sPreselectedUserName)
+  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC,
+                                                   @Nullable final String sPreselectedUserName)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -207,7 +214,8 @@ public final class SMPCommonUI
                       JQuery.idRef (sIDErrorField).empty ().append (aJSData.ref (AjaxExecutorPublicLogin.JSON_HTML)));
       aOnClick.add (new JQueryAjaxBuilder ().url (CAjax.LOGIN.getInvocationURI (aRequestScope))
                                             .method (EHttpMethod.POST)
-                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID, JQuery.idRef (sIDUserName).val ())
+                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID,
+                                                                            JQuery.idRef (sIDUserName).val ())
                                                                       .add (CLogin.REQUEST_ATTR_PASSWORD,
                                                                             JQuery.idRef (sIDPassword).val ()))
                                             .success (aJSSuccess)
@@ -246,7 +254,8 @@ public final class SMPCommonUI
     final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
     final PublicKey aPublicKey = aX509Cert.getPublicKey ();
 
-    final BootstrapTable aCertDetails = new BootstrapTable (new HCCol ().addStyle (CCSSProperties.WIDTH.newValue ("12rem")), HCCol.star ());
+    final BootstrapTable aCertDetails = new BootstrapTable (new HCCol ().addStyle (CCSSProperties.WIDTH.newValue ("12rem")),
+                                                            HCCol.star ());
     aCertDetails.setResponsive (true);
     if (StringHelper.hasText (sAlias))
       aCertDetails.addBodyRow ().addCell ("Alias:").addCell (sAlias);
@@ -255,7 +264,9 @@ public final class SMPCommonUI
     aCertDetails.addBodyRow ().addCell ("Issuer:").addCell (aX509Cert.getIssuerX500Principal ().getName ());
     aCertDetails.addBodyRow ()
                 .addCell ("Serial number:")
-                .addCell (aX509Cert.getSerialNumber ().toString () + " / 0x" + _inGroupsOf (aX509Cert.getSerialNumber ().toString (16), 4));
+                .addCell (aX509Cert.getSerialNumber ().toString () +
+                          " / 0x" +
+                          _inGroupsOf (aX509Cert.getSerialNumber ().toString (16), 4));
     aCertDetails.addBodyRow ()
                 .addCell ("Valid from:")
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotBefore, aDisplayLocale) + " "),
@@ -266,7 +277,8 @@ public final class SMPCommonUI
                 .addCell (new HCTextNode (PDTToString.getAsString (aNotAfter, aDisplayLocale) + " "),
                           aNowLDT.isAfter (aNotAfter) ? new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NO LONGER VALID!!!")
                                                       : new HCDiv ().addChild ("Valid for: " +
-                                                                               PDTDisplayHelper.getPeriodTextEN (aNowLDT, aNotAfter)));
+                                                                               PDTDisplayHelper.getPeriodTextEN (aNowLDT,
+                                                                                                                 aNotAfter)));
 
     if (aPublicKey instanceof RSAPublicKey)
     {
@@ -310,12 +322,12 @@ public final class SMPCommonUI
   @Nullable
   public static IHCNode getExtensionDisplay (@Nonnull final ISMPHasExtension aHasExtension)
   {
-    final ICommonsList <com.helger.xsds.bdxr.smp1.ExtensionType> aExtensions = aHasExtension.extensions ();
+    final ICommonsList <SMPExtension> aExtensions = aHasExtension.getExtensions ().extensions ();
     if (aExtensions.isEmpty ())
       return null;
 
     final HCNodeList aNL = new HCNodeList ();
-    for (final com.helger.xsds.bdxr.smp1.ExtensionType aExtension : aExtensions)
+    for (final SMPExtension aExtension : aExtensions)
     {
       if (aNL.hasChildren ())
       {
@@ -324,8 +336,8 @@ public final class SMPCommonUI
       }
 
       // Use only the XML element of the first extension
-      final Element aAny = (Element) aExtension.getAny ();
-      final String sXML = XMLWriter.getNodeAsString (aAny);
+      final String sXML = XMLWriter.getNodeAsString (aExtension.getAny (),
+                                                     new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN));
       aNL.addChild (new HCPrismJS (EPrismLanguage.MARKUP).addChild (sXML));
     }
     return aNL;

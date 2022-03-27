@@ -99,8 +99,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                                         .append (BSON_TARGET_SUBJECT_CN, aValue.getSubjectUniqueIdentifier ());
     if (aValue.hasCertificate ())
       ret.append (BSON_TARGET_CERTIFICATE, CertificateHelper.getPEMEncodedCertificate (aValue.getCertificate ()));
-    if (aValue.extensions ().isNotEmpty ())
-      ret.append (BSON_EXTENSIONS, aValue.getExtensionsAsString ());
+    if (aValue.getExtensions ().extensions ().isNotEmpty ())
+      ret.append (BSON_EXTENSIONS, aValue.getExtensions ().getExtensionsAsJsonString ());
     return ret;
   }
 
@@ -143,7 +143,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                                       aSMPRedirect.getTargetHref (),
                                       aSMPRedirect.getSubjectUniqueIdentifier (),
                                       aSMPRedirect.getCertificate (),
-                                      aSMPRedirect.getExtensionsAsString ());
+                                      aSMPRedirect.getExtensions ().getExtensionsAsJsonString ());
     return aSMPRedirect;
   }
 
@@ -152,7 +152,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   {
     // ServiceGroup and DocType are never changed -> therefore the ID is never
     // changed
-    final Document aOldDoc = getCollection ().findOneAndReplace (new Document (BSON_ID, aSMPRedirect.getID ()), toBson (aSMPRedirect));
+    final Document aOldDoc = getCollection ().findOneAndReplace (new Document (BSON_ID, aSMPRedirect.getID ()),
+                                                                 toBson (aSMPRedirect));
     if (aOldDoc != null)
       AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
                                         "set-all",
@@ -162,7 +163,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                                         aSMPRedirect.getTargetHref (),
                                         aSMPRedirect.getSubjectUniqueIdentifier (),
                                         aSMPRedirect.getCertificate (),
-                                        aSMPRedirect.getExtensionsAsString ());
+                                        aSMPRedirect.getExtensions ().getExtensionsAsJsonString ());
   }
 
   @Nonnull
@@ -191,7 +192,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocumentTypeIdentifier);
+    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                   aDocumentTypeIdentifier);
     final SMPRedirect aNewRedirect = new SMPRedirect (aServiceGroup,
                                                       aDocumentTypeIdentifier,
                                                       sTargetHref,
@@ -286,7 +288,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   {
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (StringHelper.hasText (sServiceGroupID))
-      getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, sServiceGroupID)).forEach (x -> ret.add (toDomain (x)));
+      getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, sServiceGroupID))
+                      .forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 
@@ -305,7 +308,8 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     if (aDocTypeID == null)
       return null;
 
-    final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()),
+    final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID,
+                                                                              aServiceGroup.getID ()),
                                                                 new Document (BSON_DOCTYPE_ID, toBson (aDocTypeID))))
                                             .first ();
     if (aMatch == null)

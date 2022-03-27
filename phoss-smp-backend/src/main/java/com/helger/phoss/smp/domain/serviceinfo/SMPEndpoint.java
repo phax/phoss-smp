@@ -22,6 +22,7 @@ import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.XMLOffsetDateTime;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.security.certificate.CertificateHelper;
@@ -71,7 +72,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     setServiceDescription (sServiceDescription);
     setTechnicalContactUrl (sTechnicalContactUrl);
     setTechnicalInformationUrl (sTechnicalInformationUrl);
-    setExtensionAsString (sExtension);
+    getExtensions ().setExtensionAsString (sExtension);
   }
 
   @Nonnull
@@ -202,7 +203,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
-    ret.setExtension (getAsPeppolExtension ());
+    ret.setExtension (getExtensions ().getAsPeppolExtension ());
     ret.setTransportProfile (m_sTransportProfile);
     return ret;
   }
@@ -220,7 +221,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
-    ret.setExtension (getAsBDXRExtension ());
+    ret.setExtension (getExtensions ().getAsBDXRExtensions ());
     ret.setTransportProfile (m_sTransportProfile);
     return ret;
   }
@@ -229,11 +230,14 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   public com.helger.xsds.bdxr.smp2.ac.EndpointType getAsJAXBObjectBDXR2 ()
   {
     final com.helger.xsds.bdxr.smp2.ac.EndpointType ret = new com.helger.xsds.bdxr.smp2.ac.EndpointType ();
-    ret.setSMPExtensions (getAsBDXR2Extension ());
+    ret.setSMPExtensions (getExtensions ().getAsBDXR2Extensions ());
     ret.setTransportProfileID (m_sTransportProfile);
-    ret.setDescription (m_sServiceDescription);
-    ret.setContact (m_sTechnicalContactUrl);
-    ret.setAddressURI (m_sEndpointReference);
+    if (StringHelper.hasText (m_sServiceDescription))
+      ret.setDescription (m_sServiceDescription);
+    if (StringHelper.hasText (m_sTechnicalContactUrl))
+      ret.setContact (m_sTechnicalContactUrl);
+    if (StringHelper.hasText (m_sEndpointReference))
+      ret.setAddressURI (m_sEndpointReference);
     if (m_aServiceActivationDT != null)
       ret.setActivationDate (m_aServiceActivationDT.toLocalDate ());
     if (m_aServiceExpirationDT != null)

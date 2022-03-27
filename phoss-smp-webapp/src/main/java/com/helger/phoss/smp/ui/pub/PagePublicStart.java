@@ -93,7 +93,8 @@ public final class PagePublicStart extends AbstractSMPWebPage
       {
         // Dynamic
         final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                            new DTCol (bShowExtensionDetails ? "Extension" : "Extension?").setDataSort (1, 0),
+                                            new DTCol (bShowExtensionDetails ? "Extension"
+                                                                             : "Extension?").setDataSort (1, 0),
                                             new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
         aFinalTable = aTable;
       }
@@ -122,20 +123,23 @@ public final class PagePublicStart extends AbstractSMPWebPage
         aRow.addCell (sDisplayName);
         if (bShowExtensionDetails)
         {
-          if (aServiceGroup.extensions ().isNotEmpty ())
-            aRow.addCell (code (HCExtHelper.nl2divList (aServiceGroup.getFirstExtensionXML ())));
+          if (aServiceGroup.getExtensions ().extensions ().isNotEmpty ())
+            aRow.addCell (code (HCExtHelper.nl2divList (aServiceGroup.getExtensions ().getFirstExtensionXMLString ())));
           else
             aRow.addCell ();
         }
         else
         {
-          aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.extensions ().isNotEmpty (), aDisplayLocale));
+          aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.getExtensions ().extensions ().isNotEmpty (),
+                                                    aDisplayLocale));
         }
-        final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope, aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
+        final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope,
+                                                                 aServiceGroup.getParticipantIdentifier ()
+                                                                              .getURIEncoded ());
         aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
-                                                                                                                             sDisplayName)
-                                                                                                                  .setTargetBlank ()
-                                                                                                                  .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                                                                                                                              sDisplayName)
+                                                                                                                   .setTargetBlank ()
+                                                                                                                   .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
       }
       if (aFinalTable.hasBodyRows ())
       {

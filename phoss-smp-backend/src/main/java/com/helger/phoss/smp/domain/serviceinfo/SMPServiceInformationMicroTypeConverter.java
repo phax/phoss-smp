@@ -52,8 +52,9 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
                                                                     ELEMENT_DOCUMENT_TYPE_IDENTIFIER));
     for (final ISMPProcess aProcess : aValue.getAllProcesses ())
       aElement.appendChild (MicroTypeConverter.convertToMicroElement (aProcess, sNamespaceURI, ELEMENT_PROCESS));
-    if (aValue.extensions ().isNotEmpty ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionsAsString ());
+    if (aValue.getExtensions ().extensions ().isNotEmpty ())
+      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION)
+              .appendText (aValue.getExtensions ().getExtensionsAsJsonString ());
     return aElement;
   }
 

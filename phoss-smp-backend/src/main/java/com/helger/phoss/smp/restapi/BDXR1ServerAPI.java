@@ -11,8 +11,10 @@
 package com.helger.phoss.smp.restapi;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,7 @@ import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.photon.security.user.IUser;
-import com.helger.smpclient.bdxr1.utils.BDXR1ExtensionConverter;
+import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.xsds.bdxr.smp1.CompleteServiceGroupType;
 import com.helger.xsds.bdxr.smp1.EndpointType;
 import com.helger.xsds.bdxr.smp1.ProcessListType;
@@ -85,6 +87,13 @@ public final class BDXR1ServerAPI
   public BDXR1ServerAPI (@Nonnull final ISMPServerAPIDataProvider aDataProvider)
   {
     m_aAPIDataProvider = ValueEnforcer.notNull (aDataProvider, "DataProvider");
+  }
+
+  @Nullable
+  public static String convertToJsonString (@Nullable final List <com.helger.xsds.bdxr.smp1.ExtensionType> aExtensions)
+  {
+    final SMPExtensionList ret = SMPExtensionList.ofBDXR1 (aExtensions);
+    return ret == null ? null : ret.getExtensionsAsJsonString ();
   }
 
   @Nonnull
@@ -333,7 +342,7 @@ public final class BDXR1ServerAPI
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final String sExtension = BDXR1ExtensionConverter.convertToJsonString (aServiceGroup.getExtension ());
+      final String sExtension = convertToJsonString (aServiceGroup.getExtension ());
       if (aServiceGroupMgr.containsSMPServiceGroupWithID (aPathServiceGroupID))
         aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension);
       else
@@ -597,8 +606,8 @@ public final class BDXR1ServerAPI
                                                     aServiceMetadata.getRedirect ().getHref (),
                                                     aServiceMetadata.getRedirect ().getCertificateUID (),
                                                     aCertificate,
-                                                    BDXR1ExtensionConverter.convertToJsonString (aServiceMetadata.getRedirect ()
-                                                                                                                 .getExtension ())) == null)
+                                                    convertToJsonString (aServiceMetadata.getRedirect ()
+                                                                                         .getExtension ())) == null)
         {
           if (LOGGER.isErrorEnabled ())
             LOGGER.error (sLog + " - ERROR - Redirect");
@@ -630,17 +639,17 @@ public final class BDXR1ServerAPI
                                                              aJAXBEndpoint.getServiceDescription (),
                                                              aJAXBEndpoint.getTechnicalContactUrl (),
                                                              aJAXBEndpoint.getTechnicalInformationUrl (),
-                                                             BDXR1ExtensionConverter.convertToJsonString (aJAXBEndpoint.getExtension ()));
+                                                             convertToJsonString (aJAXBEndpoint.getExtension ()));
               aEndpoints.add (aEndpoint);
             }
             final SMPProcess aProcess = new SMPProcess (SimpleProcessIdentifier.wrap (aJAXBProcess.getProcessIdentifier ()),
                                                         aEndpoints,
-                                                        BDXR1ExtensionConverter.convertToJsonString (aJAXBProcess.getExtension ()));
+                                                        convertToJsonString (aJAXBProcess.getExtension ()));
             aProcesses.add (aProcess);
           }
 
           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-          final String sExtensionXML = BDXR1ExtensionConverter.convertToJsonString (aServiceInformation.getExtension ());
+          final String sExtensionXML = convertToJsonString (aServiceInformation.getExtension ());
           if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPathServiceGroup,
                                                                                      aPathDocTypeID,
                                                                                      aProcesses,

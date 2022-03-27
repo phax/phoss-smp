@@ -80,7 +80,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   {
     m_sID = createSMPServiceGroupID (aParticipantIdentifier);
     setOwnerID (sOwnerID);
-    setExtensionAsString (sExtension);
+    getExtensions ().setExtensionAsString (sExtension);
     // Make a copy to avoid unwanted changes
     m_aParticipantIdentifier = _createUnifiedParticipantIdentifier (aParticipantIdentifier);
   }
@@ -126,7 +126,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
       // This is set by the REST server
       ret.setServiceMetadataReferenceCollection (null);
     }
-    ret.setExtension (getAsPeppolExtension ());
+    ret.setExtension (getExtensions ().getAsPeppolExtension ());
     return ret;
   }
 
@@ -141,7 +141,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
       // This is set by the REST server
       ret.setServiceMetadataReferenceCollection (null);
     }
-    ret.setExtension (getAsBDXRExtension ());
+    ret.setExtension (getExtensions ().getAsBDXRExtensions ());
     return ret;
   }
 
@@ -149,7 +149,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   public com.helger.xsds.bdxr.smp2.ServiceGroupType getAsJAXBObjectBDXR2 ()
   {
     final com.helger.xsds.bdxr.smp2.ServiceGroupType ret = new com.helger.xsds.bdxr.smp2.ServiceGroupType ();
-    ret.setSMPExtensions (getAsBDXR2Extension ());
+    ret.setSMPExtensions (getExtensions ().getAsBDXR2Extensions ());
     ret.setSMPVersionID ("2.0");
     // Explicit constructor call is needed here!
     ret.setParticipantID (new BDXR2ParticipantIdentifier (m_aParticipantIdentifier));

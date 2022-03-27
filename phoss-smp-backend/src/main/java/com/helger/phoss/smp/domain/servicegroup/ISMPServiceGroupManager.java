@@ -59,8 +59,6 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return The created service group object. Never <code>null</code>.
    * @throws SMPServerException
    *         In case of error
-   * @see com.helger.smpclient.peppol.utils.SMPExtensionConverter
-   * @see com.helger.smpclient.bdxr1.utils.BDXR1ExtensionConverter
    */
   @Nonnull
   ISMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty String sOwnerID,
@@ -127,7 +125,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @see ISMPRedirectManager#deleteAllSMPRedirectsOfServiceGroup(ISMPServiceGroup)
    */
   @Nonnull
-  EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier, boolean bDeleteInSML) throws SMPServerException;
+  EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier,
+                                 boolean bDeleteInSML) throws SMPServerException;
 
   /**
    * Delete the service group, and swallow all exceptions. This is only
@@ -144,7 +143,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @see #deleteSMPServiceGroup(IParticipantIdentifier, boolean)
    */
   @Nonnull
-  default EChange deleteSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier, final boolean bDeleteInSML)
+  default EChange deleteSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier,
+                                             final boolean bDeleteInSML)
   {
     try
     {

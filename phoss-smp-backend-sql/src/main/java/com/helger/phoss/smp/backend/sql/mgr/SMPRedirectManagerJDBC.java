@@ -108,7 +108,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       final ISMPRedirect aDBRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
 
       final IParticipantIdentifier aParticipantID = aServiceGroup.getParticipantIdentifier ();
-      final String sCertificate = aCertificate == null ? null : CertificateHelper.getPEMEncodedCertificate (aCertificate);
+      final String sCertificate = aCertificate == null ? null
+                                                       : CertificateHelper.getPEMEncodedCertificate (aCertificate);
 
       if (aDBRedirect == null)
       {
@@ -167,7 +168,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                                         aSMPRedirect.getTargetHref (),
                                         aSMPRedirect.getSubjectUniqueIdentifier (),
                                         aSMPRedirect.getCertificate (),
-                                        aSMPRedirect.getExtensionsAsString ());
+                                        aSMPRedirect.getExtensions ().getExtensionsAsJsonString ());
 
       m_aCallbacks.forEach (x -> x.onSMPRedirectCreated (aSMPRedirect));
     }
@@ -181,7 +182,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                                         aSMPRedirect.getTargetHref (),
                                         aSMPRedirect.getSubjectUniqueIdentifier (),
                                         aSMPRedirect.getCertificate (),
-                                        aSMPRedirect.getExtensionsAsString ());
+                                        aSMPRedirect.getExtensions ().getExtensionsAsJsonString ());
 
       m_aCallbacks.forEach (x -> x.onSMPRedirectUpdated (aSMPRedirect));
     }
@@ -339,6 +340,11 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     final DBResultRow aRow = aDBResult.get ();
     final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (aRow.getAsString (2));
-    return new SMPRedirect (aServiceGroup, aDocTypeID, aRow.getAsString (0), aRow.getAsString (1), aCertificate, aRow.getAsString (3));
+    return new SMPRedirect (aServiceGroup,
+                            aDocTypeID,
+                            aRow.getAsString (0),
+                            aRow.getAsString (1),
+                            aCertificate,
+                            aRow.getAsString (3));
   }
 }

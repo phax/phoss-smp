@@ -41,7 +41,8 @@ public final class SMPRedirectTest
   @Test
   public void testBasic ()
   {
-    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME, "0088:dummy");
+    final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                        "0088:dummy");
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                  "testdoctype");
 
@@ -55,7 +56,7 @@ public final class SMPRedirectTest
     assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
     assertNull (aRedirect.getCertificate ());
     assertFalse (aRedirect.hasCertificate ());
-    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionsAsString ());
+    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensions ().getExtensionsAsJsonString ());
   }
 
   @Test
@@ -76,6 +77,6 @@ public final class SMPRedirectTest
     assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
     assertNull (aRedirect.getCertificate ());
     assertFalse (aRedirect.hasCertificate ());
-    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensionsAsString ());
+    assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensions ().getExtensionsAsJsonString ());
   }
 }

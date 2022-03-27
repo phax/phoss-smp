@@ -53,7 +53,8 @@ import com.helger.photon.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
+public final class SMPServiceInformationManagerXML extends
+                                                   AbstractPhotonMapBasedWALDAO <ISMPServiceInformation, SMPServiceInformation>
                                                    implements
                                                    ISMPServiceInformationManager
 {
@@ -79,7 +80,8 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
                                                         @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+                                                                                                       aDocTypeID);
     if (aServiceInfo != null)
     {
       final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
@@ -127,7 +129,7 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
                                         aOldInformation.getServiceGroupID (),
                                         aOldInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aOldInformation.getAllProcesses (),
-                                        aOldInformation.getExtensionsAsString ());
+                                        aOldInformation.getExtensions ().getExtensionsAsJsonString ());
 
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - updated");
@@ -176,7 +178,7 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
                                         aSMPServiceInformation.getServiceGroupID (),
                                         aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
                                         aSMPServiceInformation.getAllProcesses (),
-                                        aSMPServiceInformation.getExtensionsAsString ());
+                                        aSMPServiceInformation.getExtensions ().getExtensionsAsJsonString ());
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - created");
 
@@ -238,7 +240,8 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
   }
 
   @Nonnull
-  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation, @Nullable final ISMPProcess aProcess)
+  public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
+                                   @Nullable final ISMPProcess aProcess)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPProcess (" + aSMPServiceInformation + ", " + aProcess + ")");
@@ -326,7 +329,9 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
     if (aServiceGroup != null)
     {
       final String sServiceGroupID = aServiceGroup.getID ();
-      findAllMapped (aSI -> aSI.getServiceGroupID ().equals (sServiceGroupID), ISMPServiceInformation::getDocumentTypeIdentifier, ret::add);
+      findAllMapped (aSI -> aSI.getServiceGroupID ().equals (sServiceGroupID),
+                     ISMPServiceInformation::getDocumentTypeIdentifier,
+                     ret::add);
     }
     return ret;
   }
@@ -341,7 +346,8 @@ public final class SMPServiceInformationManagerXML extends AbstractPhotonMapBase
       return null;
 
     final String sServiceGroupID = aServiceGroup.getID ();
-    final ICommonsList <ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ().equals (sServiceGroupID) &&
+    final ICommonsList <ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ()
+                                                                        .equals (sServiceGroupID) &&
                                                                      aSI.getDocumentTypeIdentifier ()
                                                                         .hasSameContent (aDocumentTypeIdentifier));
 

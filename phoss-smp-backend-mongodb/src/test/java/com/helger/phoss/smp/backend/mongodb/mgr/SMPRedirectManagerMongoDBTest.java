@@ -77,14 +77,19 @@ public final class SMPRedirectManagerMongoDBTest
     {
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                                   "doctype4711");
-      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "bla", "foo", null, "<ext/>");
+      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
+                                                                             aDocTypeID,
+                                                                             "bla",
+                                                                             "foo",
+                                                                             null,
+                                                                             "<ext/>");
       assertNotNull (aRedirect);
       assertSame (aSG, aRedirect.getServiceGroup ());
       assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
       assertEquals ("bla", aRedirect.getTargetHref ());
       assertEquals ("foo", aRedirect.getSubjectUniqueIdentifier ());
       assertNull (aRedirect.getCertificate ());
-      assertEquals ("<ext />", aRedirect.getFirstExtensionXML ().trim ());
+      assertEquals ("<ext />", aRedirect.getExtensions ().getFirstExtensionXMLString ().trim ());
     }
     finally
     {
@@ -117,14 +122,19 @@ public final class SMPRedirectManagerMongoDBTest
     {
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                                   "DocType4711");
-      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG, aDocTypeID, "bla", "foo", null, "<ext/>");
+      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
+                                                                             aDocTypeID,
+                                                                             "bla",
+                                                                             "foo",
+                                                                             null,
+                                                                             "<ext/>");
       assertNotNull (aRedirect);
       assertSame (aSG, aRedirect.getServiceGroup ());
       assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
       assertEquals ("bla", aRedirect.getTargetHref ());
       assertEquals ("foo", aRedirect.getSubjectUniqueIdentifier ());
       assertNull (aRedirect.getCertificate ());
-      assertEquals ("<ext />", aRedirect.getFirstExtensionXML ().trim ());
+      assertEquals ("<ext />", aRedirect.getExtensions ().getFirstExtensionXMLString ().trim ());
     }
     finally
     {

@@ -84,7 +84,7 @@ public final class ISMPServiceGroupManagerFuncTest
       assertEquals (aPI1, aSG1.getParticipantIdentifier ());
       assertEquals (sSG1, aSG1.getID ());
       assertEquals (sOwner1ID, aSG1.getOwnerID ());
-      assertEquals (sExtension, aSG1.getFirstExtensionXML ().trim ());
+      assertEquals (sExtension, aSG1.getExtensions ().getFirstExtensionXMLString ().trim ());
 
       // Check manager state
       assertEquals (nCount + 1, aSGMgr.getSMPServiceGroupCount ());
@@ -114,7 +114,7 @@ public final class ISMPServiceGroupManagerFuncTest
       assertEquals (aPI2, aSG2.getParticipantIdentifier ());
       assertEquals (sSG2, aSG2.getID ());
       assertEquals (sOwner2ID, aSG2.getOwnerID ());
-      assertEquals (sExtension, aSG2.getFirstExtensionXML ().trim ());
+      assertEquals (sExtension, aSG2.getExtensions ().getFirstExtensionXMLString ().trim ());
 
       // Check manager state
       assertEquals (nCount + 2, aSGMgr.getSMPServiceGroupCount ());

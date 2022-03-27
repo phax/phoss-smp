@@ -57,13 +57,15 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
     if (aValue.hasCertificate ())
       aElement.appendElement (sNamespaceURI, ELEMENT_CERTIFICATE)
               .appendText (CertificateHelper.getPEMEncodedCertificate (aValue.getCertificate ()));
-    if (aValue.extensions ().isNotEmpty ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION).appendText (aValue.getExtensionsAsString ());
+    if (aValue.getExtensions ().extensions ().isNotEmpty ())
+      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION)
+              .appendText (aValue.getExtensions ().getExtensionsAsJsonString ());
     return aElement;
   }
 
   @Nonnull
-  public static SMPRedirect convertToNative (@Nonnull final IMicroElement aElement, @Nonnull final ISMPServiceGroupProvider aSGProvider)
+  public static SMPRedirect convertToNative (@Nonnull final IMicroElement aElement,
+                                             @Nonnull final ISMPServiceGroupProvider aSGProvider)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUPD_ID);
@@ -79,7 +81,12 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
                                                                                                                                     ELEMENT_CERTIFICATE));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPRedirect (aServiceGroup, aDocTypeIdentifier, sTargetHref, sSubjectUniqueIdentifier, aCertificate, sExtension);
+    return new SMPRedirect (aServiceGroup,
+                            aDocTypeIdentifier,
+                            sTargetHref,
+                            sSubjectUniqueIdentifier,
+                            aCertificate,
+                            sExtension);
   }
 
   @Nonnull

@@ -74,14 +74,14 @@ public final class SMPServiceInformationTest
     assertEquals ("sd", aEP.getServiceDescription ());
     assertEquals ("tc", aEP.getTechnicalContactUrl ());
     assertEquals ("ti", aEP.getTechnicalInformationUrl ());
-    assertEquals ("[{\"Any\":\"<extep />\"}]", aEP.getExtensionsAsString ());
+    assertEquals ("[{\"Any\":\"<extep />\"}]", aEP.getExtensions ().getExtensionsAsJsonString ());
 
     final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                        "testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), "<extproc/>");
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
-    assertEquals ("[{\"Any\":\"<extproc />\"}]", aProcess.getExtensionsAsString ());
+    assertEquals ("[{\"Any\":\"<extproc />\"}]", aProcess.getExtensions ().getExtensionsAsJsonString ());
 
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                  "testdoctype");
@@ -92,7 +92,7 @@ public final class SMPServiceInformationTest
     assertSame (aSG, aSI.getServiceGroup ());
     assertEquals (aDocTypeID, aSI.getDocumentTypeIdentifier ());
     assertEquals (1, aSI.getAllProcesses ().size ());
-    assertEquals ("[{\"Any\":\"<extsi />\"}]", aSI.getExtensionsAsString ());
+    assertEquals ("[{\"Any\":\"<extsi />\"}]", aSI.getExtensions ().getExtensionsAsJsonString ());
   }
 
   @Test
@@ -123,14 +123,14 @@ public final class SMPServiceInformationTest
     assertEquals ("sd", aEP.getServiceDescription ());
     assertEquals ("tc", aEP.getTechnicalContactUrl ());
     assertNull (aEP.getTechnicalInformationUrl ());
-    assertNull (aEP.getExtensionsAsString ());
+    assertNull (aEP.getExtensions ().getExtensionsAsJsonString ());
 
     final IProcessIdentifier aProcessID = new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                        "testproc");
     final SMPProcess aProcess = new SMPProcess (aProcessID, CollectionHelper.newList (aEP), (String) null);
     assertEquals (aProcessID, aProcess.getProcessIdentifier ());
     assertEquals (1, aProcess.getAllEndpoints ().size ());
-    assertNull (aProcess.getExtensionsAsString ());
+    assertNull (aProcess.getExtensions ().getExtensionsAsJsonString ());
 
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                  "testdoctype");
@@ -141,6 +141,6 @@ public final class SMPServiceInformationTest
     assertSame (aSG, aSI.getServiceGroup ());
     assertEquals (aDocTypeID, aSI.getDocumentTypeIdentifier ());
     assertEquals (1, aSI.getAllProcesses ().size ());
-    assertNull (aSI.getExtensionsAsString ());
+    assertNull (aSI.getExtensions ().getExtensionsAsJsonString ());
   }
 }

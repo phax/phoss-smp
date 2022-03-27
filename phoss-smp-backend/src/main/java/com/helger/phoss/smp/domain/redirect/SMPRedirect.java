@@ -58,7 +58,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     setTargetHref (sTargetHref);
     setSubjectUniqueIdentifier (sSubjectUniqueIdentifier);
     setCertificate (aCertificate);
-    setExtensionAsString (sExtension);
+    getExtensions ().setExtensionAsString (sExtension);
     m_sID = aServiceGroup.getID () + "-" + aDocumentTypeIdentifier.getURIEncoded ();
   }
 
@@ -137,7 +137,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     final com.helger.xsds.peppol.smp1.RedirectType aRedirect = new com.helger.xsds.peppol.smp1.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
-    aRedirect.setExtension (getAsPeppolExtension ());
+    aRedirect.setExtension (getExtensions ().getAsPeppolExtension ());
     // Certificate is not used here
 
     final com.helger.xsds.peppol.smp1.ServiceMetadataType ret = new com.helger.xsds.peppol.smp1.ServiceMetadataType ();
@@ -151,7 +151,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     final com.helger.xsds.bdxr.smp1.RedirectType aRedirect = new com.helger.xsds.bdxr.smp1.RedirectType ();
     aRedirect.setHref (m_sTargetHref);
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
-    aRedirect.setExtension (getAsBDXRExtension ());
+    aRedirect.setExtension (getExtensions ().getAsBDXRExtensions ());
     // Certificate is not used here
 
     final com.helger.xsds.bdxr.smp1.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp1.ServiceMetadataType ();
@@ -163,7 +163,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   public com.helger.xsds.bdxr.smp2.ServiceMetadataType getAsJAXBObjectBDXR2 ()
   {
     final com.helger.xsds.bdxr.smp2.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp2.ServiceMetadataType ();
-    ret.setSMPExtensions (getAsBDXR2Extension ());
+    ret.setSMPExtensions (getExtensions ().getAsBDXR2Extensions ());
     ret.setSMPVersionID ("2.0");
     // It's okay to use the constructor directly
     ret.setID (new BDXR2DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
