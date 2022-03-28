@@ -115,8 +115,8 @@ CREATE TABLE smp_ownership (
   constraint smp_ownership_pk PRIMARY KEY (businessIdentifierScheme,businessIdentifier,username)  using index tablespace USERS
 )  tablespace USERS;
 ALTER TABLE smp_ownership ADD CONSTRAINT smp_ownership_id_fk FOREIGN KEY(businessIdentifierScheme, businessIdentifier)
-REFERENCES smp_service_group(businessIdentifierScheme, businessIdentifier) ON DELETE CASCADE ENABLE;
-CREATE INDEX smp_ownership_id_fk ON smp_ownership (businessIdentifierScheme, businessIdentifier) TABLESPACE USERS ;
+  REFERENCES smp_service_group(businessIdentifierScheme, businessIdentifier) ON DELETE CASCADE ENABLE;
+CREATE INDEX smp_ownership_id_fk ON smp_ownership (businessIdentifierScheme, businessIdentifier) TABLESPACE USERS;
   
   
 --ALTER TABLE smp_ownership ADD CONSTRAINT smp_ownership_username_fk FOREIGN KEY(username)

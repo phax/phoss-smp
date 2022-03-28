@@ -88,10 +88,10 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
         switch (eDBType)
         {
           case MYSQL:
-            aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username;");
+            aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username");
             break;
           case POSTGRESQL:
-            aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username;");
+            aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username");
             break;
           case ORACLE:
           case DB2:
@@ -115,9 +115,10 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
                                           new ConstantPreparedStatementDataProvider (sNew, sOld));
       }
 
+      // Delete the table
       try
       {
-        aExecutor.executeStatement ("DROP TABLE smp_user;");
+        aExecutor.executeStatement ("DROP TABLE smp_user");
       }
       catch (final RuntimeException ex)
       {
