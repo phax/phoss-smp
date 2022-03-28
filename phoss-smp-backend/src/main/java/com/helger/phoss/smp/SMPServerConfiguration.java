@@ -82,6 +82,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_PAYLOAD_ON_ERROR = "smp.rest.payload.on.error";
   public static final String KEY_SMP_REST_REMOTE_QUERY_API_DISABLED = "smp.rest.remote.queryapi.disabled";
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
+  public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
   public static final String KEY_SMP_TIMEZONE = "smp.timezone";
   /* legacy name - should not contain "peppol" */
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
@@ -109,6 +110,7 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_PAYLOAD_ON_ERROR = true;
   public static final boolean DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED = true;
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
+  public static final boolean DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES = false;
   public static final boolean DEFAULT_SML_REQUIRED = true;
   public static final boolean DEFAULT_SML_ENABLED = false;
   public static final int DEFAULT_SML_REQUEST_TIMEOUT_MS = 30 * (int) CGlobal.MILLISECONDS_PER_SECOND;
@@ -367,7 +369,8 @@ public final class SMPServerConfiguration
    */
   public static boolean isRestRemoteQueryAPIDisabled ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_REST_REMOTE_QUERY_API_DISABLED, DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED);
+    return getConfigFile ().getAsBoolean (KEY_SMP_REST_REMOTE_QUERY_API_DISABLED,
+                                          DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED);
   }
 
   /**
@@ -379,6 +382,18 @@ public final class SMPServerConfiguration
   public static boolean isStatusEnabled ()
   {
     return getConfigFile ().getAsBoolean (KEY_SMP_STATUS_ENABLED, DEFAULT_SMP_STATUS_ENABLED);
+  }
+
+  /**
+   * @return <code>true</code> if the certificate not before and not after dates
+   *         should be listed in the status or not. Defaults to
+   *         <code>false</code>.
+   * @since 5.7.0
+   */
+  public static boolean isStatusShowCertificateDates ()
+  {
+    return getConfigFile ().getAsBoolean (KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES,
+                                          DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES);
   }
 
   @Nonnull

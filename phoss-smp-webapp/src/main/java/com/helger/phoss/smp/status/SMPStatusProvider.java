@@ -43,6 +43,7 @@ import com.helger.json.JsonObject;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
@@ -64,7 +65,10 @@ public final class SMPStatusProvider
   {
     LIST.addAll (ServiceLoaderHelper.getAllSPIImplementations (ISMPStatusProviderExtensionSPI.class));
     if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Found " + LIST.size () + " implementation(s) of " + ISMPStatusProviderExtensionSPI.class.getSimpleName ());
+      LOGGER.info ("Found " +
+                   LIST.size () +
+                   " implementation(s) of " +
+                   ISMPStatusProviderExtensionSPI.class.getSimpleName ());
   }
 
   private SMPStatusProvider ()
@@ -86,12 +90,15 @@ public final class SMPStatusProvider
     // Since 5.0.7
     aStatusData.add ("build.timestamp", CSMPServer.getBuildTimestamp ());
     // Since 5.3.3
-    aStatusData.addIfNotNull ("startup.datetime", PDTWebDateHelper.getAsStringXSD (SMPWebAppListener.getStartupDateTime ()));
+    aStatusData.addIfNotNull ("startup.datetime",
+                              PDTWebDateHelper.getAsStringXSD (SMPWebAppListener.getStartupDateTime ()));
     aStatusData.add ("status.datetime", PDTWebDateHelper.getAsStringXSD (PDTFactory.getCurrentOffsetDateTimeUTC ()));
     aStatusData.add ("version.smp", CSMPServer.getVersionNumber ());
     aStatusData.add ("version.java", SystemProperties.getJavaVersion ());
     aStatusData.add ("global.debug", GlobalDebug.isDebugMode ());
     aStatusData.add ("global.production", GlobalDebug.isProductionMode ());
+    // Since 5.7.0
+    aStatusData.add ("smp.application", CSMP.APPLICATION_TITLE);
     aStatusData.add ("smp.backend", SMPServerConfiguration.getBackend ());
     aStatusData.add ("smp.mode", SMPWebAppConfiguration.isTestVersion () ? "test" : "production");
     aStatusData.add ("smp.resttype", SMPServerConfiguration.getRESTType ().getID ());
@@ -144,6 +151,13 @@ public final class SMPStatusProvider
           final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
           final boolean bIsExpired = aNow.isAfter (aNotAfter);
           aStatusData.add ("smp.certificate.expired", bIsExpired);
+          if (SMPServerConfiguration.isStatusShowCertificateDates ())
+          {
+            // Since v5.7.0
+            final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
+            aStatusData.add ("smp.certificate.notbefore", PDTWebDateHelper.getAsStringXSD (aNotBefore));
+            aStatusData.add ("smp.certificate.notafter", PDTWebDateHelper.getAsStringXSD (aNotAfter));
+          }
         }
       }
     }
@@ -167,7 +181,9 @@ public final class SMPStatusProvider
 
     final long nMillis = aSW.stopAndGetMillis ();
     if (nMillis > 100)
-      LOGGER.info ("Finished building status data after " + nMillis + " milliseconds which is considered to be too long");
+      LOGGER.info ("Finished building status data after " +
+                   nMillis +
+                   " milliseconds which is considered to be too long");
     else
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Finished building status data");
