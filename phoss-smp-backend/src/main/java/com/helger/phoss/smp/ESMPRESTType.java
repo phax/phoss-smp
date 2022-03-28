@@ -68,15 +68,6 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
     return m_eAPIType;
   }
 
-  /**
-   * @return <code>true</code> if this REST type supports retrieving the
-   *         complete service group
-   */
-  public boolean isCompleteServiceGroupSupported ()
-  {
-    return this == PEPPOL;
-  }
-
   public boolean isPeppol ()
   {
     return this == PEPPOL;
@@ -87,6 +78,36 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
     return this == OASIS_BDXR_V1 || this == OASIS_BDXR_V2;
   }
 
+  /**
+   * @return <code>true</code> if this REST type supports retrieving the
+   *         complete service group
+   */
+  public boolean isCompleteServiceGroupSupported ()
+  {
+    return this == PEPPOL || this == OASIS_BDXR_V1;
+  }
+
+  /**
+   * @return <code>true</code> if this REST API enforces the usage of HTTP and
+   *         does not allow HTTPS.
+   */
+  public boolean isHttpConstraint ()
+  {
+    return this == PEPPOL;
+  }
+
+  /**
+   * @return <code>true</code> if this REST API enforces the usage of port 80.
+   */
+  public boolean isPort80Constraint ()
+  {
+    return this == PEPPOL;
+  }
+
+  /**
+   * @return <code>true</code> if this REST API enforces the usage of the "/"
+   *         path.
+   */
   public boolean isPathConstraint ()
   {
     return this == PEPPOL;

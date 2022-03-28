@@ -99,18 +99,21 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
   }
 
   @Nonnull
-  private static ManageServiceMetadataServiceCaller _create (@Nonnull final ISMLInfo aSML, @Nonnull final SSLSocketFactory aSocketFactory)
+  private static ManageServiceMetadataServiceCaller _create (@Nonnull final ISMLInfo aSML,
+                                                             @Nonnull final SSLSocketFactory aSocketFactory)
   {
     final ManageServiceMetadataServiceCaller ret = new ManageServiceMetadataServiceCaller (aSML);
     ret.setSSLSocketFactory (aSocketFactory);
     return ret;
   }
 
-  private void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
+  private void _registerSMPtoSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                  @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
-    final boolean bUsePeppolConstraints = eRESTType.isPeppol ();
+    final boolean bUseHttpConstraints = eRESTType.isHttpConstraint ();
+    final boolean bUsePort80Constraints = eRESTType.isPort80Constraint ();
     final boolean bUsePathConstraints = eRESTType.isPathConstraint ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLID);
@@ -124,7 +127,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS, "A physical address must be provided!");
     else
       if (!RegExHelper.stringMatchesPattern (IPV4Addr.PATTERN_IPV4, sPhysicalAddress))
-        aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS, "The provided physical address does not seem to be an IPv4 address!");
+        aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS,
+                                   "The provided physical address does not seem to be an IPv4 address!");
       else
       {
         final String [] aParts = StringHelper.getExplodedArray ('.', sPhysicalAddress, 4);
@@ -145,7 +149,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       }
 
     if (StringHelper.hasNoText (sLogicalAddress))
-      aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS, "A logical address must be provided in the form 'http://smp.example.org'!");
+      aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
+                                 "A logical address must be provided in the form 'http://smp.example.org'!");
     else
     {
       final URL aURL = URLHelper.getAsURL (sLogicalAddress);
@@ -156,25 +161,25 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       {
         if (!"http".equals (aURL.getProtocol ()))
         {
-          if (bUsePeppolConstraints || !"https".equals (aURL.getProtocol ()))
+          if (bUseHttpConstraints || !"https".equals (aURL.getProtocol ()))
             aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
                                        "The provided logical address must use the 'http'" +
-                                                              (bUsePeppolConstraints ? "" : " or the 'https'") +
+                                                              (bUseHttpConstraints ? "" : " or the 'https'") +
                                                               " protocol and may not use the '" +
                                                               aURL.getProtocol () +
                                                               "' protocol." +
-                                                              (bUsePeppolConstraints ? " According to the Peppol SMP specification, no other protocols than 'http' are allowed!"
-                                                                                     : ""));
+                                                              (bUseHttpConstraints ? " According to the underlying SMP specification, no other protocols than 'http' are allowed!"
+                                                                                   : ""));
         }
 
-        if (bUsePeppolConstraints)
+        if (bUsePort80Constraints)
         {
           // -1 means default port
           if (aURL.getPort () != 80 && aURL.getPort () != -1)
             aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
                                        "The provided logical address must use the default http port 80 and not port " +
                                                               aURL.getPort () +
-                                                              ". According to the Peppol SMP specification, no other ports are allowed!");
+                                                              ". According to the underlying SMP specification, no other ports are allowed!");
         }
 
         if (bUsePathConstraints)
@@ -243,7 +248,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
-    final boolean bUsePeppolConstraints = eRESTType.isPeppol ();
+    final boolean bUseHttpConstraints = eRESTType.isHttpConstraint ();
+    final boolean bUsePort80Constraints = eRESTType.isPort80Constraint ();
     final boolean bUsePathConstraints = eRESTType.isPathConstraint ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLID);
@@ -257,7 +263,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS, "A physical address must be provided!");
     else
       if (!RegExHelper.stringMatchesPattern (IPV4Addr.PATTERN_IPV4, sPhysicalAddress))
-        aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS, "The provided physical address does not seem to be an IPv4 address!");
+        aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS,
+                                   "The provided physical address does not seem to be an IPv4 address!");
       else
       {
         final String [] aParts = StringHelper.getExplodedArray ('.', sPhysicalAddress, 4);
@@ -278,7 +285,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       }
 
     if (StringHelper.hasNoText (sLogicalAddress))
-      aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS, "A logical address must be provided in the form 'http://smp.example.org'!");
+      aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
+                                 "A logical address must be provided in the form 'http://smp.example.org'!");
     else
     {
       final URL aURL = URLHelper.getAsURL (sLogicalAddress);
@@ -289,24 +297,24 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       {
         if (!"http".equals (aURL.getProtocol ()))
         {
-          if (bUsePeppolConstraints || !"https".equals (aURL.getProtocol ()))
+          if (bUseHttpConstraints || !"https".equals (aURL.getProtocol ()))
             aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
                                        "The provided logical address must use the 'http'" +
-                                                              (bUsePeppolConstraints ? "" : " or the 'https'") +
+                                                              (bUseHttpConstraints ? "" : " or the 'https'") +
                                                               " protocol and may not use the '" +
                                                               aURL.getProtocol () +
                                                               "' protocol." +
-                                                              (bUsePeppolConstraints ? " According to the Peppol SMP specification, no other protocols than 'http' are allowed!"
-                                                                                     : ""));
+                                                              (bUseHttpConstraints ? " According to the underlying SMP specification, no other protocols than 'http' are allowed!"
+                                                                                   : ""));
         }
-        if (bUsePeppolConstraints)
+        if (bUsePort80Constraints)
         {
           // -1 means default port
           if (aURL.getPort () != 80 && aURL.getPort () != -1)
             aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
                                        "The provided logical address must use the default http port 80 and not port " +
                                                               aURL.getPort () +
-                                                              ". According to the Peppol SMP specification, no other ports are allowed!");
+                                                              ". According to the underlying SMP specification, no other ports are allowed!");
         }
         if (bUsePathConstraints)
         {
@@ -370,7 +378,8 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
       aNodeList.addChild (BootstrapWebPageUIHandler.INSTANCE.createIncorrectInputBox (aWPEC));
   }
 
-  private void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
+  private void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                  @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
@@ -388,16 +397,28 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
         final ManageServiceMetadataServiceCaller aCaller = _create (aSMLInfo, aSocketFactory);
         aCaller.delete (sSMPID);
 
-        final String sMsg = "Successfully deleted SMP '" + sSMPID + "' from the SML '" + aSMLInfo.getManagementServiceURL () + "'.";
+        final String sMsg = "Successfully deleted SMP '" +
+                            sSMPID +
+                            "' from the SML '" +
+                            aSMLInfo.getManagementServiceURL () +
+                            "'.";
         LOGGER.info (sMsg);
         aNodeList.addChild (success (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, aSMLInfo.getManagementServiceURL ());
       }
       catch (final Exception ex)
       {
-        final String sMsg = "Error deleting SMP '" + sSMPID + "' from the SML '" + aSMLInfo.getManagementServiceURL () + "'.";
+        final String sMsg = "Error deleting SMP '" +
+                            sSMPID +
+                            "' from the SML '" +
+                            aSMLInfo.getManagementServiceURL () +
+                            "'.";
         aNodeList.addChild (error (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
-        AuditHelper.onAuditExecuteFailure ("smp-sml-delete", sSMPID, aSMLInfo.getManagementServiceURL (), ex.getClass (), ex.getMessage ());
+        AuditHelper.onAuditExecuteFailure ("smp-sml-delete",
+                                           sSMPID,
+                                           aSMLInfo.getManagementServiceURL (),
+                                           ex.getClass (),
+                                           ex.getMessage ());
       }
     }
     else
@@ -482,7 +503,9 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                                                                 aDisplayLocale,
                                                                                 aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID").setCtrl (em (sSMPID)).setHelpText (HELPTEXT_SMP_ID));
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
+                                                     .setCtrl (em (sSMPID))
+                                                     .setHelpText (HELPTEXT_SMP_ID));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Physical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_PHYSICAL_ADDRESS,
                                                                                              sPhysicalAddress)).setPlaceholder ("The IPv4 address of your SMP. E.g. 1.2.3.4"))
@@ -515,7 +538,9 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                                                                 aDisplayLocale,
                                                                                 aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID").setCtrl (em (sSMPID)).setHelpText (HELPTEXT_SMP_ID));
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
+                                                     .setCtrl (em (sSMPID))
+                                                     .setHelpText (HELPTEXT_SMP_ID));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Physical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_PHYSICAL_ADDRESS,
                                                                                              sPhysicalAddress)).setPlaceholder ("The IPv4 address of your SMP. E.g. 1.2.3.4"))
@@ -548,7 +573,9 @@ public class PageSecureSMLRegistration extends AbstractSMPWebPage
                                                                                 aDisplayLocale,
                                                                                 aSMLFilter))
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID").setCtrl (em (sSMPID)).setHelpText (HELPTEXT_SMP_ID));
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
+                                                     .setCtrl (em (sSMPID))
+                                                     .setHelpText (HELPTEXT_SMP_ID));
 
         final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
         aToolbar.addHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM);

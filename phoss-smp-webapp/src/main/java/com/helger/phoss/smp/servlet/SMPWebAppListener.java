@@ -186,7 +186,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     UnifiedResponseDefaultSettings.setReferrerPolicy (null);
     UnifiedResponseDefaultSettings.setXFrameOptions (null, null);
 
-    if (SMPServerConfiguration.getRESTType ().isPeppol ())
+    if (SMPServerConfiguration.getRESTType ().isHttpConstraint ())
     {
       // Peppol SMP is always http only
       UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
@@ -210,8 +210,12 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     if (LOGGER.isInfoEnabled ())
       LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
 
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("This SMP uses REST API type '" + SMPServerConfiguration.getRESTType () + "'");
+
+    // Check other consistency stuff
     if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.hasNoText (SMPWebAppConfiguration.getImprintText ()))
-      LOGGER.warn ("The custom Imprint is enabled in the configuration file, but no imprint text is configured. Therefore no imprint will be shown.");
+      LOGGER.warn ("The custom Imprint is enabled in the configuration, but no imprint text is configured. Therefore no imprint will be shown.");
   }
 
   @Override
@@ -302,7 +306,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
             if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
             {
               // Notify PD server: add
-              PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
+              PDClientProvider.getInstance ()
+                              .getPDClient ()
+                              .addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
             }
           }
 
@@ -312,44 +318,50 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
             if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
             {
               // Notify PD server: delete
-              PDClientProvider.getInstance ().getPDClient ().deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
+              PDClientProvider.getInstance ()
+                              .getPDClient ()
+                              .deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
             }
           }
         });
 
         // If a service information is create, updated or deleted, also update
         // Business Card at PD
-        SMPMetaManager.getServiceInformationMgr ().serviceInformationCallbacks ().add (new ISMPServiceInformationCallback ()
-        {
-          @Override
-          public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
-          {
-            final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-            if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
-            {
-              // Only if a business card is present
-              if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
-              {
-                // Notify PD server: update
-                PDClientProvider.getInstance ()
-                                .getPDClient ()
-                                .addServiceGroupToIndex (aServiceInformation.getServiceGroup ().getParticipantIdentifier ());
-              }
-            }
-          }
+        SMPMetaManager.getServiceInformationMgr ()
+                      .serviceInformationCallbacks ()
+                      .add (new ISMPServiceInformationCallback ()
+                      {
+                        @Override
+                        public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
+                        {
+                          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+                          if (aSettings.isDirectoryIntegrationEnabled () &&
+                              aSettings.isDirectoryIntegrationAutoUpdate ())
+                          {
+                            // Only if a business card is present
+                            if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
+                            {
+                              // Notify PD server: update
+                              PDClientProvider.getInstance ()
+                                              .getPDClient ()
+                                              .addServiceGroupToIndex (aServiceInformation.getServiceGroup ()
+                                                                                          .getParticipantIdentifier ());
+                            }
+                          }
+                        }
 
-          @Override
-          public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
-          {
-            onSMPServiceInformationCreated (aServiceInformation);
-          }
+                        @Override
+                        public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
+                        {
+                          onSMPServiceInformationCreated (aServiceInformation);
+                        }
 
-          @Override
-          public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
-          {
-            onSMPServiceInformationCreated (aServiceInformation);
-          }
-        });
+                        @Override
+                        public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
+                        {
+                          onSMPServiceInformationCreated (aServiceInformation);
+                        }
+                      });
       }
     }
 
@@ -364,7 +376,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
         // requested
         ProxySettingsManager.registerProvider ( (sProtocol,
                                                  sHost,
-                                                 nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp) : null);
+                                                 nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
+                                                                                     : null);
       }
       final IProxySettings aProxyHttps = SMPServerConfiguration.getAsHttpsProxySettings ();
       if (aProxyHttps != null)
@@ -374,7 +387,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
         // requested
         ProxySettingsManager.registerProvider ( (sProtocol,
                                                  sHost,
-                                                 nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps) : null);
+                                                 nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps)
+                                                                                      : null);
       }
     }
 
