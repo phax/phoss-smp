@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import com.helger.commons.collection.impl.ICommonsSortedMap;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
 import com.helger.httpclient.HttpClientManager;
 import com.helger.httpclient.response.ResponseHandlerByteArray;
@@ -56,6 +58,7 @@ import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.smpclient.bdxr1.BDXRClientReadOnly;
+import com.helger.smpclient.bdxr2.BDXR2ClientReadOnly;
 import com.helger.smpclient.json.SMPJsonResponse;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -63,6 +66,24 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQuery
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetDocTypes.class);
+
+  @Nonnull
+  @Nonempty
+  static String getURIEncodedBDXR2 (@Nullable final String sScheme, @Nullable final String sValue)
+  {
+    // Empty scheme may be allowed, depending on the implementation
+    final String sRealScheme = StringHelper.getNotNull (sScheme);
+
+    // Empty value may be allowed, depending on the implementation
+    final String sRealValue = StringHelper.getNotNull (sValue);
+
+    // Combine scheme and value
+    if (StringHelper.hasText (sRealScheme))
+      return sRealScheme + CIdentifier.URL_SCHEME_VALUE_SEPARATOR + sRealValue;
+
+    // No double colon
+    return sRealValue;
+  }
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -156,6 +177,29 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
         }
         break;
       }
+      case OASIS_BDXR_V2:
+      {
+        aSGHrefs = new CommonsTreeMap <> ();
+        final BDXR2ClientReadOnly aBDXR2Client = new BDXR2ClientReadOnly (aQueryParams.getSMPHostURI ());
+        aBDXR2Client.setXMLSchemaValidation (bXMLSchemaValidation);
+
+        // Get all HRefs and sort them by decoded URL
+        final com.helger.xsds.bdxr.smp2.ServiceGroupType aSG = aBDXR2Client.getServiceGroupOrNull (aParticipantID);
+        // Map from cleaned URL to original URL
+        if (aSG != null && aSG.hasServiceReferenceEntries ())
+        {
+          aSGHrefs = new CommonsTreeMap <> ();
+          for (final com.helger.xsds.bdxr.smp2.ac.ServiceReferenceType aSR : aSG.getServiceReference ())
+          {
+            // Decoded href is important for unification
+            final String sSrcID = getURIEncodedBDXR2 (aSR.getID ().getSchemeID (), aSR.getID ().getValue ());
+            final String sHref = CIdentifier.createPercentDecoded (sSrcID);
+            if (aSGHrefs.put (sHref, sSrcID) != null)
+              LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
+          }
+        }
+        break;
+      }
     }
 
     IJsonObject aJson = null;
@@ -164,7 +208,9 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
 
     if (bQueryBusinessCard)
     {
-      final String sBCURL = aQueryParams.getSMPHostURI ().toString () + "/businesscard/" + aParticipantID.getURIEncoded ();
+      final String sBCURL = aQueryParams.getSMPHostURI ().toString () +
+                            "/businesscard/" +
+                            aParticipantID.getURIEncoded ();
       LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
       byte [] aData;
       try (HttpClientManager aHttpClientMgr = new HttpClientManager ())
