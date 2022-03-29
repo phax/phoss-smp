@@ -25,6 +25,7 @@ import com.helger.commons.type.ObjectType;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.bdxr.smp2.doctype.BDXR2DocumentTypeIdentifier;
 import com.helger.peppolid.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.security.certificate.CertificateHelper;
@@ -179,7 +180,8 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
         final com.helger.xsds.bdxr.smp2.ac.CertificateType aCert = new com.helger.xsds.bdxr.smp2.ac.CertificateType ();
         aCert.setActivationDate (PDTFactory.createXMLOffsetDate (m_aCertificate.getNotBefore ()));
         aCert.setExpirationDate (PDTFactory.createXMLOffsetDate (m_aCertificate.getNotAfter ()));
-        aCert.setContentBinaryObject (CertificateHelper.getEncodedCertificate (m_aCertificate));
+        aCert.setContentBinaryObject (CertificateHelper.getEncodedCertificate (m_aCertificate))
+             .setMimeCode (CSMPServer.MIME_TYPE_X509_USER_CERT.getAsString ());
         aRedirect.addCertificate (aCert);
       }
       aProc.setRedirect (aRedirect);
