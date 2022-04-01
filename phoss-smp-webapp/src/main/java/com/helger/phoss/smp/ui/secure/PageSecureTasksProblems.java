@@ -47,6 +47,7 @@ import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
+import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -295,6 +296,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
   {
     final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
+    final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
 
     if (aSMPSettings.isSMLEnabled ())
     {
@@ -306,30 +308,35 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       }
       else
       {
-        // Check if this SMP is already registered
-        final String sPublisherDNSName = sSMPID + "." + aSMLInfo.getPublisherDNSZone ();
-        try
+        if (eRESTType.isPeppol ())
         {
-          InetAddress.getByName (sPublisherDNSName);
-          // On success, ignore
-        }
-        catch (final UnknownHostException ex)
-        {
-          // continue
-          aOL.addItem (_createWarning ("It seems like this SMP was not yet registered to the SML."),
-                       div ("This is a one-time action that should be performed once. It requires a valid SMP certificate to work."),
-                       div ("The registration check was performed with the URL ").addChild (new HCA ().setHref (new SimpleURL ("http://" +
-                                                                                                                               sPublisherDNSName))
-                                                                                                      .setTargetBlank ()
-                                                                                                      .addChild (code (sPublisherDNSName))));
+          // Check if this SMP is already registered
+          final String sPublisherDNSName = sSMPID + "." + aSMLInfo.getPublisherDNSZone ();
+          try
+          {
+            InetAddress.getByName (sPublisherDNSName);
+            // On success, ignore
+          }
+          catch (final UnknownHostException ex)
+          {
+            // continue
+            aOL.addItem (_createWarning ("It seems like this SMP was not yet registered to the SML."),
+                         div ("This is a one-time action that should be performed once. It requires a valid SMP certificate to work."),
+                         div ("The registration check was performed with the URL ").addChild (new HCA ().setHref (new SimpleURL ("http://" +
+                                                                                                                                 sPublisherDNSName))
+                                                                                                        .setTargetBlank ()
+                                                                                                        .addChild (code (sPublisherDNSName))));
+          }
         }
       }
     }
     else
     {
       if (aSMPSettings.isSMLRequired ())
+      {
         aOL.addItem (_createError ("The connection to the SML is not enabled."),
                      div ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+      }
     }
   }
 
