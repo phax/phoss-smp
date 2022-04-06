@@ -67,6 +67,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetDocTypes.class);
 
+  // TODO replace with CIdentifier version in peppol-commons >= 8.7.5
   @Nonnull
   @Nonempty
   static String getURIEncodedBDXR2 (@Nullable final String sScheme, @Nullable final String sValue)
