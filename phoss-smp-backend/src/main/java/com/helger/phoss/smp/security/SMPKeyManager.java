@@ -44,16 +44,19 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.SignatureMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import org.apache.xml.security.c14n.Canonicalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
+import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.security.keystore.EKeyStoreLoadError;
@@ -69,9 +72,11 @@ import com.helger.security.keystore.LoadedKeyStore;
  */
 public final class SMPKeyManager extends AbstractGlobalSingleton
 {
+  /** The date from which on Peppol requires the new C18N algorithm */
+  public static final LocalDate PEPPOL_USING_C18N_INCLUSIVE = PDTFactory.createLocalDate (2022, Month.MAY, 1);
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPKeyManager.class);
 
-  private static final LocalDate PEPPOL_USING_C18N_INCLUSIVE = PDTFactory.createLocalDate (2022, Month.MAY, 1);
   private static final AtomicBoolean KEY_STORE_VALID = new AtomicBoolean (false);
   private static EKeyStoreLoadError s_eInitError;
   private static String s_sInitError;
@@ -221,10 +226,9 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    *
    * @param aElementToSign
    *        The XML element to sign. May not be <code>null</code>.
-   * @param bBDXR
-   *        <code>true</code> to use OASIS BDXR mode, <code>false</code> to use
-   *        Peppol mode. This differences are the hash algorithm as well as the
-   *        canonicalization algorithms.
+   * @param eRESTType
+   *        The REST type current configureed. This differences are the hash
+   *        algorithm as well as the canonicalization algorithms.
    * @throws NoSuchAlgorithmException
    *         An algorithm is not supported by the underlying platform.
    * @throws InvalidAlgorithmParameterException
@@ -232,13 +236,17 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * @throws MarshalException
    *         Marshalling the signature failed
    * @throws XMLSignatureException
-   *         Some XMLDSig speciifc stuff failed
+   *         Some XMLDSig specific stuff failed
    */
-  public void signXML (@Nonnull final Element aElementToSign, final boolean bBDXR) throws NoSuchAlgorithmException,
-                                                                                   InvalidAlgorithmParameterException,
-                                                                                   MarshalException,
-                                                                                   XMLSignatureException
+  public void signXML (@Nonnull final Element aElementToSign,
+                       @Nonnull final ESMPRESTType eRESTType) throws NoSuchAlgorithmException,
+                                                              InvalidAlgorithmParameterException,
+                                                              MarshalException,
+                                                              XMLSignatureException
   {
+    ValueEnforcer.notNull (aElementToSign, "ElementToSign");
+    ValueEnforcer.notNull (eRESTType, "RESTType");
+
     // Create a DOM XMLSignatureFactory that will be used to
     // generate the enveloped signature.
     final XMLSignatureFactory aSignatureFactory = XMLSignatureFactory.getInstance ("DOM");
@@ -247,10 +255,9 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // you are signing the whole document, so a URI of "" signifies
     // that, and also specify the SHA1 digest algorithm and
     // the ENVELOPED Transform)
+    final String sDigestAlgo = eRESTType.isBDXR () ? DigestMethod.SHA256 : DigestMethod.SHA1;
     final Reference aReference = aSignatureFactory.newReference ("",
-                                                                 aSignatureFactory.newDigestMethod (bBDXR ? DigestMethod.SHA256
-                                                                                                          : DigestMethod.SHA1,
-                                                                                                    null),
+                                                                 aSignatureFactory.newDigestMethod (sDigestAlgo, null),
                                                                  new CommonsArrayList <> (aSignatureFactory.newTransform (Transform.ENVELOPED,
                                                                                                                           (TransformParameterSpec) null)),
                                                                  (String) null,
@@ -263,19 +270,37 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // * CIPA and this server always used INCLUSIVE, but this was changed for
     // 5.0.1 to EXCLUSIVE
     // TODO after 01/05/2022 remove code
-    final boolean bUseInclusive = bBDXR || PDTFactory.getCurrentLocalDate ().compareTo (PEPPOL_USING_C18N_INCLUSIVE) >= 0;
-    final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (bUseInclusive ? CanonicalizationMethod.INCLUSIVE
-                                                                                                                               : CanonicalizationMethod.EXCLUSIVE,
+    final String sC18N;
+    final String sSignatureMethod;
+    switch (eRESTType)
+    {
+      case PEPPOL:
+        sC18N = CanonicalizationMethod.INCLUSIVE;
+        sSignatureMethod = SignatureMethod.RSA_SHA1;
+        break;
+      case OASIS_BDXR_V1:
+        sC18N = CanonicalizationMethod.INCLUSIVE;
+        sSignatureMethod = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+        break;
+      case OASIS_BDXR_V2:
+        sC18N = Canonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS;
+        sSignatureMethod = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+        break;
+      default:
+        throw new IllegalStateException ("Unsupported REST type");
+    }
+    final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (sC18N,
                                                                                                                  (C14NMethodParameterSpec) null),
-                                                                    aSignatureFactory.newSignatureMethod (bBDXR ? "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
-                                                                                                                : SignatureMethod.RSA_SHA1,
+                                                                    aSignatureFactory.newSignatureMethod (sSignatureMethod,
                                                                                                           (SignatureMethodParameterSpec) null),
                                                                     new CommonsArrayList <> (aReference));
 
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
     final X509Certificate aCert = (X509Certificate) m_aKeyEntry.getCertificate ();
-    final X509Data aX509Data = aKeyInfoFactory.newX509Data (new CommonsArrayList <> (aCert.getSubjectX500Principal ().getName (), aCert));
+    final X509Data aX509Data = aKeyInfoFactory.newX509Data (new CommonsArrayList <> (aCert.getSubjectX500Principal ()
+                                                                                          .getName (),
+                                                                                     aCert));
     final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList <> (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and

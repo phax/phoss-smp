@@ -109,8 +109,7 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     // Sign the document
     try
     {
-      SMPKeyManager.getInstance ()
-                   .signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ().isBDXR ());
+      SMPKeyManager.getInstance ().signXML (aDoc.getDocumentElement (), SMPServerConfiguration.getRESTType ());
       LOGGER.info ("Successfully signed response XML");
     }
     catch (final Exception ex)
