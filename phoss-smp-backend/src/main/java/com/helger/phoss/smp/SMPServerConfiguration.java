@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.CGlobal;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
+import com.helger.commons.mime.EMimeContentType;
 import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.network.proxy.settings.IProxySettings;
@@ -76,14 +77,20 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_PUBLIC_URL = "smp.publicurl";
   public static final String KEY_SMP_PUBLIC_URL_MODE = "smp.publicurl.mode";
   public static final String KEY_SMP_IDENTIFIER_TYPE = "smp.identifiertype";
+
   public static final String KEY_SMP_REST_TYPE = "smp.rest.type";
   public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
   public static final String KEY_SMP_REST_LOG_EXCEPTIONS = "smp.rest.log.exceptions";
   public static final String KEY_SMP_REST_PAYLOAD_ON_ERROR = "smp.rest.payload.on.error";
   public static final String KEY_SMP_REST_REMOTE_QUERY_API_DISABLED = "smp.rest.remote.queryapi.disabled";
+
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
+
+  public static final String KEY_SMP_BDXR2_CERTIFICATE_MIME_CODE = "smp.bdxr2.certificate.mimecode";
+
   public static final String KEY_SMP_TIMEZONE = "smp.timezone";
+
   /* legacy name - should not contain "peppol" */
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
   /* legacy name - should not contain "peppol" */
@@ -92,6 +99,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.peppol.directory.integration.autoupdate";
   /* legacy name - should not contain "peppol" */
   public static final String KEY_SMP_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
+
   /* legacy name - should be called "enabled" instead of "active" */
   public static final String KEY_SML_ENABLED = "sml.active";
   /* legacy name - should be called "required" instead of "needed" */
@@ -109,15 +117,21 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_LOG_EXCEPTIONS = false;
   public static final boolean DEFAULT_SMP_REST_PAYLOAD_ON_ERROR = true;
   public static final boolean DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED = true;
+
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
   public static final boolean DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES = false;
-  public static final boolean DEFAULT_SML_REQUIRED = true;
-  public static final boolean DEFAULT_SML_ENABLED = false;
-  public static final int DEFAULT_SML_REQUEST_TIMEOUT_MS = 30 * (int) CGlobal.MILLISECONDS_PER_SECOND;
+
+  public static final String DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE = EMimeContentType.APPLICATION.buildMimeType ("base64")
+                                                                                                   .getAsString ();
+
   public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED = true;
   public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED = true;
   public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = true;
   public static final String DEFAULT_SMP_DIRECTORY_HOSTNAME = "https://directory.peppol.eu";
+
+  public static final boolean DEFAULT_SML_REQUIRED = true;
+  public static final boolean DEFAULT_SML_ENABLED = false;
+  public static final int DEFAULT_SML_REQUEST_TIMEOUT_MS = 30 * (int) CGlobal.MILLISECONDS_PER_SECOND;
 
   /**
    * The name of the primary system property which points to the
@@ -396,11 +410,23 @@ public final class SMPServerConfiguration
                                           DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES);
   }
 
+  /**
+   * @return The MIME code to be used for BDXR2 certificates. Defaults to
+   *         {@link #DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE}.
+   * @since 5.7.0
+   */
+  @Nonnull
+  @Nonempty
+  public static String getBDXR2CertificateMimeCode ()
+  {
+    return getConfigFile ().getAsString (KEY_SMP_BDXR2_CERTIFICATE_MIME_CODE, DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE);
+  }
+
   @Nonnull
   @Nonempty
   public static String getTimeZoneOrDefault ()
   {
-    return s_aConfigFile.getAsString (KEY_SMP_TIMEZONE, CSMPServer.DEFAULT_TIMEZONE);
+    return getConfigFile ().getAsString (KEY_SMP_TIMEZONE, CSMPServer.DEFAULT_TIMEZONE);
   }
 
   /**
@@ -475,7 +501,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getHttpProxyHost ()
   {
-    return s_aConfigFile.getAsString ("http.proxyHost");
+    return getConfigFile ().getAsString ("http.proxyHost");
   }
 
   /**
@@ -485,7 +511,7 @@ public final class SMPServerConfiguration
    */
   public static int getHttpProxyPort ()
   {
-    return s_aConfigFile.getAsInt ("http.proxyPort", 0);
+    return getConfigFile ().getAsInt ("http.proxyPort", 0);
   }
 
   /**
@@ -497,7 +523,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getHttpsProxyHost ()
   {
-    return s_aConfigFile.getAsString ("https.proxyHost");
+    return getConfigFile ().getAsString ("https.proxyHost");
   }
 
   /**
@@ -507,7 +533,7 @@ public final class SMPServerConfiguration
    */
   public static int getHttpsProxyPort ()
   {
-    return s_aConfigFile.getAsInt ("https.proxyPort", 0);
+    return getConfigFile ().getAsInt ("https.proxyPort", 0);
   }
 
   /**
@@ -518,7 +544,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getProxyUsername ()
   {
-    return s_aConfigFile.getAsString ("proxy.username");
+    return getConfigFile ().getAsString ("proxy.username");
   }
 
   /**
@@ -529,7 +555,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getProxyPassword ()
   {
-    return s_aConfigFile.getAsString ("proxy.password");
+    return getConfigFile ().getAsString ("proxy.password");
   }
 
   /**

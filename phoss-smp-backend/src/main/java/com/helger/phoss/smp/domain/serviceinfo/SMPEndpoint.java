@@ -24,7 +24,7 @@ import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
@@ -250,7 +250,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
       aCert.setActivationDate (PDTFactory.createXMLOffsetDate (aX509Cert.getNotBefore ()));
       aCert.setExpirationDate (PDTFactory.createXMLOffsetDate (aX509Cert.getNotAfter ()));
       aCert.setContentBinaryObject (CertificateHelper.getEncodedCertificate (aX509Cert))
-           .setMimeCode (CSMPServer.MIME_TYPE_X509_USER_CERT.getAsString ());
+           .setMimeCode (SMPServerConfiguration.getBDXR2CertificateMimeCode ());
       ret.addCertificate (aCert);
     }
     return ret;

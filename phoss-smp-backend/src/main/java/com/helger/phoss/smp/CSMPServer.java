@@ -18,8 +18,6 @@ import javax.annotation.concurrent.Immutable;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.locale.LocaleCache;
-import com.helger.commons.mime.EMimeContentType;
-import com.helger.commons.mime.IMimeType;
 import com.helger.settings.ISettings;
 import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
 
@@ -46,8 +44,6 @@ public final class CSMPServer
   public static final String LOG_SUFFIX_NO_SML_INTERACTION = " (no SML interaction)";
 
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
-
-  public static final IMimeType MIME_TYPE_X509_USER_CERT = EMimeContentType.APPLICATION.buildMimeType ("x-x509-user-cert");
 
   private static final String VERSION_NUMBER;
   private static final String TIMESTAMP;
