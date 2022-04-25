@@ -33,7 +33,6 @@ import com.helger.db.jdbc.ConnectionFromDataSource;
 import com.helger.db.jdbc.IHasConnection;
 import com.helger.db.jdbc.executor.DBNoConnectionException;
 import com.helger.phoss.smp.SMPServerConfiguration;
-import com.helger.phoss.smp.backend.sql.SMPDataSourceProvider;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
@@ -51,8 +50,7 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
 
   private static boolean _isDBConnectionPossible ()
   {
-    final SMPDataSourceProvider aDSP = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ();
-    final BasicDataSource aDS = aDSP.getDataSource ();
+    final BasicDataSource aDS = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ().getDataSource ();
     try
     {
       aDS.setLoginTimeout (1);
@@ -63,7 +61,7 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
     }
 
     // Note: maxReconnects setting for MySQL makes no difference
-    final IHasConnection aCP = ConnectionFromDataSource.create (aDSP);
+    final IHasConnection aCP = new ConnectionFromDataSource (aDS);
     Connection aConnection = null;
     try
     {

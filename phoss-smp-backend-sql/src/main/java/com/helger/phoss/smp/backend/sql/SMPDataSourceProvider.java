@@ -30,12 +30,18 @@ import com.helger.db.jdbc.IHasDataSource;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.settings.exchange.configfile.ConfigFile;
 
+/**
+ * The main data source provider, only instantiated from
+ * {@link SMPDataSourceSingleton}.
+ *
+ * @author Philip Helger
+ */
 public final class SMPDataSourceProvider implements IHasDataSource, Closeable
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPDataSourceProvider.class);
   private final BasicDataSource m_aDataSource;
 
-  public SMPDataSourceProvider ()
+  SMPDataSourceProvider ()
   {
     final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
 
@@ -78,7 +84,7 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
         m_aDataSource.close ();
 
         if (LOGGER.isInfoEnabled ())
-          LOGGER.info ("Closed DataSource");
+          LOGGER.info ("Successfully closed DataSource");
       }
     }
     catch (final SQLException ex)
