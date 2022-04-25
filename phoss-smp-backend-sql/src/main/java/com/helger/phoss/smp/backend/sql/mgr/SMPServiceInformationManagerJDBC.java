@@ -390,11 +390,11 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                           "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                           "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                           "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
-                                                                          " FROM smp_service_metadata AS sm" +
-                                                                          " INNER JOIN smp_process AS sp" +
+                                                                          " FROM smp_service_metadata sm" +
+                                                                          " INNER JOIN smp_process sp" +
                                                                           "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
                                                                           "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
-                                                                          " INNER JOIN smp_endpoint AS se" +
+                                                                          " INNER JOIN smp_endpoint se" +
                                                                           "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
                                                                           "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
                                                                           "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier");
@@ -485,11 +485,11 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                             "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                             "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                             "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
-                                                                            " FROM smp_service_metadata AS sm" +
-                                                                            " INNER JOIN smp_process AS sp" +
+                                                                            " FROM smp_service_metadata sm" +
+                                                                            " INNER JOIN smp_process sp" +
                                                                             "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
                                                                             "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
-                                                                            " INNER JOIN smp_endpoint AS se" +
+                                                                            " INNER JOIN smp_endpoint se" +
                                                                             "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
                                                                             "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
                                                                             "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier" +
@@ -558,7 +558,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     {
       final IParticipantIdentifier aPID = aServiceGroup.getParticipantIdentifier ();
       final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier" +
-                                                                            " FROM smp_service_metadata AS sm" +
+                                                                            " FROM smp_service_metadata sm" +
                                                                             " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
                                                                             new ConstantPreparedStatementDataProvider (aPID.getScheme (),
                                                                                                                        aPID.getValue ()));
@@ -584,11 +584,11 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                           "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                           "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                           "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
-                                                                          " FROM smp_service_metadata AS sm" +
-                                                                          " INNER JOIN smp_process AS sp" +
+                                                                          " FROM smp_service_metadata sm" +
+                                                                          " INNER JOIN smp_process sp" +
                                                                           "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
                                                                           "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
-                                                                          " INNER JOIN smp_endpoint AS se" +
+                                                                          " INNER JOIN smp_endpoint se" +
                                                                           "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
                                                                           "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
                                                                           "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier" +
