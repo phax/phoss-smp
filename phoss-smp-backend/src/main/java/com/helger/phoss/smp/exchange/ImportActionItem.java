@@ -134,11 +134,13 @@ public final class ImportActionItem implements IHasErrorLevel
                             .addIfNotNull ("participantID", m_sPI)
                             .add ("message", m_sMsg)
                             .addIfNotNull ("exception",
-                                           m_aLinkedException != null ? StackTraceHelper.getStackAsString (m_aLinkedException) : null);
+                                           m_aLinkedException != null ? StackTraceHelper.getStackAsString (m_aLinkedException)
+                                                                      : null);
   }
 
   @Nonnull
-  public static ImportActionItem createSuccess (@Nonnull @Nonempty final String sPI, @Nonnull @Nonempty final String sMsg)
+  public static ImportActionItem createSuccess (@Nonnull @Nonempty final String sPI,
+                                                @Nonnull @Nonempty final String sMsg)
   {
     return new ImportActionItem (EErrorLevel.SUCCESS, sPI, sMsg, null);
   }

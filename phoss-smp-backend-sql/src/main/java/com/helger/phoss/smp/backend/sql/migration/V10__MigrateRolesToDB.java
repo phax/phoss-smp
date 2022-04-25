@@ -51,7 +51,8 @@ public final class V10__MigrateRolesToDB extends BaseJavaMigration
     {
       LOGGER.info ("Migrating all roles to the DB");
 
-      final String sFilename = PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY + PhotonSecurityManager.FactoryXML.FILENAME_ROLES_XML;
+      final String sFilename = PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
+                               PhotonSecurityManager.FactoryXML.FILENAME_ROLES_XML;
       final File aFile = WebFileIO.getDataIO ().getFile (sFilename);
       if (aFile.exists ())
       {

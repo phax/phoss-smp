@@ -65,7 +65,9 @@ public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTy
     final String sDirection = aElement.getAttributeValue (ATTR_DIRECTION);
     final EParticipantMigrationDirection eDirection = EParticipantMigrationDirection.getFromIDOrNull (sDirection);
     if (eDirection == null)
-      throw new IllegalStateException ("Failed to resolve Participant Migration Direction with ID '" + sDirection + "'");
+      throw new IllegalStateException ("Failed to resolve Participant Migration Direction with ID '" +
+                                       sDirection +
+                                       "'");
 
     String sState = aElement.getAttributeValue (ATTR_STATE);
     if (sState == null)
@@ -80,7 +82,8 @@ public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTy
     final SimpleParticipantIdentifier aParticipantID = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PARTICIPANT_IDENTIFIER),
                                                                                            SimpleParticipantIdentifier.class);
 
-    final LocalDateTime aInitiationDT = aElement.getAttributeValueWithConversion (ATTR_INITIATION_DATETIME, LocalDateTime.class);
+    final LocalDateTime aInitiationDT = aElement.getAttributeValueWithConversion (ATTR_INITIATION_DATETIME,
+                                                                                  LocalDateTime.class);
 
     final String sMigrationKey = aElement.getAttributeValue (ATTR_MIGRATION_KEY);
 

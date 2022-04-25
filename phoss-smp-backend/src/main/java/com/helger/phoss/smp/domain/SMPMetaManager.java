@@ -133,7 +133,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       {
         // #198; this causes a problem when finalizing an outbound migration -
         // because it deletes the migration and prevents it from being shown
-        m_aServiceGroupMgr.serviceGroupCallbacks ().add (new ParticipantMigrationSMPServiceGroupCallback (m_aParticipantMigrationMgr));
+        m_aServiceGroupMgr.serviceGroupCallbacks ()
+                          .add (new ParticipantMigrationSMPServiceGroupCallback (m_aParticipantMigrationMgr));
       }
       m_aBusinessCardMgr.bcCallbacks ().add (new LoggingSMPBusinessCardCallback ());
     }
@@ -154,7 +155,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
               final String sTransportProfile = aEP.getTransportProfile ();
               if (!m_aTransportProfileMgr.containsSMPTransportProfileWithID (sTransportProfile))
               {
-                m_aTransportProfileMgr.createSMPTransportProfile (sTransportProfile, sTransportProfile + " (automatically created)", false);
+                m_aTransportProfileMgr.createSMPTransportProfile (sTransportProfile,
+                                                                  sTransportProfile + " (automatically created)",
+                                                                  false);
                 LOGGER.info ("Created missing transport profile '" + sTransportProfile + "'");
               }
             }
@@ -200,7 +203,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         throw new IllegalStateException ("Failed to get default backend connection state!");
 
       // TODO This might become configurable in the future
-      m_aSMPURLProvider = SMPServerConfiguration.getRESTType ().isPeppol () ? PeppolURLProvider.INSTANCE : BDXLURLProvider.INSTANCE;
+      m_aSMPURLProvider = SMPServerConfiguration.getRESTType ().isPeppol () ? PeppolURLProvider.INSTANCE
+                                                                            : BDXLURLProvider.INSTANCE;
       if (m_aSMPURLProvider == null)
         throw new IllegalStateException ("Failed to create SMP URL Provider!");
 
@@ -225,7 +229,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_aRedirectMgr == null)
         throw new IllegalStateException ("Failed to create Redirect manager!");
 
-      m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
+      m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr (m_aIdentifierFactory,
+                                                                                 m_aServiceGroupMgr);
       if (m_aServiceInformationMgr == null)
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 
@@ -338,7 +343,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     return m_aRWLock.readLockedGet ( () -> m_eBackendConnectionState);
   }
 
-  public void setBackendConnectionState (@Nonnull final ETriState eConnectionEstablished, final boolean bTriggerCallback)
+  public void setBackendConnectionState (@Nonnull final ETriState eConnectionEstablished,
+                                         final boolean bTriggerCallback)
   {
     ValueEnforcer.notNull (eConnectionEstablished, "ConnectionEstablished");
 

@@ -104,7 +104,8 @@ public class SMPBusinessCard implements ISMPBusinessCard
   public PD3BusinessCardType getAsJAXBObject ()
   {
     final PD3BusinessCardType ret = new PD3BusinessCardType ();
-    ret.setParticipantIdentifier (PD3APIHelper.createIdentifier (m_aParticipantID.getScheme (), m_aParticipantID.getValue ()));
+    ret.setParticipantIdentifier (PD3APIHelper.createIdentifier (m_aParticipantID.getScheme (),
+                                                                 m_aParticipantID.getValue ()));
     for (final SMPBusinessCardEntity aItem : m_aEntities)
       ret.addBusinessEntity (aItem.getAsJAXBObject ());
     return ret;
@@ -130,6 +131,8 @@ public class SMPBusinessCard implements ISMPBusinessCard
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("ParticipantID", m_aParticipantID).append ("Entities", m_aEntities).getToString ();
+    return new ToStringGenerator (this).append ("ParticipantID", m_aParticipantID)
+                                       .append ("Entities", m_aEntities)
+                                       .getToString ();
   }
 }

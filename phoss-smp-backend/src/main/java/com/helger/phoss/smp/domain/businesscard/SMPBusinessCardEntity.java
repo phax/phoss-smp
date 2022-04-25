@@ -274,20 +274,21 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   public String toString ()
   {
     return new ToStringGenerator (this).append ("ID", m_sID)
-                                       .append ("names", m_aNames)
-                                       .append ("countryCode", m_sCountryCode)
-                                       .append ("geographicalInformation", m_sGeographicalInformation)
-                                       .append ("identifier", m_aIdentifiers)
-                                       .append ("websiteURI", m_aWebsiteURIs)
-                                       .append ("contact", m_aContacts)
-                                       .append ("additionalInformation", m_sAdditionalInformation)
-                                       .append ("registrationDate", m_aRegistrationDate)
+                                       .append ("Names", m_aNames)
+                                       .append ("CountryCode", m_sCountryCode)
+                                       .append ("GeographicalInformation", m_sGeographicalInformation)
+                                       .append ("Identifier", m_aIdentifiers)
+                                       .append ("WebsiteURI", m_aWebsiteURIs)
+                                       .append ("Contact", m_aContacts)
+                                       .append ("AdditionalInformation", m_sAdditionalInformation)
+                                       .append ("RegistrationDate", m_aRegistrationDate)
                                        .getToString ();
   }
 
   @Nonnull
-  public static SMPBusinessCardEntity createFromGenericObject (final PDBusinessEntity aEntity)
+  public static SMPBusinessCardEntity createFromGenericObject (@Nonnull final PDBusinessEntity aEntity)
   {
+    ValueEnforcer.notNull (aEntity, "Entity");
     final SMPBusinessCardEntity ret = new SMPBusinessCardEntity ();
     for (final PDName aItem : aEntity.names ())
       ret.names ().add (new SMPBusinessCardName (aItem.getName (), aItem.getLanguageCode ()));

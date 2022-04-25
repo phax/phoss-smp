@@ -93,7 +93,8 @@ public interface ISMPParticipantMigrationManager
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
   @Nonnull
-  EChange setParticipantMigrationState (@Nullable String sParticipantMigrationID, @Nonnull EParticipantMigrationState eNewState);
+  EChange setParticipantMigrationState (@Nullable String sParticipantMigrationID,
+                                        @Nonnull EParticipantMigrationState eNewState);
 
   /**
    * Find the participant migration with the provided ID.

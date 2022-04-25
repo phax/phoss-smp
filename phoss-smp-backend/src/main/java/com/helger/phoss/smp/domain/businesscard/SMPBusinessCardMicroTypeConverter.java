@@ -81,7 +81,8 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       eEntity.setAttribute (ATTR_COUNTRY_CODE, aEntity.getCountryCode ());
       if (aEntity.hasGeographicalInformation ())
       {
-        eEntity.appendElement (sNamespaceURI, ELEMENT_GEOGRAPHICAL_INFORMATION).appendText (aEntity.getGeographicalInformation ());
+        eEntity.appendElement (sNamespaceURI, ELEMENT_GEOGRAPHICAL_INFORMATION)
+               .appendText (aEntity.getGeographicalInformation ());
       }
       for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
       {
@@ -105,7 +106,8 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       }
       if (aEntity.hasAdditionalInformation ())
       {
-        eEntity.appendElement (sNamespaceURI, ELEMENT_ADDITIONAL_INFORMATION).appendText (aEntity.getAdditionalInformation ());
+        eEntity.appendElement (sNamespaceURI, ELEMENT_ADDITIONAL_INFORMATION)
+               .appendText (aEntity.getAdditionalInformation ());
       }
       eEntity.setAttributeWithConversion (ATTR_REGISTRATION_DATE, aEntity.getRegistrationDate ());
     }
@@ -158,7 +160,8 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
         }
       }
       aEntity.setCountryCode (eEntity.getAttributeValue (ATTR_COUNTRY_CODE));
-      aEntity.setGeographicalInformation (MicroHelper.getChildTextContentTrimmed (eEntity, ELEMENT_GEOGRAPHICAL_INFORMATION));
+      aEntity.setGeographicalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
+                                                                                  ELEMENT_GEOGRAPHICAL_INFORMATION));
       for (final IMicroElement eIdentifier : eEntity.getAllChildElements (ELEMENT_IDENTIFIER))
       {
         aEntity.identifiers ()
@@ -179,7 +182,8 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
                                                  eContact.getAttributeValue (ATTR_PHONE),
                                                  eContact.getAttributeValue (ATTR_EMAIL)));
       }
-      aEntity.setAdditionalInformation (MicroHelper.getChildTextContentTrimmed (eEntity, ELEMENT_ADDITIONAL_INFORMATION));
+      aEntity.setAdditionalInformation (MicroHelper.getChildTextContentTrimmed (eEntity,
+                                                                                ELEMENT_ADDITIONAL_INFORMATION));
       aEntity.setRegistrationDate (eEntity.getAttributeValueWithConversion (ATTR_REGISTRATION_DATE, LocalDate.class));
       aEntities.add (aEntity);
     }

@@ -42,13 +42,15 @@ public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManage
   @Nonnull
   public IUserManager createUserMgr () throws DAOException
   {
-    return new UserManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY + PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML);
+    return new UserManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
+                            PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML);
   }
 
   @Nonnull
   public IRoleManager createRoleMgr () throws DAOException
   {
-    return new RoleManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY + PhotonSecurityManager.FactoryXML.FILENAME_ROLES_XML);
+    return new RoleManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
+                            PhotonSecurityManager.FactoryXML.FILENAME_ROLES_XML);
   }
 
   @Nonnull

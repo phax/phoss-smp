@@ -107,9 +107,11 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
                                 final boolean bClientCertificateRequired)
   {
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sSMLInfoID),
-                                                                Updates.combine (Updates.set (BSON_DISPLAYNAME, sDisplayName),
+                                                                Updates.combine (Updates.set (BSON_DISPLAYNAME,
+                                                                                              sDisplayName),
                                                                                  Updates.set (BSON_DNSZONE, sDNSZone),
-                                                                                 Updates.set (BSON_SERVICEURL, sManagementServiceURL),
+                                                                                 Updates.set (BSON_SERVICEURL,
+                                                                                              sManagementServiceURL),
                                                                                  Updates.set (BSON_CLIENTCERT,
                                                                                               Boolean.valueOf (bClientCertificateRequired))));
     if (aOldDoc == null)
@@ -168,7 +170,10 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
       return null;
 
     // The stored field does not contain the suffix
-    final String sSearchAddress = StringHelper.trimEnd (sAddress, '/' + CSMLDefault.MANAGEMENT_SERVICE_PARTICIPANTIDENTIFIER);
-    return getCollection ().find (new Document (BSON_SERVICEURL, sSearchAddress)).map (SMLInfoManagerMongoDB::toDomain).first ();
+    final String sSearchAddress = StringHelper.trimEnd (sAddress,
+                                                        '/' + CSMLDefault.MANAGEMENT_SERVICE_PARTICIPANTIDENTIFIER);
+    return getCollection ().find (new Document (BSON_SERVICEURL, sSearchAddress))
+                           .map (SMLInfoManagerMongoDB::toDomain)
+                           .first ();
   }
 }

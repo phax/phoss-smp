@@ -51,7 +51,8 @@ public final class V11__MigrateUsersToDB extends BaseJavaMigration
     {
       LOGGER.info ("Migrating all users to the DB");
 
-      final String sFilename = PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY + PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML;
+      final String sFilename = PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
+                               PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML;
       final File aFile = WebFileIO.getDataIO ().getFile (sFilename);
       if (aFile.exists ())
       {

@@ -61,10 +61,14 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   public static Document toBson (@Nonnull final ISMPSettings aValue)
   {
     return new Document ().append (BSON_ID, ID_SETTINGS)
-                          .append (BSON_SMP_REST_WRITABLE_API_DISABLED, Boolean.valueOf (aValue.isRESTWritableAPIDisabled ()))
-                          .append (BSON_DIRECTORY_INTEGRATION_REQUIRED, Boolean.valueOf (aValue.isDirectoryIntegrationRequired ()))
-                          .append (BSON_DIRECTORY_INTEGRATION_ENABLED, Boolean.valueOf (aValue.isDirectoryIntegrationEnabled ()))
-                          .append (BSON_DIRECTORY_INTEGRATION_AUTO_UPDATE, Boolean.valueOf (aValue.isDirectoryIntegrationAutoUpdate ()))
+                          .append (BSON_SMP_REST_WRITABLE_API_DISABLED,
+                                   Boolean.valueOf (aValue.isRESTWritableAPIDisabled ()))
+                          .append (BSON_DIRECTORY_INTEGRATION_REQUIRED,
+                                   Boolean.valueOf (aValue.isDirectoryIntegrationRequired ()))
+                          .append (BSON_DIRECTORY_INTEGRATION_ENABLED,
+                                   Boolean.valueOf (aValue.isDirectoryIntegrationEnabled ()))
+                          .append (BSON_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                                   Boolean.valueOf (aValue.isDirectoryIntegrationAutoUpdate ()))
                           .append (BSON_DIRECTORY_HOSTNAME, aValue.getDirectoryHostName ())
                           .append (BSON_SML_REQUIRED, Boolean.valueOf (aValue.isSMLRequired ()))
                           .append (BSON_SML_ENABLED, Boolean.valueOf (aValue.isSMLEnabled ()))

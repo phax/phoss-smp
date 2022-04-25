@@ -175,16 +175,19 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
   public String toString ()
   {
     return new ToStringGenerator (this).append ("ID", m_sID)
-                                       .append ("type", m_sType)
-                                       .append ("name", m_sName)
-                                       .append ("phoneNumber", m_sPhoneNumber)
-                                       .append ("email", m_sEmail)
+                                       .append ("Type", m_sType)
+                                       .append ("Name", m_sName)
+                                       .append ("PhoneNumber", m_sPhoneNumber)
+                                       .append ("Email", m_sEmail)
                                        .getToString ();
   }
 
   @Nonnull
   public static SMPBusinessCardContact createFromGenericObject (@Nonnull final PDContact aEntity)
   {
-    return new SMPBusinessCardContact (aEntity.getType (), aEntity.getName (), aEntity.getPhoneNumber (), aEntity.getEmail ());
+    return new SMPBusinessCardContact (aEntity.getType (),
+                                       aEntity.getName (),
+                                       aEntity.getPhoneNumber (),
+                                       aEntity.getEmail ());
   }
 }

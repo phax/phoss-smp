@@ -50,7 +50,8 @@ import com.mongodb.client.result.DeleteResult;
  * @author Philip Helger
  * @since 5.4.0
  */
-public final class SMPParticipantMigrationManagerMongoDB extends AbstractManagerMongoDB implements ISMPParticipantMigrationManager
+public final class SMPParticipantMigrationManagerMongoDB extends AbstractManagerMongoDB implements
+                                                         ISMPParticipantMigrationManager
 {
   private static final String BSON_ID = "id";
   private static final String BSON_DIRECTION = "direction";
@@ -108,7 +109,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
                                                                       @Nonnull @Nonempty final String sMigrationKey)
   {
-    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createOutbound (aParticipantID, sMigrationKey);
+    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createOutbound (aParticipantID,
+                                                                                                     sMigrationKey);
     _createParticipantMigration (aSMPParticipantMigration);
     return aSMPParticipantMigration;
   }
@@ -117,7 +119,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   public ISMPParticipantMigration createInboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
                                                                      @Nonnull @Nonempty final String sMigrationKey)
   {
-    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createInbound (aParticipantID, sMigrationKey);
+    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createInbound (aParticipantID,
+                                                                                                    sMigrationKey);
     _createParticipantMigration (aSMPParticipantMigration);
     return aSMPParticipantMigration;
   }
@@ -147,7 +150,9 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     final DeleteResult aDR = getCollection ().deleteMany (new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID)));
     if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT, aParticipantID.getURIEncoded (), "no-such-participant-id");
+      AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT,
+                                        aParticipantID.getURIEncoded (),
+                                        "no-such-participant-id");
       return EChange.UNCHANGED;
     }
 
@@ -164,7 +169,10 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     final SMPParticipantMigration aPM = getParticipantMigrationOfID (sParticipantMigrationID);
     if (aPM == null)
     {
-      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT,
+                                        "set-migration-state",
+                                        sParticipantMigrationID,
+                                        "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -176,7 +184,10 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
 
       getCollection ().findOneAndReplace (new Document (BSON_ID, sParticipantMigrationID), toBson (aPM));
     }
-    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, eNewState);
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT,
+                                      "set-migration-state",
+                                      sParticipantMigrationID,
+                                      eNewState);
     return EChange.CHANGED;
   }
 
@@ -204,7 +215,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
 
     final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_DIRECTION, eDirection.getID ()),
                                                                 new Document (BSON_STATE, eState.getID ()),
-                                                                new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
+                                                                new Document (BSON_PARTICIPANT_ID,
+                                                                              toBson (aParticipantID))))
                                             .first ();
     if (aMatch == null)
       return null;
@@ -242,8 +254,10 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     if (aParticipantID == null)
       return false;
 
-    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION, EParticipantMigrationDirection.OUTBOUND.getID ()),
-                                               new Document (BSON_STATE, EParticipantMigrationState.IN_PROGRESS.getID ()),
+    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION,
+                                                             EParticipantMigrationDirection.OUTBOUND.getID ()),
+                                               new Document (BSON_STATE,
+                                                             EParticipantMigrationState.IN_PROGRESS.getID ()),
                                                new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID))))
                            .iterator ()
                            .hasNext ();
@@ -254,7 +268,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     if (aParticipantID == null)
       return false;
 
-    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION, EParticipantMigrationDirection.INBOUND.getID ()),
+    return getCollection ().find (Filters.and (new Document (BSON_DIRECTION,
+                                                             EParticipantMigrationDirection.INBOUND.getID ()),
                                                new Document (BSON_PARTICIPANT_ID, toBson (aParticipantID)),
                                                new Document (BSON_STATE, EParticipantMigrationState.MIGRATED.getID ())))
                            .iterator ()

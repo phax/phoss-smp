@@ -37,13 +37,15 @@ public class SMPBadRequestException extends SMPServerException
   }
 
   @Nonnull
-  public static SMPBadRequestException failedToParseSG (@Nonnull final String sServiceGroupID, @Nullable final URI aEffectedURI)
+  public static SMPBadRequestException failedToParseSG (@Nonnull final String sServiceGroupID,
+                                                        @Nullable final URI aEffectedURI)
   {
     return new SMPBadRequestException ("Failed to parse Service Group ID '" + sServiceGroupID + "'", aEffectedURI);
   }
 
   @Nonnull
-  public static SMPBadRequestException failedToParseDocType (@Nonnull final String sDocTypeID, @Nullable final URI aEffectedURI)
+  public static SMPBadRequestException failedToParseDocType (@Nonnull final String sDocTypeID,
+                                                             @Nullable final URI aEffectedURI)
   {
     return new SMPBadRequestException ("Failed to parse Document Type ID '" + sDocTypeID + "'", aEffectedURI);
   }

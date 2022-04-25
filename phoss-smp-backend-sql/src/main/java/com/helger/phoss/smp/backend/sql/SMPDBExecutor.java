@@ -38,7 +38,8 @@ public final class SMPDBExecutor extends DBExecutor
   public static final Function <String, String> TABLE_NAME_CUSTOMIZER;
   static
   {
-    final String sSchemaName = SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
+    final String sSchemaName = SMPServerConfiguration.getConfigFile ()
+                                                     .getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
     if (StringHelper.hasText (sSchemaName) && RegExHelper.stringMatchesPattern ("[0-9a-zA-Z]+", sSchemaName))
       TABLE_NAME_CUSTOMIZER = x -> sSchemaName + ".smp_" + x;
     else
@@ -67,7 +68,9 @@ public final class SMPDBExecutor extends DBExecutor
         setExecutionDurationWarnMS (nMillis);
       else
         if (LOGGER.isDebugEnabled ())
-          LOGGER.debug ("Ignoring setting '" + SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS + "' because it is invalid.");
+          LOGGER.debug ("Ignoring setting '" +
+                        SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS +
+                        "' because it is invalid.");
     }
     else
     {

@@ -78,7 +78,8 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     if (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_SMP_FLYWAY_ENABLED, true))
       FlywayMigrator.Singleton.INSTANCE.runFlyway (m_eDBType);
     else
-      LOGGER.warn ("Flyway Migration is disabled according to the configuration item " + SMPJDBCConfiguration.CONFIG_SMP_FLYWAY_ENABLED);
+      LOGGER.warn ("Flyway Migration is disabled according to the configuration item " +
+                   SMPJDBCConfiguration.CONFIG_SMP_FLYWAY_ENABLED);
 
     // Register this here, so that the SMPMetaManager is available
     DBExecutor.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
@@ -87,7 +88,8 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     });
 
     // Allow communicating in the other direction as well
-    SMPMetaManager.getInstance ().setBackendConnectionStateChangeCallback (eNew -> DBExecutor.resetConnectionEstablished ());
+    SMPMetaManager.getInstance ()
+                  .setBackendConnectionStateChangeCallback (eNew -> DBExecutor.resetConnectionEstablished ());
   }
 
   @Nonnull
@@ -127,7 +129,8 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   {
     final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor::new);
     // Enable cache by default
-    ret.setCacheEnabled (SMPServerConfiguration.getConfigFile ().getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
+    ret.setCacheEnabled (SMPServerConfiguration.getConfigFile ()
+                                               .getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
     return ret;
   }
 

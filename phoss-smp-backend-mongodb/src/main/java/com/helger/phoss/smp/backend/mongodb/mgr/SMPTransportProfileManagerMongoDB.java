@@ -42,7 +42,8 @@ import com.mongodb.client.result.DeleteResult;
  *
  * @author Philip Helger
  */
-public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMongoDB implements ISMPTransportProfileManager
+public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMongoDB implements
+                                                     ISMPTransportProfileManager
 {
   private static final String BSON_ID = "id";
   private static final String BSON_NAME = "name";
@@ -102,7 +103,11 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     if (aOldDoc == null)
       return EChange.UNCHANGED;
 
-    AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT, "set-all", sSMPTransportProfileID, sName, Boolean.valueOf (bIsDeprecated));
+    AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT,
+                                      "set-all",
+                                      sSMPTransportProfileID,
+                                      sName,
+                                      Boolean.valueOf (bIsDeprecated));
     return EChange.CHANGED;
   }
 
@@ -134,7 +139,9 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
   @Nullable
   public ISMPTransportProfile getSMPTransportProfileOfID (@Nullable final String sID)
   {
-    return getCollection ().find (new Document (BSON_ID, sID)).map (SMPTransportProfileManagerMongoDB::toDomain).first ();
+    return getCollection ().find (new Document (BSON_ID, sID))
+                           .map (SMPTransportProfileManagerMongoDB::toDomain)
+                           .first ();
   }
 
   public boolean containsSMPTransportProfileWithID (@Nullable final String sID)

@@ -51,7 +51,8 @@ import com.helger.photon.audit.AuditHelper;
  * @author Philip Helger
  * @since 5.4.0
  */
-public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManager implements ISMPParticipantMigrationManager
+public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManager implements
+                                                ISMPParticipantMigrationManager
 {
   /**
    * Constructor
@@ -90,7 +91,9 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
 
     if (eSuccess.isFailure ())
     {
-      AuditHelper.onAuditCreateFailure (SMPParticipantMigration.OT, aSMPParticipantMigration.getID (), "database-error");
+      AuditHelper.onAuditCreateFailure (SMPParticipantMigration.OT,
+                                        aSMPParticipantMigration.getID (),
+                                        "database-error");
       return null;
     }
 
@@ -107,7 +110,8 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
                                                                       @Nonnull @Nonempty final String sMigrationKey)
   {
-    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createOutbound (aParticipantID, sMigrationKey);
+    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createOutbound (aParticipantID,
+                                                                                                     sMigrationKey);
     return _createParticipantMigration (aSMPParticipantMigration);
   }
 
@@ -115,7 +119,8 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   public ISMPParticipantMigration createInboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
                                                                      @Nonnull @Nonempty final String sMigrationKey)
   {
-    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createInbound (aParticipantID, sMigrationKey);
+    final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createInbound (aParticipantID,
+                                                                                                    sMigrationKey);
     return _createParticipantMigration (aSMPParticipantMigration);
   }
 
@@ -146,7 +151,9 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
                                                                  new ConstantPreparedStatementDataProvider (aParticipantID.getURIEncoded ()));
     if (nDeleted == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT, aParticipantID.getURIEncoded (), "no-such-participant-id");
+      AuditHelper.onAuditDeleteFailure (SMPParticipantMigration.OT,
+                                        aParticipantID.getURIEncoded (),
+                                        "no-such-participant-id");
       return EChange.UNCHANGED;
     }
 
@@ -184,11 +191,17 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     if (aUpdated.is0 ())
     {
       // No such participant migration ID
-      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT,
+                                        "set-migration-state",
+                                        sParticipantMigrationID,
+                                        "no-such-id");
       return EChange.UNCHANGED;
     }
 
-    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, eNewState);
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT,
+                                      "set-migration-state",
+                                      sParticipantMigrationID,
+                                      eNewState);
     return EChange.CHANGED;
   }
 
@@ -208,8 +221,14 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     final DBResultRow aRow = aDBResult.get ();
     final EParticipantMigrationDirection eDirection = EParticipantMigrationDirection.getFromIDOrNull (aRow.getAsString (0));
     final EParticipantMigrationState eState = EParticipantMigrationState.getFromIDOrNull (aRow.getAsString (1));
-    final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ().parseParticipantIdentifier (aRow.getAsString (2));
-    return new SMPParticipantMigration (sID, eDirection, eState, aPI, aRow.getAsLocalDateTime (3), aRow.getAsString (4));
+    final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
+                                                     .parseParticipantIdentifier (aRow.getAsString (2));
+    return new SMPParticipantMigration (sID,
+                                        eDirection,
+                                        eState,
+                                        aPI,
+                                        aRow.getAsLocalDateTime (3),
+                                        aRow.getAsString (4));
   }
 
   @Nullable
@@ -256,7 +275,8 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
         for (final DBResultRow aRow : aDBResult)
         {
           final EParticipantMigrationState eRealState = EParticipantMigrationState.getFromIDOrNull (aRow.getAsString (1));
-          final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ().parseParticipantIdentifier (aRow.getAsString (2));
+          final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
+                                                           .parseParticipantIdentifier (aRow.getAsString (2));
           ret.add (new SMPParticipantMigration (aRow.getAsString (0),
                                                 eDirection,
                                                 eRealState,
@@ -269,11 +289,13 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     {
       // Use specific state
       aDBResult = newExecutor ().queryAll ("SELECT id, pid, initdt, migkey FROM smp_pmigration WHERE direction=? AND state=?",
-                                           new ConstantPreparedStatementDataProvider (eDirection.getID (), eState.getID ()));
+                                           new ConstantPreparedStatementDataProvider (eDirection.getID (),
+                                                                                      eState.getID ()));
       if (aDBResult != null)
         for (final DBResultRow aRow : aDBResult)
         {
-          final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ().parseParticipantIdentifier (aRow.getAsString (1));
+          final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
+                                                           .parseParticipantIdentifier (aRow.getAsString (1));
           ret.add (new SMPParticipantMigration (aRow.getAsString (0),
                                                 eDirection,
                                                 eState,
@@ -314,11 +336,15 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
 
   public boolean containsOutboundMigrationInProgress (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    return _containsMigration (EParticipantMigrationDirection.OUTBOUND, EParticipantMigrationState.IN_PROGRESS, aParticipantID);
+    return _containsMigration (EParticipantMigrationDirection.OUTBOUND,
+                               EParticipantMigrationState.IN_PROGRESS,
+                               aParticipantID);
   }
 
   public boolean containsInboundMigration (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    return _containsMigration (EParticipantMigrationDirection.INBOUND, EParticipantMigrationState.MIGRATED, aParticipantID);
+    return _containsMigration (EParticipantMigrationDirection.INBOUND,
+                               EParticipantMigrationState.MIGRATED,
+                               aParticipantID);
   }
 }

@@ -87,7 +87,8 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   {
     if (aDoc == null)
       return null;
-    return SMPMetaManager.getIdentifierFactory ().createDocumentTypeIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
+    return SMPMetaManager.getIdentifierFactory ()
+                         .createDocumentTypeIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
   }
 
   @Nullable
@@ -96,7 +97,8 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   {
     if (aDoc == null)
       return null;
-    return SMPMetaManager.getIdentifierFactory ().createParticipantIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
+    return SMPMetaManager.getIdentifierFactory ()
+                         .createParticipantIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
   }
 
   @Nullable
@@ -105,6 +107,7 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   {
     if (aDoc == null)
       return null;
-    return SMPMetaManager.getIdentifierFactory ().createProcessIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
+    return SMPMetaManager.getIdentifierFactory ()
+                         .createProcessIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
   }
 }

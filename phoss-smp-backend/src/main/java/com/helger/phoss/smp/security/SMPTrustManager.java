@@ -72,7 +72,9 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
     }
     m_aTrustStore = aTrustStoreLoading.getKeyStore ();
 
-    LOGGER.info ("SMPTrustManager successfully initialized with truststore '" + SMPServerConfiguration.getTrustStorePath () + "'");
+    LOGGER.info ("SMPTrustManager successfully initialized with truststore '" +
+                 SMPServerConfiguration.getTrustStorePath () +
+                 "'");
     _setTrustStoreValid (true);
   }
 

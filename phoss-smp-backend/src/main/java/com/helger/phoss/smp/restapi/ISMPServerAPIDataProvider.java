@@ -56,5 +56,6 @@ public interface ISMPServerAPIDataProvider
    * @return The HREF to the service metadata.
    */
   @Nonnull
-  String getServiceMetadataReferenceHref (@Nonnull IParticipantIdentifier aServiceGroupID, @Nonnull IDocumentTypeIdentifier aDocTypeID);
+  String getServiceMetadataReferenceHref (@Nonnull IParticipantIdentifier aServiceGroupID,
+                                          @Nonnull IDocumentTypeIdentifier aDocTypeID);
 }

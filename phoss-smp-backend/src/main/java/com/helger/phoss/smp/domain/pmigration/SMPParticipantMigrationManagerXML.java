@@ -32,7 +32,8 @@ import com.helger.photon.audit.AuditHelper;
  * @author Philip Helger
  * @since 5.4.0
  */
-public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPParticipantMigration, SMPParticipantMigration>
+public class SMPParticipantMigrationManagerXML extends
+                                               AbstractPhotonMapBasedWALDAO <ISMPParticipantMigration, SMPParticipantMigration>
                                                implements
                                                ISMPParticipantMigrationManager
 {
@@ -147,7 +148,10 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
     final SMPParticipantMigration aPM = getOfID (sParticipantMigrationID);
     if (aPM == null)
     {
-      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, "no-such-id");
+      AuditHelper.onAuditModifyFailure (SMPParticipantMigration.OT,
+                                        "set-migration-state",
+                                        sParticipantMigrationID,
+                                        "no-such-id");
       return EChange.UNCHANGED;
     }
 
@@ -165,7 +169,10 @@ public class SMPParticipantMigrationManagerXML extends AbstractPhotonMapBasedWAL
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT, "set-migration-state", sParticipantMigrationID, eNewState);
+    AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT,
+                                      "set-migration-state",
+                                      sParticipantMigrationID,
+                                      eNewState);
     return EChange.CHANGED;
   }
 

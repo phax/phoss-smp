@@ -81,7 +81,11 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
 
     if (eSuccess.isFailure ())
     {
-      AuditHelper.onAuditCreateFailure (SMPTransportProfile.OT, sID, sName, Boolean.valueOf (bIsDeprecated), "database-error");
+      AuditHelper.onAuditCreateFailure (SMPTransportProfile.OT,
+                                        sID,
+                                        sName,
+                                        Boolean.valueOf (bIsDeprecated),
+                                        "database-error");
       return null;
     }
 
@@ -119,7 +123,11 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
       return EChange.UNCHANGED;
     }
 
-    AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT, "update", sSMPTransportProfileID, sName, Boolean.valueOf (bIsDeprecated));
+    AuditHelper.onAuditModifySuccess (SMPTransportProfile.OT,
+                                      "update",
+                                      sSMPTransportProfileID,
+                                      sName,
+                                      Boolean.valueOf (bIsDeprecated));
     return EChange.CHANGED;
   }
 
@@ -171,7 +179,9 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
       return null;
 
     final DBResultRow aRow = aDBResult.get ();
-    return new SMPTransportProfile (sID, aRow.getAsString (0), aRow.getAsBoolean (1, SMPTransportProfile.DEFAULT_DEPRECATED));
+    return new SMPTransportProfile (sID,
+                                    aRow.getAsString (0),
+                                    aRow.getAsBoolean (1, SMPTransportProfile.DEFAULT_DEPRECATED));
   }
 
   public boolean containsSMPTransportProfileWithID (@Nullable final String sID)
@@ -179,7 +189,8 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     if (StringHelper.hasNoText (sID))
       return false;
 
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_tprofile WHERE id=?", new ConstantPreparedStatementDataProvider (sID)) > 0;
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_tprofile WHERE id=?",
+                                      new ConstantPreparedStatementDataProvider (sID)) > 0;
   }
 
   @Nonnegative

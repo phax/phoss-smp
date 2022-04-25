@@ -98,7 +98,8 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setDirectoryIntegrationRequired (final boolean bPeppolDirectoryIntegrationRequired)
   {
-    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED, bPeppolDirectoryIntegrationRequired);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,
+                              bPeppolDirectoryIntegrationRequired);
   }
 
   public boolean isDirectoryIntegrationEnabled ()
@@ -110,7 +111,8 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setDirectoryIntegrationEnabled (final boolean bPeppolDirectoryIntegrationEnabled)
   {
-    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_ENABLED, bPeppolDirectoryIntegrationEnabled);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_ENABLED,
+                              bPeppolDirectoryIntegrationEnabled);
   }
 
   public boolean isDirectoryIntegrationAutoUpdate ()
@@ -122,7 +124,8 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public EChange setDirectoryIntegrationAutoUpdate (final boolean bPeppolDirectoryIntegrationAutoUpdate)
   {
-    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE, bPeppolDirectoryIntegrationAutoUpdate);
+    return m_aSettings.putIn (SMPServerConfiguration.KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                              bPeppolDirectoryIntegrationAutoUpdate);
   }
 
   @Nonnull
@@ -140,7 +143,8 @@ public class SMPSettings implements ISMPSettings
 
   public boolean isSMLRequired ()
   {
-    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_REQUIRED, SMPServerConfiguration.DEFAULT_SML_REQUIRED);
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_REQUIRED,
+                                     SMPServerConfiguration.DEFAULT_SML_REQUIRED);
   }
 
   @Nonnull
@@ -151,7 +155,8 @@ public class SMPSettings implements ISMPSettings
 
   public boolean isSMLEnabled ()
   {
-    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_ENABLED, SMPServerConfiguration.DEFAULT_SML_ENABLED);
+    return m_aSettings.getAsBoolean (SMPServerConfiguration.KEY_SML_ENABLED,
+                                     SMPServerConfiguration.DEFAULT_SML_ENABLED);
   }
 
   @Nonnull
@@ -206,7 +211,8 @@ public class SMPSettings implements ISMPSettings
       if (StringHelper.hasText (sOldSMLURL))
       {
         // Check if any SML item matches
-        final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().findFirstWithManageParticipantIdentifierEndpointAddress (sOldSMLURL);
+        final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ()
+                                                .findFirstWithManageParticipantIdentifierEndpointAddress (sOldSMLURL);
         if (aSMLInfo != null)
           m_aSettings.put (KEY_SML_INFO_ID, aSMLInfo.getID ());
       }

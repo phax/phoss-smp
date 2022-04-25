@@ -130,7 +130,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   @ReturnsMutableCopy
   public static SMPBusinessCardIdentifier toBCIdentifier (@Nonnull final Document aDoc)
   {
-    return new SMPBusinessCardIdentifier (aDoc.getString (BSON_ID), aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
+    return new SMPBusinessCardIdentifier (aDoc.getString (BSON_ID),
+                                          aDoc.getString (BSON_SCHEME),
+                                          aDoc.getString (BSON_VALUE));
   }
 
   @Nonnull
@@ -233,7 +235,8 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   @ReturnsMutableCopy
   public static Document toBson (@Nonnull final ISMPBusinessCard aValue)
   {
-    final Document ret = new Document ().append (BSON_ID, aValue.getID ()).append (BSON_SERVICE_GROUP_ID, aValue.getID ());
+    final Document ret = new Document ().append (BSON_ID, aValue.getID ())
+                                        .append (BSON_SERVICE_GROUP_ID, aValue.getID ());
     final ICommonsList <Document> aEntities = new CommonsArrayList <> ();
     for (final SMPBusinessCardEntity aEntity : aValue.getAllEntities ())
       aEntities.add (toBson (aEntity));
@@ -262,7 +265,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     if (!getCollection ().insertOne (toBson (aSMPBusinessCard)).wasAcknowledged ())
       throw new IllegalStateException ("Failed to insert into MongoDB Collection");
 
-    AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
+                                      aSMPBusinessCard.getID (),
+                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     return aSMPBusinessCard;
   }
 
@@ -288,7 +293,11 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     ValueEnforcer.notNull (aEntities, "Entities");
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities)");
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
+                    aParticipantID.getURIEncoded () +
+                    ", " +
+                    aEntities.size () +
+                    " entities)");
 
     final ISMPBusinessCard aOldBusinessCard = getSMPBusinessCardOfID (aParticipantID);
     final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aParticipantID, aEntities);
@@ -334,7 +343,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
 
-    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
+                                      aSMPBusinessCard.getID (),
+                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard successful");

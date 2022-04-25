@@ -60,7 +60,8 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
    */
   public static boolean isValidMigrationKey (@Nullable final String sMigrationKey)
   {
-    return StringHelper.hasText (sMigrationKey) && RegExHelper.stringMatchesPattern (CSMLDefault.MIGRATION_CODE_PATTERN, sMigrationKey);
+    return StringHelper.hasText (sMigrationKey) &&
+           RegExHelper.stringMatchesPattern (CSMLDefault.MIGRATION_CODE_PATTERN, sMigrationKey);
   }
 
   public SMPParticipantMigration (@Nonnull @Nonempty final String sID,

@@ -97,7 +97,9 @@ public final class V15__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
           if (nIndex > 1000)
           {
             // Avoid endless loop
-            throw new IllegalStateException ("Too many iterations mapping the DB user '" + aDBUser.getUserName () + "' to a ph-oton user");
+            throw new IllegalStateException ("Too many iterations mapping the DB user '" +
+                                             aDBUser.getUserName () +
+                                             "' to a ph-oton user");
           }
         }
         aCreatedMappings.put (aDBUser.getUserName (), aPhotonUser.getID ());

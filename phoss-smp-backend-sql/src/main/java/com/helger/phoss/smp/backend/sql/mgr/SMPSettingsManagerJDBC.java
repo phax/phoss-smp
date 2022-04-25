@@ -80,7 +80,9 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     return m_aCallbacks;
   }
 
-  static void setSettingsValue (@Nonnull final DBExecutor aExecutor, @Nonnull @Nonempty final String sKey, @Nullable final String sValue)
+  static void setSettingsValue (@Nonnull final DBExecutor aExecutor,
+                                @Nonnull @Nonempty final String sKey,
+                                @Nullable final String sValue)
   {
     ValueEnforcer.notNull (aExecutor, "Executor");
     ValueEnforcer.notEmpty (sKey, "Key");
@@ -140,7 +142,9 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    aExecutor.querySingle ("SELECT value FROM smp_settings WHERE id=?", new ConstantPreparedStatementDataProvider (sKey), aDBResult::set);
+    aExecutor.querySingle ("SELECT value FROM smp_settings WHERE id=?",
+                           new ConstantPreparedStatementDataProvider (sKey),
+                           aDBResult::set);
     if (aDBResult.isNotSet ())
       return null;
 
@@ -171,7 +175,8 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
                                                                    SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE));
     ret.setDirectoryHostName (aValues.get (DIRECTORY_HOSTNAME));
     ret.setSMLEnabled (StringParser.parseBool (aValues.get (SML_ENABLED), SMPServerConfiguration.DEFAULT_SML_ENABLED));
-    ret.setSMLRequired (StringParser.parseBool (aValues.get (SML_REQUIRED), SMPServerConfiguration.DEFAULT_SML_REQUIRED));
+    ret.setSMLRequired (StringParser.parseBool (aValues.get (SML_REQUIRED),
+                                                SMPServerConfiguration.DEFAULT_SML_REQUIRED));
     ret.setSMLInfoID (aValues.get (SML_INFO_ID));
     return ret;
   }

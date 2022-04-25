@@ -28,13 +28,17 @@ import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 final class MockSMPTransportProfileManager implements ISMPTransportProfileManager
 {
   @Nullable
-  public ISMPTransportProfile createSMPTransportProfile (final String sID, final String sName, final boolean bIsDeprecated)
+  public ISMPTransportProfile createSMPTransportProfile (final String sID,
+                                                         final String sName,
+                                                         final boolean bIsDeprecated)
   {
     throw new UnsupportedOperationException ();
   }
 
   @Nonnull
-  public EChange updateSMPTransportProfile (final String sSMPTransportProfileID, final String sName, final boolean bIsDeprecated)
+  public EChange updateSMPTransportProfile (final String sSMPTransportProfileID,
+                                            final String sName,
+                                            final boolean bIsDeprecated)
   {
     throw new UnsupportedOperationException ();
   }

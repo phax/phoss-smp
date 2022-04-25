@@ -89,13 +89,15 @@ public final class BusinessCardServerAPI
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown Service Group '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPNotFoundException ("Unknown Service Group '" + sServiceGroupID + "'",
+                                        m_aAPIProvider.getCurrentURI ());
       }
 
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr == null)
       {
-        throw new SMPBadRequestException ("This SMP server does not support the Business Card API", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("This SMP server does not support the Business Card API",
+                                          m_aAPIProvider.getCurrentURI ());
       }
       final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aServiceGroup);
       if (aBusinessCard == null)
@@ -163,7 +165,8 @@ public final class BusinessCardServerAPI
       if (aServiceGroup == null)
       {
         // No such service group (on this server)
-        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'", m_aAPIProvider.getCurrentURI ());
+        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
+                                        m_aAPIProvider.getCurrentURI ());
       }
 
       // Check credentials and verify service group is owned by provided user
@@ -173,7 +176,8 @@ public final class BusinessCardServerAPI
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr == null)
       {
-        throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("This SMP server does not support the BusinessCard API",
+                                          m_aAPIProvider.getCurrentURI ());
       }
 
       final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
@@ -238,7 +242,8 @@ public final class BusinessCardServerAPI
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr == null)
       {
-        throw new SMPBadRequestException ("This SMP server does not support the Business Card API", m_aAPIProvider.getCurrentURI ());
+        throw new SMPBadRequestException ("This SMP server does not support the Business Card API",
+                                          m_aAPIProvider.getCurrentURI ());
       }
       final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroupID);
       if (aBusinessCard == null)

@@ -40,7 +40,8 @@ public class LoggingSMPServiceGroupCallback implements ISMPServiceGroupCallback
     LOGGER.info ("Successfully Updated ServiceGroup with ID '" + aParticipantID.getURIEncoded () + "'");
   }
 
-  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID, final boolean bDeleteInSML)
+  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID,
+                                        final boolean bDeleteInSML)
   {
     LOGGER.info ("Successfully Deleted ServiceGroup with ID '" +
                  aParticipantID.getURIEncoded () +

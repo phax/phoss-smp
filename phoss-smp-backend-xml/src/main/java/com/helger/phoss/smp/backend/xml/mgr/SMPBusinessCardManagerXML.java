@@ -50,7 +50,8 @@ import com.helger.photon.audit.AuditHelper;
  *
  * @author Philip Helger
  */
-public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard> implements
+public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPBusinessCard, SMPBusinessCard>
+                                             implements
                                              ISMPBusinessCardManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerXML.class);
@@ -76,7 +77,9 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     m_aRWLock.writeLocked ( () -> {
       internalCreateItem (aSMPBusinessCard);
     });
-    AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
+                                      aSMPBusinessCard.getID (),
+                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
     return aSMPBusinessCard;
   }
 
@@ -102,7 +105,11 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     ValueEnforcer.notNull (aEntities, "Entities");
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("createOrUpdateSMPBusinessCard (" + aParticipantID.getURIEncoded () + ", " + aEntities.size () + " entities)");
+      LOGGER.debug ("createOrUpdateSMPBusinessCard (" +
+                    aParticipantID.getURIEncoded () +
+                    ", " +
+                    aEntities.size () +
+                    " entities)");
 
     final ISMPBusinessCard aOldBusinessCard = getSMPBusinessCardOfID (aParticipantID);
     final SMPBusinessCard aNewBusinessCard = new SMPBusinessCard (aParticipantID, aEntities);
@@ -153,7 +160,9 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
       m_aRWLock.writeLock ().unlock ();
     }
 
-    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT, aSMPBusinessCard.getID (), Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
+    AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
+                                      aSMPBusinessCard.getID (),
+                                      Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));

@@ -47,7 +47,8 @@ public class ParticipantMigrationSMPServiceGroupCallback implements ISMPServiceG
   {}
 
   @Override
-  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID, final boolean bDeleteInSML)
+  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID,
+                                        final boolean bDeleteInSML)
   {
     // If service group is deleted, also delete respective participant
     // migrations

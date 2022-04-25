@@ -90,7 +90,8 @@ public interface ISMPManagerProvider
    * @return A new SMP redirect manager. May not be <code>null</code>.
    */
   @Nonnull
-  ISMPRedirectManager createRedirectMgr (@Nonnull IIdentifierFactory aIdentifierFactory, @Nonnull ISMPServiceGroupManager aServiceGroupMgr);
+  ISMPRedirectManager createRedirectMgr (@Nonnull IIdentifierFactory aIdentifierFactory,
+                                         @Nonnull ISMPServiceGroupManager aServiceGroupMgr);
 
   /**
    * @param aIdentifierFactory

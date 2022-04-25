@@ -86,7 +86,8 @@ public class AuditorMongoDB implements IAuditor
    * @param aCurrentUserIDProvider
    *        The current user ID provider. May not be <code>null</code>.
    */
-  public AuditorMongoDB (@Nonnull @Nonempty final String sCollectionName, @Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
+  public AuditorMongoDB (@Nonnull @Nonempty final String sCollectionName,
+                         @Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
   {
     ValueEnforcer.notEmpty (sCollectionName, "CollectionName");
     m_aCollection = MongoClientSingleton.getInstance ().getCollection (sCollectionName);
@@ -139,8 +140,10 @@ public class AuditorMongoDB implements IAuditor
                                @Nullable final String sAction,
                                @Nullable final Object... aArgs)
   {
-    final String sUserID = StringHelper.getNotEmpty (m_aCurrentUserIDProvider.getCurrentUserID (), CUserID.USER_ID_GUEST);
-    final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType.getName () : sAction,
+    final String sUserID = StringHelper.getNotEmpty (m_aCurrentUserIDProvider.getCurrentUserID (),
+                                                     CUserID.USER_ID_GUEST);
+    final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType.getName ()
+                                                                                                : sAction,
                                                                       aArgs);
     final IAuditItem aAuditItem = new AuditItem (sUserID, eActionType, eSuccess, sFullAction);
 
@@ -170,7 +173,10 @@ public class AuditorMongoDB implements IAuditor
   @Nullable
   public LocalDate getEarliestAuditDate ()
   {
-    final Document aDoc = m_aCollection.find ().sort (new Document ("dt", MongoClientProvider.SORT_ASCENDING)).batchSize (1).first ();
+    final Document aDoc = m_aCollection.find ()
+                                       .sort (new Document ("dt", MongoClientProvider.SORT_ASCENDING))
+                                       .batchSize (1)
+                                       .first ();
     if (aDoc != null)
     {
       final LocalDateTime aLDT = TypeConverter.convert (aDoc.getDate ("dt"), LocalDateTime.class);

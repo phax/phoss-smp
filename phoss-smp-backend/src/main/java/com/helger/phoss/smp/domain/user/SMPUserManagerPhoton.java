@@ -78,10 +78,12 @@ public final class SMPUserManagerPhoton
   }
 
   public static void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                      @Nonnull final IUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
+                                      @Nonnull final IUser aCurrentUser) throws SMPNotFoundException,
+                                                                         SMPUnauthorizedException
   {
     // Resolve service group
-    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
+                                                         .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
       throw new SMPNotFoundException ("Service group " + aServiceGroupID.getURIEncoded () + " does not exist");
@@ -91,10 +93,17 @@ public final class SMPUserManagerPhoton
     final String sOwnerID = aServiceGroup.getOwnerID ();
     if (!sOwnerID.equals (aCurrentUser.getID ()))
     {
-      throw new SMPUnauthorizedException ("User '" + aCurrentUser.getLoginName () + "' does not own " + aServiceGroupID.getURIEncoded ());
+      throw new SMPUnauthorizedException ("User '" +
+                                          aCurrentUser.getLoginName () +
+                                          "' does not own " +
+                                          aServiceGroupID.getURIEncoded ());
     }
 
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Verified service group " + aServiceGroup.getID () + " is owned by user '" + aCurrentUser.getLoginName () + "'");
+      LOGGER.debug ("Verified service group " +
+                    aServiceGroup.getID () +
+                    " is owned by user '" +
+                    aCurrentUser.getLoginName () +
+                    "'");
   }
 }

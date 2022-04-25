@@ -47,7 +47,9 @@ public final class SMPTransportProfileManagerMongoDBTest
       final ICommonsList <ISMPTransportProfile> aCreated = aMgr.getAllSMPTransportProfiles ();
       for (final ESMPTransportProfile e : ESMPTransportProfile.values ())
       {
-        final ISMPTransportProfile aCreate = aMgr.createSMPTransportProfile (e.getID (), e.getName (), e.isDeprecated ());
+        final ISMPTransportProfile aCreate = aMgr.createSMPTransportProfile (e.getID (),
+                                                                             e.getName (),
+                                                                             e.isDeprecated ());
         aCreated.add (aCreate);
       }
       final ICommonsList <ISMPTransportProfile> aAll = aMgr.getAllSMPTransportProfiles ();
@@ -55,7 +57,10 @@ public final class SMPTransportProfileManagerMongoDBTest
       for (final ISMPTransportProfile aCreate : aCreated)
         assertTrue (aAll.contains (aCreate));
       for (final ISMPTransportProfile aCreate : aCreated)
-        assertTrue (aMgr.updateSMPTransportProfile (aCreate.getID (), "bla " + aCreate.getName (), aCreate.isDeprecated ()).isChanged ());
+        assertTrue (aMgr.updateSMPTransportProfile (aCreate.getID (),
+                                                    "bla " + aCreate.getName (),
+                                                    aCreate.isDeprecated ())
+                        .isChanged ());
       for (final ISMPTransportProfile aCreate : aCreated)
       {
         final ISMPTransportProfile aInfo = aMgr.getSMPTransportProfileOfID (aCreate.getID ());
