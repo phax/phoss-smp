@@ -71,7 +71,8 @@ public enum EParticipantMigrationState implements IHasID <String>, IHasDisplayNa
    */
   public boolean preventsNewMigration ()
   {
-    return this == IN_PROGRESS || this == MIGRATED;
+    // Due to #209 previously migrated identifiers might be migrated again
+    return this == IN_PROGRESS;
   }
 
   public boolean isOutboundState ()
