@@ -134,7 +134,7 @@ final class FlywayMigrator
                                               // into consideration
                                               .validateOnMigrate (false)
                                               // Version 1 is the baseline
-                                              .baselineVersion ("1")
+                                              .baselineVersion ("0")
                                               .baselineDescription ("SMP 5.2.x database layout, MySQL only")
                                               // Separate directory per DB type
                                               .locations ("db/migrate-" + eDBType.getID ())
