@@ -15,13 +15,13 @@
 -- limitations under the License.
 --
 
-CREATE TABLE "smp_pmigration" (
-    "id"        varchar(45)  NOT NULL,
-    "direction" varchar(45)  NOT NULL,
-    "state"     varchar(45)  NOT NULL,
-    "pid"       varchar(255) NOT NULL,
-    "initdt"    timestamp    NOT NULL,
-    "migkey"    varchar(45)  NOT NULL,
-    CONSTRAINT "pk_smp_pmigration" PRIMARY KEY
-      ("id")
+CREATE TABLE smp_pmigration (
+    id        varchar(45)  NOT NULL,
+    direction varchar(45)  NOT NULL,
+    state     varchar(45)  NOT NULL,
+    pid       varchar(255) NOT NULL,
+    initdt    timestamp    NOT NULL,
+    migkey    varchar(45)  NOT NULL,
+    CONSTRAINT pk_smp_pmigration PRIMARY KEY
+      (id)
   );

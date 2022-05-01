@@ -15,30 +15,30 @@
 -- limitations under the License.
 --
 
-CREATE TABLE "smp_secuser" (
-    "id"             varchar(45)  NOT NULL,
-    "creationdt"     timestamp,
-    "creationuserid" varchar(20),
-    "lastmoddt"      timestamp,
-    "lastmoduserid"  varchar(20),
-    "deletedt"       timestamp,
-    "deleteuserid"   varchar(20),
-    "attrs"          clob,
-    "loginname"      varchar(200) NOT NULL,
-    "email"          varchar(200),
-    "pwalgo"         varchar(100) NOT NULL,
-    "pwsalt"         clob         NOT NULL,
-    "pwhash"         clob         NOT NULL,
-    "firstname"      clob,
-    "lastname"       clob,
-    "description"    clob,
-    "locale"         varchar(20),
-    "lastlogindt"    timestamp,
-    "logincount"     integer,
-    "failedlogins"   integer,
-    "disabled"       SMALLINT   NOT NULL,
-    CONSTRAINT "pk_smp_secuser" PRIMARY KEY
-      ("id")
+CREATE TABLE smp_secuser (
+    id             varchar(45)  NOT NULL,
+    creationdt     timestamp,
+    creationuserid varchar(20),
+    lastmoddt      timestamp,
+    lastmoduserid  varchar(20),
+    deletedt       timestamp,
+    deleteuserid   varchar(20),
+    attrs          clob,
+    loginname      varchar(200) NOT NULL,
+    email          varchar(200),
+    pwalgo         varchar(100) NOT NULL,
+    pwsalt         clob         NOT NULL,
+    pwhash         clob         NOT NULL,
+    firstname      clob,
+    lastname       clob,
+    description    clob,
+    locale         varchar(20),
+    lastlogindt    timestamp,
+    logincount     integer,
+    failedlogins   integer,
+    disabled       SMALLINT   NOT NULL,
+    CONSTRAINT pk_smp_secuser PRIMARY KEY
+      (id)
   );
 
-CREATE INDEX "idx_smp_secuser_loginname" ON "smp_secuser" ("loginname" ASC);
+CREATE INDEX idx_smp_secuser_loginname ON smp_secuser (loginname ASC);

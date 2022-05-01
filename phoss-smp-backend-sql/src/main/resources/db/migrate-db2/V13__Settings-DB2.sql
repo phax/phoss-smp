@@ -15,9 +15,9 @@
 -- limitations under the License.
 --
 
-CREATE TABLE "smp_settings" (
-    "id"    varchar(45)  NOT NULL,
-    "value" varchar(500),
-    CONSTRAINT "pk_smp_settings" PRIMARY KEY
-      ("id")
+CREATE TABLE smp_settings (
+    id    varchar(45)  NOT NULL,
+    value varchar(500),
+    CONSTRAINT pk_smp_settings PRIMARY KEY
+      (id)
   );

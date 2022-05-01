@@ -15,10 +15,10 @@
 -- limitations under the License.
 --
 
-CREATE TABLE "smp_tprofile" (
-    "id"         varchar(45) NOT NULL,
-    "name"       CLOB        NOT NULL,
-    "deprecated" SMALLINT    NOT NULL,
-    CONSTRAINT "pk_smp_tprofile" PRIMARY KEY
-      ("id")
+CREATE TABLE smp_tprofile (
+    id         varchar(45) NOT NULL,
+    name       CLOB        NOT NULL,
+    deprecated SMALLINT    NOT NULL,
+    CONSTRAINT pk_smp_tprofile PRIMARY KEY
+      (id)
   );

@@ -15,18 +15,18 @@
 -- limitations under the License.
 --
 
-CREATE TABLE "smp_secrole" (
-    "id"             varchar(45)  NOT NULL,
-    "creationdt"     timestamp,
-    "creationuserid" varchar(20),
-    "lastmoddt"      timestamp,
-    "lastmoduserid"  varchar(20),
-    "deletedt"       timestamp,
-    "deleteuserid"   varchar(20),
-    "attrs"          clob,
-    "name"           varchar(255) NOT NULL,
-    "description"    clob,
-    CONSTRAINT "pk_smp_secrole" PRIMARY KEY
-      ("id")
+CREATE TABLE smp_secrole (
+    id             varchar(45)  NOT NULL,
+    creationdt     timestamp,
+    creationuserid varchar(20),
+    lastmoddt      timestamp,
+    lastmoduserid  varchar(20),
+    deletedt       timestamp,
+    deleteuserid   varchar(20),
+    attrs          clob,
+    name           varchar(255) NOT NULL,
+    description    clob,
+    CONSTRAINT pk_smp_secrole PRIMARY KEY
+      (id)
   );
   

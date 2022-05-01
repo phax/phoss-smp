@@ -15,13 +15,13 @@
 -- limitations under the License.
 --
 
-CREATE TABLE "smp_audit" (
-    "id"         int         NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
-    "dt"         timestamp   NOT NULL,
-    "userid"     varchar(20) NOT NULL,
-    "actiontype" varchar(10) NOT NULL,
-    "success"    SMALLINT    NOT NULL,
-    "action"     CLOB,
-    CONSTRAINT "pk_smp_audit" PRIMARY KEY
-      ("id")
+CREATE TABLE smp_audit (
+    id         int         NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+    dt         timestamp   NOT NULL,
+    userid     varchar(20) NOT NULL,
+    actiontype varchar(10) NOT NULL,
+    success    SMALLINT    NOT NULL,
+    action     CLOB,
+    CONSTRAINT pk_smp_audit PRIMARY KEY
+      (id)
   );
