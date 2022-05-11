@@ -73,7 +73,7 @@ public final class SMPRendererSecure
    *
    * @author Philip Helger
    */
-  private static final class MenuSessionState extends AbstractSessionSingleton
+  public static final class MenuSessionState extends AbstractSessionSingleton
   {
     private final boolean m_bHttpProxyEnabled;
     private final boolean m_bHttpsProxyEnabled;
