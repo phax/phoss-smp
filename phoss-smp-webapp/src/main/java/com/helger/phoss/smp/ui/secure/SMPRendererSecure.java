@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.IHCNode;
@@ -55,6 +56,7 @@ import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.icon.EDefaultIcon;
+import com.helger.scope.singleton.AbstractSessionSingleton;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
@@ -64,6 +66,43 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  */
 public final class SMPRendererSecure
 {
+  /**
+   * A helper class that checks once per session if proxy information are
+   * configured or not. Usually this information does not change, it it is not
+   * worth the effort to query that in every request.
+   *
+   * @author Philip Helger
+   */
+  private static final class MenuSessionState extends AbstractSessionSingleton
+  {
+    private final boolean m_bHttpProxyEnabled;
+    private final boolean m_bHttpsProxyEnabled;
+
+    @Deprecated
+    @UsedViaReflection
+    public MenuSessionState ()
+    {
+      m_bHttpProxyEnabled = SMPServerConfiguration.getAsHttpProxySettings () != null;
+      m_bHttpsProxyEnabled = SMPServerConfiguration.getAsHttpsProxySettings () != null;
+    }
+
+    @Nonnull
+    public static MenuSessionState getInstance ()
+    {
+      return getSessionSingleton (MenuSessionState.class);
+    }
+
+    public boolean isHttpProxyEnabled ()
+    {
+      return m_bHttpProxyEnabled;
+    }
+
+    public boolean isHttpsProxyEnabled ()
+    {
+      return m_bHttpsProxyEnabled;
+    }
+  }
+
   private SMPRendererSecure ()
   {}
 
@@ -109,8 +148,10 @@ public final class SMPRendererSecure
     final HCNodeList ret = new HCNodeList ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
+    // Main menu in the left
     ret.addChild (BootstrapMenuItemRenderer.createSideBarMenu (aLEC));
 
+    // Small box with general information
     final BootstrapSuccessBox aBox = new BootstrapSuccessBox ().addClass (CBootstrapCSS.MT_2);
 
     if (SMPMetaManager.getInstance ().getBackendConnectionState ().isFalse ())
@@ -171,9 +212,15 @@ public final class SMPRendererSecure
     // Information on certificate
     if (!SMPKeyManager.isKeyStoreValid ())
     {
-      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ()).addChild (" Certificate configuration is invalid."));
+      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ()).addChild (" Certificate configuration is invalid"));
       aBox.setType (EBootstrapAlertType.DANGER);
     }
+
+    // Info, mainly for support purposes
+    if (MenuSessionState.getInstance ().isHttpProxyEnabled ())
+      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.INFO.getAsNode ()).addChild (" HTTP proxy is enabled"));
+    if (MenuSessionState.getInstance ().isHttpsProxyEnabled ())
+      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.INFO.getAsNode ()).addChild (" HTTPS proxy is enabled"));
 
     ret.addChild (aBox);
 
