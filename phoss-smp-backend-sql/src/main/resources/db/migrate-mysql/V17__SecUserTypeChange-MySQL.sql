@@ -15,5 +15,7 @@
 -- limitations under the License.
 --
 
+-- Change type from "text" to "varchar(200)"
 ALTER TABLE `smp_secuser` MODIFY `loginname` varchar(200) NOT NULL;
+-- Change type from "text" to "varchar(200)"
 ALTER TABLE `smp_secuser` MODIFY `email` varchar(200);
