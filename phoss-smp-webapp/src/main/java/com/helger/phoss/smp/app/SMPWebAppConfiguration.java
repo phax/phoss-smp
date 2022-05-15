@@ -133,7 +133,6 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    *         <code>false</code> if not. Default is <code>false</code>.
    * @since 5.0.7
    */
-  @Nullable
   public static boolean isGlobalDebugJaxWS ()
   {
     return getConfigFile ().getAsBoolean ("global.debugjaxws", false);

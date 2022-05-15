@@ -82,10 +82,9 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
                    SMPJDBCConfiguration.CONFIG_SMP_FLYWAY_ENABLED);
 
     // Register this here, so that the SMPMetaManager is available
-    DBExecutor.setConnectionStatusChangeCallback ( (eOld, eNew) -> {
-      // false: don't trigger callback, because the source is DBExecutor
-      SMPMetaManager.getInstance ().setBackendConnectionState (eNew, false);
-    });
+    DBExecutor.setConnectionStatusChangeCallback ( (eOld, eNew) ->
+    // false: don't trigger callback, because the source is DBExecutor
+    SMPMetaManager.getInstance ().setBackendConnectionState (eNew, false));
 
     // Allow communicating in the other direction as well
     SMPMetaManager.getInstance ()

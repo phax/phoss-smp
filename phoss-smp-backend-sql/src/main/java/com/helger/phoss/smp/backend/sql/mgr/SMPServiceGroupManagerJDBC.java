@@ -93,7 +93,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
   public boolean isCacheEnabled ()
   {
-    return false;
+    return m_aCache != null;
   }
 
   public void setCacheEnabled (final boolean bEnabled)
