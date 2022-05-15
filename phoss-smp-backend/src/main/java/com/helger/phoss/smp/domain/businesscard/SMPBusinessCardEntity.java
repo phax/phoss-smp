@@ -29,6 +29,8 @@ import com.helger.commons.id.IHasID;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.json.IJsonArray;
+import com.helger.json.JsonArray;
 import com.helger.pd.businesscard.generic.PDBusinessEntity;
 import com.helger.pd.businesscard.generic.PDContact;
 import com.helger.pd.businesscard.generic.PDIdentifier;
@@ -91,6 +93,27 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   public final ICommonsList <SMPBusinessCardName> names ()
   {
     return m_aNames;
+  }
+
+  /**
+   * @return <code>true</code> if this entity has exactly one name without a
+   *         specific language code.
+   * @since 5.7.0
+   */
+  public final boolean isSingleNameWithoutLanguage ()
+  {
+    return m_aNames.size () == 1 && m_aNames.getFirst ().hasNoLanguageCode ();
+  }
+
+  /**
+   * @return All names as a single JSON array.
+   * @since 5.7.0
+   * @see SMPBusinessCardName#getAsJson()
+   */
+  @Nonnull
+  public final IJsonArray getNamesAsJson ()
+  {
+    return new JsonArray ().addAllMapped (m_aNames, SMPBusinessCardName::getAsJson);
   }
 
   /**

@@ -23,6 +23,8 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.locale.LocaleHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.json.IJsonObject;
+import com.helger.json.JsonObject;
 import com.helger.pd.businesscard.generic.PDName;
 import com.helger.pd.businesscard.v3.PD3APIHelper;
 import com.helger.pd.businesscard.v3.PD3MultilingualNameType;
@@ -35,6 +37,9 @@ import com.helger.pd.businesscard.v3.PD3MultilingualNameType;
 @Immutable
 public class SMPBusinessCardName implements Serializable
 {
+  public static final String JSON_TAG_NAME = "name";
+  public static final String JSON_TAG_LANGUAGE = "language";
+
   private final String m_sName;
   private final String m_sLanguageCode;
 
@@ -82,6 +87,15 @@ public class SMPBusinessCardName implements Serializable
     return PD3APIHelper.createName (m_sName, m_sLanguageCode);
   }
 
+  @Nonnull
+  public IJsonObject getAsJson ()
+  {
+    final IJsonObject ret = new JsonObject ().add (JSON_TAG_NAME, m_sName);
+    if (StringHelper.hasText (m_sLanguageCode))
+      ret.add (JSON_TAG_LANGUAGE, m_sLanguageCode);
+    return ret;
+  }
+
   @Override
   public boolean equals (final Object o)
   {
@@ -106,5 +120,18 @@ public class SMPBusinessCardName implements Serializable
     return new ToStringGenerator (null).append ("Name", m_sName)
                                        .appendIfNotNull ("LanguageCode", m_sLanguageCode)
                                        .getToString ();
+  }
+
+  @Nullable
+  public static SMPBusinessCardName createFromJson (@Nonnull final IJsonObject aJson)
+  {
+    try
+    {
+      return new SMPBusinessCardName (aJson.getAsString (JSON_TAG_NAME), aJson.getAsString (JSON_TAG_LANGUAGE));
+    }
+    catch (final RuntimeException ex)
+    {
+      return null;
+    }
   }
 }

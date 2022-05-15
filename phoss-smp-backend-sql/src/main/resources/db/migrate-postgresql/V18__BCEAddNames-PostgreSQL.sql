@@ -1,0 +1,2 @@
+ALTER TABLE smp_bce ADD COLUMN names text;
+ALTER TABLE smp_bce ALTER COLUMN name DROP NOT NULL;

@@ -40,12 +40,15 @@ import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.mutable.MutableBoolean;
 import com.helger.commons.state.EChange;
+import com.helger.commons.state.EContinue;
 import com.helger.commons.state.ESuccess;
+import com.helger.commons.string.StringHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.json.IJson;
+import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
@@ -213,13 +216,24 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       for (final SMPBusinessCardEntity aEntity : aEntities)
       {
         // Single name only
-        aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_bce (id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate)" +
-                                          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        final String sName;
+        final String sNames;
+        if (aEntity.isSingleNameWithoutLanguage ())
+        {
+          sName = aEntity.names ().getFirst ().getName ();
+          sNames = null;
+        }
+        else
+        {
+          sName = null;
+          sNames = aEntity.getNamesAsJson ().getAsJsonString ();
+        }
+        aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_bce (id, pid, name, names, country, geoinfo, identifiers, websites, contacts, addon, regdate)" +
+                                          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                           new ConstantPreparedStatementDataProvider (aEntity.getID (),
                                                                                      sPID,
-                                                                                     aEntity.names ()
-                                                                                            .getFirst ()
-                                                                                            .getName (),
+                                                                                     sName,
+                                                                                     sNames,
                                                                                      aEntity.getCountryCode (),
                                                                                      aEntity.getGeographicalInformation (),
                                                                                      getBCIAsJson (aEntity.identifiers ()).getAsJsonString (JWS),
@@ -297,11 +311,45 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   }
 
   @Nonnull
+  private static EContinue _addNames (@Nonnull final SMPBusinessCardEntity aEntity,
+                                      @Nullable final String sName,
+                                      @Nullable final String sNames)
+  {
+    if (StringHelper.hasText (sNames))
+    {
+      // Eventually more then one name - parse JSON
+      final IJsonArray aJsonArray = JsonReader.builder ().source (sNames).readAsArray ();
+      if (aJsonArray != null)
+        for (final IJsonObject aJsonObj : aJsonArray.iteratorObjects ())
+        {
+          final SMPBusinessCardName aBCName = SMPBusinessCardName.createFromJson (aJsonObj);
+          if (aBCName != null)
+            aEntity.names ().add (aBCName);
+        }
+
+      // Check only once at the end
+      if (aEntity.names ().isEmpty ())
+      {
+        LOGGER.error ("The names of a Business Entity retrieved from the DB (" +
+                      sNames +
+                      ") could not be parsed properly to a JSON array of JSON objects. Ignoring Business Entity.");
+        return EContinue.BREAK;
+      }
+    }
+    else
+    {
+      // Single name
+      aEntity.names ().add (new SMPBusinessCardName (sName, null));
+    }
+    return EContinue.CONTINUE;
+  }
+
+  @Nonnull
   @ReturnsMutableCopy
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, pid, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, pid, name, names, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
                                                                           " FROM smp_bce");
     if (aDBResult != null)
     {
@@ -312,18 +360,28 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       for (final DBResultRow aRow : aDBResult)
       {
         final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aRow.getAsString (0));
-        // Single name only
-        aEntity.names ().add (new SMPBusinessCardName (aRow.getAsString (2), null));
-        aEntity.setCountryCode (aRow.getAsString (3));
-        aEntity.setGeographicalInformation (aRow.getAsString (4));
-        aEntity.identifiers ().setAll (getJsonAsBCI (aRow.getAsString (5)));
-        aEntity.websiteURIs ().setAll (getJsonAsString (aRow.getAsString (6)));
-        aEntity.contacts ().setAll (getJsonAsBCC (aRow.getAsString (7)));
-        aEntity.setAdditionalInformation (aRow.getAsString (8));
-        aEntity.setRegistrationDate (aRow.get (9).getAsLocalDate ());
-        aEntityMap.computeIfAbsent (aIF.parseParticipantIdentifier (aRow.getAsString (1)),
-                                    k -> new CommonsArrayList <> ())
-                  .add (aEntity);
+        final String sPID = aRow.getAsString (1);
+        final IParticipantIdentifier aPID = aIF.parseParticipantIdentifier (sPID);
+        if (aPID == null)
+        {
+          LOGGER.error ("The participant identifier of a Business Entity retrieved from the DB (" +
+                        sPID +
+                        ") cannot be parsed properly. Ignoring Business Entity.");
+          continue;
+        }
+
+        // Single name or multiple names?
+        final String sName = aRow.getAsString (2);
+        final String sNames = aRow.getAsString (3);
+        _addNames (aEntity, sName, sNames);
+        aEntity.setCountryCode (aRow.getAsString (4));
+        aEntity.setGeographicalInformation (aRow.getAsString (5));
+        aEntity.identifiers ().setAll (getJsonAsBCI (aRow.getAsString (6)));
+        aEntity.websiteURIs ().setAll (getJsonAsString (aRow.getAsString (7)));
+        aEntity.contacts ().setAll (getJsonAsBCC (aRow.getAsString (8)));
+        aEntity.setAdditionalInformation (aRow.getAsString (9));
+        aEntity.setRegistrationDate (aRow.get (10).getAsLocalDate ());
+        aEntityMap.computeIfAbsent (aPID, k -> new CommonsArrayList <> ()).add (aEntity);
       }
 
       // Convert
@@ -354,7 +412,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     if (aID == null)
       return null;
 
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, name, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, name, names, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
                                                                           " FROM smp_bce" +
                                                                           " WHERE pid=?",
                                                                           new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
@@ -368,15 +426,16 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     for (final DBResultRow aRow : aDBResult)
     {
       final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aRow.getAsString (0));
-      // Single name only
-      aEntity.names ().add (new SMPBusinessCardName (aRow.getAsString (1), null));
-      aEntity.setCountryCode (aRow.getAsString (2));
-      aEntity.setGeographicalInformation (aRow.getAsString (3));
-      aEntity.identifiers ().setAll (getJsonAsBCI (aRow.getAsString (4)));
-      aEntity.websiteURIs ().setAll (getJsonAsString (aRow.getAsString (5)));
-      aEntity.contacts ().setAll (getJsonAsBCC (aRow.getAsString (6)));
-      aEntity.setAdditionalInformation (aRow.getAsString (7));
-      aEntity.setRegistrationDate (aRow.get (8).getAsLocalDate ());
+      final String sName = aRow.getAsString (1);
+      final String sNames = aRow.getAsString (2);
+      _addNames (aEntity, sName, sNames);
+      aEntity.setCountryCode (aRow.getAsString (3));
+      aEntity.setGeographicalInformation (aRow.getAsString (4));
+      aEntity.identifiers ().setAll (getJsonAsBCI (aRow.getAsString (5)));
+      aEntity.websiteURIs ().setAll (getJsonAsString (aRow.getAsString (6)));
+      aEntity.contacts ().setAll (getJsonAsBCC (aRow.getAsString (7)));
+      aEntity.setAdditionalInformation (aRow.getAsString (8));
+      aEntity.setRegistrationDate (aRow.get (9).getAsLocalDate ());
       aEntities.add (aEntity);
     }
     return new SMPBusinessCard (aID, aEntities);
