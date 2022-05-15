@@ -29,6 +29,7 @@ import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
+import com.helger.xsds.bdxr.smp2.bc.ContentBinaryObjectType;
 
 /**
  * Default implementation of the {@link ISMPEndpoint} interface.
@@ -249,8 +250,9 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
       final com.helger.xsds.bdxr.smp2.ac.CertificateType aCert = new com.helger.xsds.bdxr.smp2.ac.CertificateType ();
       aCert.setActivationDate (PDTFactory.createXMLOffsetDate (aX509Cert.getNotBefore ()));
       aCert.setExpirationDate (PDTFactory.createXMLOffsetDate (aX509Cert.getNotAfter ()));
-      aCert.setContentBinaryObject (CertificateHelper.getEncodedCertificate (aX509Cert))
-           .setMimeCode (SMPServerConfiguration.getBDXR2CertificateMimeCode ());
+      final ContentBinaryObjectType aCBO = aCert.setContentBinaryObject (CertificateHelper.getEncodedCertificate (aX509Cert));
+      aCBO.setMimeCode (SMPServerConfiguration.getBDXR2CertificateMimeCode ());
+      aCert.setTypeCode (SMPServerConfiguration.getBDXR2CertificateTypeCode ());
       ret.addCertificate (aCert);
     }
     return ret;

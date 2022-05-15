@@ -88,6 +88,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
 
   public static final String KEY_SMP_BDXR2_CERTIFICATE_MIME_CODE = "smp.bdxr2.certificate.mimecode";
+  public static final String KEY_SMP_BDXR2_CERTIFICATE_TYPE_CODE = "smp.bdxr2.certificate.typecode";
 
   public static final String KEY_SMP_TIMEZONE = "smp.timezone";
 
@@ -123,6 +124,7 @@ public final class SMPServerConfiguration
 
   public static final String DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE = EMimeContentType.APPLICATION.buildMimeType ("base64")
                                                                                                    .getAsString ();
+  public static final String DEFAULT_SMP_BDXR2_CERTIFICATE_TYPE_CODE = "bdxr-as4-signing-encryption";
 
   public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED = true;
   public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED = true;
@@ -420,6 +422,18 @@ public final class SMPServerConfiguration
   public static String getBDXR2CertificateMimeCode ()
   {
     return getConfigFile ().getAsString (KEY_SMP_BDXR2_CERTIFICATE_MIME_CODE, DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE);
+  }
+
+  /**
+   * @return The type code to be used for BDXR2 certificates. Defaults to
+   *         {@link #DEFAULT_SMP_BDXR2_CERTIFICATE_TYPE_CODE}.
+   * @since 5.7.0
+   */
+  @Nonnull
+  @Nonempty
+  public static String getBDXR2CertificateTypeCode ()
+  {
+    return getConfigFile ().getAsString (KEY_SMP_BDXR2_CERTIFICATE_TYPE_CODE, DEFAULT_SMP_BDXR2_CERTIFICATE_TYPE_CODE);
   }
 
   @Nonnull
