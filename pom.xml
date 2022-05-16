@@ -26,7 +26,7 @@
   </parent>
   <groupId>com.helger</groupId>
   <artifactId>phoss-smp-parent-pom</artifactId>
-  <version>5.7.0</version>
+  <version>5.7.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>phoss-smp-parent-pom</name>
   <description>Base POM to build the phoss SMP projects</description>
@@ -50,7 +50,7 @@
     <connection>scm:git:git@github.com:phax/phoss-smp.git</connection>
     <developerConnection>scm:git:git@github.com:phax/phoss-smp.git</developerConnection>
     <url>http://github.com/phax/phoss-smp</url>
-    <tag>phoss-smp-parent-pom-5.7.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <organization>
