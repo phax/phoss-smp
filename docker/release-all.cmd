@@ -17,7 +17,7 @@
 
 @echo off
 
-set version=5.6.2
+set version=5.7.0
 
 docker login --username phelger
 
