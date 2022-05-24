@@ -18,30 +18,27 @@
 @echo off
 
 set version=5.7.0
+::set db=docker buildx build --platform=linux/amd64,linux/arm64 --push
+
+echo Docker login
+docker login --username phelger
+
+echo Starting buildx
+docker buildx create --name phoss-smp node-amd64
 
 rem --------------- XML -----------------------
 
-docker build --pull --build-arg SMP_VERSION=%version% -t phoss-smp-release-binary-xml-%version% -f Dockerfile-release-binary-xml .
-
-rem legacy names
-
-docker tag phoss-smp-release-binary-xml-%version% phelger/smp:%version%
-docker tag phoss-smp-release-binary-xml-%version% phelger/smp:latest
-
-rem new names
-
-docker tag phoss-smp-release-binary-xml-%version% phelger/phoss-smp-xml:%version%
-docker tag phoss-smp-release-binary-xml-%version% phelger/phoss-smp-xml:latest
+docker buildx build --platform=linux/amd64 --push --pull --build-arg SMP_VERSION=%version% -t phelger/smp:%version% -t phelger/smp:latest -t phelger/phoss-smp-xml:%version% -t phelger/phoss-smp-xml:latest -f Dockerfile-release-binary-xml .
+docker buildx build --platform=linux/arm64 --push --pull --build-arg SMP_VERSION=%version% -t phelger/phoss-smp-xml-arm64:%version% -t phelger/phoss-smp-xml-arm64:latest -f Dockerfile-release-binary-xml .
 
 rem --------------- SQL -----------------------
 
-docker build --pull --build-arg SMP_VERSION=%version% -t phoss-smp-release-binary-sql-%version% -f Dockerfile-release-binary-sql .
-docker tag phoss-smp-release-binary-sql-%version% phelger/phoss-smp-sql:%version%
-docker tag phoss-smp-release-binary-sql-%version% phelger/phoss-smp-sql:latest
+docker buildx build --platform=linux/amd64 --push --pull --build-arg SMP_VERSION=%version% -t phelger/phoss-smp-sql:%version% -t phelger/phoss-smp-sql:latest -f Dockerfile-release-binary-sql .
+docker buildx build --platform=linux/arm64 --push --pull --build-arg SMP_VERSION=%version% -t phelger/phoss-smp-sql-arm64:%version% -t phelger/phoss-smp-sql-arm64:latest -f Dockerfile-release-binary-sql .
 
 rem --------------- MongoDB -----------------------
 
-docker build --pull --build-arg SMP_VERSION=%version% -t phoss-smp-release-binary-mongodb-%version% -f Dockerfile-release-binary-mongodb .
-docker tag phoss-smp-release-binary-mongodb-%version% phelger/phoss-smp-mongodb:%version%
-docker tag phoss-smp-release-binary-mongodb-%version% phelger/phoss-smp-mongodb:latest
+docker buildx build --platform=linux/amd64 --push --pull --build-arg SMP_VERSION=%version% -t phelger/phoss-smp-mongodb:%version% -t phelger/phoss-smp-mongodb:latest -f Dockerfile-release-binary-mongodb .
+docker buildx build --platform=linux/arm64 --push --pull --build-arg SMP_VERSION=%version% -t phelger/phoss-smp-mongodb-arm64:%version% -t phelger/phoss-smp-mongodb-arm:latest -f Dockerfile-release-binary-mongodb .
 
+:end
