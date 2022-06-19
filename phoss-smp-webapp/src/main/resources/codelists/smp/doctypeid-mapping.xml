@@ -1,22 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (C) 2014-2022 Philip Helger and contributors
-    philip[at]helger[dot]com
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-            http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
 <root type="doctypeid">
   <item id="busdox-docid-qns::urn:fdc:difi.no:2017:payment:extras-1::HandlingException##urn:fdc:difi.no:2017:payment:handling:1.0:for:urn:iso:std:iso:20022:tech:xsd:camt.029.001.03:restricted:urn:fdc:bits.no:2017:iso20022:1.5::1.0" name="Peppol EHF Cancellation of General Credit transfer Initiation (Profile 02) (Camt.029 Handling Exception)" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:bits.no:2017:profile:02:1.0" />
@@ -78,6 +60,12 @@
   <item id="busdox-docid-qns::urn:fdc:difi.no:2017:payment:extras-1::ReceptionAcknowledgement##urn:fdc:difi.no:2017:payment:handling:1.0:for:urn:urn:iso:std:iso:20022:tech:xsd:camt.054.001.02:restricted:urn:fdc:bits.no:2017:iso20022:1.5::1.0" name="Peppol EHF Accounting/General Ledger/cash management (Profile 09) (Camt.054 Reception Acknowledgement)" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:bits.no:2017:profile:09:1.0" />
   </item>
+  <item id="busdox-docid-qns::urn:fdc:peppol:end-user-reporting:1.0::EndUserReport##urn:fdc:peppol.eu:oo:trns:end-user-report:1::1.0" name="Peppol OpenPeppol End User Report" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:oo:bis:reporting:1" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:peppol:transaction-statistics-reporting:1.0::TransactionStatisticsReport##urn:fdc:peppol.eu:oo:trns:transaction-statistics-reporting:1::1.0" name="Peppol OpenPeppol Transaction Statistics Report" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:oo:bis:reporting:1" />
+  </item>
   <item id="busdox-docid-qns::urn:iso:std:iso:20022:tech:xsd:camt.029.001.03::Document##urn:fdc:bits.no:2017:iso20022:1.5::03" name="Peppol EHF Cancellation of General Credit transfer Initiation (Profile 02) (Camt.029 Message)" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:bits.no:2017:profile:02:1.0" />
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:bits.no:2017:profile:04:1.0" />
@@ -109,6 +97,9 @@
   </item>
   <item id="busdox-docid-qns::urn:kosit:names:spec:peppol-reporting:schema:xsd:Reporting-1::APData##Reporting::1.0" name="Peppol German Peppol Usage Evaluation AP" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:kosit:profile:reporting:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2::ApplicationResponse##urn:fdc:peppol.eu:logistics:trns:despatch_advice_response:1::2.1" name="Peppol BEAst Despatch Advice Response" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_response:1" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2::ApplicationResponse##urn:fdc:peppol.eu:poacc:trns:catalogue_response:3::2.1" name="Peppol Catalogue Response transaction 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:poacc:bis:catalogue_only:3" />
@@ -209,6 +200,12 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.1::2.1" name="Peppol XRechnung UBL CreditNote V2.1" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
   </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.2#conformant#urn:xoev-de:kosit:extension:xrechnung_2.2::2.1" name="Peppol XRechnung UBL CreditNote V2.2 Extension" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.2::2.1" name="Peppol XRechnung UBL CreditNote V2.2" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
+  </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:cen.eu:en16931:2017#conformant#urn:UBL.BE:1.0.0.20180214::2.1" name="Peppol UBL.BE Credit Note 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
   </item>
@@ -241,6 +238,10 @@
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:www.cenbii.eu:transaction:biitrns014:ver2.0:extended:urn:www.peppol.eu:bis:peppol5a:ver2.0:extended:e-fff:ver3.0::2.1" name="e-FFF 3.0 CreditNote" deprecated="true">
     <procid scheme="cenbii-procid-ubl" value="urn:www.cenbii.eu:profile:bii05:ver1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:DespatchAdvice-2::DespatchAdvice##urn:fdc:peppol.eu:logistics:trns:advanced_despatch_advice:1::2.1" name="Peppol BEAst Advanced Despatch Advice" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_only:1" />
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_response:1" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:DespatchAdvice-2::DespatchAdvice##urn:fdc:peppol.eu:poacc:trns:despatch_advice:3::2.1" name="Peppol Despatch Advice transaction 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:poacc:bis:despatch_advice:3" />
@@ -336,6 +337,12 @@
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.1::2.1" name="Peppol XRechnung UBL Invoice V2.1" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.2#conformant#urn:xoev-de:kosit:extension:xrechnung_2.2::2.1" name="Peppol XRechnung UBL Invoice V2.2 Extension" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.2::2.1" name="Peppol XRechnung UBL Invoice V2.2" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#conformant#urn:UBL.BE:1.0.0.20180214::2.1" name="Peppol UBL.BE Invoice 3.0" deprecated="false">
@@ -513,6 +520,9 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TenderWithdrawal-2::TenderWithdrawal##urn:fdc:peppol.eu:prac:trns:t013:1.1::2.2" name="Peppol Tender Withdrawal / Tender Withdrawal V1.1" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:prac:bis:p007:1.1" />
   </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:WeightStatement-2::WeightStatement##urn:fdc:peppol.eu:logistics:trns:weight_statement:1::2.3" name="Peppol BEAst Weight Statement" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:weight_statement:1" />
+  </item>
   <item id="busdox-docid-qns::urn:oasis:names:tc:ebxml-regrep:xsd:lcm:4.0::SubmitObjectsRequest##urn:fdc:peppol.eu:prac:trns:t015:1.1::4.0" name="Peppol Publish Notice / Publish Notice V1.1" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:prac:bis:p008:1.1" />
   </item>
@@ -558,6 +568,12 @@
   <item id="busdox-docid-qns::urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100::CrossIndustryInvoice##urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.1::D16B" name="Peppol XRechnung CII Invoice V2.1" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
   </item>
+  <item id="busdox-docid-qns::urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100::CrossIndustryInvoice##urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.2#conformant#urn:xoev-de:kosit:extension:xrechnung_2.2::D16B" name="Peppol XRechnung CII Invoice V2.2 Extension" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100::CrossIndustryInvoice##urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.2::D16B" name="Peppol XRechnung CII Invoice V2.2" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
+  </item>
   <item id="busdox-docid-qns::urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100::CrossIndustryInvoice##urn:cen.eu:en16931:2017::D16B" name="Peppol EN 16931 CII Invoice" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:poacc:en16931:any" />
   </item>
@@ -570,30 +586,4 @@
   <item id="busdox-docid-qns::urn:www.peppol.eu:schema:xsd:VirtualCompanyDossierPackage-1::VirtualCompanyDossierPackage##urn:www.cenbii.eu:transaction:biicoretrdm992:ver0.1:#urn:www.peppol.eu:bis:peppol992a:ver1.0::0.1" name="Peppol Virtual Company Dossier Package" deprecated="true">
     <procid scheme="cenbii-procid-ubl" value="none" />
   </item>
-  <item id="toop-doctypeid-qns::CrewCertificate::CREWCERTIFICATE_TYPE::UNSTRUCTURED::toop-edm:v2.0" name="TOOP Crew Certificate Data 2.0" deprecated="true" />
-  <item id="toop-doctypeid-qns::FinancialRecord::FINANCIAL_RECORD_TYPE::UNSTRUCTURED::toop-edm:v2.0" name="TOOP EDM Document Request on Fincancial Record 2.0" deprecated="true" />
-  <item id="toop-doctypeid-qns::FinancialRecord::FINANCIAL_RECORD_TYPE::UNSTRUCTURED::toop-edm:v2.1" name="TOOP EDM Document Request on Fincancial Record 2.1" deprecated="false" />
-  <item id="toop-doctypeid-qns::QueryResponse::toop-edm:v2.0" name="TOOP EDM Response 2.0" deprecated="true" />
-  <item id="toop-doctypeid-qns::QueryResponse::toop-edm:v2.1" name="TOOP EDM Response 2.1" deprecated="false" />
-  <item id="toop-doctypeid-qns::RegisteredOrganization::REGISTERED_ORGANIZATION_TYPE::CONCEPT##CCCEV::toop-edm:v2.0" name="TOOP EDM Concept Request on RegisteredOrganisation Data 2.0" deprecated="true" />
-  <item id="toop-doctypeid-qns::RegisteredOrganization::REGISTERED_ORGANIZATION_TYPE::CONCEPT##CCCEV::toop-edm:v2.1" name="TOOP EDM Concept Request on RegisteredOrganisation Data 2.1" deprecated="false" />
-  <item id="toop-doctypeid-qns::ShipCertificate::SHIPCERTIFICATE_TYPE::UNSTRUCTURED::toop-edm:v2.0" name="TOOP Ship Certificate Data 2.0" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p10::Request##urn:eu.toop.request.registeredorganization::1.10" name="TOOP Registered Organization Request" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p10::Response##urn:eu.toop.response.registeredorganization::1.10" name="TOOP Registered Organization Response" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.crewcertificate-list::1.40" name="TOOP Crew Certificate List Request" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.crewcertificate::1.40" name="TOOP Crew Certificate Request" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.evidence-list::1.40" name="TOOP Evidence List Request" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.evidence::1.40" name="TOOP Evidence Request" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.registeredorganization-list::1.40" name="TOOP Registered Organization List Request" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.registeredorganization::1.40" name="TOOP Registered Organization Request" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.shipcertificate-list::1.40" name="TOOP Ship Certificate List Request" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Request##urn:eu.toop.request.shipcertificate::1.40" name="TOOP Ship Certificate Request" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.crewcertificate-list::1.40" name="TOOP Crew Certificate List Response" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.crewcertificate::1.40" name="TOOP Crew Certificate Response" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.evidence-list::1.40" name="TOOP Evidence List Response" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.evidence::1.40" name="TOOP Evidence Response" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.registeredorganization-list::1.40" name="TOOP Registered Organization List Response" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.registeredorganization::1.40" name="TOOP Registered Organization Response" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.shipcertificate-list::1.40" name="TOOP Ship Certificate List Response" deprecated="true" />
-  <item id="toop-doctypeid-qns::urn:eu:toop:ns:dataexchange-1p40::Response##urn:eu.toop.response.shipcertificate::1.40" name="TOOP Ship Certificate Response" deprecated="true" />
 </root>
