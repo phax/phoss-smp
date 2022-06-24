@@ -27,10 +27,13 @@ ARG SMP_VERSION
 # Set to environment to be persistent
 ENV SMP_VERSION=${SMP_VERSION:-5.7.0}
 
-# Download, unzip and copy result to Tomcat webapps dir
+# Download the SMP from GitHub releases
+# Unzip the WAR file to /smp
+# Remove the default "application.properties" file to avoid invalid default configuration
 RUN echo Downloading phoss SMP $SMP_VERSION \
   && wget -nv https://github.com/phax/phoss-smp/releases/download/phoss-smp-parent-pom-$SMP_VERSION/phoss-smp-webapp-mongodb-$SMP_VERSION.war -O smp.zip \ 
-  && unzip smp.zip -d /smp
+  && unzip smp.zip -d /smp \
+  && rm /smp/WEB-INF/classes/application.properties
 
 
 # Use an official Tomcat runtime as a base image
