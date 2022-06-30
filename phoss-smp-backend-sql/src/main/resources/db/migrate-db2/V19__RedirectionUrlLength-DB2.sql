@@ -15,4 +15,19 @@
 -- limitations under the License.
 --
 
-ALTER TABLE smp_service_metadata_red ALTER COLUMN redirectionUrl SET DATA TYPE CLOB NOT NULL;
+-- This is not allowed in DB2
+-- ALTER TABLE smp_service_metadata_red ALTER COLUMN redirectionUrl SET DATA TYPE CLOB NOT NULL;
+
+-- Alternative steps to do:
+-- Rename existing column to new name (col1)
+ALTER TABLE smp_service_metadata_red RENAME COLUMN redirectionUrl TO old1;
+
+-- create column with requested name of CLOB type (col2)
+ALTER TABLE smp_service_metadata_red ADD COLUMN redirectionUrl CLOB NOT NULL;
+
+-- copy from new column (col1) to "old column" (col2)
+UPDATE TABLE smp_service_metadata_red redirectionUrl = old1;
+
+-- delete new column (col1)
+ ALTER TABLE smp_service_metadata_red DROP COLUMN old1;
+ 
