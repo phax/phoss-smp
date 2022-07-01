@@ -20,6 +20,7 @@
 
 -- Alternative steps to do:
 -- Rename existing column to new name (col1)
+ALTER TABLE smp_service_metadata_red COLUMN redirectionUrl DROP DEFAULT;
 ALTER TABLE smp_service_metadata_red RENAME COLUMN redirectionUrl TO old1;
 
 -- create column with requested name of CLOB type (col2)
@@ -30,4 +31,3 @@ UPDATE TABLE smp_service_metadata_red redirectionUrl = old1;
 
 -- delete new column (col1)
  ALTER TABLE smp_service_metadata_red DROP COLUMN old1;
- 
