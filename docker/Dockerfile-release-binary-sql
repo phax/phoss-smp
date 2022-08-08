@@ -25,7 +25,7 @@ RUN apt-get update \
 
 ARG SMP_VERSION
 # Set to environment to be persistent
-ENV SMP_VERSION=${SMP_VERSION:-5.7.0}
+ENV SMP_VERSION=${SMP_VERSION:-5.7.1}
 
 # Download the SMP from GitHub releases
 # Unzip the WAR file to /smp
@@ -46,7 +46,7 @@ ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_EN
 # Set arguments and labels after initial cleanup was performed
 ARG SMP_VERSION
 # Set to environment to be persistent
-ENV SMP_VERSION=${SMP_VERSION:-5.7.0}
+ENV SMP_VERSION=${SMP_VERSION:-5.7.1}
 LABEL vendor="Philip Helger"
 LABEL version=$SMP_VERSION
 
