@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.ui;
 
+import java.time.Duration;
+
 import javax.annotation.Nonnull;
 
 import com.helger.phoss.smp.SMPServerConfiguration;
@@ -38,10 +40,12 @@ public final class SMPLoginManager extends BootstrapLoginManager
   {
     super (CSMP.getApplicationTitle () + " Administration - Login");
     setRequiredRoleIDs (CSMP.REQUIRED_ROLE_IDS_CONFIG);
+    setFailedLoginWaitingTime (Duration.ofSeconds (1));
   }
 
   @Override
-  protected IHTMLProvider createLoginScreen (final boolean bLoginError, @Nonnull final ICredentialValidationResult aLoginResult)
+  protected IHTMLProvider createLoginScreen (final boolean bLoginError,
+                                             @Nonnull final ICredentialValidationResult aLoginResult)
   {
     return new SMPLoginHTMLProvider (bLoginError, aLoginResult, getPageTitle ());
   }

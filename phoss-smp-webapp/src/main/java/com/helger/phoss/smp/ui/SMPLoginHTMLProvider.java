@@ -25,6 +25,7 @@ import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.textlevel.HCSmall;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.ui.pub.SMPRendererPublic;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
@@ -45,6 +46,7 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
                                @Nullable final IHCNode aPageTitle)
   {
     super (bLoginError, aLoginResult, aPageTitle);
+    setShowLoginErrorDetails (SMPWebAppConfiguration.isSecurityLoginShowErrorDetails ());
   }
 
   @Override
@@ -56,7 +58,8 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
 
   @Override
   @Nonnull
-  protected IHCNode createPageHeader (@Nonnull final ISimpleWebExecutionContext aSWEC, @Nullable final IHCNode aPageTitle)
+  protected IHCNode createPageHeader (@Nonnull final ISimpleWebExecutionContext aSWEC,
+                                      @Nullable final IHCNode aPageTitle)
   {
     final HCNodeList ret = new HCNodeList ();
     ret.addChild (new HCDiv ().addClass (CBootstrapCSS.MB_3).addChild (SMPRendererPublic.createLogoBig (aSWEC)));

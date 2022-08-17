@@ -227,6 +227,16 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> if the details of login failures (like "User not
+   *         existing" or "Invalid password") should be shown or not.
+   * @since 6.0.0
+   */
+  public static boolean isSecurityLoginShowErrorDetails ()
+  {
+    return getConfigFile ().getAsBoolean ("webapp.security.login.errordetails", true);
+  }
+
+  /**
    * Settings for issue #102
    *
    * @return <code>true</code> if the Login UI elements should be shown,

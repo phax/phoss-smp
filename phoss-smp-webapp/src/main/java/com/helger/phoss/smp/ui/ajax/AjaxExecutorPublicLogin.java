@@ -28,6 +28,7 @@ import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.render.HCRenderer;
 import com.helger.json.JsonObject;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.bootstrap4.traits.IHCBootstrap4Trait;
 import com.helger.photon.core.EPhotonCoreText;
@@ -57,7 +58,9 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor imple
 
     // Main login
     final ELoginResult eLoginResult = LoggedInUserManager.getInstance ()
-                                                         .loginUser (sLoginName, sPassword, CSMP.REQUIRED_ROLE_IDS_WRITABLERESTAPI);
+                                                         .loginUser (sLoginName,
+                                                                     sPassword,
+                                                                     CSMP.REQUIRED_ROLE_IDS_WRITABLERESTAPI);
     if (eLoginResult.isSuccess ())
     {
       aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, true));
@@ -70,11 +73,17 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor imple
         LOGGER.warn ("Login of '" + sLoginName + "' failed because " + eLoginResult);
 
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
-    final IHCNode aRoot = error (EPhotonCoreText.LOGIN_ERROR_MSG.getDisplayText (aDisplayLocale) +
-                                 " " +
-                                 eLoginResult.getDisplayText (aDisplayLocale));
+    String sErrorMessage = EPhotonCoreText.LOGIN_ERROR_MSG.getDisplayText (aDisplayLocale);
+    if (SMPWebAppConfiguration.isSecurityLoginShowErrorDetails ())
+    {
+      // Append details
+      sErrorMessage += " " + eLoginResult.getDisplayText (aDisplayLocale);
+    }
+
+    final IHCNode aRoot = error (sErrorMessage);
 
     // Set as result property
-    aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, false).add (JSON_HTML, HCRenderer.getAsHTMLStringWithoutNamespaces (aRoot)));
+    aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, false)
+                                         .add (JSON_HTML, HCRenderer.getAsHTMLStringWithoutNamespaces (aRoot)));
   }
 }
