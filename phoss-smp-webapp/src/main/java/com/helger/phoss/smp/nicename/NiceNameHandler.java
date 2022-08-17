@@ -36,7 +36,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
-import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.phoss.smp.app.SMPConfigV6;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.serialize.MicroReader;
@@ -60,7 +60,8 @@ public final class NiceNameHandler
 
   @Nonnull
   @ReturnsMutableCopy
-  public static ICommonsOrderedMap <String, NiceNameEntry> readEntries (@Nonnull final IReadableResource aRes, final boolean bReadProcIDs)
+  public static ICommonsOrderedMap <String, NiceNameEntry> readEntries (@Nonnull final IReadableResource aRes,
+                                                                        final boolean bReadProcIDs)
   {
     if (LOGGER.isInfoEnabled ())
       LOGGER.info ("Trying to read nice name entries from '" + aRes.getPath () + "'");
@@ -79,7 +80,8 @@ public final class NiceNameHandler
         {
           aProcIDs = new CommonsArrayList <> ();
           for (final IMicroElement eItem : eChild.getAllChildElements ("procid"))
-            aProcIDs.add (new SimpleProcessIdentifier (eItem.getAttributeValue ("scheme"), eItem.getAttributeValue ("value")));
+            aProcIDs.add (new SimpleProcessIdentifier (eItem.getAttributeValue ("scheme"),
+                                                       eItem.getAttributeValue ("value")));
         }
 
         ret.put (sID, new NiceNameEntry (sName, bDeprecated, aProcIDs));
@@ -93,13 +95,14 @@ public final class NiceNameHandler
     // Doc types
     {
       IReadableResource aDocTypeIDRes = null;
-      final String sPath = SMPWebAppConfiguration.getConfigFile ().getAsString ("webapp.nicename.doctypes.path");
+      final String sPath = SMPConfigV6.getConfig ().getAsString ("webapp.nicename.doctypes.path");
       if (StringHelper.hasText (sPath))
       {
         aDocTypeIDRes = new FileSystemResource (sPath);
         if (!aDocTypeIDRes.exists ())
         {
-          LOGGER.warn ("The configured document type nice name file '" + sPath + "' does not exist");
+          if (LOGGER.isWarnEnabled ())
+            LOGGER.warn ("The configured document type nice name file '" + sPath + "' does not exist");
           // Enforce defaults
           aDocTypeIDRes = null;
         }
@@ -111,19 +114,21 @@ public final class NiceNameHandler
 
       final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes, true);
       RW_LOCK.writeLocked ( () -> DOCTYPE_IDS.setAll (aDocTypeIDs));
-      LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document type nice name entries");
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document type nice name entries");
     }
 
     // Processes
     {
       IReadableResource aProcessIDRes = null;
-      final String sPath = SMPWebAppConfiguration.getConfigFile ().getAsString ("webapp.nicename.processes.path");
+      final String sPath = SMPConfigV6.getConfig ().getAsString ("webapp.nicename.processes.path");
       if (StringHelper.hasText (sPath))
       {
         aProcessIDRes = new FileSystemResource (sPath);
         if (!aProcessIDRes.exists ())
         {
-          LOGGER.warn ("The configured process nice name file '" + sPath + "' does not exist");
+          if (LOGGER.isWarnEnabled ())
+            LOGGER.warn ("The configured process nice name file '" + sPath + "' does not exist");
           // Enforce defaults
           aProcessIDRes = null;
         }
@@ -135,7 +140,8 @@ public final class NiceNameHandler
 
       final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes, false);
       RW_LOCK.writeLocked ( () -> PROCESS_IDS.setAll (aProcessIDs));
-      LOGGER.info ("Loaded " + aProcessIDs.size () + " process nice name entries");
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info ("Loaded " + aProcessIDs.size () + " process nice name entries");
     }
   }
 

@@ -21,62 +21,24 @@ import java.net.URL;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.debug.GlobalDebug;
-import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
 import com.helger.commons.url.URLHelper;
+import com.helger.config.IConfig;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
-import com.helger.settings.ISettings;
-import com.helger.settings.exchange.configfile.ConfigFile;
-import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 
 /**
- * This class provides access to the web application settings. The order of the
- * properties file resolving is as follows:
- * <ol>
- * <li>Check for the value of the environment variable
- * <code>SMP_WEBAPP_CONFIG</code> (since 5.1.0)</li>
- * <li>Check for the value of the system property
- * <code>peppol.smp.webapp.properties.path</code></li>
- * <li>Check for the value of the system property
- * <code>smp.webapp.properties.path</code></li>
- * <li>The filename <code>private-webapp.properties</code> in the root of the
- * classpath</li>
- * <li>The filename <code>webapp.properties</code> in the root of the
- * classpath</li>
- * </ol>
+ * This class provides access to the web application settings.
  *
  * @author Philip Helger
  */
 public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
 {
-  public static final String PATH_WEBAPP_PROPERTIES = "webapp.properties";
   public static final String WEBAPP_KEY_GLOBAL_DEBUG = "global.debug";
   public static final String WEBAPP_KEY_GLOBAL_PRODUCTION = "global.production";
-
-  private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppConfiguration.class);
-
-  private static final ConfigFile CONFIG_FILE;
-
-  static
-  {
-    final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromEnvVar ("SMP_WEBAPP_CONFIG")
-                                                           .addPathFromSystemProperty ("peppol.smp.webapp.properties.path")
-                                                           .addPathFromSystemProperty ("smp.webapp.properties.path")
-                                                           .addPath ("private-" + PATH_WEBAPP_PROPERTIES)
-                                                           .addPath (PATH_WEBAPP_PROPERTIES);
-
-    CONFIG_FILE = aCFB.build ();
-    if (!CONFIG_FILE.isRead ())
-      throw new IllegalStateException ("Failed to read Peppol SMP UI properties from " + aCFB.getAllPaths ());
-    LOGGER.info ("Read " + CSMP.APPLICATION_TITLE + " UI properties from " + CONFIG_FILE.getReadResource ().getPath ());
-  }
 
   /**
    * @deprecated Only called via reflection
@@ -87,25 +49,13 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   {}
 
   /**
-   * @return The web application (UI) configuration file for the SMP server.
-   *         Never <code>null</code>.
+   * @return The web application (UI) configuration for the SMP server. Never
+   *         <code>null</code>.
    */
   @Nonnull
-  public static ConfigFile getConfigFile ()
+  private static IConfig _getConfig ()
   {
-    return CONFIG_FILE;
-  }
-
-  @Nonnull
-  public static ISettings getSettingsObject ()
-  {
-    return getConfigFile ().getSettings ();
-  }
-
-  @Nonnull
-  public static IReadableResource getSettingsResource ()
-  {
-    return getConfigFile ().getReadResource ();
+    return SMPConfigV6.getConfig ();
   }
 
   /**
@@ -115,7 +65,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getGlobalDebug ()
   {
-    return getConfigFile ().getAsString (WEBAPP_KEY_GLOBAL_DEBUG);
+    return _getConfig ().getAsString (WEBAPP_KEY_GLOBAL_DEBUG);
   }
 
   /**
@@ -125,7 +75,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getGlobalProduction ()
   {
-    return getConfigFile ().getAsString (WEBAPP_KEY_GLOBAL_PRODUCTION);
+    return _getConfig ().getAsString (WEBAPP_KEY_GLOBAL_PRODUCTION);
   }
 
   /**
@@ -135,7 +85,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isGlobalDebugJaxWS ()
   {
-    return getConfigFile ().getAsBoolean ("global.debugjaxws", false);
+    return _getConfig ().getAsBoolean ("global.debugjaxws", false);
   }
 
   /**
@@ -145,12 +95,12 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getDataPath ()
   {
-    return getConfigFile ().getAsString ("webapp.datapath");
+    return _getConfig ().getAsString ("webapp.datapath");
   }
 
   public static boolean isCheckFileAccess ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.checkfileaccess", true);
+    return _getConfig ().getAsBoolean ("webapp.checkfileaccess", true);
   }
 
   /**
@@ -159,7 +109,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isTestVersion ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.testversion", GlobalDebug.isDebugMode ());
+    return _getConfig ().getAsBoolean ("webapp.testversion", GlobalDebug.isDebugMode ());
   }
 
   /**
@@ -169,7 +119,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isPersistStatisticsOnEnd ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.statistics.persist", true);
+    return _getConfig ().getAsBoolean ("webapp.statistics.persist", true);
   }
 
   /**
@@ -180,7 +130,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isStartPageDynamicTable ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.startpage.dynamictable", false);
+    return _getConfig ().getAsBoolean ("webapp.startpage.dynamictable", false);
   }
 
   /**
@@ -190,7 +140,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isStartPageParticipantsNone ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.startpage.participants.none", false);
+    return _getConfig ().getAsBoolean ("webapp.startpage.participants.none", false);
   }
 
   /**
@@ -201,7 +151,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isStartPageExtensionsShow ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.startpage.extensions.show", false);
+    return _getConfig ().getAsBoolean ("webapp.startpage.extensions.show", false);
   }
 
   /**
@@ -212,7 +162,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nonnull
   public static String getDirectoryName ()
   {
-    return getConfigFile ().getAsString ("webapp.directory.name", "Peppol Directory");
+    return _getConfig ().getAsString ("webapp.directory.name", "Peppol Directory");
   }
 
   /**
@@ -223,7 +173,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isServiceGroupsExtensionsShow ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.servicegroups.extensions.show", false);
+    return _getConfig ().getAsBoolean ("webapp.servicegroups.extensions.show", false);
   }
 
   /**
@@ -233,7 +183,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isSecurityLoginShowErrorDetails ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.security.login.errordetails", true);
+    return _getConfig ().getAsBoolean ("webapp.security.login.errordetails", true);
   }
 
   /**
@@ -246,7 +196,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isPublicLoginEnabled ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.public.login.enabled", true);
+    return _getConfig ().getAsBoolean ("webapp.public.login.enabled", true);
   }
 
   /**
@@ -262,7 +212,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getPublicLogoInline ()
   {
-    return getConfigFile ().getAsString ("webapp.public.logo.inline");
+    return _getConfig ().getAsString ("webapp.public.logo.inline");
   }
 
   /**
@@ -278,7 +228,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getPublicLogoExternalUrl ()
   {
-    return getConfigFile ().getAsString ("webapp.public.logo.externalurl");
+    return _getConfig ().getAsString ("webapp.public.logo.externalurl");
   }
 
   /**
@@ -292,7 +242,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getPublicLogoInternalUrl ()
   {
-    return getConfigFile ().getAsString ("webapp.public.logo.internalurl");
+    return _getConfig ().getAsString ("webapp.public.logo.internalurl");
   }
 
   /**
@@ -302,7 +252,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isPublicShowApplicationName ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.public.showappname", true);
+    return _getConfig ().getAsBoolean ("webapp.public.showappname", true);
   }
 
   /**
@@ -312,7 +262,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isPublicShowSource ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.public.showsource", true);
+    return _getConfig ().getAsBoolean ("webapp.public.showsource", true);
   }
 
   /**
@@ -322,7 +272,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isPublicShowAuthor ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.public.showauthor", true);
+    return _getConfig ().getAsBoolean ("webapp.public.showauthor", true);
   }
 
   /**
@@ -334,7 +284,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isImprintEnabled ()
   {
-    return getConfigFile ().getAsBoolean ("webapp.imprint.enabled", false);
+    return _getConfig ().getAsBoolean ("webapp.imprint.enabled", false);
   }
 
   /**
@@ -347,7 +297,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getImprintText ()
   {
-    return getConfigFile ().getAsString ("webapp.imprint.text");
+    return _getConfig ().getAsString ("webapp.imprint.text");
   }
 
   /**
@@ -362,7 +312,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static ISimpleURL getImprintHref ()
   {
     // Take only valid URLs
-    final URL aHref = URLHelper.getAsURL (getConfigFile ().getAsString ("webapp.imprint.href"), false);
+    final URL aHref = URLHelper.getAsURL (_getConfig ().getAsString ("webapp.imprint.href"), false);
     return aHref == null ? null : new SimpleURL (aHref);
   }
 
@@ -379,7 +329,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getImprintTarget ()
   {
-    return getConfigFile ().getAsString ("webapp.imprint.target");
+    return _getConfig ().getAsString ("webapp.imprint.target");
   }
 
   /**
@@ -395,7 +345,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getImprintCSSClasses ()
   {
-    return StringHelper.trim (getConfigFile ().getAsString ("webapp.imprint.cssclasses"));
+    return StringHelper.trim (_getConfig ().getAsString ("webapp.imprint.cssclasses"));
   }
 
   /**
@@ -406,7 +356,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static boolean isHttpOptionsDisabled ()
   {
     // Enable by default
-    return getConfigFile ().getAsBoolean ("http.method.options.disabled", false);
+    return _getConfig ().getAsBoolean ("http.method.options.disabled", false);
   }
 
   /**
@@ -416,7 +366,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isCSPEnabled ()
   {
-    return getConfigFile ().getAsBoolean ("csp.enabled", true);
+    return _getConfig ().getAsBoolean ("csp.enabled", true);
   }
 
   /**
@@ -427,7 +377,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isCSPReportingOnly ()
   {
-    return getConfigFile ().getAsBoolean ("csp.reporting.only", false);
+    return _getConfig ().getAsBoolean ("csp.reporting.only", false);
   }
 
   /**
@@ -438,6 +388,6 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isCSPReportingEnabled ()
   {
-    return getConfigFile ().getAsBoolean ("csp.reporting.enabled", false);
+    return _getConfig ().getAsBoolean ("csp.reporting.enabled", false);
   }
 }

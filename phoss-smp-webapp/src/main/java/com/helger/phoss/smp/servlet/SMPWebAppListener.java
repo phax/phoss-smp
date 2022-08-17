@@ -46,6 +46,7 @@ import com.helger.pd.client.PDHttpClientSettings;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.PDClientProvider;
+import com.helger.phoss.smp.app.SMPConfigV6;
 import com.helger.phoss.smp.app.SMPSecurity;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -145,7 +146,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       throw new InitializationException (sErrorMsg);
     }
 
-    LOGGER.info ("Set default timezone to '" + sDesiredTimeZone + "'");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Set default timezone to '" + sDesiredTimeZone + "'");
   }
 
   @Override
@@ -208,10 +210,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                           CSMPServer.PATTERN_SMP_ID +
                                           "'!");
     if (LOGGER.isInfoEnabled ())
+    {
       LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
-
-    if (LOGGER.isInfoEnabled ())
       LOGGER.info ("This SMP uses REST API type '" + SMPServerConfiguration.getRESTType () + "'");
+    }
 
     // Check other consistency stuff
     if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.hasNoText (SMPWebAppConfiguration.getImprintText ()))
@@ -276,8 +278,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
       aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
                                                                                                   .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
-      aCFM.registerConfigurationFile (new ConfigurationFile (SMPWebAppConfiguration.getSettingsResource ()).setDescription ("SMP web application configuration")
-                                                                                                           .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
+      aCFM.registerAll (SMPConfigV6.getConfig ());
       final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
       if (aConfigRes != null)
       {

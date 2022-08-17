@@ -389,7 +389,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     final SMPBackendRegistry aBackendRegistry = SMPBackendRegistry.getInstance ();
     final String sBackendID = SMPServerConfiguration.getBackend ();
 
-    LOGGER.info ("Initializing SMP manager for backend '" + sBackendID + "'");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Initializing SMP manager for backend '" + sBackendID + "'");
 
     final ISMPManagerProvider aManagerProvider = aBackendRegistry.getManagerProvider (sBackendID);
     if (aManagerProvider == null)

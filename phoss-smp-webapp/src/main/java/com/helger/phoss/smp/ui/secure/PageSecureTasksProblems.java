@@ -113,11 +113,9 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     {
       aOL.addItem (_createWarning ("Debug mode is enabled."),
                    div ("This mode enables increased debug checks and logging and therefore results in reduced performance.").addChild (" This should not be enabled in a production system.")
-                                                                                                                             .addChild (" The configuration file property ")
+                                                                                                                             .addChild (" The configuration property ")
                                                                                                                              .addChild (code (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_DEBUG))
-                                                                                                                             .addChild (" in file " +
-                                                                                                                                        SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
-                                                                                                                                        " should be set to ")
+                                                                                                                             .addChild (" should be set to ")
                                                                                                                              .addChild (code ("false"))
                                                                                                                              .addChild (" to fix this."));
     }
@@ -127,11 +125,9 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     {
       aOL.addItem (_createWarning ("Production mode is disabled."),
                    div ("This mode is required so that all background jobs are enabled and mail sending works (if configured).").addChild (" This should be enabled in a production system.")
-                                                                                                                                .addChild (" The configuration file property ")
+                                                                                                                                .addChild (" The configuration property ")
                                                                                                                                 .addChild (code (SMPWebAppConfiguration.WEBAPP_KEY_GLOBAL_PRODUCTION))
-                                                                                                                                .addChild (" in file " +
-                                                                                                                                           SMPWebAppConfiguration.PATH_WEBAPP_PROPERTIES +
-                                                                                                                                           " should be set to ")
+                                                                                                                                .addChild (" should be set to ")
                                                                                                                                 .addChild (code ("true"))
                                                                                                                                 .addChild (" to fix this."));
     }
