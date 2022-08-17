@@ -24,7 +24,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.apache.http.client.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,19 +93,24 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     final StopWatch aSW = StopWatch.createdStarted ();
 
     final String sLogPrefix = "[QueryAPI] ";
-    LOGGER.info (sLogPrefix +
-                 "BusinessCard of '" +
-                 aParticipantID.getURIEncoded () +
-                 "' is queried using SMP API '" +
-                 eAPIType +
-                 "' from '" +
-                 aQueryParams.getSMPHostURI () +
-                 "'");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix +
+                   "BusinessCard of '" +
+                   aParticipantID.getURIEncoded () +
+                   "' is queried using SMP API '" +
+                   eAPIType +
+                   "' from '" +
+                   aQueryParams.getSMPHostURI () +
+                   "'");
 
     IJsonObject aJson = null;
 
-    final String sBCURL = aQueryParams.getSMPHostURI ().toString () + "/businesscard/" + aParticipantID.getURIEncoded ();
-    LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
+    final String sBCURL = aQueryParams.getSMPHostURI ().toString () +
+                          "/businesscard/" +
+                          aParticipantID.getURIEncoded ();
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
+
     byte [] aData;
     try (HttpClientManager aHttpClientMgr = new HttpClientManager ())
     {
@@ -118,13 +123,17 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     }
 
     if (aData == null)
-      LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
+    {
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
+    }
     else
     {
       final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, (Charset) null);
       if (aBC == null)
       {
-        LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
+        if (LOGGER.isErrorEnabled ())
+          LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
       }
       else
       {
@@ -137,12 +146,17 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
 
     if (aJson == null)
     {
-      LOGGER.error (sLogPrefix + "Failed to perform the BusinessCard SMP lookup");
+      if (LOGGER.isErrorEnabled ())
+        LOGGER.error (sLogPrefix + "Failed to perform the BusinessCard SMP lookup");
       aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
     }
     else
     {
-      LOGGER.info (sLogPrefix + "Succesfully finished BusinessCard lookup lookup after " + aSW.getMillis () + " milliseconds");
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info (sLogPrefix +
+                     "Succesfully finished BusinessCard lookup lookup after " +
+                     aSW.getMillis () +
+                     " milliseconds");
 
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());
