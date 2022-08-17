@@ -250,6 +250,52 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * The inline version has precedence over the external URL and the internal
+   * URL version.
+   *
+   * @return An inline data URL that represents an image and will be used as the
+   *         logo on the public page part. Must start with "data:".
+   * @see #getPublicLogoExternalUrl()
+   * @see #getPublicLogoInternalUrl()
+   * @since 6.0.0
+   */
+  @Nullable
+  public static String getPublicLogoInline ()
+  {
+    return getConfigFile ().getAsString ("webapp.public.logo.inline");
+  }
+
+  /**
+   * The external URL version has precedence over the internal URL version.
+   *
+   * @return An absolute URL pointing to an image and will be used as the logo
+   *         on the public page part. Should start with "http:" or "https:".
+   *         Please consider CORS settings on the other side.
+   * @see #getPublicLogoInline()
+   * @see #getPublicLogoInternalUrl()
+   * @since 6.0.0
+   */
+  @Nullable
+  public static String getPublicLogoExternalUrl ()
+  {
+    return getConfigFile ().getAsString ("webapp.public.logo.externalurl");
+  }
+
+  /**
+   * @return A relative URL pointing to an image inside the same web server that
+   *         will be used as the logo on the public page part. Should start with
+   *         "/".
+   * @see #getPublicLogoInline()
+   * @see #getPublicLogoExternalUrl()
+   * @since 6.0.0
+   */
+  @Nullable
+  public static String getPublicLogoInternalUrl ()
+  {
+    return getConfigFile ().getAsString ("webapp.public.logo.internalurl");
+  }
+
+  /**
    * @return <code>true</code> to show the author in the public area,
    *         <code>false</code> to not show it.
    * @since 5.5.0

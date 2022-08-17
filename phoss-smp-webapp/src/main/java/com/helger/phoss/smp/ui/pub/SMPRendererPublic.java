@@ -20,6 +20,9 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.ICommonsList;
@@ -28,8 +31,10 @@ import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
+import com.helger.commons.url.URLHelper;
 import com.helger.css.property.CCSSProperties;
 import com.helger.css.propertyvalue.CCSSValue;
+import com.helger.css.utils.CSSDataURLHelper;
 import com.helger.html.css.DefaultCSSClassProvider;
 import com.helger.html.css.ICSSClassProvider;
 import com.helger.html.hc.IHCNode;
@@ -87,8 +92,8 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  */
 public final class SMPRendererPublic
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPRendererPublic.class);
   private static final ICSSClassProvider CSS_CLASS_FOOTER_LINKS = DefaultCSSClassProvider.create ("footer-links");
-
   private static final ICommonsList <IMenuObject> FOOTER_OBJECTS = new CommonsArrayList <> ();
 
   static
@@ -102,7 +107,8 @@ public final class SMPRendererPublic
   private SMPRendererPublic ()
   {}
 
-  private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC, @Nonnull final BootstrapNavbar aNavbar)
+  private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC,
+                                             @Nonnull final BootstrapNavbar aNavbar)
   {
     if (!SMPWebAppConfiguration.isPublicLoginEnabled ())
       return;
@@ -135,7 +141,8 @@ public final class SMPRendererPublic
       final BootstrapNavbarNav aNav = aToggleable.addAndReturnNav ();
       final BootstrapDropdownMenu aDropDown = new BootstrapDropdownMenu ();
       {
-        final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.P_2).addStyle (CCSSProperties.MIN_WIDTH.newValue ("400px"));
+        final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.P_2)
+                                       .addStyle (CCSSProperties.MIN_WIDTH.newValue ("400px"));
         aDiv.addChild (SMPCommonUI.createViewLoginForm (aLEC, null));
         aDropDown.addChild (aDiv);
       }
@@ -143,25 +150,82 @@ public final class SMPRendererPublic
     }
   }
 
+  // Create the logo URL only once
+  private static final ISimpleURL CUSTOM_LOGO_URL_CACHE;
+  static
+  {
+    final String sInlineURL = SMPWebAppConfiguration.getPublicLogoInline ();
+    if (StringHelper.hasText (sInlineURL) && CSSDataURLHelper.isDataURL (sInlineURL))
+    {
+      // Use custom inline data URL
+      CUSTOM_LOGO_URL_CACHE = new SimpleURL (sInlineURL);
+      LOGGER.info ("Using a custom inline data URL as logo");
+    }
+    else
+    {
+      final String sExternalURL = SMPWebAppConfiguration.getPublicLogoExternalUrl ();
+      if (StringHelper.hasText (sExternalURL) && URLHelper.getAsURL (sExternalURL) != null)
+      {
+        // Use custom external URL
+        CUSTOM_LOGO_URL_CACHE = new SimpleURL (sExternalURL);
+        if (LOGGER.isInfoEnabled ())
+          LOGGER.info ("Using a custom external URL as logo: '" + sExternalURL + "'");
+      }
+      else
+      {
+        final String sInternalURL = SMPWebAppConfiguration.getPublicLogoInternalUrl ();
+        if (StringHelper.hasText (sInternalURL))
+        {
+          // Use custom internal URL
+          CUSTOM_LOGO_URL_CACHE = new SimpleURL (sInternalURL);
+          if (LOGGER.isInfoEnabled ())
+            LOGGER.info ("Using a custom internal URL as logo: '" + sInternalURL + "'");
+        }
+        else
+        {
+          // Use the default logo
+          CUSTOM_LOGO_URL_CACHE = null;
+        }
+      }
+    }
+  }
+
+  /**
+   * Create the logo node. This applies to public and secure mode.
+   *
+   * @param aSWEC
+   *        The current web execution context
+   * @return The HC Node. Never <code>null</code>.
+   */
   @Nonnull
-  public static IHCNode createLogo (@Nonnull final ISimpleWebExecutionContext aSWEC)
+  public static final IHCNode createLogo (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
-    return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope, "/image/phoss-smp-136-50.png"))
+
+    final ISimpleURL aLogoHref;
+    if (CUSTOM_LOGO_URL_CACHE != null)
+      aLogoHref = CUSTOM_LOGO_URL_CACHE;
+    else
+    {
+      // The default logo
+      aLogoHref = LinkHelper.getStreamURL (aRequestScope, "/image/phoss-smp-136-50.png");
+    }
+
+    return new HCImg ().setSrc (aLogoHref)
                        .addStyle (CCSSProperties.MARGIN.newValue ("-15px"))
                        .addStyle (CCSSProperties.VERTICAL_ALIGN.newValue (CCSSValue.TOP))
                        .addStyle (CCSSProperties.PADDING.newValue ("0 6px"));
   }
 
   @Nonnull
-  public static IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
+  public static final IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
     return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope, "/image/phoss-smp-272-100.png"));
   }
 
   @Nonnull
-  private static BootstrapNavbar _getNavbar (@Nonnull final ILayoutExecutionContext aLEC)
+  private static final BootstrapNavbar _getNavbar (@Nonnull final ILayoutExecutionContext aLEC)
   {
     final ISimpleURL aLinkToStartPage = aLEC.getLinkToMenuItem (aLEC.getMenuTree ().getDefaultMenuItemID ());
 
@@ -174,11 +238,12 @@ public final class SMPRendererPublic
   }
 
   @Nonnull
-  public static IHCNode getMenuContent (@Nonnull final LayoutExecutionContext aLEC)
+  public static final IHCNode getMenuContent (@Nonnull final LayoutExecutionContext aLEC)
   {
     // Main menu
     final IMenuTree aMenuTree = aLEC.getMenuTree ();
-    final MenuItemDeterminatorCallback aCallback = new MenuItemDeterminatorCallback (aMenuTree, aLEC.getSelectedMenuItemID ())
+    final MenuItemDeterminatorCallback aCallback = new MenuItemDeterminatorCallback (aMenuTree,
+                                                                                     aLEC.getSelectedMenuItemID ())
     {
       @Override
       protected boolean isMenuItemValidToBeDisplayed (@Nonnull final IMenuObject aMenuObj)
@@ -207,11 +272,12 @@ public final class SMPRendererPublic
    *         <code>null</code> but maybe empty.
    */
   @Nonnull
-  public static BootstrapContainer createDefaultFooter (final boolean bShowApplicationName,
-                                                        final boolean bShowSource,
-                                                        final boolean bShowAuthor)
+  public static final BootstrapContainer createDefaultFooter (final boolean bShowApplicationName,
+                                                              final boolean bShowSource,
+                                                              final boolean bShowAuthor)
   {
-    final BootstrapContainer aContainer = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER).setFluid (true);
+    final BootstrapContainer aContainer = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER)
+                                                                   .setFluid (true);
 
     if (bShowApplicationName)
     {
@@ -235,7 +301,8 @@ public final class SMPRendererPublic
         if (aBy.hasChildren ())
           aBy.addChild (" - ");
         aBy.addChild (new HCA (new SimpleURL ("https://github.com/phax/phoss-smp")).setTargetBlank ()
-                                                                                   .addChild (CSMP.APPLICATION_TITLE + " on GitHub"));
+                                                                                   .addChild (CSMP.APPLICATION_TITLE +
+                                                                                              " on GitHub"));
       }
 
       if (aBy.hasChildren ())
@@ -267,7 +334,8 @@ public final class SMPRendererPublic
         final String sImprintCSSClasses = SMPWebAppConfiguration.getImprintCSSClasses ();
         if (StringHelper.hasText (sImprintCSSClasses))
         {
-          final ICommonsSet <String> aUniqueNames = new CommonsHashSet <> (RegExHelper.getSplitToList (sImprintCSSClasses, "\\s+"));
+          final ICommonsSet <String> aUniqueNames = new CommonsHashSet <> (RegExHelper.getSplitToList (sImprintCSSClasses,
+                                                                                                       "\\s+"));
           for (final String sCSSClass : aUniqueNames)
             aNode.addClass (DefaultCSSClassProvider.create (sCSSClass));
         }
@@ -280,7 +348,7 @@ public final class SMPRendererPublic
   }
 
   @Nonnull
-  public static IHCNode getContent (@Nonnull final LayoutExecutionContext aLEC)
+  public static final IHCNode getContent (@Nonnull final LayoutExecutionContext aLEC)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final HCNodeList ret = new HCNodeList ();
@@ -319,7 +387,11 @@ public final class SMPRendererPublic
               aUL.addItem (aRenderer.renderMenuItemPage (aLEC, (IMenuItemPage) aMenuObj, false, false, false));
             else
               if (aMenuObj instanceof IMenuItemExternal)
-                aUL.addItem (aRenderer.renderMenuItemExternal (aLEC, (IMenuItemExternal) aMenuObj, false, false, false));
+                aUL.addItem (aRenderer.renderMenuItemExternal (aLEC,
+                                                               (IMenuItemExternal) aMenuObj,
+                                                               false,
+                                                               false,
+                                                               false));
               else
                 throw new IllegalStateException ("Unsupported menu object type!");
         }
