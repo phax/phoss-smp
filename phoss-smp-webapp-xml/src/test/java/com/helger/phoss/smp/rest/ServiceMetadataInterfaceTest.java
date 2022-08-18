@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
-import com.helger.commons.io.resource.ClassPathResource;
+import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.smp.ESMPTransportProfile;
@@ -86,8 +86,7 @@ public final class ServiceMetadataInterfaceTest
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   @Rule
-  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-xml-peppol.properties")
-                                                                                           .getAbsolutePath ());
+  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-xml-peppol.properties"));
 
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
 
@@ -175,7 +174,8 @@ public final class ServiceMetadataInterfaceTest
     try
     {
       // PUT ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Read both
@@ -376,7 +376,8 @@ public final class ServiceMetadataInterfaceTest
     try
     {
       // PUT ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
@@ -548,7 +549,8 @@ public final class ServiceMetadataInterfaceTest
     try
     {
       // PUT ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // GET ServiceGroup

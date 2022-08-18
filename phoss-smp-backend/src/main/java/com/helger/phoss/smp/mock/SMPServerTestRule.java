@@ -13,11 +13,6 @@ package com.helger.phoss.smp.mock;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.system.SystemProperties;
-import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.LoggingSMPRedirectCallback;
 import com.helger.phoss.smp.domain.serviceinfo.LoggingSMPServiceInformationCallback;
@@ -34,19 +29,7 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
 public class SMPServerTestRule extends PhotonAppWebTestRule
 {
   public SMPServerTestRule ()
-  {
-    this (null);
-  }
-
-  public SMPServerTestRule (@Nullable final String sSMPServerPropertiesPath)
-  {
-    if (StringHelper.hasText (sSMPServerPropertiesPath))
-    {
-      SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH,
-                                         sSMPServerPropertiesPath);
-      SMPServerConfiguration.reloadConfiguration ();
-    }
-  }
+  {}
 
   @Override
   public void before ()

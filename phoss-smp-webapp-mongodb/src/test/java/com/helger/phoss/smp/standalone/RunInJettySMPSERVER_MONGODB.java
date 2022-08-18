@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.standalone;
 
-import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.photon.jetty.JettyStarter;
 
 /**
@@ -33,7 +32,9 @@ public final class RunInJettySMPSERVER_MONGODB
 {
   public static void main (final String... args) throws Exception
   {
-    SMPServerConfiguration.getConfigFile ().applyAllNetworkSystemProperties ();
-    new JettyStarter (RunInJettySMPSERVER_MONGODB.class).setPort (90).setStopPort (8078).setSessionCookieName ("SMPSESSION").run ();
+    new JettyStarter (RunInJettySMPSERVER_MONGODB.class).setPort (90)
+                                                        .setStopPort (8078)
+                                                        .setSessionCookieName ("SMPSESSION")
+                                                        .run ();
   }
 }

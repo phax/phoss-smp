@@ -24,10 +24,11 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.ToStringGenerator;
+import com.helger.config.IConfig;
 import com.helger.dao.DAOException;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.SMPConfigSource;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
@@ -44,7 +45,6 @@ import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.jdbc.PhotonSecurityManagerFactoryJDBC;
-import com.helger.settings.exchange.configfile.ConfigFile;
 
 /**
  * A JDBC based implementation of the {@link ISMPManagerProvider} interface.
@@ -68,14 +68,14 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Override
   public void beforeInitManagers ()
   {
-    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+    final IConfig aConfig = SMPConfigSource.getConfig ();
 
     // Set the special PhotonSecurityManager factory
     // Must be before Flyway, so that auditing of Flyway actions (may) work
     PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
     // Flyway migration is enabled by default
-    if (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_SMP_FLYWAY_ENABLED, true))
+    if (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_SMP_FLYWAY_ENABLED, true))
       FlywayMigrator.Singleton.INSTANCE.runFlyway (m_eDBType);
     else
       LOGGER.warn ("Flyway Migration is disabled according to the configuration item " +
@@ -128,8 +128,8 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   {
     final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor::new);
     // Enable cache by default
-    ret.setCacheEnabled (SMPServerConfiguration.getConfigFile ()
-                                               .getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
+    ret.setCacheEnabled (SMPConfigSource.getConfig ()
+                                    .getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
     return ret;
   }
 

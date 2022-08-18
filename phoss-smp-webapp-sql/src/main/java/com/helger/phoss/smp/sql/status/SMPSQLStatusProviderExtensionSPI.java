@@ -32,7 +32,7 @@ import com.helger.db.api.jdbc.JDBCHelper;
 import com.helger.db.jdbc.ConnectionFromDataSource;
 import com.helger.db.jdbc.IHasConnection;
 import com.helger.db.jdbc.executor.DBNoConnectionException;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.SMPConfigSource;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
@@ -89,11 +89,11 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
   public ICommonsOrderedMap <String, ?> getAdditionalStatusData (final boolean bDisableLongRunningOperations)
   {
     final ICommonsOrderedMap <String, Object> ret = new CommonsLinkedHashMap <> ();
-    if (SMPServerConfiguration.getConfigFile ().getAsBoolean ("smp.status.sql.enabled", true))
+    if (SMPConfigSource.getConfig ().getAsBoolean ("smp.status.sql.enabled", true))
     {
       // Since 5.3.0-RC5
       ret.put ("smp.sql.target-database",
-               SMPServerConfiguration.getConfigFile ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE));
+               SMPConfigSource.getConfig ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE));
 
       if (!bDisableLongRunningOperations)
       {

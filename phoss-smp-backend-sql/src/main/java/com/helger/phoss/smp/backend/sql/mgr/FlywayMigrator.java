@@ -34,7 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.string.StringHelper;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.config.IConfig;
+import com.helger.phoss.smp.SMPConfigSource;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V10__MigrateRolesToDB;
@@ -45,7 +46,6 @@ import com.helger.phoss.smp.backend.sql.migration.V15__MigrateDBUsersToPhotonUse
 import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.backend.sql.migration.V5__MigrateTransportProfilesToDB;
 import com.helger.photon.audit.AuditHelper;
-import com.helger.settings.exchange.configfile.ConfigFile;
 
 /**
  * This class has the sole purpose of encapsulating the org.flywaydb classes, so
@@ -74,9 +74,9 @@ final class FlywayMigrator
   {
     ValueEnforcer.notNull (eDBType, "DBType");
 
-    LOGGER.info ("Starting to run Flyway for DB type " + eDBType);
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Starting to run Flyway for DB type " + eDBType);
 
-    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
     final Callback aCallbackLogging = new BaseCallback ()
     {
       public void handle (@Nonnull final Event aEvent, @Nonnull final Context aContext)
@@ -121,50 +121,56 @@ final class FlywayMigrator
       }
     };
 
-    final FluentConfiguration aConfig = Flyway.configure ()
-                                              .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
-                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),
-                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL),
-                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER),
-                                                                                 aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD)))
-                                              // Required for creating DB table
-                                              .baselineOnMigrate (true)
-                                              // Disable validation, because
-                                              // DDL comments are also taken
-                                              // into consideration
-                                              .validateOnMigrate (false)
-                                              // Version 1 is the baseline
-                                              .baselineVersion ("0")
-                                              .baselineDescription ("SMP 5.2.x database layout, MySQL only")
-                                              // Separate directory per DB type
-                                              .locations ("db/migrate-" + eDBType.getID ())
-                                              /*
-                                               * Avoid scanning the ClassPath by
-                                               * enumerating them explicitly
-                                               */
-                                              .javaMigrations (new V2__MigrateDBUsersToPhotonUsers (),
-                                                               new V5__MigrateTransportProfilesToDB (),
-                                                               new V10__MigrateRolesToDB (),
-                                                               new V11__MigrateUsersToDB (),
-                                                               new V12__MigrateUserGroupsToDB (),
-                                                               new V14__MigrateSettingsToDB (),
-                                                               new V15__MigrateDBUsersToPhotonUsers ())
-                                              .callbacks (aCallbackLogging, aCallbackAudit);
+    final IConfig aConfig = SMPConfigSource.getConfig ();
+    final FluentConfiguration aFlywayConfig = Flyway.configure ()
+                                                    .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
+                                                                                       aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),
+                                                                                       aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL),
+                                                                                       aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER),
+                                                                                       aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD)))
+                                                    // Required for creating DB
+                                                    // table
+                                                    .baselineOnMigrate (true)
+                                                    // Disable validation,
+                                                    // because
+                                                    // DDL comments are also
+                                                    // taken
+                                                    // into consideration
+                                                    .validateOnMigrate (false)
+                                                    // Version 1 is the baseline
+                                                    .baselineVersion ("0")
+                                                    .baselineDescription ("SMP 5.2.x database layout, MySQL only")
+                                                    // Separate directory per DB
+                                                    // type
+                                                    .locations ("db/migrate-" + eDBType.getID ())
+                                                    /*
+                                                     * Avoid scanning the
+                                                     * ClassPath by enumerating
+                                                     * them explicitly
+                                                     */
+                                                    .javaMigrations (new V2__MigrateDBUsersToPhotonUsers (),
+                                                                     new V5__MigrateTransportProfilesToDB (),
+                                                                     new V10__MigrateRolesToDB (),
+                                                                     new V11__MigrateUsersToDB (),
+                                                                     new V12__MigrateUserGroupsToDB (),
+                                                                     new V14__MigrateSettingsToDB (),
+                                                                     new V15__MigrateDBUsersToPhotonUsers ())
+                                                    .callbacks (aCallbackLogging, aCallbackAudit);
 
     // Flyway to handle the DB schema?
-    final String sSchema = aCF.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
+    final String sSchema = aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
     if (StringHelper.hasText (sSchema))
     {
       // Use the schema only, if it is explicitly configured
       // The default schema name is ["$user", public] and as such unusable
-      aConfig.schemas (sSchema);
+      aFlywayConfig.schemas (sSchema);
     }
 
     // If no schema is specified, schema create should also be disabled
-    final boolean bCreateSchema = aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA_CREATE, false);
-    aConfig.createSchemas (bCreateSchema);
+    final boolean bCreateSchema = aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA_CREATE, false);
+    aFlywayConfig.createSchemas (bCreateSchema);
 
-    final Flyway aFlyway = aConfig.load ();
+    final Flyway aFlyway = aFlywayConfig.load ();
     if (false)
       aFlyway.validate ();
     aFlyway.migrate ();

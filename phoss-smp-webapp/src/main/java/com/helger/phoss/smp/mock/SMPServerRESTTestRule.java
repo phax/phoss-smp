@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.mock;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,10 +27,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.lang.ClassPathHelper;
-import com.helger.commons.system.SystemProperties;
+import com.helger.config.Config;
+import com.helger.config.ConfigFactory;
+import com.helger.config.IConfig;
+import com.helger.config.source.MultiConfigurationValueProvider;
+import com.helger.config.source.res.ConfigurationSourceProperties;
 import com.helger.peppol.sml.ESML;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.SMPConfigSource;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.jetty.JettyRunner;
 
@@ -37,18 +43,41 @@ public class SMPServerRESTTestRule extends ExternalResource
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerRESTTestRule.class);
 
+  private IConfig m_aOldConfig;
+  private IConfig m_aNewConfig;
   private JettyRunner m_aServer;
 
-  public SMPServerRESTTestRule (@Nullable final String sSMPServerPropertiesPath)
+  @Nonnull
+  public static MultiConfigurationValueProvider createSMPClientValueProvider (@Nonnull final IReadableResource aRes)
   {
-    SystemProperties.setPropertyValue (SMPServerConfiguration.SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH, sSMPServerPropertiesPath);
-    SMPServerConfiguration.reloadConfiguration ();
+    // Start with default setup
+    final MultiConfigurationValueProvider ret = ConfigFactory.createDefaultValueProvider ();
+
+    // Lower priority than the standard files
+    ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8),
+                                ConfigFactory.APPLICATION_PROPERTIES_PRIORITY - 1);
+
+    return ret;
+  }
+
+  public SMPServerRESTTestRule (@Nullable final IReadableResource aSMPServerProperties)
+  {
+    if (aSMPServerProperties != null && aSMPServerProperties.exists ())
+    {
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info ("Creating custom SMP configuration using " + aSMPServerProperties);
+
+      m_aOldConfig = SMPConfigSource.getConfig ();
+      // Create new config
+      m_aNewConfig = Config.create (createSMPClientValueProvider (aSMPServerProperties));
+    }
   }
 
   @Override
   public void before () throws Throwable
   {
-    super.before ();
+    if (m_aNewConfig != null)
+      SMPConfigSource.setConfig (m_aNewConfig);
 
     if (false)
       ClassPathHelper.forAllClassPathEntries (LOGGER::info);
@@ -59,7 +88,8 @@ public class SMPServerRESTTestRule extends ExternalResource
     // Ensure non-invasive setup
     // PD enabled but no auto-update
     // SML disabled
-    SMPMetaManager.getSettingsMgr ().updateSettings (false, true, false, false, "dummy", false, false, ESML.DEVELOPMENT_LOCAL.getID ());
+    SMPMetaManager.getSettingsMgr ()
+                  .updateSettings (false, true, false, false, "dummy", false, false, ESML.DEVELOPMENT_LOCAL.getID ());
 
     LOGGER.info ("Finished SMPServerRESTTestRule before. Listening at '" + getFullURL () + "'");
   }
@@ -88,8 +118,9 @@ public class SMPServerRESTTestRule extends ExternalResource
     }
     finally
     {
-      LOGGER.info ("super.after");
-      super.after ();
+      // Restore old config
+      if (m_aOldConfig != null)
+        SMPConfigSource.setConfig (m_aOldConfig);
     }
   }
 

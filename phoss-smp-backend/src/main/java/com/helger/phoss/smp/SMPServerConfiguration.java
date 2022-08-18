@@ -14,24 +14,18 @@ import java.net.Proxy;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.hc.core5.util.Timeout;
 
-import com.helger.commons.CGlobal;
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.concurrent.SimpleReadWriteLock;
 import com.helger.commons.mime.EMimeContentType;
-import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
+import com.helger.config.IConfig;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettings;
 import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.security.keystore.EKeyStoreType;
-import com.helger.settings.exchange.configfile.ConfigFile;
-import com.helger.settings.exchange.configfile.ConfigFileBuilder;
 
 /**
  * The central configuration for the SMP server. This class manages the content
@@ -79,7 +73,6 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_IDENTIFIER_TYPE = "smp.identifiertype";
 
   public static final String KEY_SMP_REST_TYPE = "smp.rest.type";
-  public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
   public static final String KEY_SMP_REST_LOG_EXCEPTIONS = "smp.rest.log.exceptions";
   public static final String KEY_SMP_REST_PAYLOAD_ON_ERROR = "smp.rest.payload.on.error";
   public static final String KEY_SMP_REST_REMOTE_QUERY_API_DISABLED = "smp.rest.remote.queryapi.disabled";
@@ -92,19 +85,6 @@ public final class SMPServerConfiguration
 
   public static final String KEY_SMP_TIMEZONE = "smp.timezone";
 
-  /* legacy name - should not contain "peppol" */
-  public static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
-  /* legacy name - should not contain "peppol" */
-  public static final String KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED = "smp.peppol.directory.integration.required";
-  /* legacy name - should not contain "peppol" */
-  public static final String KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.peppol.directory.integration.autoupdate";
-  /* legacy name - should not contain "peppol" */
-  public static final String KEY_SMP_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
-
-  /* legacy name - should be called "enabled" instead of "active" */
-  public static final String KEY_SML_ENABLED = "sml.active";
-  /* legacy name - should be called "required" instead of "needed" */
-  public static final String KEY_SML_REQUIRED = "sml.needed";
   public static final String KEY_SML_SMPID = "sml.smpid";
   public static final String KEY_SML_SMP_IP = "sml.smp.ip";
   public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";
@@ -114,7 +94,6 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_FORCEROOT = false;
   public static final ESMPIdentifierType DEFAULT_SMP_IDENTIFIER_TYPE = ESMPIdentifierType.PEPPOL;
   public static final ESMPRESTType DEFAULT_SMP_REST_TYPE = ESMPRESTType.PEPPOL;
-  public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
   public static final boolean DEFAULT_SMP_REST_LOG_EXCEPTIONS = false;
   public static final boolean DEFAULT_SMP_REST_PAYLOAD_ON_ERROR = true;
   public static final boolean DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED = true;
@@ -126,71 +105,7 @@ public final class SMPServerConfiguration
                                                                                                    .getAsString ();
   public static final String DEFAULT_SMP_BDXR2_CERTIFICATE_TYPE_CODE = "bdxr-as4-signing-encryption";
 
-  public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED = true;
-  public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED = true;
-  public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = true;
-  public static final String DEFAULT_SMP_DIRECTORY_HOSTNAME = "https://directory.peppol.eu";
-
-  public static final boolean DEFAULT_SML_REQUIRED = true;
-  public static final boolean DEFAULT_SML_ENABLED = false;
-  public static final int DEFAULT_SML_REQUEST_TIMEOUT_MS = 30 * (int) CGlobal.MILLISECONDS_PER_SECOND;
-
-  /**
-   * The name of the primary system property which points to the
-   * smp-server.properties files
-   */
-  public static final String SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH = "peppol.smp.server.properties.path";
-  /**
-   * The name of the secondary system property which points to the
-   * smp-server.properties files
-   */
-  public static final String SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH = "smp.server.properties.path";
-
-  /** The default primary properties file to load */
-  public static final String PATH_PRIVATE_SMP_SERVER_PROPERTIES = "private-smp-server.properties";
-  /** The default secondary properties file to load */
-  public static final String PATH_SMP_SERVER_PROPERTIES = "smp-server.properties";
-
-  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerConfiguration.class);
-  private static final SimpleReadWriteLock RW_LOCK = new SimpleReadWriteLock ();
-  @GuardedBy ("RW_LOCK")
-  private static ConfigFile s_aConfigFile;
-
-  static
-  {
-    reloadConfiguration ();
-  }
-
-  /**
-   * Reload the configuration file. It checks if the system property
-   * {@link #SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH} or
-   * {@link #SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH} is present and if so,
-   * tries it first, than {@link #PATH_PRIVATE_SMP_SERVER_PROPERTIES} is checked
-   * and finally the {@link #PATH_SMP_SERVER_PROPERTIES} path is checked.
-   *
-   * @return {@link ESuccess}
-   */
-  @Nonnull
-  public static ESuccess reloadConfiguration ()
-  {
-    final ConfigFileBuilder aCFB = new ConfigFileBuilder ().addPathFromEnvVar ("SMP_SERVER_CONFIG")
-                                                           .addPathFromSystemProperty (SYSTEM_PROPERTY_PEPPOL_SMP_SERVER_PROPERTIES_PATH)
-                                                           .addPathFromSystemProperty (SYSTEM_PROPERTY_SMP_SERVER_PROPERTIES_PATH)
-                                                           .addPath (PATH_PRIVATE_SMP_SERVER_PROPERTIES)
-                                                           .addPath (PATH_SMP_SERVER_PROPERTIES);
-
-    return RW_LOCK.writeLockedGet ( () -> {
-      s_aConfigFile = aCFB.build ();
-      if (s_aConfigFile.isRead ())
-      {
-        LOGGER.info ("Read SMP server properties from " + s_aConfigFile.getReadResource ().getPath ());
-        return ESuccess.SUCCESS;
-      }
-
-      LOGGER.warn ("Failed to read  SMP server properties from " + aCFB.getAllPaths ());
-      return ESuccess.FAILURE;
-    });
-  }
+  public static final Timeout DEFAULT_SML_REQUEST_TIMEOUT = Timeout.ofSeconds (30);
 
   private SMPServerConfiguration ()
   {}
@@ -199,9 +114,9 @@ public final class SMPServerConfiguration
    * @return The configuration file. Never <code>null</code>.
    */
   @Nonnull
-  public static ConfigFile getConfigFile ()
+  private static IConfig _getConfig ()
   {
-    return RW_LOCK.readLockedGet ( () -> s_aConfigFile);
+    return SMPConfigSource.getConfig ();
   }
 
   /**
@@ -213,7 +128,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getBackend ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_BACKEND);
+    return _getConfig ().getAsString (KEY_SMP_BACKEND);
   }
 
   /**
@@ -224,7 +139,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static EKeyStoreType getKeyStoreType ()
   {
-    final String sType = getConfigFile ().getAsString (KEY_SMP_KEYSTORE_TYPE);
+    final String sType = _getConfig ().getAsString (KEY_SMP_KEYSTORE_TYPE);
     return EKeyStoreType.getFromIDCaseInsensitiveOrDefault (sType, EKeyStoreType.JKS);
   }
 
@@ -235,7 +150,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeyStorePath ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_KEYSTORE_PATH);
+    return _getConfig ().getAsString (KEY_SMP_KEYSTORE_PATH);
   }
 
   /**
@@ -245,7 +160,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeyStorePassword ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_KEYSTORE_PASSWORD);
+    return _getConfig ().getAsString (KEY_SMP_KEYSTORE_PASSWORD);
   }
 
   /**
@@ -255,7 +170,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getKeyStoreKeyAlias ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_KEYSTORE_KEY_ALIAS);
+    return _getConfig ().getAsString (KEY_SMP_KEYSTORE_KEY_ALIAS);
   }
 
   /**
@@ -266,7 +181,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static char [] getKeyStoreKeyPassword ()
   {
-    return getConfigFile ().getAsCharArray (KEY_SMP_KEYSTORE_KEY_PASSWORD);
+    return _getConfig ().getAsCharArray (KEY_SMP_KEYSTORE_KEY_PASSWORD);
   }
 
   /**
@@ -276,7 +191,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static EKeyStoreType getTrustStoreType ()
   {
-    final String sType = getConfigFile ().getAsString (KEY_SMP_TRUSTSTORE_TYPE);
+    final String sType = _getConfig ().getAsString (KEY_SMP_TRUSTSTORE_TYPE);
     return EKeyStoreType.getFromIDCaseInsensitiveOrDefault (sType, EKeyStoreType.JKS);
   }
 
@@ -287,7 +202,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getTrustStorePath ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_TRUSTSTORE_PATH);
+    return _getConfig ().getAsString (KEY_SMP_TRUSTSTORE_PATH);
   }
 
   /**
@@ -297,7 +212,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getTrustStorePassword ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_TRUSTSTORE_PASSWORD);
+    return _getConfig ().getAsString (KEY_SMP_TRUSTSTORE_PASSWORD);
   }
 
   /**
@@ -307,7 +222,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isForceRoot ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_FORCE_ROOT, DEFAULT_SMP_FORCEROOT);
+    return _getConfig ().getAsBoolean (KEY_SMP_FORCE_ROOT, DEFAULT_SMP_FORCEROOT);
   }
 
   /**
@@ -318,7 +233,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getPublicServerURL ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_PUBLIC_URL);
+    return _getConfig ().getAsString (KEY_SMP_PUBLIC_URL);
   }
 
   /**
@@ -329,7 +244,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getPublicServerURLMode ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_PUBLIC_URL_MODE);
+    return _getConfig ().getAsString (KEY_SMP_PUBLIC_URL_MODE);
   }
 
   /**
@@ -340,7 +255,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESMPIdentifierType getIdentifierType ()
   {
-    final String sType = getConfigFile ().getAsString (KEY_SMP_IDENTIFIER_TYPE);
+    final String sType = _getConfig ().getAsString (KEY_SMP_IDENTIFIER_TYPE);
     return ESMPIdentifierType.getFromIDOrDefault (sType, DEFAULT_SMP_IDENTIFIER_TYPE);
   }
 
@@ -351,7 +266,7 @@ public final class SMPServerConfiguration
   @Nonnull
   public static ESMPRESTType getRESTType ()
   {
-    final String sType = getConfigFile ().getAsString (KEY_SMP_REST_TYPE);
+    final String sType = _getConfig ().getAsString (KEY_SMP_REST_TYPE);
     return ESMPRESTType.getFromIDOrDefault (sType, DEFAULT_SMP_REST_TYPE);
   }
 
@@ -362,7 +277,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isRESTLogExceptions ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_REST_LOG_EXCEPTIONS, DEFAULT_SMP_REST_LOG_EXCEPTIONS);
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_LOG_EXCEPTIONS, DEFAULT_SMP_REST_LOG_EXCEPTIONS);
   }
 
   /**
@@ -374,7 +289,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isRESTPayloadOnError ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_REST_PAYLOAD_ON_ERROR, DEFAULT_SMP_REST_PAYLOAD_ON_ERROR);
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_PAYLOAD_ON_ERROR, DEFAULT_SMP_REST_PAYLOAD_ON_ERROR);
   }
 
   /**
@@ -385,8 +300,8 @@ public final class SMPServerConfiguration
    */
   public static boolean isRestRemoteQueryAPIDisabled ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_REST_REMOTE_QUERY_API_DISABLED,
-                                          DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED);
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_REMOTE_QUERY_API_DISABLED,
+                                       DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED);
   }
 
   /**
@@ -397,7 +312,7 @@ public final class SMPServerConfiguration
    */
   public static boolean isStatusEnabled ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_STATUS_ENABLED, DEFAULT_SMP_STATUS_ENABLED);
+    return _getConfig ().getAsBoolean (KEY_SMP_STATUS_ENABLED, DEFAULT_SMP_STATUS_ENABLED);
   }
 
   /**
@@ -408,8 +323,8 @@ public final class SMPServerConfiguration
    */
   public static boolean isStatusShowCertificateDates ()
   {
-    return getConfigFile ().getAsBoolean (KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES,
-                                          DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES);
+    return _getConfig ().getAsBoolean (KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES,
+                                       DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES);
   }
 
   /**
@@ -421,7 +336,7 @@ public final class SMPServerConfiguration
   @Nonempty
   public static String getBDXR2CertificateMimeCode ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_BDXR2_CERTIFICATE_MIME_CODE, DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE);
+    return _getConfig ().getAsString (KEY_SMP_BDXR2_CERTIFICATE_MIME_CODE, DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE);
   }
 
   /**
@@ -433,14 +348,14 @@ public final class SMPServerConfiguration
   @Nonempty
   public static String getBDXR2CertificateTypeCode ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_BDXR2_CERTIFICATE_TYPE_CODE, DEFAULT_SMP_BDXR2_CERTIFICATE_TYPE_CODE);
+    return _getConfig ().getAsString (KEY_SMP_BDXR2_CERTIFICATE_TYPE_CODE, DEFAULT_SMP_BDXR2_CERTIFICATE_TYPE_CODE);
   }
 
   @Nonnull
   @Nonempty
   public static String getTimeZoneOrDefault ()
   {
-    return getConfigFile ().getAsString (KEY_SMP_TIMEZONE, CSMPServer.DEFAULT_TIMEZONE);
+    return _getConfig ().getAsString (KEY_SMP_TIMEZONE, CSMPServer.DEFAULT_TIMEZONE);
   }
 
   /**
@@ -450,7 +365,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLSMPID ()
   {
-    return getConfigFile ().getAsString (KEY_SML_SMPID);
+    return _getConfig ().getAsString (KEY_SML_SMPID);
   }
 
   /**
@@ -462,7 +377,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLSMPIP ()
   {
-    return getConfigFile ().getAsString (KEY_SML_SMP_IP);
+    return _getConfig ().getAsString (KEY_SML_SMP_IP);
   }
 
   /**
@@ -475,7 +390,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLSMPHostname ()
   {
-    String ret = getConfigFile ().getAsString (KEY_SML_SMP_HOSTNAME);
+    String ret = _getConfig ().getAsString (KEY_SML_SMP_HOSTNAME);
 
     // Ensure prefix
     if (StringHelper.hasText (ret) && !ret.startsWith ("http://"))
@@ -487,23 +402,30 @@ public final class SMPServerConfiguration
    * @return The connection timeout in milliseconds used for connecting to the
    *         SML server. May be <code>null</code> in which case the system
    *         default timeout should be used.
-   * @since 5.0.4
+   * @since 6.0.0
    */
   @Nullable
-  public static Integer getSMLConnectionTimeoutMS ()
+  public static Timeout getSMLConnectionTimeout ()
   {
-    return getConfigFile ().getAsIntObj (KEY_SML_CONNECTION_TIMEOUT_MS);
+    final long ret = _getConfig ().getAsLong (KEY_SML_CONNECTION_TIMEOUT_MS, -1L);
+    if (ret >= 0)
+      return Timeout.ofMilliseconds (ret);
+    return null;
   }
 
   /**
-   * @return The request timeout in milliseconds used for connecting to the SML
-   *         server. The default is defined in
-   *         {@link #DEFAULT_SML_REQUEST_TIMEOUT_MS} since 5.1.1.
-   * @since 5.0.4
+   * @return The request timeout used for connecting to the SML server. The
+   *         default is defined in {@link #DEFAULT_SML_REQUEST_TIMEOUT} since
+   *         5.1.1.
+   * @since 6.0.0
    */
-  public static int getSMLRequestTimeoutMS ()
+  @Nonnull
+  public static Timeout getSMLRequestTimeout ()
   {
-    return getConfigFile ().getAsInt (KEY_SML_REQUEST_TIMEOUT_MS, DEFAULT_SML_REQUEST_TIMEOUT_MS);
+    final long ret = _getConfig ().getAsLong (KEY_SML_REQUEST_TIMEOUT_MS, -1L);
+    if (ret >= 0)
+      return Timeout.ofMilliseconds (ret);
+    return DEFAULT_SML_REQUEST_TIMEOUT;
   }
 
   /**
@@ -515,7 +437,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getHttpProxyHost ()
   {
-    return getConfigFile ().getAsString ("http.proxyHost");
+    return _getConfig ().getAsString ("http.proxyHost");
   }
 
   /**
@@ -525,7 +447,7 @@ public final class SMPServerConfiguration
    */
   public static int getHttpProxyPort ()
   {
-    return getConfigFile ().getAsInt ("http.proxyPort", 0);
+    return _getConfig ().getAsInt ("http.proxyPort", 0);
   }
 
   /**
@@ -537,7 +459,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getHttpsProxyHost ()
   {
-    return getConfigFile ().getAsString ("https.proxyHost");
+    return _getConfig ().getAsString ("https.proxyHost");
   }
 
   /**
@@ -547,7 +469,7 @@ public final class SMPServerConfiguration
    */
   public static int getHttpsProxyPort ()
   {
-    return getConfigFile ().getAsInt ("https.proxyPort", 0);
+    return _getConfig ().getAsInt ("https.proxyPort", 0);
   }
 
   /**
@@ -558,7 +480,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getProxyUsername ()
   {
-    return getConfigFile ().getAsString ("proxy.username");
+    return _getConfig ().getAsString ("proxy.username");
   }
 
   /**
@@ -569,7 +491,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getProxyPassword ()
   {
-    return getConfigFile ().getAsString ("proxy.password");
+    return _getConfig ().getAsString ("proxy.password");
   }
 
   /**

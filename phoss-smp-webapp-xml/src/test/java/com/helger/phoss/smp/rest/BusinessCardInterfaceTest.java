@@ -40,7 +40,7 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
-import com.helger.commons.io.resource.ClassPathResource;
+import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.pd.businesscard.v1.PD1APIHelper;
@@ -77,8 +77,7 @@ public final class BusinessCardInterfaceTest
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   @Rule
-  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (ClassPathResource.getAsFile ("test-smp-server-xml-peppol.properties")
-                                                                                           .getAbsolutePath ());
+  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-xml-peppol.properties"));
 
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
   private final com.helger.pd.businesscard.v1.ObjectFactory m_aBC1ObjFactory = new com.helger.pd.businesscard.v1.ObjectFactory ();
@@ -92,7 +91,8 @@ public final class BusinessCardInterfaceTest
     return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
-  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
+  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+                                                @Nonempty final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
@@ -128,7 +128,8 @@ public final class BusinessCardInterfaceTest
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI)
+                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get SG - must work
@@ -226,7 +227,8 @@ public final class BusinessCardInterfaceTest
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI)
+                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get SG - must work
@@ -324,7 +326,8 @@ public final class BusinessCardInterfaceTest
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI)
+                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get SG - must work

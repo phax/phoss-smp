@@ -27,7 +27,6 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
-import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsCallback;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
@@ -52,7 +51,7 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   private static final String BSON_SML_ENABLED = "sml-enabled";
   private static final String BSON_SML_INFO_ID = "smlinfo-id";
 
-  private final SMPSettings m_aSettings = new SMPSettings ();
+  private final SMPSettings m_aSettings = new SMPSettings (true);
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
   private final AtomicBoolean m_aInsertDocument = new AtomicBoolean ();
 
@@ -78,16 +77,16 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   public static void toDomain (@Nonnull final Document aDoc, @Nonnull final SMPSettings aTarget)
   {
     aTarget.setRESTWritableAPIDisabled (aDoc.getBoolean (BSON_SMP_REST_WRITABLE_API_DISABLED,
-                                                         SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED));
+                                                         SMPSettings.DEFAULT_SMP_REST_WRITABLE_API_DISABLED));
     aTarget.setDirectoryIntegrationRequired (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_REQUIRED,
-                                                              SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED));
+                                                              SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED));
     aTarget.setDirectoryIntegrationEnabled (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_ENABLED,
-                                                             SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED));
+                                                             SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED));
     aTarget.setDirectoryIntegrationAutoUpdate (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                                                SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE));
+                                                                SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE));
     aTarget.setDirectoryHostName (aDoc.getString (BSON_DIRECTORY_HOSTNAME));
-    aTarget.setSMLRequired (aDoc.getBoolean (BSON_SML_REQUIRED, SMPServerConfiguration.DEFAULT_SML_REQUIRED));
-    aTarget.setSMLEnabled (aDoc.getBoolean (BSON_SML_ENABLED, SMPServerConfiguration.DEFAULT_SML_ENABLED));
+    aTarget.setSMLRequired (aDoc.getBoolean (BSON_SML_REQUIRED, SMPSettings.DEFAULT_SML_REQUIRED));
+    aTarget.setSMLEnabled (aDoc.getBoolean (BSON_SML_ENABLED, SMPSettings.DEFAULT_SML_ENABLED));
     aTarget.setSMLInfoID (aDoc.getString (BSON_SML_INFO_ID));
   }
 

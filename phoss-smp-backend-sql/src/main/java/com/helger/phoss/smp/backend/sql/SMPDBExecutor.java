@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
+import com.helger.config.IConfig;
 import com.helger.db.jdbc.executor.DBExecutor;
-import com.helger.phoss.smp.SMPServerConfiguration;
-import com.helger.settings.exchange.configfile.ConfigFile;
+import com.helger.phoss.smp.SMPConfigSource;
 
 /**
  * The SMP specific DB Executor
@@ -38,8 +38,7 @@ public final class SMPDBExecutor extends DBExecutor
   public static final Function <String, String> TABLE_NAME_CUSTOMIZER;
   static
   {
-    final String sSchemaName = SMPServerConfiguration.getConfigFile ()
-                                                     .getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
+    final String sSchemaName = SMPConfigSource.getConfig ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
     if (StringHelper.hasText (sSchemaName) && RegExHelper.stringMatchesPattern ("[0-9a-zA-Z]+", sSchemaName))
       TABLE_NAME_CUSTOMIZER = x -> sSchemaName + ".smp_" + x;
     else
@@ -52,18 +51,18 @@ public final class SMPDBExecutor extends DBExecutor
   {
     super (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
 
-    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
+    final IConfig aConfig = SMPConfigSource.getConfig ();
 
     // This is ONLY for debugging
-    setDebugConnections (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_CONNECTIONS, false));
-    setDebugTransactions (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_TRANSACTIONS, false));
-    setDebugSQLStatements (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_SQL, false));
+    setDebugConnections (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_CONNECTIONS, false));
+    setDebugTransactions (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_TRANSACTIONS, false));
+    setDebugSQLStatements (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_SQL, false));
 
-    if (aCF.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
-                          SMPJDBCConfiguration.DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE))
+    if (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
+                              SMPJDBCConfiguration.DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE))
     {
-      final long nMillis = aCF.getAsLong (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
-                                          DBExecutor.DEFAULT_EXECUTION_DURATION_WARN_MS);
+      final long nMillis = aConfig.getAsLong (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
+                                              DBExecutor.DEFAULT_EXECUTION_DURATION_WARN_MS);
       if (nMillis > 0)
         setExecutionDurationWarnMS (nMillis);
       else

@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,8 +123,11 @@ public final class SMPStatusProvider
       aStatusData.add ("smp.sml.url", aSMLInfo.getManagementServiceURL ());
       aStatusData.add ("smp.sml.dnszone", aSMLInfo.getDNSZone ());
     }
-    aStatusData.addIfNotNull ("smp.sml.connection-timeout-ms", SMPServerConfiguration.getSMLConnectionTimeoutMS ());
-    aStatusData.add ("smp.sml.request-timeout-ms", SMPServerConfiguration.getSMLRequestTimeoutMS ());
+
+    final Timeout aCT = SMPServerConfiguration.getSMLConnectionTimeout ();
+    if (aCT != null)
+      aStatusData.add ("smp.sml.connection-timeout-ms", aCT.toMilliseconds ());
+    aStatusData.add ("smp.sml.request-timeout-ms", SMPServerConfiguration.getSMLRequestTimeout ().toMilliseconds ());
 
     // Directory information
     aStatusData.add ("smp.pd.enabled", aSettings.isDirectoryIntegrationEnabled ());

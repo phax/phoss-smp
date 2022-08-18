@@ -1,4 +1,4 @@
-package com.helger.phoss.smp.app;
+package com.helger.phoss.smp;
 
 import java.nio.charset.StandardCharsets;
 
@@ -27,15 +27,33 @@ import com.helger.config.source.res.ConfigurationSourceProperties;
  * The global configuration provider for SMP V6.
  *
  * @author Philip Helger
+ * @since 6.0.0
  */
 @ThreadSafe
-public final class SMPConfigV6
+public final class SMPConfigSource
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (SMPConfigV6.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPConfigSource.class);
 
   static
   {
-    // Since 6.0.0
+    // smp-server.properties stuff
+    if (StringHelper.hasText (SystemProperties.getPropertyValueOrNull ("peppol.smp.server.properties.path")))
+      throw new InitializationException ("The system property 'peppol.smp.server.properties.path' is no longer supported." +
+                                         " All configuration properties are in 'application.properties' since v6.0.0." +
+                                         " See https://github.com/phax/ph-commons#ph-config for alternatives." +
+                                         " Consider using the system property 'config.file' instead.");
+    if (StringHelper.hasText (SystemProperties.getPropertyValueOrNull ("smp.server.properties.path")))
+      throw new InitializationException ("The system property 'smp.server.properties.path' is no longer supported." +
+                                         " All configuration properties are in 'application.properties' since v6.0.0." +
+                                         " See https://github.com/phax/ph-commons#ph-config for alternatives." +
+                                         " Consider using the system property 'config.file' instead.");
+    if (StringHelper.hasText (System.getenv ().get ("SMP_SERVER_CONFIG")))
+      throw new InitializationException ("The environment variable 'SMP_SERVER_CONFIG' is no longer supported." +
+                                         " All configuration properties are in 'application.properties' since v6.0.0." +
+                                         " See https://github.com/phax/ph-commons#ph-config for alternatives." +
+                                         " Consider using the environment variable 'CONFIG_FILE' instead.");
+
+    // webapp.properties stuff
     if (StringHelper.hasText (SystemProperties.getPropertyValueOrNull ("peppol.smp.webapp.properties.path")))
       throw new InitializationException ("The system property 'peppol.smp.webapp.properties.path' is no longer supported." +
                                          " All configuration properties are in 'application.properties' since v6.0.0." +
@@ -69,6 +87,20 @@ public final class SMPConfigV6
     final int nBasePrio = ConfigFactory.APPLICATION_PROPERTIES_PRIORITY;
 
     // Lower priority than the standard files
+    aRes = aResourceProvider.getReadableResourceIf ("private-smp-server.properties", IReadableResource::exists);
+    if (aRes != null)
+    {
+      LOGGER.warn ("The support for the properties file 'private-smp-server.properties' is deprecated. Place the properties in 'application.properties' instead.");
+      ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 1);
+    }
+
+    aRes = aResourceProvider.getReadableResourceIf ("smp-server.properties", IReadableResource::exists);
+    if (aRes != null)
+    {
+      LOGGER.warn ("The support for the properties file 'smp-server.properties' is deprecated. Place the properties in 'application.properties' instead.");
+      ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 2);
+    }
+
     aRes = aResourceProvider.getReadableResourceIf ("private-webapp.properties", IReadableResource::exists);
     if (aRes != null)
     {
@@ -92,7 +124,7 @@ public final class SMPConfigV6
   @GuardedBy ("RW_LOCK")
   private static IConfig s_aConfig = DEFAULT_CONFIG;
 
-  private SMPConfigV6 ()
+  private SMPConfigSource ()
   {}
 
   /**

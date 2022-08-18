@@ -42,7 +42,6 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
-import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsCallback;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
@@ -166,17 +165,16 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     final ICommonsMap <String, String> aValues = getAllSettingsValues ();
     final SMPSettings ret = new SMPSettings (false);
     ret.setRESTWritableAPIDisabled (StringParser.parseBool (aValues.get (SMP_REST_WRITABLE_API_DISABLED),
-                                                            SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED));
+                                                            SMPSettings.DEFAULT_SMP_REST_WRITABLE_API_DISABLED));
     ret.setDirectoryIntegrationEnabled (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_ENABLED),
-                                                                SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED));
+                                                                SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED));
     ret.setDirectoryIntegrationRequired (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_REQUIRED),
-                                                                 SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED));
+                                                                 SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED));
     ret.setDirectoryIntegrationAutoUpdate (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_AUTO_UPDATE),
-                                                                   SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE));
+                                                                   SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE));
     ret.setDirectoryHostName (aValues.get (DIRECTORY_HOSTNAME));
-    ret.setSMLEnabled (StringParser.parseBool (aValues.get (SML_ENABLED), SMPServerConfiguration.DEFAULT_SML_ENABLED));
-    ret.setSMLRequired (StringParser.parseBool (aValues.get (SML_REQUIRED),
-                                                SMPServerConfiguration.DEFAULT_SML_REQUIRED));
+    ret.setSMLEnabled (StringParser.parseBool (aValues.get (SML_ENABLED), SMPSettings.DEFAULT_SML_ENABLED));
+    ret.setSMLRequired (StringParser.parseBool (aValues.get (SML_REQUIRED), SMPSettings.DEFAULT_SML_REQUIRED));
     ret.setSMLInfoID (aValues.get (SML_INFO_ID));
     return ret;
   }

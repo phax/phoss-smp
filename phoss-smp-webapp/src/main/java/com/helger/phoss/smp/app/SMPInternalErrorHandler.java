@@ -28,12 +28,12 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.email.EmailAddress;
 import com.helger.commons.string.StringHelper;
+import com.helger.config.IConfig;
 import com.helger.phoss.smp.CSMPServer;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.SMPConfigSource;
 import com.helger.photon.core.interror.InternalErrorBuilder;
 import com.helger.photon.core.interror.InternalErrorSettings;
 import com.helger.photon.core.interror.callback.AbstractErrorCallback;
-import com.helger.settings.exchange.configfile.ConfigFile;
 import com.helger.smtp.settings.SMTPSettings;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
@@ -64,20 +64,20 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
 
   public static void doSetup ()
   {
-    final ConfigFile aCF = SMPServerConfiguration.getConfigFile ();
-    final String sSenderAddress = aCF.getAsString ("smp.errorhandler.sender.email");
-    final String sSenderName = aCF.getAsString ("smp.errorhandler.sender.name", "SMP Internal Error Sender");
-    final String sReceiverAddress = aCF.getAsString ("smp.errorhandler.receiver.email");
-    final String sReceiverName = aCF.getAsString ("smp.errorhandler.receiver.name");
-    final String sSMTPHostName = aCF.getAsString ("smp.smtp.hostname");
-    final int nSMTPPort = aCF.getAsInt ("smp.smtp.port", -1);
-    final String sSMTPUserName = aCF.getAsString ("smp.smtp.username");
-    final String sSMTPPassword = aCF.getAsString ("smp.smtp.password");
-    final boolean bSMTPSSLEnabled = aCF.getAsBoolean ("smp.smtp.ssl", false);
-    final boolean bSMTPSTARTTLSEnabled = aCF.getAsBoolean ("smp.smtp.starttls", false);
-    final long nSMTPConnectionTimeoutMS = aCF.getAsLong ("smp.smtp.connectiontimeoutms", 10_000);
-    final long nSMTPSocketTimeoutMS = aCF.getAsLong ("smp.smtp.sockettimeoutms", 10_000);
-    final boolean bSMTPDebug = aCF.getAsBoolean ("smp.smtp.debug", false);
+    final IConfig aConfig = SMPConfigSource.getConfig ();
+    final String sSenderAddress = aConfig.getAsString ("smp.errorhandler.sender.email");
+    final String sSenderName = aConfig.getAsString ("smp.errorhandler.sender.name", "SMP Internal Error Sender");
+    final String sReceiverAddress = aConfig.getAsString ("smp.errorhandler.receiver.email");
+    final String sReceiverName = aConfig.getAsString ("smp.errorhandler.receiver.name");
+    final String sSMTPHostName = aConfig.getAsString ("smp.smtp.hostname");
+    final int nSMTPPort = aConfig.getAsInt ("smp.smtp.port", -1);
+    final String sSMTPUserName = aConfig.getAsString ("smp.smtp.username");
+    final String sSMTPPassword = aConfig.getAsString ("smp.smtp.password");
+    final boolean bSMTPSSLEnabled = aConfig.getAsBoolean ("smp.smtp.ssl", false);
+    final boolean bSMTPSTARTTLSEnabled = aConfig.getAsBoolean ("smp.smtp.starttls", false);
+    final long nSMTPConnectionTimeoutMS = aConfig.getAsLong ("smp.smtp.connectiontimeoutms", 10_000);
+    final long nSMTPSocketTimeoutMS = aConfig.getAsLong ("smp.smtp.sockettimeoutms", 10_000);
+    final boolean bSMTPDebug = aConfig.getAsBoolean ("smp.smtp.debug", false);
     final SMTPSettings aSMTPSettings = StringHelper.hasText (sSMTPHostName) ? new SMTPSettings (sSMTPHostName,
                                                                                                 nSMTPPort,
                                                                                                 sSMTPUserName,

@@ -34,7 +34,6 @@ import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.ClassPathResource;
-import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.lang.priviledged.IPrivilegedAction;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
@@ -44,9 +43,9 @@ import com.helger.network.proxy.settings.ProxySettingsManager;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.pd.client.PDHttpClientSettings;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.SMPConfigSource;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.PDClientProvider;
-import com.helger.phoss.smp.app.SMPConfigV6;
 import com.helger.phoss.smp.app.SMPSecurity;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -278,13 +277,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
       aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
                                                                                                   .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
-      aCFM.registerAll (SMPConfigV6.getConfig ());
-      final IReadableResource aConfigRes = SMPServerConfiguration.getConfigFile ().getReadResource ();
-      if (aConfigRes != null)
-      {
-        aCFM.registerConfigurationFile (new ConfigurationFile (aConfigRes).setDescription ("SMP server configuration")
-                                                                          .setSyntaxHighlightLanguage (EConfigurationFileSyntax.PROPERTIES));
-      }
+      aCFM.registerAll (SMPConfigSource.getConfig ());
       aCFM.registerAll (PDClientConfiguration.getConfig ());
     }
 

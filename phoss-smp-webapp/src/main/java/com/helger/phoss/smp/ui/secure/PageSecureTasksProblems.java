@@ -103,9 +103,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     {
       aOL.addItem (_createWarning ("The public server URL is not configured"),
                    div ("The configuration file property ").addChild (code (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
-                                                           .addChild (" in file " +
-                                                                      SMPServerConfiguration.PATH_SMP_SERVER_PROPERTIES +
-                                                                      " is not set. This property is usually required to create valid Internet-URLs."));
+                                                           .addChild (" is not set. This property is usually required to create valid Internet-URLs."));
     }
 
     // Check that the global debug setting is off

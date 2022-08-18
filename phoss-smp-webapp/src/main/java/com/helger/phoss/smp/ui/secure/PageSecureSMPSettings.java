@@ -29,11 +29,11 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.settings.SMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageSimpleForm;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.bootstrap4.card.BootstrapCard;
@@ -99,13 +99,16 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
       aTable.setLeft (4);
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection required?")
-                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLRequired (), aDisplayLocale)));
+                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLRequired (),
+                                                                                          aDisplayLocale)));
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection enabled?")
-                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLEnabled (), aDisplayLocale)));
+                                                    .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLEnabled (),
+                                                                                          aDisplayLocale)));
 
       final ISMLInfo aSMLInfo = aObject.getSMLInfo ();
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML to be used")
-                                                    .setCtrl (aSMLInfo == null ? em ("none") : HCSMLSelect.getDisplayNameNode (aSMLInfo)));
+                                                    .setCtrl (aSMLInfo == null ? em ("none")
+                                                                               : HCSMLSelect.getDisplayNameNode (aSMLInfo)));
     }
 
     {
@@ -139,26 +142,28 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
 
     final boolean bRESTWritableAPIDisabled = aWPEC.params ()
                                                   .isCheckBoxChecked (FIELD_SMP_REST_WRITABLE_API_DISABLED,
-                                                                      SMPServerConfiguration.DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
+                                                                      SMPSettings.DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
 
-    final boolean bSMLActive = aWPEC.params ().isCheckBoxChecked (FIELD_SML_ACTIVE, SMPServerConfiguration.DEFAULT_SML_ENABLED);
-    final boolean bSMLRequired = aWPEC.params ().isCheckBoxChecked (FIELD_SML_REQUIRED, SMPServerConfiguration.DEFAULT_SML_REQUIRED);
+    final boolean bSMLActive = aWPEC.params ().isCheckBoxChecked (FIELD_SML_ACTIVE, SMPSettings.DEFAULT_SML_ENABLED);
+    final boolean bSMLRequired = aWPEC.params ()
+                                      .isCheckBoxChecked (FIELD_SML_REQUIRED, SMPSettings.DEFAULT_SML_REQUIRED);
     final String sSMLInfoID = aWPEC.params ().getAsString (FIELD_SML_INFO);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLInfoID);
 
     final boolean bDirectoryIntegrationEnabled = aWPEC.params ()
                                                       .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_ENABLED,
-                                                                          SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
+                                                                          SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
     final boolean bDirectoryIntegrationRequired = aWPEC.params ()
                                                        .isCheckBoxChecked (FIELD_SML_DIRECTORY_INTEGRATION_REQUIRED,
-                                                                           SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED);
+                                                                           SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED);
     final boolean bDirectoryIntegrationAutoUpdate = aWPEC.params ()
                                                          .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                                                             SMPServerConfiguration.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE);
+                                                                             SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE);
     final String sDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_DIRECTORY_HOSTNAME);
 
     if (bSMLActive && !SMPKeyManager.isKeyStoreValid ())
-      aFormErrors.addFieldError (FIELD_SML_ACTIVE, "SML connection cannot be activated, because the configured keystore is invalid!");
+      aFormErrors.addFieldError (FIELD_SML_ACTIVE,
+                                 "SML connection cannot be activated, because the configured keystore is invalid!");
 
     if (aSMLInfo == null)
     {
@@ -170,7 +175,10 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     {
       if (bDirectoryIntegrationEnabled)
         aFormErrors.addFieldError (FIELD_SMP_DIRECTORY_HOSTNAME,
-                                   sDirectoryName + " hostname may not be empty if " + sDirectoryName + " intergration is enabled.");
+                                   sDirectoryName +
+                                                                 " hostname may not be empty if " +
+                                                                 sDirectoryName +
+                                                                 " intergration is enabled.");
     }
     else
       if (!URLValidator.isValid (sDirectoryHostName))
@@ -221,7 +229,8 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                  .setHelpText ("If this checkbox is checked, service group changes are propagated to the SML.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SML_ACTIVE)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SML configuration")
-                                                 .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_INFO, aObject.getSMLInfoID ()),
+                                                 .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_INFO,
+                                                                                              aObject.getSMLInfoID ()),
                                                                             aDisplayLocale,
                                                                             null))
                                                  .setHelpText (new HCTextNode ("Select the SML to operate on. The list of available configurations can be "),

@@ -18,6 +18,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,12 +105,11 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     final ManageParticipantIdentifierServiceCaller ret = new ManageParticipantIdentifierServiceCaller (aSMLEndpointURL);
     ret.setSSLSocketFactory (aSocketFactory);
     ret.setHostnameVerifier (aHostnameVerifier);
-    final Integer aConnectionTimeoutMS = SMPServerConfiguration.getSMLConnectionTimeoutMS ();
-    if (aConnectionTimeoutMS != null)
-      ret.setConnectionTimeoutMS (aConnectionTimeoutMS.intValue ());
-    final int nRequestTimeoutMS = SMPServerConfiguration.getSMLRequestTimeoutMS ();
-    if (nRequestTimeoutMS >= 0)
-      ret.setRequestTimeoutMS (nRequestTimeoutMS);
+    final Timeout aConnectionTimeout = SMPServerConfiguration.getSMLConnectionTimeout ();
+    if (aConnectionTimeout != null)
+      ret.setConnectionTimeoutMS (aConnectionTimeout.toMillisecondsIntBound ());
+    final Timeout aRequestTimeout = SMPServerConfiguration.getSMLRequestTimeout ();
+    ret.setRequestTimeoutMS (aRequestTimeout.toMillisecondsIntBound ());
     return ret;
   }
 

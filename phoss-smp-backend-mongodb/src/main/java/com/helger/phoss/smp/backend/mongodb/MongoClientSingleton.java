@@ -26,9 +26,9 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.string.StringHelper;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.config.IConfig;
+import com.helger.phoss.smp.SMPConfigSource;
 import com.helger.scope.IScope;
-import com.helger.settings.exchange.configfile.ConfigFile;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 import com.mongodb.client.MongoCollection;
 
@@ -53,20 +53,21 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
   protected void onAfterInstantiation (@Nonnull final IScope aScope)
   {
     // Standard configuration file
-    final ConfigFile aConfigFile = SMPServerConfiguration.getConfigFile ();
-    final String sConnectionString = aConfigFile.getAsString (CONFIG_MONGODB_CONNECTION_STRING);
+    final IConfig aConfig = SMPConfigSource.getConfig ();
+    final String sConnectionString = aConfig.getAsString (CONFIG_MONGODB_CONNECTION_STRING);
     if (StringHelper.hasNoText (sConnectionString))
       throw new IllegalStateException ("The MongoDB connection string is missing in the configuration. See property '" +
                                        CONFIG_MONGODB_CONNECTION_STRING +
                                        "'");
 
-    final String sDBName = aConfigFile.getAsString (CONFIG_MONGODB_DB_NAME);
+    final String sDBName = aConfig.getAsString (CONFIG_MONGODB_DB_NAME);
     if (StringHelper.hasNoText (sDBName))
       throw new IllegalStateException ("The MongoDB database name is missing in the configuration. See property '" +
                                        CONFIG_MONGODB_DB_NAME +
                                        "'");
 
-    LOGGER.info ("Using Mongo DB database name '" + sDBName + "'");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info ("Using Mongo DB database name '" + sDBName + "'");
 
     m_aProvider = new MongoClientProvider (sConnectionString, sDBName);
   }

@@ -36,7 +36,7 @@ import com.helger.xml.microdom.MicroDocument;
 @ThreadSafe
 public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements ISMPSettingsManager
 {
-  private final SMPSettings m_aSettings = new SMPSettings ();
+  private final SMPSettings m_aSettings = new SMPSettings (true);
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
 
   public SMPSettingsManagerXML (@Nullable final String sFilename) throws DAOException
@@ -61,7 +61,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   {
     final IMicroDocument ret = new MicroDocument ();
     final SettingsMicroDocumentConverter <Settings> aConverter = new SettingsMicroDocumentConverter <> (ISettingsFactory.newInstance ());
-    ret.appendChild (aConverter.convertToMicroElement (m_aSettings.getAsSettings (), null, "root"));
+    ret.appendChild (aConverter.convertToMicroElement (m_aSettings.getAsMutableSettings (), null, "root"));
     return ret;
   }
 

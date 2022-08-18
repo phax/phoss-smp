@@ -26,7 +26,7 @@ import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.string.StringHelper;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.SMPConfigSource;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 
@@ -43,8 +43,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
 
   static
   {
-    final String sDBType = SMPServerConfiguration.getConfigFile ()
-                                                 .getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE);
+    final String sDBType = SMPConfigSource.getConfig ().getAsString (SMPJDBCConfiguration.CONFIG_TARGET_DATABASE);
     DB_TYPE = EDatabaseType.getFromIDOrNull (sDBType);
     if (DB_TYPE == null)
       throw new IllegalStateException ("The database type MUST be provided and MUST be one of " +
