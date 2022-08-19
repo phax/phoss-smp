@@ -221,7 +221,17 @@ public final class SMPRendererPublic
   public static final IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
-    return new HCImg ().setSrc (LinkHelper.getStreamURL (aRequestScope, "/image/phoss-smp-272-100.png"));
+
+    final ISimpleURL aLogoHref;
+    if (CUSTOM_LOGO_URL_CACHE != null)
+      aLogoHref = CUSTOM_LOGO_URL_CACHE;
+    else
+    {
+      // The default logo
+      aLogoHref = LinkHelper.getStreamURL (aRequestScope, "/image/phoss-smp-272-100.png");
+    }
+
+    return new HCImg ().setSrc (aLogoHref);
   }
 
   @Nonnull
