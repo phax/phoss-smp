@@ -27,7 +27,7 @@ import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.config.IConfig;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 import com.helger.scope.IScope;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 import com.mongodb.client.MongoCollection;
@@ -53,7 +53,7 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
   protected void onAfterInstantiation (@Nonnull final IScope aScope)
   {
     // Standard configuration file
-    final IConfig aConfig = SMPConfigSource.getConfig ();
+    final IConfig aConfig = SMPConfigProvider.getConfig ();
     final String sConnectionString = aConfig.getAsString (CONFIG_MONGODB_CONNECTION_STRING);
     if (StringHelper.hasNoText (sConnectionString))
       throw new IllegalStateException ("The MongoDB connection string is missing in the configuration. See property '" +

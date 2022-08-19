@@ -30,9 +30,9 @@ import com.helger.config.source.res.ConfigurationSourceProperties;
  * @since 6.0.0
  */
 @ThreadSafe
-public final class SMPConfigSource
+public final class SMPConfigProvider
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (SMPConfigSource.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPConfigProvider.class);
 
   static
   {
@@ -86,32 +86,38 @@ public final class SMPConfigSource
     IReadableResource aRes;
     final int nBasePrio = ConfigFactory.APPLICATION_PROPERTIES_PRIORITY;
 
+    final String sDefaultSuffix = "\n  Place all properties in 'application.properties' instead. !This fallback will be removed in version 7 of phoss SMP!";
+
     // Lower priority than the standard files
     aRes = aResourceProvider.getReadableResourceIf ("private-smp-server.properties", IReadableResource::exists);
     if (aRes != null)
     {
-      LOGGER.warn ("The support for the properties file 'private-smp-server.properties' is deprecated. Place the properties in 'application.properties' instead.");
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
       ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 1);
     }
 
     aRes = aResourceProvider.getReadableResourceIf ("smp-server.properties", IReadableResource::exists);
     if (aRes != null)
     {
-      LOGGER.warn ("The support for the properties file 'smp-server.properties' is deprecated. Place the properties in 'application.properties' instead.");
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
       ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 2);
     }
 
     aRes = aResourceProvider.getReadableResourceIf ("private-webapp.properties", IReadableResource::exists);
     if (aRes != null)
     {
-      LOGGER.warn ("The support for the properties file 'private-webapp.properties' is deprecated. Place the properties in 'application.properties' instead.");
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
       ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 1);
     }
 
     aRes = aResourceProvider.getReadableResourceIf ("webapp.properties", IReadableResource::exists);
     if (aRes != null)
     {
-      LOGGER.warn ("The support for the properties file 'webapp.properties' is deprecated. Place the properties in 'application.properties' instead.");
+      if (LOGGER.isWarnEnabled ())
+        LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
       ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 2);
     }
 
@@ -124,7 +130,7 @@ public final class SMPConfigSource
   @GuardedBy ("RW_LOCK")
   private static IConfig s_aConfig = DEFAULT_CONFIG;
 
-  private SMPConfigSource ()
+  private SMPConfigProvider ()
   {}
 
   /**

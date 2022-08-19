@@ -35,7 +35,7 @@ import com.helger.config.IConfig;
 import com.helger.config.source.MultiConfigurationValueProvider;
 import com.helger.config.source.res.ConfigurationSourceProperties;
 import com.helger.peppol.sml.ESML;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.jetty.JettyRunner;
 
@@ -67,7 +67,7 @@ public class SMPServerRESTTestRule extends ExternalResource
       if (LOGGER.isInfoEnabled ())
         LOGGER.info ("Creating custom SMP configuration using " + aSMPServerProperties);
 
-      m_aOldConfig = SMPConfigSource.getConfig ();
+      m_aOldConfig = SMPConfigProvider.getConfig ();
       // Create new config
       m_aNewConfig = Config.create (createSMPClientValueProvider (aSMPServerProperties));
     }
@@ -77,7 +77,7 @@ public class SMPServerRESTTestRule extends ExternalResource
   public void before () throws Throwable
   {
     if (m_aNewConfig != null)
-      SMPConfigSource.setConfig (m_aNewConfig);
+      SMPConfigProvider.setConfig (m_aNewConfig);
 
     if (false)
       ClassPathHelper.forAllClassPathEntries (LOGGER::info);
@@ -120,7 +120,7 @@ public class SMPServerRESTTestRule extends ExternalResource
     {
       // Restore old config
       if (m_aOldConfig != null)
-        SMPConfigSource.setConfig (m_aOldConfig);
+        SMPConfigProvider.setConfig (m_aOldConfig);
     }
   }
 

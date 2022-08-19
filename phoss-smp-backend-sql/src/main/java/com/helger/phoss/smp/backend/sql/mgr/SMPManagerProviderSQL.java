@@ -28,7 +28,7 @@ import com.helger.config.IConfig;
 import com.helger.dao.DAOException;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
@@ -68,7 +68,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Override
   public void beforeInitManagers ()
   {
-    final IConfig aConfig = SMPConfigSource.getConfig ();
+    final IConfig aConfig = SMPConfigProvider.getConfig ();
 
     // Set the special PhotonSecurityManager factory
     // Must be before Flyway, so that auditing of Flyway actions (may) work
@@ -128,7 +128,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   {
     final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor::new);
     // Enable cache by default
-    ret.setCacheEnabled (SMPConfigSource.getConfig ()
+    ret.setCacheEnabled (SMPConfigProvider.getConfig ()
                                     .getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_CACHE_SG_ENABLED, true));
     return ret;
   }

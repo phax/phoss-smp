@@ -25,7 +25,7 @@ import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.config.IConfig;
 import com.helger.db.jdbc.executor.DBExecutor;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 
 /**
  * The SMP specific DB Executor
@@ -38,7 +38,7 @@ public final class SMPDBExecutor extends DBExecutor
   public static final Function <String, String> TABLE_NAME_CUSTOMIZER;
   static
   {
-    final String sSchemaName = SMPConfigSource.getConfig ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
+    final String sSchemaName = SMPConfigProvider.getConfig ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
     if (StringHelper.hasText (sSchemaName) && RegExHelper.stringMatchesPattern ("[0-9a-zA-Z]+", sSchemaName))
       TABLE_NAME_CUSTOMIZER = x -> sSchemaName + ".smp_" + x;
     else
@@ -51,7 +51,7 @@ public final class SMPDBExecutor extends DBExecutor
   {
     super (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
 
-    final IConfig aConfig = SMPConfigSource.getConfig ();
+    final IConfig aConfig = SMPConfigProvider.getConfig ();
 
     // This is ONLY for debugging
     setDebugConnections (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_CONNECTIONS, false));

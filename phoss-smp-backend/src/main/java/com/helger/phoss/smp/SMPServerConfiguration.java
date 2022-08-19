@@ -116,7 +116,7 @@ public final class SMPServerConfiguration
   @Nonnull
   private static IConfig _getConfig ()
   {
-    return SMPConfigSource.getConfig ();
+    return SMPConfigProvider.getConfig ();
   }
 
   /**

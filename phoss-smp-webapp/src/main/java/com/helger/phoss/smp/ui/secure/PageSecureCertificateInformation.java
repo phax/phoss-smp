@@ -85,9 +85,14 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                           3,
                           false),
     // TOOP Pilot PKI
-    TOOP_PILOT_SMP ("TOOP pilot", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, false),
-    // DE4A Test PKI
-    ;
+    TOOP_PILOT_SMP ("TOOP pilot", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, true),
+    // DE4A PKIs
+    DE4A_TEST ("DE4A Test",
+               "E=CEF-EDELIVERY-SUPPORT@ec.europa.eu,CN=DE4A_TEST_SMP_CA,OU=CEF,O=DE4A,ST=Brussels-Capital,C=BE",
+               4,
+               true),
+    DE4A_TELSEC ("DE4A Telesec", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, false),
+    DE4A_COMMISSIGN_2 ("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, false);
 
     private final String m_sDisplayName;
     private final String m_sIssuer;

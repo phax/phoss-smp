@@ -30,7 +30,7 @@ import com.helger.commons.email.EmailAddress;
 import com.helger.commons.string.StringHelper;
 import com.helger.config.IConfig;
 import com.helger.phoss.smp.CSMPServer;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 import com.helger.photon.core.interror.InternalErrorBuilder;
 import com.helger.photon.core.interror.InternalErrorSettings;
 import com.helger.photon.core.interror.callback.AbstractErrorCallback;
@@ -64,7 +64,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
 
   public static void doSetup ()
   {
-    final IConfig aConfig = SMPConfigSource.getConfig ();
+    final IConfig aConfig = SMPConfigProvider.getConfig ();
     final String sSenderAddress = aConfig.getAsString ("smp.errorhandler.sender.email");
     final String sSenderName = aConfig.getAsString ("smp.errorhandler.sender.name", "SMP Internal Error Sender");
     final String sReceiverAddress = aConfig.getAsString ("smp.errorhandler.receiver.email");

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.config.IConfig;
 import com.helger.db.jdbc.IHasDataSource;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 
 /**
  * The main data source provider, only instantiated from
@@ -43,7 +43,7 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
 
   SMPDataSourceProvider ()
   {
-    final IConfig aConfig = SMPConfigSource.getConfig ();
+    final IConfig aConfig = SMPConfigProvider.getConfig ();
 
     // build data source
     // This is usually only called once on startup and than the same

@@ -43,7 +43,7 @@ import com.helger.network.proxy.settings.ProxySettingsManager;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.pd.client.PDHttpClientSettings;
 import com.helger.phoss.smp.CSMPServer;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPSecurity;
@@ -277,7 +277,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       final ConfigurationFileManager aCFM = ConfigurationFileManager.getInstance ();
       aCFM.registerConfigurationFile (new ConfigurationFile (new ClassPathResource ("log4j2.xml")).setDescription ("Log4J2 configuration")
                                                                                                   .setSyntaxHighlightLanguage (EConfigurationFileSyntax.XML));
-      aCFM.registerAll (SMPConfigSource.getConfig ());
+      aCFM.registerAll (SMPConfigProvider.getConfig ());
       aCFM.registerAll (PDClientConfiguration.getConfig ());
     }
 

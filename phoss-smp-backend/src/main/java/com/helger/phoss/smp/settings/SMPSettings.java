@@ -26,7 +26,7 @@ import com.helger.commons.type.ObjectType;
 import com.helger.config.IConfig;
 import com.helger.config.value.ConfiguredValue;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.settings.ISettings;
@@ -77,7 +77,7 @@ public class SMPSettings implements ISMPSettings
     {
       // Create settings and use the values from the configuration file as the
       // default values
-      final IConfig aConfig = SMPConfigSource.getConfig ();
+      final IConfig aConfig = SMPConfigProvider.getConfig ();
       // SML Info ID is not taken from Config!
       for (final String sKey : new String [] { KEY_SMP_REST_WRITABLE_API_DISABLED,
                                                KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,

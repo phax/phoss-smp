@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.string.StringHelper;
 import com.helger.config.IConfig;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V10__MigrateRolesToDB;
@@ -121,7 +121,7 @@ final class FlywayMigrator
       }
     };
 
-    final IConfig aConfig = SMPConfigSource.getConfig ();
+    final IConfig aConfig = SMPConfigProvider.getConfig ();
     final FluentConfiguration aFlywayConfig = Flyway.configure ()
                                                     .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
                                                                                        aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER),

@@ -28,7 +28,7 @@ import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
 import com.helger.commons.url.URLHelper;
 import com.helger.config.IConfig;
-import com.helger.phoss.smp.SMPConfigSource;
+import com.helger.phoss.smp.SMPConfigProvider;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 
 /**
@@ -56,7 +56,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nonnull
   private static IConfig _getConfig ()
   {
-    return SMPConfigSource.getConfig ();
+    return SMPConfigProvider.getConfig ();
   }
 
   /**
