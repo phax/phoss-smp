@@ -19,9 +19,7 @@
 FROM phelger/phoss-smp-xml
 
 # Add configuration file paths via env vars
-ENV SMP_SERVER_CONFIG=/config/smp-server.properties \
-    SMP_WEBAPP_CONFIG=/config/webapp.properties \
-    CONFIG_FILE=/config/application.properties
+ENV CONFIG_FILE=/config/application.properties
 
 # Copy the local configuration files into the image
 WORKDIR /config

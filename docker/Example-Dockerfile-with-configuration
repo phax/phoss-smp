@@ -19,4 +19,4 @@
 FROM phelger/phoss-smp-xml
 
 # Add configuration file paths via system properties
-ENV CATALINA_OPTS="$CATALINA_OPTS -Dsmp.server.properties.path=/config/smp-server.properties -Dsmp.webapp.properties.path=/config/webapp.properties -Dconfig.file=/config/application.properties"
+ENV CATALINA_OPTS="$CATALINA_OPTS -Dconfig.file=/config/application.properties"

@@ -18,14 +18,14 @@
 # Use an official Tomcat runtime as a base image
 FROM tomcat:9-jdk11
 
-ARG SMP_VERSION
-ENV SMP_VERSION=${SMP_VERSION:-5.7.0}
-LABEL vendor="Philip Helger"
-LABEL version=$SMP_VERSION
-
 # Special encoded slash handling for SMP
 # Use non-blocking random
 ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.security.egd=file:/dev/urandom"
+
+ARG SMP_VERSION
+ENV SMP_VERSION=$SMP_VERSION
+LABEL vendor="Philip Helger"
+LABEL version=$SMP_VERSION
 
 COPY smp-binary/ $CATALINA_HOME/webapps/ROOT
 RUN rm $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/private-smp-server.properties \
