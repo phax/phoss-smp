@@ -201,6 +201,36 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> to show the author in the public area,
+   *         <code>false</code> to not show it.
+   * @since 5.5.0
+   */
+  public static boolean isPublicShowApplicationName ()
+  {
+    return _getConfig ().getAsBoolean ("webapp.public.showappname", true);
+  }
+
+  /**
+   * @return <code>true</code> to show the author in the public area,
+   *         <code>false</code> to not show it.
+   * @since 5.5.0
+   */
+  public static boolean isPublicShowSource ()
+  {
+    return _getConfig ().getAsBoolean ("webapp.public.showsource", true);
+  }
+
+  /**
+   * @return <code>true</code> to show the author in the public area,
+   *         <code>false</code> to not show it.
+   * @since 5.2.6
+   */
+  public static boolean isPublicShowAuthor ()
+  {
+    return _getConfig ().getAsBoolean ("webapp.public.showauthor", true);
+  }
+
+  /**
    * The inline version has precedence over the external URL and the internal
    * URL version.
    *
@@ -244,36 +274,6 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static String getPublicLogoInternalUrl ()
   {
     return _getConfig ().getAsString ("webapp.logo.internalurl");
-  }
-
-  /**
-   * @return <code>true</code> to show the author in the public area,
-   *         <code>false</code> to not show it.
-   * @since 5.5.0
-   */
-  public static boolean isPublicShowApplicationName ()
-  {
-    return _getConfig ().getAsBoolean ("webapp.public.showappname", true);
-  }
-
-  /**
-   * @return <code>true</code> to show the author in the public area,
-   *         <code>false</code> to not show it.
-   * @since 5.5.0
-   */
-  public static boolean isPublicShowSource ()
-  {
-    return _getConfig ().getAsBoolean ("webapp.public.showsource", true);
-  }
-
-  /**
-   * @return <code>true</code> to show the author in the public area,
-   *         <code>false</code> to not show it.
-   * @since 5.2.6
-   */
-  public static boolean isPublicShowAuthor ()
-  {
-    return _getConfig ().getAsBoolean ("webapp.public.showauthor", true);
   }
 
   /**

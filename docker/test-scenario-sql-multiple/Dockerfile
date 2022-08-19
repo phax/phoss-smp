@@ -28,6 +28,6 @@ LABEL vendor="Philip Helger"
 LABEL version=$SMP_VERSION
 
 COPY smp-binary/ $CATALINA_HOME/webapps/ROOT
-RUN rm $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/private-smp-server.properties \
- && rm $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/smp-server.properties
+RUN rm $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/private-application.properties \
+ && rm $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/application.properties
 COPY config/* $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/
