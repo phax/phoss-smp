@@ -22,6 +22,9 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
@@ -163,6 +166,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
 
   public static class SettingsSingleton extends AbstractRequestWebSingleton
   {
+    private static final Logger LOGGER = LoggerFactory.getLogger (SMPSettingsManagerJDBC.SettingsSingleton.class);
     private ISMPSettings m_aSettings;
 
     @Deprecated
@@ -203,7 +207,16 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     {
       ISMPSettings ret = m_aSettings;
       if (ret == null)
+      {
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("Loading SMP settings from DB");
         ret = m_aSettings = _getSettingsFromDB (aMgr);
+      }
+      else
+      {
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("Reusing SMP settings of request");
+      }
       return ret;
     }
   }
