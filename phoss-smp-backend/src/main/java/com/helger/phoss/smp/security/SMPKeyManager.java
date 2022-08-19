@@ -16,8 +16,6 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
@@ -52,7 +50,6 @@ import org.w3c.dom.Element;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
@@ -72,9 +69,6 @@ import com.helger.security.keystore.LoadedKeyStore;
  */
 public final class SMPKeyManager extends AbstractGlobalSingleton
 {
-  /** The date from which on Peppol requires the new C18N algorithm */
-  public static final LocalDate PEPPOL_USING_C18N_INCLUSIVE = PDTFactory.createLocalDate (2022, Month.MAY, 1);
-
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPKeyManager.class);
 
   private static final AtomicBoolean KEY_STORE_VALID = new AtomicBoolean (false);
@@ -215,7 +209,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
       LOGGER.warn ("No truststore is configured, so the build SSL/TLS connection will trust all hosts!");
     }
 
-    // Assign key manager and empty trust manager to SSL/TLS context
+    // Assign key manager and trust manager to SSL/TLS context
     final SSLContext aSSLCtx = SSLContext.getInstance ("TLS");
     aSSLCtx.init (aKeyManagerFactory.getKeyManagers (), aTrustManagers, null);
     return aSSLCtx;
@@ -269,7 +263,6 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // * OASIS BDXR always used INCLUSIVE
     // * CIPA and this server always used INCLUSIVE, but this was changed for
     // 5.0.1 to EXCLUSIVE
-    // TODO after 01/05/2022 remove code
     final String sC18N;
     final String sSignatureMethod;
     switch (eRESTType)
