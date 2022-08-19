@@ -26,9 +26,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.config.IConfig;
 import com.helger.db.jdbc.IHasDataSource;
-import com.helger.phoss.smp.SMPConfigProvider;
 
 /**
  * The main data source provider, only instantiated from
@@ -43,20 +41,18 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
 
   SMPDataSourceProvider ()
   {
-    final IConfig aConfig = SMPConfigProvider.getConfig ();
-
     // build data source
     // This is usually only called once on startup and than the same
     // DataSource is reused during the entire lifetime
     m_aDataSource = new BasicDataSource ();
-    m_aDataSource.setDriverClassName (aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_DRIVER));
-    final String sUserName = aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_USER);
+    m_aDataSource.setDriverClassName (SMPJDBCConfiguration.getJdbcDriver ());
+    final String sUserName = SMPJDBCConfiguration.getJdbcUser ();
     if (sUserName != null)
       m_aDataSource.setUsername (sUserName);
-    final String sPassword = aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_PASSWORD);
+    final String sPassword = SMPJDBCConfiguration.getJdbcPassword ();
     if (sPassword != null)
       m_aDataSource.setPassword (sPassword);
-    m_aDataSource.setUrl (aConfig.getAsString (SMPJDBCConfiguration.CONFIG_JDBC_URL));
+    m_aDataSource.setUrl (SMPJDBCConfiguration.getJdbcUrl ());
 
     // settings
     m_aDataSource.setDefaultAutoCommit (Boolean.FALSE);

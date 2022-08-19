@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
-import com.helger.config.IConfig;
 import com.helger.db.jdbc.executor.DBExecutor;
-import com.helger.phoss.smp.SMPConfigProvider;
 
 /**
  * The SMP specific DB Executor
@@ -38,7 +36,7 @@ public final class SMPDBExecutor extends DBExecutor
   public static final Function <String, String> TABLE_NAME_CUSTOMIZER;
   static
   {
-    final String sSchemaName = SMPConfigProvider.getConfig ().getAsString (SMPJDBCConfiguration.CONFIG_JDBC_SCHEMA);
+    final String sSchemaName = SMPJDBCConfiguration.getJdbcSchema ();
     if (StringHelper.hasText (sSchemaName) && RegExHelper.stringMatchesPattern ("[0-9a-zA-Z]+", sSchemaName))
       TABLE_NAME_CUSTOMIZER = x -> sSchemaName + ".smp_" + x;
     else
@@ -51,18 +49,14 @@ public final class SMPDBExecutor extends DBExecutor
   {
     super (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
 
-    final IConfig aConfig = SMPConfigProvider.getConfig ();
-
     // This is ONLY for debugging
-    setDebugConnections (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_CONNECTIONS, false));
-    setDebugTransactions (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_TRANSACTIONS, false));
-    setDebugSQLStatements (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_DEBUG_SQL, false));
+    setDebugConnections (SMPJDBCConfiguration.isJdbcDebugConnections ());
+    setDebugTransactions (SMPJDBCConfiguration.isJdbcDebugTransaction ());
+    setDebugSQLStatements (SMPJDBCConfiguration.isJdbcDebugSQL ());
 
-    if (aConfig.getAsBoolean (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_ENABLE,
-                              SMPJDBCConfiguration.DEFAULT_JDBC_EXECUTION_TIME_WARNING_ENABLE))
+    if (SMPJDBCConfiguration.isJdbcExecutionTimeWarningEnabled ())
     {
-      final long nMillis = aConfig.getAsLong (SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
-                                              DBExecutor.DEFAULT_EXECUTION_DURATION_WARN_MS);
+      final long nMillis = SMPJDBCConfiguration.getJdbcExecutionTimeWarningMilliseconds ();
       if (nMillis > 0)
         setExecutionDurationWarnMS (nMillis);
       else
