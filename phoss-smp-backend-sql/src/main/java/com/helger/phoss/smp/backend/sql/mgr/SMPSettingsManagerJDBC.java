@@ -79,9 +79,9 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     return m_aCallbacks;
   }
 
-  static void setSettingsValue (@Nonnull final DBExecutor aExecutor,
-                                @Nonnull @Nonempty final String sKey,
-                                @Nullable final String sValue)
+  static void setSettingsValueInDB (@Nonnull final DBExecutor aExecutor,
+                                    @Nonnull @Nonempty final String sKey,
+                                    @Nullable final String sValue)
   {
     ValueEnforcer.notNull (aExecutor, "Executor");
     ValueEnforcer.notEmpty (sKey, "Key");
@@ -106,7 +106,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   }
 
   @Nonnull
-  public ESuccess setSettingsValues (@Nonnull @Nonempty final Map <String, String> aEntries)
+  public ESuccess setSettingsValuesInDB (@Nonnull @Nonempty final Map <String, String> aEntries)
   {
     ValueEnforcer.notEmpty (aEntries, "Entries");
 
@@ -117,14 +117,14 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
         final String sKey = aEntry.getKey ();
         final String sValue = aEntry.getValue ();
 
-        setSettingsValue (aExecutor, sKey, sValue);
+        setSettingsValueInDB (aExecutor, sKey, sValue);
       }
     });
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsMap <String, String> getAllSettingsValues ()
+  public ICommonsMap <String, String> getAllSettingsValuesFromDB ()
   {
     final ICommonsMap <String, String> ret = new CommonsHashMap <> ();
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, value FROM smp_settings");
@@ -135,7 +135,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   }
 
   @Nullable
-  public static String getSettingsValue (@Nonnull final DBExecutor aExecutor, @Nullable final String sKey)
+  public static String getSettingsValueFromDB (@Nonnull final DBExecutor aExecutor, @Nullable final String sKey)
   {
     if (StringHelper.hasNoText (sKey))
       return null;
@@ -156,13 +156,15 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     if (StringHelper.hasNoText (sKey))
       return null;
 
-    return getSettingsValue (newExecutor (), sKey);
+    return getSettingsValueFromDB (newExecutor (), sKey);
   }
 
   @Nonnull
   public ISMPSettings getSettings ()
   {
-    final ICommonsMap <String, String> aValues = getAllSettingsValues ();
+    // Queries DB
+    final ICommonsMap <String, String> aValues = getAllSettingsValuesFromDB ();
+
     final SMPSettings ret = new SMPSettings (false);
     ret.setRESTWritableAPIDisabled (StringParser.parseBool (aValues.get (SMP_REST_WRITABLE_API_DISABLED),
                                                             SMPSettings.DEFAULT_SMP_REST_WRITABLE_API_DISABLED));
@@ -198,7 +200,9 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     aMap.putIn (SML_ENABLED, bSMLEnabled);
     aMap.putIn (SML_REQUIRED, bSMLRequired);
     aMap.putIn (SML_INFO_ID, sSMLInfoID);
-    if (setSettingsValues (aMap).isFailure ())
+
+    // Save
+    if (setSettingsValuesInDB (aMap).isFailure ())
       return EChange.UNCHANGED;
     return EChange.CHANGED;
   }

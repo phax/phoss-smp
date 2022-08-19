@@ -67,13 +67,13 @@ public class SMPIDFactoryJDBC extends AbstractPersistingLongIDFactory
     final DBExecutor aExecutor = new SMPDBExecutor ();
     aExecutor.performInTransaction ( () -> {
       // Read existing value
-      final String sExistingValue = SMPSettingsManagerJDBC.getSettingsValue (aExecutor, SETTINGS_KEY_LATEST_ID);
+      final String sExistingValue = SMPSettingsManagerJDBC.getSettingsValueFromDB (aExecutor, SETTINGS_KEY_LATEST_ID);
       final long nRead = StringParser.parseLong (sExistingValue, m_nInitialCount);
       aReadValue.set (nRead);
 
       // Write new value
       final long nNewValue = nRead + nReserveCount;
-      SMPSettingsManagerJDBC.setSettingsValue (aExecutor, SETTINGS_KEY_LATEST_ID, Long.toString (nNewValue));
+      SMPSettingsManagerJDBC.setSettingsValueInDB (aExecutor, SETTINGS_KEY_LATEST_ID, Long.toString (nNewValue));
 
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Updated SQL ID from " + sExistingValue + " to " + nNewValue);

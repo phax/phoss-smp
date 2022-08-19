@@ -133,6 +133,7 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
     eChange = eChange.or (m_aSettings.setSMLInfoID (sSMLInfoID));
     if (eChange.isChanged ())
     {
+      // Write to DB
       final Document aDoc = toBson (m_aSettings);
       if (m_aInsertDocument.getAndSet (false))
       {

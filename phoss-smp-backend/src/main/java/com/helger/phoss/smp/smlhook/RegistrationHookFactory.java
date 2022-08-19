@@ -24,8 +24,8 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 @Immutable
 public final class RegistrationHookFactory
 {
-  private static final RegistrationHookDoNothing s_aDoNothing = new RegistrationHookDoNothing ();
-  private static final RegistrationHookWriteToSML s_aWriteToSML = new RegistrationHookWriteToSML ();
+  private static final RegistrationHookDoNothing HOOK_DO_NOTHING = new RegistrationHookDoNothing ();
+  private static final RegistrationHookWriteToSML HOOK_WRITE_TO_SML = new RegistrationHookWriteToSML ();
 
   private RegistrationHookFactory ()
   {}
@@ -41,6 +41,6 @@ public final class RegistrationHookFactory
   @Nonnull
   public static IRegistrationHook getInstance ()
   {
-    return SMPMetaManager.getSettings ().isSMLEnabled () ? s_aWriteToSML : s_aDoNothing;
+    return SMPMetaManager.getSettings ().isSMLEnabled () ? HOOK_WRITE_TO_SML : HOOK_DO_NOTHING;
   }
 }
