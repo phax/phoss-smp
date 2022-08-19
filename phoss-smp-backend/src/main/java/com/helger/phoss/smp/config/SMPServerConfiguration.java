@@ -10,8 +10,6 @@
  */
 package com.helger.phoss.smp.config;
 
-import java.net.Proxy;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -22,35 +20,14 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.EMimeContentType;
 import com.helger.commons.string.StringHelper;
 import com.helger.config.IConfig;
-import com.helger.network.proxy.settings.IProxySettings;
-import com.helger.network.proxy.settings.ProxySettings;
 import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.security.keystore.EKeyStoreType;
 
 /**
- * The central configuration for the SMP server. This class manages the content
- * of the "smp-server.properties" file. The order of the properties file
- * resolving is as follows:
- * <ol>
- * <li>Check for the value of the environment variable
- * <code>SMP_SERVER_CONFIG</code> (since 5.1.0)</li>
- * <li>Check for the value of the system property
- * <code>peppol.smp.server.properties.path</code></li>
- * <li>Check for the value of the system property
- * <code>smp.server.properties.path</code></li>
- * <li>The filename <code>private-smp-server.properties</code> in the root of
- * the classpath</li>
- * <li>The filename <code>smp-server.properties</code> in the root of the
- * classpath</li>
- * </ol>
- * <p>
- * Some of the properties contained in this class can be overwritten in the SMP
- * settings at runtime. That's why the respective direct access methods are
- * deprecated. Use the ones from
- * {@link com.helger.phoss.smp.settings.ISMPSettings} instead!
- * </p>
+ * This class provides easy access to certain configuration properties using
+ * {@link SMPConfigProvider}.
  *
  * @author Philip Helger
  */
@@ -428,103 +405,5 @@ public final class SMPServerConfiguration
     if (ret >= 0)
       return Timeout.ofMilliseconds (ret);
     return DEFAULT_SML_REQUEST_TIMEOUT;
-  }
-
-  /**
-   * @return The proxy host to be used for "http" calls. May be
-   *         <code>null</code>.
-   * @see #getHttpsProxyHost()
-   * @since 5.0.7
-   */
-  @Nullable
-  public static String getHttpProxyHost ()
-  {
-    return _getConfig ().getAsString ("http.proxyHost");
-  }
-
-  /**
-   * @return The proxy port to be used for "http" calls. Defaults to 0.
-   * @see #getHttpsProxyPort()
-   * @since 5.0.7
-   */
-  public static int getHttpProxyPort ()
-  {
-    return _getConfig ().getAsInt ("http.proxyPort", 0);
-  }
-
-  /**
-   * @return The proxy host to be used for "https" calls. May be
-   *         <code>null</code>.
-   * @see #getHttpProxyHost()
-   * @since 5.0.7
-   */
-  @Nullable
-  public static String getHttpsProxyHost ()
-  {
-    return _getConfig ().getAsString ("https.proxyHost");
-  }
-
-  /**
-   * @return The proxy port to be used for "https" calls. Defaults to 0.
-   * @see #getHttpProxyPort()
-   * @since 5.0.7
-   */
-  public static int getHttpsProxyPort ()
-  {
-    return _getConfig ().getAsInt ("https.proxyPort", 0);
-  }
-
-  /**
-   * @return The username for proxy calls. Valid for https and https proxy. May
-   *         be <code>null</code>.
-   * @since 5.0.7
-   */
-  @Nullable
-  public static String getProxyUsername ()
-  {
-    return _getConfig ().getAsString ("proxy.username");
-  }
-
-  /**
-   * @return The password for proxy calls. Valid for https and https proxy. May
-   *         be <code>null</code>.
-   * @since 5.0.7
-   */
-  @Nullable
-  public static String getProxyPassword ()
-  {
-    return _getConfig ().getAsString ("proxy.password");
-  }
-
-  /**
-   * @return A single object for all http (but not https) proxy settings. May be
-   *         <code>null</code>.
-   * @see #getAsHttpsProxySettings()
-   * @since 5.0.7
-   */
-  @Nullable
-  public static IProxySettings getAsHttpProxySettings ()
-  {
-    final String sHostname = getHttpProxyHost ();
-    final int nPort = getHttpProxyPort ();
-    if (sHostname != null && nPort > 0)
-      return new ProxySettings (Proxy.Type.HTTP, sHostname, nPort, getProxyUsername (), getProxyPassword ());
-    return null;
-  }
-
-  /**
-   * @return A single object for all https (but not http) proxy settings. May be
-   *         <code>null</code>.
-   * @see #getAsHttpProxySettings()
-   * @since 5.0.7
-   */
-  @Nullable
-  public static IProxySettings getAsHttpsProxySettings ()
-  {
-    final String sHostname = getHttpsProxyHost ();
-    final int nPort = getHttpsProxyPort ();
-    if (sHostname != null && nPort > 0)
-      return new ProxySettings (Proxy.Type.HTTP, sHostname, nPort, getProxyUsername (), getProxyPassword ());
-    return null;
   }
 }

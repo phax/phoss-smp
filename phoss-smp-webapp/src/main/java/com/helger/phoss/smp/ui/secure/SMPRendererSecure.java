@@ -30,6 +30,7 @@ import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.config.SMPHttpConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
@@ -82,8 +83,8 @@ public final class SMPRendererSecure
     @UsedViaReflection
     public MenuSessionState ()
     {
-      m_bHttpProxyEnabled = SMPServerConfiguration.getAsHttpProxySettings () != null;
-      m_bHttpsProxyEnabled = SMPServerConfiguration.getAsHttpsProxySettings () != null;
+      m_bHttpProxyEnabled = SMPHttpConfiguration.getAsHttpProxySettings () != null;
+      m_bHttpsProxyEnabled = SMPHttpConfiguration.getAsHttpsProxySettings () != null;
     }
 
     @Nonnull
@@ -190,7 +191,8 @@ public final class SMPRendererSecure
     {
       if (aSettings.isDirectoryIntegrationEnabled ())
       {
-        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ()).addChild (" Directory support is configured."));
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ())
+                                   .addChild (" Directory support is configured."));
         if (StringHelper.hasNoText (aSettings.getDirectoryHostName ()))
         {
           aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
@@ -212,7 +214,8 @@ public final class SMPRendererSecure
     // Information on certificate
     if (!SMPKeyManager.isKeyStoreValid ())
     {
-      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ()).addChild (" Certificate configuration is invalid"));
+      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
+                                 .addChild (" Certificate configuration is invalid"));
       aBox.setType (EBootstrapAlertType.DANGER);
     }
 
@@ -247,8 +250,10 @@ public final class SMPRendererSecure
 
     // Content
     {
-      final HCDiv aRow = aOuterContainer.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX).addClass (CBootstrapCSS.MT_2));
-      final HCDiv aCol1 = aRow.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX).addClass (CBootstrapCSS.MR_2));
+      final HCDiv aRow = aOuterContainer.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX)
+                                                                        .addClass (CBootstrapCSS.MT_2));
+      final HCDiv aCol1 = aRow.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX)
+                                                              .addClass (CBootstrapCSS.MR_2));
       final HCDiv aCol2 = aRow.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.FLEX_FILL));
 
       // left

@@ -213,7 +213,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getPublicLogoInline ()
   {
-    return _getConfig ().getAsString ("webapp.public.logo.inline");
+    return _getConfig ().getAsString ("webapp.logo.inline");
   }
 
   /**
@@ -229,7 +229,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getPublicLogoExternalUrl ()
   {
-    return _getConfig ().getAsString ("webapp.public.logo.externalurl");
+    return _getConfig ().getAsString ("webapp.logo.externalurl");
   }
 
   /**
@@ -243,7 +243,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   @Nullable
   public static String getPublicLogoInternalUrl ()
   {
-    return _getConfig ().getAsString ("webapp.public.logo.internalurl");
+    return _getConfig ().getAsString ("webapp.logo.internalurl");
   }
 
   /**

@@ -29,6 +29,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTConfig;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.debug.GlobalDebug;
@@ -39,6 +40,7 @@ import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.network.proxy.ProxySelectorProxySettingsManager;
 import com.helger.network.proxy.settings.IProxySettings;
+import com.helger.network.proxy.settings.IProxySettingsProvider;
 import com.helger.network.proxy.settings.ProxySettingsManager;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.pd.client.PDHttpClientSettings;
@@ -47,6 +49,7 @@ import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPSecurity;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPConfigProvider;
+import com.helger.phoss.smp.config.SMPHttpConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
@@ -87,6 +90,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppListener.class);
   private static OffsetDateTime s_aStartupDateTime;
+
+  private final ICommonsList <IProxySettingsProvider> m_aProxySettingsProvider = new CommonsArrayList <> ();
 
   @Nullable
   public static OffsetDateTime getStartupDateTime ()
@@ -363,26 +368,29 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       LOGGER.info ("Init of HTTP and Proxy settings");
       // Register global proxy servers
       ProxySelectorProxySettingsManager.setAsDefault (true);
-      final IProxySettings aProxyHttp = SMPServerConfiguration.getAsHttpProxySettings ();
+      final IProxySettings aProxyHttp = SMPHttpConfiguration.getAsHttpProxySettings ();
       if (aProxyHttp != null)
       {
         // Register a handler that returns the "http" proxy, if an "http" URL is
         // requested
-        ProxySettingsManager.registerProvider ( (sProtocol,
-                                                 sHost,
-                                                 nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
-                                                                                     : null);
+        final IProxySettingsProvider aPSP = (sProtocol,
+                                             sHost,
+                                             nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
+                                                                                 : null;
+        ProxySettingsManager.registerProvider (aPSP);
+        m_aProxySettingsProvider.add (aPSP);
       }
-      final IProxySettings aProxyHttps = SMPServerConfiguration.getAsHttpsProxySettings ();
+      final IProxySettings aProxyHttps = SMPHttpConfiguration.getAsHttpsProxySettings ();
       if (aProxyHttps != null)
       {
         // Register a handler that returns the "https" proxy, if an "https" URL
-        // is
-        // requested
-        ProxySettingsManager.registerProvider ( (sProtocol,
-                                                 sHost,
-                                                 nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps)
-                                                                                      : null);
+        // is requested
+        final IProxySettingsProvider aPSP = (sProtocol,
+                                             sHost,
+                                             nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps)
+                                                                                  : null;
+        ProxySettingsManager.registerProvider (aPSP);
+        m_aProxySettingsProvider.add (aPSP);
       }
     }
 
@@ -397,8 +405,13 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected void beforeContextDestroyed (@Nonnull final ServletContext aSC)
   {
+    // Explicitly unregister all proxy setting providers
+    for (final IProxySettingsProvider aPSP : m_aProxySettingsProvider)
+      ProxySettingsManager.unregisterProvider (aPSP);
+
     // Cleanup proxy selector (avoid ClassLoader leak)
-    IPrivilegedAction.proxySelectorSetDefault (null);
+    if (ProxySelectorProxySettingsManager.isDefault ())
+      IPrivilegedAction.proxySelectorSetDefault (null);
 
     // Reset for unit tests
     BasePageUtilsHttpClient.HttpClientConfigRegistry.setToDefault ();

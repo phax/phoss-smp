@@ -45,6 +45,7 @@ import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.phoss.smp.config.SMPHttpConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
@@ -169,9 +170,9 @@ public final class SMPStatusProvider
     }
 
     // Proxy configuration (since 5.2.0)
-    aStatusData.add ("proxy.http.configured", SMPServerConfiguration.getAsHttpProxySettings () != null);
-    aStatusData.add ("proxy.https.configured", SMPServerConfiguration.getAsHttpsProxySettings () != null);
-    aStatusData.add ("proxy.username.configured", StringHelper.hasText (SMPServerConfiguration.getProxyUsername ()));
+    aStatusData.add ("proxy.http.configured", SMPHttpConfiguration.getAsHttpProxySettings () != null);
+    aStatusData.add ("proxy.https.configured", SMPHttpConfiguration.getAsHttpsProxySettings () != null);
+    aStatusData.add ("proxy.username.configured", StringHelper.hasText (SMPHttpConfiguration.getProxyUsername ()));
 
     // CSP configuration (since 5.2.6)
     aStatusData.add ("csp.enabled", SMPWebAppConfiguration.isCSPEnabled ());
