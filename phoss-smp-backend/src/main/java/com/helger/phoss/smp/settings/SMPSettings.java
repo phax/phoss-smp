@@ -43,6 +43,13 @@ import com.helger.settings.Settings;
 public class SMPSettings implements ISMPSettings
 {
   public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
+
+  /* legacy name - should be called "required" instead of "needed" */
+  public static final String KEY_SML_REQUIRED = "sml.needed";
+  /* legacy name - should be called "enabled" instead of "active" */
+  public static final String KEY_SML_ENABLED = "sml.active";
+  private static final String KEY_SML_INFO_ID = "smlinfo.id";
+
   /* legacy name - should not contain "peppol" */
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
   /* legacy name - should not contain "peppol" */
@@ -51,20 +58,17 @@ public class SMPSettings implements ISMPSettings
   public static final String KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.peppol.directory.integration.autoupdate";
   /* legacy name - should not contain "peppol" */
   public static final String KEY_SMP_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
-  /* legacy name - should be called "required" instead of "needed" */
-  public static final String KEY_SML_REQUIRED = "sml.needed";
-  /* legacy name - should be called "enabled" instead of "active" */
-  public static final String KEY_SML_ENABLED = "sml.active";
-  private static final String KEY_SML_INFO_ID = "smlinfo.id";
 
   public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
+
+  public static final boolean DEFAULT_SML_REQUIRED = true;
+  public static final boolean DEFAULT_SML_ENABLED = false;
+
   public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED = true;
   public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED = true;
   public static final boolean DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = true;
   public static final String DEFAULT_SMP_DIRECTORY_HOSTNAME_PROD = "https://directory.peppol.eu";
   public static final String DEFAULT_SMP_DIRECTORY_HOSTNAME_TEST = "https://test-directory.peppol.eu";
-  public static final boolean DEFAULT_SML_REQUIRED = true;
-  public static final boolean DEFAULT_SML_ENABLED = false;
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPSettings.class);
   private static final ObjectType OT = new ObjectType ("smp-settings");
@@ -80,12 +84,12 @@ public class SMPSettings implements ISMPSettings
       final IConfig aConfig = SMPConfigProvider.getConfig ();
       // SML Info ID is not taken from Config!
       for (final String sKey : new String [] { KEY_SMP_REST_WRITABLE_API_DISABLED,
+                                               KEY_SML_REQUIRED,
+                                               KEY_SML_ENABLED,
                                                KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,
                                                KEY_SMP_DIRECTORY_INTEGRATION_ENABLED,
                                                KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                               KEY_SMP_DIRECTORY_HOSTNAME,
-                                               KEY_SML_REQUIRED,
-                                               KEY_SML_ENABLED })
+                                               KEY_SMP_DIRECTORY_HOSTNAME })
       {
         final ConfiguredValue aCV = aConfig.getConfiguredValue (sKey);
         if (aCV != null)
@@ -120,6 +124,48 @@ public class SMPSettings implements ISMPSettings
   public EChange setRESTWritableAPIDisabled (final boolean bRESTWritableAPIDisabled)
   {
     return m_aSettings.putIn (KEY_SMP_REST_WRITABLE_API_DISABLED, bRESTWritableAPIDisabled);
+  }
+
+  public boolean isSMLRequired ()
+  {
+    return m_aSettings.getAsBoolean (KEY_SML_REQUIRED, DEFAULT_SML_REQUIRED);
+  }
+
+  @Nonnull
+  public EChange setSMLRequired (final boolean bSMLRequired)
+  {
+    return m_aSettings.putIn (KEY_SML_REQUIRED, bSMLRequired);
+  }
+
+  public boolean isSMLEnabled ()
+  {
+    return m_aSettings.getAsBoolean (KEY_SML_ENABLED, DEFAULT_SML_ENABLED);
+  }
+
+  @Nonnull
+  public EChange setSMLEnabled (final boolean bSMLEnabled)
+  {
+    return m_aSettings.putIn (KEY_SML_ENABLED, bSMLEnabled);
+  }
+
+  @Nullable
+  @Override
+  public String getSMLInfoID ()
+  {
+    return m_aSettings.getAsString (KEY_SML_INFO_ID);
+  }
+
+  @Nullable
+  public ISMLInfo getSMLInfo ()
+  {
+    final String sID = getSMLInfoID ();
+    return SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sID);
+  }
+
+  @Nonnull
+  public EChange setSMLInfoID (@Nullable final String sSMLInfoID)
+  {
+    return m_aSettings.putIn (KEY_SML_INFO_ID, sSMLInfoID);
   }
 
   public boolean isDirectoryIntegrationRequired ()
@@ -171,57 +217,15 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.putIn (KEY_SMP_DIRECTORY_HOSTNAME, sDirectoryHostName);
   }
 
-  public boolean isSMLRequired ()
-  {
-    return m_aSettings.getAsBoolean (KEY_SML_REQUIRED, DEFAULT_SML_REQUIRED);
-  }
-
-  @Nonnull
-  public EChange setSMLRequired (final boolean bSMLRequired)
-  {
-    return m_aSettings.putIn (KEY_SML_REQUIRED, bSMLRequired);
-  }
-
-  public boolean isSMLEnabled ()
-  {
-    return m_aSettings.getAsBoolean (KEY_SML_ENABLED, DEFAULT_SML_ENABLED);
-  }
-
-  @Nonnull
-  public EChange setSMLEnabled (final boolean bSMLEnabled)
-  {
-    return m_aSettings.putIn (KEY_SML_ENABLED, bSMLEnabled);
-  }
-
-  @Nullable
-  @Override
-  public String getSMLInfoID ()
-  {
-    return m_aSettings.getAsString (KEY_SML_INFO_ID);
-  }
-
-  @Nullable
-  public ISMLInfo getSMLInfo ()
-  {
-    final String sID = getSMLInfoID ();
-    return SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sID);
-  }
-
-  @Nonnull
-  public EChange setSMLInfoID (@Nullable final String sSMLInfoID)
-  {
-    return m_aSettings.putIn (KEY_SML_INFO_ID, sSMLInfoID);
-  }
-
   @Nonnull
   @ReturnsMutableCopy
-  final Settings getAsMutableSettings ()
+  final Settings internalGetAsMutableSettings ()
   {
     return m_aSettings;
   }
 
   @Nonnull
-  final EChange initFromSettings (@Nonnull final ISettings aSettings)
+  final EChange internalSetFromSettings (@Nonnull final ISettings aSettings)
   {
     ValueEnforcer.notNull (aSettings, "settings");
     return m_aSettings.setAll (aSettings);

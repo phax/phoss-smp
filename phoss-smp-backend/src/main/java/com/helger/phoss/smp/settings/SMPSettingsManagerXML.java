@@ -51,7 +51,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   {
     final SettingsMicroDocumentConverter <Settings> aConverter = new SettingsMicroDocumentConverter <> (ISettingsFactory.newInstance ());
     final ISettings aSettings = aConverter.convertToNative (aDoc.getDocumentElement ());
-    m_aSettings.initFromSettings (aSettings);
+    m_aSettings.internalSetFromSettings (aSettings);
     return EChange.UNCHANGED;
   }
 
@@ -61,7 +61,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   {
     final IMicroDocument ret = new MicroDocument ();
     final SettingsMicroDocumentConverter <Settings> aConverter = new SettingsMicroDocumentConverter <> (ISettingsFactory.newInstance ());
-    ret.appendChild (aConverter.convertToMicroElement (m_aSettings.getAsMutableSettings (), null, "root"));
+    ret.appendChild (aConverter.convertToMicroElement (m_aSettings.internalGetAsMutableSettings (), null, "root"));
     return ret;
   }
 
