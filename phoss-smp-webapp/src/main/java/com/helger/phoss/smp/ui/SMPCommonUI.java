@@ -19,7 +19,7 @@ package com.helger.phoss.smp.ui;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -49,7 +49,6 @@ import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.html.hc.impl.HCTextNode;
 import com.helger.html.jquery.JQuery;
 import com.helger.html.jquery.JQueryAjaxBuilder;
 import com.helger.html.jscode.JSAnonymousFunction;
@@ -231,7 +230,9 @@ public final class SMPCommonUI
   {
     if (nChars < 1)
       return s;
+
     final int nMax = s.length ();
+    // Worst case: 1 char 1 separator
     final StringBuilder aSB = new StringBuilder (nMax * 2);
     int nIndex = 0;
     while (nIndex < nMax - 1)
@@ -245,13 +246,62 @@ public final class SMPCommonUI
   }
 
   @Nonnull
+  public static String getCertIssuer (@Nonnull final X509Certificate aX509Cert)
+  {
+    return aX509Cert.getIssuerX500Principal ().getName ();
+  }
+
+  @Nonnull
+  public static String getCertSubject (@Nonnull final X509Certificate aX509Cert)
+  {
+    return aX509Cert.getSubjectX500Principal ().getName ();
+  }
+
+  @Nonnull
+  public static String getCertSerialNumber (@Nonnull final X509Certificate aX509Cert)
+  {
+    return aX509Cert.getSerialNumber ().toString () +
+           " / 0x" +
+           _inGroupsOf (aX509Cert.getSerialNumber ().toString (16), 4);
+  }
+
+  @Nonnull
+  public static IHCNode getNodeCertNotBefore (@Nonnull final OffsetDateTime aNotBefore,
+                                              @Nonnull final OffsetDateTime aNowDT,
+                                              @Nonnull final Locale aDisplayLocale)
+  {
+    final HCNodeList ret = new HCNodeList ();
+    ret.addChild (PDTToString.getAsString (aNotBefore, aDisplayLocale));
+    if (aNowDT.isBefore (aNotBefore))
+      ret.addChild (new HCDiv ().addChild (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NOT YET VALID!!!")));
+    return ret;
+  }
+
+  @Nonnull
+  public static IHCNode getNodeCertNotAfter (@Nonnull final OffsetDateTime aNotAfter,
+                                             @Nonnull final OffsetDateTime aNowDT,
+                                             @Nonnull final Locale aDisplayLocale)
+  {
+    final HCNodeList ret = new HCNodeList ();
+    ret.addChild (PDTToString.getAsString (aNotAfter, aDisplayLocale));
+    if (aNowDT.isAfter (aNotAfter))
+      ret.addChild (" ").addChild (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NO LONGER VALID!!!"));
+    else
+      ret.addChild (" ")
+         .addChild (new BootstrapBadge (EBootstrapBadgeType.SUCCESS).addChild ("Valid for: " +
+                                                                               PDTDisplayHelper.getPeriodTextEN (aNowDT.toLocalDateTime (),
+                                                                                                                 aNotAfter.toLocalDateTime ())));
+    return ret;
+  }
+
+  @Nonnull
   public static BootstrapTable createCertificateDetailsTable (@Nullable final String sAlias,
                                                               @Nonnull final X509Certificate aX509Cert,
-                                                              @Nonnull final LocalDateTime aNowLDT,
+                                                              @Nonnull final OffsetDateTime aNowLDT,
                                                               @Nonnull final Locale aDisplayLocale)
   {
-    final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
-    final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
+    final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
+    final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
     final PublicKey aPublicKey = aX509Cert.getPublicKey ();
 
     final BootstrapTable aCertDetails = new BootstrapTable (new HCCol ().addStyle (CCSSProperties.WIDTH.newValue ("12rem")),
@@ -260,25 +310,15 @@ public final class SMPCommonUI
     if (StringHelper.hasText (sAlias))
       aCertDetails.addBodyRow ().addCell ("Alias:").addCell (sAlias);
     aCertDetails.addBodyRow ().addCell ("Version:").addCell (Integer.toString (aX509Cert.getVersion ()));
-    aCertDetails.addBodyRow ().addCell ("Subject:").addCell (aX509Cert.getSubjectX500Principal ().getName ());
-    aCertDetails.addBodyRow ().addCell ("Issuer:").addCell (aX509Cert.getIssuerX500Principal ().getName ());
+    aCertDetails.addBodyRow ().addCell ("Issuer:").addCell (getCertIssuer (aX509Cert));
+    aCertDetails.addBodyRow ().addCell ("Subject:").addCell (getCertSubject (aX509Cert));
+    aCertDetails.addBodyRow ().addCell ("Serial number:").addCell (getCertSerialNumber (aX509Cert));
     aCertDetails.addBodyRow ()
-                .addCell ("Serial number:")
-                .addCell (aX509Cert.getSerialNumber ().toString () +
-                          " / 0x" +
-                          _inGroupsOf (aX509Cert.getSerialNumber ().toString (16), 4));
+                .addCell ("Not before:")
+                .addCell (getNodeCertNotBefore (aNotBefore, aNowLDT, aDisplayLocale));
     aCertDetails.addBodyRow ()
-                .addCell ("Valid from:")
-                .addCell (new HCTextNode (PDTToString.getAsString (aNotBefore, aDisplayLocale) + " "),
-                          aNowLDT.isBefore (aNotBefore) ? new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NOT YET VALID!!!")
-                                                        : null);
-    aCertDetails.addBodyRow ()
-                .addCell ("Valid to:")
-                .addCell (new HCTextNode (PDTToString.getAsString (aNotAfter, aDisplayLocale) + " "),
-                          aNowLDT.isAfter (aNotAfter) ? new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("!!!NO LONGER VALID!!!")
-                                                      : new HCDiv ().addChild ("Valid for: " +
-                                                                               PDTDisplayHelper.getPeriodTextEN (aNowLDT,
-                                                                                                                 aNotAfter)));
+                .addCell ("Not after:")
+                .addCell (getNodeCertNotAfter (aNotAfter, aNowLDT, aDisplayLocale));
 
     if (aPublicKey instanceof RSAPublicKey)
     {

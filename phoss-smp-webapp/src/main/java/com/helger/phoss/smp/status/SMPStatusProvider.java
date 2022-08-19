@@ -19,7 +19,7 @@ package com.helger.phoss.smp.status;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -84,7 +84,7 @@ public final class SMPStatusProvider
 
     final StopWatch aSW = StopWatch.createdStarted ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-    final LocalDateTime aNow = PDTFactory.getCurrentLocalDateTime ();
+    final OffsetDateTime aNow = PDTFactory.getCurrentOffsetDateTime ();
     final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
 
     final IJsonObject aStatusData = new JsonObject ();
@@ -93,7 +93,9 @@ public final class SMPStatusProvider
     // Since 5.3.3
     aStatusData.addIfNotNull ("startup.datetime",
                               PDTWebDateHelper.getAsStringXSD (SMPWebAppListener.getStartupDateTime ()));
-    aStatusData.add ("status.datetime", PDTWebDateHelper.getAsStringXSD (PDTFactory.getCurrentOffsetDateTimeUTC ()));
+    aStatusData.add ("status.datetime", PDTWebDateHelper.getAsStringXSD (aNow));
+    aStatusData.add ("status.datetime.utc",
+                     PDTWebDateHelper.getAsStringXSD (PDTFactory.getCurrentOffsetDateTimeUTC ()));
     aStatusData.add ("version.smp", CSMPServer.getVersionNumber ());
     aStatusData.add ("version.java", SystemProperties.getJavaVersion ());
     aStatusData.add ("global.debug", GlobalDebug.isDebugMode ());
@@ -152,13 +154,13 @@ public final class SMPStatusProvider
           aStatusData.add ("smp.certificate.issuer", aX509Cert.getIssuerX500Principal ().getName ());
           aStatusData.add ("smp.certificate.subject", aX509Cert.getSubjectX500Principal ().getName ());
 
-          final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aX509Cert.getNotAfter ());
+          final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
           final boolean bIsExpired = aNow.isAfter (aNotAfter);
           aStatusData.add ("smp.certificate.expired", bIsExpired);
           if (SMPServerConfiguration.isStatusShowCertificateDates ())
           {
             // Since v5.7.0
-            final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aX509Cert.getNotBefore ());
+            final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
             aStatusData.add ("smp.certificate.notbefore", PDTWebDateHelper.getAsStringXSD (aNotBefore));
             aStatusData.add ("smp.certificate.notafter", PDTWebDateHelper.getAsStringXSD (aNotAfter));
           }
@@ -185,12 +187,17 @@ public final class SMPStatusProvider
 
     final long nMillis = aSW.stopAndGetMillis ();
     if (nMillis > 100)
-      LOGGER.info ("Finished building status data after " +
-                   nMillis +
-                   " milliseconds which is considered to be too long");
+    {
+      if (LOGGER.isInfoEnabled ())
+        LOGGER.info ("Finished building status data after " +
+                     nMillis +
+                     " milliseconds which is considered to be too long");
+    }
     else
+    {
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Finished building status data");
+    }
 
     return aStatusData;
   }

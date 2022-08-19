@@ -19,7 +19,7 @@ package com.helger.phoss.smp.ui.secure;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -413,7 +413,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
-    final LocalDateTime aNowLDT = PDTFactory.getCurrentLocalDateTime ();
+    final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
 
     aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of endpoint"));
 
@@ -484,7 +484,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                    .setCtrl (aEndpointCert == null ? strong ("!!!FAILED TO INTERPRETE!!!")
                                                                                    : SMPCommonUI.createCertificateDetailsTable (null,
                                                                                                                                 aEndpointCert,
-                                                                                                                                aNowLDT,
+                                                                                                                                aNowDT,
                                                                                                                                 aDisplayLocale)
                                                                                                 .setResponsive (true)));
     }

@@ -17,7 +17,7 @@
 package com.helger.phoss.smp.ui.secure;
 
 import java.security.cert.X509Certificate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,7 +37,6 @@ import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.collection.impl.ICommonsSortedSet;
 import com.helger.commons.compare.ESortOrder;
 import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.state.EValidity;
 import com.helger.commons.state.IValidityIndicator;
 import com.helger.commons.string.StringHelper;
@@ -64,6 +63,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.app.PhotonWorkerPool;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
@@ -107,7 +107,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
                                   @Nonnull final String sOldUnifiedCert,
                                   @Nonnull final String sNewCert)
     {
-      super ("BulkChangeCertificate", new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change certificate"));
+      super ("BulkChangeCertificate",
+             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change certificate"));
       m_aAllSIs = aAllSIs;
       m_aDisplayLocale = aDisplayLocale;
       m_sOldUnifiedCert = sOldUnifiedCert;
@@ -155,7 +156,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
           final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old certificate was changed in " +
                                                                         nChangedEndpoints +
                                                                         " endpoints to the new certificate:"),
-                                                                   _getCertificateDisplay (m_sNewCert, m_aDisplayLocale),
+                                                                   _getCertificateDisplay (m_sNewCert,
+                                                                                           m_aDisplayLocale),
                                                                    div ("Effected service groups are:"),
                                                                    aUL);
           if (nSaveErrors == 0)
@@ -202,7 +204,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     {
       aNodeList.addChild (warn ("No service group is present! At least one service group must be present to change certificates."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
-                                                .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC, CMenuSecure.MENU_SERVICE_GROUPS))
+                                                .setOnClick (AbstractWebPageForm.createCreateURL (aWPEC,
+                                                                                                  CMenuSecure.MENU_SERVICE_GROUPS))
                                                 .setIcon (EDefaultIcon.YES));
       return EValidity.INVALID;
     }
@@ -240,7 +243,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     {
       final int nDisplayLen = 20;
       final String sCertPart = (sCert.length () > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert);
-      final HCDiv ret = new HCDiv ().addChild ("Invalid certificate").addChild (sCert.length () > nDisplayLen ? " starting with: " : ": ");
+      final HCDiv ret = new HCDiv ().addChild ("Invalid certificate")
+                                    .addChild (sCert.length () > nDisplayLen ? " starting with: " : ": ");
       if (sCertPart.length () > 0)
         ret.addChild (new HCCode ().addChild (sCertPart));
       else
@@ -248,15 +252,18 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       return ret;
     }
 
+    final OffsetDateTime aNowLDT = PDTFactory.getCurrentOffsetDateTime ();
+    final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aEndpointCert.getNotBefore ());
+    final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aEndpointCert.getNotAfter ());
+
     final HCNodeList ret = new HCNodeList ();
-    ret.addChild (new HCDiv ().addChild ("Issuer: " + aEndpointCert.getIssuerX500Principal ().toString ()));
-    ret.addChild (new HCDiv ().addChild ("Subject: " + aEndpointCert.getSubjectX500Principal ().toString ()));
-
-    final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aEndpointCert.getNotBefore ());
-    ret.addChild (new HCDiv ().addChild ("Not before: " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
-
-    final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aEndpointCert.getNotAfter ());
-    ret.addChild (new HCDiv ().addChild ("Not after: " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+    ret.addChild (new HCDiv ().addChild ("Issuer: " + SMPCommonUI.getCertIssuer (aEndpointCert)));
+    ret.addChild (new HCDiv ().addChild ("Subject: " + SMPCommonUI.getCertSubject (aEndpointCert)));
+    ret.addChild (new HCDiv ().addChild ("Serial number: " + SMPCommonUI.getCertSerialNumber (aEndpointCert)));
+    ret.addChild (new HCDiv ().addChild ("Not before: ")
+                              .addChild (SMPCommonUI.getNodeCertNotBefore (aNotBefore, aNowLDT, aDisplayLocale)));
+    ret.addChild (new HCDiv ().addChild ("Not after: ")
+                              .addChild (SMPCommonUI.getNodeCertNotAfter (aNotAfter, aNowLDT, aDisplayLocale)));
 
     return ret;
   }
@@ -290,7 +297,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
           final String sUnifiedCertificate = _getUnifiedCert (aEndpoint.getCertificate ());
-          aEndpointsGroupedPerURL.computeIfAbsent (sUnifiedCertificate, k -> new CommonsArrayList <> ()).add (aEndpoint);
+          aEndpointsGroupedPerURL.computeIfAbsent (sUnifiedCertificate, k -> new CommonsArrayList <> ())
+                                 .add (aEndpoint);
           aServiceGroupsGroupedPerURL.computeIfAbsent (sUnifiedCertificate, k -> new CommonsHashSet <> ()).add (aSG);
           ++nTotalEndpointCount;
         }
@@ -339,17 +347,20 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
             aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE, "The new certificate is invalid: " + sErrorDetails);
           else
             if (sNewUnifiedCert.equals (sOldUnifiedCert))
-              aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE, "The new certificate is identical to the old certificate");
+              aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE,
+                                         "The new certificate is identical to the old certificate");
         }
 
         // Validate parameters
         if (aFormErrors.containsNoError ())
         {
           PhotonWorkerPool.getInstance ()
-                          .run ("BulkChangeCertificate", new BulkChangeCertificate (aAllSIs, aDisplayLocale, sOldUnifiedCert, sNewCert));
+                          .run ("BulkChangeCertificate",
+                                new BulkChangeCertificate (aAllSIs, aDisplayLocale, sOldUnifiedCert, sNewCert));
 
           aWPEC.postRedirectGetInternal (success ().addChildren (div ("The bulk change of the endpoint certificate to"),
-                                                                 _getCertificateDisplay (sNewUnifiedCert, aDisplayLocale),
+                                                                 _getCertificateDisplay (sNewUnifiedCert,
+                                                                                         aDisplayLocale),
                                                                  div ("is now running in the background. Please manually refresh the page to see the update.")));
         }
       }
@@ -393,11 +404,14 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     {
       aNodeList.addChild (info ().addChildren (div ("This page lets you change the certificates of multiple endpoints at once. This is e.g. helpful when the old certificate expired."),
                                                div ("Currently " +
-                                                    (nTotalEndpointCount == 1 ? "1 endpoint is" : nTotalEndpointCount + " endpoints are") +
+                                                    (nTotalEndpointCount == 1 ? "1 endpoint is"
+                                                                              : nTotalEndpointCount +
+                                                                                " endpoints are") +
                                                     " registered.")));
 
       final HCTable aTable = new HCTable (new DTCol ("Certificate").setInitialSorting (ESortOrder.ASCENDING),
-                                          new DTCol ("Service Group Count").setDisplayType (EDTColType.INT, aDisplayLocale),
+                                          new DTCol ("Service Group Count").setDisplayType (EDTColType.INT,
+                                                                                            aDisplayLocale),
                                           new DTCol ("Endpoint Count").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
       aEndpointsGroupedPerURL.forEach ( (sCert, aEndpoints) -> {

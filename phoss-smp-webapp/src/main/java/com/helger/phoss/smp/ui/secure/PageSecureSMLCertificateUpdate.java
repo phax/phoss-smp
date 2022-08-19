@@ -21,7 +21,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -198,8 +198,9 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
         aCaller.prepareChangeCertificate (sMigrationPublicCert, aMigrationDate);
 
-        final LocalDateTime aNotBefore = PDTFactory.createLocalDateTime (aMigrationPublicCert.getNotBefore ());
-        final LocalDateTime aNotAfter = PDTFactory.createLocalDateTime (aMigrationPublicCert.getNotAfter ());
+        final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
+        final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aMigrationPublicCert.getNotBefore ());
+        final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aMigrationPublicCert.getNotAfter ());
 
         final LocalDate aEffectiveMigrationDate = aMigrationDate != null ? aMigrationDate : aNotBefore.toLocalDate ();
         final String sMsg = "Successfully prepared migration of SMP certificate at SML '" +
@@ -211,14 +212,16 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         LOGGER.info (sMsg);
 
         aNodeList.addChild (success ().addChild (div (sMsg))
-                                      .addChild (div ("Issuer: " +
-                                                      aMigrationPublicCert.getIssuerX500Principal ().toString ()))
-                                      .addChild (div ("Subject: " +
-                                                      aMigrationPublicCert.getSubjectX500Principal ().toString ()))
-                                      .addChild (div ("Not before: " +
-                                                      PDTToString.getAsString (aNotBefore, aDisplayLocale)))
-                                      .addChild (div ("Not after: " +
-                                                      PDTToString.getAsString (aNotAfter, aDisplayLocale))));
+                                      .addChild (div ("Issuer: " + SMPCommonUI.getCertIssuer (aMigrationPublicCert)))
+                                      .addChild (div ("Subject: " + SMPCommonUI.getCertSubject (aMigrationPublicCert)))
+                                      .addChild (div ("Serial number: " +
+                                                      SMPCommonUI.getCertSerialNumber (aMigrationPublicCert)))
+                                      .addChild (div ("Not before: ").addChild (SMPCommonUI.getNodeCertNotBefore (aNotBefore,
+                                                                                                                  aNowDT,
+                                                                                                                  aDisplayLocale)))
+                                      .addChild (div ("Not after: ").addChild (SMPCommonUI.getNodeCertNotAfter (aNotAfter,
+                                                                                                                aNowDT,
+                                                                                                                aDisplayLocale))));
 
         AuditHelper.onAuditExecuteSuccess ("smp-sml-update-cert",
                                            aSMLInfo.getManagementServiceURL (),
