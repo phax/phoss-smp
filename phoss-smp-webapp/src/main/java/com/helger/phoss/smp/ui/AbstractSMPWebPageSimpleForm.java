@@ -25,7 +25,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 
 /**
  * Base class for simple form pages.
- * 
+ *
  * @author Philip Helger
  * @param <DATATYPE>
  *        The handled data type
@@ -33,7 +33,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 public abstract class AbstractSMPWebPageSimpleForm <DATATYPE extends IHasID <String>> extends
                                                    AbstractBootstrapWebPageSimpleForm <DATATYPE, WebPageExecutionContext>
 {
-  public AbstractSMPWebPageSimpleForm (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
+  protected AbstractSMPWebPageSimpleForm (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
   {
     super (sID, sName);
   }

@@ -40,7 +40,8 @@ public final class MenuSecure
   public static void init (@Nonnull final IMenuTree aMenuTree)
   {
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID);
-    final IMenuObjectFilter aFilterPeppolDirectory = x -> SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled () &&
+    final IMenuObjectFilter aFilterPeppolDirectory = x -> SMPMetaManager.getSettings ()
+                                                                        .isDirectoryIntegrationEnabled () &&
                                                           SMPMetaManager.hasBusinessCardMgr ();
     final IMenuObjectFilter aFilterSMLConnectionActive = x -> SMPMetaManager.getSettings ().isSMLEnabled ();
     final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> SMPMetaManager.getSettings ().isSMLEnabled () ||
@@ -50,8 +51,10 @@ public final class MenuSecure
       final IMenuItemPage aServiceGroups = aMenuTree.createRootItem (new PageSecureServiceGroup (CMenuSecure.MENU_SERVICE_GROUPS));
       aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupExport (CMenuSecure.MENU_SERVICE_GROUPS_EXPORT));
       aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupImport (CMenuSecure.MENU_SERVICE_GROUPS_IMPORT));
-      aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupMigrationOutbound (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_OUTBOUND));
-      aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupMigrationInbound (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_INBOUND));
+      aMenuTree.createItem (aServiceGroups,
+                            new PageSecureServiceGroupMigrationOutbound (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_OUTBOUND));
+      aMenuTree.createItem (aServiceGroups,
+                            new PageSecureServiceGroupMigrationInbound (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_INBOUND));
     }
     {
       final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new BasePageShowChildren <WebPageExecutionContext> (CMenuSecure.MENU_ENDPOINTS,
@@ -60,10 +63,12 @@ public final class MenuSecure
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointList (CMenuSecure.MENU_ENDPOINT_LIST));
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointTree (CMenuSecure.MENU_ENDPOINT_TREE));
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointChangeURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_URL));
-      aMenuTree.createItem (aEndpoints, new PageSecureEndpointChangeCertificate (CMenuSecure.MENU_ENDPOINTS_CHANGE_CERTIFICATE));
+      aMenuTree.createItem (aEndpoints,
+                            new PageSecureEndpointChangeCertificate (CMenuSecure.MENU_ENDPOINTS_CHANGE_CERTIFICATE));
     }
     aMenuTree.createRootItem (new PageSecureRedirect (CMenuSecure.MENU_REDIRECTS));
-    aMenuTree.createRootItem (new PageSecureBusinessCard (CMenuSecure.MENU_BUSINESS_CARDS)).setDisplayFilter (aFilterPeppolDirectory);
+    aMenuTree.createRootItem (new PageSecureBusinessCard (CMenuSecure.MENU_BUSINESS_CARDS))
+             .setDisplayFilter (aFilterPeppolDirectory);
     aMenuTree.createRootItem (new PageSecureCertificateInformation (CMenuSecure.MENU_CERTIFICATE_INFORMATION));
     aMenuTree.createRootItem (new PageSecureTasksProblems (CMenuSecure.MENU_TASKS));
     aMenuTree.createRootSeparator ();
@@ -74,11 +79,18 @@ public final class MenuSecure
                                                                                                                  "Administration",
                                                                                                                  aMenuTree));
       {
-        final IMenuItemPage aAdminSML = aMenuTree.createItem (aAdmin, new BasePageShowChildren <> (CMenuSecure.MENU_SML, "SML", aMenuTree))
+        final IMenuItemPage aAdminSML = aMenuTree.createItem (aAdmin,
+                                                              new BasePageShowChildren <> (CMenuSecure.MENU_SML,
+                                                                                           "SML",
+                                                                                           aMenuTree))
                                                  .setDisplayFilter (aFilterSMLConnectionActiveOrNeeded);
         aMenuTree.createItem (aAdminSML, new PageSecureSMLConfiguration (CMenuSecure.MENU_SML_CONFIGURATION))
                  .setDisplayFilter (aFilterSMLConnectionActiveOrNeeded);
-        aMenuTree.createItem (aAdminSML, new PageSecureSMLRegistration (CMenuSecure.MENU_SML_REGISTRATION))
+        aMenuTree.createItem (aAdminSML, new PageSecureSMLRegCreate (CMenuSecure.MENU_SML_REG_CREATE))
+                 .setDisplayFilter (aFilterSMLConnectionActive);
+        aMenuTree.createItem (aAdminSML, new PageSecureSMLRegUpdate (CMenuSecure.MENU_SML_REG_UPDATE))
+                 .setDisplayFilter (aFilterSMLConnectionActive);
+        aMenuTree.createItem (aAdminSML, new PageSecureSMLRegDelete (CMenuSecure.MENU_SML_REG_DELETE))
                  .setDisplayFilter (aFilterSMLConnectionActive);
         aMenuTree.createItem (aAdminSML, new PageSecureSMLCertificateUpdate (CMenuSecure.MENU_SML_CERTIFICATE_UPDATE))
                  .setDisplayFilter (aFilterSMLConnectionActive);
@@ -86,7 +98,8 @@ public final class MenuSecure
       aMenuTree.createItem (aAdmin, new PageSecureSMPSettings (CMenuSecure.MENU_SMP_SETTINGS));
       aMenuTree.createItem (aAdmin, new PageSecureSMPIdentifierMappings (CMenuSecure.MENU_SMP_IDENTIFIER_MAPPINGS));
       aMenuTree.createItem (aAdmin, new PageSecureTransportProfiles (CMenuSecure.MENU_TRANSPORT_PROFILES));
-      aMenuTree.createItem (aAdmin, new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
+      aMenuTree.createItem (aAdmin,
+                            new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CSMPServer.DEFAULT_LOCALE);
     }
 

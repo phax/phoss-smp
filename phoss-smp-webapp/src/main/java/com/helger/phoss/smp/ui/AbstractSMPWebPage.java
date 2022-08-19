@@ -29,7 +29,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
  */
 public abstract class AbstractSMPWebPage extends AbstractBootstrapWebPage <WebPageExecutionContext>
 {
-  public AbstractSMPWebPage (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
+  protected AbstractSMPWebPage (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
   {
     super (sID, sName);
   }

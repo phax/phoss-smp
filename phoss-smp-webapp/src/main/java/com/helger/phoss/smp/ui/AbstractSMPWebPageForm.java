@@ -47,13 +47,14 @@ public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> 
   /** Grid spec for identifier values */
   protected static final BootstrapGridSpec GS_IDENTIFIER_VALUE = BootstrapGridSpec.create (6, 6, 6, 8, 9);
 
-  public AbstractSMPWebPageForm (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
+  protected AbstractSMPWebPageForm (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
   {
     super (sID, sName);
   }
 
   @Override
-  protected void onInputFormError (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
+  protected void onInputFormError (@Nonnull final WebPageExecutionContext aWPEC,
+                                   @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
