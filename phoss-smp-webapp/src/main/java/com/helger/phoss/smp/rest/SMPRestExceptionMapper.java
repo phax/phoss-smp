@@ -26,7 +26,7 @@ import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.state.EHandled;
 import com.helger.commons.string.StringHelper;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;

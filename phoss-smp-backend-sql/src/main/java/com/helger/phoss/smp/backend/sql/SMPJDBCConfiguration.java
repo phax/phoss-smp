@@ -24,7 +24,7 @@ import com.helger.commons.annotation.PresentForCodeCoverage;
 import com.helger.commons.annotation.Since;
 import com.helger.config.IConfig;
 import com.helger.db.jdbc.executor.DBExecutor;
-import com.helger.phoss.smp.SMPConfigProvider;
+import com.helger.phoss.smp.config.SMPConfigProvider;
 
 /**
  * Default JPA configuration file properties

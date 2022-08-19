@@ -20,8 +20,8 @@ import java.time.Duration;
 
 import javax.annotation.Nonnull;
 
-import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.app.html.IHTMLProvider;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapLoginManager;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;

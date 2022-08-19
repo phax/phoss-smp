@@ -44,7 +44,7 @@ import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.state.EContinue;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.api.APIDescriptor;
 import com.helger.photon.api.APIPath;
 import com.helger.photon.api.GlobalAPIInvoker;

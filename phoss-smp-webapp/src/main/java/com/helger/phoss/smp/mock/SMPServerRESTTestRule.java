@@ -29,13 +29,13 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.lang.ClassPathHelper;
-import com.helger.config.Config;
 import com.helger.config.ConfigFactory;
-import com.helger.config.IConfig;
 import com.helger.config.source.MultiConfigurationValueProvider;
 import com.helger.config.source.res.ConfigurationSourceProperties;
 import com.helger.peppol.sml.ESML;
-import com.helger.phoss.smp.SMPConfigProvider;
+import com.helger.phoss.smp.config.ISMPConfig;
+import com.helger.phoss.smp.config.SMPConfig;
+import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.jetty.JettyRunner;
 
@@ -43,8 +43,8 @@ public class SMPServerRESTTestRule extends ExternalResource
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerRESTTestRule.class);
 
-  private IConfig m_aOldConfig;
-  private IConfig m_aNewConfig;
+  private ISMPConfig m_aOldConfig;
+  private ISMPConfig m_aNewConfig;
   private JettyRunner m_aServer;
 
   @Nonnull
@@ -70,7 +70,7 @@ public class SMPServerRESTTestRule extends ExternalResource
       // Remember the old config
       m_aOldConfig = SMPConfigProvider.getConfig ();
       // Create new config
-      m_aNewConfig = Config.create (createSMPClientValueProvider (aSMPServerProperties));
+      m_aNewConfig = new SMPConfig (createSMPClientValueProvider (aSMPServerProperties));
     }
   }
 

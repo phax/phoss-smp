@@ -37,7 +37,7 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.CSMLDefault;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.ESMPRESTType;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;

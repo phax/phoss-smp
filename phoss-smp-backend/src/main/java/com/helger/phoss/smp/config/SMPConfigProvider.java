@@ -8,7 +8,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.helger.phoss.smp;
+package com.helger.phoss.smp.config;
 
 import java.nio.charset.StandardCharsets;
 
@@ -27,7 +27,6 @@ import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.io.resourceprovider.ReadableResourceProviderChain;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
-import com.helger.config.Config;
 import com.helger.config.ConfigFactory;
 import com.helger.config.IConfig;
 import com.helger.config.source.MultiConfigurationValueProvider;
@@ -134,11 +133,11 @@ public final class SMPConfigProvider
     return ret;
   }
 
-  private static final IConfig DEFAULT_CONFIG = Config.create (createSMPClientValueProvider ());
+  private static final ISMPConfig DEFAULT_CONFIG = new SMPConfig (createSMPClientValueProvider ());
 
   private static final SimpleReadWriteLock RW_LOCK = new SimpleReadWriteLock ();
   @GuardedBy ("RW_LOCK")
-  private static IConfig s_aConfig = DEFAULT_CONFIG;
+  private static ISMPConfig s_aConfig = DEFAULT_CONFIG;
 
   private SMPConfigProvider ()
   {}
@@ -147,7 +146,7 @@ public final class SMPConfigProvider
    * @return The current global configuration. Never <code>null</code>.
    */
   @Nonnull
-  public static IConfig getConfig ()
+  public static ISMPConfig getConfig ()
   {
     // Inline for performance
     RW_LOCK.readLock ().lock ();
@@ -169,14 +168,14 @@ public final class SMPConfigProvider
    * @return The old value of {@link IConfig}. Never <code>null</code>.
    */
   @Nonnull
-  public static IConfig setConfig (@Nonnull final IConfig aNewConfig)
+  public static ISMPConfig setConfig (@Nonnull final ISMPConfig aNewConfig)
   {
     ValueEnforcer.notNull (aNewConfig, "NewConfig");
-    final IConfig ret;
+    final ISMPConfig aOld;
     RW_LOCK.writeLock ().lock ();
     try
     {
-      ret = s_aConfig;
+      aOld = s_aConfig;
       s_aConfig = aNewConfig;
     }
     finally
@@ -184,9 +183,9 @@ public final class SMPConfigProvider
       RW_LOCK.writeLock ().unlock ();
     }
 
-    if (!EqualsHelper.identityEqual (ret, aNewConfig))
+    if (!EqualsHelper.identityEqual (aOld, aNewConfig))
       if (LOGGER.isInfoEnabled ())
         LOGGER.info ("The SMP configuration provider was changed to " + aNewConfig);
-    return ret;
+    return aOld;
   }
 }

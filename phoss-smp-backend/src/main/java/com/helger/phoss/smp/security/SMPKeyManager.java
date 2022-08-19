@@ -54,7 +54,7 @@ import com.helger.commons.exception.InitializationException;
 import com.helger.commons.ws.TrustManagerTrustAll;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.phoss.smp.ESMPRESTType;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;

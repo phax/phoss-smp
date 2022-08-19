@@ -30,7 +30,7 @@ import com.helger.commons.email.EmailAddress;
 import com.helger.commons.string.StringHelper;
 import com.helger.config.IConfig;
 import com.helger.phoss.smp.CSMPServer;
-import com.helger.phoss.smp.SMPConfigProvider;
+import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.photon.core.interror.InternalErrorBuilder;
 import com.helger.photon.core.interror.InternalErrorSettings;
 import com.helger.photon.core.interror.callback.AbstractErrorCallback;

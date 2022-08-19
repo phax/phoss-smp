@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.settings;
 
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -23,11 +26,11 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.config.IConfig;
 import com.helger.config.value.ConfiguredValue;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.phoss.smp.SMPConfigProvider;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.config.ISMPConfig;
+import com.helger.phoss.smp.config.SMPConfigProvider;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.settings.ISettings;
 import com.helger.settings.Settings;
@@ -42,22 +45,23 @@ import com.helger.settings.Settings;
 @NotThreadSafe
 public class SMPSettings implements ISMPSettings
 {
-  public static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
+  private static final String KEY_SMP_REST_WRITABLE_API_DISABLED = "smp.rest.writableapi.disabled";
 
-  /* legacy name - should be called "required" instead of "needed" */
-  public static final String KEY_SML_REQUIRED = "sml.needed";
-  /* legacy name - should be called "enabled" instead of "active" */
-  public static final String KEY_SML_ENABLED = "sml.active";
+  private static final String KEY_SML_REQUIRED = "sml.required";
+  private static final String KEY_SML_REQUIRED_OLD = "sml.needed";
+  private static final String KEY_SML_ENABLED = "sml.enabled";
+  private static final String KEY_SML_ENABLED_OLD = "sml.active";
+  // No matching configuration item
   private static final String KEY_SML_INFO_ID = "smlinfo.id";
 
-  /* legacy name - should not contain "peppol" */
-  public static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.peppol.directory.integration.enabled";
-  /* legacy name - should not contain "peppol" */
-  public static final String KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED = "smp.peppol.directory.integration.required";
-  /* legacy name - should not contain "peppol" */
-  public static final String KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.peppol.directory.integration.autoupdate";
-  /* legacy name - should not contain "peppol" */
-  public static final String KEY_SMP_DIRECTORY_HOSTNAME = "smp.peppol.directory.hostname";
+  private static final String KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED = "smp.directory.integration.required";
+  private static final String KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED_OLD = "smp.peppol.directory.integration.required";
+  private static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED = "smp.directory.integration.enabled";
+  private static final String KEY_SMP_DIRECTORY_INTEGRATION_ENABLED_OLD = "smp.peppol.directory.integration.enabled";
+  private static final String KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smp.directory.integration.autoupdate";
+  private static final String KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE_OLD = "smp.peppol.directory.integration.autoupdate";
+  private static final String KEY_SMP_DIRECTORY_HOSTNAME = "smp.directory.hostname";
+  private static final String KEY_SMP_DIRECTORY_HOSTNAME_OLD = "smp.peppol.directory.hostname";
 
   public static final boolean DEFAULT_SMP_REST_WRITABLE_API_DISABLED = false;
 
@@ -81,16 +85,9 @@ public class SMPSettings implements ISMPSettings
     {
       // Create settings and use the values from the configuration file as the
       // default values
-      final IConfig aConfig = SMPConfigProvider.getConfig ();
-      // SML Info ID is not taken from Config!
-      for (final String sKey : new String [] { KEY_SMP_REST_WRITABLE_API_DISABLED,
-                                               KEY_SML_REQUIRED,
-                                               KEY_SML_ENABLED,
-                                               KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,
-                                               KEY_SMP_DIRECTORY_INTEGRATION_ENABLED,
-                                               KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                               KEY_SMP_DIRECTORY_HOSTNAME })
-      {
+      final ISMPConfig aConfig = SMPConfigProvider.getConfig ();
+
+      final Consumer <String> aGetSet = sKey -> {
         final ConfiguredValue aCV = aConfig.getConfiguredValue (sKey);
         if (aCV != null)
         {
@@ -98,7 +95,28 @@ public class SMPSettings implements ISMPSettings
             LOGGER.debug ("Initializing settings property '" + sKey + "' with Configuration property " + aCV);
           m_aSettings.putIn (sKey, aCV.getValue ());
         }
-      }
+      };
+      final BiConsumer <String, String []> aGetSetMulti = (sKey, aOldOnes) -> {
+        final ConfiguredValue aCV = aConfig.getConfiguredValueOrFallback (sKey, aOldOnes);
+        if (aCV != null)
+        {
+          if (LOGGER.isDebugEnabled ())
+            LOGGER.debug ("Initializing settings property '" + sKey + "' with Configuration property " + aCV);
+          m_aSettings.putIn (sKey, aCV.getValue ());
+        }
+      };
+
+      // SML Info ID is not taken from Config!
+      aGetSet.accept (KEY_SMP_REST_WRITABLE_API_DISABLED);
+      aGetSetMulti.accept (KEY_SML_REQUIRED, new String [] { KEY_SML_REQUIRED_OLD });
+      aGetSetMulti.accept (KEY_SML_ENABLED, new String [] { KEY_SML_ENABLED_OLD });
+      aGetSetMulti.accept (KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,
+                           new String [] { KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED_OLD });
+      aGetSetMulti.accept (KEY_SMP_DIRECTORY_INTEGRATION_ENABLED,
+                           new String [] { KEY_SMP_DIRECTORY_INTEGRATION_ENABLED_OLD });
+      aGetSetMulti.accept (KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+                           new String [] { KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE_OLD });
+      aGetSetMulti.accept (KEY_SMP_DIRECTORY_HOSTNAME, new String [] { KEY_SMP_DIRECTORY_HOSTNAME_OLD });
     }
   }
 
@@ -128,24 +146,24 @@ public class SMPSettings implements ISMPSettings
 
   public boolean isSMLRequired ()
   {
-    return m_aSettings.getAsBoolean (KEY_SML_REQUIRED, DEFAULT_SML_REQUIRED);
+    return m_aSettings.getAsBoolean (KEY_SML_REQUIRED_OLD, DEFAULT_SML_REQUIRED);
   }
 
   @Nonnull
   public EChange setSMLRequired (final boolean bSMLRequired)
   {
-    return m_aSettings.putIn (KEY_SML_REQUIRED, bSMLRequired);
+    return m_aSettings.putIn (KEY_SML_REQUIRED_OLD, bSMLRequired);
   }
 
   public boolean isSMLEnabled ()
   {
-    return m_aSettings.getAsBoolean (KEY_SML_ENABLED, DEFAULT_SML_ENABLED);
+    return m_aSettings.getAsBoolean (KEY_SML_ENABLED_OLD, DEFAULT_SML_ENABLED);
   }
 
   @Nonnull
   public EChange setSMLEnabled (final boolean bSMLEnabled)
   {
-    return m_aSettings.putIn (KEY_SML_ENABLED, bSMLEnabled);
+    return m_aSettings.putIn (KEY_SML_ENABLED_OLD, bSMLEnabled);
   }
 
   @Nullable
@@ -170,51 +188,52 @@ public class SMPSettings implements ISMPSettings
 
   public boolean isDirectoryIntegrationRequired ()
   {
-    return m_aSettings.getAsBoolean (KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED,
+    return m_aSettings.getAsBoolean (KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED_OLD,
                                      DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED);
   }
 
   @Nonnull
   public EChange setDirectoryIntegrationRequired (final boolean bPeppolDirectoryIntegrationRequired)
   {
-    return m_aSettings.putIn (KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED, bPeppolDirectoryIntegrationRequired);
+    return m_aSettings.putIn (KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED_OLD, bPeppolDirectoryIntegrationRequired);
   }
 
   public boolean isDirectoryIntegrationEnabled ()
   {
-    return m_aSettings.getAsBoolean (KEY_SMP_DIRECTORY_INTEGRATION_ENABLED, DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
+    return m_aSettings.getAsBoolean (KEY_SMP_DIRECTORY_INTEGRATION_ENABLED_OLD,
+                                     DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
   }
 
   @Nonnull
   public EChange setDirectoryIntegrationEnabled (final boolean bPeppolDirectoryIntegrationEnabled)
   {
-    return m_aSettings.putIn (KEY_SMP_DIRECTORY_INTEGRATION_ENABLED, bPeppolDirectoryIntegrationEnabled);
+    return m_aSettings.putIn (KEY_SMP_DIRECTORY_INTEGRATION_ENABLED_OLD, bPeppolDirectoryIntegrationEnabled);
   }
 
   public boolean isDirectoryIntegrationAutoUpdate ()
   {
-    return m_aSettings.getAsBoolean (KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
+    return m_aSettings.getAsBoolean (KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE_OLD,
                                      DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE);
   }
 
   @Nonnull
   public EChange setDirectoryIntegrationAutoUpdate (final boolean bPeppolDirectoryIntegrationAutoUpdate)
   {
-    return m_aSettings.putIn (KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE, bPeppolDirectoryIntegrationAutoUpdate);
+    return m_aSettings.putIn (KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE_OLD, bPeppolDirectoryIntegrationAutoUpdate);
   }
 
   @Nonnull
   public String getDirectoryHostName ()
   {
     // TODO select between test and prod in default
-    return m_aSettings.getAsString (KEY_SMP_DIRECTORY_HOSTNAME,
+    return m_aSettings.getAsString (KEY_SMP_DIRECTORY_HOSTNAME_OLD,
                                     true ? DEFAULT_SMP_DIRECTORY_HOSTNAME_PROD : DEFAULT_SMP_DIRECTORY_HOSTNAME_TEST);
   }
 
   @Nonnull
   public EChange setDirectoryHostName (@Nullable final String sDirectoryHostName)
   {
-    return m_aSettings.putIn (KEY_SMP_DIRECTORY_HOSTNAME, sDirectoryHostName);
+    return m_aSettings.putIn (KEY_SMP_DIRECTORY_HOSTNAME_OLD, sDirectoryHostName);
   }
 
   @Nonnull

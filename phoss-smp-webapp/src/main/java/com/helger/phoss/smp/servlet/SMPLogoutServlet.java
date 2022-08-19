@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
-import com.helger.phoss.smp.SMPServerConfiguration;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.core.servlet.LogoutXServletHandler;
 import com.helger.servlet.StaticServerInfo;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;

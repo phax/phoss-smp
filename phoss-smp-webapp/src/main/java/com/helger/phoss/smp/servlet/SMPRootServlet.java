@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.string.StringHelper;
-import com.helger.phoss.smp.SMPServerConfiguration;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
 import com.helger.servlet.StaticServerInfo;
 import com.helger.servlet.response.UnifiedResponse;

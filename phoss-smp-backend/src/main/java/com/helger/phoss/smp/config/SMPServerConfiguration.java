@@ -8,7 +8,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.helger.phoss.smp;
+package com.helger.phoss.smp.config;
 
 import java.net.Proxy;
 
@@ -25,6 +25,8 @@ import com.helger.config.IConfig;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettings;
 import com.helger.peppolid.factory.ESMPIdentifierType;
+import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.security.keystore.EKeyStoreType;
 
 /**

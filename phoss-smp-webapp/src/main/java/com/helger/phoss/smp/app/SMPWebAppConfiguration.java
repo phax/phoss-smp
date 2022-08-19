@@ -28,7 +28,7 @@ import com.helger.commons.url.ISimpleURL;
 import com.helger.commons.url.SimpleURL;
 import com.helger.commons.url.URLHelper;
 import com.helger.config.IConfig;
-import com.helger.phoss.smp.SMPConfigProvider;
+import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 
 /**

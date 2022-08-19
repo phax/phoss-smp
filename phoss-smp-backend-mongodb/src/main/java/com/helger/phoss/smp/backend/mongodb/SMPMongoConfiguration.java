@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import com.helger.config.IConfig;
-import com.helger.phoss.smp.SMPConfigProvider;
+import com.helger.phoss.smp.config.SMPConfigProvider;
 
 @Immutable
 public final class SMPMongoConfiguration
