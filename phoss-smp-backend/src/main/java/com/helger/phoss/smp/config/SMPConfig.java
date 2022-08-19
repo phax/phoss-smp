@@ -18,6 +18,20 @@ public class SMPConfig extends Config implements ISMPConfig
   public SMPConfig (@Nonnull final IConfigurationValueProvider aValueProvider)
   {
     super (aValueProvider);
+    if (LOGGER.isDebugEnabled ())
+    {
+      // Print details on every lookup
+      setFoundKeyConsumer ( (k,
+                             v) -> LOGGER.debug ("Found Configuration key '" +
+                                                 k +
+                                                 "' with value '" +
+                                                 v.getValue () +
+                                                 "' and prio " +
+                                                 v.getConfigurationSource ().getPriority () +
+                                                 " in " +
+                                                 v.getConfigurationSource ().getSourceType ()));
+      setKeyNotFoundConsumer ( (k) -> LOGGER.debug ("Failed to find Configuration key '" + k + "'"));
+    }
   }
 
   private static void _logRenamedConfig (@Nonnull final String sOld, @Nonnull final String sNew)
