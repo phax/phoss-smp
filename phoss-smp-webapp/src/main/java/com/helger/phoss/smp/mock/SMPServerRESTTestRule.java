@@ -67,6 +67,7 @@ public class SMPServerRESTTestRule extends ExternalResource
       if (LOGGER.isInfoEnabled ())
         LOGGER.info ("Creating custom SMP configuration using " + aSMPServerProperties);
 
+      // Remember the old config
       m_aOldConfig = SMPConfigProvider.getConfig ();
       // Create new config
       m_aNewConfig = Config.create (createSMPClientValueProvider (aSMPServerProperties));

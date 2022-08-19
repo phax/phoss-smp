@@ -36,7 +36,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
-import com.helger.phoss.smp.SMPConfigProvider;
+import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.serialize.MicroReader;
@@ -95,7 +95,7 @@ public final class NiceNameHandler
     // Doc types
     {
       IReadableResource aDocTypeIDRes = null;
-      final String sPath = SMPConfigProvider.getConfig ().getAsString ("webapp.nicename.doctypes.path");
+      final String sPath = SMPWebAppConfiguration.getNiceNameDocTypesPath ();
       if (StringHelper.hasText (sPath))
       {
         aDocTypeIDRes = new FileSystemResource (sPath);
@@ -121,7 +121,7 @@ public final class NiceNameHandler
     // Processes
     {
       IReadableResource aProcessIDRes = null;
-      final String sPath = SMPConfigProvider.getConfig ().getAsString ("webapp.nicename.processes.path");
+      final String sPath = SMPWebAppConfiguration.getNiceNameProcessesPath ();
       if (StringHelper.hasText (sPath))
       {
         aProcessIDRes = new FileSystemResource (sPath);

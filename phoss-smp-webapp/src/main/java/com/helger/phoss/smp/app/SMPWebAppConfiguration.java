@@ -391,4 +391,16 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   {
     return _getConfig ().getAsBoolean ("csp.reporting.enabled", false);
   }
+
+  @Nullable
+  public static String getNiceNameDocTypesPath ()
+  {
+    return _getConfig ().getAsString ("webapp.nicename.doctypes.path");
+  }
+
+  @Nullable
+  public static String getNiceNameProcessesPath ()
+  {
+    return _getConfig ().getAsString ("webapp.nicename.processes.path");
+  }
 }
