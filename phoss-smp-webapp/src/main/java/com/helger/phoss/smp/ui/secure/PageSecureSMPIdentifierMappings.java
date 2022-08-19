@@ -25,14 +25,15 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.tabular.HCRow;
-import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.nicename.NiceNameEntry;
 import com.helger.phoss.smp.nicename.NiceNameHandler;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
+import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.uicore.css.CPageParam;
@@ -61,11 +62,13 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
                                @Nonnull final String sSuffix)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final HCTable aTable = new HCTable (new DTCol ("ID"), new DTCol ("Name"), new DTCol ("Deprecated?")).setID (getID () + sSuffix);
+    final BootstrapTable aTable = new BootstrapTable (new DTCol ("ID").setWidthPerc (60),
+                                                      new DTCol ("Name"),
+                                                      new DTCol ("Deprecated?").setWidth (100)).setID (getID () + sSuffix);
     for (final Map.Entry <String, NiceNameEntry> aEntry : aEntries.entrySet ())
     {
       final HCRow aRow = aTable.addBodyRow ();
-      aRow.addCell (aEntry.getKey ());
+      aRow.addCell (span (aEntry.getKey ()).addClass (CBootstrapCSS.TEXT_BREAK));
       aRow.addCell (aEntry.getValue ().getName ());
       aRow.addCell (EPhotonCoreText.getYesOrNo (aEntry.getValue ().isDeprecated (), aDisplayLocale));
     }
@@ -80,7 +83,8 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
     final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
     aToolbar.addChild (new BootstrapButton ().addChild ("Reload")
                                              .setIcon (EDefaultIcon.REFRESH)
-                                             .setOnClick (aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_RELOAD)));
+                                             .setOnClick (aWPEC.getSelfHref ()
+                                                               .add (CPageParam.PARAM_ACTION, ACTION_RELOAD)));
 
     if (aWPEC.hasAction (ACTION_RELOAD))
     {
@@ -89,7 +93,9 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
     }
 
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
-    aTabBox.addTab ("doctypes", "Document Types", _createList (aWPEC, NiceNameHandler.getAllDocumentTypeMappings (), "doctypes"));
+    aTabBox.addTab ("doctypes",
+                    "Document Types",
+                    _createList (aWPEC, NiceNameHandler.getAllDocumentTypeMappings (), "doctypes"));
     aTabBox.addTab ("procs", "Processes", _createList (aWPEC, NiceNameHandler.getAllProcessMappings (), "procs"));
   }
 }
