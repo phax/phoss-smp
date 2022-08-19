@@ -26,17 +26,12 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.string.StringHelper;
-import com.helger.config.IConfig;
-import com.helger.phoss.smp.SMPConfigProvider;
 import com.helger.scope.IScope;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 import com.mongodb.client.MongoCollection;
 
 public class MongoClientSingleton extends AbstractGlobalWebSingleton
 {
-  public static final String CONFIG_MONGODB_CONNECTION_STRING = "mongodb.connectionstring";
-  public static final String CONFIG_MONGODB_DB_NAME = "mongodb.dbname";
-
   private static final Logger LOGGER = LoggerFactory.getLogger (MongoClientSingleton.class);
 
   private MongoClientProvider m_aProvider;
@@ -53,17 +48,16 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
   protected void onAfterInstantiation (@Nonnull final IScope aScope)
   {
     // Standard configuration file
-    final IConfig aConfig = SMPConfigProvider.getConfig ();
-    final String sConnectionString = aConfig.getAsString (CONFIG_MONGODB_CONNECTION_STRING);
+    final String sConnectionString = SMPMongoConfiguration.getMongoConnectionString ();
     if (StringHelper.hasNoText (sConnectionString))
       throw new IllegalStateException ("The MongoDB connection string is missing in the configuration. See property '" +
-                                       CONFIG_MONGODB_CONNECTION_STRING +
+                                       SMPMongoConfiguration.CONFIG_MONGODB_CONNECTION_STRING +
                                        "'");
 
-    final String sDBName = aConfig.getAsString (CONFIG_MONGODB_DB_NAME);
+    final String sDBName = SMPMongoConfiguration.getMongoDBName ();
     if (StringHelper.hasNoText (sDBName))
       throw new IllegalStateException ("The MongoDB database name is missing in the configuration. See property '" +
-                                       CONFIG_MONGODB_DB_NAME +
+                                       SMPMongoConfiguration.CONFIG_MONGODB_DB_NAME +
                                        "'");
 
     if (LOGGER.isInfoEnabled ())
