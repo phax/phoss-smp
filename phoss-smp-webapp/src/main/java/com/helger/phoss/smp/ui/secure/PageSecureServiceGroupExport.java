@@ -27,7 +27,6 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
 import com.helger.phoss.smp.settings.ISMPSettings;
-import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.ajax.AbstractSMPAjaxExecutor;
 import com.helger.phoss.smp.ui.ajax.CAjax;
@@ -59,12 +58,12 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
       protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
                                         @Nonnull final PhotonUnifiedResponse aAjaxResponse) throws Exception
       {
-        final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
+        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
         final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
         final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
 
         final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups,
-                                                                         aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ());
+                                                                                 aSettings.isDirectoryIntegrationEnabled ());
 
         // Build the XML response
         aAjaxResponse.xml (aDoc);
@@ -97,8 +96,10 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
       else
       {
         aNodeList.addChild (info ("Export " +
-                                  (nServiceGroupCount == 1 ? "service group" : "all " + nServiceGroupCount + " service groups") +
-                                  (bHandleBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s") : "") +
+                                  (nServiceGroupCount == 1 ? "service group"
+                                                           : "all " + nServiceGroupCount + " service groups") +
+                                  (bHandleBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s")
+                                                        : "") +
                                   " to an XML file."));
       }
 

@@ -33,7 +33,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
-import com.helger.phoss.smp.settings.ISMPSettingsManager;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -61,14 +61,15 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[REST API Export-All-XML-V1] ";
-    LOGGER.info (sLogPrefix + "Starting Export");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix + "Starting Export");
 
     // Only authenticated user may do so
     final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     // Start action after authentication
-    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
     // Now get all relevant service groups
@@ -76,10 +77,11 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
 
     final boolean bIncludeBusinessCards = aRequestScope.params ()
                                                        .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
-                                                                      aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ());
+                                                                      aSettings.isDirectoryIntegrationEnabled ());
     final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards);
 
-    LOGGER.info (sLogPrefix + "Finished creating Export data");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix + "Finished creating Export data");
 
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();

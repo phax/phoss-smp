@@ -38,7 +38,7 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
-import com.helger.phoss.smp.settings.ISMPSettingsManager;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -68,14 +68,15 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
     final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
 
     final String sLogPrefix = "[REST API Export-Specific-XML-V1] ";
-    LOGGER.info (sLogPrefix + "Starting Export of '" + sPathServiceGroupID + "'");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix + "Starting Export of '" + sPathServiceGroupID + "'");
 
     // Only authenticated user may do so
     final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     // Start action after authentication
-    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
 
@@ -92,16 +93,18 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
     if (aServiceGroup == null)
     {
       // No such service group
-      throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'", aDataProvider.getCurrentURI ());
+      throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
+                                      aDataProvider.getCurrentURI ());
     }
 
     final boolean bIncludeBusinessCards = aRequestScope.params ()
                                                        .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
-                                                                      aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ());
+                                                                      aSettings.isDirectoryIntegrationEnabled ());
     final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (new CommonsArrayList <> (aServiceGroup),
                                                                              bIncludeBusinessCards);
 
-    LOGGER.info (sLogPrefix + "Finished creating Export data");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix + "Finished creating Export data");
 
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();

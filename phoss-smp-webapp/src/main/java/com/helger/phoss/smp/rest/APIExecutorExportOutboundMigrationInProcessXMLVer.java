@@ -37,7 +37,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
-import com.helger.phoss.smp.settings.ISMPSettingsManager;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -66,14 +66,15 @@ public final class APIExecutorExportOutboundMigrationInProcessXMLVer extends Abs
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[REST API Export-OutboundMigrationInProcess-XML-V1] ";
-    LOGGER.info (sLogPrefix + "Starting Export for all with outbound migration state 'in progress'");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix + "Starting Export for all with outbound migration state 'in progress'");
 
     // Only authenticated user may do so
     final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     // Start action after authentication
-    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
 
@@ -87,18 +88,22 @@ public final class APIExecutorExportOutboundMigrationInProcessXMLVer extends Abs
       if (aSG != null)
         aAllServiceGroups.add (aSG);
       else
-        LOGGER.warn (sLogPrefix +
-                     "Failed to resolve PID '" +
-                     aMigration.getParticipantIdentifier ().getURIEncoded () +
-                     "' to a Service Group");
+      {
+        if (LOGGER.isWarnEnabled ())
+          LOGGER.warn (sLogPrefix +
+                       "Failed to resolve PID '" +
+                       aMigration.getParticipantIdentifier ().getURIEncoded () +
+                       "' to a Service Group");
+      }
     }
 
     final boolean bIncludeBusinessCards = aRequestScope.params ()
                                                        .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
-                                                                      aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ());
+                                                                      aSettings.isDirectoryIntegrationEnabled ());
     final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards);
 
-    LOGGER.info (sLogPrefix + "Finished creating Export data");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix + "Finished creating Export data");
 
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();

@@ -35,7 +35,7 @@ import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
-import com.helger.phoss.smp.settings.ISMPSettingsManager;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.security.user.IUser;
 import com.helger.servlet.response.UnifiedResponse;
@@ -66,14 +66,15 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
     final String sPathUserLoginName = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
 
     final String sLogPrefix = "[REST API Export-ByOwner-XML-V1] ";
-    LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");
 
     // Only authenticated user may do so
     final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
     final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
 
     // Start action after authentication
-    final ISMPSettingsManager aSettingsMgr = SMPMetaManager.getSettingsMgr ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
 
@@ -92,10 +93,11 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
 
     final boolean bIncludeBusinessCards = aRequestScope.params ()
                                                        .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
-                                                                      aSettingsMgr.getSettings ().isDirectoryIntegrationEnabled ());
+                                                                      aSettings.isDirectoryIntegrationEnabled ());
     final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards);
 
-    LOGGER.info (sLogPrefix + "Finished creating Export data");
+    if (LOGGER.isInfoEnabled ())
+      LOGGER.info (sLogPrefix + "Finished creating Export data");
 
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();
