@@ -214,7 +214,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   public com.helger.xsds.bdxr.smp1.EndpointType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.EndpointType ret = new com.helger.xsds.bdxr.smp1.EndpointType ();
-    ret.setEndpointURI (m_sEndpointReference);
+    // Ensure an empty element is emitted if no endpoint reference is present
+    ret.setEndpointURI (StringHelper.getNotNull (m_sEndpointReference));
     ret.setRequireBusinessLevelSignature (Boolean.valueOf (m_bRequireBusinessLevelSignature));
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
     ret.setServiceActivationDate (m_aServiceActivationDT);
