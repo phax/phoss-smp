@@ -30,10 +30,10 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.lang.ClassPathHelper;
 import com.helger.config.ConfigFactory;
+import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.config.source.MultiConfigurationValueProvider;
 import com.helger.config.source.res.ConfigurationSourceProperties;
 import com.helger.peppol.sml.ESML;
-import com.helger.phoss.smp.config.ISMPConfig;
 import com.helger.phoss.smp.config.SMPConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -43,8 +43,8 @@ public class SMPServerRESTTestRule extends ExternalResource
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerRESTTestRule.class);
 
-  private ISMPConfig m_aOldConfig;
-  private ISMPConfig m_aNewConfig;
+  private IConfigWithFallback m_aOldConfig;
+  private IConfigWithFallback m_aNewConfig;
   private JettyRunner m_aServer;
 
   @Nonnull

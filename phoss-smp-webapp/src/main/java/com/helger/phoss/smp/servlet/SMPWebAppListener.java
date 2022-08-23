@@ -77,6 +77,7 @@ import com.helger.photon.core.requestparam.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.core.requestparam.RequestParameterManager;
 import com.helger.servlet.ServletContextPathHolder;
 import com.helger.servlet.response.UnifiedResponseDefaultSettings;
+import com.helger.smpclient.config.SMPClientConfiguration;
 import com.helger.wsclient.WSHelper;
 import com.helger.xservlet.requesttrack.RequestTrackerSettings;
 
@@ -174,6 +175,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // JUL to SLF4J
     SLF4JBridgeHandler.removeHandlersForRootLogger ();
     SLF4JBridgeHandler.install ();
+
+    // Set configs with variables
+    PDClientConfiguration.setConfig (SMPConfigProvider.getConfig ());
+    SMPClientConfiguration.setConfig (SMPConfigProvider.getConfig ());
 
     if (SMPServerConfiguration.isForceRoot ())
     {

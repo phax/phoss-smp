@@ -29,6 +29,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.system.SystemProperties;
 import com.helger.config.ConfigFactory;
 import com.helger.config.IConfig;
+import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.config.source.MultiConfigurationValueProvider;
 import com.helger.config.source.res.ConfigurationSourceProperties;
 
@@ -135,11 +136,11 @@ public final class SMPConfigProvider
     return ret;
   }
 
-  private static final ISMPConfig DEFAULT_CONFIG = new SMPConfig (createSMPClientValueProvider ());
+  private static final IConfigWithFallback DEFAULT_CONFIG = new SMPConfig (createSMPClientValueProvider ());
 
   private static final SimpleReadWriteLock RW_LOCK = new SimpleReadWriteLock ();
   @GuardedBy ("RW_LOCK")
-  private static ISMPConfig s_aConfig = DEFAULT_CONFIG;
+  private static IConfigWithFallback s_aConfig = DEFAULT_CONFIG;
 
   private SMPConfigProvider ()
   {}
@@ -148,7 +149,7 @@ public final class SMPConfigProvider
    * @return The current global configuration. Never <code>null</code>.
    */
   @Nonnull
-  public static ISMPConfig getConfig ()
+  public static IConfigWithFallback getConfig ()
   {
     // Inline for performance
     RW_LOCK.readLock ().lock ();
@@ -170,10 +171,10 @@ public final class SMPConfigProvider
    * @return The old value of {@link IConfig}. Never <code>null</code>.
    */
   @Nonnull
-  public static ISMPConfig setConfig (@Nonnull final ISMPConfig aNewConfig)
+  public static IConfigWithFallback setConfig (@Nonnull final IConfigWithFallback aNewConfig)
   {
     ValueEnforcer.notNull (aNewConfig, "NewConfig");
-    final ISMPConfig aOld;
+    final IConfigWithFallback aOld;
     RW_LOCK.writeLock ().lock ();
     try
     {

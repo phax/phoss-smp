@@ -26,9 +26,9 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
+import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.config.value.ConfiguredValue;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.phoss.smp.config.ISMPConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -85,7 +85,7 @@ public class SMPSettings implements ISMPSettings
     {
       // Create settings and use the values from the configuration file as the
       // default values
-      final ISMPConfig aConfig = SMPConfigProvider.getConfig ();
+      final IConfigWithFallback aConfig = SMPConfigProvider.getConfig ();
 
       final Consumer <String> aGetSet = sKey -> {
         final ConfiguredValue aCV = aConfig.getConfiguredValue (sKey);
