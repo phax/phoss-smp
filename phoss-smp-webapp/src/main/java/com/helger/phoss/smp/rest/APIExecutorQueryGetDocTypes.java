@@ -23,7 +23,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ import com.helger.commons.collection.impl.ICommonsSortedMap;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
-import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
 import com.helger.httpclient.HttpClientManager;
 import com.helger.httpclient.response.ResponseHandlerByteArray;
@@ -66,25 +64,6 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQuery
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetDocTypes.class);
-
-  // TODO replace with CIdentifier version in peppol-commons >= 8.7.5
-  @Nonnull
-  @Nonempty
-  static String getURIEncodedBDXR2 (@Nullable final String sScheme, @Nullable final String sValue)
-  {
-    // Empty scheme may be allowed, depending on the implementation
-    final String sRealScheme = StringHelper.getNotNull (sScheme);
-
-    // Empty value may be allowed, depending on the implementation
-    final String sRealValue = StringHelper.getNotNull (sValue);
-
-    // Combine scheme and value
-    if (StringHelper.hasText (sRealScheme))
-      return sRealScheme + CIdentifier.URL_SCHEME_VALUE_SEPARATOR + sRealValue;
-
-    // No double colon
-    return sRealValue;
-  }
 
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
@@ -197,7 +176,8 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
           for (final com.helger.xsds.bdxr.smp2.ac.ServiceReferenceType aSR : aSG.getServiceReference ())
           {
             // Decoded href is important for unification
-            final String sSrcID = getURIEncodedBDXR2 (aSR.getID ().getSchemeID (), aSR.getID ().getValue ());
+            final String sSrcID = CIdentifier.getURIEncodedBDXR2 (aSR.getID ().getSchemeID (),
+                                                                  aSR.getID ().getValue ());
             final String sHref = CIdentifier.createPercentDecoded (sSrcID);
             if (aSGHrefs.put (sHref, sSrcID) != null)
               if (LOGGER.isWarnEnabled ())

@@ -45,6 +45,7 @@ public final class SMPConfigProvider
 
   static
   {
+    // TODO remove block in v7
     // smp-server.properties stuff
     if (StringHelper.hasText (SystemProperties.getPropertyValueOrNull ("peppol.smp.server.properties.path")))
       throw new InitializationException ("The system property 'peppol.smp.server.properties.path' is no longer supported." +
@@ -97,6 +98,7 @@ public final class SMPConfigProvider
 
     final String sDefaultSuffix = "\n  Place all properties in 'application.properties' instead. !This fallback will be removed in version 7 of phoss SMP!";
 
+    // TODO remove block in v7
     // Lower priority than the standard files
     aRes = aResourceProvider.getReadableResourceIf ("private-smp-server.properties", IReadableResource::exists);
     if (aRes != null)

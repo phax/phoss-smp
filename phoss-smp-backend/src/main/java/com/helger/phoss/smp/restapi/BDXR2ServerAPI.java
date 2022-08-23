@@ -521,7 +521,7 @@ public final class BDXR2ServerAPI
               final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
               for (final EndpointType aJAXBEndpoint : aPM.getEndpoint ())
               {
-                // TODO use first cert only
+                // TODO BDXR2 use first cert only
                 byte [] aCertBytes = null;
                 if (aJAXBEndpoint.hasCertificateEntries ())
                   aCertBytes = aJAXBEndpoint.getCertificateAtIndex (0).getContentBinaryObjectValue ();
