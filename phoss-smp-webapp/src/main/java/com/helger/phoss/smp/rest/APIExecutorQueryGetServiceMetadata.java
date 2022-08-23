@@ -45,6 +45,7 @@ import com.helger.json.JsonValue;
 import com.helger.json.serialize.JsonWriter;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppol.sml.ESMPAPIType;
+import com.helger.peppolid.CIdentifier;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -111,7 +112,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
     return ret;
   }
 
-  // TODO move to SMPJsonResponse when ready
+  // TODO use SMPJsonResponse version in peppol-commons>8.8.0
   @Nonnull
   static IJsonObject convert (@Nonnull final IParticipantIdentifier aParticipantID,
                               @Nonnull final IDocumentTypeIdentifier aDocTypeID,
@@ -142,16 +143,16 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
         for (final ProcessType aProc : aPM.getProcess ())
         {
           final IJsonObject aJsonProc = new JsonObject ().add ("id",
-                                                               APIExecutorQueryGetDocTypes.getURIEncodedBDXR2 (aProc.getID ()
-                                                                                                                    .getSchemeID (),
-                                                                                                               aProc.getID ()
-                                                                                                                    .getValue ()));
+                                                               CIdentifier.getURIEncodedBDXR2 (aProc.getID ()
+                                                                                                    .getSchemeID (),
+                                                                                               aProc.getID ()
+                                                                                                    .getValue ()));
           if (aProc.hasRoleIDEntries ())
           {
             aJsonProc.add ("roleids",
                            new JsonArray ().addAllMapped (aProc.getRoleID (),
-                                                          x -> JsonValue.create (APIExecutorQueryGetDocTypes.getURIEncodedBDXR2 (x.getSchemeID (),
-                                                                                                                                 x.getValue ()))));
+                                                          x -> JsonValue.create (CIdentifier.getURIEncodedBDXR2 (x.getSchemeID (),
+                                                                                                                 x.getValue ()))));
           }
 
           final SMPExtensionList aExts = SMPExtensionList.ofBDXR2 (aProc.getSMPExtensions ());
