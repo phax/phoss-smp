@@ -38,7 +38,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   static
   {
     final String sDBType = SMPJDBCConfiguration.getTargetDatabaseType ();
-    DB_TYPE = EDatabaseType.getFromIDOrNull (sDBType);
+    DB_TYPE = EDatabaseType.getFromCaseIDInsensitiveOrNull (sDBType);
     if (DB_TYPE == null)
       throw new IllegalStateException ("The database type MUST be provided and MUST be one of " +
                                        StringHelper.imploder ()

@@ -63,7 +63,7 @@ public enum EDatabaseType implements IHasID <String>, IHasDisplayName
   }
 
   @Nullable
-  public static EDatabaseType getFromIDOrNull (@Nullable final String sID)
+  public static EDatabaseType getFromCaseIDInsensitiveOrNull (@Nullable final String sID)
   {
     return EnumHelper.getFromIDCaseInsensitiveOrNull (EDatabaseType.class, sID);
   }
