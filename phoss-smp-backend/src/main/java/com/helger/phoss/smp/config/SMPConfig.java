@@ -41,7 +41,7 @@ public class SMPConfig extends ConfigWithFallback
                                                  v.getConfigurationSource ().getPriority () +
                                                  " in " +
                                                  v.getConfigurationSource ().getSourceType ()));
-      setKeyNotFoundConsumer ( (k) -> LOGGER.debug ("Failed to find Configuration key '" + k + "'"));
+      setKeyNotFoundConsumer (k -> LOGGER.debug ("Failed to find Configuration key '" + k + "'"));
     }
   }
 }
