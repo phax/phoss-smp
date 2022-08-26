@@ -19,6 +19,7 @@
 
 version=6.0.0
 
+echo Login Docker Hub:
 docker login --username phelger
 
 # --------------- XML -----------------------
@@ -41,4 +42,3 @@ docker push phelger/phoss-smp-mongodb:latest
 # --------------- finalize
 
 docker logout
-
