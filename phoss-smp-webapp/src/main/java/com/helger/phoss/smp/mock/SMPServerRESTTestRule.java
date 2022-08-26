@@ -31,6 +31,7 @@ import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.lang.ClassPathHelper;
 import com.helger.config.ConfigFactory;
 import com.helger.config.fallback.IConfigWithFallback;
+import com.helger.config.source.EConfigSourceType;
 import com.helger.config.source.MultiConfigurationValueProvider;
 import com.helger.config.source.res.ConfigurationSourceProperties;
 import com.helger.peppol.sml.ESML;
@@ -53,9 +54,9 @@ public class SMPServerRESTTestRule extends ExternalResource
     // Start with default setup
     final MultiConfigurationValueProvider ret = ConfigFactory.createDefaultValueProvider ();
 
-    // Lower priority than the standard files
+    // Higher priority than the standard files
     ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8),
-                                ConfigFactory.APPLICATION_PROPERTIES_PRIORITY - 1);
+                                EConfigSourceType.RESOURCE.getDefaultPriority () + 1);
 
     return ret;
   }
