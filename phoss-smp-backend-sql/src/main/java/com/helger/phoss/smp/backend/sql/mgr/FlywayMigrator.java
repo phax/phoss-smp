@@ -127,7 +127,7 @@ final class FlywayMigrator
                                                                                        SMPJDBCConfiguration.getJdbcUser (),
                                                                                        SMPJDBCConfiguration.getJdbcPassword ()));
 
-    // Required for creating DB table
+    // Required for creating DB tables
     aFlywayConfig.baselineOnMigrate (true);
 
     // Disable validation, because DDL comments are also taken into
@@ -135,7 +135,8 @@ final class FlywayMigrator
     aFlywayConfig.validateOnMigrate (false);
 
     // Version 1 is the baseline
-    aFlywayConfig.baselineVersion ("0").baselineDescription ("SMP 5.2.x database layout, MySQL only");
+    aFlywayConfig.baselineVersion (Integer.toString (SMPJDBCConfiguration.getFlywayBaselineVersion ()))
+                 .baselineDescription ("SMP 5.2.x database layout, MySQL only");
 
     // Separate directory per DB type
     aFlywayConfig.locations ("db/migrate-" + eDBType.getID ());
