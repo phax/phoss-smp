@@ -19,8 +19,12 @@ package com.helger.phoss.smp.ui.secure;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.bootstrap4.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap4.pages.security.BasePageSecurityChangePassword;
@@ -34,6 +38,8 @@ import com.helger.photon.uicore.page.system.BasePageShowChildren;
 @Immutable
 public final class MenuSecure
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (MenuSecure.class);
+
   private MenuSecure ()
   {}
 
@@ -101,6 +107,12 @@ public final class MenuSecure
       aMenuTree.createItem (aAdmin,
                             new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CSMPServer.DEFAULT_LOCALE);
+
+      if (SMPWebAppConfiguration.isWebAppPageSessionManagmentDisabled ())
+      {
+        LOGGER.warn ("The 'Administration / Monitoring / Sessions' page was explicitly disabled via the configuration.");
+        aMenuTree.removeItemWithID (BootstrapPagesMenuConfigurator.MENU_ADMIN_MONITORING_SESSIONS);
+      }
     }
 
     // Default menu item

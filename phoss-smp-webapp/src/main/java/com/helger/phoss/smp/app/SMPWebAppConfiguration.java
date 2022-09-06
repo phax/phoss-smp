@@ -350,6 +350,17 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> if the "Administration / Monitoring / Sessions"
+   *         page should be disabled (for security reasons), <code>false</code>
+   *         to show it (also the default).
+   */
+  public static boolean isWebAppPageSessionManagmentDisabled ()
+  {
+    // Enable by default
+    return _getConfig ().getAsBoolean ("webapp.page.admin.monitoring.sessions.disabled", false);
+  }
+
+  /**
    * @return <code>true</code> if support for the HTTP "OPTIONS" verb should not
    *         be provided.
    * @since 5.2.6
