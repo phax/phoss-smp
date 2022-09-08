@@ -54,16 +54,11 @@
   </developers>
   
   <properties>
-    <flyway.version>9.1.5</flyway.version>
+    <flyway.version>9.3.0</flyway.version>
   </properties>
   
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>com.helger.photon</groupId>
-        <artifactId>ph-oton-jdbc</artifactId>
-        <version>1.0.3</version>
-      </dependency>
       <dependency>
         <groupId>net.jodah</groupId>
         <artifactId>expiringmap</artifactId>

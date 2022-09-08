@@ -119,7 +119,7 @@
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>8.4.1</version>
+        <version>8.4.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -140,7 +140,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-xmldsig</artifactId>
-        <version>4.4.2</version>
+        <version>4.4.3</version>
       </dependency>
       
       <dependency>
