@@ -20,7 +20,6 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
-import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.ISimpleURL;
 import com.helger.html.hc.IHCNode;
@@ -30,7 +29,6 @@ import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.app.CSMP;
-import com.helger.phoss.smp.config.SMPHttpConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
@@ -57,7 +55,6 @@ import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.icon.EDefaultIcon;
-import com.helger.scope.singleton.AbstractSessionSingleton;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
@@ -67,43 +64,6 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  */
 public final class SMPRendererSecure
 {
-  /**
-   * A helper class that checks once per session if proxy information are
-   * configured or not. Usually this information does not change, it it is not
-   * worth the effort to query that in every request.
-   *
-   * @author Philip Helger
-   */
-  public static final class MenuSessionState extends AbstractSessionSingleton
-  {
-    private final boolean m_bHttpProxyEnabled;
-    private final boolean m_bHttpsProxyEnabled;
-
-    @Deprecated
-    @UsedViaReflection
-    public MenuSessionState ()
-    {
-      m_bHttpProxyEnabled = SMPHttpConfiguration.getAsHttpProxySettings () != null;
-      m_bHttpsProxyEnabled = SMPHttpConfiguration.getAsHttpsProxySettings () != null;
-    }
-
-    @Nonnull
-    public static MenuSessionState getInstance ()
-    {
-      return getSessionSingleton (MenuSessionState.class);
-    }
-
-    public boolean isHttpProxyEnabled ()
-    {
-      return m_bHttpProxyEnabled;
-    }
-
-    public boolean isHttpsProxyEnabled ()
-    {
-      return m_bHttpsProxyEnabled;
-    }
-  }
-
   private SMPRendererSecure ()
   {}
 
@@ -220,9 +180,9 @@ public final class SMPRendererSecure
     }
 
     // Info, mainly for support purposes
-    if (MenuSessionState.getInstance ().isHttpProxyEnabled ())
+    if (SecureSessionState.getInstance ().isHttpProxyEnabled ())
       aBox.addChild (new HCDiv ().addChild (EDefaultIcon.INFO.getAsNode ()).addChild (" HTTP proxy is enabled"));
-    if (MenuSessionState.getInstance ().isHttpsProxyEnabled ())
+    if (SecureSessionState.getInstance ().isHttpsProxyEnabled ())
       aBox.addChild (new HCDiv ().addChild (EDefaultIcon.INFO.getAsNode ()).addChild (" HTTPS proxy is enabled"));
 
     ret.addChild (aBox);
