@@ -80,18 +80,13 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
                      3,
                      false),
-    PEPPOL_PRODUCTION_V3 ("Peppol production v3",
-                          "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
-                          3,
-                          false),
+    PEPPOL_PRODUCTION_V3 ("Peppol production v3", "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE", 3, false),
     // TOOP Pilot PKI
     TOOP_PILOT_SMP ("TOOP pilot", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, true),
     // DE4A PKIs
-    DE4A_TEST ("DE4A Test",
-               "E=CEF-EDELIVERY-SUPPORT@ec.europa.eu,CN=DE4A_TEST_SMP_CA,OU=CEF,O=DE4A,ST=Brussels-Capital,C=BE",
-               4,
-               true),
-    DE4A_TELSEC ("DE4A Telesec", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, false),
+    DE4A_TEST ("DE4A Test", "E=CEF-EDELIVERY-SUPPORT@ec.europa.eu,CN=DE4A_TEST_SMP_CA,OU=CEF,O=DE4A,ST=Brussels-Capital,C=BE", 4, true),
+    DE4A_TELSEC1 ("DE4A Telesec [1]", "CN=TeleSec Business CA 1,OU=T-Systems Trust Center,O=T-Systems International GmbH,C=DE", 3, false),
+    DE4A_TELSEC2 ("DE4A Telesec [2]", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, false),
     DE4A_COMMISSIGN_2 ("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, false);
 
     private final String m_sDisplayName;
@@ -195,21 +190,16 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
       aToolbar.addChild (new BootstrapButton ().addChild ("Reload keystore")
                                                .setIcon (EDefaultIcon.REFRESH)
-                                               .setOnClick (aWPEC.getSelfHref ()
-                                                                 .add (CPageParam.PARAM_ACTION,
-                                                                       ACTION_RELOAD_KEYSTORE)));
+                                               .setOnClick (aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_RELOAD_KEYSTORE)));
       aToolbar.addChild (new BootstrapButton ().addChild ("Reload truststore")
                                                .setIcon (EDefaultIcon.REFRESH)
-                                               .setOnClick (aWPEC.getSelfHref ()
-                                                                 .add (CPageParam.PARAM_ACTION,
-                                                                       ACTION_RELOAD_TRUSTSTORE)));
+                                               .setOnClick (aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_RELOAD_TRUSTSTORE)));
       if (SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
       {
         aToolbar.addChild (new BootstrapButton ().addChild ("Reload " + sDirectoryName + " configuration")
                                                  .setIcon (EDefaultIcon.REFRESH)
                                                  .setOnClick (aWPEC.getSelfHref ()
-                                                                   .add (CPageParam.PARAM_ACTION,
-                                                                         ACTION_RELOAD_DIRECTORY_CONFIGURATION)));
+                                                                   .add (CPageParam.PARAM_ACTION, ACTION_RELOAD_DIRECTORY_CONFIGURATION)));
       }
       aNodeList.addChild (aToolbar);
     }
@@ -274,9 +264,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             {
               if (eCert.isDeprecated ())
                 aTab.addChild (warn ("You are currently using a ").addChild (strong ("deprecated"))
-                                                                  .addChild (" " +
-                                                                             eCert.getDisplayName () +
-                                                                             " certificate!"));
+                                                                  .addChild (" " + eCert.getDisplayName () + " certificate!"));
               else
                 aTab.addChild (info ("You are currently using a " + eCert.getDisplayName () + " certificate!"));
               if (aChain.length != eCert.getCertificateTreeLength ())
@@ -296,15 +284,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             if (aCert instanceof X509Certificate)
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias,
-                                                                                             aX509Cert,
-                                                                                             aNowDT,
-                                                                                             aDisplayLocale);
+              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias, aX509Cert, aNowDT, aDisplayLocale);
               aOL.addItem (aCertDetails);
             }
             else
-              aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
-                           ClassHelper.getClassName (aCert));
+              aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " + ClassHelper.getClassName (aCert));
           }
           aTab.addChild (aOL);
         }
@@ -339,15 +323,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             if (aCert instanceof X509Certificate)
             {
               final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias,
-                                                                                             aX509Cert,
-                                                                                             aNowDT,
-                                                                                             aDisplayLocale);
+              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias, aX509Cert, aNowDT, aDisplayLocale);
               aOL.addItem (aCertDetails);
             }
             else
-              aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
-                           ClassHelper.getClassName (aCert));
+              aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " + ClassHelper.getClassName (aCert));
           }
         }
         catch (final GeneralSecurityException ex)
@@ -377,9 +357,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           final LoadedKey <KeyStore.PrivateKeyEntry> aKeyLoading = PDClientConfiguration.loadPrivateKey (aKeyStoreLR.getKeyStore ());
           if (aKeyLoading.isFailure ())
           {
-            aTab.addChild (success (div ("Keystore is located at '" +
-                                         sKeyStorePath +
-                                         "' and was successfully loaded.")));
+            aTab.addChild (success (div ("Keystore is located at '" + sKeyStorePath + "' and was successfully loaded.")));
             aTab.addChild (error (PeppolKeyStoreHelper.getLoadError (aKeyLoading)));
           }
           else
@@ -406,9 +384,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                 if (eCert.isDeprecated ())
                 {
                   aTab.addChild (warn ("You are currently using a ").addChild (strong ("deprecated"))
-                                                                    .addChild (" " +
-                                                                               eCert.getDisplayName () +
-                                                                               " certificate!"));
+                                                                    .addChild (" " + eCert.getDisplayName () + " certificate!"));
                 }
                 else
                   aTab.addChild (info ("You are currently using a " + eCert.getDisplayName () + " certificate!"));
@@ -428,15 +404,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               if (aCert instanceof X509Certificate)
               {
                 final X509Certificate aX509Cert = (X509Certificate) aCert;
-                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias,
-                                                                                               aX509Cert,
-                                                                                               aNowDT,
-                                                                                               aDisplayLocale);
+                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias, aX509Cert, aNowDT, aDisplayLocale);
                 aUL.addItem (aCertDetails);
               }
               else
-                aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
-                             ClassHelper.getClassName (aCert));
+                aUL.addItem ("The certificate is not an X.509 certificate! It is internally a " + ClassHelper.getClassName (aCert));
             }
             aTab.addChild (aUL);
           }
@@ -460,9 +432,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           final KeyStore aTrustStore = aTrustStoreLR.getKeyStore ();
 
           // Trust store path and password are fine
-          aTab.addChild (success (div ("Truststore is located at '" +
-                                       sTrustStorePath +
-                                       "' and was successfully loaded.")));
+          aTab.addChild (success (div ("Truststore is located at '" + sTrustStorePath + "' and was successfully loaded.")));
 
           final HCOL aOL = new HCOL ();
           try
@@ -473,15 +443,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
               if (aCert instanceof X509Certificate)
               {
                 final X509Certificate aX509Cert = (X509Certificate) aCert;
-                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias,
-                                                                                               aX509Cert,
-                                                                                               aNowDT,
-                                                                                               aDisplayLocale);
+                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias, aX509Cert, aNowDT, aDisplayLocale);
                 aOL.addItem (aCertDetails);
               }
               else
-                aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " +
-                             ClassHelper.getClassName (aCert));
+                aOL.addItem ("The certificate is not an X.509 certificate! It is internally a " + ClassHelper.getClassName (aCert));
             }
           }
           catch (final GeneralSecurityException ex)
