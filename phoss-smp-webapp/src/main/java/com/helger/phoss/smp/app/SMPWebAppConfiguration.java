@@ -276,6 +276,18 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
     return _getConfig ().getAsString ("webapp.logo.internalurl");
   }
 
+  @Nullable
+  public static String getNiceNameDocTypesPath ()
+  {
+    return _getConfig ().getAsString ("webapp.nicename.doctypes.path");
+  }
+
+  @Nullable
+  public static String getNiceNameProcessesPath ()
+  {
+    return _getConfig ().getAsString ("webapp.nicename.processes.path");
+  }
+
   /**
    * Setting for issue #132
    *
@@ -361,6 +373,16 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
+   * @return <code>true</code> if the system message allows Markdown,
+   *         <code>false</code> if not
+   * @since 6.0.1
+   */
+  public static boolean isWebAppSystemMessageUseMarkdown ()
+  {
+    return _getConfig ().getAsBoolean ("webapp.systemmsg.usemarkdown", true);
+  }
+
+  /**
    * @return <code>true</code> if support for the HTTP "OPTIONS" verb should not
    *         be provided.
    * @since 5.2.6
@@ -401,17 +423,5 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static boolean isCSPReportingEnabled ()
   {
     return _getConfig ().getAsBoolean ("csp.reporting.enabled", false);
-  }
-
-  @Nullable
-  public static String getNiceNameDocTypesPath ()
-  {
-    return _getConfig ().getAsString ("webapp.nicename.doctypes.path");
-  }
-
-  @Nullable
-  public static String getNiceNameProcessesPath ()
-  {
-    return _getConfig ().getAsString ("webapp.nicename.processes.path");
   }
 }
