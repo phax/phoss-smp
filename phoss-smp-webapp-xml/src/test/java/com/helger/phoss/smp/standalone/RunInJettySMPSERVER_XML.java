@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.standalone;
 
+import java.io.File;
+
 import com.helger.photon.jetty.JettyStarter;
 
 /**
@@ -32,6 +34,9 @@ public final class RunInJettySMPSERVER_XML
 {
   public static void main (final String... args) throws Exception
   {
+    if (!new File ("pom.xml").exists ())
+      throw new IllegalStateException ("Please make sure your working directory is the directory containing 'pom.xml'");
+
     new JettyStarter (RunInJettySMPSERVER_XML.class).setPort (90)
                                                     .setStopPort (8078)
                                                     .setSessionCookieName ("SMPSESSION")
