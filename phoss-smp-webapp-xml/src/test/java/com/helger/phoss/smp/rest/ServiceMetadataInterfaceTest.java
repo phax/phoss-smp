@@ -155,7 +155,7 @@ public final class ServiceMetadataInterfaceTest
       aEndpoint.setCertificate ("blacert");
       aEndpoint.setServiceDescription ("Unit test service");
       aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
-      aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ());
+      aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID ());
       aSEL.addEndpoint (aEndpoint);
       aProcess.setServiceEndpointList (aSEL);
       aPL.addProcess (aProcess);
@@ -174,8 +174,7 @@ public final class ServiceMetadataInterfaceTest
     try
     {
       // PUT ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Read both
@@ -264,7 +263,7 @@ public final class ServiceMetadataInterfaceTest
       aEndpoint.setCertificate ("blacert");
       aEndpoint.setServiceDescription ("Unit test service");
       aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
-      aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ());
+      aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID ());
       aSEL.addEndpoint (aEndpoint);
       aProcess.setServiceEndpointList (aSEL);
       aPL.addProcess (aProcess);
@@ -376,8 +375,7 @@ public final class ServiceMetadataInterfaceTest
     try
     {
       // PUT ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
@@ -549,8 +547,7 @@ public final class ServiceMetadataInterfaceTest
     try
     {
       // PUT ServiceGroup
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // GET ServiceGroup

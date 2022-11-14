@@ -267,7 +267,7 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
         aEndpoint.setCertificate ("blacert");
         aEndpoint.setServiceDescription ("Unit test service");
         aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
-        aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ());
+        aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID ());
         aSEL.addEndpoint (aEndpoint);
         aProcess.setServiceEndpointList (aSEL);
         aPL.addProcess (aProcess);

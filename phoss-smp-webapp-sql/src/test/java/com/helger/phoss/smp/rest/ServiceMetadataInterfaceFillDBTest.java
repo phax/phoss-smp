@@ -78,8 +78,7 @@ public final class ServiceMetadataInterfaceFillDBTest extends AbstractSMPWebAppS
 
         final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
 
-        for (final ESMPTransportProfile eTP : new ESMPTransportProfile [] { ESMPTransportProfile.TRANSPORT_PROFILE_AS2,
-                                                                            ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2 })
+        for (final ESMPTransportProfile eTP : new ESMPTransportProfile [] { ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2 })
         {
           final ServiceInformationType aSI = new ServiceInformationType ();
           aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));

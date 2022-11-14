@@ -68,8 +68,7 @@ public final class MainCreate1MillionEndpoints
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
-                                                 @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
@@ -115,7 +114,7 @@ public final class MainCreate1MillionEndpoints
           aEndpoint.setCertificate ("blacert");
           aEndpoint.setServiceDescription ("Unit test service");
           aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
-          aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID ());
+          aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID ());
           aSEL.addEndpoint (aEndpoint);
           aProcess.setServiceEndpointList (aSEL);
           aPL.addProcess (aProcess);
