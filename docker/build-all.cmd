@@ -17,7 +17,7 @@
 
 @echo off
 
-set version=6.0.4
+set version=6.0.5
 
 echo Docker login
 docker login --username phelger

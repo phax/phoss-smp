@@ -17,7 +17,7 @@
 #
 
 
-version=6.0.4
+version=6.0.5
 
 echo Docker login
 docker login --username phelger

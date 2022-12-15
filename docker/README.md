@@ -201,7 +201,7 @@ Open `http://localhost:8888` in your browser.
 To change the version build of binary release versions you can specify the version on the commandline when building:
 
 ```
-docker build --build-arg SMP_VERSION=6.0.4 -t phoss-smp-release-binary-xml-6.0.4 -f Dockerfile-release-binary-xml .
+docker build --build-arg SMP_VERSION=6.0.5 -t phoss-smp-release-binary-xml-6.0.5 -f Dockerfile-release-binary-xml .
 ```
 
 ### Docker cheatsheet
