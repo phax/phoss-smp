@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.concurrent.SimpleReadWriteLock;
+import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.io.resource.IReadableResource;
@@ -187,7 +188,7 @@ public final class SMPConfigProvider
     }
 
     if (!EqualsHelper.identityEqual (aOld, aNewConfig))
-      if (LOGGER.isInfoEnabled ())
+      if (!GlobalDebug.isProductionMode ())
         LOGGER.info ("The SMP configuration provider was changed to " + aNewConfig);
     return aOld;
   }
