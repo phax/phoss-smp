@@ -38,7 +38,7 @@ public final class RunInJettySMPSERVER_XML
       throw new IllegalStateException ("Please make sure your working directory is the directory containing 'pom.xml'");
 
     new JettyStarter (RunInJettySMPSERVER_XML.class).setPort (90)
-                                                    .setStopPort (8078)
+                                                    .setStopPort (x -> x + 1000)
                                                     .setSessionCookieName ("SMPSESSION")
                                                     .run ();
   }

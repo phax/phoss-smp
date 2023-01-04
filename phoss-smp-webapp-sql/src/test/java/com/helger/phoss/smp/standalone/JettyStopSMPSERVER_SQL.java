@@ -27,6 +27,6 @@ public final class JettyStopSMPSERVER_SQL
 {
   public static void main (final String [] args) throws IOException
   {
-    new JettyStopper ().setStopPort (8078).run ();
+    new JettyStopper ().setStopPort (8090).run ();
   }
 }
