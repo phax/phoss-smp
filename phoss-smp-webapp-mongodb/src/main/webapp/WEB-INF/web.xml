@@ -18,9 +18,16 @@
 
 -->
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
-         id="SMP_WebApp" 
-         version="2.5">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
   <display-name>phoss SMP (MongoDB backend)</display-name>
+  
+  <session-config>
+    <cookie-config>
+      <http-only>true</http-only>
+    </cookie-config>
+  </session-config>
 
   <listener>
     <listener-class>com.helger.phoss.smp.mongodb.servlet.SMPWebAppListenerMongoDB</listener-class>
