@@ -2,8 +2,6 @@
 
 This folder contains the Docker configuration files for phoss SMP.
 It is based on the official `tomcat:9-jdk11` image since v5.3.2.
-It was previously based on the official `tomcat:9-jre11` image (v5.1.2 to v5.3.1).
-It was previously based on the official `tomcat:8.5` image (up to v5.1.1).
 
 Prebuild images are available from:
 * https://hub.docker.com/r/phelger/
@@ -78,25 +76,8 @@ as in
 ```shell
 docker run -d --name phoss-smp -p 80:8080 \
  -e "CONFIG_FILE=/config/application.properties" \
- -v /home/ubuntu/config:/config phelger/phoss-smp-xml:latest
-```
-
-#### For old version v5.x
-
-```
--e "SMP_SERVER_CONFIG=/config/smp-server.properties"
--e "SMP_WEBAPP_CONFIG=/config/webapp.properties"
--e "CONFIG_FILE=/config/application.properties"
-```
-
-as in
-
-```shell
-docker run -d --name phoss-smp -p 80:8080 \
- -e "SMP_SERVER_CONFIG=/config/smp-server.properties" \
- -e "SMP_WEBAPP_CONFIG=/config/webapp.properties" \
- -e "CONFIG_FILE=/config/application.properties" \
- -v /home/ubuntu/config:/config phelger/phoss-smp-xml:latest
+ -v /home/ubuntu/config:/config \
+ phelger/phoss-smp-xml:latest
 ```
 
 # Building Docker images
@@ -168,7 +149,7 @@ Open `http://localhost:8888` in your browser.
 
 ### Release from source, XML Backend
 
-Build the SMP from source with the XML backend using the tag of the last release.
+Build the SMP from GitHub source with the XML backend using the tag of the last release.
 
 ```
 docker build --pull -t phoss-smp-release-from-source-xml -f Dockerfile-release-from-source-xml .
@@ -182,6 +163,8 @@ Open `http://localhost:8888` in your browser.
 
 ### Latest snapshot version from source, MongoDB backend
 
+Build the SMP from GitHub source with the MongoDB backend using the HEAD version of the master branch (SNAPSHOT version).
+
 ```
 docker build --pull -t phoss-smp-snapshot-from-source-mongodb -f Dockerfile-snapshot-from-source-mongodb .
 docker run -d --name phoss-smp-snapshot-from-source-mongodb -p 8888:8080 phoss-smp-snapshot-from-source-mongodb
@@ -190,6 +173,8 @@ docker rm phoss-smp-snapshot-from-source-mongodb
 ```
 
 ### Latest snapshot version from source, SQL backend
+
+Build the SMP from GitHub source with the SQL backend using the HEAD version of the master branch (SNAPSHOT version).
 
 ```
 docker build --pull -t phoss-smp-snapshot-from-source-sql -f Dockerfile-snapshot-from-source-sql .
@@ -200,7 +185,7 @@ docker rm phoss-smp-snapshot-from-source-sql
 
 ### Latest snapshot version from source, XML Backend
 
-Build the SMP from source with the XML backend using the HEAD version of the master branch (SNAPSHOT version).
+Build the SMP from GitHub source with the XML backend using the HEAD version of the master branch (SNAPSHOT version).
 
 ```
 docker build --pull -t phoss-smp-snapshot-from-source-xml -f Dockerfile-snapshot-from-source-xml .
