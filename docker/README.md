@@ -67,6 +67,22 @@ docker run -d --name phoss-smp-with-config -p 8888:8080 -v c:\dev\git\phoss-smp\
 
 Alternatively the full paths of the configuration properties can also be provided with environment variables directly on the `docker run` commandline:
 
+#### For v6.x and onwards
+
+```
+-e "CONFIG_FILE=/config/application.properties"
+```
+
+as in
+
+```shell
+docker run -d --name phoss-smp -p 80:8080 \
+ -e "CONFIG_FILE=/config/application.properties" \
+ -v /home/ubuntu/config:/config phelger/phoss-smp-xml:latest
+```
+
+#### For old version v5.x
+
 ```
 -e "SMP_SERVER_CONFIG=/config/smp-server.properties"
 -e "SMP_WEBAPP_CONFIG=/config/webapp.properties"
