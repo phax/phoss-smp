@@ -19,7 +19,7 @@
 -->
 <weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app http://xmlns.oracle.com/weblogic/weblogic-web-app/1.4/weblogic-web-app.xsd">
+                  xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app https://www.oracle.com/webfolder/technetwork/weblogic/weblogic-web-app/1.4/weblogic-web-app.xsd">
   <context-root>phoss-smp-webapp-sql</context-root>
   <container-descriptor>
     <container-initializer-enabled>true</container-initializer-enabled>
