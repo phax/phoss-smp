@@ -2,8 +2,8 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.helger/phoss-smp-parent-pom/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.helger/phoss-smp-parent-pom) 
 
-phoss SMP is a complete SMP server that supports both the PEPPOL SMP specification as well as the OASIS BDXR SMP 1.0 specification.
-It comes with a management GUI and an XML backend for simplified operations.  
+phoss SMP is a complete SMP server that supports both the Peppol SMP specification as well as the OASIS BDXR SMP 1.0 specification.
+It comes with a management GUI and an XML, SQL or MongoDB backend for simplified operations.  
 It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/OASIS+SMP+conformant+solutions).
 
 Latest version: **[6.0.6](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-6.0.6)** (2023-02-15).
@@ -17,6 +17,8 @@ Docker containers can be found, depending on the backend you want to use:
 * https://hub.docker.com/r/phelger/phoss-smp-mongodb/tags
 
 Please read the **[Wiki](https://github.com/phax/phoss-smp/wiki)** for a detailed description, configuration reference and setup hints. It contains an introduction with screenshots, configuration, building and running instructions as well as [News and noteworthy](https://github.com/phax/phoss-smp/wiki/News-and-noteworthy).
+
+For a quick start guide to setup an SMP for Peppol: see also the step by step tutorial in https://github.com/phax/phoss-smp/tree/master/docs
 
 For querying an SMP server you may want to have a look at the OSS [peppol-smp-client](https://github.com/phax/peppol-commons/) library.
 
