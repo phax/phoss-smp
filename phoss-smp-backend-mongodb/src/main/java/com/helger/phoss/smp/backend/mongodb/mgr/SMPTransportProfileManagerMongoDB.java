@@ -28,6 +28,7 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
+import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
@@ -47,7 +48,9 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
 {
   private static final String BSON_ID = "id";
   private static final String BSON_NAME = "name";
+  @Deprecated
   private static final String BSON_DEPRECATED = "deprecated";
+  private static final String BSON_STATE = "state";
 
   public SMPTransportProfileManagerMongoDB ()
   {
@@ -61,16 +64,24 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
   {
     return new Document ().append (BSON_ID, aValue.getID ())
                           .append (BSON_NAME, aValue.getName ())
-                          .append (BSON_DEPRECATED, Boolean.valueOf (aValue.isDeprecated ()));
+                          .append (BSON_STATE, aValue.getState ().getID ());
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public static SMPTransportProfile toDomain (@Nonnull final Document aDoc)
   {
-    return new SMPTransportProfile (aDoc.getString (BSON_ID),
-                                    aDoc.getString (BSON_NAME),
-                                    aDoc.getBoolean (BSON_DEPRECATED, SMPTransportProfile.DEFAULT_DEPRECATED));
+    ESMPTransportProfileState eState = null;
+    final String sStateID = aDoc.getString (BSON_STATE);
+    if (sStateID != null)
+      eState = ESMPTransportProfileState.getFromIDOrNull (sStateID);
+    if (eState == null)
+    {
+      final boolean bDeprecated = aDoc.getBoolean (BSON_DEPRECATED, false);
+      eState = bDeprecated ? ESMPTransportProfileState.DEPRECATED : ESMPTransportProfileState.ACTIVE;
+    }
+
+    return new SMPTransportProfile (aDoc.getString (BSON_ID), aDoc.getString (BSON_NAME), eState);
   }
 
   @Nullable
@@ -82,7 +93,10 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     if (containsSMPTransportProfileWithID (sID))
       return null;
 
-    final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID, sName, bIsDeprecated);
+    final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID,
+                                                                              sName,
+                                                                              bIsDeprecated ? ESMPTransportProfileState.DEPRECATED
+                                                                                            : ESMPTransportProfileState.ACTIVE);
 
     if (!getCollection ().insertOne (toBson (aSMPTransportProfile)).wasAcknowledged ())
       throw new IllegalStateException ("Failed to insert into MongoDB Collection");
