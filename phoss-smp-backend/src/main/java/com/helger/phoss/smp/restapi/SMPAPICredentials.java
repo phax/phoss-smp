@@ -33,26 +33,44 @@ public class SMPAPICredentials
     m_sBearerToken = sBearerToken;
   }
 
+  /**
+   * @return <code>true</code> if this instance uses BasicAuth credentials,
+   *         <code>false</code> if not.
+   * @see #hasBearerToken()
+   */
+  public final boolean hasBasicAuth ()
+  {
+    return m_aBasicAuth != null;
+  }
+
+  /**
+   * @return The BasicAuth credentials, if any. May be <code>null</code>.
+   * @see #hasBasicAuth()
+   */
   @Nullable
   public final BasicAuthClientCredentials getBasicAuth ()
   {
     return m_aBasicAuth;
   }
 
-  public final boolean hasBasicAuth ()
+  /**
+   * @return <code>true</code> if this instance uses a Bearer token,
+   *         <code>false</code> if not.
+   * @see #hasBasicAuth()
+   */
+  public final boolean hasBearerToken ()
   {
-    return m_aBasicAuth != null;
+    return m_sBearerToken != null;
   }
 
+  /**
+   * @return The Bearer token, if any. May be <code>null</code>.
+   * @see #hasBearerToken()
+   */
   @Nullable
   public final String getBearerToken ()
   {
     return m_sBearerToken;
-  }
-
-  public final boolean hasBearerToken ()
-  {
-    return m_sBearerToken != null;
   }
 
   @Override
