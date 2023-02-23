@@ -6,7 +6,7 @@ phoss SMP is a complete SMP server that supports both the Peppol SMP specificati
 It comes with a management GUI and an XML, SQL or MongoDB backend for simplified operations.  
 It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/OASIS+SMP+conformant+solutions).
 
-Latest version: **[6.0.6](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-6.0.6)** (2023-02-15).
+Latest version: **[6.0.7](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-6.0.7)** (2023-02-23).
 See the special [Migrations guide](https://github.com/phax/phoss-smp/wiki/Migrations) for actions necessary on updates/version changes.
 
 **!! Users with SQL backend need to change the DB layout when updating to 5.3.x !!**
