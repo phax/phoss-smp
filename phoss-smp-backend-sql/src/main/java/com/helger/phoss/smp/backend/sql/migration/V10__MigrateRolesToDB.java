@@ -76,7 +76,7 @@ public final class V10__MigrateRolesToDB extends BaseJavaMigration
       }
       else
       {
-        LOGGER.warn ("No role file found");
+        LOGGER.warn ("No role XML file found");
       }
     }
   }

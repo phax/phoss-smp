@@ -87,7 +87,7 @@ public final class V12__MigrateUserGroupsToDB extends BaseJavaMigration
       }
       else
       {
-        LOGGER.warn ("No user group file found");
+        LOGGER.warn ("No user group XML file found");
       }
     }
   }

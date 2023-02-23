@@ -79,7 +79,7 @@ public final class V11__MigrateUsersToDB extends BaseJavaMigration
       }
       else
       {
-        LOGGER.warn ("No user file found");
+        LOGGER.warn ("No user XML file found");
       }
     }
   }
