@@ -64,7 +64,7 @@ public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManage
   }
 
   @Nonnull
-  public IUserTokenManager createUserTokenMgr () throws DAOException
+  public IUserTokenManager createUserTokenMgr (@Nonnull final IUserManager aUserMgr) throws DAOException
   {
     return new UserTokenManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
                                  PhotonSecurityManager.FactoryXML.FILENAME_USERTOKENS_XML);
