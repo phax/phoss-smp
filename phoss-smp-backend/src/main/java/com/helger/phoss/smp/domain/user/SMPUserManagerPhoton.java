@@ -84,6 +84,10 @@ public final class SMPUserManagerPhoton
         LOGGER.warn ("User '" + aBasicAuth.getUserName () + "' is disabled");
         throw new SMPUnauthorizedException ("User is disabled!");
       }
+
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("The provided BasicAuth credentials resolved to the user '" + aUser.getLoginName () + "'");
+
       return aUser;
     }
 
@@ -117,6 +121,10 @@ public final class SMPUserManagerPhoton
         LOGGER.warn ("User '" + aUser.getLoginName () + "' of Bearer token '" + sTokenString + "' is disabled");
         throw new SMPUnauthorizedException ("User is disabled!");
       }
+
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("The provided Bearer token resolved to the user '" + aUser.getLoginName () + "'");
+
       return aUser;
     }
 
