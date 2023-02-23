@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.mgr.SMPTransportProfileManagerJDBC;
@@ -62,7 +63,7 @@ public final class V5__MigrateTransportProfilesToDB extends BaseJavaMigration
           for (final ISMPTransportProfile aTransportProfile : aTransportProfiles)
             if (aMgrNew.createSMPTransportProfile (aTransportProfile.getID (),
                                                    aTransportProfile.getName (),
-                                                   aTransportProfile.isDeprecated ()) == null)
+                                                   aTransportProfile.getState () == ESMPTransportProfileState.DEPRECATED) == null)
               LOGGER.error ("Failed to migrate " + aTransportProfile + " to DB");
         }
 
