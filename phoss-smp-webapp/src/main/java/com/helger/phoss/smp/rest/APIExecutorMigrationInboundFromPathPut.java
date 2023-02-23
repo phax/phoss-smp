@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.BadRequestFault;
@@ -48,6 +47,7 @@ import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
@@ -76,7 +76,8 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
                                        @Nonnull final String sMigrationKey,
                                        @Nonnull final String sLogPrefix,
                                        @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                                       @Nonnull final UnifiedResponse aUnifiedResponse) throws SMPServerException, GeneralSecurityException
+                                       @Nonnull final UnifiedResponse aUnifiedResponse) throws SMPServerException,
+                                                                                        GeneralSecurityException
   {
     LOGGER.info (sLogPrefix +
                  "Starting inbound migration for Service Group ID '" +
@@ -86,8 +87,8 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
                  "'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
-    final IUser aOwningUser = SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+    final IUser aOwningUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
@@ -117,7 +118,8 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     // Check that service group does not exist yet
     if (aServiceGroupMgr.containsSMPServiceGroupWithID (aParticipantID))
     {
-      throw new SMPBadRequestException ("The Service Group '" + sServiceGroupID + "' already exists.", aDataProvider.getCurrentURI ());
+      throw new SMPBadRequestException ("The Service Group '" + sServiceGroupID + "' already exists.",
+                                        aDataProvider.getCurrentURI ());
     }
 
     if (false)
@@ -127,7 +129,9 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
       // valid
       if (aParticipantMigrationMgr.containsInboundMigration (aParticipantID))
       {
-        throw new SMPBadRequestException ("The inbound migration of the Service Group '" + sServiceGroupID + "' is already contained.",
+        throw new SMPBadRequestException ("The inbound migration of the Service Group '" +
+                                          sServiceGroupID +
+                                          "' is already contained.",
                                           aDataProvider.getCurrentURI ());
       }
     }
@@ -182,12 +186,16 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     else
     {
       // No exception here
-      LOGGER.error (sLogPrefix + "Error creating the new SMP Service Group for participant '" + aParticipantID.getURIEncoded () + "'.",
+      LOGGER.error (sLogPrefix +
+                    "Error creating the new SMP Service Group for participant '" +
+                    aParticipantID.getURIEncoded () +
+                    "'.",
                     aCaughtEx);
     }
 
     // Remember internally
-    final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.createInboundParticipantMigration (aParticipantID, sMigrationKey);
+    final ISMPParticipantMigration aMigration = aParticipantMigrationMgr.createInboundParticipantMigration (aParticipantID,
+                                                                                                            sMigrationKey);
     if (aMigration != null)
     {
       LOGGER.info (sLogPrefix +
@@ -200,7 +208,10 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     else
     {
       // No exception here
-      LOGGER.error (sLogPrefix + "Failed to store the participant migration for '" + aParticipantID.getURIEncoded () + "'.");
+      LOGGER.error (sLogPrefix +
+                    "Failed to store the participant migration for '" +
+                    aParticipantID.getURIEncoded () +
+                    "'.");
     }
 
     final IMicroDocument aResponseDoc = new MicroDocument ();

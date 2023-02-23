@@ -25,7 +25,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.state.ESuccess;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.pd.businesscard.generic.PDBusinessCard;
 import com.helger.pd.businesscard.helper.PDBusinessCardHelper;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -34,6 +33,7 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BusinessCardServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -73,9 +73,11 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
       throw new SMPBadRequestException ("Failed to parse XML payload as BusinessCard.", aDataProvider.getCurrentURI ());
     }
 
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
-    final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID, aBC, aBasicAuth);
+    final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
+                                                                                            aBC,
+                                                                                            aCredentials);
     if (eSuccess.isFailure ())
       aUnifiedResponse.setStatus (CHttp.HTTP_INTERNAL_SERVER_ERROR);
     else

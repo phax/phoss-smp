@@ -22,11 +22,11 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -46,7 +46,7 @@ public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
     // No service group available
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
 
-    final BasicAuthClientCredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())

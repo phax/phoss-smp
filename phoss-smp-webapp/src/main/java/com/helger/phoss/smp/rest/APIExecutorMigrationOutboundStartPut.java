@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.BadRequestFault;
@@ -46,6 +45,7 @@ import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
@@ -91,8 +91,8 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     LOGGER.info (sLogPrefix + "Starting outbound migration for Service Group ID '" + sServiceGroupID + "'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
-    SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+    SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
@@ -121,7 +121,8 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     // Check that service group exists
     if (!aServiceGroupMgr.containsSMPServiceGroupWithID (aServiceGroupID))
     {
-      throw new SMPBadRequestException ("The Service Group '" + sServiceGroupID + "' does not exist", aDataProvider.getCurrentURI ());
+      throw new SMPBadRequestException ("The Service Group '" + sServiceGroupID + "' does not exist",
+                                        aDataProvider.getCurrentURI ());
     }
 
     // Ensure no existing migration is in process
@@ -142,11 +143,15 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
       // Create a random migration key,
       // Than call SML
       sMigrationKey = aCaller.prepareToMigrate (aServiceGroupID, SMPServerConfiguration.getSMLSMPID ());
-      LOGGER.info (sLogPrefix + "Successfully called prepareToMigrate on SML. Created migration key is '" + sMigrationKey + "'");
+      LOGGER.info (sLogPrefix +
+                   "Successfully called prepareToMigrate on SML. Created migration key is '" +
+                   sMigrationKey +
+                   "'");
     }
     catch (final BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault | ClientTransportException ex)
     {
-      throw new SMPSMLException ("Failed to call prepareToMigrate on SML for Service Group '" + sServiceGroupID + "'", ex);
+      throw new SMPSMLException ("Failed to call prepareToMigrate on SML for Service Group '" + sServiceGroupID + "'",
+                                 ex);
     }
 
     // Remember internally
@@ -154,10 +159,15 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
                                                                                                              sMigrationKey);
     if (aMigration == null)
     {
-      throw new SMPInternalErrorException ("Failed to create outbound Participant Migration for '" + sServiceGroupID + "' internally");
+      throw new SMPInternalErrorException ("Failed to create outbound Participant Migration for '" +
+                                           sServiceGroupID +
+                                           "' internally");
     }
 
-    LOGGER.info (sLogPrefix + "Successfully created outbound Participant Migration with ID '" + aMigration.getID () + "' internally.");
+    LOGGER.info (sLogPrefix +
+                 "Successfully created outbound Participant Migration with ID '" +
+                 aMigration.getID () +
+                 "' internally.");
 
     // Build result
     final IMicroDocument aResponseDoc = new MicroDocument ();

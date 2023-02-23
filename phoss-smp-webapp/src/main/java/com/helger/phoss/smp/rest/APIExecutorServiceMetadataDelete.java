@@ -22,13 +22,13 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -53,18 +53,22 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
     }
 
     final String sDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:
-        new SMPServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID, sDocumentTypeID, aBasicAuth);
+        new SMPServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID, sDocumentTypeID, aCredentials);
         break;
       case OASIS_BDXR_V1:
-        new BDXR1ServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID, sDocumentTypeID, aBasicAuth);
+        new BDXR1ServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID,
+                                                                      sDocumentTypeID,
+                                                                      aCredentials);
         break;
       case OASIS_BDXR_V2:
-        new BDXR2ServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID, sDocumentTypeID, aBasicAuth);
+        new BDXR2ServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID,
+                                                                      sDocumentTypeID,
+                                                                      aCredentials);
         break;
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");

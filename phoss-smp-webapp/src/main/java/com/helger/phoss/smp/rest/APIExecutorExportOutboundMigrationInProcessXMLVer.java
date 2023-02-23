@@ -28,7 +28,6 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
@@ -37,6 +36,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -70,8 +70,8 @@ public final class APIExecutorExportOutboundMigrationInProcessXMLVer extends Abs
       LOGGER.info (sLogPrefix + "Starting Export for all with outbound migration state 'in progress'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
-    SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+    SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     // Start action after authentication
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();

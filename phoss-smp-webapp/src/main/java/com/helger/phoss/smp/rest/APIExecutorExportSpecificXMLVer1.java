@@ -27,7 +27,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -38,6 +37,7 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -72,8 +72,8 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
       LOGGER.info (sLogPrefix + "Starting Export of '" + sPathServiceGroupID + "'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
-    SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+    SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     // Start action after authentication
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();

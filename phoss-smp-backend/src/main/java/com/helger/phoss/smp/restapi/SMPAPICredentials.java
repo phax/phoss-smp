@@ -14,6 +14,7 @@ import com.helger.http.basicauth.BasicAuthClientCredentials;
  * That may either be a pair of username and password or a User Token.
  *
  * @author Philip Helger
+ * @since 6.1.0
  */
 @Immutable
 public class SMPAPICredentials

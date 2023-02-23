@@ -27,7 +27,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -35,6 +34,7 @@ import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.security.user.IUser;
@@ -70,20 +70,20 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
       LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
-    final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+    final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     // Start action after authentication
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
 
-    if (!aBasicAuth.getUserName ().equals (sPathUserLoginName))
+    if (!aUser.getLoginName ().equals (sPathUserLoginName))
     {
       throw new SMPUnauthorizedException ("URL user '" +
                                           sPathUserLoginName +
                                           "' does not match HTTP Basic Auth user name '" +
-                                          aBasicAuth.getUserName () +
+                                          aUser.getLoginName () +
                                           "'",
                                           aDataProvider.getCurrentURI ());
     }

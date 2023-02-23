@@ -22,13 +22,13 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -52,19 +52,19 @@ public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
                                                 aDataProvider.getCurrentURI ());
     }
 
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
     final boolean bDeleteInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("delete-in-sml"));
 
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:
-        new SMPServerAPI (aDataProvider).deleteServiceGroup (sPathServiceGroupID, bDeleteInSML, aBasicAuth);
+        new SMPServerAPI (aDataProvider).deleteServiceGroup (sPathServiceGroupID, bDeleteInSML, aCredentials);
         break;
       case OASIS_BDXR_V1:
-        new BDXR1ServerAPI (aDataProvider).deleteServiceGroup (sPathServiceGroupID, bDeleteInSML, aBasicAuth);
+        new BDXR1ServerAPI (aDataProvider).deleteServiceGroup (sPathServiceGroupID, bDeleteInSML, aCredentials);
         break;
       case OASIS_BDXR_V2:
-        new BDXR2ServerAPI (aDataProvider).deleteServiceGroup (sPathServiceGroupID, bDeleteInSML, aBasicAuth);
+        new BDXR2ServerAPI (aDataProvider).deleteServiceGroup (sPathServiceGroupID, bDeleteInSML, aCredentials);
         break;
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");

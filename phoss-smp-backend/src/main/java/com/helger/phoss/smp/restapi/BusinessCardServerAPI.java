@@ -22,7 +22,6 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.pd.businesscard.generic.PDBusinessCard;
 import com.helger.pd.businesscard.generic.PDBusinessEntity;
 import com.helger.pd.businesscard.v3.PD3BusinessCardType;
@@ -124,7 +123,7 @@ public final class BusinessCardServerAPI
   @Nonnull
   public ESuccess createBusinessCard (@Nonnull final String sServiceGroupID,
                                       @Nonnull final PDBusinessCard aBusinessCard,
-                                      @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                      @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "PUT /businesscard/" + sServiceGroupID;
     final String sAction = "createBusinessCard";
@@ -217,7 +216,7 @@ public final class BusinessCardServerAPI
    * @since 5.0.2
    */
   public void deleteBusinessCard (@Nonnull final String sServiceGroupID,
-                                  @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                  @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /businesscard/" + sServiceGroupID;
     final String sAction = "deleteBusinessCard";

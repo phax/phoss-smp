@@ -22,13 +22,13 @@ import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletResponse;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -52,18 +52,18 @@ public final class APIExecutorServiceMetadataDeleteAll extends AbstractSMPAPIExe
                                                 aDataProvider.getCurrentURI ());
     }
 
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     switch (SMPServerConfiguration.getRESTType ())
     {
       case PEPPOL:
-        new SMPServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aBasicAuth);
+        new SMPServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aCredentials);
         break;
       case OASIS_BDXR_V1:
-        new BDXR1ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aBasicAuth);
+        new BDXR1ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aCredentials);
         break;
       case OASIS_BDXR_V2:
-        new BDXR2ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aBasicAuth);
+        new BDXR2ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aCredentials);
         break;
       default:
         throw new UnsupportedOperationException ("Unsupported REST type specified!");

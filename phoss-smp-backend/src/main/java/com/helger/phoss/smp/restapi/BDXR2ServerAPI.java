@@ -31,7 +31,6 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -162,7 +161,7 @@ public final class BDXR2ServerAPI
   public void saveServiceGroup (@Nonnull final String sPathServiceGroupID,
                                 @Nonnull final ServiceGroupType aServiceGroup,
                                 final boolean bCreateInSML,
-                                @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "PUT /" +
@@ -237,7 +236,7 @@ public final class BDXR2ServerAPI
   @Nonnull
   public EChange deleteServiceGroup (@Nonnull final String sPathServiceGroupID,
                                      final boolean bDeleteInSML,
-                                     @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                     @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "DELETE /" +
@@ -363,7 +362,7 @@ public final class BDXR2ServerAPI
   public ESuccess saveServiceRegistration (@Nonnull final String sPathServiceGroupID,
                                            @Nonnull final String sPathDocumentTypeID,
                                            @Nonnull final ServiceMetadataType aServiceMetadata,
-                                           @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                           @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + "/services/" + sPathDocumentTypeID;
     final String sAction = "saveServiceRegistration";
@@ -587,7 +586,7 @@ public final class BDXR2ServerAPI
 
   public void deleteServiceRegistration (@Nonnull final String sPathServiceGroupID,
                                          @Nonnull final String sPathDocTypeID,
-                                         @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                         @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "deleteServiceRegistration";
@@ -687,7 +686,7 @@ public final class BDXR2ServerAPI
   }
 
   public void deleteServiceRegistrations (@Nonnull final String sPathServiceGroupID,
-                                          @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                          @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/";
     final String sAction = "deleteServiceRegistrations";

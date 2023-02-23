@@ -54,7 +54,9 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
     _logRestException (sMsg, t, false);
   }
 
-  private static void _logRestException (@Nonnull final String sMsg, @Nonnull final Throwable t, final boolean bForceNoStackTrace)
+  private static void _logRestException (@Nonnull final String sMsg,
+                                         @Nonnull final Throwable t,
+                                         final boolean bForceNoStackTrace)
   {
     final boolean bConfiguredToLog = SMPServerConfiguration.isRESTLogExceptions ();
     if (bConfiguredToLog)
@@ -137,21 +139,27 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
     {
       // Forcing no stack trace, because the context should be self-explanatory
       _logRestException ("Bad request", aThrowable, true);
-      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_BAD_REQUEST, getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              CHttp.HTTP_BAD_REQUEST,
+                              getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPPreconditionFailedException)
     {
       // Forcing no stack trace, because the context should be self-explanatory
       _logRestException ("Precondition failed", aThrowable, true);
-      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_PRECONDITION_FAILED, getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              CHttp.HTTP_PRECONDITION_FAILED,
+                              getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPServerException)
     {
       // Generic fallback only
       _logRestException ("Generic SMP error", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_INTERNAL_SERVER_ERROR, getResponseEntityWithoutStackTrace (aThrowable));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              CHttp.HTTP_INTERNAL_SERVER_ERROR,
+                              getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof RuntimeException)

@@ -39,7 +39,6 @@ import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
 import com.helger.commons.mutable.MutableInt;
 import com.helger.commons.timing.StopWatch;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
@@ -57,6 +56,7 @@ import com.helger.phoss.smp.exchange.ImportActionItem;
 import com.helger.phoss.smp.exchange.ImportSummary;
 import com.helger.phoss.smp.exchange.ServiceGroupImport;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -106,8 +106,8 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     LOGGER.info (sLogPrefix + "Starting Import");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
-    SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+    SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     // Start action after authentication
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -126,13 +126,23 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     {
       // Cannot set the owner to a deleted user
       // Setting the owner to a disabled user might make sense
-      throw new SMPBadRequestException (sLogPrefix + "The user ID or login name '" + sPathUserLoginName + "' does not exist",
+      throw new SMPBadRequestException (sLogPrefix +
+                                        "The user ID or login name '" +
+                                        sPathUserLoginName +
+                                        "' does not exist",
                                         aDataProvider.getCurrentURI ());
     }
 
-    LOGGER.info (sLogPrefix + "Using '" + aDefaultOwner.getID () + "' / '" + aDefaultOwner.getLoginName () + "' as the default owner");
+    LOGGER.info (sLogPrefix +
+                 "Using '" +
+                 aDefaultOwner.getID () +
+                 "' / '" +
+                 aDefaultOwner.getLoginName () +
+                 "' as the default owner");
 
-    final boolean bOverwriteExisting = aRequestScope.params ().getAsBoolean (PARAM_OVERVWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
+    final boolean bOverwriteExisting = aRequestScope.params ()
+                                                    .getAsBoolean (PARAM_OVERVWRITE_EXISTING,
+                                                                   DEFAULT_OVERWRITE_EXISTING);
 
     final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
     final IMicroDocument aDoc = MicroReader.readMicroXML (aPayload);
@@ -145,7 +155,8 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     final String sVersion = aDoc.getDocumentElement ().getAttributeValue (CSMPExchange.ATTR_VERSION);
     if (!CSMPExchange.VERSION_10.equals (sVersion))
     {
-      throw new SMPBadRequestException ("The provided payload is not an XML file version 1.0", aDataProvider.getCurrentURI ());
+      throw new SMPBadRequestException ("The provided payload is not an XML file version 1.0",
+                                        aDataProvider.getCurrentURI ());
     }
 
     // Version 1.0

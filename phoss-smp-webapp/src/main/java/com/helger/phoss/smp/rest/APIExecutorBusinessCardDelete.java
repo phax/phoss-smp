@@ -22,12 +22,12 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BusinessCardServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -59,9 +59,9 @@ public final class APIExecutorBusinessCardDelete extends AbstractSMPAPIExecutor
                                                 aDataProvider.getCurrentURI ());
     }
 
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
-    new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID, aBasicAuth);
+    new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID, aCredentials);
     aUnifiedResponse.setStatus (CHttp.HTTP_OK);
   }
 }

@@ -26,7 +26,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.state.ESuccess;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
@@ -34,6 +33,7 @@ import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -69,7 +69,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
       throw new SMPBadRequestException ("Failed to parse provided payload as XML", aDataProvider.getCurrentURI ());
     }
 
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
     final boolean bCreateInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("create-in-sml"));
 
     ESuccess eSuccess = ESuccess.FAILURE;
@@ -83,7 +83,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
           new SMPServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID,
                                                              aServiceGroup,
                                                              bCreateInSML,
-                                                             aBasicAuth);
+                                                             aCredentials);
           eSuccess = ESuccess.SUCCESS;
         }
         break;
@@ -96,7 +96,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
           new BDXR1ServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID,
                                                                aServiceGroup,
                                                                bCreateInSML,
-                                                               aBasicAuth);
+                                                               aCredentials);
           eSuccess = ESuccess.SUCCESS;
         }
         break;
@@ -109,7 +109,7 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
           new BDXR2ServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID,
                                                                aServiceGroup,
                                                                bCreateInSML,
-                                                               aBasicAuth);
+                                                               aCredentials);
           eSuccess = ESuccess.SUCCESS;
         }
         break;

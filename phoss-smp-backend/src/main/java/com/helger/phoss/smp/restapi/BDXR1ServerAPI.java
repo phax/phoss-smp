@@ -29,7 +29,6 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
 import com.helger.commons.statistics.StatisticsManager;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -173,7 +172,7 @@ public final class BDXR1ServerAPI
 
   @Nonnull
   public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sPathUserID,
-                                                                     @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                                                     @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /list/" + sPathUserID;
     final String sAction = "getServiceGroupReferenceList";
@@ -184,17 +183,18 @@ public final class BDXR1ServerAPI
 
     try
     {
-      if (!aCredentials.getUserName ().equals (sPathUserID))
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+
+      if (!aSMPUser.getLoginName ().equals (sPathUserID))
       {
         throw new SMPUnauthorizedException ("URL user name '" +
                                             sPathUserID +
-                                            "' does not match HTTP Basic Auth user name '" +
-                                            aCredentials.getUserName () +
-                                            "'",
+                                            "' does not match the user name '" +
+                                            aSMPUser.getLoginName () +
+                                            "' derived from the credentials",
                                             m_aAPIDataProvider.getCurrentURI ());
       }
 
-      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
       final ICommonsList <ISMPServiceGroup> aServiceGroups = aSGMgr.getAllSMPServiceGroupsOfOwner (aSMPUser.getID ());
 
@@ -289,7 +289,7 @@ public final class BDXR1ServerAPI
   public void saveServiceGroup (@Nonnull final String sPathServiceGroupID,
                                 @Nonnull final ServiceGroupType aServiceGroup,
                                 final boolean bCreateInSML,
-                                @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "PUT /" +
@@ -364,7 +364,7 @@ public final class BDXR1ServerAPI
   @Nonnull
   public EChange deleteServiceGroup (@Nonnull final String sPathServiceGroupID,
                                      final boolean bDeleteInSML,
-                                     @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                     @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "DELETE /" +
@@ -491,7 +491,7 @@ public final class BDXR1ServerAPI
   public ESuccess saveServiceRegistration (@Nonnull final String sPathServiceGroupID,
                                            @Nonnull final String sPathDocumentTypeID,
                                            @Nonnull final ServiceMetadataType aServiceMetadata,
-                                           @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                           @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + "/services/" + sPathDocumentTypeID;
     final String sAction = "saveServiceRegistration";
@@ -688,7 +688,7 @@ public final class BDXR1ServerAPI
 
   public void deleteServiceRegistration (@Nonnull final String sPathServiceGroupID,
                                          @Nonnull final String sPathDocTypeID,
-                                         @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                         @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "deleteServiceRegistration";
@@ -788,7 +788,7 @@ public final class BDXR1ServerAPI
   }
 
   public void deleteServiceRegistrations (@Nonnull final String sPathServiceGroupID,
-                                          @Nonnull final BasicAuthClientCredentials aCredentials) throws SMPServerException
+                                          @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/";
     final String sAction = "deleteServiceRegistrations";

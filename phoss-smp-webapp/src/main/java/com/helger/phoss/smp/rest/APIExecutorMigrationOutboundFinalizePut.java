@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -39,6 +38,7 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -74,8 +74,8 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
     LOGGER.info (sLogPrefix + "Finalizing outbound migration for Service Group ID '" + sServiceGroupID + "'");
 
     // Only authenticated user may do so
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
-    SMPUserManagerPhoton.validateUserCredentials (aBasicAuth);
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+    SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -94,7 +94,9 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
                                                                                                                  aServiceGroupID);
     if (aMigration == null)
     {
-      throw new SMPBadRequestException ("Failed to resolve outbound participant migration for Service Group ID '" + sServiceGroupID + "'",
+      throw new SMPBadRequestException ("Failed to resolve outbound participant migration for Service Group ID '" +
+                                        sServiceGroupID +
+                                        "'",
                                         aDataProvider.getCurrentURI ());
     }
 
@@ -103,7 +105,8 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
     final EParticipantMigrationState eOldState = aMigration.getState ();
 
     // Migrate state
-    if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.MIGRATED).isUnchanged ())
+    if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.MIGRATED)
+                                .isUnchanged ())
     {
       throw new SMPBadRequestException ("The participant migration with ID '" + sMigrationID + "' is already finalized",
                                         aDataProvider.getCurrentURI ());
@@ -129,7 +132,9 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
       }
       else
       {
-        throw new SMPBadRequestException ("The SMP Service Group for participant '" + sServiceGroupID + "' could not be deleted",
+        throw new SMPBadRequestException ("The SMP Service Group for participant '" +
+                                          sServiceGroupID +
+                                          "' could not be deleted",
                                           aDataProvider.getCurrentURI ());
       }
     }

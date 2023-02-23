@@ -26,7 +26,6 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.state.ESuccess;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
@@ -34,6 +33,7 @@ import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
@@ -70,7 +70,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
     }
 
     final String sDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
-    final BasicAuthClientCredentials aBasicAuth = getMandatoryAuth (aRequestScope.headers ());
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     ESuccess eSuccess = ESuccess.FAILURE;
     switch (SMPServerConfiguration.getRESTType ())
@@ -83,7 +83,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
           eSuccess = new SMPServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
                                                                                sDocumentTypeID,
                                                                                aServiceMetadata,
-                                                                               aBasicAuth);
+                                                                               aCredentials);
         }
         break;
       }
@@ -95,7 +95,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
           eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
                                                                                  sDocumentTypeID,
                                                                                  aServiceMetadata,
-                                                                                 aBasicAuth);
+                                                                                 aCredentials);
         }
         break;
       }
@@ -107,7 +107,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
           eSuccess = new BDXR2ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
                                                                                  sDocumentTypeID,
                                                                                  aServiceMetadata,
-                                                                                 aBasicAuth);
+                                                                                 aCredentials);
         }
         break;
       }

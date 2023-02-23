@@ -15,6 +15,7 @@ import com.helger.http.basicauth.BasicAuthClientCredentials;
  * Test class for class {@link SMPAPICredentials}.
  *
  * @author Philip Helger
+ * @since 6.1.0
  */
 public final class SMPAPICredentialsTest
 {

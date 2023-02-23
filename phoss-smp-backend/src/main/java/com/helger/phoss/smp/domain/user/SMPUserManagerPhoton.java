@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -22,7 +23,10 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exception.SMPUnknownUserException;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.token.user.IUserToken;
+import com.helger.photon.security.token.user.IUserTokenManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
 
@@ -53,28 +57,70 @@ public final class SMPUserManagerPhoton
    *         If the password is invalid or if the user is marked as disabled
    */
   @Nonnull
-  public static IUser validateUserCredentials (@Nonnull final BasicAuthClientCredentials aCredentials) throws SMPUnknownUserException,
-                                                                                                       SMPUnauthorizedException
+  public static IUser validateUserCredentials (@Nonnull final SMPAPICredentials aCredentials) throws SMPUnknownUserException,
+                                                                                              SMPUnauthorizedException
   {
+    ValueEnforcer.notNull (aCredentials, "Credentials");
+
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
-    final IUser aUser = aUserMgr.getUserOfLoginName (aCredentials.getUserName ());
-    if (aUser == null || aUser.isDeleted ())
+
+    if (aCredentials.hasBasicAuth ())
     {
-      // Deleted users are handled like non-existing users
-      LOGGER.warn ("Invalid login name provided: '" + aCredentials.getUserName () + "'");
-      throw new SMPUnknownUserException (aCredentials.getUserName ());
+      final BasicAuthClientCredentials aBasicAuth = aCredentials.getBasicAuth ();
+      final IUser aUser = aUserMgr.getUserOfLoginName (aBasicAuth.getUserName ());
+      if (aUser == null || aUser.isDeleted ())
+      {
+        // Deleted users are handled like non-existing users
+        LOGGER.warn ("Invalid login name provided: '" + aBasicAuth.getUserName () + "'");
+        throw new SMPUnknownUserException (aBasicAuth.getUserName ());
+      }
+      if (!aUserMgr.areUserIDAndPasswordValid (aUser.getID (), aBasicAuth.getPassword ()))
+      {
+        LOGGER.warn ("Invalid password provided for '" + aBasicAuth.getUserName () + "'");
+        throw new SMPUnauthorizedException ("Username and/or password are invalid!");
+      }
+      if (aUser.isDisabled ())
+      {
+        LOGGER.warn ("User '" + aBasicAuth.getUserName () + "' is disabled");
+        throw new SMPUnauthorizedException ("User is disabled!");
+      }
+      return aUser;
     }
-    if (!aUserMgr.areUserIDAndPasswordValid (aUser.getID (), aCredentials.getPassword ()))
+
+    if (aCredentials.hasBearerToken ())
     {
-      LOGGER.warn ("Invalid password provided for '" + aCredentials.getUserName () + "'");
-      throw new SMPUnauthorizedException ("Username and/or password are invalid!");
+      final IUserTokenManager aUserTokenMgr = PhotonSecurityManager.getUserTokenMgr ();
+
+      final String sTokenString = aCredentials.getBearerToken ();
+      final IUserToken aUserToken = aUserTokenMgr.getUserTokenOfTokenString (sTokenString);
+      if (aUserToken == null)
+      {
+        // Deleted users are handled like non-existing users
+        LOGGER.warn ("Invalid Bearer token provided: '" + sTokenString + "'");
+        throw new SMPUnknownUserException ("{BearerToken}" + sTokenString);
+      }
+      if (aUserToken.isDeleted ())
+      {
+        // Deleted tokens are handled like non-existing token
+        LOGGER.warn ("Deleted Bearer token provided: '" + sTokenString + "'");
+        throw new SMPUnknownUserException ("{BearerToken}" + sTokenString);
+      }
+      final IUser aUser = aUserToken.getUser ();
+      if (aUser.isDeleted ())
+      {
+        // Deleted users are handled like non-existing users
+        LOGGER.warn ("The user to which the Bearer token '" + sTokenString + "' belongs is deleted");
+        throw new SMPUnknownUserException (aUser.getLoginName ());
+      }
+      if (aUser.isDisabled ())
+      {
+        LOGGER.warn ("User '" + aUser.getLoginName () + "' of Bearer token '" + sTokenString + "' is disabled");
+        throw new SMPUnauthorizedException ("User is disabled!");
+      }
+      return aUser;
     }
-    if (aUser.isDisabled ())
-    {
-      LOGGER.warn ("User '" + aCredentials.getUserName () + "' is disabled");
-      throw new SMPUnauthorizedException ("User is disabled!");
-    }
-    return aUser;
+
+    throw new IllegalStateException ("Unsupported credential method provided!");
   }
 
   public static void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
