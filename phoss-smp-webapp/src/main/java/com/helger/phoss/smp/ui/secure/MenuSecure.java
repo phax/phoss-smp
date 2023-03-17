@@ -113,6 +113,11 @@ public final class MenuSecure
         LOGGER.warn ("The 'Administration / Monitoring / Sessions' page was explicitly disabled via the configuration.");
         aMenuTree.removeItemWithID (BootstrapPagesMenuConfigurator.MENU_ADMIN_MONITORING_SESSIONS);
       }
+      if (SMPWebAppConfiguration.isWebAppPageEnvVarsDisabled ())
+      {
+        LOGGER.warn ("The 'Administration / System Information / Environment Variables' page was explicitly disabled via the configuration.");
+        aMenuTree.removeItemWithID (BootstrapPagesMenuConfigurator.MENU_ADMIN_SYSINFO_ENVVARS);
+      }
     }
 
     // Default menu item

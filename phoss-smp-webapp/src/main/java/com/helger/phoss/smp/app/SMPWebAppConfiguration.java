@@ -365,11 +365,24 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    * @return <code>true</code> if the "Administration / Monitoring / Sessions"
    *         page should be disabled (for security reasons), <code>false</code>
    *         to show it (also the default).
+   * @since 6.0.0
    */
   public static boolean isWebAppPageSessionManagmentDisabled ()
   {
     // Enable by default
     return _getConfig ().getAsBoolean ("webapp.page.admin.monitoring.sessions.disabled", false);
+  }
+
+  /**
+   * @return <code>true</code> if the "Administration / System Information /
+   *         Environment Variables" page should be disabled (for security
+   *         reasons), <code>false</code> to show it (also the default).
+   * @since 6.0.8
+   */
+  public static boolean isWebAppPageEnvVarsDisabled ()
+  {
+    // Enable by default
+    return _getConfig ().getAsBoolean ("webapp.page.admin.sysinfo.envvars.disabled", false);
   }
 
   /**
