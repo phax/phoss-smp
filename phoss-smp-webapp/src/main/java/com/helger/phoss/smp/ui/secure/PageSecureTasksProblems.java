@@ -38,6 +38,7 @@ import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.lang.ClassHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.SimpleURL;
+import com.helger.commons.url.URLHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.grouping.HCUL;
@@ -99,12 +100,22 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
   private void _checkSettings (@Nonnull final HCOL aOL)
   {
     // Check that public URL is set
-    if (StringHelper.hasNoText (SMPServerConfiguration.getPublicServerURL ()))
+
+    final String sPublicUrl = SMPServerConfiguration.getPublicServerURL ();
+    if (StringHelper.hasNoText (sPublicUrl))
     {
       aOL.addItem (_createWarning ("The public server URL is not configured"),
                    div ("The configuration file property ").addChild (code (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
                                                            .addChild (" is not set. This property is usually required to create valid Internet-URLs."));
     }
+    else
+      if (URLHelper.getAsURL (sPublicUrl, false) == null)
+      {
+        aOL.addItem (_createError ("The public server URL configuration is invalid."),
+                     div ("The configuration file property ").addChild (code (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
+                                                             .addChild (" is not a valid URL: ")
+                                                             .addChild (code (sPublicUrl)));
+      }
 
     // Check that the global debug setting is off
     if (GlobalDebug.isDebugMode ())

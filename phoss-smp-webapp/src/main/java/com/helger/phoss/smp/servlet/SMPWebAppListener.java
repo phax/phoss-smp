@@ -38,6 +38,7 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.lang.priviledged.IPrivilegedAction;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.url.URLHelper;
 import com.helger.network.proxy.ProxySelectorProxySettingsManager;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.IProxySettingsProvider;
@@ -101,18 +102,21 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
+  @Nullable
   protected String getInitParameterDebug (@Nonnull final ServletContext aSC)
   {
     return SMPWebAppConfiguration.getGlobalDebug ();
   }
 
   @Override
+  @Nullable
   protected String getInitParameterProduction (@Nonnull final ServletContext aSC)
   {
     return SMPWebAppConfiguration.getGlobalProduction ();
   }
 
   @Override
+  @Nullable
   protected String getDataPath (@Nonnull final ServletContext aSC)
   {
     return SMPWebAppConfiguration.getDataPath ();
@@ -125,10 +129,22 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
+  @Nullable
   protected String getInitParameterServerURL (@Nonnull final ServletContext aSC, final boolean bProductionMode)
   {
     // This is internally set in "StaticServerInfo" class
-    return SMPServerConfiguration.getPublicServerURL ();
+    final String sPublicURL = SMPServerConfiguration.getPublicServerURL ();
+    if (StringHelper.hasText (sPublicURL))
+    {
+      // Check validity (see #237)
+      if (URLHelper.getAsURL (sPublicURL, false) != null)
+        return sPublicURL;
+
+      final String sErrorMsg = "The configured public URL '" + sPublicURL + "' is not a valid URL!";
+      LOGGER.error (sErrorMsg);
+      throw new InitializationException (sErrorMsg);
+    }
+    return null;
   }
 
   private static void _initTimeZone ()

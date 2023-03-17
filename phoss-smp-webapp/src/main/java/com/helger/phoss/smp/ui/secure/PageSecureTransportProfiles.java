@@ -77,7 +77,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
   private static final ICommonsSet <String> DEFAULT_PROFILE_IDS;
   static
   {
-    // Use all non-deprecated ones
+    // Use all active ones
     DEFAULT_PROFILES.addAll (ESMPTransportProfile.values (), x -> x.getState () == ESMPTransportProfileState.ACTIVE);
     DEFAULT_PROFILE_IDS = new CommonsHashSet <> (DEFAULT_PROFILES, ESMPTransportProfile::getID);
   }
@@ -127,7 +127,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
                             {
                               if (aTransportProfileMgr.createSMPTransportProfile (eTP.getID (),
                                                                                   eTP.getName (),
-                                                                                  eTP.isDeprecated ()) != null)
+                                                                                  eTP.getState () == ESMPTransportProfileState.DEPRECATED) != null)
                               {
                                 aSuccessBox.addChild (div ("Successfully created the transport profile '" +
                                                            eTP.getName () +
@@ -202,7 +202,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("ID").setCtrl (aSelectedObject.getID ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aSelectedObject.getName ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Deprecated?")
-                                                 .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedObject.isDeprecated (),
+                                                 .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedObject.getState () == ESMPTransportProfileState.DEPRECATED,
                                                                                        aDisplayLocale)));
 
     aNodeList.addChild (aForm);
@@ -239,7 +239,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Deprecated?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_DEPRECATED,
-                                                                                                    aSelectedObject != null ? aSelectedObject.isDeprecated ()
+                                                                                                    aSelectedObject != null ? aSelectedObject.getState () == ESMPTransportProfileState.DEPRECATED
                                                                                                                             : DEFAULT_DEPRECATED)))
                                                  .setHelpText ("Is the transport profile deprecated?")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DEPRECATED)));
@@ -330,7 +330,8 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (aCurObject.getID ()));
       aRow.addCell (aCurObject.getName ());
-      aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.isDeprecated (), aDisplayLocale));
+      aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.getState () == ESMPTransportProfileState.DEPRECATED,
+                                                aDisplayLocale));
 
       aRow.addCell (createEditLink (aWPEC, aCurObject, "Edit " + aCurObject.getID ()),
                     new HCTextNode (" "),
