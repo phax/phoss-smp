@@ -21,9 +21,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +42,10 @@ import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+
 /**
  * Create many service groups - please make sure the SML connection is not
  * enabled.
@@ -57,7 +58,8 @@ public final class MainCreateManyServiceGroups
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+                                                 @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))
@@ -110,7 +112,8 @@ public final class MainCreateManyServiceGroups
                                                        .target (sServerBasePath)
                                                        .path (sPI)
                                                        .request ()
-                                                       .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
+                                                       .header (CHttpHeader.AUTHORIZATION,
+                                                                CREDENTIALS.getRequestValue ())
                                                        .put (Entity.xml (aObjFactory.createServiceGroup (aSG)));
             _testResponseJerseyClient (aResponseMsg, 200);
           }

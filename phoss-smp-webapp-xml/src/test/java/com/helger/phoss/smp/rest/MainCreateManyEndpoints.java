@@ -19,9 +19,6 @@ package com.helger.phoss.smp.rest;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +50,10 @@ import com.helger.xsds.peppol.smp1.ServiceEndpointList;
 import com.helger.xsds.peppol.smp1.ServiceInformationType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+
 /**
  * Create one million endpoints. Run this AFTER
  * {@link MainCreateManyServiceGroups}.
@@ -75,6 +76,7 @@ public final class MainCreateManyEndpoints
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
+  @SuppressWarnings ("deprecation")
   public static void main (final String [] args) throws Throwable
   {
     final String sServerBasePath = "http://localhost:90";

@@ -19,7 +19,6 @@ package com.helger.phoss.smp.rest;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletResponse;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
@@ -33,6 +32,8 @@ import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public final class APIExecutorServiceMetadataDeleteAll extends AbstractSMPAPIExecutor
 {

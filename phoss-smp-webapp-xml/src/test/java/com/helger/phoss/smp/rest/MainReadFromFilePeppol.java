@@ -20,9 +20,6 @@ import java.io.File;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +36,10 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.security.CSecurity;
+
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Create one million endpoints. Run this AFTER

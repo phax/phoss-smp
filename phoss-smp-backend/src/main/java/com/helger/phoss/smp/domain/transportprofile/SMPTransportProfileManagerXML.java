@@ -21,6 +21,7 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
 import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
@@ -55,7 +56,10 @@ public final class SMPTransportProfileManagerXML extends
     if (containsWithID (sID))
       return null;
 
-    final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID, sName, bIsDeprecated);
+    final SMPTransportProfile aSMPTransportProfile = new SMPTransportProfile (sID,
+                                                                              sName,
+                                                                              bIsDeprecated ? ESMPTransportProfileState.DEPRECATED
+                                                                                            : ESMPTransportProfileState.ACTIVE);
 
     m_aRWLock.writeLocked ( () -> {
       internalCreateItem (aSMPTransportProfile);
@@ -81,7 +85,8 @@ public final class SMPTransportProfileManagerXML extends
     {
       EChange eChange = EChange.UNCHANGED;
       eChange = eChange.or (aSMPTransportProfile.setName (sName));
-      eChange = eChange.or (aSMPTransportProfile.setDeprecated (bIsDeprecated));
+      eChange = eChange.or (aSMPTransportProfile.setState (bIsDeprecated ? ESMPTransportProfileState.DEPRECATED
+                                                                         : ESMPTransportProfileState.ACTIVE));
       if (eChange.isUnchanged ())
         return EChange.UNCHANGED;
 

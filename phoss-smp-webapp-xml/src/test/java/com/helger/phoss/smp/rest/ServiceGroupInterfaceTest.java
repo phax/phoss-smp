@@ -24,11 +24,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,6 +51,12 @@ import com.helger.smpclient.peppol.SMPClient;
 import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
+
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation.Builder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Test class for class {@link SMPRestFilter}

@@ -19,9 +19,6 @@ package com.helger.phoss.smp.rest;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +53,10 @@ import com.helger.xsds.peppol.smp1.ServiceEndpointList;
 import com.helger.xsds.peppol.smp1.ServiceInformationType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+
 /**
  * Create one million endpoints. Run this AFTER
  * {@link MainCreate1MillionServiceGroups}.
@@ -68,7 +69,8 @@ public final class MainCreate1MillionEndpoints
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
+  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+                                                 @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
     if (StringHelper.hasText (sResponse))

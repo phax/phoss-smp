@@ -80,7 +80,8 @@ public final class NiceNameUI
     ret.addChild (new BootstrapBadge (eType).addChild (sName));
     if (bIsDeprecated)
     {
-      ret.addChild (" ").addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Identifier is deprecated"));
+      ret.addChild (" ")
+         .addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Identifier is deprecated"));
     }
     if (bInDetails)
     {
@@ -90,11 +91,17 @@ public final class NiceNameUI
   }
 
   @Nonnull
-  private static IHCNode _createID (@Nonnull final String sID, @Nullable final NiceNameEntry aNiceName, final boolean bInDetails)
+  private static IHCNode _createID (@Nonnull final String sID,
+                                    @Nullable final NiceNameEntry aNiceName,
+                                    final boolean bInDetails)
   {
     if (aNiceName == null)
       return createFormattedID (sID, null, null, false, bInDetails);
-    return createFormattedID (sID, aNiceName.getName (), EBootstrapBadgeType.SUCCESS, aNiceName.isDeprecated (), bInDetails);
+    return createFormattedID (sID,
+                              aNiceName.getName (),
+                              EBootstrapBadgeType.SUCCESS,
+                              aNiceName.isDeprecated (),
+                              bInDetails);
   }
 
   @Nonnull
@@ -132,6 +139,10 @@ public final class NiceNameUI
     final ISMPTransportProfile aTP = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfile);
     if (aTP == null)
       return createFormattedID (sTransportProfile, null, null, false, bInDetails);
-    return createFormattedID (sTransportProfile, aTP.getName (), EBootstrapBadgeType.SUCCESS, aTP.isDeprecated (), bInDetails);
+    return createFormattedID (sTransportProfile,
+                              aTP.getName (),
+                              EBootstrapBadgeType.SUCCESS,
+                              aTP.getState ().isDeprecated (),
+                              bInDetails);
   }
 }

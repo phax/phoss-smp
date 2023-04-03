@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.ui.secure.hc;
 
 import java.util.Comparator;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
@@ -36,18 +37,20 @@ public class HCSMPTransportProfileSelect extends HCSelect
 {
   @Nonnull
   @Nonempty
-  public static String getDisplayName (@Nonnull final ISMPTransportProfile aTP)
+  public static String getDisplayName (@Nonnull final ISMPTransportProfile aTP, @Nonnull final Locale aDisplayLocale)
   {
-    return aTP.getName () + " (" + aTP.getID () + ")" + (aTP.isDeprecated () ? " [deprecated]" : "");
+    final String sSuffix = aTP.getState ().isActive () ? ""
+                                                       : " [" + aTP.getState ().getDisplayText (aDisplayLocale) + "]";
+    return aTP.getName () + " (" + aTP.getID () + ")" + sSuffix;
   }
 
-  public HCSMPTransportProfileSelect (@Nonnull final RequestField aRF)
+  public HCSMPTransportProfileSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
   {
     super (aRF);
 
     for (final ISMPTransportProfile aTP : SMPMetaManager.getTransportProfileMgr ()
                                                         .getAllSMPTransportProfiles ()
                                                         .getSortedInline (Comparator.comparing (IHasName::getName)))
-      addOption (aTP.getID (), getDisplayName (aTP));
+      addOption (aTP.getID (), getDisplayName (aTP, aDisplayLocale));
   }
 }

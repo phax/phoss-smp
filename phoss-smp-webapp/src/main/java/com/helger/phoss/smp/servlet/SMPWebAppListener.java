@@ -21,7 +21,6 @@ import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.servlet.ServletContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +80,8 @@ import com.helger.servlet.response.UnifiedResponseDefaultSettings;
 import com.helger.smpclient.config.SMPClientConfiguration;
 import com.helger.wsclient.WSHelper;
 import com.helger.xservlet.requesttrack.RequestTrackerSettings;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Special SMP web app listener. This is the entry point for application

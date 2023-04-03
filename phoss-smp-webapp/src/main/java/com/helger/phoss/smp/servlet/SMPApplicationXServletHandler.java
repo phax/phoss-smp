@@ -18,8 +18,6 @@ package com.helger.phoss.smp.servlet;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-
 import com.helger.commons.http.CHttpHeader;
 import com.helger.http.csp.CSP2Directive;
 import com.helger.http.csp.CSP2Policy;
@@ -28,6 +26,8 @@ import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.servlet.ServletException;
 
 /**
  * CSP enabled application servlet handler

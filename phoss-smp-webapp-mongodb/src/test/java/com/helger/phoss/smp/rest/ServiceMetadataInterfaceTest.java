@@ -25,11 +25,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,6 +70,12 @@ import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceInformationType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
+
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation.Builder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Test class for class {@link SMPRestFilter}.
@@ -172,7 +173,8 @@ public final class ServiceMetadataInterfaceTest
       try
       {
         // PUT ServiceGroup
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
 
         // Read both
@@ -397,7 +399,8 @@ public final class ServiceMetadataInterfaceTest
       try
       {
         // PUT ServiceGroup
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
 
         assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
@@ -416,7 +419,8 @@ public final class ServiceMetadataInterfaceTest
                                                  .path (sDT)
                                                  .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
           _testResponseJerseyClient (aResponseMsg, 200);
-          assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+          assertNotNull (SMPMetaManager.getRedirectMgr ()
+                                       .getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
           // PUT 2 ServiceInformation
           aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
@@ -424,19 +428,22 @@ public final class ServiceMetadataInterfaceTest
                                                  .path (sDT)
                                                  .request ()).put (Entity.xml (m_aObjFactory.createServiceMetadata (aSM)));
           _testResponseJerseyClient (aResponseMsg, 200);
-          assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+          assertNotNull (SMPMetaManager.getRedirectMgr ()
+                                       .getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
 
           // DELETE 1 Redirect
           aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
           _testResponseJerseyClient (aResponseMsg, 200);
-          assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+          assertNull (SMPMetaManager.getRedirectMgr ()
+                                    .getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
         }
         finally
         {
           // DELETE 2 Redirect
           aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
           _testResponseJerseyClient (aResponseMsg, 200, 404);
-          assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+          assertNull (SMPMetaManager.getRedirectMgr ()
+                                    .getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDT));
         }
 
         assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
