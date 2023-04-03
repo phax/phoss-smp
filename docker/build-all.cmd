@@ -21,9 +21,11 @@ set version=7.0.0-rc1
 
 echo Docker login
 docker login --username phelger
+if errorlevel 1 goto end
 
 echo Starting buildx
 docker buildx create --name phoss-smp node-amd64
+if errorlevel 1 goto end
 
 rem --------------- XML -----------------------
 docker buildx build --platform=linux/amd64 --push --pull --build-arg SMP_VERSION=%version% -t phelger/smp:%version% -t phelger/smp:latest -t phelger/phoss-smp-xml:%version% -t phelger/phoss-smp-xml:latest -f Dockerfile-release-binary-xml .
