@@ -141,19 +141,6 @@
           <sourceDirectory>src/main/resources/css</sourceDirectory>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/NOTICE</exclude>
-            <exclude>**/LICENSE</exclude>
-            <exclude>conf/**</exclude>
-            <exclude>**/*.min.css</exclude>
-            <exclude>**/*.min.js</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
     </plugins>
   </build>  
 </project>

@@ -177,23 +177,6 @@
         <groupId>com.helger.maven</groupId>
         <artifactId>ph-csscompress-maven-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/NOTICE</exclude>
-            <exclude>**/LICENSE</exclude>
-            <exclude>conf/**</exclude>
-            <exclude>src/main/webapp/*.jsp</exclude>
-            <exclude>**/*.min.js</exclude>
-            <exclude>**/*.min.css</exclude>
-            <exclude>**/*.p12</exclude>
-            <exclude>**/*.jks</exclude>
-            <exclude>**/*.txt</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
     </plugins>
   </build>  
 </project>

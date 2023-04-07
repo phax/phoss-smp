@@ -270,23 +270,6 @@
 
     <plugins>
       <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/Dockerfile*</exclude>
-            <exclude>**/example*</exclude>
-            <exclude>**/LICENSE</exclude>
-            <exclude>**/NOTICE</exclude>
-            <exclude>**/*.j2</exclude>
-            <exclude>**/*.jks</exclude>
-            <exclude>**/*.p12</exclude>
-            <exclude>**/*.txt</exclude>
-            <exclude>docs/**</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
