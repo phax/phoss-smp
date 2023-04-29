@@ -58,8 +58,7 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
     m_aDataSource.setDefaultAutoCommit (Boolean.FALSE);
     m_aDataSource.setPoolPreparedStatements (true);
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Created new DataSource " + m_aDataSource);
+    LOGGER.info ("Created new DataSource " + m_aDataSource);
   }
 
   @Nonnull
@@ -78,9 +77,7 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
           LOGGER.debug ("Now closing DataSource");
 
         m_aDataSource.close ();
-
-        if (LOGGER.isInfoEnabled ())
-          LOGGER.info ("Successfully closed DataSource");
+        LOGGER.info ("Successfully closed DataSource");
       }
     }
     catch (final SQLException ex)

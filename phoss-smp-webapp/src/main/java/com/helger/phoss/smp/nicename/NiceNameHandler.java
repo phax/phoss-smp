@@ -63,8 +63,7 @@ public final class NiceNameHandler
   public static ICommonsOrderedMap <String, NiceNameEntry> readEntries (@Nonnull final IReadableResource aRes,
                                                                         final boolean bReadProcIDs)
   {
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Trying to read nice name entries from '" + aRes.getPath () + "'");
+    LOGGER.info ("Trying to read nice name entries from '" + aRes.getPath () + "'");
 
     final ICommonsOrderedMap <String, NiceNameEntry> ret = new CommonsLinkedHashMap <> ();
     final IMicroDocument aDoc = MicroReader.readMicroXML (aRes);
@@ -83,7 +82,6 @@ public final class NiceNameHandler
             aProcIDs.add (new SimpleProcessIdentifier (eItem.getAttributeValue ("scheme"),
                                                        eItem.getAttributeValue ("value")));
         }
-
         ret.put (sID, new NiceNameEntry (sName, bDeprecated, aProcIDs));
       }
     }
@@ -101,23 +99,19 @@ public final class NiceNameHandler
         aDocTypeIDRes = new FileSystemResource (sPath);
         if (!aDocTypeIDRes.exists ())
         {
-          if (LOGGER.isWarnEnabled ())
-            LOGGER.warn ("The configured document type nice name file '" + sPath + "' does not exist");
+          LOGGER.warn ("The configured document type nice name file '" + sPath + "' does not exist");
           // Enforce defaults
           aDocTypeIDRes = null;
         }
       }
-
       // Use defaults
       if (aDocTypeIDRes == null)
         aDocTypeIDRes = new ClassPathResource ("codelists/smp/doctypeid-mapping.xml");
 
       final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes, true);
       RW_LOCK.writeLocked ( () -> DOCTYPE_IDS.setAll (aDocTypeIDs));
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document type nice name entries");
+      LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document type nice name entries");
     }
-
     // Processes
     {
       IReadableResource aProcessIDRes = null;
@@ -127,21 +121,18 @@ public final class NiceNameHandler
         aProcessIDRes = new FileSystemResource (sPath);
         if (!aProcessIDRes.exists ())
         {
-          if (LOGGER.isWarnEnabled ())
-            LOGGER.warn ("The configured process nice name file '" + sPath + "' does not exist");
+          LOGGER.warn ("The configured process nice name file '" + sPath + "' does not exist");
           // Enforce defaults
           aProcessIDRes = null;
         }
       }
-
       // Use defaults
       if (aProcessIDRes == null)
         aProcessIDRes = new ClassPathResource ("codelists/smp/processid-mapping.xml");
 
       final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes, false);
       RW_LOCK.writeLocked ( () -> PROCESS_IDS.setAll (aProcessIDs));
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info ("Loaded " + aProcessIDs.size () + " process nice name entries");
+      LOGGER.info ("Loaded " + aProcessIDs.size () + " process nice name entries");
     }
   }
 

@@ -24,11 +24,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +50,12 @@ import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.client.Invocation.Builder;
+
 /**
  * Test class for class {@link SMPRestFilter}.
  *
@@ -76,7 +77,8 @@ public final class ServiceGroupInterfaceTest extends AbstractSMPWebAppSQLTest
     return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
-  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
+  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+                                                @Nonempty final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
@@ -122,7 +124,8 @@ public final class ServiceGroupInterfaceTest extends AbstractSMPWebAppSQLTest
       try
       {
         // PUT 1 - create
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
 
         // Both regular and upper case must work
@@ -132,9 +135,11 @@ public final class ServiceGroupInterfaceTest extends AbstractSMPWebAppSQLTest
         assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
 
         // PUT 2 - overwrite
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
-        aResponseMsg = _addCredentials (aTarget.path (sPI_UC).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_UC)
+                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
 
         // Both regular and upper case must work

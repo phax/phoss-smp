@@ -66,8 +66,7 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
     final String sPathUserLoginName = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
 
     final String sLogPrefix = "[REST API Export-ByOwner-XML-V1] ";
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");
+    LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");
 
     // Only authenticated user may do so
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
@@ -77,7 +76,6 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
-
     if (!aUser.getLoginName ().equals (sPathUserLoginName))
     {
       throw new SMPUnauthorizedException ("URL user '" +
@@ -87,7 +85,6 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
                                           "'",
                                           aDataProvider.getCurrentURI ());
     }
-
     // Now get all relevant service groups
     final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroupsOfOwner (aUser.getID ());
 
@@ -96,8 +93,7 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
                                                                       aSettings.isDirectoryIntegrationEnabled ());
     final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards);
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix + "Finished creating Export data");
+    LOGGER.info (sLogPrefix + "Finished creating Export data");
 
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();

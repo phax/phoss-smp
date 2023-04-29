@@ -68,8 +68,7 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
     final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
 
     final String sLogPrefix = "[REST API Export-Specific-XML-V1] ";
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix + "Starting Export of '" + sPathServiceGroupID + "'");
+    LOGGER.info (sLogPrefix + "Starting Export of '" + sPathServiceGroupID + "'");
 
     // Only authenticated user may do so
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
@@ -87,7 +86,6 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
       // Invalid identifier
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
-
     // Retrieve the service group
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
     if (aServiceGroup == null)
@@ -96,15 +94,13 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
       throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
                                       aDataProvider.getCurrentURI ());
     }
-
     final boolean bIncludeBusinessCards = aRequestScope.params ()
                                                        .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
                                                                       aSettings.isDirectoryIntegrationEnabled ());
     final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (new CommonsArrayList <> (aServiceGroup),
                                                                              bIncludeBusinessCards);
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix + "Finished creating Export data");
+    LOGGER.info (sLogPrefix + "Finished creating Export data");
 
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();

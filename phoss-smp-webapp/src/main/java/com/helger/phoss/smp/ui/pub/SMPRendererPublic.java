@@ -117,7 +117,6 @@ public final class SMPRendererPublic
     final IUser aUser = aLEC.getLoggedInUser ();
 
     final BootstrapNavbarToggleable aToggleable = aNavbar.addAndReturnToggleable ();
-
     if (aUser != null)
     {
       final Locale aDisplayLocale = aLEC.getDisplayLocale ();
@@ -168,8 +167,7 @@ public final class SMPRendererPublic
       {
         // Use custom external URL
         CUSTOM_LOGO_URL_CACHE = new SimpleURL (sExternalURL);
-        if (LOGGER.isInfoEnabled ())
-          LOGGER.info ("Using a custom external URL as logo: '" + sExternalURL + "'");
+        LOGGER.info ("Using a custom external URL as logo: '" + sExternalURL + "'");
       }
       else
       {
@@ -178,8 +176,7 @@ public final class SMPRendererPublic
         {
           // Use custom internal URL
           CUSTOM_LOGO_URL_CACHE = new SimpleURL (sInternalURL);
-          if (LOGGER.isInfoEnabled ())
-            LOGGER.info ("Using a custom internal URL as logo: '" + sInternalURL + "'");
+          LOGGER.info ("Using a custom internal URL as logo: '" + sInternalURL + "'");
         }
         else
         {
@@ -198,7 +195,7 @@ public final class SMPRendererPublic
    * @return The HC Node. Never <code>null</code>.
    */
   @Nonnull
-  public static final IHCNode createLogo (@Nonnull final ISimpleWebExecutionContext aSWEC)
+  public static IHCNode createLogo (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
 
@@ -210,7 +207,6 @@ public final class SMPRendererPublic
       // The default logo
       aLogoHref = LinkHelper.getStreamURL (aRequestScope, "/image/phoss-smp-136-50.png");
     }
-
     return new HCImg ().setSrc (aLogoHref)
                        .addStyle (CCSSProperties.MARGIN.newValue ("-15px"))
                        .addStyle (CCSSProperties.VERTICAL_ALIGN.newValue (CCSSValue.TOP))
@@ -218,7 +214,7 @@ public final class SMPRendererPublic
   }
 
   @Nonnull
-  public static final IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
+  public static IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
 
@@ -230,12 +226,11 @@ public final class SMPRendererPublic
       // The default logo
       aLogoHref = LinkHelper.getStreamURL (aRequestScope, "/image/phoss-smp-272-100.png");
     }
-
     return new HCImg ().setSrc (aLogoHref);
   }
 
   @Nonnull
-  private static final BootstrapNavbar _getNavbar (@Nonnull final ILayoutExecutionContext aLEC)
+  private static BootstrapNavbar _getNavbar (@Nonnull final ILayoutExecutionContext aLEC)
   {
     final ISimpleURL aLinkToStartPage = aLEC.getLinkToMenuItem (aLEC.getMenuTree ().getDefaultMenuItemID ());
 
@@ -248,7 +243,7 @@ public final class SMPRendererPublic
   }
 
   @Nonnull
-  public static final IHCNode getMenuContent (@Nonnull final LayoutExecutionContext aLEC)
+  public static IHCNode getMenuContent (@Nonnull final LayoutExecutionContext aLEC)
   {
     // Main menu
     final IMenuTree aMenuTree = aLEC.getMenuTree ();
@@ -282,13 +277,12 @@ public final class SMPRendererPublic
    *         <code>null</code> but maybe empty.
    */
   @Nonnull
-  public static final BootstrapContainer createDefaultFooter (final boolean bShowApplicationName,
-                                                              final boolean bShowSource,
-                                                              final boolean bShowAuthor)
+  public static BootstrapContainer createDefaultFooter (final boolean bShowApplicationName,
+                                                        final boolean bShowSource,
+                                                        final boolean bShowAuthor)
   {
     final BootstrapContainer aContainer = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER)
                                                                    .setFluid (true);
-
     if (bShowApplicationName)
     {
       aContainer.addChild (new HCP ().addChild (CSMP.getApplicationTitleAndVersion () +
@@ -296,7 +290,6 @@ public final class SMPRendererPublic
                                                 SMPServerConfiguration.getRESTType ().getDisplayName () +
                                                 " API"));
     }
-
     // By
     {
       final HCP aBy = new HCP ();
@@ -314,11 +307,9 @@ public final class SMPRendererPublic
                                                                                    .addChild (CSMP.APPLICATION_TITLE +
                                                                                               " on GitHub"));
       }
-
       if (aBy.hasChildren ())
         aContainer.addChild (aBy);
     }
-
     // Imprint
     if (SMPWebAppConfiguration.isImprintEnabled ())
     {
@@ -339,7 +330,6 @@ public final class SMPRendererPublic
           // Text only
           aNode = new HCSpan ().addChild (sImprintText);
         }
-
         // Already trimmed
         final String sImprintCSSClasses = SMPWebAppConfiguration.getImprintCSSClasses ();
         if (StringHelper.hasText (sImprintCSSClasses))
@@ -349,16 +339,14 @@ public final class SMPRendererPublic
           for (final String sCSSClass : aUniqueNames)
             aNode.addClass (DefaultCSSClassProvider.create (sCSSClass));
         }
-
         aContainer.addChild (new HCP ().addChild ("Imprint ").addChild (aNode));
       }
     }
-
     return aContainer;
   }
 
   @Nonnull
-  public static final IHCNode getContent (@Nonnull final LayoutExecutionContext aLEC)
+  public static IHCNode getContent (@Nonnull final LayoutExecutionContext aLEC)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final HCNodeList ret = new HCNodeList ();
@@ -375,7 +363,6 @@ public final class SMPRendererPublic
       aBreadcrumbs.addClasses (CBootstrapCSS.D_NONE, CBootstrapCSS.D_SM_BLOCK);
       aOuterContainer.addChild (aBreadcrumbs);
     }
-
     // Content
     aOuterContainer.addChild (BootstrapPageRenderer.getPageContent (aLEC));
 
@@ -384,7 +371,6 @@ public final class SMPRendererPublic
       final BootstrapContainer aDiv = createDefaultFooter (SMPWebAppConfiguration.isPublicShowApplicationName (),
                                                            SMPWebAppConfiguration.isPublicShowSource (),
                                                            SMPWebAppConfiguration.isPublicShowAuthor ());
-
       {
         final BootstrapMenuItemRendererHorz aRenderer = new BootstrapMenuItemRendererHorz (aDisplayLocale);
         final HCUL aUL = new HCUL ().addClass (CSS_CLASS_FOOTER_LINKS);
@@ -408,11 +394,9 @@ public final class SMPRendererPublic
         if (aUL.hasChildren ())
           aDiv.addChild (aUL);
       }
-
       if (aDiv.hasChildren ())
         aOuterContainer.addChild (aDiv);
     }
-
     return ret;
   }
 }

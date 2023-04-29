@@ -9,8 +9,6 @@ _*.cmd
 
 .settings/ 
 bin/
-conf/
-_conf/
 generated/
 target/
 

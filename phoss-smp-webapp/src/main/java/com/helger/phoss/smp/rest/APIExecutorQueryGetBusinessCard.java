@@ -77,7 +77,6 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
       throw new SMPPreconditionFailedException ("The remote query API is disabled. getRemoteBusinessCard will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
-
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
@@ -86,30 +85,27 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     {
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
-
     final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
 
     final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
     final String sLogPrefix = "[QueryAPI] ";
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix +
-                   "BusinessCard of '" +
-                   aParticipantID.getURIEncoded () +
-                   "' is queried using SMP API '" +
-                   eAPIType +
-                   "' from '" +
-                   aQueryParams.getSMPHostURI () +
-                   "'");
+    LOGGER.info (sLogPrefix +
+                 "BusinessCard of '" +
+                 aParticipantID.getURIEncoded () +
+                 "' is queried using SMP API '" +
+                 eAPIType +
+                 "' from '" +
+                 aQueryParams.getSMPHostURI () +
+                 "'");
 
     IJsonObject aJson = null;
 
     final String sBCURL = aQueryParams.getSMPHostURI ().toString () +
                           "/businesscard/" +
                           aParticipantID.getURIEncoded ();
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
+    LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
 
     byte [] aData;
     try (HttpClientManager aHttpClientMgr = new HttpClientManager ())
@@ -121,19 +117,16 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     {
       aData = null;
     }
-
     if (aData == null)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
+      LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
     }
     else
     {
       final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, (Charset) null);
       if (aBC == null)
       {
-        if (LOGGER.isErrorEnabled ())
-          LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
+        LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
       }
       else
       {
@@ -141,22 +134,18 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
         aJson = aBC.getAsJson ();
       }
     }
-
     aSW.stop ();
-
     if (aJson == null)
     {
-      if (LOGGER.isErrorEnabled ())
-        LOGGER.error (sLogPrefix + "Failed to perform the BusinessCard SMP lookup");
+      LOGGER.error (sLogPrefix + "Failed to perform the BusinessCard SMP lookup");
       aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
     }
     else
     {
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLogPrefix +
-                     "Succesfully finished BusinessCard lookup lookup after " +
-                     aSW.getMillis () +
-                     " milliseconds");
+      LOGGER.info (sLogPrefix +
+                   "Succesfully finished BusinessCard lookup lookup after " +
+                   aSW.getMillis () +
+                   " milliseconds");
 
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());

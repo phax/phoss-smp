@@ -36,6 +36,7 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
+import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
@@ -66,7 +67,10 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
                                                          @Nonnull @Nonempty final String sName,
                                                          final boolean bIsDeprecated)
   {
-    final ISMPTransportProfile ret = new SMPTransportProfile (sID, sName, bIsDeprecated);
+    final ISMPTransportProfile ret = new SMPTransportProfile (sID,
+                                                              sName,
+                                                              bIsDeprecated ? ESMPTransportProfileState.DEPRECATED
+                                                                            : ESMPTransportProfileState.ACTIVE);
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Create new
@@ -74,7 +78,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
                                                               new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (ret.getID (),
                                                                                                                                            45),
                                                                                                          ret.getName (),
-                                                                                                         Boolean.valueOf (ret.isDeprecated ())));
+                                                                                                         Boolean.valueOf (ret.getState () == ESMPTransportProfileState.DEPRECATED)));
       if (nCreated != 1)
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
     });
@@ -160,7 +164,8 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
       {
         ret.add (new SMPTransportProfile (aRow.getAsString (0),
                                           aRow.getAsString (1),
-                                          aRow.getAsBoolean (2, SMPTransportProfile.DEFAULT_DEPRECATED)));
+                                          aRow.getAsBoolean (2, false) ? ESMPTransportProfileState.DEPRECATED
+                                                                       : ESMPTransportProfileState.ACTIVE));
       }
     return ret;
   }
@@ -181,7 +186,8 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     final DBResultRow aRow = aDBResult.get ();
     return new SMPTransportProfile (sID,
                                     aRow.getAsString (0),
-                                    aRow.getAsBoolean (1, SMPTransportProfile.DEFAULT_DEPRECATED));
+                                    aRow.getAsBoolean (1, false) ? ESMPTransportProfileState.DEPRECATED
+                                                                 : ESMPTransportProfileState.ACTIVE);
   }
 
   public boolean containsSMPTransportProfileWithID (@Nullable final String sID)

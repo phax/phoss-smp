@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.servlet;
 
 import javax.annotation.Nonnull;
-import javax.servlet.ServletException;
 
 import com.helger.commons.http.CHttp;
 import com.helger.commons.state.EContinue;
@@ -28,6 +27,8 @@ import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.servlet.ServletException;
 
 /**
  * A special servlet filter that checks that a user can only access the config

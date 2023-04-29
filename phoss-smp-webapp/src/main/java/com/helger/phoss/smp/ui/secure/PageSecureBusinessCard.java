@@ -1136,8 +1136,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     // When auto update is enabled, there is no need for a manual update
     // Change: update possibility always, in case document type was changed
-    // if (!SMPMetaManager.getSettings ().isPEPPOLDirectoryIntegrationAutoUpdate
-    // () || GlobalDebug.isDebugMode ())
     {
       ret.addChildren (new HCTextNode (" "),
                        new HCA (aWPEC.getSelfHref ()

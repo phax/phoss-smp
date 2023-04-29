@@ -145,9 +145,8 @@ public final class ServiceGroupImport
       aActionList.add (ImportActionItem.createError (pi, msg, ex));
     };
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Starting import of Service Groups from XML v1.0, overwrite is " +
-                   (bOverwriteExisting ? "enabled" : "disabled"));
+    LOGGER.info ("Starting import of Service Groups from XML v1.0, overwrite is " +
+                 (bOverwriteExisting ? "enabled" : "disabled"));
 
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();

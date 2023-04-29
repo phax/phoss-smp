@@ -19,9 +19,6 @@ package com.helger.phoss.smp.rest;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +50,10 @@ import com.helger.xsds.peppol.smp1.ServiceEndpointList;
 import com.helger.xsds.peppol.smp1.ServiceInformationType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+
 /**
  * Create one million endpoints. Run this AFTER
  * {@link MainCreateManyServiceGroups}.
@@ -75,6 +76,7 @@ public final class MainCreateManyEndpoints
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
+  @SuppressWarnings ("deprecation")
   public static void main (final String [] args) throws Throwable
   {
     final String sServerBasePath = "http://localhost:90";
@@ -88,15 +90,15 @@ public final class MainCreateManyEndpoints
       for (final EPredefinedDocumentTypeIdentifier aEDT : new EPredefinedDocumentTypeIdentifier [] { EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CREDITNOTE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017,
-                                                                                                     EPredefinedDocumentTypeIdentifier.INVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_1_2,
-                                                                                                     EPredefinedDocumentTypeIdentifier.CREDITNOTE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_1_2,
-                                                                                                     EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_1_2,
-                                                                                                     EPredefinedDocumentTypeIdentifier.INVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0,
-                                                                                                     EPredefinedDocumentTypeIdentifier.CREDITNOTE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0,
-                                                                                                     EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_02,
-                                                                                                     EPredefinedDocumentTypeIdentifier.INVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0_CONFORMANT_XOEV_DE_KOSIT_EXTENSION_XRECHNUNG_2_0,
-                                                                                                     EPredefinedDocumentTypeIdentifier.CREDITNOTE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0_CONFORMANT_XOEV_DE_KOSIT_EXTENSION_XRECHNUNG_2_0,
-                                                                                                     EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017_COMPLIANT_XOEV_DE_KOSIT_STANDARD_XRECHNUNG_2_0_CONFORMANT_XOEV_DE_KOSIT_EXTENSION_XRECHNUNG_2_02 })
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V12,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V12,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V12,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V20,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V20,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V202,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_UBL_V20,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_CREDIT_NOTE_UBL_V20,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_CII_V202 })
 
       {
         final PeppolDocumentTypeIdentifier aDT = aEDT.getAsDocumentTypeIdentifier ();

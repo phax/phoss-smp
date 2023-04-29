@@ -35,7 +35,6 @@ package com.helger.phoss.smp.rest;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
-import javax.servlet.ServletException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +53,8 @@ import com.helger.photon.api.InvokableAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.AbstractXFilterUnifiedResponse;
+
+import jakarta.servlet.ServletException;
 
 /**
  * This is the SMP REST filter that MUST be implemented as a filter on "/*"

@@ -38,7 +38,6 @@ import com.helger.commons.state.ESuccess;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.type.ObjectType;
 import com.helger.commons.typeconvert.TypeConverter;
-import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.phoss.smp.backend.mongodb.MongoClientProvider;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.helger.photon.audit.AuditItem;
@@ -130,7 +129,7 @@ public class AuditorMongoDB implements IAuditor
     return new AuditItem (aDT,
                           aDoc.getString ("userid"),
                           EAuditActionType.getFromIDOrNull (aDoc.getString ("type")),
-                          ESuccess.valueOf (aDoc.getBoolean ("success", SMPTransportProfile.DEFAULT_DEPRECATED)),
+                          ESuccess.valueOf (aDoc.getBoolean ("success", false)),
                           sAction);
   }
 

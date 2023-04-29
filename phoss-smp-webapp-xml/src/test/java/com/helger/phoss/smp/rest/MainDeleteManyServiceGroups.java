@@ -19,8 +19,6 @@ package com.helger.phoss.smp.rest;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +35,9 @@ import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.web.scope.mock.WebScopeTestRule;
+
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Create many service groups - please make sure the SML connection is not

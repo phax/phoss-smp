@@ -66,11 +66,9 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor imple
       aAjaxResponse.json (new JsonObject ().add (JSON_LOGGEDIN, true));
       return;
     }
-
     // Get the rendered content of the menu area
     if (GlobalDebug.isDebugMode ())
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn ("Login of '" + sLoginName + "' failed because " + eLoginResult);
+      LOGGER.warn ("Login of '" + sLoginName + "' failed because " + eLoginResult);
 
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     String sErrorMessage = EPhotonCoreText.LOGIN_ERROR_MSG.getDisplayText (aDisplayLocale);
@@ -79,7 +77,6 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor imple
       // Append details
       sErrorMessage += " " + eLoginResult.getDisplayText (aDisplayLocale);
     }
-
     final IHCNode aRoot = error (sErrorMessage);
 
     // Set as result property

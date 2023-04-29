@@ -87,8 +87,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
                                                                                                 bSMTPSTARTTLSEnabled,
                                                                                                 nSMTPConnectionTimeoutMS,
                                                                                                 nSMTPSocketTimeoutMS,
-                                                                                                bSMTPDebug)
-                                                                            : null;
+                                                                                                bSMTPDebug) : null;
     if (StringHelper.hasText (sSenderAddress) &&
         StringHelper.hasText (sReceiverAddress) &&
         aSMTPSettings != null &&
@@ -102,8 +101,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
       InternalErrorSettings.setSMTPSettings (aSMTPSettings);
       InternalErrorSettings.setFallbackLocale (CSMPServer.DEFAULT_LOCALE);
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);
+      LOGGER.info ("Setup internal error handler to send emails on internal errors to " + sReceiverAddress);
     }
     else
     {

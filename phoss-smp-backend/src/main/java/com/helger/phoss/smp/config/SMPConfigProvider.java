@@ -105,35 +105,27 @@ public final class SMPConfigProvider
     aRes = aResourceProvider.getReadableResourceIf ("private-smp-server.properties", IReadableResource::exists);
     if (aRes != null)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
+      LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
       ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 1);
     }
-
     aRes = aResourceProvider.getReadableResourceIf ("smp-server.properties", IReadableResource::exists);
     if (aRes != null)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
+      LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
       ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 2);
     }
-
     aRes = aResourceProvider.getReadableResourceIf ("private-webapp.properties", IReadableResource::exists);
     if (aRes != null)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
+      LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
       ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 1);
     }
-
     aRes = aResourceProvider.getReadableResourceIf ("webapp.properties", IReadableResource::exists);
     if (aRes != null)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
+      LOGGER.warn ("The support for the properties file '" + aRes.getAsURL () + "' is deprecated." + sDefaultSuffix);
       ret.addConfigurationSource (new ConfigurationSourceProperties (aRes, StandardCharsets.UTF_8), nBasePrio - 2);
     }
-
     return ret;
   }
 
@@ -186,7 +178,6 @@ public final class SMPConfigProvider
     {
       RW_LOCK.writeLock ().unlock ();
     }
-
     if (!EqualsHelper.identityEqual (aOld, aNewConfig))
       if (!GlobalDebug.isProductionMode ())
         LOGGER.info ("The SMP configuration provider was changed to " + aNewConfig);

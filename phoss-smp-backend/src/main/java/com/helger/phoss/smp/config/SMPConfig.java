@@ -32,25 +32,23 @@ public class SMPConfig extends ConfigWithFallback
     super (aValueProvider);
     setReplaceVariables (true);
     setOutdatedNotifier ( (sOld, sNew) -> {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn ("Please rename the configuration property '" +
-                     sOld +
-                     "' to '" +
-                     sNew +
-                     "'. Support for the old property name will be removed in the next major release.");
+      LOGGER.warn ("Please rename the configuration property '" +
+                   sOld +
+                   "' to '" +
+                   sNew +
+                   "'. Support for the old property name will be removed in the next major release.");
     });
     if (LOGGER.isDebugEnabled ())
     {
       // Print details on every lookup
-      setFoundKeyConsumer ( (k,
-                             v) -> LOGGER.debug ("Found Configuration key '" +
-                                                 k +
-                                                 "' with value '" +
-                                                 v.getValue () +
-                                                 "' and prio " +
-                                                 v.getConfigurationSource ().getPriority () +
-                                                 " in " +
-                                                 v.getConfigurationSource ().getSourceType ()));
+      setFoundKeyConsumer ( (k, v) -> LOGGER.debug ("Found Configuration key '" +
+                                                    k +
+                                                    "' with value '" +
+                                                    v.getValue () +
+                                                    "' and prio " +
+                                                    v.getConfigurationSource ().getPriority () +
+                                                    " in " +
+                                                    v.getConfigurationSource ().getSourceType ()));
       setKeyNotFoundConsumer (k -> LOGGER.debug ("Failed to find Configuration key '" + k + "'"));
     }
   }

@@ -37,7 +37,7 @@ RUN echo Building phoss SMP $SMP_VERSION \
 
 
 # Use an official Tomcat runtime as a base image
-FROM tomcat:9-jdk11
+FROM tomcat:10.1-jdk17
 
 ARG SMP_VERSION
 ENV SMP_VERSION=$SMP_VERSION

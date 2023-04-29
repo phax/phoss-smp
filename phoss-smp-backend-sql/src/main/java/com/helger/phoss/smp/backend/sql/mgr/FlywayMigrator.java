@@ -74,16 +74,13 @@ final class FlywayMigrator
   {
     ValueEnforcer.notNull (eDBType, "DBType");
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Starting to run Flyway for DB type " + eDBType);
+    LOGGER.info ("Starting to run Flyway for DB type " + eDBType);
 
     final Callback aCallbackLogging = new BaseCallback ()
     {
       public void handle (@Nonnull final Event aEvent, @Nullable final Context aContext)
       {
-        if (LOGGER.isInfoEnabled ())
-          LOGGER.info ("Flyway: Event " + aEvent.getId ());
-
+        LOGGER.info ("Flyway: Event " + aEvent.getId ());
         if (aEvent == Event.AFTER_EACH_MIGRATE && aContext != null)
         {
           final MigrationInfo aMI = aContext.getMigrationInfo ();
@@ -91,8 +88,7 @@ final class FlywayMigrator
           {
             final ResolvedMigration aRM = ((MigrationInfoImpl) aMI).getResolvedMigration ();
             if (aRM != null)
-              if (LOGGER.isInfoEnabled ())
-                LOGGER.info ("  Performed migration: " + aRM);
+              LOGGER.info ("  Performed migration: " + aRM);
           }
         }
       }
@@ -163,7 +159,6 @@ final class FlywayMigrator
       // The default schema name is ["$user", public] and as such unusable
       aFlywayConfig.schemas (sSchema);
     }
-
     // If no schema is specified, schema create should also be disabled
     aFlywayConfig.createSchemas (SMPJDBCConfiguration.isJdbcSchemaCreate ());
 

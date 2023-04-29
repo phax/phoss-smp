@@ -21,7 +21,6 @@ import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.servlet.ServletContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +80,8 @@ import com.helger.servlet.response.UnifiedResponseDefaultSettings;
 import com.helger.smpclient.config.SMPClientConfiguration;
 import com.helger.wsclient.WSHelper;
 import com.helger.xservlet.requesttrack.RequestTrackerSettings;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Special SMP web app listener. This is the entry point for application
@@ -158,7 +159,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       LOGGER.error (sErrorMsg);
       throw new InitializationException (sErrorMsg);
     }
-
     // Set the default timezone
     if (PDTConfig.setDefaultDateTimeZoneID (sDesiredTimeZone).isFailure ())
     {
@@ -166,9 +166,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       LOGGER.error (sErrorMsg);
       throw new InitializationException (sErrorMsg);
     }
-
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Set default timezone to '" + sDesiredTimeZone + "'");
+    LOGGER.info ("Set default timezone to '" + sDesiredTimeZone + "'");
   }
 
   @Override
@@ -195,30 +193,25 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Set configs with variables
     PDClientConfiguration.setConfig (SMPConfigProvider.getConfig ());
     SMPClientConfiguration.setConfig (SMPConfigProvider.getConfig ());
-
     if (SMPServerConfiguration.isForceRoot ())
     {
       // Enforce an empty context path according to the specs!
       ServletContextPathHolder.setCustomContextPath ("");
     }
     RequestParameterManager.getInstance ().setParameterHandler (new RequestParameterHandlerURLPathNamed ());
-
     if (!GlobalDebug.isProductionMode ())
     {
       RequestTrackerSettings.setLongRunningRequestsCheckEnabled (false);
       RequestTrackerSettings.setParallelRunningRequestsCheckEnabled (false);
     }
-
     // Handled via the XServletSettings instead
     UnifiedResponseDefaultSettings.setReferrerPolicy (null);
     UnifiedResponseDefaultSettings.setXFrameOptions (null, null);
-
     if (SMPServerConfiguration.getRESTType ().isHttpConstraint ())
     {
       // Peppol SMP is always http only
       UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
     }
-
     // Avoid writing unnecessary stuff
     setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
 
@@ -234,11 +227,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                           "' is not valid when used as a DNS name. It must match the regular expression '" +
                                           CSMPServer.PATTERN_SMP_ID +
                                           "'!");
-    if (LOGGER.isInfoEnabled ())
-    {
-      LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
-      LOGGER.info ("This SMP uses REST API type '" + SMPServerConfiguration.getRESTType () + "'");
-    }
+    LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
+    LOGGER.info ("This SMP uses REST API type '" + SMPServerConfiguration.getRESTType () + "'");
 
     // Check other consistency stuff
     if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.hasNoText (SMPWebAppConfiguration.getImprintText ()))
@@ -266,7 +256,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       MenuPublic.init (aMenuTree);
       PhotonGlobalState.state (CApplicationID.APP_ID_PUBLIC).setMenuTree (aMenuTree);
     }
-
     {
       LOGGER.info ("Initializing secure menu");
       final MenuTree aMenuTree = new MenuTree ();
@@ -306,7 +295,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       aCFM.registerAll (SMPConfigProvider.getConfig ());
       aCFM.registerAll (PDClientConfiguration.getConfig ());
     }
-
     {
       LOGGER.info ("Init of Directory client stuff");
 
@@ -384,7 +372,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                       });
       }
     }
-
     {
       LOGGER.info ("Init of HTTP and Proxy settings");
       // Register global proxy servers
@@ -394,10 +381,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         // Register a handler that returns the "http" proxy, if an "http" URL is
         // requested
-        final IProxySettingsProvider aPSP = (sProtocol,
-                                             sHost,
-                                             nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
-                                                                                 : null;
+        final IProxySettingsProvider aPSP = (sProtocol, sHost, nPort) -> "http".equals (sProtocol)
+                                                                                                   ? new CommonsArrayList <> (aProxyHttp)
+                                                                                                   : null;
         ProxySettingsManager.registerProvider (aPSP);
         m_aProxySettingsProvider.add (aPSP);
       }
@@ -406,15 +392,13 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         // Register a handler that returns the "https" proxy, if an "https" URL
         // is requested
-        final IProxySettingsProvider aPSP = (sProtocol,
-                                             sHost,
-                                             nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps)
-                                                                                  : null;
+        final IProxySettingsProvider aPSP = (sProtocol, sHost, nPort) -> "https".equals (sProtocol)
+                                                                                                    ? new CommonsArrayList <> (aProxyHttps)
+                                                                                                    : null;
         ProxySettingsManager.registerProvider (aPSP);
         m_aProxySettingsProvider.add (aPSP);
       }
     }
-
     // Special http client config
     BasePageUtilsHttpClient.HttpClientConfigRegistry.register (new HttpClientConfig ("directoryclient",
                                                                                      "Directory client settings",
