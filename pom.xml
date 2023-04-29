@@ -50,7 +50,7 @@
     <connection>scm:git:git@github.com:phax/phoss-smp.git</connection>
     <developerConnection>scm:git:git@github.com:phax/phoss-smp.git</developerConnection>
     <url>http://github.com/phax/phoss-smp</url>
-    <tag>7.x</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <organization>
@@ -112,7 +112,7 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>10.1.1-SNAPSHOT</version>
+        <version>10.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

@@ -54,7 +54,7 @@
   </developers>
   
   <properties>
-    <flyway.version>9.16.3</flyway.version>
+    <flyway.version>9.17.0</flyway.version>
   </properties>
   
   <dependencyManagement>
