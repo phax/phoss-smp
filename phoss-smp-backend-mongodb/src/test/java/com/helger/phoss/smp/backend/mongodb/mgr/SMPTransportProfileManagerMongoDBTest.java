@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.peppol.smp.ESMPTransportProfile;
+import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 
@@ -49,7 +50,7 @@ public final class SMPTransportProfileManagerMongoDBTest
       {
         final ISMPTransportProfile aCreate = aMgr.createSMPTransportProfile (e.getID (),
                                                                              e.getName (),
-                                                                             e.isDeprecated ());
+                                                                             e.getState () == ESMPTransportProfileState.DEPRECATED);
         aCreated.add (aCreate);
       }
       final ICommonsList <ISMPTransportProfile> aAll = aMgr.getAllSMPTransportProfiles ();
@@ -59,7 +60,7 @@ public final class SMPTransportProfileManagerMongoDBTest
       for (final ISMPTransportProfile aCreate : aCreated)
         assertTrue (aMgr.updateSMPTransportProfile (aCreate.getID (),
                                                     "bla " + aCreate.getName (),
-                                                    aCreate.isDeprecated ())
+                                                    aCreate.getState () == ESMPTransportProfileState.DEPRECATED)
                         .isChanged ());
       for (final ISMPTransportProfile aCreate : aCreated)
       {
