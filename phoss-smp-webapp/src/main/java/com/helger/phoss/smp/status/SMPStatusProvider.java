@@ -66,11 +66,10 @@ public final class SMPStatusProvider
   static
   {
     LIST.addAll (ServiceLoaderHelper.getAllSPIImplementations (ISMPStatusProviderExtensionSPI.class));
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Found " +
-                   LIST.size () +
-                   " implementation(s) of " +
-                   ISMPStatusProviderExtensionSPI.class.getSimpleName ());
+    LOGGER.info ("Found " +
+                 LIST.size () +
+                 " implementation(s) of " +
+                 ISMPStatusProviderExtensionSPI.class.getSimpleName ());
   }
 
   private SMPStatusProvider ()
@@ -126,7 +125,6 @@ public final class SMPStatusProvider
       aStatusData.add ("smp.sml.url", aSMLInfo.getManagementServiceURL ());
       aStatusData.add ("smp.sml.dnszone", aSMLInfo.getDNSZone ());
     }
-
     final Timeout aCT = SMPServerConfiguration.getSMLConnectionTimeout ();
     if (aCT != null)
       aStatusData.add ("smp.sml.connection-timeout-ms", aCT.toMilliseconds ());
@@ -168,7 +166,6 @@ public final class SMPStatusProvider
         }
       }
     }
-
     // Proxy configuration (since 5.2.0)
     aStatusData.add ("proxy.http.configured", SMPHttpConfiguration.getAsHttpProxySettings () != null);
     aStatusData.add ("proxy.https.configured", SMPHttpConfiguration.getAsHttpsProxySettings () != null);
@@ -185,21 +182,18 @@ public final class SMPStatusProvider
       final ICommonsOrderedMap <String, ?> aMap = aImpl.getAdditionalStatusData (bDisableLongRunningOperations);
       aStatusData.addAll (aMap);
     }
-
     final long nMillis = aSW.stopAndGetMillis ();
     if (nMillis > 100)
     {
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info ("Finished building status data after " +
-                     nMillis +
-                     " milliseconds which is considered to be too long");
+      LOGGER.info ("Finished building status data after " +
+                   nMillis +
+                   " milliseconds which is considered to be too long");
     }
     else
     {
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("Finished building status data");
     }
-
     return aStatusData;
   }
 

@@ -61,8 +61,7 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[REST API Export-All-XML-V1] ";
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix + "Starting Export");
+    LOGGER.info (sLogPrefix + "Starting Export");
 
     // Only authenticated user may do so
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
@@ -80,8 +79,7 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
                                                                       aSettings.isDirectoryIntegrationEnabled ());
     final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards);
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix + "Finished creating Export data");
+    LOGGER.info (sLogPrefix + "Finished creating Export data");
 
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();

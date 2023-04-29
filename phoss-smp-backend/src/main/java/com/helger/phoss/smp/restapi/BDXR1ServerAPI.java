@@ -101,8 +101,7 @@ public final class BDXR1ServerAPI
     final String sLog = LOG_PREFIX + "GET /complete/" + sPathServiceGroupID;
     final String sAction = "getCompleteServiceGroup";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
@@ -156,15 +155,13 @@ public final class BDXR1ServerAPI
           aCompleteServiceGroup.addServiceMetadata (aSM);
       }
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return aCompleteServiceGroup;
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -177,8 +174,7 @@ public final class BDXR1ServerAPI
     final String sLog = LOG_PREFIX + "GET /list/" + sPathUserID;
     final String sAction = "getServiceGroupReferenceList";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
@@ -208,15 +204,13 @@ public final class BDXR1ServerAPI
         aRefList.addServiceGroupReference (aServGroupRefType);
       }
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return aRefList;
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -228,8 +222,7 @@ public final class BDXR1ServerAPI
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID;
     final String sAction = "getServiceGroup";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
@@ -272,15 +265,13 @@ public final class BDXR1ServerAPI
       }
       aSG.setServiceMetadataReferenceCollection (aCollectionType);
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return aSG;
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -297,8 +288,7 @@ public final class BDXR1ServerAPI
                         (bCreateInSML ? "" : CSMPServer.LOG_SUFFIX_NO_SML_INTERACTION);
     final String sAction = "saveServiceGroup";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog + " ==> " + aServiceGroup);
+    LOGGER.info (sLog + " ==> " + aServiceGroup);
     STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
@@ -348,14 +338,12 @@ public final class BDXR1ServerAPI
       else
         aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aPathServiceGroupID, sExtension, bCreateInSML);
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -372,8 +360,7 @@ public final class BDXR1ServerAPI
                         (bDeleteInSML ? "" : CSMPServer.LOG_SUFFIX_NO_SML_INTERACTION);
     final String sAction = "deleteServiceGroup";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
@@ -392,16 +379,14 @@ public final class BDXR1ServerAPI
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final EChange eDeleted = aServiceGroupMgr.deleteSMPServiceGroup (aPathServiceGroupID, bDeleteInSML);
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
 
       return eDeleted;
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -414,8 +399,7 @@ public final class BDXR1ServerAPI
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "getServiceRegistration";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
@@ -473,15 +457,13 @@ public final class BDXR1ServerAPI
 
       // Signature must be added by the rest service
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return aSignedServiceMetadata;
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -496,8 +478,7 @@ public final class BDXR1ServerAPI
     final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + "/services/" + sPathDocumentTypeID;
     final String sAction = "saveServiceRegistration";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog + " ==> " + aServiceMetadata);
+    LOGGER.info (sLog + " ==> " + aServiceMetadata);
     STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
@@ -609,13 +590,11 @@ public final class BDXR1ServerAPI
                                                     convertToJsonString (aServiceMetadata.getRedirect ()
                                                                                          .getExtension ())) == null)
         {
-          if (LOGGER.isErrorEnabled ())
-            LOGGER.error (sLog + " - ERROR - Redirect");
+          LOGGER.error (sLog + " - ERROR - Redirect");
           STATS_COUNTER_ERROR.increment (sAction);
           return ESuccess.FAILURE;
         }
-        if (LOGGER.isInfoEnabled ())
-          LOGGER.info (sLog + " SUCCESS - Redirect");
+        LOGGER.info (sLog + " SUCCESS - Redirect");
       }
       else
         if (aServiceInformation != null)
@@ -656,14 +635,12 @@ public final class BDXR1ServerAPI
                                                                                      sExtensionXML))
                              .isFailure ())
           {
-            if (LOGGER.isErrorEnabled ())
-              LOGGER.error (sLog + " - ERROR - ServiceInformation");
+            LOGGER.error (sLog + " - ERROR - ServiceInformation");
             STATS_COUNTER_ERROR.increment (sAction);
             return ESuccess.FAILURE;
           }
 
-          if (LOGGER.isInfoEnabled ())
-            LOGGER.info (sLog + " SUCCESS - ServiceInformation");
+          LOGGER.info (sLog + " SUCCESS - ServiceInformation");
         }
         else
         {
@@ -672,15 +649,13 @@ public final class BDXR1ServerAPI
         }
 
       if (false)
-        if (LOGGER.isInfoEnabled ())
-          LOGGER.info (sLog + " SUCCESS");
+        LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return ESuccess.SUCCESS;
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -693,8 +668,7 @@ public final class BDXR1ServerAPI
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "deleteServiceRegistration";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
@@ -742,8 +716,7 @@ public final class BDXR1ServerAPI
                                           ")",
                                           m_aAPIDataProvider.getCurrentURI ());
         }
-        if (LOGGER.isInfoEnabled ())
-          LOGGER.info (sLog + " SUCCESS - ServiceInformation");
+        LOGGER.info (sLog + " SUCCESS - ServiceInformation");
         STATS_COUNTER_SUCCESS.increment (sAction);
       }
       else
@@ -766,8 +739,7 @@ public final class BDXR1ServerAPI
                                             ")",
                                             m_aAPIDataProvider.getCurrentURI ());
           }
-          if (LOGGER.isInfoEnabled ())
-            LOGGER.info (sLog + " SUCCESS - Redirect");
+          LOGGER.info (sLog + " SUCCESS - Redirect");
           STATS_COUNTER_SUCCESS.increment (sAction);
         }
         else
@@ -780,8 +752,7 @@ public final class BDXR1ServerAPI
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -793,8 +764,7 @@ public final class BDXR1ServerAPI
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/";
     final String sAction = "deleteServiceRegistrations";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
 
     try
@@ -824,15 +794,13 @@ public final class BDXR1ServerAPI
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
       eChange = eChange.or (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aServiceGroup));
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS - " + eChange);
+      LOGGER.info (sLog + " SUCCESS - " + eChange);
 
       STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }

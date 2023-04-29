@@ -63,11 +63,10 @@ public final class ServiceGroupExport
   {
     ValueEnforcer.notNull (aServiceGroups, "ServiceGroups");
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Start creating Service Group export data XML v1.0 for " +
-                   aServiceGroups.size () +
-                   " entries - " +
-                   (bIncludeBusinessCards ? "incl. Business Cards" : "excl. Business Cards"));
+    LOGGER.info ("Start creating Service Group export data XML v1.0 for " +
+                 aServiceGroups.size () +
+                 " entries - " +
+                 (bIncludeBusinessCards ? "incl. Business Cards" : "excl. Business Cards"));
 
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();

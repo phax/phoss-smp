@@ -80,7 +80,6 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
       throw new SMPPreconditionFailedException ("The remote query API is disabled. getRemoteDocTypes will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
-
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
@@ -89,7 +88,6 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
     {
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
-
     final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
 
     final boolean bQueryBusinessCard = aRequestScope.params ().getAsBoolean ("businessCard", false);
@@ -100,16 +98,15 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
 
     final String sLogPrefix = "[QueryAPI] ";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix +
-                   "Document types of '" +
-                   aParticipantID.getURIEncoded () +
-                   "' are queried using SMP API '" +
-                   eAPIType +
-                   "' from '" +
-                   aQueryParams.getSMPHostURI () +
-                   "'; XSD validation=" +
-                   bXMLSchemaValidation);
+    LOGGER.info (sLogPrefix +
+                 "Document types of '" +
+                 aParticipantID.getURIEncoded () +
+                 "' are queried using SMP API '" +
+                 eAPIType +
+                 "' from '" +
+                 aQueryParams.getSMPHostURI () +
+                 "'; XSD validation=" +
+                 bXMLSchemaValidation);
 
     ICommonsSortedMap <String, String> aSGHrefs = null;
     switch (eAPIType)
@@ -131,8 +128,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
             // Decoded href is important for unification
             final String sHref = CIdentifier.createPercentDecoded (aSMR.getHref ());
             if (aSGHrefs.put (sHref, aSMR.getHref ()) != null)
-              if (LOGGER.isWarnEnabled ())
-                LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
+              LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
           }
         }
         break;
@@ -155,8 +151,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
             // Decoded href is important for unification
             final String sHref = CIdentifier.createPercentDecoded (aSMR.getHref ());
             if (aSGHrefs.put (sHref, aSMR.getHref ()) != null)
-              if (LOGGER.isWarnEnabled ())
-                LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
+              LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
           }
         }
         break;
@@ -180,25 +175,21 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
                                                                   aSR.getID ().getValue ());
             final String sHref = CIdentifier.createPercentDecoded (sSrcID);
             if (aSGHrefs.put (sHref, sSrcID) != null)
-              if (LOGGER.isWarnEnabled ())
-                LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
+              LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
           }
         }
         break;
       }
     }
-
     IJsonObject aJson = null;
     if (aSGHrefs != null)
       aJson = SMPJsonResponse.convert (eAPIType, aParticipantID, aSGHrefs, aIF);
-
     if (bQueryBusinessCard)
     {
       final String sBCURL = aQueryParams.getSMPHostURI ().toString () +
                             "/businesscard/" +
                             aParticipantID.getURIEncoded ();
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
+      LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
 
       byte [] aData;
       try (HttpClientManager aHttpClientMgr = new HttpClientManager ())
@@ -210,19 +201,16 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
       {
         aData = null;
       }
-
       if (aData == null)
       {
-        if (LOGGER.isWarnEnabled ())
-          LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
+        LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
       }
       else
       {
         final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, (Charset) null);
         if (aBC == null)
         {
-          if (LOGGER.isErrorEnabled ())
-            LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
+          LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
         }
         else
         {
@@ -233,19 +221,15 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
         }
       }
     }
-
     aSW.stop ();
-
     if (aJson == null)
     {
-      if (LOGGER.isErrorEnabled ())
-        LOGGER.error (sLogPrefix + "Failed to perform the SMP lookup");
+      LOGGER.error (sLogPrefix + "Failed to perform the SMP lookup");
       aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
     }
     else
     {
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLogPrefix + "Succesfully finished lookup lookup after " + aSW.getMillis () + " milliseconds");
+      LOGGER.info (sLogPrefix + "Succesfully finished lookup lookup after " + aSW.getMillis () + " milliseconds");
 
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());

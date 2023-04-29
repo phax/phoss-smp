@@ -60,8 +60,7 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
                                        SMPMongoConfiguration.CONFIG_MONGODB_DB_NAME +
                                        "'");
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info ("Using Mongo DB database name '" + sDBName + "'");
+    LOGGER.info ("Using Mongo DB database name '" + sDBName + "'");
 
     m_aProvider = new MongoClientProvider (sConnectionString, sDBName);
   }

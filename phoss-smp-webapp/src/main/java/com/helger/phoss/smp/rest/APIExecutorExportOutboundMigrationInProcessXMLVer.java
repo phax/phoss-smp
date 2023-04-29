@@ -66,8 +66,7 @@ public final class APIExecutorExportOutboundMigrationInProcessXMLVer extends Abs
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[REST API Export-OutboundMigrationInProcess-XML-V1] ";
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix + "Starting Export for all with outbound migration state 'in progress'");
+    LOGGER.info (sLogPrefix + "Starting Export for all with outbound migration state 'in progress'");
 
     // Only authenticated user may do so
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
@@ -89,21 +88,18 @@ public final class APIExecutorExportOutboundMigrationInProcessXMLVer extends Abs
         aAllServiceGroups.add (aSG);
       else
       {
-        if (LOGGER.isWarnEnabled ())
-          LOGGER.warn (sLogPrefix +
-                       "Failed to resolve PID '" +
-                       aMigration.getParticipantIdentifier ().getURIEncoded () +
-                       "' to a Service Group");
+        LOGGER.warn (sLogPrefix +
+                     "Failed to resolve PID '" +
+                     aMigration.getParticipantIdentifier ().getURIEncoded () +
+                     "' to a Service Group");
       }
     }
-
     final boolean bIncludeBusinessCards = aRequestScope.params ()
                                                        .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
                                                                       aSettings.isDirectoryIntegrationEnabled ());
     final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards);
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLogPrefix + "Finished creating Export data");
+    LOGGER.info (sLogPrefix + "Finished creating Export data");
 
     // Build the XML response
     final IXMLWriterSettings aXWS = new XMLWriterSettings ();

@@ -98,10 +98,8 @@ public final class BDXR2ServerAPI
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID;
     final String sAction = "getServiceGroup";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
-
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -111,7 +109,6 @@ public final class BDXR2ServerAPI
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
@@ -123,7 +120,6 @@ public final class BDXR2ServerAPI
         throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
-
       // Then add the service metadata references
       final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR2 ();
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
@@ -143,16 +139,13 @@ public final class BDXR2ServerAPI
           aSG.addServiceReference (aMetadataReference);
         }
       }
-
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return aSG;
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -169,10 +162,8 @@ public final class BDXR2ServerAPI
                         (bCreateInSML ? "" : CSMPServer.LOG_SUFFIX_NO_SML_INTERACTION);
     final String sAction = "saveServiceGroup";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog + " ==> " + aServiceGroup);
+    LOGGER.info (sLog + " ==> " + aServiceGroup);
     STATS_COUNTER_INVOCATION.increment (sAction);
-
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -182,7 +173,6 @@ public final class BDXR2ServerAPI
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       // Parse the content of the payload with the same identifier factory to
       // ensure same case sensitivity
       final IParticipantIdentifier aPayloadServiceGroupID;
@@ -204,13 +194,11 @@ public final class BDXR2ServerAPI
         throw new SMPBadRequestException ("Service Group Inconsistency. The URL points to '" +
                                           aPathServiceGroupID.getURIEncoded () +
                                           "' whereas the Service Group contains " +
-                                          (aPayloadServiceGroupID == null ? "<none>"
-                                                                          : "'" +
-                                                                            aPayloadServiceGroupID.getURIEncoded () +
-                                                                            "'"),
+                                          (aPayloadServiceGroupID == null ? "<none>" : "'" +
+                                                                                       aPayloadServiceGroupID.getURIEncoded () +
+                                                                                       "'"),
                                           m_aAPIDataProvider.getCurrentURI ());
       }
-
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -220,14 +208,12 @@ public final class BDXR2ServerAPI
       else
         aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aPathServiceGroupID, sExtension, bCreateInSML);
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -244,10 +230,8 @@ public final class BDXR2ServerAPI
                         (bDeleteInSML ? "" : CSMPServer.LOG_SUFFIX_NO_SML_INTERACTION);
     final String sAction = "deleteServiceGroup";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
-
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -257,23 +241,20 @@ public final class BDXR2ServerAPI
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final EChange eDeleted = aServiceGroupMgr.deleteSMPServiceGroup (aPathServiceGroupID, bDeleteInSML);
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
 
       return eDeleted;
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -286,10 +267,8 @@ public final class BDXR2ServerAPI
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "getServiceRegistration";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
-
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -299,7 +278,6 @@ public final class BDXR2ServerAPI
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       final ISMPServiceGroup aPathServiceGroup = SMPMetaManager.getServiceGroupMgr ()
                                                                .getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aPathServiceGroup == null)
@@ -307,13 +285,11 @@ public final class BDXR2ServerAPI
         throw new SMPNotFoundException ("No such Service Group '" + sPathServiceGroupID + "'",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
-
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
       if (aPathDocTypeID == null)
       {
         throw SMPBadRequestException.failedToParseDocType (sPathDocTypeID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       // First check for redirection, then for actual service
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
       final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroup,
@@ -341,18 +317,15 @@ public final class BDXR2ServerAPI
                                           m_aAPIDataProvider.getCurrentURI ());
         }
       }
-
       // Signature must be added by the rest service
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS");
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return aServiceMetadata;
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -367,10 +340,8 @@ public final class BDXR2ServerAPI
     final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + "/services/" + sPathDocumentTypeID;
     final String sAction = "saveServiceRegistration";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog + " ==> " + aServiceMetadata);
+    LOGGER.info (sLog + " ==> " + aServiceMetadata);
     STATS_COUNTER_INVOCATION.increment (sAction);
-
     try
     {
       // Parse provided identifiers
@@ -381,14 +352,12 @@ public final class BDXR2ServerAPI
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocumentTypeID);
       if (aPathDocTypeID == null)
       {
         // Invalid identifier
         throw SMPBadRequestException.failedToParseDocType (sPathDocumentTypeID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       // Business identifiers from path (ServiceGroupID) and from service
       // metadata (body) must equal path
       if (aServiceMetadata.getParticipantID () == null)
@@ -405,23 +374,20 @@ public final class BDXR2ServerAPI
                                                                                                                             .getSchemeID (),
                                                                                                             aServiceMetadata.getParticipantID ()
                                                                                                                             .getValue ());
-
       if (!aPathServiceGroupID.hasSameContent (aPayloadServiceGroupID))
       {
         // Participant ID in URL must match the one in XML structure
         throw new SMPBadRequestException ("Save Service Metadata was called with inconsistent values.\n" +
                                           "Service Metadata Participant ID: " +
-                                          (aPayloadServiceGroupID == null ? "<none>"
-                                                                          : "'" +
-                                                                            aPayloadServiceGroupID.getURIEncoded () +
-                                                                            "'") +
+                                          (aPayloadServiceGroupID == null ? "<none>" : "'" +
+                                                                                       aPayloadServiceGroupID.getURIEncoded () +
+                                                                                       "'") +
                                           "\n" +
                                           "URL parameter value: '" +
                                           aPathServiceGroupID.getURIEncoded () +
                                           "'",
                                           m_aAPIDataProvider.getCurrentURI ());
       }
-
       if (aServiceMetadata.getID () == null)
       {
         throw new SMPBadRequestException ("Save Service Metadata was called with inconsistent values.\n" +
@@ -447,7 +413,6 @@ public final class BDXR2ServerAPI
                                           "'",
                                           m_aAPIDataProvider.getCurrentURI ());
       }
-
       // Main save
       final IUser aDataUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aDataUser);
@@ -460,7 +425,6 @@ public final class BDXR2ServerAPI
         throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
-
       for (final ProcessMetadataType aPM : aServiceMetadata.getProcessMetadata ())
       {
         if (aPM.getRedirect () != null)
@@ -475,16 +439,14 @@ public final class BDXR2ServerAPI
                                                       aPM.getRedirect ().getPublisherURI ().getValue (),
                                                       sCertificateUID,
                                                       aCertificate,
-                                                      convertToJsonString (aPM.getRedirect ()
-                                                                              .getSMPExtensions ())) == null)
+                                                      convertToJsonString (aPM.getRedirect ().getSMPExtensions ())) ==
+              null)
           {
-            if (LOGGER.isErrorEnabled ())
-              LOGGER.error (sLog + " - ERROR - Redirect");
+            LOGGER.error (sLog + " - ERROR - Redirect");
             STATS_COUNTER_ERROR.increment (sAction);
             return ESuccess.FAILURE;
           }
-          if (LOGGER.isInfoEnabled ())
-            LOGGER.info (sLog + " SUCCESS - Redirect");
+          LOGGER.info (sLog + " SUCCESS - Redirect");
         }
         else
           if (aPM.getEndpoint () != null)
@@ -513,7 +475,6 @@ public final class BDXR2ServerAPI
               throw new SMPBadRequestException ("Save Service Metadata was called without any valid Process IDs",
                                                 m_aAPIDataProvider.getCurrentURI ());
             }
-
             final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
             for (final Map.Entry <IProcessIdentifier, String> aProcIDEntry : aProcIDs.entrySet ())
             {
@@ -531,8 +492,8 @@ public final class BDXR2ServerAPI
                                                                null,
                                                                PDTFactory.createXMLOffsetDateTime (aJAXBEndpoint.getActivationDateValue ()),
                                                                PDTFactory.createXMLOffsetDateTime (aJAXBEndpoint.getExpirationDateValue ()),
-                                                               aCertBytes == null ? null
-                                                                                  : Base64.encodeBytes (aCertBytes),
+                                                               aCertBytes == null ? null : Base64.encodeBytes (
+                                                                                                               aCertBytes),
                                                                aJAXBEndpoint.getDescriptionValue (),
                                                                aJAXBEndpoint.getContactValue (),
                                                                null,
@@ -542,23 +503,18 @@ public final class BDXR2ServerAPI
               final SMPProcess aProcess = new SMPProcess (aProcIDEntry.getKey (), aEndpoints, aProcIDEntry.getValue ());
               aProcesses.add (aProcess);
             }
-
             final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
             final String sExtensionXML = convertToJsonString (aServiceMetadata.getSMPExtensions ());
             if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPathServiceGroup,
                                                                                        aPathDocTypeID,
                                                                                        aProcesses,
-                                                                                       sExtensionXML))
-                               .isFailure ())
+                                                                                       sExtensionXML)).isFailure ())
             {
-              if (LOGGER.isErrorEnabled ())
-                LOGGER.error (sLog + " - ERROR - ServiceInformation");
+              LOGGER.error (sLog + " - ERROR - ServiceInformation");
               STATS_COUNTER_ERROR.increment (sAction);
               return ESuccess.FAILURE;
             }
-
-            if (LOGGER.isInfoEnabled ())
-              LOGGER.info (sLog + " SUCCESS - ServiceInformation");
+            LOGGER.info (sLog + " SUCCESS - ServiceInformation");
           }
           else
           {
@@ -566,19 +522,15 @@ public final class BDXR2ServerAPI
                                               m_aAPIDataProvider.getCurrentURI ());
           }
       }
-
       if (false)
-        if (LOGGER.isInfoEnabled ())
-          LOGGER.info (sLog + " SUCCESS");
+
+        LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return ESuccess.SUCCESS;
     }
-    catch (
-
-    final SMPServerException ex)
+    catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -591,10 +543,8 @@ public final class BDXR2ServerAPI
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "deleteServiceRegistration";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
-
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -604,14 +554,12 @@ public final class BDXR2ServerAPI
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
       if (aPathDocTypeID == null)
       {
         // Invalid identifier
         throw SMPBadRequestException.failedToParseDocType (sPathDocTypeID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
@@ -622,7 +570,6 @@ public final class BDXR2ServerAPI
         throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
-
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
                                                                                                                          aPathDocTypeID);
@@ -640,8 +587,7 @@ public final class BDXR2ServerAPI
                                           ")",
                                           m_aAPIDataProvider.getCurrentURI ());
         }
-        if (LOGGER.isInfoEnabled ())
-          LOGGER.info (sLog + " SUCCESS - ServiceInformation");
+        LOGGER.info (sLog + " SUCCESS - ServiceInformation");
         STATS_COUNTER_SUCCESS.increment (sAction);
       }
       else
@@ -664,8 +610,7 @@ public final class BDXR2ServerAPI
                                             ")",
                                             m_aAPIDataProvider.getCurrentURI ());
           }
-          if (LOGGER.isInfoEnabled ())
-            LOGGER.info (sLog + " SUCCESS - Redirect");
+          LOGGER.info (sLog + " SUCCESS - Redirect");
           STATS_COUNTER_SUCCESS.increment (sAction);
         }
         else
@@ -678,8 +623,7 @@ public final class BDXR2ServerAPI
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }
@@ -691,10 +635,8 @@ public final class BDXR2ServerAPI
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/";
     final String sAction = "deleteServiceRegistrations";
 
-    if (LOGGER.isInfoEnabled ())
-      LOGGER.info (sLog);
+    LOGGER.info (sLog);
     STATS_COUNTER_INVOCATION.increment (sAction);
-
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -704,7 +646,6 @@ public final class BDXR2ServerAPI
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
-
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
@@ -715,22 +656,19 @@ public final class BDXR2ServerAPI
         throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
-
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       EChange eChange = aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup);
 
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
       eChange = eChange.or (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aServiceGroup));
 
-      if (LOGGER.isInfoEnabled ())
-        LOGGER.info (sLog + " SUCCESS - " + eChange);
+      LOGGER.info (sLog + " SUCCESS - " + eChange);
 
       STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)
     {
-      if (LOGGER.isWarnEnabled ())
-        LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
       STATS_COUNTER_ERROR.increment (sAction);
       throw ex;
     }

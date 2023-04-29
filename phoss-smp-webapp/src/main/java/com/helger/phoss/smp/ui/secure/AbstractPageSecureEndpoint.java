@@ -167,7 +167,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
         final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
         final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
-
         if (aSelectedProcess != null &&
             aSelectedEndpoint != null &&
             aSelectedProcess.deleteEndpoint (aSelectedEndpoint.getTransportProfile ()).isChanged () &&
@@ -266,7 +265,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                 .setIcon (EDefaultIcon.YES));
       return EValidity.INVALID;
     }
-
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     if (aTransportProfileMgr.getSMPTransportProfileCount () <= 0)
     {
@@ -280,7 +278,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                 .setIcon (EDefaultIcon.YES));
       return EValidity.INVALID;
     }
-
     return super.isValidToDisplayPage (aWPEC);
   }
 
@@ -330,25 +327,22 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
           aWPEC.getRequestScope ().attrs ().putIn (REQUEST_ATTR_ENDPOINT, aEndpoint);
           return true;
         }
-        if (LOGGER.isWarnEnabled ())
-          LOGGER.warn ("Action " +
-                       eFormAction.getID () +
-                       " is not allowed, because endpoint with transport profile is missing ('" +
-                       sTransportProfile +
-                       "')");
+        LOGGER.warn ("Action " +
+                     eFormAction.getID () +
+                     " is not allowed, because endpoint with transport profile is missing ('" +
+                     sTransportProfile +
+                     "')");
       }
       else
       {
-        if (LOGGER.isWarnEnabled ())
-          LOGGER.warn ("Action " +
-                       eFormAction.getID () +
-                       " is not allowed, because process ID fields are missing ('" +
-                       sProcessIDScheme +
-                       "', '" +
-                       sProcessIDValue +
-                       "')");
+        LOGGER.warn ("Action " +
+                     eFormAction.getID () +
+                     " is not allowed, because process ID fields are missing ('" +
+                     sProcessIDScheme +
+                     "', '" +
+                     sProcessIDValue +
+                     "')");
       }
-
       return false;
     }
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
@@ -399,7 +393,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                                                              aSelectedProcess,
                                                                                              aSelectedEndpoint)));
     }
-
     // Callback
     modifyViewToolbar (aWPEC, aSelectedObject, aToolbar);
     return aToolbar;
@@ -440,7 +433,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       }
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Document type ID").setCtrl (aCtrl));
     }
-
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Process ID")
                                                  .setCtrl (NiceNameUI.getProcessID (aSelectedObject.getDocumentTypeIdentifier (),
                                                                                     aSelectedProcess.getProcessIdentifier (),
@@ -464,7 +456,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     if (aSelectedEndpoint.hasMinimumAuthenticationLevel ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Minimum authentication level")
                                                    .setCtrl (aSelectedEndpoint.getMinimumAuthenticationLevel ()));
-
     if (aSelectedEndpoint.hasServiceActivationDateTime ())
     {
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not before")
@@ -477,19 +468,18 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                    .setCtrl (PDTToString.getAsString (aSelectedEndpoint.getServiceExpirationDateTime (),
                                                                                       aDisplayLocale)));
     }
-
     if (aSelectedEndpoint.hasCertificate ())
     {
       final X509Certificate aEndpointCert = CertificateHelper.convertStringToCertficateOrNull (aSelectedEndpoint.getCertificate ());
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate")
-                                                   .setCtrl (aEndpointCert == null ? strong ("!!!FAILED TO INTERPRETE!!!")
+                                                   .setCtrl (aEndpointCert == null ? strong (
+                                                                                             "!!!FAILED TO INTERPRETE!!!")
                                                                                    : SMPCommonUI.createCertificateDetailsTable (null,
                                                                                                                                 aEndpointCert,
                                                                                                                                 aNowDT,
                                                                                                                                 aDisplayLocale)
                                                                                                 .setResponsive (true)));
     }
-
     if (aSelectedEndpoint.hasServiceDescription ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service description")
                                                    .setCtrl (aSelectedEndpoint.getServiceDescription ()));
@@ -507,7 +497,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                    .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedEndpoint)));
 
     aNodeList.addChild (aForm);
-
   }
 
   @Override
@@ -526,23 +515,23 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-    final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
-                                         : aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
+    final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID () : aWPEC.params ()
+                                                                                       .getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
     ISMPServiceGroup aServiceGroup = null;
 
-    final String sDocTypeIDScheme = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getScheme ()
-                                          : aWPEC.params ().getAsStringTrimmed (FIELD_DOCTYPE_ID_SCHEME);
-    final String sDocTypeIDValue = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getValue ()
-                                         : aWPEC.params ().getAsStringTrimmed (FIELD_DOCTYPE_ID_VALUE);
+    final String sDocTypeIDScheme = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getScheme () : aWPEC.params ()
+                                                                                                             .getAsStringTrimmed (FIELD_DOCTYPE_ID_SCHEME);
+    final String sDocTypeIDValue = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getValue () : aWPEC.params ()
+                                                                                                           .getAsStringTrimmed (FIELD_DOCTYPE_ID_VALUE);
     IDocumentTypeIdentifier aDocTypeID = null;
-    final String sProcessIDScheme = bEdit ? aSelectedProcess.getProcessIdentifier ().getScheme ()
-                                          : aWPEC.params ().getAsStringTrimmed (FIELD_PROCESS_ID_SCHEME);
-    final String sProcessIDValue = bEdit ? aSelectedProcess.getProcessIdentifier ().getValue ()
-                                         : aWPEC.params ().getAsStringTrimmed (FIELD_PROCESS_ID_VALUE);
+    final String sProcessIDScheme = bEdit ? aSelectedProcess.getProcessIdentifier ().getScheme () : aWPEC.params ()
+                                                                                                         .getAsStringTrimmed (FIELD_PROCESS_ID_SCHEME);
+    final String sProcessIDValue = bEdit ? aSelectedProcess.getProcessIdentifier ().getValue () : aWPEC.params ()
+                                                                                                       .getAsStringTrimmed (FIELD_PROCESS_ID_VALUE);
     IProcessIdentifier aProcessID = null;
 
-    final String sTransportProfileID = bEdit ? aSelectedEndpoint.getTransportProfile ()
-                                             : aWPEC.params ().getAsStringTrimmed (FIELD_TRANSPORT_PROFILE);
+    final String sTransportProfileID = bEdit ? aSelectedEndpoint.getTransportProfile () : aWPEC.params ()
+                                                                                               .getAsStringTrimmed (FIELD_TRANSPORT_PROFILE);
     final ISMPTransportProfile aTransportProfile = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfileID);
     final String sEndpointReference = aWPEC.params ().getAsStringTrimmed (FIELD_ENDPOINT_REFERENCE);
     final boolean bRequireBusinessLevelSignature = aWPEC.params ()
@@ -567,7 +556,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       if (aServiceGroup == null)
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided service group does not exist!");
     }
-
     if (aIdentifierFactory.isDocumentTypeIdentifierSchemeMandatory () && StringHelper.hasNoText (sDocTypeIDScheme))
       aFormErrors.addFieldError (FIELD_DOCTYPE_ID_SCHEME, "Document type ID scheme must not be empty!");
     else
@@ -617,7 +605,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, sMsg);
       aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, sMsg);
     }
-
     if (StringHelper.hasNoText (sEndpointReference))
     {
       if (false)
@@ -626,11 +613,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     else
       if (URLHelper.getAsURL (sEndpointReference) == null)
         aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "The Endpoint Reference is not a valid URL!");
-
     if (aNotBeforeDate != null && aNotAfterDate != null)
       if (aNotBeforeDate.isAfter (aNotAfterDate))
         aFormErrors.addFieldError (FIELD_NOT_BEFORE, "Not Before Date must not be after Not After Date!");
-
     if (StringHelper.hasNoText (sCertificate))
       aFormErrors.addFieldError (FIELD_CERTIFICATE, "Certificate must not be empty!");
     else
@@ -648,20 +633,17 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         aFormErrors.addFieldError (FIELD_CERTIFICATE,
                                    "The provided certificate string is not a valid X509 certificate!");
     }
-
     if (StringHelper.hasNoText (sServiceDescription))
       aFormErrors.addFieldError (FIELD_SERVICE_DESCRIPTION, "Service Description must not be empty!");
 
     if (StringHelper.hasNoText (sTechnicalContact))
       aFormErrors.addFieldError (FIELD_TECHNICAL_CONTACT, "Technical Contact must not be empty!");
-
     if (StringHelper.hasText (sExtension))
     {
       final IMicroDocument aDoc = MicroReader.readMicroXML (sExtension);
       if (aDoc == null)
         aFormErrors.addFieldError (FIELD_EXTENSION, "The extension must be XML content.");
     }
-
     if (aFormErrors.isEmpty ())
     {
       ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
@@ -675,7 +657,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         aProcess = new SMPProcess (aProcessID, null, null);
         aServiceInfo.addProcess ((SMPProcess) aProcess);
       }
-
       aProcess.setEndpoint (new SMPEndpoint (sTransportProfileID,
                                              sEndpointReference,
                                              bRequireBusinessLevelSignature,
@@ -687,7 +668,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                              sTechnicalContact,
                                              sTechnicalInformation,
                                              sExtension));
-
       if (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfo).isSuccess ())
       {
         if (bEdit)
@@ -739,31 +719,32 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service group")
                                                  .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                       aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                               : null),
+                                                                                                       aSelectedObject !=
+                                                                                                                               null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                    : null),
                                                                                      aDisplayLocale).setReadOnly (bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
-
     {
       final BootstrapRow aRow = new BootstrapRow ();
       aRow.createColumn (GS_IDENTIFIER_SCHEME)
           .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_SCHEME,
-                                                   aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
+                                                   aSelectedObject != null ? aSelectedObject
+                                                                                            .getDocumentTypeIdentifier ()
                                                                                             .getScheme ()
                                                                            : aIdentifierFactory.getDefaultDocumentTypeIdentifierScheme ())).setPlaceholder ("Identifier scheme")
                                                                                                                                            .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_DOCTYPE_ID_VALUE,
-                                                   aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
-                                                                                            .getValue ()
-                                                                           : null)).setPlaceholder ("Identifier value")
-                                                                                   .setReadOnly (bEdit));
+                                                   aSelectedObject != null ? aSelectedObject
+                                                                                            .getDocumentTypeIdentifier ()
+                                                                                            .getValue () : null))
+                                                                                                                 .setPlaceholder ("Identifier value")
+                                                                                                                 .setReadOnly (bEdit));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Document type ID")
                                                    .setCtrl (aRow)
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_DOCTYPE_ID_SCHEME,
                                                                                                FIELD_DOCTYPE_ID_VALUE)));
     }
-
     {
       final BootstrapRow aRow = new BootstrapRow ();
       aRow.createColumn (GS_IDENTIFIER_SCHEME)
@@ -775,36 +756,38 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PROCESS_ID_VALUE,
                                                    aSelectedProcess != null ? aSelectedProcess.getProcessIdentifier ()
-                                                                                              .getValue ()
-                                                                            : null)).setPlaceholder ("Identifier value")
-                                                                                    .setReadOnly (bEdit));
+                                                                                              .getValue () : null))
+                                                                                                                   .setPlaceholder ("Identifier value")
+                                                                                                                   .setReadOnly (bEdit));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Process ID")
                                                    .setCtrl (aRow)
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PROCESS_ID_SCHEME,
                                                                                                FIELD_PROCESS_ID_VALUE)));
     }
-
-    final ESMPTransportProfile eDefault = SMPServerConfiguration.getRESTType ()
-                                                                .isPeppol () ? ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2
-                                                                             : ESMPTransportProfile.TRANSPORT_PROFILE_BDXR_AS4;
+    final ESMPTransportProfile eDefault = SMPServerConfiguration.getRESTType ().isPeppol ()
+                                                                                            ? ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2
+                                                                                            : ESMPTransportProfile.TRANSPORT_PROFILE_BDXR_AS4;
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Transport Profile")
                                                  .setCtrl (new HCSMPTransportProfileSelect (new RequestField (FIELD_TRANSPORT_PROFILE,
-                                                                                                              aSelectedEndpoint != null ? aSelectedEndpoint.getTransportProfile ()
-                                                                                                                                        : eDefault.getID ()),
+                                                                                                              aSelectedEndpoint !=
+                                                                                                                                       null ? aSelectedEndpoint.getTransportProfile ()
+                                                                                                                                            : eDefault.getID ()),
                                                                                             aDisplayLocale).setReadOnly (bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_TRANSPORT_PROFILE)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint Reference")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_ENDPOINT_REFERENCE,
-                                                                                         aSelectedEndpoint != null ? aSelectedEndpoint.getEndpointReference ()
+                                                                                         aSelectedEndpoint != null
+                                                                                                                   ? aSelectedEndpoint.getEndpointReference ()
                                                                                                                    : null)))
                                                  .setHelpText ("The URL where messsages of this type should be targeted to.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_ENDPOINT_REFERENCE)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires Business Level Signature")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
-                                                                                                    aSelectedEndpoint != null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
-                                                                                                                              : SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE)))
+                                                                                                    aSelectedEndpoint !=
+                                                                                                                                             null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
+                                                                                                                                                  : SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE)))
                                                  .setHelpText ("Check the box if the recipient requires business-level signatures for " +
                                                                "the message, meaning a signature applied to the business message " +
                                                                "before the message is put on the transport. This is independent of " +
@@ -818,7 +801,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Minimum Authentication Level")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_MINIMUM_AUTHENTICATION_LEVEL,
-                                                                                         aSelectedEndpoint != null ? aSelectedEndpoint.getMinimumAuthenticationLevel ()
+                                                                                         aSelectedEndpoint != null
+                                                                                                                   ? aSelectedEndpoint.getMinimumAuthenticationLevel ()
                                                                                                                    : null)))
                                                  .setHelpText ("Indicates the minimum authentication level that recipient requires. " +
                                                                "The specific semantics of this field is defined in a specific instance " +
@@ -829,7 +813,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not before")
                                                  .setCtrl (BootstrapDateTimePicker.create (FIELD_NOT_BEFORE,
-                                                                                           aSelectedEndpoint != null ? aSelectedEndpoint.getServiceActivationDate ()
+                                                                                           aSelectedEndpoint != null
+                                                                                                                     ? aSelectedEndpoint.getServiceActivationDate ()
                                                                                                                      : null,
                                                                                            aDisplayLocale))
                                                  .setHelpText ("Activation date of the service. Senders should ignore services that " +
@@ -838,7 +823,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not after")
                                                  .setCtrl (BootstrapDateTimePicker.create (FIELD_NOT_AFTER,
-                                                                                           aSelectedEndpoint != null ? aSelectedEndpoint.getServiceExpirationDate ()
+                                                                                           aSelectedEndpoint != null
+                                                                                                                     ? aSelectedEndpoint.getServiceExpirationDate ()
                                                                                                                      : null,
                                                                                            aDisplayLocale))
                                                  .setHelpText ("Expiration date of the service. Senders should ignore services that " +
@@ -847,7 +833,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Certificate")
                                                  .setCtrl (new HCTextArea (new RequestField (FIELD_CERTIFICATE,
-                                                                                             aSelectedEndpoint != null ? aSelectedEndpoint.getCertificate ()
+                                                                                             aSelectedEndpoint != null
+                                                                                                                       ? aSelectedEndpoint.getCertificate ()
                                                                                                                        : null)))
                                                  .setHelpText ("Holds the complete signing certificate of the recipient AP, as a " +
                                                                "PEM base 64 encoded X509 DER formatted value.")
@@ -855,14 +842,16 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Description")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_SERVICE_DESCRIPTION,
-                                                                                         aSelectedEndpoint != null ? aSelectedEndpoint.getServiceDescription ()
+                                                                                         aSelectedEndpoint != null
+                                                                                                                   ? aSelectedEndpoint.getServiceDescription ()
                                                                                                                    : null)))
                                                  .setHelpText ("A human readable description of the service.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_DESCRIPTION)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Technical Contact")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_TECHNICAL_CONTACT,
-                                                                                         aSelectedEndpoint != null ? aSelectedEndpoint.getTechnicalContactUrl ()
+                                                                                         aSelectedEndpoint != null
+                                                                                                                   ? aSelectedEndpoint.getTechnicalContactUrl ()
                                                                                                                    : null)))
                                                  .setHelpText ("Represents a link to human readable contact information. This " +
                                                                "might also be an email address.")
@@ -870,7 +859,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical Information")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_TECHNICAL_INFORMATION,
-                                                                                         aSelectedEndpoint != null ? aSelectedEndpoint.getTechnicalInformationUrl ()
+                                                                                         aSelectedEndpoint != null
+                                                                                                                   ? aSelectedEndpoint.getTechnicalInformationUrl ()
                                                                                                                    : null)))
                                                  .setHelpText ("A URL to human readable documentation of the service format. " +
                                                                "This could for example be a web site containing links to XML " +
@@ -879,7 +869,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                  .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION,
-                                                                                             aSelectedEndpoint != null ? aSelectedEndpoint.getExtensions ()
+                                                                                             aSelectedEndpoint != null
+                                                                                                                       ? aSelectedEndpoint.getExtensions ()
                                                                                                                                           .getFirstExtensionXMLString ()
                                                                                                                        : null)))
                                                  .setHelpText ("Optional extension to the endpoint. If present it must be valid XML content!")
