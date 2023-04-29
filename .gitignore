@@ -10,7 +10,6 @@ _*.cmd
 .settings/ 
 bin/
 generated/
-_generated/
 target/
 
 .factorypath
