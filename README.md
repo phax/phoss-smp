@@ -2,11 +2,13 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.helger/phoss-smp-parent-pom/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.helger/phoss-smp-parent-pom) 
 
-phoss SMP is a complete SMP server that supports both the Peppol SMP specification as well as the OASIS BDXR SMP 1.0 specification.
+phoss SMP is a complete SMP server that supports both the Peppol SMP specification as well 
+  as the OASIS BDXR SMP 1.0 and 2.0 specifications.
 It comes with a management GUI and an XML, SQL or MongoDB backend for simplified operations.  
-It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/OASIS+SMP+conformant+solutions).
 
-Latest version: **[6.0.7](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-6.0.7)** (2023-02-23).
+It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/OASIS+SMP+conformant+solutions).
+
+Latest version: **[7.0.0](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-7.0.0)** (2023-04-29).
 See the special [Migrations guide](https://github.com/phax/phoss-smp/wiki/Migrations) for actions necessary on updates/version changes.
 
 **!! Users with SQL backend need to change the DB layout when updating to 5.3.x !!**
