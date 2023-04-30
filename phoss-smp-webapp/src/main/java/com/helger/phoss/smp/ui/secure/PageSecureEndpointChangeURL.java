@@ -90,7 +90,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
    */
   private static final class BulkChangeEndpointURL extends AbstractLongRunningJobRunnable implements IHCBootstrap4Trait
   {
-    private static final AtomicInteger s_aRunningJobs = new AtomicInteger (0);
+    private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
 
     private final ICommonsList <ISMPServiceInformation> m_aAllSIs;
     private final ISMPServiceGroup m_aServiceGroup;
@@ -112,7 +112,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     @Nonnull
     public LongRunningJobResult createLongRunningJobResult ()
     {
-      s_aRunningJobs.incrementAndGet ();
+      RUNNING_JOBS.incrementAndGet ();
       try (final WebScoped w = new WebScoped ())
       {
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -174,14 +174,14 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       }
       finally
       {
-        s_aRunningJobs.decrementAndGet ();
+        RUNNING_JOBS.decrementAndGet ();
       }
     }
 
     @Nonnegative
     public static int getRunningJobCount ()
     {
-      return s_aRunningJobs.get ();
+      return RUNNING_JOBS.get ();
     }
   }
 
