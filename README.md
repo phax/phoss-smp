@@ -29,5 +29,4 @@ If you like (and use) this SMP it is highly appreciated if you could star this p
 ---
 
 My personal [Coding Styleguide](https://github.com/phax/meta/blob/master/CodingStyleguide.md) |
-On Twitter: <a href="https://twitter.com/philiphelger">@philiphelger</a> |
 Kindly supported by [YourKit Java Profiler](https://www.yourkit.com)
