@@ -396,12 +396,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     {
       final Locale aCountry = CountryCache.getInstance ().getCountry (aEntity.getCountryCode ());
       final HCNodeList aCtrl = new HCNodeList ();
-      final EFamFamFlagIcon eIcon = EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
+      final EFamFamFlagIcon eIcon = aCountry == null ? null : EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
       if (eIcon != null)
-      {
-        aCtrl.addChild (eIcon.getAsNode ());
-        aCtrl.addChild (" ");
-      }
+        aCtrl.addChild (eIcon.getAsNode ()).addChild (" ");
       aCtrl.addChild (aCountry.getDisplayCountry (aDisplayLocale) + " [" + aEntity.getCountryCode () + "]");
       aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code").setCtrl (aCtrl));
     }
@@ -1198,7 +1195,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
           final Locale aCountry = CountryCache.getInstance ().getCountry (aEntity.getCountryCode ());
           final IHCCell <?> aCountryCell = aRow.addCell ();
-          final EFamFamFlagIcon eIcon = EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
+          final EFamFamFlagIcon eIcon = aCountry == null ? null
+                                                         : EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
           if (eIcon != null)
             aCountryCell.addChild (eIcon.getAsNode ()).addChild (" ");
           aCountryCell.addChild (aCountry.getDisplayCountry (aDisplayLocale));
