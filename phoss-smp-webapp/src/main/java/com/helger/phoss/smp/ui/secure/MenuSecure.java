@@ -32,7 +32,6 @@ import com.helger.photon.core.menu.IMenuItemPage;
 import com.helger.photon.core.menu.IMenuObjectFilter;
 import com.helger.photon.core.menu.IMenuTree;
 import com.helger.photon.core.menu.filter.MenuObjectFilterUserAssignedToUserGroup;
-import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uicore.page.system.BasePageShowChildren;
 
 @Immutable
@@ -63,9 +62,9 @@ public final class MenuSecure
                             new PageSecureServiceGroupMigrationInbound (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_INBOUND));
     }
     {
-      final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new BasePageShowChildren <WebPageExecutionContext> (CMenuSecure.MENU_ENDPOINTS,
-                                                                                                                     "Endpoints",
-                                                                                                                     aMenuTree));
+      final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new BasePageShowChildren <> (CMenuSecure.MENU_ENDPOINTS,
+                                                                                              "Endpoints",
+                                                                                              aMenuTree));
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointList (CMenuSecure.MENU_ENDPOINT_LIST));
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointTree (CMenuSecure.MENU_ENDPOINT_TREE));
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointChangeURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_URL));
@@ -81,9 +80,9 @@ public final class MenuSecure
 
     // Administrator
     {
-      final IMenuItemPage aAdmin = aMenuTree.createRootItem (new BasePageShowChildren <WebPageExecutionContext> (CMenuSecure.MENU_ADMIN,
-                                                                                                                 "Administration",
-                                                                                                                 aMenuTree));
+      final IMenuItemPage aAdmin = aMenuTree.createRootItem (new BasePageShowChildren <> (CMenuSecure.MENU_ADMIN,
+                                                                                          "Administration",
+                                                                                          aMenuTree));
       {
         final IMenuItemPage aAdminSML = aMenuTree.createItem (aAdmin,
                                                               new BasePageShowChildren <> (CMenuSecure.MENU_SML,
@@ -104,8 +103,7 @@ public final class MenuSecure
       aMenuTree.createItem (aAdmin, new PageSecureSMPSettings (CMenuSecure.MENU_SMP_SETTINGS));
       aMenuTree.createItem (aAdmin, new PageSecureSMPIdentifierMappings (CMenuSecure.MENU_SMP_IDENTIFIER_MAPPINGS));
       aMenuTree.createItem (aAdmin, new PageSecureTransportProfiles (CMenuSecure.MENU_TRANSPORT_PROFILES));
-      aMenuTree.createItem (aAdmin,
-                            new BasePageSecurityChangePassword <WebPageExecutionContext> (CMenuSecure.MENU_CHANGE_PASSWORD));
+      aMenuTree.createItem (aAdmin, new BasePageSecurityChangePassword <> (CMenuSecure.MENU_CHANGE_PASSWORD));
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CSMPServer.DEFAULT_LOCALE);
 
       if (SMPWebAppConfiguration.isWebAppPageSessionManagmentDisabled ())
