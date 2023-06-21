@@ -204,6 +204,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       RequestTrackerSettings.setLongRunningRequestsCheckEnabled (false);
       RequestTrackerSettings.setParallelRunningRequestsCheckEnabled (false);
     }
+
     // Handled via the XServletSettings instead
     UnifiedResponseDefaultSettings.setReferrerPolicy (null);
     UnifiedResponseDefaultSettings.setXFrameOptions (null, null);
@@ -212,6 +213,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       // Peppol SMP is always http only
       UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
     }
+
     // Avoid writing unnecessary stuff
     setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
 
@@ -295,6 +297,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       aCFM.registerAll (SMPConfigProvider.getConfig ());
       aCFM.registerAll (PDClientConfiguration.getConfig ());
     }
+
     {
       LOGGER.info ("Init of Directory client stuff");
 
@@ -372,6 +375,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                       });
       }
     }
+
     {
       LOGGER.info ("Init of HTTP and Proxy settings");
       // Register global proxy servers

@@ -14,8 +14,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.redirect.LoggingSMPRedirectCallback;
-import com.helger.phoss.smp.domain.serviceinfo.LoggingSMPServiceInformationCallback;
 import com.helger.photon.app.mock.PhotonAppWebTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -37,12 +35,6 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
     super.before ();
 
     SMPMetaManager.initBackendFromConfiguration ();
-    // Add some logging
-    if (false)
-      SMPMetaManager.getServiceInformationMgr ()
-                    .serviceInformationCallbacks ()
-                    .add (new LoggingSMPServiceInformationCallback ());
-    SMPMetaManager.getRedirectMgr ().redirectCallbacks ().add (new LoggingSMPRedirectCallback ());
 
     PhotonSecurityManager.getUserMgr ()
                          .createPredefinedUser (CSecurity.USER_ADMINISTRATOR_ID,

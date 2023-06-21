@@ -31,12 +31,14 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.LoggingSMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.redirect.LoggingSMPRedirectCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.LoggingSMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.serviceinfo.LoggingSMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
@@ -122,6 +124,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   {
     // Always log
     m_aServiceGroupMgr.serviceGroupCallbacks ().add (new LoggingSMPServiceGroupCallback ());
+    m_aRedirectMgr.redirectCallbacks ().add (new LoggingSMPRedirectCallback ());
+    m_aServiceInformationMgr.serviceInformationCallbacks ().add (new LoggingSMPServiceInformationCallback ());
+
     if (m_aBusinessCardMgr != null)
     {
       // If service group is deleted, also delete respective business card
@@ -133,6 +138,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         m_aServiceGroupMgr.serviceGroupCallbacks ()
                           .add (new ParticipantMigrationSMPServiceGroupCallback (m_aParticipantMigrationMgr));
       }
+
+      // Always log
       m_aBusinessCardMgr.bcCallbacks ().add (new LoggingSMPBusinessCardCallback ());
     }
   }
