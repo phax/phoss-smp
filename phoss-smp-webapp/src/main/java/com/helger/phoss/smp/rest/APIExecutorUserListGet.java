@@ -56,7 +56,8 @@ public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
         // Unspecified extension
         final com.helger.xsds.peppol.smp1.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID,
                                                                                                                                              aCredentials);
-        aBytes = new SMPMarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        aBytes = new SMPMarshallerServiceGroupReferenceListType ().setUseSchema (XML_SCHEMA_VALIDATION)
+                                                                  .getAsBytes (ret);
         break;
       }
       case OASIS_BDXR_V1:
@@ -64,7 +65,8 @@ public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
         // Unspecified extension
         final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID,
                                                                                                                                              aCredentials);
-        aBytes = new BDXR1MarshallerServiceGroupReferenceListType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        aBytes = new BDXR1MarshallerServiceGroupReferenceListType ().setUseSchema (XML_SCHEMA_VALIDATION)
+                                                                    .getAsBytes (ret);
         break;
       }
       // Not available in OASIS BDXR v2

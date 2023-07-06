@@ -73,8 +73,9 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
                                                                                                                                    sPathDocumentTypeID);
 
         // Convert to DOM document
+        final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType ();
         // Disable XSD check, because Signature is added later
-        final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType (false);
+        aMarshaller.setUseSchema (false);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
@@ -84,8 +85,9 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
                                                                                                                                    sPathDocumentTypeID);
 
         // Convert to DOM document
+        final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType ();
         // Disable XSD check, because Signature is added later
-        final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType (false);
+        aMarshaller.setUseSchema (false);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
@@ -95,8 +97,9 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
                                                                                                                              sPathDocumentTypeID);
 
         // Convert to DOM document
+        final BDXR2MarshallerServiceMetadata aMarshaller = new BDXR2MarshallerServiceMetadata ();
         // Disable XSD check, because Signature is added later
-        final BDXR2MarshallerServiceMetadata aMarshaller = new BDXR2MarshallerServiceMetadata (false);
+        aMarshaller.setUseSchema (false);
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }

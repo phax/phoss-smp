@@ -58,7 +58,7 @@ public final class SMPServiceGroupTest
     assertNotNull (aSGPeppol.getExtension ());
     aSGPeppol.setServiceMetadataReferenceCollection (new com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType ());
 
-    final Document aDoc = new SMPMarshallerServiceGroupType (true).getAsDocument (aSGPeppol);
+    final Document aDoc = new SMPMarshallerServiceGroupType ().getAsDocument (aSGPeppol);
     assertNotNull (aDoc);
   }
 
@@ -90,7 +90,7 @@ public final class SMPServiceGroupTest
     aSGBDXR.setServiceMetadataReferenceCollection (new com.helger.xsds.bdxr.smp1.ServiceMetadataReferenceCollectionType ());
     assertEquals (2, aSGBDXR.getExtension ().size ());
 
-    final Document aDoc = new BDXR1MarshallerServiceGroupType (true).getAsDocument (aSGBDXR);
+    final Document aDoc = new BDXR1MarshallerServiceGroupType ().getAsDocument (aSGBDXR);
     assertNotNull (aDoc);
   }
 }

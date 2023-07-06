@@ -77,7 +77,8 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
     {
       case PEPPOL:
       {
-        final com.helger.xsds.peppol.smp1.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
+        final com.helger.xsds.peppol.smp1.ServiceMetadataType aServiceMetadata = new SMPMarshallerServiceMetadataType ().setUseSchema (XML_SCHEMA_VALIDATION)
+                                                                                                                        .read (aServiceMetadataDoc);
         if (aServiceMetadata != null)
         {
           eSuccess = new SMPServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
@@ -89,7 +90,8 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
       }
       case OASIS_BDXR_V1:
       {
-        final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
+        final com.helger.xsds.bdxr.smp1.ServiceMetadataType aServiceMetadata = new BDXR1MarshallerServiceMetadataType ().setUseSchema (XML_SCHEMA_VALIDATION)
+                                                                                                                        .read (aServiceMetadataDoc);
         if (aServiceMetadata != null)
         {
           eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
@@ -101,7 +103,8 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
       }
       case OASIS_BDXR_V2:
       {
-        final com.helger.xsds.bdxr.smp2.ServiceMetadataType aServiceMetadata = new BDXR2MarshallerServiceMetadata (XML_SCHEMA_VALIDATION).read (aServiceMetadataDoc);
+        final com.helger.xsds.bdxr.smp2.ServiceMetadataType aServiceMetadata = new BDXR2MarshallerServiceMetadata ().setUseSchema (XML_SCHEMA_VALIDATION)
+                                                                                                                    .read (aServiceMetadataDoc);
         if (aServiceMetadata != null)
         {
           eSuccess = new BDXR2ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,

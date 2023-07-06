@@ -53,19 +53,19 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
       case PEPPOL:
       {
         final com.helger.xsds.peppol.smp1.ServiceGroupType ret = new SMPServerAPI (aDataProvider).getServiceGroup (sPathServiceGroupID);
-        aBytes = new SMPMarshallerServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        aBytes = new SMPMarshallerServiceGroupType ().setUseSchema (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       case OASIS_BDXR_V1:
       {
         final com.helger.xsds.bdxr.smp1.ServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroup (sPathServiceGroupID);
-        aBytes = new BDXR1MarshallerServiceGroupType (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        aBytes = new BDXR1MarshallerServiceGroupType ().setUseSchema (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       case OASIS_BDXR_V2:
       {
         final com.helger.xsds.bdxr.smp2.ServiceGroupType ret = new BDXR2ServerAPI (aDataProvider).getServiceGroup (sPathServiceGroupID);
-        aBytes = new BDXR2MarshallerServiceGroup (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        aBytes = new BDXR2MarshallerServiceGroup ().setUseSchema (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       default:
