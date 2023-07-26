@@ -26,7 +26,7 @@
   </parent>
   <groupId>com.helger</groupId>
   <artifactId>phoss-smp-parent-pom</artifactId>
-  <version>7.0.2</version>
+  <version>7.0.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>phoss-smp-parent-pom</name>
   <description>Base POM to build the phoss SMP projects</description>
