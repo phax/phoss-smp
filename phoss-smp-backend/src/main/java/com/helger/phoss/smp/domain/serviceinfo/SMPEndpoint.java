@@ -204,7 +204,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     ret.setCertificate (CertificateHelper.getRFC1421CompliantString (m_sCertificate, false, "\n"));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
-    ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
+    if (StringHelper.hasText (m_sTechnicalInformationUrl))
+      ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
     ret.setExtension (getExtensions ().getAsPeppolExtension ());
     ret.setTransportProfile (m_sTransportProfile);
     return ret;
