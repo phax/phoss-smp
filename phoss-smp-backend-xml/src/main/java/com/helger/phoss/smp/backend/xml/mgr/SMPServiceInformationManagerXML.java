@@ -45,8 +45,8 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
-import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
 /**
  * Manager for all {@link SMPServiceInformation} objects.

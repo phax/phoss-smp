@@ -31,7 +31,7 @@ import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.mgr.SMPTransportProfileManagerJDBC;
 import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
-import com.helger.photon.app.io.WebFileIO;
+import com.helger.photon.io.WebFileIO;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**

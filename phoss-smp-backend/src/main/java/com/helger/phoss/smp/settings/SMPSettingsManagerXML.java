@@ -18,7 +18,7 @@ import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
 import com.helger.dao.DAOException;
-import com.helger.photon.app.dao.AbstractPhotonSimpleDAO;
+import com.helger.photon.io.dao.AbstractPhotonSimpleDAO;
 import com.helger.settings.ISettings;
 import com.helger.settings.Settings;
 import com.helger.settings.exchange.xml.SettingsMicroDocumentConverter;

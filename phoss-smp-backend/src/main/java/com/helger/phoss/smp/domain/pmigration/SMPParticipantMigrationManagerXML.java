@@ -23,8 +23,8 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
 /**
  * The XML implementation of {@link ISMPParticipantMigrationManager}

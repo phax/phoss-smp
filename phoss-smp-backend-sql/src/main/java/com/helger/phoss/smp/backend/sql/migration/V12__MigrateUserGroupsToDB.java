@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
-import com.helger.photon.app.io.WebFileIO;
+import com.helger.photon.io.WebFileIO;
 import com.helger.photon.jdbc.security.RoleManagerJDBC;
 import com.helger.photon.jdbc.security.UserGroupManagerJDBC;
 import com.helger.photon.jdbc.security.UserManagerJDBC;

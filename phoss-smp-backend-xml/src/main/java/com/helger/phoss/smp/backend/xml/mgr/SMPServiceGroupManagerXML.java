@@ -49,8 +49,8 @@ import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
-import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
 /**
  * Implementation of {@link ISMPServiceGroupManager} for the XML backend.

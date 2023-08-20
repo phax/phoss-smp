@@ -27,7 +27,7 @@ import com.helger.commons.io.file.SimpleFileIO;
 import com.helger.commons.string.StringParser;
 import com.helger.phoss.smp.backend.sql.mgr.SMPIDFactoryJDBC;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
-import com.helger.photon.app.io.WebFileIO;
+import com.helger.photon.io.WebFileIO;
 
 /**
  * Special SMP web app listener for the SQL backend

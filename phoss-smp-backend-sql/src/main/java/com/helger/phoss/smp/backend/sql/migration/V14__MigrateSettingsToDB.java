@@ -29,7 +29,7 @@ import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.mgr.SMPSettingsManagerJDBC;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
-import com.helger.photon.app.io.WebFileIO;
+import com.helger.photon.io.WebFileIO;
 import com.helger.web.scope.mgr.WebScoped;
 
 public class V14__MigrateSettingsToDB extends BaseJavaMigration

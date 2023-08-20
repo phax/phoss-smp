@@ -24,8 +24,8 @@ import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.SMPTransportProfile;
-import com.helger.photon.app.dao.AbstractPhotonMapBasedWALDAO;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
 public final class SMPTransportProfileManagerXML extends
                                                  AbstractPhotonMapBasedWALDAO <ISMPTransportProfile, SMPTransportProfile>
