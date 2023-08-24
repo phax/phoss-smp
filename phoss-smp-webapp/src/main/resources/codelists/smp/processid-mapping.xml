@@ -16,15 +16,23 @@
   <item id="cenbii-procid-ubl::urn:fdc:bits.no:2017:profile:09:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:bits.no:2017:profile:10:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:bits.no:2017:profile:11:1.0" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:hr-xml:2007:timesheet:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:poacc:selfbilling:01:1.0" name="Peppol predefined" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p001:01:1.0" name="Peppol predefined" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p002:01:1.0" name="Peppol predefined" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p003:01:1.0" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p001:01:1.0" name="Peppol predefined" deprecated="true" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p002:01:1.0" name="Peppol predefined" deprecated="true" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p003:01:1.0" name="Peppol predefined" deprecated="true" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:edec:bis:reporting:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:despatch_advice_only:1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_receipt_advice:1" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_response:1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:transport_execution_plan_only:1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:transport_execution_plan_w_request:1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:transportation_status_only:1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:transportation_status_w_request:1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:waybill:1" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:weight_statement:1" name="Peppol predefined" deprecated="false" />
-  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:oo:bis:reporting:1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:oo:bis:reporting:1" name="Peppol predefined" deprecated="true" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:advanced_ordering:3" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:catalogue_only:3" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:catalogue_wo_response:3" name="Peppol predefined" deprecated="false" />
@@ -37,16 +45,23 @@
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:bis:punch_out:3" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:poacc:en16931:any" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p001:1.1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p001:1.2" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p002:1.1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p002:1.2" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p003:1.1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p003:1.2" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p004:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p004:1.1" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p005:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p005:1.1" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p006:1.1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p006:1.2" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p007:1.1" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p008:1.1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p008:1.2" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p009:1.1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p010:1.1" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:prac:bis:p011:1.1" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:www.efaktura.gov.pl:ver1.0:account_corr:ver1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:www.efaktura.gov.pl:ver1.0:corr_inv:ver1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:www.efaktura.gov.pl:ver1.0:receipt_advice:ver1.0" name="Peppol predefined" deprecated="false" />
@@ -55,6 +70,8 @@
   <item id="cenbii-procid-ubl::urn:fdc:www.efaktura.gov.pl:ver2.0:sbcn:ver1.4" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:www.efaktura.gov.pl:ver2.0:us:ver1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:kosit:profile:reporting:1.0" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:peppol:bis:billing" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:peppol:bis:selfbilling" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii01:ver1.0" name="Peppol predefined" deprecated="true" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii01:ver2.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii03:ver1.0" name="Peppol predefined" deprecated="true" />
