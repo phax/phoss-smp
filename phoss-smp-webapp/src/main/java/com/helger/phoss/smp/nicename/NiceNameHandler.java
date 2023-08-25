@@ -35,6 +35,10 @@ import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.peppolid.factory.SimpleIdentifierFactory;
+import com.helger.peppolid.peppol.PeppolIdentifierHelper;
+import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
+import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifierParts;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.xml.microdom.IMicroDocument;
@@ -43,7 +47,10 @@ import com.helger.xml.microdom.serialize.MicroReader;
 
 public final class NiceNameHandler
 {
+  private static final String PREFIX_WILDCARD = PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_PEPPOL_DOCTYPE_WILDCARD +
+                                                "::";
   private static final Logger LOGGER = LoggerFactory.getLogger (NiceNameHandler.class);
+
   private static final SimpleReadWriteLock RW_LOCK = new SimpleReadWriteLock ();
   @GuardedBy ("RW_LOCK")
   private static final ICommonsOrderedMap <String, NiceNameEntry> DOCTYPE_IDS = new CommonsLinkedHashMap <> ();
@@ -71,7 +78,7 @@ public final class NiceNameHandler
     {
       for (final IMicroElement eChild : aDoc.getDocumentElement ().getAllChildElements ("item"))
       {
-        final String sID = eChild.getAttributeValue ("id");
+        String sID = eChild.getAttributeValue ("id");
         final String sName = eChild.getAttributeValue ("name");
         final boolean bDeprecated = eChild.getAttributeValueAsBool ("deprecated", false);
         ICommonsList <IProcessIdentifier> aProcIDs = null;
@@ -82,7 +89,31 @@ public final class NiceNameHandler
             aProcIDs.add (new SimpleProcessIdentifier (eItem.getAttributeValue ("scheme"),
                                                        eItem.getAttributeValue ("value")));
         }
-        ret.put (sID, new NiceNameEntry (sName, bDeprecated, aProcIDs));
+
+        String sSpecialLabel = null;
+        if (sID.startsWith (PREFIX_WILDCARD))
+        {
+          // When loading wildcards, a special handling is needed
+          // Because the identifiers in the codelist are without "*" we need to
+          // add the "*" here, because the SMP entries need the "*" to be
+          // correct
+          sSpecialLabel = "Wildcard";
+
+          final IDocumentTypeIdentifier aDT = SimpleIdentifierFactory.INSTANCE.parseDocumentTypeIdentifier (sID);
+          final IPeppolDocumentTypeIdentifierParts aParts = PeppolDocumentTypeIdentifierParts.extractFromIdentifier (aDT);
+          if (aParts != null)
+          {
+            // Add the "*" to the Customization ID for the SMP
+            final PeppolDocumentTypeIdentifierParts aStarParts = new PeppolDocumentTypeIdentifierParts (aParts.getRootNS (),
+                                                                                                        aParts.getLocalName (),
+                                                                                                        aParts.getCustomizationID () +
+                                                                                                                                "*",
+                                                                                                        aParts.getVersion ());
+            sID = PREFIX_WILDCARD + aStarParts.getAsDocumentTypeIdentifierValue ();
+          }
+        }
+
+        ret.put (sID, new NiceNameEntry (sName, bDeprecated, sSpecialLabel, aProcIDs));
       }
     }
     return ret;

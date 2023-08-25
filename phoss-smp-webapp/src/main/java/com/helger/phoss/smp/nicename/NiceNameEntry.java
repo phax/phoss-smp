@@ -32,14 +32,17 @@ public final class NiceNameEntry implements Serializable
 {
   private final String m_sName;
   private final boolean m_bDeprecated;
+  private final String m_sSpecialLabel;
   private final ICommonsList <IProcessIdentifier> m_aProcIDs;
 
   public NiceNameEntry (@Nonnull @Nonempty final String sName,
                         final boolean bDeprecated,
+                        @Nullable final String sSpecialLabel,
                         @Nullable final ICommonsList <IProcessIdentifier> aProcIDs)
   {
     m_sName = sName;
     m_bDeprecated = bDeprecated;
+    m_sSpecialLabel = sSpecialLabel;
     m_aProcIDs = aProcIDs;
   }
 
@@ -53,6 +56,12 @@ public final class NiceNameEntry implements Serializable
   public boolean isDeprecated ()
   {
     return m_bDeprecated;
+  }
+
+  @Nullable
+  public String getSpecialLabel ()
+  {
+    return m_sSpecialLabel;
   }
 
   public boolean hasProcessIDs ()
@@ -91,8 +100,9 @@ public final class NiceNameEntry implements Serializable
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("Name", m_sName)
+    return new ToStringGenerator (null).append ("Name", m_sName)
                                        .append ("Deprecated", m_bDeprecated)
+                                       .append ("SpecialLabel", m_sSpecialLabel)
                                        .append ("ProcessIDs", m_aProcIDs)
                                        .getToString ();
   }
