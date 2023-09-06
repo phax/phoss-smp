@@ -119,10 +119,10 @@ final class FlywayMigrator
 
     final FluentConfiguration aFlywayConfig = Flyway.configure ()
                                                     .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
-                                                                                       SMPJDBCConfiguration.getJdbcDriver (),
-                                                                                       SMPJDBCConfiguration.getJdbcUrl (),
-                                                                                       SMPJDBCConfiguration.getJdbcUser (),
-                                                                                       SMPJDBCConfiguration.getJdbcPassword ()));
+                                                                                       SMPJDBCConfiguration.getFlywayJdbcDriver (),
+                                                                                       SMPJDBCConfiguration.getFlywayJdbcUrl (),
+                                                                                       SMPJDBCConfiguration.getFlywayJdbcUser (),
+                                                                                       SMPJDBCConfiguration.getFlywayJdbcPassword ()));
 
     // Required for creating DB tables
     aFlywayConfig.baselineOnMigrate (true);

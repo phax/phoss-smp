@@ -74,6 +74,15 @@ public final class SMPJDBCConfiguration
   private static final String CONFIG_SMP_FLYWAY_BASELINE_VERSION = "smp.flyway.baseline.version";
   private static final int DEFAULT_SMP_FLYWAY_BASELINE_VERSION = 0;
 
+  @Since ("7.0.4")
+  private static final String CONFIG_SMP_FLYWAY_JDBC_DRIVER = "smp.flyway.jdbc.driver";
+  @Since ("7.0.4")
+  private static final String CONFIG_SMP_FLYWAY_JDBC_USER = "smp.flyway.jdbc.user";
+  @Since ("7.0.4")
+  private static final String CONFIG_SMP_FLYWAY_JDBC_PASSWORD = "smp.flyway.jdbc.password";
+  @Since ("7.0.4")
+  private static final String CONFIG_SMP_FLYWAY_JDBC_URL = "smp.flyway.jdbc.url";
+
   @PresentForCodeCoverage
   private static final SMPJDBCConfiguration INSTANCE = new SMPJDBCConfiguration ();
 
@@ -167,6 +176,34 @@ public final class SMPJDBCConfiguration
   public static int getFlywayBaselineVersion ()
   {
     return _getConfig ().getAsInt (CONFIG_SMP_FLYWAY_BASELINE_VERSION, DEFAULT_SMP_FLYWAY_BASELINE_VERSION);
+  }
+
+  @Nullable
+  public static String getFlywayJdbcDriver ()
+  {
+    final String ret = _getConfig ().getAsString (CONFIG_SMP_FLYWAY_JDBC_DRIVER);
+    return ret != null ? ret : getJdbcDriver ();
+  }
+
+  @Nullable
+  public static String getFlywayJdbcUser ()
+  {
+    final String ret = _getConfig ().getAsString (CONFIG_SMP_FLYWAY_JDBC_USER);
+    return ret != null ? ret : getJdbcUser ();
+  }
+
+  @Nullable
+  public static String getFlywayJdbcPassword ()
+  {
+    final String ret = _getConfig ().getAsString (CONFIG_SMP_FLYWAY_JDBC_PASSWORD);
+    return ret != null ? ret : getJdbcPassword ();
+  }
+
+  @Nullable
+  public static String getFlywayJdbcUrl ()
+  {
+    final String ret = _getConfig ().getAsString (CONFIG_SMP_FLYWAY_JDBC_URL);
+    return ret != null ? ret : getJdbcUrl ();
   }
 
   public static boolean isStatusEnabled ()
