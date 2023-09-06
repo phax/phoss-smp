@@ -24,7 +24,6 @@
   <description>SMP backend library with all common parts used for a full SMP server web application</description>
   <url>https://github.com/phax/phoss-smp/phoss-smp-backend</url>
   <inceptionYear>2015</inceptionYear>
-
   <licenses>
     <license>
       <name>MPL 2.0</name>
@@ -32,12 +31,10 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
   <organization>
     <name>Philip Helger</name>
     <url>http://www.helger.com</url>
   </organization>
-
   <developers>
     <developer>
       <id>philip</id>
@@ -46,7 +43,6 @@
       <url>http://www.helger.com</url>
     </developer>
   </developers>
-
   <dependencies>
     <dependency>
       <groupId>com.helger.commons</groupId>
@@ -88,7 +84,6 @@
       <groupId>com.helger</groupId>
       <artifactId>ph-xmldsig</artifactId>
     </dependency>
-
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
@@ -104,7 +99,6 @@
       <artifactId>ph-oton-security</artifactId>
       <optional>true</optional>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -116,7 +110,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
     <resources>
       <!-- Hack to filter only properties files -->
@@ -135,7 +128,6 @@
         </excludes>
       </resource>
     </resources>
-    
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -149,7 +141,8 @@
             <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)",
 osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)",
 osgi.serviceloader; filter:="(osgi.serviceloader=com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI)"; cardinality:=multiple; resolution:=optional</Require-Capability>
-            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI</Provide-Capability>
+            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.commons.typeconvert.ITypeConverterRegistrarSPI,
+osgi.serviceloader; osgi.serviceloader=com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI</Provide-Capability>
             <!-- The latter one has precedence -->
             <Include-Resource>{maven-resources},smp-server-version.properties=target/classes/smp-server-version.properties</Include-Resource>
           </instructions>
