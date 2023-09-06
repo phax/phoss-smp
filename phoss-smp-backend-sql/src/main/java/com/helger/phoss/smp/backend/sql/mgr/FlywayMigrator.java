@@ -117,9 +117,10 @@ final class FlywayMigrator
       }
     };
 
+    // The JDBC driver is the same as for main connection
     final FluentConfiguration aFlywayConfig = Flyway.configure ()
                                                     .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
-                                                                                       SMPJDBCConfiguration.getFlywayJdbcDriver (),
+                                                                                       SMPJDBCConfiguration.getJdbcDriver (),
                                                                                        SMPJDBCConfiguration.getFlywayJdbcUrl (),
                                                                                        SMPJDBCConfiguration.getFlywayJdbcUser (),
                                                                                        SMPJDBCConfiguration.getFlywayJdbcPassword ()));
