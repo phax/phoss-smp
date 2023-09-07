@@ -257,6 +257,8 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     aNodeList.addChild (info ().addChildren (div ("Prepare the update of your SMP certificate in the future."),
                                              div ("Note: this is a custom SML extension that only works with the CEF SML instances!")));
 
+    aNodeList.addChild (warn ("This step MUST be performed with the old SMP certificate installed, as long as it is valid"));
+
     // check for expired certificate
     boolean bShowForm = true;
     {
