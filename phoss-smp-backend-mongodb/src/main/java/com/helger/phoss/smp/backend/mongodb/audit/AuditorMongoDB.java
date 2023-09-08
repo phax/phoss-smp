@@ -57,6 +57,12 @@ import com.mongodb.client.MongoCollection;
  */
 public class AuditorMongoDB implements IAuditor
 {
+  private static final String BSON_DT = "dt";
+  private static final String BSON_USERID = "userid";
+  private static final String BSON_TYPE = "type";
+  private static final String BSON_SUCCESS = "success";
+  private static final String BSON_ACTION = "action";
+
   private static final Logger LOGGER = LoggerFactory.getLogger (AuditorMongoDB.class);
 
   /** The default collection name if none is provided */
@@ -97,20 +103,20 @@ public class AuditorMongoDB implements IAuditor
   @ReturnsMutableCopy
   public static Document toBson (@Nonnull final IAuditItem aValue)
   {
-    return new Document ().append ("dt", TypeConverter.convert (aValue.getDateTime (), Date.class))
-                          .append ("userid", aValue.getUserID ())
-                          .append ("type", aValue.getTypeID ())
-                          .append ("success", Boolean.valueOf (aValue.isSuccess ()))
-                          .append ("action", aValue.getAction ());
+    return new Document ().append (BSON_DT, TypeConverter.convert (aValue.getDateTime (), Date.class))
+                          .append (BSON_USERID, aValue.getUserID ())
+                          .append (BSON_TYPE, aValue.getTypeID ())
+                          .append (BSON_SUCCESS, Boolean.valueOf (aValue.isSuccess ()))
+                          .append (BSON_ACTION, aValue.getAction ());
   }
 
   @Nonnull
   @ReturnsMutableCopy
   public static AuditItem toDomain (@Nonnull final Document aDoc)
   {
-    final LocalDateTime aDT = TypeConverter.convert (aDoc.getDate ("dt"), LocalDateTime.class);
+    final LocalDateTime aDT = TypeConverter.convert (aDoc.getDate (BSON_DT), LocalDateTime.class);
 
-    String sAction = aDoc.getString ("action");
+    String sAction = aDoc.getString (BSON_ACTION);
     final List <Document> aArgsList = aDoc.getList ("args", Document.class);
     if (aArgsList != null)
     {
@@ -127,9 +133,9 @@ public class AuditorMongoDB implements IAuditor
     }
 
     return new AuditItem (aDT,
-                          aDoc.getString ("userid"),
-                          EAuditActionType.getFromIDOrNull (aDoc.getString ("type")),
-                          ESuccess.valueOf (aDoc.getBoolean ("success", false)),
+                          aDoc.getString (BSON_USERID),
+                          EAuditActionType.getFromIDOrNull (aDoc.getString (BSON_TYPE)),
+                          ESuccess.valueOf (aDoc.getBoolean (BSON_SUCCESS, false)),
                           sAction);
   }
 
@@ -163,7 +169,7 @@ public class AuditorMongoDB implements IAuditor
 
     final ICommonsList <IAuditItem> ret = new CommonsArrayList <> ();
     m_aCollection.find ()
-                 .sort (new Document ("dt", MongoClientProvider.SORT_DESCENDING))
+                 .sort (new Document (BSON_DT, MongoClientProvider.SORT_DESCENDING))
                  .limit (nMaxItems)
                  .forEach (x -> ret.add (toDomain (x)));
     return ret;
@@ -173,12 +179,12 @@ public class AuditorMongoDB implements IAuditor
   public LocalDate getEarliestAuditDate ()
   {
     final Document aDoc = m_aCollection.find ()
-                                       .sort (new Document ("dt", MongoClientProvider.SORT_ASCENDING))
+                                       .sort (new Document (BSON_DT, MongoClientProvider.SORT_ASCENDING))
                                        .batchSize (1)
                                        .first ();
     if (aDoc != null)
     {
-      final LocalDateTime aLDT = TypeConverter.convert (aDoc.getDate ("dt"), LocalDateTime.class);
+      final LocalDateTime aLDT = TypeConverter.convert (aDoc.getDate (BSON_DT), LocalDateTime.class);
       if (aLDT != null)
         return aLDT.toLocalDate ();
     }
