@@ -30,6 +30,7 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
+import com.helger.phoss.smp.backend.sql.SMPFlywayConfiguration;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -71,11 +72,11 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
     // Flyway migration is enabled by default
-    if (SMPJDBCConfiguration.isFlywayEnabled ())
+    if (SMPFlywayConfiguration.isFlywayEnabled ())
       FlywayMigrator.Singleton.INSTANCE.runFlyway (m_eDBType);
     else
       LOGGER.warn ("Flyway Migration is disabled according to the configuration item " +
-                   SMPJDBCConfiguration.CONFIG_SMP_FLYWAY_ENABLED);
+                   SMPFlywayConfiguration.CONFIG_SMP_FLYWAY_ENABLED);
 
     // Register this here, so that the SMPMetaManager is available
     DBExecutor.setConnectionStatusChangeCallback ( (eOld, eNew) ->

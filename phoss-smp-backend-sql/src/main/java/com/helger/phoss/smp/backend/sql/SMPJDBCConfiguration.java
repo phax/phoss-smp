@@ -66,20 +66,8 @@ public final class SMPJDBCConfiguration
   private static final String CONFIG_JDBC_DEBUG_SQL = "jdbc.debug.sql";
   private static final boolean DEFAULT_JDBC_DEBUG_SQL = false;
 
-  @Since ("5.4.0")
-  public static final String CONFIG_SMP_FLYWAY_ENABLED = "smp.flyway.enabled";
-  private static final boolean DEFAULT_SMP_FLYWAY_ENABLED = true;
-
-  @Since ("7.0.4")
-  private static final String CONFIG_SMP_FLYWAY_JDBC_USER = "smp.flyway.jdbc.user";
-  @Since ("7.0.4")
-  private static final String CONFIG_SMP_FLYWAY_JDBC_PASSWORD = "smp.flyway.jdbc.password";
-  @Since ("7.0.4")
-  private static final String CONFIG_SMP_FLYWAY_JDBC_URL = "smp.flyway.jdbc.url";
-
-  @Since ("6.0.0")
-  private static final String CONFIG_SMP_FLYWAY_BASELINE_VERSION = "smp.flyway.baseline.version";
-  private static final int DEFAULT_SMP_FLYWAY_BASELINE_VERSION = 0;
+  private static final String CONFIG_SMP_STATUS_SQL_ENABLED = "smp.status.sql.enabled";
+  private static final boolean DEFAULT_SMP_STATUS_SQL_ENABLED = true;
 
   @PresentForCodeCoverage
   private static final SMPJDBCConfiguration INSTANCE = new SMPJDBCConfiguration ();
@@ -166,39 +154,8 @@ public final class SMPJDBCConfiguration
     return _getConfig ().getAsBoolean (CONFIG_JDBC_DEBUG_SQL, DEFAULT_JDBC_DEBUG_SQL);
   }
 
-  public static boolean isFlywayEnabled ()
-  {
-    return _getConfig ().getAsBoolean (CONFIG_SMP_FLYWAY_ENABLED, DEFAULT_SMP_FLYWAY_ENABLED);
-  }
-
-  public static int getFlywayBaselineVersion ()
-  {
-    return _getConfig ().getAsInt (CONFIG_SMP_FLYWAY_BASELINE_VERSION, DEFAULT_SMP_FLYWAY_BASELINE_VERSION);
-  }
-
-  @Nullable
-  public static String getFlywayJdbcUser ()
-  {
-    final String ret = _getConfig ().getAsString (CONFIG_SMP_FLYWAY_JDBC_USER);
-    return ret != null ? ret : getJdbcUser ();
-  }
-
-  @Nullable
-  public static String getFlywayJdbcPassword ()
-  {
-    final String ret = _getConfig ().getAsString (CONFIG_SMP_FLYWAY_JDBC_PASSWORD);
-    return ret != null ? ret : getJdbcPassword ();
-  }
-
-  @Nullable
-  public static String getFlywayJdbcUrl ()
-  {
-    final String ret = _getConfig ().getAsString (CONFIG_SMP_FLYWAY_JDBC_URL);
-    return ret != null ? ret : getJdbcUrl ();
-  }
-
   public static boolean isStatusEnabled ()
   {
-    return _getConfig ().getAsBoolean ("smp.status.sql.enabled", true);
+    return _getConfig ().getAsBoolean (CONFIG_SMP_STATUS_SQL_ENABLED, DEFAULT_SMP_STATUS_SQL_ENABLED);
   }
 }

@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
+import com.helger.phoss.smp.backend.sql.SMPFlywayConfiguration;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V10__MigrateRolesToDB;
 import com.helger.phoss.smp.backend.sql.migration.V11__MigrateUsersToDB;
@@ -121,9 +122,9 @@ final class FlywayMigrator
     final FluentConfiguration aFlywayConfig = Flyway.configure ()
                                                     .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
                                                                                        SMPJDBCConfiguration.getJdbcDriver (),
-                                                                                       SMPJDBCConfiguration.getFlywayJdbcUrl (),
-                                                                                       SMPJDBCConfiguration.getFlywayJdbcUser (),
-                                                                                       SMPJDBCConfiguration.getFlywayJdbcPassword ()));
+                                                                                       SMPFlywayConfiguration.getFlywayJdbcUrl (),
+                                                                                       SMPFlywayConfiguration.getFlywayJdbcUser (),
+                                                                                       SMPFlywayConfiguration.getFlywayJdbcPassword ()));
 
     // Required for creating DB tables
     aFlywayConfig.baselineOnMigrate (true);
@@ -133,7 +134,7 @@ final class FlywayMigrator
     aFlywayConfig.validateOnMigrate (false);
 
     // Version 1 is the baseline
-    aFlywayConfig.baselineVersion (Integer.toString (SMPJDBCConfiguration.getFlywayBaselineVersion ()))
+    aFlywayConfig.baselineVersion (Integer.toString (SMPFlywayConfiguration.getFlywayBaselineVersion ()))
                  .baselineDescription ("SMP 5.2.x database layout, MySQL only");
 
     // Separate directory per DB type
