@@ -64,13 +64,13 @@ public final class NiceNameUI
   }
 
   @Nonnull
-  private static IHCNode createFormattedID (@Nonnull final String sID,
-                                            @Nullable final String sName,
-                                            @Nullable final EBootstrapBadgeType eNameBadgeType,
-                                            final boolean bIsDeprecated,
-                                            @Nullable final String sSpecialLabel,
-                                            @Nullable final EBootstrapBadgeType eSpecialLabelBadgeType,
-                                            final boolean bInDetails)
+  private static IHCNode _createFormattedID (@Nonnull final String sID,
+                                             @Nullable final String sName,
+                                             @Nullable final EBootstrapBadgeType eNameBadgeType,
+                                             final boolean bIsDeprecated,
+                                             @Nullable final String sSpecialLabel,
+                                             @Nullable final EBootstrapBadgeType eSpecialLabelBadgeType,
+                                             final boolean bInDetails)
   {
     if (sName == null)
     {
@@ -112,20 +112,21 @@ public final class NiceNameUI
                                     final boolean bInDetails)
   {
     if (aNiceName == null)
-      return createFormattedID (sID, null, null, false, null, null, bInDetails);
-    return createFormattedID (sID,
-                              aNiceName.getName (),
-                              EBootstrapBadgeType.SUCCESS,
-                              aNiceName.isDeprecated (),
-                              aNiceName.getSpecialLabel (),
-                              EBootstrapBadgeType.INFO,
-                              bInDetails);
+      return _createFormattedID (sID, null, null, false, null, null, bInDetails);
+    return _createFormattedID (sID,
+                               aNiceName.getName (),
+                               EBootstrapBadgeType.SUCCESS,
+                               aNiceName.isDeprecated (),
+                               aNiceName.getSpecialLabel (),
+                               EBootstrapBadgeType.INFO,
+                               bInDetails);
   }
 
   @Nonnull
   public static IHCNode getDocumentTypeID (@Nonnull final IDocumentTypeIdentifier aDocTypeID, final boolean bInDetails)
   {
-    return _createID (aDocTypeID.getURIEncoded (), NiceNameHandler.getDocTypeNiceName (aDocTypeID), bInDetails);
+    final String sURI = aDocTypeID.getURIEncoded ();
+    return _createID (sURI, NiceNameHandler.getDocTypeNiceName (sURI), bInDetails);
   }
 
   @Nonnull
@@ -140,27 +141,27 @@ public final class NiceNameUI
     if (aNN != null)
       return _createID (sURI, aNN, bInDetails);
 
-    aNN = NiceNameHandler.getDocTypeNiceName (aDocTypeID);
+    aNN = NiceNameHandler.getDocTypeNiceName (aDocTypeID.getURIEncoded ());
     if (aNN != null)
     {
       if (aNN.containsProcessID (aProcessID))
-        return createFormattedID (sURI,
-                                  "Matching Process Identifier",
-                                  EBootstrapBadgeType.SUCCESS,
-                                  false,
-                                  null,
-                                  null,
-                                  bInDetails);
+        return _createFormattedID (sURI,
+                                   "Matching Process Identifier",
+                                   EBootstrapBadgeType.SUCCESS,
+                                   false,
+                                   null,
+                                   null,
+                                   bInDetails);
 
-      return createFormattedID (sURI,
-                                "Unexpected Process Identifier",
-                                EBootstrapBadgeType.WARNING,
-                                false,
-                                null,
-                                null,
-                                true);
+      return _createFormattedID (sURI,
+                                 "Unexpected Process Identifier",
+                                 EBootstrapBadgeType.WARNING,
+                                 false,
+                                 null,
+                                 null,
+                                 bInDetails);
     }
-    return createFormattedID (sURI, null, null, false, null, null, bInDetails);
+    return _createFormattedID (sURI, null, null, false, null, null, bInDetails);
   }
 
   @Nonnull
@@ -169,14 +170,14 @@ public final class NiceNameUI
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     final ISMPTransportProfile aTP = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfile);
     if (aTP == null)
-      return createFormattedID (sTransportProfile, null, null, false, null, null, bInDetails);
+      return _createFormattedID (sTransportProfile, null, null, false, null, null, bInDetails);
 
-    return createFormattedID (sTransportProfile,
-                              aTP.getName (),
-                              EBootstrapBadgeType.SUCCESS,
-                              aTP.getState ().isDeprecated (),
-                              null,
-                              null,
-                              bInDetails);
+    return _createFormattedID (sTransportProfile,
+                               aTP.getName (),
+                               EBootstrapBadgeType.SUCCESS,
+                               aTP.getState ().isDeprecated (),
+                               null,
+                               null,
+                               bInDetails);
   }
 }
