@@ -25,9 +25,9 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
-import com.helger.pd.businesscard.generic.PDName;
-import com.helger.pd.businesscard.v3.PD3APIHelper;
-import com.helger.pd.businesscard.v3.PD3MultilingualNameType;
+import com.helger.peppol.businesscard.generic.PDName;
+import com.helger.peppol.businesscard.v3.PD3APIHelper;
+import com.helger.peppol.businesscard.v3.PD3MultilingualNameType;
 
 /**
  * Generic name.

@@ -38,15 +38,15 @@ import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.commons.string.StringHelper;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-import com.helger.pd.businesscard.v1.PD1APIHelper;
-import com.helger.pd.businesscard.v1.PD1BusinessCardType;
-import com.helger.pd.businesscard.v1.PD1BusinessEntityType;
-import com.helger.pd.businesscard.v2.PD2APIHelper;
-import com.helger.pd.businesscard.v2.PD2BusinessCardType;
-import com.helger.pd.businesscard.v2.PD2BusinessEntityType;
-import com.helger.pd.businesscard.v3.PD3APIHelper;
-import com.helger.pd.businesscard.v3.PD3BusinessCardType;
-import com.helger.pd.businesscard.v3.PD3BusinessEntityType;
+import com.helger.peppol.businesscard.v1.PD1APIHelper;
+import com.helger.peppol.businesscard.v1.PD1BusinessCardType;
+import com.helger.peppol.businesscard.v1.PD1BusinessEntityType;
+import com.helger.peppol.businesscard.v2.PD2APIHelper;
+import com.helger.peppol.businesscard.v2.PD2BusinessCardType;
+import com.helger.peppol.businesscard.v2.PD2BusinessEntityType;
+import com.helger.peppol.businesscard.v3.PD3APIHelper;
+import com.helger.peppol.businesscard.v3.PD3BusinessCardType;
+import com.helger.peppol.businesscard.v3.PD3BusinessEntityType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
@@ -81,9 +81,9 @@ public final class BusinessCardInterfaceTest
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-xml-peppol.properties"));
 
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
-  private final com.helger.pd.businesscard.v1.ObjectFactory m_aBC1ObjFactory = new com.helger.pd.businesscard.v1.ObjectFactory ();
-  private final com.helger.pd.businesscard.v2.ObjectFactory m_aBC2ObjFactory = new com.helger.pd.businesscard.v2.ObjectFactory ();
-  private final com.helger.pd.businesscard.v3.ObjectFactory m_aBC3ObjFactory = new com.helger.pd.businesscard.v3.ObjectFactory ();
+  private final com.helger.peppol.businesscard.v1.ObjectFactory m_aBC1ObjFactory = new com.helger.peppol.businesscard.v1.ObjectFactory ();
+  private final com.helger.peppol.businesscard.v2.ObjectFactory m_aBC2ObjFactory = new com.helger.peppol.businesscard.v2.ObjectFactory ();
+  private final com.helger.peppol.businesscard.v3.ObjectFactory m_aBC3ObjFactory = new com.helger.peppol.businesscard.v3.ObjectFactory ();
 
   @Nonnull
   private static Builder _addCredentials (@Nonnull final Builder aBuilder)
@@ -129,8 +129,8 @@ public final class BusinessCardInterfaceTest
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (
+                                                                                                                        aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get SG - must work
@@ -155,9 +155,8 @@ public final class BusinessCardInterfaceTest
       aBE.setGeographicalInformation ("Berlin");
       aBC.addBusinessEntity (aBE);
 
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard")
-                                             .path (sPI)
-                                             .request ()).put (Entity.xml (m_aBC1ObjFactory.createBusinessCard (aBC)));
+      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
+                                                                                                            m_aBC1ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
@@ -174,9 +173,8 @@ public final class BusinessCardInterfaceTest
       aBE.setCountryCode ("SE");
       aBE.setGeographicalInformation ("Stockholm");
       aBC.addBusinessEntity (aBE);
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard")
-                                             .path (sPI)
-                                             .request ()).put (Entity.xml (m_aBC1ObjFactory.createBusinessCard (aBC)));
+      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
+                                                                                                            m_aBC1ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
@@ -228,8 +226,8 @@ public final class BusinessCardInterfaceTest
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (
+                                                                                                                        aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get SG - must work
@@ -254,9 +252,8 @@ public final class BusinessCardInterfaceTest
       aBE.setGeographicalInformation ("Berlin");
       aBC.addBusinessEntity (aBE);
 
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard")
-                                             .path (sPI)
-                                             .request ()).put (Entity.xml (m_aBC2ObjFactory.createBusinessCard (aBC)));
+      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
+                                                                                                            m_aBC2ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
@@ -273,9 +270,8 @@ public final class BusinessCardInterfaceTest
       aBE.setCountryCode ("SE");
       aBE.setGeographicalInformation ("Stockholm");
       aBC.addBusinessEntity (aBE);
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard")
-                                             .path (sPI)
-                                             .request ()).put (Entity.xml (m_aBC2ObjFactory.createBusinessCard (aBC)));
+      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
+                                                                                                            m_aBC2ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
@@ -327,8 +323,8 @@ public final class BusinessCardInterfaceTest
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (
+                                                                                                                        aSG)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get SG - must work
@@ -353,9 +349,8 @@ public final class BusinessCardInterfaceTest
       aBE.setGeographicalInformation ("Berlin");
       aBC.addBusinessEntity (aBE);
 
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard")
-                                             .path (sPI)
-                                             .request ()).put (Entity.xml (m_aBC3ObjFactory.createBusinessCard (aBC)));
+      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
+                                                                                                            m_aBC3ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
@@ -372,9 +367,8 @@ public final class BusinessCardInterfaceTest
       aBE.setCountryCode ("SE");
       aBE.setGeographicalInformation ("Stockholm");
       aBC.addBusinessEntity (aBE);
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard")
-                                             .path (sPI)
-                                             .request ()).put (Entity.xml (m_aBC3ObjFactory.createBusinessCard (aBC)));
+      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
+                                                                                                            m_aBC3ObjFactory.createBusinessCard (aBC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Get BC - must work (always V3)

@@ -20,7 +20,7 @@ import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.id.IHasID;
-import com.helger.pd.businesscard.v3.PD3BusinessCardType;
+import com.helger.peppol.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppolid.IParticipantIdentifier;
 
 /**

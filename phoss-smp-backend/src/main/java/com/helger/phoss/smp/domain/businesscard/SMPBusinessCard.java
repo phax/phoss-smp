@@ -24,8 +24,8 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
-import com.helger.pd.businesscard.v3.PD3APIHelper;
-import com.helger.pd.businesscard.v3.PD3BusinessCardType;
+import com.helger.peppol.businesscard.v3.PD3APIHelper;
+import com.helger.peppol.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 

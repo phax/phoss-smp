@@ -22,9 +22,9 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.id.IHasID;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.pd.businesscard.generic.PDIdentifier;
-import com.helger.pd.businesscard.v3.PD3APIHelper;
-import com.helger.pd.businesscard.v3.PD3IdentifierType;
+import com.helger.peppol.businesscard.generic.PDIdentifier;
+import com.helger.peppol.businesscard.v3.PD3APIHelper;
+import com.helger.peppol.businesscard.v3.PD3IdentifierType;
 
 /**
  * A single business card identifier.

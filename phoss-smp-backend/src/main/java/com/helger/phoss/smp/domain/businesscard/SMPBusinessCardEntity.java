@@ -31,11 +31,11 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.json.IJsonArray;
 import com.helger.json.JsonArray;
-import com.helger.pd.businesscard.generic.PDBusinessEntity;
-import com.helger.pd.businesscard.generic.PDContact;
-import com.helger.pd.businesscard.generic.PDIdentifier;
-import com.helger.pd.businesscard.generic.PDName;
-import com.helger.pd.businesscard.v3.PD3BusinessEntityType;
+import com.helger.peppol.businesscard.generic.PDBusinessEntity;
+import com.helger.peppol.businesscard.generic.PDContact;
+import com.helger.peppol.businesscard.generic.PDIdentifier;
+import com.helger.peppol.businesscard.generic.PDName;
+import com.helger.peppol.businesscard.v3.PD3BusinessEntityType;
 
 /**
  * This class represents a single Business Card entity - a part of a Business

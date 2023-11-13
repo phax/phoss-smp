@@ -22,8 +22,8 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
-import com.helger.pd.businesscard.v3.PD3BusinessCardMarshaller;
-import com.helger.pd.businesscard.v3.PD3BusinessCardType;
+import com.helger.peppol.businesscard.v3.PD3BusinessCardMarshaller;
+import com.helger.peppol.businesscard.v3.PD3BusinessCardType;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;

@@ -24,8 +24,8 @@ import com.helger.commons.id.IHasID;
 import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.pd.businesscard.generic.PDContact;
-import com.helger.pd.businesscard.v3.PD3ContactType;
+import com.helger.peppol.businesscard.generic.PDContact;
+import com.helger.peppol.businesscard.v3.PD3ContactType;
 
 /**
  * A single business card contact.
