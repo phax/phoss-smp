@@ -221,7 +221,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * @param aElementToSign
    *        The XML element to sign. May not be <code>null</code>.
    * @param eRESTType
-   *        The REST type current configureed. This differences are the hash
+   *        The REST type current configured. This differences are the hash
    *        algorithm as well as the canonicalization algorithms.
    * @throws NoSuchAlgorithmException
    *         An algorithm is not supported by the underlying platform.
@@ -232,11 +232,11 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * @throws XMLSignatureException
    *         Some XMLDSig specific stuff failed
    */
-  public void signXML (@Nonnull final Element aElementToSign,
-                       @Nonnull final ESMPRESTType eRESTType) throws NoSuchAlgorithmException,
-                                                              InvalidAlgorithmParameterException,
-                                                              MarshalException,
-                                                              XMLSignatureException
+  public void signXML (@Nonnull final Element aElementToSign, @Nonnull final ESMPRESTType eRESTType)
+                                                                                                     throws NoSuchAlgorithmException,
+                                                                                                     InvalidAlgorithmParameterException,
+                                                                                                     MarshalException,
+                                                                                                     XMLSignatureException
   {
     ValueEnforcer.notNull (aElementToSign, "ElementToSign");
     ValueEnforcer.notNull (eRESTType, "RESTType");
@@ -249,7 +249,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // you are signing the whole document, so a URI of "" signifies
     // that, and also specify the SHA1 digest algorithm and
     // the ENVELOPED Transform)
-    final String sDigestAlgo = eRESTType.isBDXR () ? DigestMethod.SHA256 : DigestMethod.SHA1;
+    // * Peppol SMP Spec 1.3.0 changed from SHA-1 to SHA-256
+    final String sDigestAlgo = DigestMethod.SHA256;
     final Reference aReference = aSignatureFactory.newReference ("",
                                                                  aSignatureFactory.newDigestMethod (sDigestAlgo, null),
                                                                  new CommonsArrayList <> (aSignatureFactory.newTransform (Transform.ENVELOPED,
@@ -263,21 +264,22 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // * OASIS BDXR always used INCLUSIVE
     // * CIPA and this server always used INCLUSIVE, but this was changed for
     // 5.0.1 to EXCLUSIVE
+    // * Peppol SMP Spec 1.3.0 changed from SHA-1 to SHA-256
     final String sC18N;
     final String sSignatureMethod;
     switch (eRESTType)
     {
       case PEPPOL:
         sC18N = CanonicalizationMethod.INCLUSIVE;
-        sSignatureMethod = SignatureMethod.RSA_SHA1;
+        sSignatureMethod = SignatureMethod.RSA_SHA256;
         break;
       case OASIS_BDXR_V1:
         sC18N = CanonicalizationMethod.INCLUSIVE;
-        sSignatureMethod = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+        sSignatureMethod = SignatureMethod.RSA_SHA256;
         break;
       case OASIS_BDXR_V2:
         sC18N = Canonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS;
-        sSignatureMethod = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+        sSignatureMethod = SignatureMethod.RSA_SHA256;
         break;
       default:
         throw new IllegalStateException ("Unsupported REST type");
@@ -292,8 +294,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
     final X509Certificate aCert = (X509Certificate) m_aKeyEntry.getCertificate ();
     final X509Data aX509Data = aKeyInfoFactory.newX509Data (new CommonsArrayList <> (aCert.getSubjectX500Principal ()
-                                                                                          .getName (),
-                                                                                     aCert));
+                                                                                          .getName (), aCert));
     final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList <> (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and
