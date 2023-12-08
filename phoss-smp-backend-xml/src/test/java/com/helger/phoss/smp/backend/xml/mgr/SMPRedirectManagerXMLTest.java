@@ -74,7 +74,9 @@ public final class SMPRedirectManagerXMLTest
     try
     {
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
-                                                                                                  "doctype4711");
+                                                                                                  "xml::xml##doctype4711::1");
+      assertNotNull (aDocTypeID);
+
       final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
                                                                              aDocTypeID,
                                                                              "bla",
@@ -121,7 +123,9 @@ public final class SMPRedirectManagerXMLTest
     try
     {
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
-                                                                                                  "DocType4711");
+                                                                                                  "xml::xml##DocType4711::1");
+      assertNotNull (aDocTypeID);
+
       final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
                                                                              aDocTypeID,
                                                                              "bla",

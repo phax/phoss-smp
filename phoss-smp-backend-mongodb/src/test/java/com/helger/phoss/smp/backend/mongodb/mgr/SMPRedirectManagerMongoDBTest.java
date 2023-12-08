@@ -76,7 +76,9 @@ public final class SMPRedirectManagerMongoDBTest
     try
     {
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
-                                                                                                  "doctype4711");
+                                                                                                  "xml::xml##doctype4711::1");
+      assertNotNull (aDocTypeID);
+
       final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
                                                                              aDocTypeID,
                                                                              "bla",
@@ -121,7 +123,9 @@ public final class SMPRedirectManagerMongoDBTest
     try
     {
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
-                                                                                                  "DocType4711");
+                                                                                                  "xml::xml##DocType4711::1");
+      assertNotNull (aDocTypeID);
+
       final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
                                                                              aDocTypeID,
                                                                              "bla",
@@ -161,7 +165,8 @@ public final class SMPRedirectManagerMongoDBTest
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
     final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
-                                                                                                "doctype4711");
+                                                                                                "xml::xml##doctype4711::1");
+    assertNotNull (aDocTypeID);
 
     // Delete existing service group
     final IParticipantIdentifier aPI = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,

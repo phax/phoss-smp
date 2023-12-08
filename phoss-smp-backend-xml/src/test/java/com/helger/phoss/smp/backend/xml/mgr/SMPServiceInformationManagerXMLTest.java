@@ -84,8 +84,10 @@ public final class SMPServiceInformationManagerXMLTest
       final XMLOffsetDateTime aEndDT = aStartDT.plusYears (1);
       final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                                         "testproc");
+      assertNotNull (aProcessID);
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
-                                                                                                  "testdoctype");
+                                                                                                  "xml::xml##testdoctype::1");
+      assertNotNull (aDocTypeID);
 
       {
         // Create a new service information
