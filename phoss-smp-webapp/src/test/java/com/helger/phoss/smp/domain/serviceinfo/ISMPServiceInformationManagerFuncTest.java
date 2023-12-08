@@ -52,8 +52,13 @@ public final class ISMPServiceInformationManagerFuncTest
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
-    final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc#ext:1.0");
+    assertNotNull (aPI1);
+
+    final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc##ext::1.0");
+    assertNotNull (aDocTypeID);
+
     final IProcessIdentifier aProcessID = PeppolIdentifierFactory.INSTANCE.createProcessIdentifierWithDefaultScheme ("junit-proc");
+    assertNotNull (aProcessID);
 
     final String sUserID = CSecurity.USER_ADMINISTRATOR_ID;
     if (SMPMetaManager.getInstance ().getBackendConnectionState ().isFalse ())

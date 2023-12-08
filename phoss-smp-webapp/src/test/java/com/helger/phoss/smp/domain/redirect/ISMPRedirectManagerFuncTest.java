@@ -56,8 +56,13 @@ public final class ISMPRedirectManagerFuncTest
     }
 
     final IParticipantIdentifier aPI1 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest1");
+    assertNotNull (aPI1);
+
     final IParticipantIdentifier aPI2 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest2");
-    final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc#ext:1.0");
+    assertNotNull (aPI2);
+
+    final IDocumentTypeIdentifier aDocTypeID = PeppolIdentifierFactory.INSTANCE.createDocumentTypeIdentifierWithDefaultScheme ("junit::testdoc##ext::1.0");
+    assertNotNull (aDocTypeID);
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null, true);
