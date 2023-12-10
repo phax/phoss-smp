@@ -51,6 +51,7 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.peppolid.factory.SimpleIdentifierFactory;
 import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifierParts;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
@@ -286,7 +287,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   protected ISMPServiceInformation getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
                                                       @Nullable final String sID)
   {
-    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    // Important to use the Simple IDF here, in case rules get more strict (as
+    // in 7.1.0)
+    final IIdentifierFactory aIdentifierFactory = SimpleIdentifierFactory.INSTANCE;
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
