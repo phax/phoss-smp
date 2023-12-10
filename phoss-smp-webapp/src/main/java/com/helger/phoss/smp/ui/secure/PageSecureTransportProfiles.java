@@ -127,7 +127,9 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
                             {
                               if (aTransportProfileMgr.createSMPTransportProfile (eTP.getID (),
                                                                                   eTP.getName (),
-                                                                                  eTP.getState () == ESMPTransportProfileState.DEPRECATED) != null)
+                                                                                  eTP.getState () ==
+                                                                                                  ESMPTransportProfileState.DEPRECATED) !=
+                                  null)
                               {
                                 aSuccessBox.addChild (div ("Successfully created the transport profile '" +
                                                            eTP.getName () +
@@ -202,7 +204,8 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("ID").setCtrl (aSelectedObject.getID ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aSelectedObject.getName ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Deprecated?")
-                                                 .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedObject.getState () == ESMPTransportProfileState.DEPRECATED,
+                                                 .setCtrl (EPhotonCoreText.getYesOrNo (aSelectedObject.getState () ==
+                                                                                       ESMPTransportProfileState.DEPRECATED,
                                                                                        aDisplayLocale)));
 
     aNodeList.addChild (aForm);
@@ -220,27 +223,30 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
 
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit transport profile '" +
                                                                 aSelectedObject.getID () +
-                                                                "'"
-                                                              : "Create new transport profile"));
+                                                                "'" : "Create new transport profile"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("ID")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_ID,
-                                                                                         aSelectedObject != null ? aSelectedObject.getID ()
+                                                                                         aSelectedObject != null
+                                                                                                                 ? aSelectedObject.getID ()
                                                                                                                  : null)).setReadOnly (bEdit))
                                                  .setHelpText ("The ID of the transport profile to be used in SMP endpoints.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_ID)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Name")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_NAME,
-                                                                                         aSelectedObject != null ? aSelectedObject.getName ()
+                                                                                         aSelectedObject != null
+                                                                                                                 ? aSelectedObject.getName ()
                                                                                                                  : null)))
                                                  .setHelpText ("The name of the transport profile")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_NAME)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Deprecated?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_DEPRECATED,
-                                                                                                    aSelectedObject != null ? aSelectedObject.getState () == ESMPTransportProfileState.DEPRECATED
-                                                                                                                            : DEFAULT_DEPRECATED)))
+                                                                                                    aSelectedObject !=
+                                                                                                                      null ? aSelectedObject.getState () ==
+                                                                                                                             ESMPTransportProfileState.DEPRECATED
+                                                                                                                           : DEFAULT_DEPRECATED)))
                                                  .setHelpText ("Is the transport profile deprecated?")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DEPRECATED)));
   }
@@ -280,7 +286,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
         if (aTransportProfileMgr.updateSMPTransportProfile (sID, sName, bIsDeprecated).isChanged ())
           aWPEC.postRedirectGetInternal (success ("The transport profile '" + sID + "' was successfully edited."));
         else
-          aWPEC.postRedirectGetInternal (error ("Failed to edit transport profile '" + sID + "'."));
+          aWPEC.postRedirectGetInternal (info ("No change editing transport profile '" + sID + "'."));
       }
       else
       {
@@ -337,10 +343,11 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
                     new HCTextNode (" "),
                     createCopyLink (aWPEC, aCurObject, "Copy " + aCurObject.getID ()),
                     new HCTextNode (" "),
-                    isActionAllowed (aWPEC,
-                                     EWebPageFormAction.DELETE,
-                                     aCurObject) ? createDeleteLink (aWPEC, aCurObject, "Delete " + aCurObject.getID ())
-                                                 : createEmptyAction ());
+                    isActionAllowed (aWPEC, EWebPageFormAction.DELETE, aCurObject) ? createDeleteLink (aWPEC,
+                                                                                                       aCurObject,
+                                                                                                       "Delete " +
+                                                                                                                   aCurObject.getID ())
+                                                                                   : createEmptyAction ());
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
