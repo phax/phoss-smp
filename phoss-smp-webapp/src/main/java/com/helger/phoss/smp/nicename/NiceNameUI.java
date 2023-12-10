@@ -31,6 +31,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
@@ -70,63 +71,74 @@ public final class NiceNameUI
                                              final boolean bIsDeprecated,
                                              @Nullable final String sSpecialLabel,
                                              @Nullable final EBootstrapBadgeType eSpecialLabelBadgeType,
-                                             final boolean bInDetails)
+                                             final boolean bInDetails,
+                                             final boolean bIsValid)
   {
+    final HCNodeList ret = new HCNodeList ();
     if (sName == null)
     {
       // No nice name present
-      final AbstractHCElementWithChildren <?> ret = bInDetails ? new HCCode () : new HCSpan ();
-      ret.addChild (sID);
+      final AbstractHCElementWithChildren <?> aElement = ret.addAndReturnChild (bInDetails ? new HCCode ()
+                                                                                           : new HCSpan ());
+      aElement.addChild (sID);
       if (bInDetails)
-        ret.addChild (" ").addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Unknown ID"));
-      return ret;
-    }
-
-    final HCNodeList ret = new HCNodeList ();
-    final BootstrapBadge aNameBadge = ret.addAndReturnChild (new BootstrapBadge (eNameBadgeType).addChild (sName));
-    if (bIsDeprecated)
-    {
-      ret.addChild (" ")
-         .addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Identifier is deprecated"));
-    }
-    if (StringHelper.hasText (sSpecialLabel))
-    {
-      ret.addChild (" ").addChild (new BootstrapBadge (eSpecialLabelBadgeType).addChild (sSpecialLabel));
-    }
-    if (bInDetails)
-    {
-      // Print ID in smaller font
-      ret.addChild (new HCSmall ().addChild (" (").addChild (new HCCode ().addChild (sID)).addChild (")"));
+        aElement.addChild (" ").addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Unknown ID"));
     }
     else
     {
-      // Add ID as mouse over
-      aNameBadge.setTitle (sID);
+      final BootstrapBadge aNameBadge = ret.addAndReturnChild (new BootstrapBadge (eNameBadgeType).addChild (sName));
+      if (bIsDeprecated)
+      {
+        ret.addChild (" ")
+           .addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Identifier is deprecated"));
+      }
+      if (StringHelper.hasText (sSpecialLabel))
+      {
+        ret.addChild (" ").addChild (new BootstrapBadge (eSpecialLabelBadgeType).addChild (sSpecialLabel));
+      }
+      if (bInDetails)
+      {
+        // Print ID in smaller font
+        ret.addChild (new HCSmall ().addChild (" (").addChild (new HCCode ().addChild (sID)).addChild (")"));
+      }
+      else
+      {
+        // Add ID as mouse over
+        aNameBadge.setTitle (sID);
+      }
     }
+    if (!bIsValid)
+      ret.addChild (" ").addChild (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("Invalid"));
     return ret;
   }
 
   @Nonnull
   private static IHCNode _createID (@Nonnull final String sID,
                                     @Nullable final NiceNameEntry aNiceName,
-                                    final boolean bInDetails)
+                                    final boolean bInDetails,
+                                    final boolean bIsValid)
   {
     if (aNiceName == null)
-      return _createFormattedID (sID, null, null, false, null, null, bInDetails);
+      return _createFormattedID (sID, null, null, false, null, null, bInDetails, bIsValid);
     return _createFormattedID (sID,
                                aNiceName.getName (),
                                EBootstrapBadgeType.SUCCESS,
                                aNiceName.isDeprecated (),
                                aNiceName.getSpecialLabel (),
                                EBootstrapBadgeType.INFO,
-                               bInDetails);
+                               bInDetails,
+                               bIsValid);
   }
 
   @Nonnull
   public static IHCNode getDocumentTypeID (@Nonnull final IDocumentTypeIdentifier aDocTypeID, final boolean bInDetails)
   {
     final String sURI = aDocTypeID.getURIEncoded ();
-    return _createID (sURI, NiceNameHandler.getDocTypeNiceName (sURI), bInDetails);
+    final boolean bIsValid = SMPServerConfiguration.getIdentifierType ()
+                                                   .getIdentifierFactory ()
+                                                   .createDocumentTypeIdentifier (aDocTypeID.getScheme (),
+                                                                                  aDocTypeID.getValue ()) != null;
+    return _createID (sURI, NiceNameHandler.getDocTypeNiceName (sURI), bInDetails, bIsValid);
   }
 
   @Nonnull
@@ -135,11 +147,15 @@ public final class NiceNameUI
                                       final boolean bInDetails)
   {
     final String sURI = aProcessID.getURIEncoded ();
+    final boolean bIsValid = SMPServerConfiguration.getIdentifierType ()
+                                                   .getIdentifierFactory ()
+                                                   .createProcessIdentifier (aProcessID.getScheme (),
+                                                                             aProcessID.getValue ()) != null;
 
     // Check direct match first
     NiceNameEntry aNN = NiceNameHandler.getProcessNiceName (sURI);
     if (aNN != null)
-      return _createID (sURI, aNN, bInDetails);
+      return _createID (sURI, aNN, bInDetails, bIsValid);
 
     aNN = NiceNameHandler.getDocTypeNiceName (aDocTypeID.getURIEncoded ());
     if (aNN != null)
@@ -151,7 +167,8 @@ public final class NiceNameUI
                                    false,
                                    null,
                                    null,
-                                   bInDetails);
+                                   bInDetails,
+                                   bIsValid);
 
       return _createFormattedID (sURI,
                                  "Unexpected Process Identifier",
@@ -159,9 +176,10 @@ public final class NiceNameUI
                                  false,
                                  null,
                                  null,
-                                 bInDetails);
+                                 bInDetails,
+                                 bIsValid);
     }
-    return _createFormattedID (sURI, null, null, false, null, null, bInDetails);
+    return _createFormattedID (sURI, null, null, false, null, null, bInDetails, bIsValid);
   }
 
   @Nonnull
@@ -169,8 +187,10 @@ public final class NiceNameUI
   {
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     final ISMPTransportProfile aTP = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfile);
+    final boolean bIsValid = true;
+
     if (aTP == null)
-      return _createFormattedID (sTransportProfile, null, null, false, null, null, bInDetails);
+      return _createFormattedID (sTransportProfile, null, null, false, null, null, bInDetails, bIsValid);
 
     return _createFormattedID (sTransportProfile,
                                aTP.getName (),
@@ -178,6 +198,7 @@ public final class NiceNameUI
                                aTP.getState ().isDeprecated (),
                                null,
                                null,
-                               bInDetails);
+                               bInDetails,
+                               bIsValid);
   }
 }
