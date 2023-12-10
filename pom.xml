@@ -35,12 +35,12 @@
   <licenses>
     <license>
       <name>MPL 2.0</name>
-      <url>http://www.mozilla.org/MPL/2.0/</url>
+      <url>https://www.mozilla.org/MPL/2.0/</url>
       <distribution>repo</distribution>
     </license>
     <license>
       <name>Apache 2</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -48,13 +48,13 @@
   <scm>
     <connection>scm:git:https://github.com/phax/phoss-smp.git</connection>
     <developerConnection>scm:git:https://github.com/phax/phoss-smp.git</developerConnection>
-    <url>http://github.com/phax/phoss-smp</url>
+    <url>https://github.com/phax/phoss-smp</url>
     <tag>HEAD</tag>
   </scm>
 
   <organization>
     <name>Philip Helger</name>
-    <url>http://www.helger.com</url>
+    <url>https://www.helger.com</url>
   </organization>
 
   <developers>
@@ -62,7 +62,7 @@
       <id>philip</id>
       <name>Philip Helger</name>
       <email>ph(at)helger.com</email>
-      <url>http://www.helger.com</url>
+      <url>https://www.helger.com</url>
     </developer>
   </developers>
 
