@@ -262,7 +262,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                     sDirectoryName +
                                                                     " to index '" +
                                                                     aParticipantID.getURIEncoded () +
-                                                                    "'"));
+                                                                    "'. Please see the log file for details."));
                             }
                           }
                           return EShowList.SHOW_LIST;
