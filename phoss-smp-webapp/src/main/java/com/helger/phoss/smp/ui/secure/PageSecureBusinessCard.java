@@ -328,7 +328,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                     sDirectoryName +
                                                     " to index '" +
                                                     sPI +
-                                                    "'"));
+                                                    "'. Please see the log file for details."));
                               }
                               aResultNodes.addChild (aBox);
                             }
