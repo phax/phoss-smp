@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.url.URLHelper;
 import com.helger.commons.url.URLValidator;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
@@ -159,7 +160,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final boolean bDirectoryIntegrationAutoUpdate = aWPEC.params ()
                                                          .isCheckBoxChecked (FIELD_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                                                              SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE);
-    final String sDirectoryHostName = aWPEC.params ().getAsString (FIELD_SMP_DIRECTORY_HOSTNAME);
+    final String sDirectoryHostName = aWPEC.params ().getAsStringTrimmed (FIELD_SMP_DIRECTORY_HOSTNAME);
 
     if (bSMLActive && !SMPKeyManager.isKeyStoreValid ())
       aFormErrors.addFieldError (FIELD_SML_ACTIVE,
@@ -181,7 +182,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                  " intergration is enabled.");
     }
     else
-      if (!URLValidator.isValid (sDirectoryHostName))
+      if (!URLValidator.isValid (sDirectoryHostName) || URLHelper.getAsURI (sDirectoryHostName) == null)
         aFormErrors.addFieldError (FIELD_SMP_DIRECTORY_HOSTNAME, sDirectoryName + " hostname must be a valid URL.");
 
     if (aFormErrors.isEmpty ())
