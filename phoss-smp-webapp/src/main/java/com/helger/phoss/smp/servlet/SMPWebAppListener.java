@@ -213,6 +213,11 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       // Peppol SMP is always http only
       UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
     }
+    // Instead of the service using the X-XSS-Protection header, a better way to
+    // protect against XSS attacks is final to define a final strong
+    // Content-Security-Policy header final that prevents the final execution of
+    // embedded final JavaScript code.
+    UnifiedResponseDefaultSettings.setEnableXSSFilter (false);
 
     // Avoid writing unnecessary stuff
     setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
