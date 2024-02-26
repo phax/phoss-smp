@@ -7,7 +7,7 @@ It comes with a management GUI and an XML, SQL or MongoDB backend for simplified
 
 It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/OASIS+SMP+conformant+solutions).
 
-Latest version: **[7.1.0](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-7.1.0)** (2023-12-10).
+Latest version: **[7.1.1](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-7.1.1)** (2024-02-26).
 See the special [Migrations guide](https://github.com/phax/phoss-smp/wiki/Migrations) for actions necessary on updates/version changes.
 
 Docker containers can be found, depending on the backend you want to use:
