@@ -67,7 +67,7 @@
   </developers>
 
   <properties>
-    <log4j.version>2.22.1</log4j.version>
+    <log4j.version>2.23.0</log4j.version>
     <protobuf.version>3.25.3</protobuf.version>
   </properties>
   
