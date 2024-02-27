@@ -228,7 +228,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
       final Predicate <ISMLInfo> aSMLFilter = ISMLInfo::isClientCertificateRequired;
 
       // Register SMP at SML
-      final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3);
+      final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2);
       aForm.addChild (info ("Register this SMP to the SML. This must only be done once per SMP!"));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                    .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,

@@ -57,7 +57,8 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
     super (sID, "Unregister from SML");
   }
 
-  private void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final FormErrorList aFormErrors)
+  private void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC,
+                                  @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
@@ -75,16 +76,28 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
         final ManageServiceMetadataServiceCaller aCaller = createSMLCaller (aSMLInfo, aSocketFactory);
         aCaller.delete (sSMPID);
 
-        final String sMsg = "Successfully deleted SMP '" + sSMPID + "' from the SML '" + aSMLInfo.getManagementServiceURL () + "'.";
+        final String sMsg = "Successfully deleted SMP '" +
+                            sSMPID +
+                            "' from the SML '" +
+                            aSMLInfo.getManagementServiceURL () +
+                            "'.";
         LOGGER.info (sMsg);
         aNodeList.addChild (success (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-delete", sSMPID, aSMLInfo.getManagementServiceURL ());
       }
       catch (final Exception ex)
       {
-        final String sMsg = "Error deleting SMP '" + sSMPID + "' from the SML '" + aSMLInfo.getManagementServiceURL () + "'.";
+        final String sMsg = "Error deleting SMP '" +
+                            sSMPID +
+                            "' from the SML '" +
+                            aSMLInfo.getManagementServiceURL () +
+                            "'.";
         aNodeList.addChild (error (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
-        AuditHelper.onAuditExecuteFailure ("smp-sml-delete", sSMPID, aSMLInfo.getManagementServiceURL (), ex.getClass (), ex.getMessage ());
+        AuditHelper.onAuditExecuteFailure ("smp-sml-delete",
+                                           sSMPID,
+                                           aSMLInfo.getManagementServiceURL (),
+                                           ex.getClass (),
+                                           ex.getMessage ());
       }
     }
     else
@@ -134,25 +147,25 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
       final Predicate <ISMLInfo> aSMLFilter = ISMLInfo::isClientCertificateRequired;
 
       // Delete SMP from SML
-      {
-        final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3);
-        aForm.addChild (info ("Delete this SMP from the SML."));
-        aForm.addChild (error ("This will remove ALL participants / Service Groups from the network! Your local Service Groups will become unreachable."));
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
-                                                     .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
-                                                                                                  aDefaultSML == null ? null
-                                                                                                                      : aDefaultSML.getID ()),
-                                                                                aDisplayLocale,
-                                                                                aSMLFilter))
-                                                     .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID").setCtrl (em (sSMPID)).setHelpText (HELPTEXT_SMP_ID));
+      final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2);
+      aForm.addChild (info ("Delete this SMP from the SML."));
+      aForm.addChild (error ("This will remove ALL participants / Service Groups from the network! Your local Service Groups will become unreachable."));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
+                                                   .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
+                                                                                                aDefaultSML == null ? null
+                                                                                                                    : aDefaultSML.getID ()),
+                                                                              aDisplayLocale,
+                                                                              aSMLFilter))
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
+                                                   .setCtrl (em (sSMPID))
+                                                   .setHelpText (HELPTEXT_SMP_ID));
 
-        final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
-        aToolbar.addHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM);
-        aToolbar.addSubmitButton ("Delete SMP from SML");
+      final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
+      aToolbar.addHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM);
+      aToolbar.addSubmitButton ("Delete SMP from SML");
 
-        aNodeList.addChild (aForm);
-      }
+      aNodeList.addChild (aForm);
     }
   }
 }

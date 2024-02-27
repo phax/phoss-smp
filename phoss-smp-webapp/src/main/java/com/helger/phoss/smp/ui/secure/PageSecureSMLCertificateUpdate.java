@@ -268,10 +268,10 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         try
         {
           aEntry.checkValidity ();
-          aNodeList.addChild (info ("Your SMP certificate is still valid until " +
-                                    PDTToString.getAsString (PDTFactory.createLocalDateTime (aEntry.getNotAfter ()),
-                                                             aDisplayLocale) +
-                                    "."));
+          aNodeList.addChild (success ("Your SMP certificate is still valid until " +
+                                       PDTToString.getAsString (PDTFactory.createLocalDateTime (aEntry.getNotAfter ()),
+                                                                aDisplayLocale) +
+                                       "."));
         }
         catch (final CertificateExpiredException ex)
         {
@@ -299,7 +299,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     if (bShowForm)
     {
       final BootstrapForm aForm = getUIHandler ().createFormFileUploadSelf (aWPEC);
-      aForm.setLeft (3);
+      aForm.setLeft (3, 3, 2, 2, 2);
       aForm.addChild (warn ("It is your responsibility to actually perform the update of the certificate in this SMP at the specified time! This does NOT happen automatically."));
 
       final BootstrapDateTimePicker aDTP = BootstrapDateTimePicker.create (FIELD_PM_MIGRATION_DATE,
