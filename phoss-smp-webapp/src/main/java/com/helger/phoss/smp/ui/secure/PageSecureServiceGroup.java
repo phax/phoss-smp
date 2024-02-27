@@ -137,19 +137,20 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                 @Nonnull final BootstrapForm aForm,
                                 @Nullable final ISMPServiceGroup aSelectedObject)
       {
-        final BootstrapQuestionBox aQB = question (div ("Are you sure you want to delete the complete service group '" +
+        final BootstrapQuestionBox aQB = question (div ("Are you sure you want to delete the complete SMP Service Group '" +
                                                         aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                                        "'?")).addChild (div ("This means that all endpoints and all redirects are deleted as well."));
+                                                        "'?")).addChild (div ("This means that all Endpoints and all Redirects are deleted as well."));
         if (SMPMetaManager.hasBusinessCardMgr ())
-          aQB.addChild (div ("If a Business Card for this service group exists, it will also be deleted."));
+          aQB.addChild (div ("If a Business Card for this Service Group exists, it will also be deleted."));
         if (SMPMetaManager.getSettings ().isSMLEnabled ())
-          aQB.addChild (div ("Since the connection to the SML is active this service group will also be deleted from the SML!"));
+          aQB.addChild (div ("Since the connection to the SML is active this Service Group will also be deleted from the SML!"));
 
         aForm.addChild (aQB);
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPServiceGroup aSelectedObject)
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nullable final ISMPServiceGroup aSelectedObject)
       {
         final HCNodeList aNL = new HCNodeList ();
         final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
@@ -180,205 +181,214 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         aWPEC.postRedirectGetInternal (aNL);
       }
     });
-    addCustomHandler (ACTION_CHECK_DNS, new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (false)
-    {
-      @Nonnull
-      public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPServiceGroup aSelectedObject)
-      {
-        final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-        final HCNodeList aNodeList = aWPEC.getNodeList ();
-        final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    addCustomHandler (ACTION_CHECK_DNS,
+                      new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (false)
+                      {
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nullable final ISMPServiceGroup aSelectedObject)
+                        {
+                          final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+                          final HCNodeList aNodeList = aWPEC.getNodeList ();
+                          final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+                          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
-        aNodeList.addChild (getUIHandler ().createActionHeader ("Check DNS state of participants"));
+                          aNodeList.addChild (getUIHandler ().createActionHeader ("Check DNS state of participants"));
 
-        {
-          final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-          aToolbar.addButton ("Refresh", aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS), EDefaultIcon.REFRESH);
-          aNodeList.addChild (aToolbar);
-        }
+                          {
+                            final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+                            aToolbar.addButton ("Refresh",
+                                                aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
+                                                EDefaultIcon.REFRESH);
+                            aNodeList.addChild (aToolbar);
+                          }
 
-        // If your local Linux client does not allow you to query e.g. NAPTR
-        // records
-        aNodeList.addChild (warn ("The information on this page may be totally unreliable, depending on your OS DNS client. This is just an indicator - sorry."));
+                          // If your local Linux client does not allow you to
+                          // query e.g. NAPTR records
+                          aNodeList.addChild (warn ("The information on this page may be totally unreliable, depending on your OS DNS client. This is just an indicator - sorry."));
 
-        // Simple check if we're online or not
-        boolean bOffline = NetworkOnlineStatusDeterminator.getNetworkStatus ().isOffline ();
-        if (bOffline && SecureSessionState.getInstance ().isAnyHttpProxyEnabled ())
-        {
-          // TODO this is a work around because the network status determination
-          // fails with a proxy enabled
-          bOffline = false;
-        }
-        if (bOffline)
-        {
-          aNodeList.addChild (warn ("It seems like you are offline! So please interpret the results on this page with care!"));
-        }
-        else
-        {
-          // In case you made a test and want to see the results immediately
-          // reflected
-          aNodeList.addChild (info ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
-        }
+                          // Simple check if we're online or not
+                          boolean bOffline = NetworkOnlineStatusDeterminator.getNetworkStatus ().isOffline ();
+                          if (bOffline && SecureSessionState.getInstance ().isAnyHttpProxyEnabled ())
+                          {
+                            // TODO this is a work around because the network
+                            // status determination fails with a proxy enabled
+                            bOffline = false;
+                          }
+                          if (bOffline)
+                          {
+                            aNodeList.addChild (warn ("It seems like you are offline! So please interpret the results on this page with care!"));
+                          }
+                          else
+                          {
+                            // In case you made a test and want to see the
+                            // results immediately reflected
+                            aNodeList.addChild (info ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
+                          }
 
-        aNodeList.addChild (warn ("Please note that this page can only be used with Peppol and standard CEF BDMSL entries. Other entries, like BPC ones, may not be resolved correctly!"));
+                          aNodeList.addChild (warn ("Please note that this page can only be used with Peppol and standard CEF BDMSL entries. Other entries, like BPC ones, may not be resolved correctly!"));
 
-        final String sSMLZoneName = aSettings.getSMLDNSZone ();
-        final ISMPURLProvider aURLProvider = SMPMetaManager.getSMPURLProvider ();
+                          final String sSMLZoneName = aSettings.getSMLDNSZone ();
+                          final ISMPURLProvider aURLProvider = SMPMetaManager.getSMPURLProvider ();
 
-        final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
-                                            new DTCol ("DNS name"),
-                                            new DTCol ("IP address").setDataSort (2, 0),
-                                            new DTCol ("Nice name"),
-                                            new DTCol ("Action")).setID (getID () + "_checkdns");
+                          final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
+                                                              new DTCol ("DNS name"),
+                                                              new DTCol ("IP address").setDataSort (2, 0),
+                                                              new DTCol ("Nice name"),
+                                                              new DTCol ("Action")).setID (getID () + "_checkdns");
 
-        final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
-        final StopWatch aSW = StopWatch.createdStarted ();
-        for (final ISMPServiceGroup aServiceGroup : aAllServiceGroups)
-        {
-          // Avoid endless actions
-          final Duration aDuration = aSW.getLapDuration ();
-          final boolean bTookTooLong = aDuration.compareTo (Duration.ofSeconds (30)) > 0;
+                          final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+                          final StopWatch aSW = StopWatch.createdStarted ();
+                          for (final ISMPServiceGroup aServiceGroup : aAllServiceGroups)
+                          {
+                            // Avoid endless actions
+                            final Duration aDuration = aSW.getLapDuration ();
+                            final boolean bTookTooLong = aDuration.compareTo (Duration.ofSeconds (30)) > 0;
 
-          String sDNSName = null;
-          try
-          {
-            if (aURLProvider instanceof IPeppolURLProvider)
-              sDNSName = ((IPeppolURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
-                                                                                      sSMLZoneName);
-            else
-              if (aURLProvider instanceof IBDXLURLProvider)
-              {
-                // Fallback by not resolving the NAPTR
-                sDNSName = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
-                                                                                      sSMLZoneName);
-              }
-              else
-              {
-                // Of course this should never happen
-                LOGGER.error ("Unexpected URL provider found: " + aURLProvider);
-                continue;
-              }
-          }
-          catch (final SMPDNSResolutionException ex)
-          {
-            // Ignore
-          }
+                            String sDNSName = null;
+                            try
+                            {
+                              if (aURLProvider instanceof IPeppolURLProvider)
+                                sDNSName = ((IPeppolURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
+                                                                                                        sSMLZoneName);
+                              else
+                                if (aURLProvider instanceof IBDXLURLProvider)
+                                {
+                                  // Fallback by not resolving the NAPTR
+                                  sDNSName = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
+                                                                                                        sSMLZoneName);
+                                }
+                                else
+                                {
+                                  // Of course this should never happen
+                                  LOGGER.error ("Unexpected URL provider found: " + aURLProvider);
+                                  continue;
+                                }
+                            }
+                            catch (final SMPDNSResolutionException ex)
+                            {
+                              // Ignore
+                            }
 
-          InetAddress aInetAddress = null;
-          InetAddress aNice = null;
-          if (bTookTooLong)
-          {
-            // We ignore this participant, because we're
-            // already running some
-            // time
-          }
-          else
-          {
-            // This is what I think takes forever
-            // Avoid that the loopback interface is returned
-            if (sDNSName != null)
-              try
-              {
-                aInetAddress = InetAddress.getByName (sDNSName);
-              }
-              catch (final UnknownHostException ex)
-              {
-                // Ignore
-              }
+                            InetAddress aInetAddress = null;
+                            InetAddress aNice = null;
+                            if (bTookTooLong)
+                            {
+                              // We ignore this participant, because we're
+                              // already running some
+                              // time
+                            }
+                            else
+                            {
+                              // This is what I think takes forever
+                              // Avoid that the loopback interface is returned
+                              if (sDNSName != null)
+                                try
+                                {
+                                  aInetAddress = InetAddress.getByName (sDNSName);
+                                }
+                                catch (final UnknownHostException ex)
+                                {
+                                  // Ignore
+                                }
 
-            if (aInetAddress != null)
-              try
-              {
-                aNice = InetAddress.getByAddress (aInetAddress.getAddress ());
-              }
-              catch (final UnknownHostException ex)
-              {
-                // Ignore
-              }
-          }
+                              if (aInetAddress != null)
+                                try
+                                {
+                                  aNice = InetAddress.getByAddress (aInetAddress.getAddress ());
+                                }
+                                catch (final UnknownHostException ex)
+                                {
+                                  // Ignore
+                                }
+                            }
 
-          final HCRow aRow = aTable.addBodyRow ();
-          aRow.addCell (aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
-          if (sDNSName != null)
-            aRow.addCell (new HCA (new SimpleURL ("http://" + sDNSName)).setTargetBlank ().addChild (sDNSName));
-          else
-            aRow.addCell (new HCEM ().addChild ("DNS resolve failed"));
-          if (aInetAddress != null)
-          {
-            aRow.addCell (new IPV4Addr (aInetAddress).getAsString ());
-            aRow.addCell (aNice == null ? null : aNice.getCanonicalHostName ());
-            aRow.addCell (new BootstrapButton (EBootstrapButtonType.DANGER,
-                                               EBootstrapButtonSize.SMALL).addChild ("Unregister from SML")
-                                                                          .setOnClick (aWPEC.getSelfHref ()
-                                                                                            .add (CPageParam.PARAM_ACTION,
-                                                                                                  ACTION_UNREGISTER_FROM_SML)
-                                                                                            .add (CPageParam.PARAM_OBJECT,
-                                                                                                  aServiceGroup.getID ()))
-                                                                          .setDisabled (bOffline || !aSettings.isSMLEnabled ()));
-          }
-          else
-          {
-            if (bTookTooLong)
-            {
-              aRow.addAndReturnCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Was not checked - took too long"))
-                  .setColspan (3);
-            }
-            else
-            {
-              aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("is not registered in SML"));
-              aRow.addCell ();
-              aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).addChild ("Register in SML")
-                                                                            .setOnClick (aWPEC.getSelfHref ()
-                                                                                              .add (CPageParam.PARAM_ACTION,
-                                                                                                    ACTION_REGISTER_TO_SML)
-                                                                                              .add (CPageParam.PARAM_OBJECT,
-                                                                                                    aServiceGroup.getID ()))
-                                                                            .setDisabled (bOffline || !aSettings.isSMLEnabled ()));
-            }
-          }
-        }
+                            final HCRow aRow = aTable.addBodyRow ();
+                            aRow.addCell (aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
+                            if (sDNSName != null)
+                              aRow.addCell (new HCA (new SimpleURL ("http://" + sDNSName)).setTargetBlank ()
+                                                                                          .addChild (sDNSName));
+                            else
+                              aRow.addCell (new HCEM ().addChild ("DNS resolve failed"));
+                            if (aInetAddress != null)
+                            {
+                              aRow.addCell (new IPV4Addr (aInetAddress).getAsString ());
+                              aRow.addCell (aNice == null ? null : aNice.getCanonicalHostName ());
+                              aRow.addCell (new BootstrapButton (EBootstrapButtonType.DANGER,
+                                                                 EBootstrapButtonSize.SMALL).addChild ("Unregister from SML")
+                                                                                            .setOnClick (aWPEC.getSelfHref ()
+                                                                                                              .add (CPageParam.PARAM_ACTION,
+                                                                                                                    ACTION_UNREGISTER_FROM_SML)
+                                                                                                              .add (CPageParam.PARAM_OBJECT,
+                                                                                                                    aServiceGroup.getID ()))
+                                                                                            .setDisabled (bOffline ||
+                                                                                                          !aSettings.isSMLEnabled ()));
+                            }
+                            else
+                            {
+                              if (bTookTooLong)
+                              {
+                                aRow.addAndReturnCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Was not checked - took too long"))
+                                    .setColspan (3);
+                              }
+                              else
+                              {
+                                aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("is not registered in SML"));
+                                aRow.addCell ();
+                                aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).addChild ("Register in SML")
+                                                                                              .setOnClick (aWPEC.getSelfHref ()
+                                                                                                                .add (CPageParam.PARAM_ACTION,
+                                                                                                                      ACTION_REGISTER_TO_SML)
+                                                                                                                .add (CPageParam.PARAM_OBJECT,
+                                                                                                                      aServiceGroup.getID ()))
+                                                                                              .setDisabled (bOffline ||
+                                                                                                            !aSettings.isSMLEnabled ()));
+                              }
+                            }
+                          }
 
-        final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-        aNodeList.addChild (aTable).addChild (aDataTables);
+                          final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+                          aNodeList.addChild (aTable).addChild (aDataTables);
 
-        {
-          final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-          aToolbar.addButtonBack (aDisplayLocale);
-          aNodeList.addChild (aToolbar);
-        }
+                          {
+                            final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+                            aToolbar.addButtonBack (aDisplayLocale);
+                            aNodeList.addChild (aToolbar);
+                          }
 
-        return EShowList.DONT_SHOW_LIST;
-      }
-    });
-    addCustomHandler (ACTION_REGISTER_TO_SML, new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (true)
-    {
-      @Nonnull
-      public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPServiceGroup aSelectedObject)
-      {
-        final StringMap aTargetParams = new StringMap ();
-        aTargetParams.putIn (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
-        final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
-        final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
-        try
-        {
-          aHook.createServiceGroup (aParticipantID);
-          aWPEC.postRedirectGetInternal (success ("The Service group '" +
-                                                  aParticipantID.getURIEncoded () +
-                                                  "' was successfully registered at the configured SML!"),
-                                         aTargetParams);
-        }
-        catch (final RegistrationHookException ex)
-        {
-          aWPEC.postRedirectGetInternal (error ("Error registering the Service group '" +
-                                                aParticipantID.getURIEncoded () +
-                                                "' at the configured SML!").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)),
-                                         aTargetParams);
-        }
-        // Never reached
-        return EShowList.DONT_SHOW_LIST;
-      }
-    });
+                          return EShowList.DONT_SHOW_LIST;
+                        }
+                      });
+    addCustomHandler (ACTION_REGISTER_TO_SML,
+                      new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (true)
+                      {
+                        @Nonnull
+                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                                       @Nonnull final ISMPServiceGroup aSelectedObject)
+                        {
+                          final StringMap aTargetParams = new StringMap ();
+                          aTargetParams.putIn (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
+                          final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
+                          final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
+                          try
+                          {
+                            aHook.createServiceGroup (aParticipantID);
+                            aWPEC.postRedirectGetInternal (success ("The Service Group '" +
+                                                                    aParticipantID.getURIEncoded () +
+                                                                    "' was successfully registered at the configured SML!"),
+                                                           aTargetParams);
+                          }
+                          catch (final RegistrationHookException ex)
+                          {
+                            aWPEC.postRedirectGetInternal (error ("Error registering the Service Group '" +
+                                                                  aParticipantID.getURIEncoded () +
+                                                                  "' at the configured SML!").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)),
+                                                           aTargetParams);
+                          }
+                          // Never reached
+                          return EShowList.DONT_SHOW_LIST;
+                        }
+                      });
     addCustomHandler (ACTION_UNREGISTER_FROM_SML,
                       new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (true)
                       {
@@ -392,15 +402,17 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                           try
                           {
                             aHook.deleteServiceGroup (aSelectedObject.getParticipantIdentifier ());
-                            aWPEC.postRedirectGetInternal (success ("The Service group '" +
-                                                                    aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                            aWPEC.postRedirectGetInternal (success ("The Service Group '" +
+                                                                    aSelectedObject.getParticipantIdentifier ()
+                                                                                   .getURIEncoded () +
                                                                     "' was successfully unregistered from the configured SML!"),
                                                            aTargetParams);
                           }
                           catch (final RegistrationHookException ex)
                           {
-                            aWPEC.postRedirectGetInternal (error ("Error unregistering the Service group '" +
-                                                                  aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                            aWPEC.postRedirectGetInternal (error ("Error unregistering the Service Group '" +
+                                                                  aSelectedObject.getParticipantIdentifier ()
+                                                                                 .getURIEncoded () +
                                                                   "' from the configured SML!").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)),
                                                            aTargetParams);
                           }
@@ -430,7 +442,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
   @Override
   @Nullable
-  protected ISMPServiceGroup getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
+  protected ISMPServiceGroup getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+                                                @Nullable final String sID)
   {
     if (sID == null)
       return null;
@@ -441,22 +454,27 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPServiceGroup aSelectedObject)
+  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+                                     @Nonnull final ISMPServiceGroup aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final boolean bShowBusinessCard = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
 
-    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of service group '" + aSelectedObject.getID () + "'"));
+    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of service group '" +
+                                                            aSelectedObject.getID () +
+                                                            "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
-                                                 .setCtrl (aSelectedObject.getParticipantIdentifier ().getURIEncoded ()));
+                                                 .setCtrl (aSelectedObject.getParticipantIdentifier ()
+                                                                          .getURIEncoded ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
                                                  .setCtrl (SMPCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
     if (aSelectedObject.getExtensions ().extensions ().isNotEmpty ())
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension").setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
+                                                   .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
 
     if (bShowBusinessCard)
     {
@@ -499,19 +517,24 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       final BootstrapRow aRow = new BootstrapRow ();
       aRow.createColumn (GS_IDENTIFIER_SCHEME)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_SCHEME,
-                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ().getScheme ()
+                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ()
+                                                                                            .getScheme ()
                                                                            : sDefaultScheme)).setPlaceholder ("Identifier scheme")
                                                                                              .setReadOnly (bEdit));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
-                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ().getValue ()
+                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ()
+                                                                                            .getValue ()
                                                                            : null)).setPlaceholder ("Identifier value")
                                                                                    .setReadOnly (bEdit));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
                                                    .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme" +
-                                                                 (sDefaultScheme == null ? "" : " (default: " + sDefaultScheme + ")") +
+                                                                 (sDefaultScheme == null ? ""
+                                                                                         : " (default: " +
+                                                                                           sDefaultScheme +
+                                                                                           ")") +
                                                                  ", the right part is the identifier value (e.g. 9915:test)")
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PARTICIPANT_ID_SCHEME,
                                                                                                FIELD_PARTICIPANT_ID_VALUE)));
@@ -656,7 +679,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aToolbar.addAndReturnButton ("Check DNS state",
                                    aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                    EDefaultIcon.MAGNIFIER)
-              .setDisabled (aSettings.getSMLDNSZone () == null || aAllServiceGroups.isEmpty () || !aSettings.isSMLEnabled ());
+              .setDisabled (aSettings.getSMLDNSZone () == null ||
+                            aAllServiceGroups.isEmpty () ||
+                            !aSettings.isSMLEnabled ());
     }
     aNodeList.addChild (aToolbar);
 
@@ -665,7 +690,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
                                         bShowBusinessCardName ? new DTCol ("Business Card Name") : null,
-                                        new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle ("Is an Extension present?")),
+                                        new DTCol (span (bShowExtensionDetails ? "Ext"
+                                                                               : "Ext?").setTitle ("Is an Extension present?")),
                                         bShowDetails ? new DTCol (span ("Docs").setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
                                                                                                                                                 aDisplayLocale)
                                                      : null,
@@ -699,13 +725,15 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       if (bShowExtensionDetails)
       {
         if (aCurObject.getExtensions ().extensions ().isNotEmpty ())
-          aRow.addCell (new HCCode ().addChildren (HCExtHelper.nl2divList (aCurObject.getExtensions ().getFirstExtensionXMLString ())));
+          aRow.addCell (new HCCode ().addChildren (HCExtHelper.nl2divList (aCurObject.getExtensions ()
+                                                                                     .getFirstExtensionXMLString ())));
         else
           aRow.addCell ();
       }
       else
       {
-        aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.getExtensions ().extensions ().isNotEmpty (), aDisplayLocale));
+        aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.getExtensions ().extensions ().isNotEmpty (),
+                                                  aDisplayLocale));
       }
 
       if (bShowDetails)
