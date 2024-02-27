@@ -29,12 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
-import com.helger.commons.string.StringParser;
 import com.helger.commons.text.util.TextHelper;
 import com.helger.commons.url.URLHelper;
-import com.helger.dns.ip.IPV4Addr;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
@@ -60,7 +57,6 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
   private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureSMLRegUpdate.class);
 
   private static final String FIELD_SML_ID = "sml";
-  private static final String FIELD_PHYSICAL_ADDRESS = "physicaladdr";
   private static final String FIELD_LOGICAL_ADDRESS = "logicaladdr";
 
   public PageSecureSMLRegUpdate (@Nonnull @Nonempty final String sID)
@@ -77,36 +73,7 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
     final boolean bUsePathConstraints = eRESTType.isPathConstraint ();
     final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLID);
-    final String sPhysicalAddress = aWPEC.params ().getAsString (FIELD_PHYSICAL_ADDRESS);
     final String sLogicalAddress = aWPEC.params ().getAsString (FIELD_LOGICAL_ADDRESS);
-
-    if (aSMLInfo == null)
-      aFormErrors.addFieldError (FIELD_SML_ID, "A valid SML must be selected!");
-
-    if (StringHelper.hasNoText (sPhysicalAddress))
-      aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS, "A physical address must be provided!");
-    else
-      if (!RegExHelper.stringMatchesPattern (IPV4Addr.PATTERN_IPV4, sPhysicalAddress))
-        aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS,
-                                   "The provided physical address does not seem to be an IPv4 address!");
-      else
-      {
-        final String [] aParts = StringHelper.getExplodedArray ('.', sPhysicalAddress, 4);
-        final byte [] aBytes = new byte [] { (byte) StringParser.parseInt (aParts[0], -1),
-                                             (byte) StringParser.parseInt (aParts[1], -1),
-                                             (byte) StringParser.parseInt (aParts[2], -1),
-                                             (byte) StringParser.parseInt (aParts[3], -1) };
-        try
-        {
-          InetAddress.getByAddress (aBytes);
-        }
-        catch (final UnknownHostException ex)
-        {
-          aFormErrors.addFieldError (FIELD_PHYSICAL_ADDRESS,
-                                     "The provided IP address does not resolve to a valid host. " +
-                                                             SMPCommonUI.getTechnicalDetailsString (ex));
-        }
-      }
 
     if (StringHelper.hasNoText (sLogicalAddress))
       aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
@@ -158,13 +125,11 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
       {
         final SSLSocketFactory aSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
         final ManageServiceMetadataServiceCaller aCaller = createSMLCaller (aSMLInfo, aSocketFactory);
-        aCaller.update (sSMPID, sPhysicalAddress, sLogicalAddress);
+        aCaller.update (sSMPID, DEFAULT_PHYSICAL_ADDRESS, sLogicalAddress);
 
         final String sMsg = "Successfully updated SMP '" +
                             sSMPID +
-                            "' with physical address '" +
-                            sPhysicalAddress +
-                            "' and logical address '" +
+                            "' with logical address '" +
                             sLogicalAddress +
                             "' at the SML '" +
                             aSMLInfo.getManagementServiceURL () +
@@ -173,7 +138,7 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
         aNodeList.addChild (success (sMsg));
         AuditHelper.onAuditExecuteSuccess ("smp-sml-update",
                                            sSMPID,
-                                           sPhysicalAddress,
+                                           DEFAULT_PHYSICAL_ADDRESS,
                                            sLogicalAddress,
                                            aSMLInfo.getManagementServiceURL ());
       }
@@ -181,9 +146,7 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
       {
         final String sMsg = "Error updating SMP '" +
                             sSMPID +
-                            "' with physical address '" +
-                            sPhysicalAddress +
-                            "' and logical address '" +
+                            "' with logical address '" +
                             sLogicalAddress +
                             "' to the SML '" +
                             aSMLInfo.getManagementServiceURL () +
@@ -191,7 +154,7 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
         aNodeList.addChild (error (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-update",
                                            sSMPID,
-                                           sPhysicalAddress,
+                                           DEFAULT_PHYSICAL_ADDRESS,
                                            sLogicalAddress,
                                            aSMLInfo.getManagementServiceURL (),
                                            ex.getClass (),
@@ -243,15 +206,12 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
     if (bShowInput)
     {
       // Get default from configuration
-      final String sPhysicalAddress = SMPServerConfiguration.getSMLSMPIP ();
       final String sLogicalAddress = SMPServerConfiguration.getSMLSMPHostname ();
-      String sDefaultPhysicalAddress = "";
       String sDefaultLogicalAddress = "";
 
       try
       {
         final InetAddress aLocalHost = InetAddress.getLocalHost ();
-        sDefaultPhysicalAddress = aLocalHost.getHostAddress ();
         sDefaultLogicalAddress = "http://" + aLocalHost.getCanonicalHostName ();
       }
       catch (final UnknownHostException ex)
@@ -275,12 +235,6 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
                                                      .setCtrl (em (sSMPID))
                                                      .setHelpText (HELPTEXT_SMP_ID));
-        aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Physical address")
-                                                     .setCtrl (new HCEdit (new RequestField (FIELD_PHYSICAL_ADDRESS,
-                                                                                             sPhysicalAddress)).setPlaceholder ("The IPv4 address of your SMP. E.g. 1.2.3.4"))
-                                                     .setHelpText (TextHelper.getFormattedText (HELPTEXT_PHYSICAL_ADDRESS,
-                                                                                                sDefaultPhysicalAddress))
-                                                     .setErrorList (aFormErrors.getListOfField (FIELD_PHYSICAL_ADDRESS)));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Logical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_LOGICAL_ADDRESS,
                                                                                              sLogicalAddress)).setPlaceholder ("The domain name of your SMP server. E.g. http://smp.example.org"))

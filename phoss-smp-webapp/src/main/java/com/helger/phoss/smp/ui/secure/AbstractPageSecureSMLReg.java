@@ -31,8 +31,8 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 public abstract class AbstractPageSecureSMLReg extends AbstractSMPWebPage
 {
   protected static final String HELPTEXT_SMP_ID = "This is the unique ID your SMP will have inside the SML. All continuing operations must use this ID. This ID is taken from the configuration file. All uppercase names are appreciated!";
-  protected static final String HELPTEXT_PHYSICAL_ADDRESS = "This must be the public IPv4 address of your SMP. IPv6 addresses are not yet supported! By default the IP address of localhost is used. The IP address of localhost is ''{0}''.";
   protected static final String HELPTEXT_LOGICAL_ADDRESS = "This must be the public fully qualified domain name of your SMP. This can be either a domain name like ''http://smp.example.org'' or an IP address like ''http://1.1.1.1''! The hostname of localhost is ''{0}''.";
+  protected static final String DEFAULT_PHYSICAL_ADDRESS = "1.1.1.1";
 
   protected AbstractPageSecureSMLReg (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
   {

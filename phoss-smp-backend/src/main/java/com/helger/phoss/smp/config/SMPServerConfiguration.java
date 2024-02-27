@@ -354,6 +354,7 @@ public final class SMPServerConfiguration
    * @since 5.0.3
    */
   @Nullable
+  @Deprecated (forRemoval = true, since = "7.1.1")
   public static String getSMLSMPIP ()
   {
     return _getConfig ().getAsString (KEY_SML_SMP_IP);
