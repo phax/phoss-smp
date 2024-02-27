@@ -91,11 +91,11 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
                           EDefaultIcon.MAGNIFIER);
     aNodeList.addChild (aToolbar);
 
-    final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING)
+    final HCTable aTable = new HCTable (new DTCol ("Service Group").setInitialSorting (ESortOrder.ASCENDING)
                                                                    .setDataSort (0, 1, 2, 3),
-                                        new DTCol ("Document type ID").setDataSort (1, 0, 2, 3),
+                                        new DTCol ("Document Type ID").setDataSort (1, 0, 2, 3),
                                         new DTCol ("Process ID").setDataSort (2, 0, 1, 3),
-                                        new DTCol ("Transport profile").setDataSort (3, 0, 1, 2),
+                                        new DTCol ("Transport Profile").setDataSort (3, 0, 1, 2),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos)
     {
