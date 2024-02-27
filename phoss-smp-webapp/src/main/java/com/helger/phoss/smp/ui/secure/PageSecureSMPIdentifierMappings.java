@@ -79,6 +79,11 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
   protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeEntries = NiceNameHandler.getAllDocumentTypeMappings ();
+    final ICommonsOrderedMap <String, NiceNameEntry> aProcEntries = NiceNameHandler.getAllProcessMappings ();
+
+    if (aDocTypeEntries.isNotEmpty () || aProcEntries.isNotEmpty ())
+      aNodeList.addChild (info ("The lists below are only for display purposes. The lists are not in any way limiting the registration possibilities in the Endpoints."));
 
     final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
     aToolbar.addChild (new BootstrapButton ().addChild ("Reload")
@@ -93,9 +98,7 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
     }
 
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
-    aTabBox.addTab ("doctypes",
-                    "Document Types",
-                    _createList (aWPEC, NiceNameHandler.getAllDocumentTypeMappings (), "doctypes"));
-    aTabBox.addTab ("procs", "Processes", _createList (aWPEC, NiceNameHandler.getAllProcessMappings (), "procs"));
+    aTabBox.addTab ("doctypes", "Document Types", _createList (aWPEC, aDocTypeEntries, "doctypes"));
+    aTabBox.addTab ("procs", "Processes", _createList (aWPEC, aProcEntries, "procs"));
   }
 }
