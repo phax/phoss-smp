@@ -57,6 +57,12 @@ public final class NiceNameHandler
   @GuardedBy ("RW_LOCK")
   private static final ICommonsOrderedMap <String, NiceNameEntry> PROCESS_IDS = new CommonsLinkedHashMap <> ();
 
+  @Nonnull
+  private static ClassLoader _getCL ()
+  {
+    return NiceNameHandler.class.getClassLoader ();
+  }
+
   static
   {
     reloadNames ();
@@ -137,7 +143,7 @@ public final class NiceNameHandler
       }
       // Use defaults
       if (aDocTypeIDRes == null)
-        aDocTypeIDRes = new ClassPathResource ("codelists/smp/doctypeid-mapping.xml");
+        aDocTypeIDRes = new ClassPathResource ("codelists/smp/doctypeid-mapping.xml", _getCL ());
 
       final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes, true);
       RW_LOCK.writeLocked ( () -> DOCTYPE_IDS.setAll (aDocTypeIDs));
@@ -159,7 +165,7 @@ public final class NiceNameHandler
       }
       // Use defaults
       if (aProcessIDRes == null)
-        aProcessIDRes = new ClassPathResource ("codelists/smp/processid-mapping.xml");
+        aProcessIDRes = new ClassPathResource ("codelists/smp/processid-mapping.xml", _getCL ());
 
       final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes, false);
       RW_LOCK.writeLocked ( () -> PROCESS_IDS.setAll (aProcessIDs));
