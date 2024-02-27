@@ -129,7 +129,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
   public PageSecureServiceGroup (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "Service groups");
+    super (sID, "Service Groups");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPServiceGroup, WebPageExecutionContext> ()
     {
       @Override
