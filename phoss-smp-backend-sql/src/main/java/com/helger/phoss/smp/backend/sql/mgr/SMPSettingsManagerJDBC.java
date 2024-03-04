@@ -186,18 +186,23 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
       // Queries DB
       final ICommonsMap <String, String> aValues = aMgr.getAllSettingsValuesFromDB ();
 
-      final SMPSettings ret = new SMPSettings (false);
+      final SMPSettings ret = new SMPSettings (true);
       ret.setRESTWritableAPIDisabled (StringParser.parseBool (aValues.get (SMP_REST_WRITABLE_API_DISABLED),
-                                                              SMPSettings.DEFAULT_SMP_REST_WRITABLE_API_DISABLED));
+                                                              ret.isRESTWritableAPIDisabled ()));
       ret.setDirectoryIntegrationEnabled (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_ENABLED),
-                                                                  SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED));
+                                                                  ret.isDirectoryIntegrationEnabled ()));
       ret.setDirectoryIntegrationRequired (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_REQUIRED),
-                                                                   SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED));
+                                                                   ret.isDirectoryIntegrationRequired ()));
       ret.setDirectoryIntegrationAutoUpdate (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_AUTO_UPDATE),
-                                                                     SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE));
-      ret.setDirectoryHostName (aValues.get (DIRECTORY_HOSTNAME));
-      ret.setSMLEnabled (StringParser.parseBool (aValues.get (SML_ENABLED), SMPSettings.DEFAULT_SML_ENABLED));
-      ret.setSMLRequired (StringParser.parseBool (aValues.get (SML_REQUIRED), SMPSettings.DEFAULT_SML_REQUIRED));
+                                                                     ret.isDirectoryIntegrationAutoUpdate ()));
+      String sDirectoryHostName = aValues.get (DIRECTORY_HOSTNAME);
+      if (sDirectoryHostName == null)
+      {
+        sDirectoryHostName = ret.getDirectoryHostName ();
+      }
+      ret.setDirectoryHostName (sDirectoryHostName);
+      ret.setSMLEnabled (StringParser.parseBool (aValues.get (SML_ENABLED), ret.isSMLEnabled ()));
+      ret.setSMLRequired (StringParser.parseBool (aValues.get (SML_REQUIRED), ret.isSMLRequired ()));
       ret.setSMLInfoID (aValues.get (SML_INFO_ID));
       return ret;
     }

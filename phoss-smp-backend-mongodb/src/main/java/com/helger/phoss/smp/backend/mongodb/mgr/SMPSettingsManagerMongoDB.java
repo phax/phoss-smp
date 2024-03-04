@@ -77,16 +77,21 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   public static void toDomain (@Nonnull final Document aDoc, @Nonnull final SMPSettings aTarget)
   {
     aTarget.setRESTWritableAPIDisabled (aDoc.getBoolean (BSON_SMP_REST_WRITABLE_API_DISABLED,
-                                                         SMPSettings.DEFAULT_SMP_REST_WRITABLE_API_DISABLED));
-    aTarget.setDirectoryIntegrationRequired (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_REQUIRED,
-                                                              SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED));
+                                                         aTarget.isRESTWritableAPIDisabled ()));
     aTarget.setDirectoryIntegrationEnabled (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_ENABLED,
-                                                             SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED));
+                                                             aTarget.isDirectoryIntegrationEnabled ()));
+    aTarget.setDirectoryIntegrationRequired (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_REQUIRED,
+                                                              aTarget.isDirectoryIntegrationRequired ()));
     aTarget.setDirectoryIntegrationAutoUpdate (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_AUTO_UPDATE,
-                                                                SMPSettings.DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE));
-    aTarget.setDirectoryHostName (aDoc.getString (BSON_DIRECTORY_HOSTNAME));
-    aTarget.setSMLRequired (aDoc.getBoolean (BSON_SML_REQUIRED, SMPSettings.DEFAULT_SML_REQUIRED));
-    aTarget.setSMLEnabled (aDoc.getBoolean (BSON_SML_ENABLED, SMPSettings.DEFAULT_SML_ENABLED));
+                                                                aTarget.isDirectoryIntegrationAutoUpdate ()));
+    String sDirectoryHostName = aDoc.getString (BSON_DIRECTORY_HOSTNAME);
+    if (sDirectoryHostName == null)
+    {
+      sDirectoryHostName = aTarget.getDirectoryHostName ();
+    }
+    aTarget.setDirectoryHostName (sDirectoryHostName);
+    aTarget.setSMLEnabled (aDoc.getBoolean (BSON_SML_ENABLED, aTarget.isSMLEnabled ()));
+    aTarget.setSMLRequired (aDoc.getBoolean (BSON_SML_REQUIRED, aTarget.isSMLRequired ()));
     aTarget.setSMLInfoID (aDoc.getString (BSON_SML_INFO_ID));
   }
 
@@ -100,7 +105,7 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   }
 
   @Nonnull
-  @ReturnsMutableObject
+  @aTargeturnsMutableObject
   public final CallbackList <ISMPSettingsCallback> callbacks ()
   {
     return m_aCallbacks;
