@@ -19,12 +19,19 @@ Prebuild images are available from:
 
 # Running pre-build image from Docker Hub
 
+Note: running the pre-build image assumes that you adopted the [configuration](https://github.com/phax/phoss-smp/wiki/Configuration) of the SMP so that it suits your needs.
+
 Running a pre-build image (XML backend only):
 
 ```
 docker run -d --name phoss-smp -p 8888:8080 phelger/phoss-smp-xml:latest
 docker stop phoss-smp
 docker rm phoss-smp
+```
+
+Alternative console without any configuration - for quick startup testing only:
+```
+docker run --name phoss-smp -p 8888:8080 -v.:/a -e WEBAPP_DATAPATH=/a -e SML_SMPID=TEST1 -e SMP_BACKEND=xml phelger/phoss-smp-xml:latest
 ```
 
 The command line exposes port 8888 locally if Tomcat is running successfully.
