@@ -100,7 +100,10 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
 public final class SMPCommonUI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPCommonUI.class);
-  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25).addItem (50).addItem (100).addItemAll ();
+  private static final DataTablesLengthMenu LENGTH_MENU = new DataTablesLengthMenu ().addItem (25)
+                                                                                     .addItem (50)
+                                                                                     .addItem (100)
+                                                                                     .addItemAll ();
 
   private SMPCommonUI ()
   {}
@@ -115,7 +118,8 @@ public final class SMPCommonUI
                                                           .data (new JSAssocArray ().add (AjaxExecutorDataTables.OBJECT_ID,
                                                                                           aTable.getID ())))
                  .setServerFilterType (EDataTablesFilterType.ALL_TERMS_PER_ROW)
-                 .setTextLoadingURL (CAjax.DATATABLES_I18N.getInvocationURL (aRequestScope), AjaxExecutorDataTablesI18N.LANGUAGE_ID)
+                 .setTextLoadingURL (CAjax.DATATABLES_I18N.getInvocationURL (aRequestScope),
+                                     AjaxExecutorDataTablesI18N.LANGUAGE_ID)
                  .addPlugin (new DataTablesPluginSearchHighlight ());
     });
 
@@ -167,11 +171,12 @@ public final class SMPCommonUI
         aSB.append (", ");
       aSB.append (aParts.get (i));
     }
-    return aSB.append (" and ").append (aParts.getLast ()).toString ();
+    return aSB.append (" and ").append (aParts.getLastOrNull ()).toString ();
   }
 
   @Nonnull
-  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC, @Nullable final String sPreselectedUserName)
+  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC,
+                                                   @Nullable final String sPreselectedUserName)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -209,7 +214,8 @@ public final class SMPCommonUI
                       JQuery.idRef (sIDErrorField).empty ().append (aJSData.ref (AjaxExecutorPublicLogin.JSON_HTML)));
       aOnClick.add (new JQueryAjaxBuilder ().url (CAjax.LOGIN.getInvocationURI (aRequestScope))
                                             .method (EHttpMethod.POST)
-                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID, JQuery.idRef (sIDUserName).val ())
+                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID,
+                                                                            JQuery.idRef (sIDUserName).val ())
                                                                       .add (CLogin.REQUEST_ATTR_PASSWORD,
                                                                             JQuery.idRef (sIDPassword).val ()))
                                             .success (aJSSuccess)
@@ -255,7 +261,9 @@ public final class SMPCommonUI
   @Nonnull
   public static String getCertSerialNumber (@Nonnull final X509Certificate aX509Cert)
   {
-    return aX509Cert.getSerialNumber ().toString () + " / 0x" + _inGroupsOf (aX509Cert.getSerialNumber ().toString (16), 4);
+    return aX509Cert.getSerialNumber ().toString () +
+           " / 0x" +
+           _inGroupsOf (aX509Cert.getSerialNumber ().toString (16), 4);
   }
 
   @Nonnull
@@ -297,7 +305,8 @@ public final class SMPCommonUI
     final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
     final PublicKey aPublicKey = aX509Cert.getPublicKey ();
 
-    final BootstrapTable aCertDetails = new BootstrapTable (new HCCol ().addStyle (CCSSProperties.WIDTH.newValue ("12rem")), HCCol.star ());
+    final BootstrapTable aCertDetails = new BootstrapTable (new HCCol ().addStyle (CCSSProperties.WIDTH.newValue ("12rem")),
+                                                            HCCol.star ());
     aCertDetails.setResponsive (true);
     if (StringHelper.hasText (sAlias))
       aCertDetails.addBodyRow ().addCell ("Alias:").addCell (sAlias);
@@ -305,8 +314,12 @@ public final class SMPCommonUI
     aCertDetails.addBodyRow ().addCell ("Issuer:").addCell (getCertIssuer (aX509Cert));
     aCertDetails.addBodyRow ().addCell ("Subject:").addCell (getCertSubject (aX509Cert));
     aCertDetails.addBodyRow ().addCell ("Serial number:").addCell (getCertSerialNumber (aX509Cert));
-    aCertDetails.addBodyRow ().addCell ("Not before:").addCell (getNodeCertNotBefore (aNotBefore, aNowLDT, aDisplayLocale));
-    aCertDetails.addBodyRow ().addCell ("Not after:").addCell (getNodeCertNotAfter (aNotAfter, aNowLDT, aDisplayLocale));
+    aCertDetails.addBodyRow ()
+                .addCell ("Not before:")
+                .addCell (getNodeCertNotBefore (aNotBefore, aNowLDT, aDisplayLocale));
+    aCertDetails.addBodyRow ()
+                .addCell ("Not after:")
+                .addCell (getNodeCertNotAfter (aNotAfter, aNowLDT, aDisplayLocale));
 
     if (aPublicKey instanceof RSAPublicKey)
     {

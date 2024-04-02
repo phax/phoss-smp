@@ -359,7 +359,7 @@ public final class SMPServiceInformationManagerXML extends
                    "' and document type '" +
                    aDocumentTypeIdentifier.getValue () +
                    "'. This seems to be a bug! Using the first one.");
-    return ret.getFirst ();
+    return ret.getFirstOrNull ();
   }
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)

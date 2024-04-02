@@ -79,7 +79,7 @@ public final class MainCreateManyEndpoints
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
-  @SuppressWarnings ("deprecation")
+  @SuppressWarnings ({ "deprecation", "resource" })
   public static void main (final String [] args)
   {
     final String sServerBasePath = "http://localhost:90";
@@ -160,16 +160,19 @@ public final class MainCreateManyEndpoints
                              .delete ();
 
               // Create a new
-              final Response aResponseMsg = ClientBuilder.newClient ()
-                                                         .target (sServerBasePath)
-                                                         .path (sPI)
-                                                         .path ("services")
-                                                         .path (sDT)
-                                                         .request ()
-                                                         .header (CHttpHeader.AUTHORIZATION,
-                                                                  CREDENTIALS.getRequestValue ())
-                                                         .put (Entity.xml (aObjFactory.createServiceMetadata (aSM)));
-              _testResponseJerseyClient (aResponseMsg, 200);
+              try (
+                  final Response aResponseMsg = ClientBuilder.newClient ()
+                                                             .target (sServerBasePath)
+                                                             .path (sPI)
+                                                             .path ("services")
+                                                             .path (sDT)
+                                                             .request ()
+                                                             .header (CHttpHeader.AUTHORIZATION,
+                                                                      CREDENTIALS.getRequestValue ())
+                                                             .put (Entity.xml (aObjFactory.createServiceMetadata (aSM))))
+              {
+                _testResponseJerseyClient (aResponseMsg, 200);
+              }
             }
 
             aSW.stop ();

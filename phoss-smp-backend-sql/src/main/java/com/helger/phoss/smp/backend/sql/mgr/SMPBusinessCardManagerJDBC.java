@@ -220,7 +220,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
         final String sNames;
         if (aEntity.isSingleNameWithoutLanguage ())
         {
-          sName = aEntity.names ().getFirst ().getName ();
+          sName = aEntity.names ().getFirstOrNull ().getName ();
           sNames = null;
         }
         else

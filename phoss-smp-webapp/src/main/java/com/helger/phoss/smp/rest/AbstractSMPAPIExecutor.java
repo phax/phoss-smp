@@ -77,7 +77,7 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
                                           CHttpHeader.AUTHORIZATION +
                                           "' for user authentication");
 
-    final String sAuthHeader = aHeaders.getFirst ();
+    final String sAuthHeader = aHeaders.getFirstOrNull ();
 
     // Check bearer token first (does not log in case of error)
     final String sBearerToken = _getBearerToken (sAuthHeader);

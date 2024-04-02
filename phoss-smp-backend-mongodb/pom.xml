@@ -52,16 +52,6 @@
       <url>https://www.helger.com</url>
     </developer>
   </developers>
-  
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.mongodb</groupId>
-        <artifactId>mongodb-driver-sync</artifactId>
-        <version>4.11.1</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -71,6 +61,7 @@
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongodb-driver-sync</artifactId>
+      <version>${mongodb.version}</version>
     </dependency>
     <dependency>
       <groupId>com.helger.photon</groupId>

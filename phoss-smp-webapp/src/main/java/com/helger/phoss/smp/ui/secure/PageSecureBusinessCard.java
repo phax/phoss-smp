@@ -391,7 +391,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     final BootstrapViewForm aForm2 = aPanel.createAndAddBody ().addAndReturnChild (new BootstrapViewForm ());
 
-    aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aEntity.names ().getFirst ().getName ()));
+    aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Name")
+                                                  .setCtrl (aEntity.names ().getFirstOrNull ().getName ()));
 
     {
       final Locale aCountry = CountryCache.getInstance ().getCountry (aEntity.getCountryCode ());
@@ -688,9 +689,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     {
       // Store in a consistent manner
       aSMPEntities.sort ( (o1, o2) -> o1.names ()
-                                        .getFirst ()
+                                        .getFirstOrNull ()
                                         .getName ()
-                                        .compareToIgnoreCase (o2.names ().getFirst ().getName ()));
+                                        .compareToIgnoreCase (o2.names ().getFirstOrNull ().getName ()));
       if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (),
                                                           aSMPEntities) != null)
       {
@@ -868,7 +869,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                  .setCtrl (new HCEdit (new RequestField (sFieldName,
                                                                                          aExistingEntity == null ? null
                                                                                                                  : aExistingEntity.names ()
-                                                                                                                                  .getFirst ()
+                                                                                                                                  .getFirstOrNull ()
                                                                                                                                   .getName ())))
                                                  .setErrorList (aFormErrors.getListOfField (sFieldName)));
 
@@ -1191,7 +1192,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         {
           final HCRow aRow = aTable.addBodyRow ();
           aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-          aRow.addCell (aEntity.names ().getFirst ().getName ());
+          aRow.addCell (aEntity.names ().getFirstOrNull ().getName ());
 
           final Locale aCountry = CountryCache.getInstance ().getCountry (aEntity.getCountryCode ());
           final IHCCell <?> aCountryCell = aRow.addCell ();

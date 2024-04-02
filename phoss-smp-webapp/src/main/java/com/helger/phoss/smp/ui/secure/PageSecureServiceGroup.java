@@ -718,7 +718,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         {
           final SMPBusinessCardEntity aEntity = aBC.getEntityAtIndex (0);
           if (aEntity != null && aEntity.names ().isNotEmpty ())
-            aName = HCTextNode.createOnDemand (aEntity.names ().getFirst ().getName ());
+            aName = HCTextNode.createOnDemand (aEntity.names ().getFirstOrNull ().getName ());
         }
         aRow.addCell (aName);
       }

@@ -102,7 +102,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
    */
   public final boolean isSingleNameWithoutLanguage ()
   {
-    return m_aNames.size () == 1 && m_aNames.getFirst ().hasNoLanguageCode ();
+    return m_aNames.size () == 1 && m_aNames.getFirstOrNull ().hasNoLanguageCode ();
   }
 
   /**

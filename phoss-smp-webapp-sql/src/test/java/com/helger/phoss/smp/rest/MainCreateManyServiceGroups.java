@@ -68,6 +68,7 @@ public final class MainCreateManyServiceGroups
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
+  @SuppressWarnings ("resource")
   public static void main (final String [] args)
   {
     final String sServerBasePath = "http://localhost:90";

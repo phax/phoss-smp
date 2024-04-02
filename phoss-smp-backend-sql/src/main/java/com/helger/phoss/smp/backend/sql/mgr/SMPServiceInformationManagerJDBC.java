@@ -599,7 +599,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                                                      aDocTypeID.getValue ()));
     if (aDBResult != null && aDBResult.isNotEmpty ())
     {
-      final String sServiceInformationExtension = aDBResult.getFirst ().getAsString (0);
+      final String sServiceInformationExtension = aDBResult.getFirstOrNull ().getAsString (0);
 
       final ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>> aEndpoints = new CommonsHashMap <> ();
       for (final DBResultRow aDBRow : aDBResult)

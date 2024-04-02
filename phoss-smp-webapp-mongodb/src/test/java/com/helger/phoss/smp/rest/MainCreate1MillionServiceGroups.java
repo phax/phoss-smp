@@ -68,6 +68,7 @@ public final class MainCreate1MillionServiceGroups
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
+  @SuppressWarnings ("resource")
   public static void main (final String [] args) throws Throwable
   {
     final SMPServerRESTTestRule aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-mongodb.properties"));
@@ -102,13 +103,16 @@ public final class MainCreate1MillionServiceGroups
                          .delete ();
 
           // Create a new
-          final Response aResponseMsg = ClientBuilder.newClient ()
-                                                     .target (aRule.getFullURL ())
-                                                     .path (sPI)
-                                                     .request ()
-                                                     .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                                                     .put (Entity.xml (aObjFactory.createServiceGroup (aSG)));
-          _testResponseJerseyClient (aResponseMsg, 200);
+          try (final Response aResponseMsg = ClientBuilder.newClient ()
+                                                          .target (aRule.getFullURL ())
+                                                          .path (sPI)
+                                                          .request ()
+                                                          .header (CHttpHeader.AUTHORIZATION,
+                                                                   CREDENTIALS.getRequestValue ())
+                                                          .put (Entity.xml (aObjFactory.createServiceGroup (aSG))))
+          {
+            _testResponseJerseyClient (aResponseMsg, 200);
+          }
         }
 
         aSW.stop ();

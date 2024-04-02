@@ -79,6 +79,7 @@ public final class MainCreate1MillionEndpoints
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
+  @SuppressWarnings ("resource")
   public static void main (final String [] args) throws Throwable
   {
     final SMPServerRESTTestRule aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-mongodb.properties"));
