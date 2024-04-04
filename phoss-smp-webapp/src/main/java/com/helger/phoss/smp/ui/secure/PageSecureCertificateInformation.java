@@ -98,14 +98,14 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     DE4A_TELSEC1 ("DE4A Telesec [1]",
                   "CN=TeleSec Business CA 1,OU=T-Systems Trust Center,O=T-Systems International GmbH,C=DE",
                   3,
-                  false),
-    DE4A_TELSEC2 ("DE4A Telesec [2]", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, false),
-    DE4A_COMMISSIGN_2 ("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, false);
+                  true),
+    DE4A_TELSEC2 ("DE4A Telesec [2]", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, true),
+    DE4A_COMMISSIGN_2 ("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, true);
 
     private final String m_sDisplayName;
     private final String m_sIssuer;
     private final int m_nCerts;
-    private boolean m_bDeprecated;
+    private final boolean m_bDeprecated;
 
     /**
      * @param sDisplayName
