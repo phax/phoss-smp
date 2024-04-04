@@ -31,10 +31,8 @@ import com.helger.commons.concurrent.ExecutorServiceHelper;
 import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
-import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.web.scope.mock.WebScopeTestRule;
@@ -52,11 +50,9 @@ import jakarta.ws.rs.core.Response;
  *
  * @author Philip Helger
  */
-public final class MainCreateManyServiceGroups
+public final class MainCreateManyServiceGroups extends AbstractCreateMany
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (MainCreateManyServiceGroups.class);
-  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
-                                                                                                CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
                                                  @Nonempty final int... aStatusCodes)
@@ -78,12 +74,10 @@ public final class MainCreateManyServiceGroups
     {
       final ObjectFactory aObjFactory = new ObjectFactory ();
       final StopWatch aSWOverall = StopWatch.createdStarted ();
-      final int nStart = 0;
-      final int nCount = 1000;
 
       final ExecutorService es = Executors.newFixedThreadPool (2);
 
-      for (int i = nStart; i < nStart + nCount; ++i)
+      for (int i = START_INDEX; i < START_INDEX + PARTICIPANTS; ++i)
       {
         final int idx = i;
         es.submit ( () -> {

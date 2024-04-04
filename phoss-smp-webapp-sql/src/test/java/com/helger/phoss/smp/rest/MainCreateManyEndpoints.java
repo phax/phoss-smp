@@ -31,20 +31,19 @@ import com.helger.commons.concurrent.ExecutorServiceHelper;
 import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.doctype.EPredefinedDocumentTypeIdentifier;
 import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
-import com.helger.peppolid.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.photon.security.CSecurity;
+import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.web.scope.mock.WebScopeTestRule;
+import com.helger.xsds.peppol.id1.ProcessIdentifierType;
 import com.helger.xsds.peppol.smp1.EndpointType;
 import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ProcessListType;
@@ -63,11 +62,9 @@ import jakarta.ws.rs.core.Response;
  *
  * @author Philip Helger
  */
-public final class MainCreateManyEndpoints
+public final class MainCreateManyEndpoints extends AbstractCreateMany
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (MainCreateManyEndpoints.class);
-  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
-                                                                                                CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
                                                  @Nonempty final int... aStatusCodes)
@@ -108,12 +105,15 @@ public final class MainCreateManyEndpoints
       {
         final PeppolDocumentTypeIdentifier aDT = aEDT.getAsDocumentTypeIdentifier ();
         final String sDT = aDT.getURIEncoded ();
-        final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
+        final ProcessIdentifierType aProcID;
+        if (true)
+          aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
+        else
+          aProcID = new SimpleProcessIdentifier ("",
+                                                 EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ()
+                                                                                          .getValue ());
 
-        final int nStart = 0;
-        final int nCount = 100;
-
-        for (int i = nStart; i < nStart + nCount; ++i)
+        for (int i = START_INDEX; i < START_INDEX + PARTICIPANTS; ++i)
         {
           final int idx = i;
           es.submit ( () -> {
