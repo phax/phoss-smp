@@ -28,16 +28,14 @@ import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.doctype.EPredefinedDocumentTypeIdentifier;
 import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
-import com.helger.peppolid.peppol.process.PeppolProcessIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.photon.security.CSecurity;
+import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
@@ -60,11 +58,9 @@ import jakarta.ws.rs.core.Response;
  *
  * @author Philip Helger
  */
-public final class MainCreateManyEndpoints
+public final class MainCreateManyEndpoints extends AbstractCreateMany
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (MainCreateManyEndpoints.class);
-  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
-                                                                                                CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
                                                  @Nonempty final int... aStatusCodes)
@@ -76,7 +72,7 @@ public final class MainCreateManyEndpoints
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
-  @SuppressWarnings ({ "deprecation", "resource" })
+  @SuppressWarnings ({ "resource" })
   public static void main (final String [] args) throws Throwable
   {
     final String sServerBasePath = "http://localhost:90";
@@ -90,9 +86,6 @@ public final class MainCreateManyEndpoints
       for (final EPredefinedDocumentTypeIdentifier aEDT : new EPredefinedDocumentTypeIdentifier [] { EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CREDITNOTE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V12,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V12,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V12,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V20,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V20,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V202,
@@ -103,9 +96,11 @@ public final class MainCreateManyEndpoints
       {
         final PeppolDocumentTypeIdentifier aDT = aEDT.getAsDocumentTypeIdentifier ();
         final String sDT = aDT.getURIEncoded ();
-        final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
+        final SimpleProcessIdentifier aProcID = new SimpleProcessIdentifier ("",
+                                                                             EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ()
+                                                                                                                      .getValue ());
 
-        for (int i = 0; i < 10_000; ++i)
+        for (int i = 0; i < PARTICIPANTS; ++i)
         {
           final StopWatch aSW = StopWatch.createdStarted ();
           final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +

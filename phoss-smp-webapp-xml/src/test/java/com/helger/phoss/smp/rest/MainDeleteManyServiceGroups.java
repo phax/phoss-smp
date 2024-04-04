@@ -28,10 +28,8 @@ import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.http.CHttpHeader;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
-import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
-import com.helger.photon.security.CSecurity;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.web.scope.mock.WebScopeTestRule;
@@ -45,11 +43,9 @@ import jakarta.ws.rs.core.Response;
  *
  * @author Philip Helger
  */
-public final class MainDeleteManyServiceGroups
+public final class MainDeleteManyServiceGroups extends AbstractCreateMany
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (MainDeleteManyServiceGroups.class);
-  private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
-                                                                                                CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
   private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
                                                  @Nonempty final int... aStatusCodes)
@@ -69,7 +65,7 @@ public final class MainDeleteManyServiceGroups
     try
     {
       final StopWatch aSWOverall = StopWatch.createdStarted ();
-      for (int i = 0; i < 10_000; ++i)
+      for (int i = 0; i < PARTICIPANTS; ++i)
       {
         final StopWatch aSW = StopWatch.createdStarted ();
         final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
