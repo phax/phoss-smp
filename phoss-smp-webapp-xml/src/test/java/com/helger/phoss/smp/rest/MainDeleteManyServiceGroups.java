@@ -65,7 +65,7 @@ public final class MainDeleteManyServiceGroups extends AbstractCreateMany
     try
     {
       final StopWatch aSWOverall = StopWatch.createdStarted ();
-      for (int i = 0; i < PARTICIPANTS; ++i)
+      for (int i = START_INDEX; i < START_INDEX + PARTICIPANTS; ++i)
       {
         final StopWatch aSW = StopWatch.createdStarted ();
         final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +

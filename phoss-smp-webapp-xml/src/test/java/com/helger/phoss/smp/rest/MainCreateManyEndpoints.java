@@ -40,6 +40,7 @@ import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.web.scope.mock.WebScopeTestRule;
+import com.helger.xsds.peppol.id1.ProcessIdentifierType;
 import com.helger.xsds.peppol.smp1.EndpointType;
 import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ProcessListType;
@@ -96,11 +97,15 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
       {
         final PeppolDocumentTypeIdentifier aDT = aEDT.getAsDocumentTypeIdentifier ();
         final String sDT = aDT.getURIEncoded ();
-        final SimpleProcessIdentifier aProcID = new SimpleProcessIdentifier ("",
-                                                                             EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ()
-                                                                                                                      .getValue ());
+        final ProcessIdentifierType aProcID;
+        if (true)
+          aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
+        else
+          aProcID = new SimpleProcessIdentifier ("",
+                                                 EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ()
+                                                                                          .getValue ());
 
-        for (int i = 0; i < PARTICIPANTS; ++i)
+        for (int i = START_INDEX; i < START_INDEX + PARTICIPANTS; ++i)
         {
           final StopWatch aSW = StopWatch.createdStarted ();
           final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
