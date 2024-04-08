@@ -90,6 +90,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                           false),
     // TOOP Pilot PKI
     TOOP_PILOT_SMP ("TOOP pilot", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, true),
+
     // DE4A PKIs
     DE4A_TEST ("DE4A Test",
                "E=CEF-EDELIVERY-SUPPORT@ec.europa.eu,CN=DE4A_TEST_SMP_CA,OU=CEF,O=DE4A,ST=Brussels-Capital,C=BE",
@@ -100,7 +101,21 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                   3,
                   true),
     DE4A_TELSEC2 ("DE4A Telesec [2]", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, true),
-    DE4A_COMMISSIGN_2 ("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, true);
+    DE4A_COMMISSIGN_2 ("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, true),
+
+    // DBNA
+    DBNA_PRODUCTION ("DBNA Production",
+                     "CN=Digital Business Networks Alliance Intermediate CA,O=Digital Business Networks Alliance,C=US",
+                     3,
+                     false),
+    DBNA_TEST ("DBNA Test",
+               "CN=DBNAlliance Demo Intermediate Test,O=Digital Business Network Alliance,STREET=3 River Way Suite 920,PostalCode=77056,L=Houston,ST=Texas,C=US",
+               3,
+               false),
+    DBNA_PILOT ("DBNA Pilot",
+                "CN=DBNAlliance Demo Intermediate Pilot,O=Digital Business Network Alliance,STREET=3 River Way Suite 920,PostalCode=77056,L=Houston,ST=Texas,C=US",
+                3,
+                false),;
 
     private final String m_sDisplayName;
     private final String m_sIssuer;
