@@ -53,7 +53,8 @@ RUN rm -rf $CATALINA_HOME/webapps/manager \
            $CATALINA_HOME/webapps/host-manager \
            $CATALINA_HOME/webapps/docs \
            $CATALINA_HOME/webapps/examples \
-           $CATALINA_HOME/webapps/ROOT
+           $CATALINA_HOME/webapps/ROOT \
+           $CATALINA_HOME/webapps.dist
 
 COPY --from=build /smp $CATALINA_HOME/webapps/ROOT
 WORKDIR /home/git

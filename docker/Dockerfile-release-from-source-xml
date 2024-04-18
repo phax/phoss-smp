@@ -53,6 +53,7 @@ RUN rm -rf $CATALINA_HOME/webapps/manager \
            $CATALINA_HOME/webapps/host-manager \
            $CATALINA_HOME/webapps/docs \
            $CATALINA_HOME/webapps/examples \
-           $CATALINA_HOME/webapps/ROOT
+           $CATALINA_HOME/webapps/ROOT \
+           $CATALINA_HOME/webapps.dist
 
 COPY --from=build /build/phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT
