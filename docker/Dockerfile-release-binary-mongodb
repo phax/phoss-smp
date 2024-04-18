@@ -47,6 +47,10 @@ ARG SMP_VERSION
 ENV SMP_VERSION=$SMP_VERSION
 LABEL vendor="Philip Helger"
 LABEL version=$SMP_VERSION
- 
+
+# Remove unused Tomcat web applications
+WORKDIR $CATALINA_HOME/webapps
+RUN rm -rf manager host-manager docs examples ROOT
+
 COPY --from=build /smp $CATALINA_HOME/webapps/ROOT
 WORKDIR /home/git
