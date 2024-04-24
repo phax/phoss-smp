@@ -278,7 +278,13 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:billing-1@aunz-1::2.1" name="Peppol A-NZ PINT Credit Note v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:billing-1@my-1::2.1" name="Peppol MY PINT Credit Note v1.0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
+  </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:selfbilling-1@aunz-1::2.1" name="Peppol A-NZ PINT Self-Billing Credit Note v1.0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:selfbilling-1@my-1::2.1" name="Peppol MY PINT Self-Billing Credit Note v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:www.cenbii.eu:transaction:biicoretrdm014:ver1.0:#urn:www.cenbii.eu:profile:biixx:ver1.0#urn:www.difi.no:ehf:kreditnota:ver1::2.0" name="Peppol Standalone Credit Note according to EHF V1" deprecated="false">
@@ -456,6 +462,9 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@jp-1::2.1" name="Peppol JP PINT Invoice v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@my-1::2.1" name="Peppol MY PINT Invoice v1.0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
+  </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:nontaxinvoice-1@jp-1::2.1" name="Peppol JP BIS Invoice for Non-tax Registered Businesses" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
@@ -463,6 +472,9 @@
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@jp-1::2.1" name="Peppol JP BIS Self-Billing Invoice" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@my-1::2.1" name="Peppol MY PINT Self-Billing Invoice v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:www.cenbii.eu:transaction:biicoretrdm010:ver1.0:#urn:www.peppol.eu:bis:peppol4a:ver1.0#urn:www.difi.no:ehf:faktura:ver1::2.0" name="Peppol EHF Invoice V1" deprecated="true">
@@ -761,10 +773,16 @@
   <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:billing-1@aunz-1::2.1" name="Peppol A-NZ PINT Credit Note v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
+  <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:billing-1@my-1::2.1" name="Peppol MY PINT Credit Note v1.0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
+  </item>
   <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:billing-1@sg-1::2.1" name="Peppol SG PINT Credit Note v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
   <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:selfbilling-1@aunz-1::2.1" name="Peppol A-NZ PINT Self-Billing Credit Note v1.0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
+  </item>
+  <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:selfbilling-1@my-1::2.1" name="Peppol MY PINT Self-Billing Credit Note v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
   <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1::2.1" name="Peppol PINT Invoice v1.0" deprecated="false">
@@ -774,6 +792,9 @@
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
   <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@jp-1::2.1" name="Peppol JP PINT Invoice v1.0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
+  </item>
+  <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@my-1::2.1" name="Peppol MY PINT Invoice v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
   <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@sg-1::2.1" name="Peppol SG PINT Invoice v1.0" deprecated="false">
@@ -786,6 +807,9 @@
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
   <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@jp-1::2.1" name="Peppol JP BIS Self-Billing Invoice" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
+  </item>
+  <item id="peppol-doctype-wildcard::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@my-1::2.1" name="Peppol MY PINT Self-Billing Invoice v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
 </root>
