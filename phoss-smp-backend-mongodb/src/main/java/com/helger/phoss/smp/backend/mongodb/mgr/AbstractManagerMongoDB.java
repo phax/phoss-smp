@@ -21,6 +21,8 @@ import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
@@ -40,6 +42,8 @@ import com.mongodb.client.MongoCollection;
  */
 public abstract class AbstractManagerMongoDB implements AutoCloseable
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractManagerMongoDB.class);
+
   private static final String BSON_SCHEME = "scheme";
   private static final String BSON_VALUE = "value";
 
@@ -87,8 +91,12 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   {
     if (aDoc == null)
       return null;
-    return SMPMetaManager.getIdentifierFactory ()
-                         .createDocumentTypeIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
+    final String sScheme = aDoc.getString (BSON_SCHEME);
+    final String sValue = aDoc.getString (BSON_VALUE);
+    final var ret = SMPMetaManager.getIdentifierFactory ().createDocumentTypeIdentifier (sScheme, sValue);
+    if (ret == null)
+      LOGGER.warn ("Failed to parse '" + sScheme + "' and '" + sValue + "' to a document type ID");
+    return ret;
   }
 
   @Nullable
@@ -97,8 +105,12 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   {
     if (aDoc == null)
       return null;
-    return SMPMetaManager.getIdentifierFactory ()
-                         .createParticipantIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
+    final String sScheme = aDoc.getString (BSON_SCHEME);
+    final String sValue = aDoc.getString (BSON_VALUE);
+    final var ret = SMPMetaManager.getIdentifierFactory ().createParticipantIdentifier (sScheme, sValue);
+    if (ret == null)
+      LOGGER.warn ("Failed to parse '" + sScheme + "' and '" + sValue + "' to a participant ID");
+    return ret;
   }
 
   @Nullable
@@ -107,7 +119,11 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   {
     if (aDoc == null)
       return null;
-    return SMPMetaManager.getIdentifierFactory ()
-                         .createProcessIdentifier (aDoc.getString (BSON_SCHEME), aDoc.getString (BSON_VALUE));
+    final String sScheme = aDoc.getString (BSON_SCHEME);
+    final String sValue = aDoc.getString (BSON_VALUE);
+    final var ret = SMPMetaManager.getIdentifierFactory ().createProcessIdentifier (sScheme, sValue);
+    if (ret == null)
+      LOGGER.warn ("Failed to parse '" + sScheme + "' and '" + sValue + "' to a process ID");
+    return ret;
   }
 }
