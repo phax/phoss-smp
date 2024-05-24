@@ -74,6 +74,7 @@
     <dependency>
       <groupId>net.jodah</groupId>
       <artifactId>expiringmap</artifactId>
+      <version>${expiringmap.version}</version>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
