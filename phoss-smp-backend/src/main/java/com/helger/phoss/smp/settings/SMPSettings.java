@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
+import com.helger.commons.annotation.DevelopersNote;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.state.EChange;
@@ -79,6 +80,8 @@ public class SMPSettings implements ISMPSettings
 
   private final Settings m_aSettings = new Settings ("smp-settings");
 
+  @Deprecated (forRemoval = true, since = "7.1.4")
+  @DevelopersNote ("Use the factory methods instead - the constructor will be made private")
   public SMPSettings (final boolean bInitFromConfiguration)
   {
     if (bInitFromConfiguration)
@@ -200,8 +203,7 @@ public class SMPSettings implements ISMPSettings
 
   public boolean isDirectoryIntegrationEnabled ()
   {
-    return m_aSettings.getAsBoolean (KEY_SMP_DIRECTORY_INTEGRATION_ENABLED,
-                                     DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
+    return m_aSettings.getAsBoolean (KEY_SMP_DIRECTORY_INTEGRATION_ENABLED, DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
   }
 
   @Nonnull
@@ -254,5 +256,17 @@ public class SMPSettings implements ISMPSettings
   public String toString ()
   {
     return new ToStringGenerator (this).append ("Settings", m_aSettings).getToString ();
+  }
+
+  @Nonnull
+  public static SMPSettings createEmpty ()
+  {
+    return new SMPSettings (false);
+  }
+
+  @Nonnull
+  public static SMPSettings createInitializedFromConfiguration ()
+  {
+    return new SMPSettings (true);
   }
 }

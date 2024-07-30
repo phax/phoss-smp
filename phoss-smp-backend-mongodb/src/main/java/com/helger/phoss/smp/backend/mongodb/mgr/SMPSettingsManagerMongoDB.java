@@ -23,10 +23,12 @@ import javax.annotation.Nullable;
 
 import org.bson.Document;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
 import com.helger.commons.state.EChange;
+import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsCallback;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
@@ -51,7 +53,7 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   private static final String BSON_SML_ENABLED = "sml-enabled";
   private static final String BSON_SML_INFO_ID = "smlinfo-id";
 
-  private final SMPSettings m_aSettings = new SMPSettings (true);
+  private final SMPSettings m_aSMPSettings = SMPSettings.createInitializedFromConfiguration ();
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
   private final AtomicBoolean m_aInsertDocument = new AtomicBoolean ();
 
@@ -76,6 +78,9 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
 
   public static void toDomain (@Nonnull final Document aDoc, @Nonnull final SMPSettings aTarget)
   {
+    ValueEnforcer.notNull (aDoc, "Doc");
+    ValueEnforcer.notNull (aTarget, "Target");
+
     aTarget.setRESTWritableAPIDisabled (aDoc.getBoolean (BSON_SMP_REST_WRITABLE_API_DISABLED,
                                                          aTarget.isRESTWritableAPIDisabled ()));
     aTarget.setDirectoryIntegrationEnabled (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_ENABLED,
@@ -84,12 +89,12 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
                                                               aTarget.isDirectoryIntegrationRequired ()));
     aTarget.setDirectoryIntegrationAutoUpdate (aDoc.getBoolean (BSON_DIRECTORY_INTEGRATION_AUTO_UPDATE,
                                                                 aTarget.isDirectoryIntegrationAutoUpdate ()));
+
     String sDirectoryHostName = aDoc.getString (BSON_DIRECTORY_HOSTNAME);
-    if (sDirectoryHostName == null)
-    {
+    if (StringHelper.hasNoText (sDirectoryHostName))
       sDirectoryHostName = aTarget.getDirectoryHostName ();
-    }
     aTarget.setDirectoryHostName (sDirectoryHostName);
+
     aTarget.setSMLEnabled (aDoc.getBoolean (BSON_SML_ENABLED, aTarget.isSMLEnabled ()));
     aTarget.setSMLRequired (aDoc.getBoolean (BSON_SML_REQUIRED, aTarget.isSMLRequired ()));
     aTarget.setSMLInfoID (aDoc.getString (BSON_SML_INFO_ID));
@@ -100,12 +105,12 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
     super ("smp-settings");
     final Document aDoc = getCollection ().find (new Document (BSON_ID, ID_SETTINGS)).first ();
     if (aDoc != null)
-      toDomain (aDoc, m_aSettings);
+      toDomain (aDoc, m_aSMPSettings);
     m_aInsertDocument.set (aDoc == null);
   }
 
   @Nonnull
-  @aTargeturnsMutableObject
+  @ReturnsMutableObject
   public final CallbackList <ISMPSettingsCallback> callbacks ()
   {
     return m_aCallbacks;
@@ -114,7 +119,7 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   @Nonnull
   public ISMPSettings getSettings ()
   {
-    return m_aSettings;
+    return m_aSMPSettings;
   }
 
   @Nonnull
@@ -128,18 +133,18 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
                                  @Nullable final String sSMLInfoID)
   {
     EChange eChange = EChange.UNCHANGED;
-    eChange = eChange.or (m_aSettings.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
-    eChange = eChange.or (m_aSettings.setDirectoryIntegrationEnabled (bDirectoryIntegrationEnabled));
-    eChange = eChange.or (m_aSettings.setDirectoryIntegrationRequired (bDirectoryIntegrationRequired));
-    eChange = eChange.or (m_aSettings.setDirectoryIntegrationAutoUpdate (bDirectoryIntegrationAutoUpdate));
-    eChange = eChange.or (m_aSettings.setDirectoryHostName (sDirectoryHostName));
-    eChange = eChange.or (m_aSettings.setSMLEnabled (bSMLEnabled));
-    eChange = eChange.or (m_aSettings.setSMLRequired (bSMLRequired));
-    eChange = eChange.or (m_aSettings.setSMLInfoID (sSMLInfoID));
+    eChange = eChange.or (m_aSMPSettings.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
+    eChange = eChange.or (m_aSMPSettings.setDirectoryIntegrationEnabled (bDirectoryIntegrationEnabled));
+    eChange = eChange.or (m_aSMPSettings.setDirectoryIntegrationRequired (bDirectoryIntegrationRequired));
+    eChange = eChange.or (m_aSMPSettings.setDirectoryIntegrationAutoUpdate (bDirectoryIntegrationAutoUpdate));
+    eChange = eChange.or (m_aSMPSettings.setDirectoryHostName (sDirectoryHostName));
+    eChange = eChange.or (m_aSMPSettings.setSMLEnabled (bSMLEnabled));
+    eChange = eChange.or (m_aSMPSettings.setSMLRequired (bSMLRequired));
+    eChange = eChange.or (m_aSMPSettings.setSMLInfoID (sSMLInfoID));
     if (eChange.isChanged ())
     {
       // Write to DB
-      final Document aDoc = toBson (m_aSettings);
+      final Document aDoc = toBson (m_aSMPSettings);
       if (m_aInsertDocument.getAndSet (false))
       {
         if (!getCollection ().insertOne (aDoc).wasAcknowledged ())
@@ -152,7 +157,7 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
       }
 
       // Invoke callbacks
-      m_aCallbacks.forEach (x -> x.onSMPSettingsChanged (m_aSettings));
+      m_aCallbacks.forEach (x -> x.onSMPSettingsChanged (m_aSMPSettings));
     }
 
     return eChange;

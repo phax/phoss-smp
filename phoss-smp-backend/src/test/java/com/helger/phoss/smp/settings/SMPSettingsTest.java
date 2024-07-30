@@ -24,7 +24,7 @@ public class SMPSettingsTest
   @Test
   public void testBasic ()
   {
-    final SMPSettings aSettings = new SMPSettings (true);
+    final SMPSettings aSettings = SMPSettings.createInitializedFromConfiguration ();
     assertTrue (aSettings.isDirectoryIntegrationRequired ());
   }
 }

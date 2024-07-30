@@ -36,7 +36,7 @@ import com.helger.xml.microdom.MicroDocument;
 @ThreadSafe
 public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements ISMPSettingsManager
 {
-  private final SMPSettings m_aSettings = new SMPSettings (true);
+  private final SMPSettings m_aSMPSettings = SMPSettings.createInitializedFromConfiguration ();
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
 
   public SMPSettingsManagerXML (@Nullable final String sFilename) throws DAOException
@@ -51,7 +51,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   {
     final SettingsMicroDocumentConverter <Settings> aConverter = new SettingsMicroDocumentConverter <> (ISettingsFactory.newInstance ());
     final ISettings aSettings = aConverter.convertToNative (aDoc.getDocumentElement ());
-    m_aSettings.internalSetFromSettings (aSettings);
+    m_aSMPSettings.internalSetFromSettings (aSettings);
     return EChange.UNCHANGED;
   }
 
@@ -61,7 +61,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   {
     final IMicroDocument ret = new MicroDocument ();
     final SettingsMicroDocumentConverter <Settings> aConverter = new SettingsMicroDocumentConverter <> (ISettingsFactory.newInstance ());
-    ret.appendChild (aConverter.convertToMicroElement (m_aSettings.internalGetAsMutableSettings (), null, "root"));
+    ret.appendChild (aConverter.convertToMicroElement (m_aSMPSettings.internalGetAsMutableSettings (), null, "root"));
     return ret;
   }
 
@@ -75,7 +75,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   @Nonnull
   public ISMPSettings getSettings ()
   {
-    return m_aSettings;
+    return m_aSMPSettings;
   }
 
   @Nonnull
@@ -92,14 +92,14 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
     m_aRWLock.writeLock ().lock ();
     try
     {
-      eChange = eChange.or (m_aSettings.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
-      eChange = eChange.or (m_aSettings.setDirectoryIntegrationRequired (bDirectoryIntegrationRequired));
-      eChange = eChange.or (m_aSettings.setDirectoryIntegrationEnabled (bDirectoryIntegrationEnabled));
-      eChange = eChange.or (m_aSettings.setDirectoryIntegrationAutoUpdate (bDirectoryIntegrationAutoUpdate));
-      eChange = eChange.or (m_aSettings.setDirectoryHostName (sDirectoryHostName));
-      eChange = eChange.or (m_aSettings.setSMLRequired (bSMLRequired));
-      eChange = eChange.or (m_aSettings.setSMLEnabled (bSMLActive));
-      eChange = eChange.or (m_aSettings.setSMLInfoID (sSMLInfoID));
+      eChange = eChange.or (m_aSMPSettings.setRESTWritableAPIDisabled (bRESTWritableAPIDisabled));
+      eChange = eChange.or (m_aSMPSettings.setDirectoryIntegrationRequired (bDirectoryIntegrationRequired));
+      eChange = eChange.or (m_aSMPSettings.setDirectoryIntegrationEnabled (bDirectoryIntegrationEnabled));
+      eChange = eChange.or (m_aSMPSettings.setDirectoryIntegrationAutoUpdate (bDirectoryIntegrationAutoUpdate));
+      eChange = eChange.or (m_aSMPSettings.setDirectoryHostName (sDirectoryHostName));
+      eChange = eChange.or (m_aSMPSettings.setSMLRequired (bSMLRequired));
+      eChange = eChange.or (m_aSMPSettings.setSMLEnabled (bSMLActive));
+      eChange = eChange.or (m_aSMPSettings.setSMLInfoID (sSMLInfoID));
       if (eChange.isChanged ())
         markAsChanged ();
     }
@@ -110,7 +110,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
 
     // Invoke callbacks
     if (eChange.isChanged ())
-      m_aCallbacks.forEach (x -> x.onSMPSettingsChanged (m_aSettings));
+      m_aCallbacks.forEach (x -> x.onSMPSettingsChanged (m_aSMPSettings));
 
     return eChange;
   }

@@ -167,7 +167,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   public static class SettingsSingleton extends AbstractRequestWebSingleton
   {
     private static final Logger LOGGER = LoggerFactory.getLogger (SMPSettingsManagerJDBC.SettingsSingleton.class);
-    private ISMPSettings m_aSettings;
+    private ISMPSettings m_aSMPSettings;
 
     @Deprecated
     @UsedViaReflection
@@ -181,12 +181,12 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     }
 
     @Nonnull
-    private ISMPSettings _getSettingsFromDB (@Nonnull final SMPSettingsManagerJDBC aMgr)
+    private static ISMPSettings _createSettingsFromDB (@Nonnull final SMPSettingsManagerJDBC aMgr)
     {
       // Queries DB
       final ICommonsMap <String, String> aValues = aMgr.getAllSettingsValuesFromDB ();
 
-      final SMPSettings ret = new SMPSettings (true);
+      final SMPSettings ret = SMPSettings.createInitializedFromConfiguration ();
       ret.setRESTWritableAPIDisabled (StringParser.parseBool (aValues.get (SMP_REST_WRITABLE_API_DISABLED),
                                                               ret.isRESTWritableAPIDisabled ()));
       ret.setDirectoryIntegrationEnabled (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_ENABLED),
@@ -196,10 +196,8 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
       ret.setDirectoryIntegrationAutoUpdate (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_AUTO_UPDATE),
                                                                      ret.isDirectoryIntegrationAutoUpdate ()));
       String sDirectoryHostName = aValues.get (DIRECTORY_HOSTNAME);
-      if (sDirectoryHostName == null)
-      {
+      if (StringHelper.hasNoText (sDirectoryHostName))
         sDirectoryHostName = ret.getDirectoryHostName ();
-      }
       ret.setDirectoryHostName (sDirectoryHostName);
       ret.setSMLEnabled (StringParser.parseBool (aValues.get (SML_ENABLED), ret.isSMLEnabled ()));
       ret.setSMLRequired (StringParser.parseBool (aValues.get (SML_REQUIRED), ret.isSMLRequired ()));
@@ -210,12 +208,12 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     @Nonnull
     public ISMPSettings getSettings (@Nonnull final SMPSettingsManagerJDBC aMgr)
     {
-      ISMPSettings ret = m_aSettings;
+      ISMPSettings ret = m_aSMPSettings;
       if (ret == null)
       {
         if (LOGGER.isDebugEnabled ())
           LOGGER.debug ("Loading SMP settings from DB");
-        ret = m_aSettings = _getSettingsFromDB (aMgr);
+        ret = m_aSMPSettings = _createSettingsFromDB (aMgr);
       }
       else
       {
