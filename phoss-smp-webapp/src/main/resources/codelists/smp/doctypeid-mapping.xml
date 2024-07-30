@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (C) 2014-2024 Philip Helger and contributors
-    philip[at]helger[dot]com
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-            http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
 <root type="doctypeid">
+  <item id="busdox-docid-qns::http://ns.hr-xml.org/2007-04-15::Assignment##hr-xml:status@nl-1.4::2.5" name="Peppol SETU HR-XML Assignment Status v1.4" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:hr-xml:2007:assignment:1.0" />
+  </item>
+  <item id="busdox-docid-qns::http://ns.hr-xml.org/2007-04-15::Assignment##hr-xml@nl-1.4.1::2.5" name="Peppol SETU HR-XML Assignment v1.4.1" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:hr-xml:2007:assignment:1.0" />
+  </item>
+  <item id="busdox-docid-qns::http://ns.hr-xml.org/2007-04-15::HumanResource##hr-xml:status@nl-1.4::2.5" name="Peppol SETU HR-XML HumanResource Status v1.4" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:hr-xml:2007:humanresource:1.0" />
+  </item>
+  <item id="busdox-docid-qns::http://ns.hr-xml.org/2007-04-15::HumanResource##hr-xml@nl-1.4::2.5" name="Peppol SETU HR-XML HumanResource v1.4" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:hr-xml:2007:humanresource:1.0" />
+  </item>
+  <item id="busdox-docid-qns::http://ns.hr-xml.org/2007-04-15::StaffingOrder##hr-xml:status@nl-1.4::2.5" name="Peppol SETU HR-XML StaffingOrder Status v1.4" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:hr-xml:2007:staffingorder:1.0" />
+  </item>
+  <item id="busdox-docid-qns::http://ns.hr-xml.org/2007-04-15::StaffingOrder##hr-xml@nl-1.4::2.5" name="Peppol SETU HR-XML StaffingOrder v1.4" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:hr-xml:2007:staffingorder:1.0" />
+  </item>
   <item id="busdox-docid-qns::http://ns.hr-xml.org/2007-04-15::TimeCard##hr-xml@nl-1.4::2.5" name="Peppol SETU HR-XML Timecard v1.4.1" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:hr-xml:2007:timesheet:1.0" />
   </item>
@@ -80,6 +80,37 @@
   </item>
   <item id="busdox-docid-qns::urn:fdc:difi.no:2017:payment:extras-1::ReceptionAcknowledgement##urn:fdc:difi.no:2017:payment:handling:1.0:for:urn:urn:iso:std:iso:20022:tech:xsd:camt.054.001.02:restricted:urn:fdc:bits.no:2017:iso20022:1.5::1.0" name="Peppol EHF Accounting/General Ledger/cash management (Profile 09) (Camt.054 Reception Acknowledgement)" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:bits.no:2017:profile:09:1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:digdir.no:2020:innbyggerpost:xsd::innbyggerpost##urn:fdc:digdir.no:2020:innbyggerpost:schema:aapningskvittering::1.0" name="Peppol INNBYGGERPOST_DPI_AAPNINGSKVITTERING_1_0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:digital:ver1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:digdir.no:2020:innbyggerpost:xsd::innbyggerpost##urn:fdc:digdir.no:2020:innbyggerpost:schema:digital::1.0" name="Peppol INNBYGGERPOST_DPI_DIGITAL_1_0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:digital:ver1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:digdir.no:2020:innbyggerpost:xsd::innbyggerpost##urn:fdc:digdir.no:2020:innbyggerpost:schema:feil::1.0" name="Peppol INNBYGGERPOST_DPI_FEILKVITTERING_1_0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:digital:ver1.0" />
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:utskrift:ver1.0" />
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:flyttet:ver1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:digdir.no:2020:innbyggerpost:xsd::innbyggerpost##urn:fdc:digdir.no:2020:innbyggerpost:schema:flyttet::1.0" name="Peppol INNBYGGERPOST_DPI_FLYTTET_1_0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:flyttet:ver1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:digdir.no:2020:innbyggerpost:xsd::innbyggerpost##urn:fdc:digdir.no:2020:innbyggerpost:schema:leveringskvittering::1.0" name="Peppol INNBYGGERPOST_DPI_LEVERINGSKVITTERING_1_0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:digital:ver1.0" />
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:utskrift:ver1.0" />
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:flyttet:ver1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:digdir.no:2020:innbyggerpost:xsd::innbyggerpost##urn:fdc:digdir.no:2020:innbyggerpost:schema:mottakskvittering::1.0" name="Peppol INNBYGGERPOST_DPI_MOTTAKSKVITTERING_1_0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:utskrift:ver1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:digdir.no:2020:innbyggerpost:xsd::innbyggerpost##urn:fdc:digdir.no:2020:innbyggerpost:schema:returpostkvittering::1.0" name="Peppol INNBYGGERPOST_DPI_RETURPOSTKVITTERING_1_0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:utskrift:ver1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:digdir.no:2020:innbyggerpost:xsd::innbyggerpost##urn:fdc:digdir.no:2020:innbyggerpost:schema:utskrift::1.0" name="Peppol INNBYGGERPOST_DPI_UTSKRIFT_1_0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:utskrift:ver1.0" />
+  </item>
+  <item id="busdox-docid-qns::urn:fdc:digdir.no:2020:innbyggerpost:xsd::innbyggerpost##urn:fdc:digdir.no:2020:innbyggerpost:schema:varslingfeiletkvittering::1.0" name="Peppol INNBYGGERPOST_DPI_VARSLINGFEILETKVITTERING_1_0" deprecated="false">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:digital:ver1.0" />
   </item>
   <item id="busdox-docid-qns::urn:fdc:peppol:end-user-reporting:1.0::EndUserReport##urn:fdc:peppol.eu:oo:trns:end-user-report:1::1.0" name="Peppol End User Report" deprecated="true">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:oo:bis:reporting:1" />
@@ -305,6 +336,7 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:DespatchAdvice-2::DespatchAdvice##urn:fdc:peppol.eu:logistics:trns:advanced_despatch_advice:1::2.1" name="Peppol Advanced Despatch Advice" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_only:1" />
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_response:1" />
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_receipt_advice:1" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:DespatchAdvice-2::DespatchAdvice##urn:fdc:peppol.eu:poacc:trns:despatch_advice:3::2.1" name="Peppol Despatch Advice transaction 3.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:poacc:bis:despatch_advice:3" />
@@ -453,25 +485,25 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:fdc:anskaffelser.no:2019:ehf:spec:payment-request:3.0::2.2" name="Peppol EHF Payment Request 3.0 (Payment Request)" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:anskaffelser.no:2019:ehf:postaward:g3:07:1.0" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:fdc:peppol:jp:billing:3.0::2.1" name="Peppol JP PINT invoice" deprecated="false">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:fdc:peppol:jp:billing:3.0::2.1" name="Peppol JP PINT invoice" deprecated="true">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@aunz-1::2.1" name="Peppol A-NZ PINT Invoice v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@jp-1::2.1" name="Peppol JP PINT Invoice v1.0" deprecated="false">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@jp-1::2.1" name="Peppol JP PINT Invoice v1.0" deprecated="true">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@my-1::2.1" name="Peppol MY PINT Invoice v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:nontaxinvoice-1@jp-1::2.1" name="Peppol JP BIS Invoice for Non-tax Registered Businesses" deprecated="false">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:nontaxinvoice-1@jp-1::2.1" name="Peppol JP BIS Invoice for Non-tax Registered Businesses" deprecated="true">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@aunz-1::2.1" name="Peppol A-NZ PINT Self-Billing Invoice v1.0" deprecated="false">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@jp-1::2.1" name="Peppol JP BIS Self-Billing Invoice" deprecated="false">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@jp-1::2.1" name="Peppol JP BIS Self-Billing Invoice" deprecated="true">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@my-1::2.1" name="Peppol MY PINT Self-Billing Invoice v1.0" deprecated="false">
