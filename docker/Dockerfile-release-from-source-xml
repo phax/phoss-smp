@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM adoptopenjdk:11-hotspot as build
+FROM adoptopenjdk:11-hotspot AS build
 
 ARG SMP_VERSION
 

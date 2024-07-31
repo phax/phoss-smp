@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM --platform=$BUILDPLATFORM ubuntu:latest as build
+FROM --platform=$BUILDPLATFORM ubuntu:latest AS build
 
 # Install unzip
 RUN apt-get update \
