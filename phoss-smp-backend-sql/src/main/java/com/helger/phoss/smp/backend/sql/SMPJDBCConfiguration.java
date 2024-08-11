@@ -27,7 +27,7 @@ import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.phoss.smp.config.SMPConfigProvider;
 
 /**
- * Default JPA configuration file properties
+ * Default JDBC configuration file properties
  *
  * @author Philip Helger
  */
