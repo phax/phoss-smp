@@ -111,6 +111,7 @@ public final class SMPJDBCConfiguration
     return _getConfig ().getAsString (CONFIG_JDBC_SCHEMA);
   }
 
+  // TODO this should be part of the Flyway configuration
   public static boolean isJdbcSchemaCreate ()
   {
     return _getConfig ().getAsBoolean (CONFIG_JDBC_SCHEMA_CREATE, DEFAULT_JDBC_SCHEMA_CREATE);
