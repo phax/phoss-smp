@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
-import com.helger.config.IConfig;
+import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettings;
 
@@ -36,7 +36,7 @@ public final class SMPHttpConfiguration
    * @return The configuration file. Never <code>null</code>.
    */
   @Nonnull
-  private static IConfig _getConfig ()
+  private static IConfigWithFallback _getConfig ()
   {
     return SMPConfigProvider.getConfig ();
   }
