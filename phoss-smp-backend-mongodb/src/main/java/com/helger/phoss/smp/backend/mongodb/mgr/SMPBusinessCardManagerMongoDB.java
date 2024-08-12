@@ -371,6 +371,14 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
+  public boolean containsSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
+  {
+    if (aID == null)
+      return false;
+
+    return getCollection ().find (new Document (BSON_ID, aID.getURIEncoded ())).first () != null;
+  }
+
   @Nullable
   public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
   {

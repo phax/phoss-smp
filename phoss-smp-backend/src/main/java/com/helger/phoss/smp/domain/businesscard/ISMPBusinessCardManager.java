@@ -115,8 +115,19 @@ public interface ISMPBusinessCardManager
    */
   default boolean containsSMPBusinessCardOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
   {
-    return getSMPBusinessCardOfServiceGroup (aServiceGroup) != null;
+    return aServiceGroup != null && containsSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
   }
+
+  /**
+   * Check if a business card of the passed service group ID exists.
+   *
+   * @param aID
+   *        The ID to check. May be <code>null</code>.
+   * @return <code>true</code> if a business card is contained,
+   *         <code>false</code> if not.
+   * @since 7.1.5
+   */
+  boolean containsSMPBusinessCardOfID (@Nullable IParticipantIdentifier aID);
 
   /**
    * Get the business card of the passed ID (= Service group ID).

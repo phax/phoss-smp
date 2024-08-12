@@ -406,6 +406,16 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
+  public boolean containsSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
+  {
+    if (aID == null)
+      return false;
+
+    final long nCount = newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_bce" + " WHERE pid=?",
+                                                   new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
+    return nCount == 1;
+  }
+
   @Nullable
   public ISMPBusinessCard getSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
   {

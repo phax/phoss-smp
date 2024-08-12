@@ -74,9 +74,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
   @IsLocked (ELockType.WRITE)
   private ISMPBusinessCard _createSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard)
   {
-    m_aRWLock.writeLocked ( () -> {
-      internalCreateItem (aSMPBusinessCard);
-    });
+    m_aRWLock.writeLocked ( () -> { internalCreateItem (aSMPBusinessCard); });
     AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
                                       aSMPBusinessCard.getID (),
                                       Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
@@ -87,9 +85,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
   @IsLocked (ELockType.WRITE)
   private ISMPBusinessCard _updateSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard)
   {
-    m_aRWLock.writeLocked ( () -> {
-      internalUpdateItem (aSMPBusinessCard);
-    });
+    m_aRWLock.writeLocked ( () -> { internalUpdateItem (aSMPBusinessCard); });
     AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
                                       "set-all",
                                       aSMPBusinessCard.getID (),
@@ -185,6 +181,11 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
   public ICommonsSet <String> getAllSMPBusinessCardIDs ()
   {
     return getAllIDs ();
+  }
+
+  public boolean containsSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
+  {
+    return aID != null && containsWithID (aID.getURIEncoded ());
   }
 
   @Nullable
