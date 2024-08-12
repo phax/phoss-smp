@@ -25,12 +25,17 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.OffsetDateTime;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 
+import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.impl.CommonsLinkedHashMap;
 import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
 import com.helger.commons.datetime.XMLOffsetDateTime;
@@ -74,6 +79,57 @@ import com.helger.security.keystore.LoadedKeyStore;
 
 public class PageSecureTasksProblems extends AbstractSMPWebPage
 {
+  /**
+   * Item for the endpoint certificate cache.
+   *
+   * @author Philip Helger
+   * @see CertCache
+   * @since 7.1.5
+   */
+  @NotThreadSafe
+  private static final class CertCacheItem
+  {
+    private final int m_nIndex;
+    private int m_nEndpoints = 0;
+
+    CertCacheItem (final int nIndex)
+    {
+      ValueEnforcer.isGT0 (nIndex, "Index");
+      m_nIndex = nIndex;
+    }
+
+    void incEndpointCount ()
+    {
+      m_nEndpoints++;
+    }
+  }
+
+  /**
+   * Endpoint certificate cache
+   *
+   * @author Philip Helger
+   * @see CertCacheItem
+   * @since 7.1.5
+   */
+  @NotThreadSafe
+  private static final class CertCache
+  {
+    private final ICommonsMap <String, CertCacheItem> m_aMap = new CommonsLinkedHashMap <> ();
+
+    @Nonnull
+    CertCacheItem getOrCreate (@Nonnull final String sCert)
+    {
+      final String sNormalizedCert = CertificateHelper.getWithoutPEMHeader (sCert);
+      return m_aMap.computeIfAbsent (sNormalizedCert, k -> new CertCacheItem (m_aMap.size () + 1));
+    }
+
+    @Nonnull
+    Iterable <Map.Entry <String, CertCacheItem>> iterateAll ()
+    {
+      return m_aMap.entrySet ();
+    }
+  }
+
   public PageSecureTasksProblems (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Tasks/problems");
@@ -413,6 +469,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
     final OffsetDateTime aNowPlusDT = aNowDT.plusMonths (3);
+    final XMLOffsetDateTime aNowXMLDT = XMLOffsetDateTime.of (aNowDT);
+    final XMLOffsetDateTime aNowPlusXMLDT = XMLOffsetDateTime.of (aNowPlusDT);
 
     aNodeList.addChild (info ("This page tries to identify upcoming tasks and potential problems in the SMP configuration. It is meant to highlight immediate and upcoming action items as well as potential misconfiguration."));
 
@@ -425,8 +483,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     {
       aOL.addItem (_createError ("Please change the password of the default user " +
                                  CSecurity.USER_ADMINISTRATOR_EMAIL +
-                                 "!"),
-                   div ("This is a severe security risk"));
+                                 "!"), div ("This is a severe security risk"));
     }
 
     _checkSettings (aOL);
@@ -452,6 +509,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       }
       else
       {
+        final CertCache aCertCache = new CertCache ();
+
         // For all service groups
         for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (aServiceGroups,
                                                                                 ISMPServiceGroup.comparator ()))
@@ -465,13 +524,18 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
           }
           else
           {
+            // For all service information within service group
             for (final ISMPServiceInformation aServiceInfo : aServiceInfos)
             {
               final HCUL aULPerDocType = new HCUL ();
+
+              // For all processes
               final ICommonsList <ISMPProcess> aProcesses = aServiceInfo.getAllProcesses ();
               for (final ISMPProcess aProcess : aProcesses)
               {
                 final HCUL aULPerProcess = new HCUL ();
+
+                // For all endpoints
                 final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ();
                 for (final ISMPEndpoint aEndpoint : aEndpoints)
                 {
@@ -485,7 +549,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
                   if (aEndpoint.getServiceActivationDateTime () != null)
                   {
-                    if (aEndpoint.getServiceActivationDateTime ().isAfter (XMLOffsetDateTime.of (aNowDT)))
+                    if (aEndpoint.getServiceActivationDateTime ().isAfter (aNowXMLDT))
                       aULPerEndpoint.addItem (_createWarning ("The endpoint is not yet active."),
                                               div ("It will be active from " +
                                                    PDTToString.getAsString (aEndpoint.getServiceActivationDateTime (),
@@ -495,14 +559,14 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
                   if (aEndpoint.getServiceExpirationDateTime () != null)
                   {
-                    if (aEndpoint.getServiceExpirationDateTime ().isBefore (XMLOffsetDateTime.of (aNowDT)))
+                    if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowXMLDT))
                       aULPerEndpoint.addItem (_createError ("The endpoint is no longer active."),
                                               div ("It was valid until " +
                                                    PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
                                                                             aDisplayLocale) +
                                                    "."));
                     else
-                      if (aEndpoint.getServiceExpirationDateTime ().isBefore (XMLOffsetDateTime.of (aNowPlusDT)))
+                      if (aEndpoint.getServiceExpirationDateTime ().isBefore (aNowPlusXMLDT))
                         aULPerEndpoint.addItem (_createWarning ("The endpoint will be inactive soon."),
                                                 div ("It is only valid until " +
                                                      PDTToString.getAsString (aEndpoint.getServiceExpirationDateTime (),
@@ -510,38 +574,10 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
                                                      "."));
                   }
 
-                  X509Certificate aX509Cert = null;
-                  try
+                  if (aEndpoint.hasCertificate ())
                   {
-                    aX509Cert = CertificateHelper.convertStringToCertficate (aEndpoint.getCertificate ());
-                  }
-                  catch (final CertificateException ex)
-                  {
-                    // Ignore
-                  }
-                  if (aX509Cert == null)
-                    aULPerEndpoint.addItem (_createError ("The X.509 certificate configured at the endpoint is invalid and could not be interpreted as a certificate."));
-                  else
-                  {
-                    final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
-                    if (aNowDT.isBefore (aNotBefore))
-                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is not yet active."),
-                                              div ("It will be valid from " +
-                                                   PDTToString.getAsString (aNotBefore, aDisplayLocale) +
-                                                   "."));
-
-                    final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
-                    if (aNowDT.isAfter (aNotAfter))
-                      aULPerEndpoint.addItem (_createError ("The endpoint certificate is already expired."),
-                                              div ("It was valid until " +
-                                                   PDTToString.getAsString (aNotAfter, aDisplayLocale) +
-                                                   "."));
-                    else
-                      if (aNowPlusDT.isAfter (aNotAfter))
-                        aULPerEndpoint.addItem (_createWarning ("The endpoint certificate will expire soon."),
-                                                div ("It is only valid until " +
-                                                     PDTToString.getAsString (aNotAfter, aDisplayLocale) +
-                                                     "."));
+                    // Do certificates separately
+                    aCertCache.getOrCreate (aEndpoint.getCertificate ()).incEndpointCount ();
                   }
 
                   // Show per endpoint errors
@@ -566,8 +602,48 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
           // Show per service group errors
           if (aULPerSG.hasChildren ())
             aOL.addItem (div ("Service group ").addChild (code (aServiceGroup.getParticipantIdentifier ()
-                                                                             .getURIEncoded ())),
-                         aULPerSG);
+                                                                             .getURIEncoded ())), aULPerSG);
+        }
+
+        // Check all AP certificates at the end
+        for (final var e : aCertCache.iterateAll ())
+        {
+          X509Certificate aX509Cert = null;
+          try
+          {
+            aX509Cert = CertificateHelper.convertStringToCertficate (e.getKey ());
+          }
+          catch (final CertificateException ex)
+          {
+            // Ignore
+          }
+
+          final String sErrorPrefix = "The X.509 endpoint certificate #" +
+                                      e.getValue ().m_nIndex +
+                                      " (used by " +
+                                      e.getValue ().m_nEndpoints +
+                                      " endpoints) ";
+
+          if (aX509Cert == null)
+            aOL.addItem (_createError (sErrorPrefix + "is invalid and could not be interpreted as a certificate."));
+          else
+          {
+            final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
+            if (aNowDT.isBefore (aNotBefore))
+              aOL.addItem (_createError (sErrorPrefix + "is not yet active."),
+                           div ("It will be valid from " + PDTToString.getAsString (aNotBefore, aDisplayLocale) + "."));
+
+            final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
+            if (aNowDT.isAfter (aNotAfter))
+              aOL.addItem (_createError (sErrorPrefix + "is already expired."),
+                           div ("It was valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale) + "."));
+            else
+              if (aNowPlusDT.isAfter (aNotAfter))
+                aOL.addItem (_createWarning (sErrorPrefix + "will expire soon."),
+                             div ("It is only valid until " +
+                                  PDTToString.getAsString (aNotAfter, aDisplayLocale) +
+                                  "."));
+          }
         }
       }
     }
