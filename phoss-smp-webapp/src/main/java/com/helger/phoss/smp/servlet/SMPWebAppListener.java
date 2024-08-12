@@ -44,6 +44,7 @@ import com.helger.network.proxy.settings.IProxySettingsProvider;
 import com.helger.network.proxy.settings.ProxySettingsManager;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.pd.client.PDHttpClientSettings;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPSecurity;
@@ -355,13 +356,12 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                               aSettings.isDirectoryIntegrationAutoUpdate ())
                           {
                             // Only if a business card is present
-                            if (aBusinessCardMgr.containsSMPBusinessCardOfServiceGroup (aServiceInformation.getServiceGroup ()))
+                            final IParticipantIdentifier aPID = aServiceInformation.getServiceGroup ()
+                                                                                   .getParticipantIdentifier ();
+                            if (aBusinessCardMgr.containsSMPBusinessCardOfID (aPID))
                             {
                               // Notify PD server: update
-                              PDClientProvider.getInstance ()
-                                              .getPDClient ()
-                                              .addServiceGroupToIndex (aServiceInformation.getServiceGroup ()
-                                                                                          .getParticipantIdentifier ());
+                              PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aPID);
                             }
                           }
                         }
