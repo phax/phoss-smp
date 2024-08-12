@@ -48,13 +48,13 @@ import com.helger.photon.security.user.IUser;
 public final class BusinessCardServerAPI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (BusinessCardServerAPI.class);
-  private static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_INVOCATION = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
-                                                                                                                                  "$call");
-  private static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_SUCCESS = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
-                                                                                                                               "$success");
-  private static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_ERROR = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
-                                                                                                                             "$error");
-  private static final String LOG_PREFIX = "[BusinessCard REST API] ";
+  public static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_INVOCATION = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
+                                                                                                                                 "$call");
+  public static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_SUCCESS = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
+                                                                                                                              "$success");
+  public static final IMutableStatisticsHandlerKeyedCounter STATS_COUNTER_ERROR = StatisticsManager.getKeyedCounterHandler (BusinessCardServerAPI.class.getName () +
+                                                                                                                            "$error");
+  public static final String LOG_PREFIX = "[BusinessCard REST API] ";
 
   private final ISMPServerAPIDataProvider m_aAPIProvider;
 
