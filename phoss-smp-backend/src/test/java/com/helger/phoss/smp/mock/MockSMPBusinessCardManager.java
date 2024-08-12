@@ -13,6 +13,7 @@ package com.helger.phoss.smp.mock;
 import java.util.Collection;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.callback.CallbackList;
@@ -58,6 +59,11 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
   }
 
   public ICommonsSet <String> getAllSMPBusinessCardIDs ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public boolean containsSMPBusinessCardOfID (@Nullable final IParticipantIdentifier aID)
   {
     throw new UnsupportedOperationException ();
   }
