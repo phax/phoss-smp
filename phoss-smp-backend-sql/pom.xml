@@ -61,6 +61,7 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-db-jdbc</artifactId>
+      <version>${ph-db.version}</version>
     </dependency>
     <dependency>
       <groupId>com.helger.photon</groupId>
