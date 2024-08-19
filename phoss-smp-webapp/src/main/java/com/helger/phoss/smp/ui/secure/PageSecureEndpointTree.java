@@ -80,8 +80,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
 
     // Create list of service groups
     final ICommonsMap <ISMPServiceGroup, ICommonsList <ISMPServiceInformation>> aMap = new CommonsHashMap <> ();
-    aServiceInfoMgr.getAllSMPServiceInformation ()
-                   .forEach (x -> aMap.computeIfAbsent (x.getServiceGroup (), k -> new CommonsArrayList <> ()).add (x));
+    aServiceInfoMgr.forEachSMPServiceInformation (x -> aMap.computeIfAbsent (x.getServiceGroup (),
+                                                                             k -> new CommonsArrayList <> ()).add (x));
 
     final HCUL aULSG = new HCUL ();
     final ICommonsList <ISMPServiceGroup> aServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ()
@@ -107,9 +107,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
                                                                     .getSortedInline (ISMPProcess.comparator ());
           for (final ISMPProcess aProcess : aProcesses)
           {
-            final BootstrapTable aEPTable = new BootstrapTable (HCCol.perc (40),
-                                                                HCCol.perc (40),
-                                                                HCCol.perc (20)).setBordered (true);
+            final BootstrapTable aEPTable = new BootstrapTable (HCCol.perc (40), HCCol.perc (40), HCCol.perc (20))
+                                                                                                                  .setBordered (true);
             final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ()
                                                                    .getSortedInline (ISMPEndpoint.comparator ());
             for (final ISMPEndpoint aEndpoint : aEndpoints)
@@ -158,8 +157,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
               aDiv.addChild (" ")
                   .addChild (new HCA (aWPEC.getSelfHref ()
                                            .addAll (createParamMap (aServiceInfo, aProcess, (ISMPEndpoint) null))
-                                           .add (CPageParam.PARAM_ACTION, ACTION_DELETE_PROCESS))
-                                                                                                 .setTitle ("Delete process")
+                                           .add (CPageParam.PARAM_ACTION, ACTION_DELETE_PROCESS)).setTitle (
+                                                                                                            "Delete process")
                                                                                                  .addChild (EDefaultIcon.DELETE.getAsNode ()));
             }
             else
@@ -184,8 +183,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
                                          .addAll (createParamMap (aServiceInfo,
                                                                   (ISMPProcess) null,
                                                                   (ISMPEndpoint) null))
-                                         .add (CPageParam.PARAM_ACTION, ACTION_DELETE_DOCUMENT_TYPE))
-                                                                                                     .setTitle ("Delete document type")
+                                         .add (CPageParam.PARAM_ACTION, ACTION_DELETE_DOCUMENT_TYPE)).setTitle (
+                                                                                                                "Delete document type")
                                                                                                      .addChild (EDefaultIcon.DELETE.getAsNode ()));
           }
           else

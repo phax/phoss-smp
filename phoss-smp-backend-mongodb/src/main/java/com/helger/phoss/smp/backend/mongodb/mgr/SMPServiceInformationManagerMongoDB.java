@@ -432,8 +432,13 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
-    getCollection ().find ().forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, true)));
+    forEachSMPServiceInformation (ret::add);
     return ret;
+  }
+
+  public void forEachSMPServiceInformation (@Nonnull final Consumer <? super ISMPServiceInformation> aConsumer)
+  {
+    getCollection ().find ().forEach (x -> aConsumer.accept (toServiceInformation (x, true)));
   }
 
   @Nonnegative
@@ -461,8 +466,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     if (aServiceGroup != null)
     {
       getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()))
-                      .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x,
-                                                                                          false).getDocumentTypeIdentifier ()));
+                      .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, false)
+                                                                                                   .getDocumentTypeIdentifier ()));
     }
     return ret;
   }
@@ -499,8 +504,6 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
     // As simple as it can be
     return getCollection ().find (new Document (BSON_PROCESSES + "." + BSON_ENDPOINTS + "." + BSON_TRANSPORT_PROFILE,
-                                                sTransportProfileID))
-                           .iterator ()
-                           .hasNext ();
+                                                sTransportProfileID)).iterator ().hasNext ();
   }
 }

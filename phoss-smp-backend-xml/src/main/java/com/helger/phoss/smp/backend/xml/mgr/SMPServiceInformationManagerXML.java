@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.xml.mgr;
 
+import java.util.function.Consumer;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -119,9 +121,7 @@ public final class SMPServiceInformationManagerXML extends
     if (bChangeExisting)
     {
       // Edit existing
-      m_aRWLock.writeLocked ( () -> {
-        internalUpdateItem (aOldInformation);
-      });
+      m_aRWLock.writeLocked ( () -> { internalUpdateItem (aOldInformation); });
 
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
                                         "set-all",
@@ -300,6 +300,11 @@ public final class SMPServiceInformationManagerXML extends
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     return getAll ();
+  }
+
+  public void forEachSMPServiceInformation (@Nonnull final Consumer <? super ISMPServiceInformation> aConsumer)
+  {
+    forEachValue (aConsumer);
   }
 
   @Nonnegative

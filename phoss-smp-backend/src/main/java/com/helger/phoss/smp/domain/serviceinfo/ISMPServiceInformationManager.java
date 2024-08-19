@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
+import java.util.function.Consumer;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,6 +25,7 @@ import com.helger.commons.state.ESuccess;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.ChangeSMPV8;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**
@@ -74,6 +77,7 @@ public interface ISMPServiceInformationManager
    * @see #getSMPServiceInformationOfServiceGroupAndDocumentType(ISMPServiceGroup,
    *      IDocumentTypeIdentifier)
    */
+  @ChangeSMPV8 ("Rename to findSMPServiceInformation")
   @Nullable
   ISMPServiceInformation findServiceInformation (@Nullable ISMPServiceGroup aServiceGroup,
                                                  @Nullable IDocumentTypeIdentifier aDocTypeID,
@@ -130,6 +134,16 @@ public interface ISMPServiceInformationManager
   @Nonnull
   @ReturnsMutableCopy
   ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ();
+
+  /**
+   * Iterate each Service Information element and invoke the provided consumer
+   * for it.
+   *
+   * @param aConsumer
+   *        The consumer to invoke. May not be <code>null</code>.
+   * @since 7.1.5
+   */
+  void forEachSMPServiceInformation (@Nonnull Consumer <? super ISMPServiceInformation> aConsumer);
 
   /**
    * @return The count of all service information objects. Always &ge; 0.
@@ -189,7 +203,7 @@ public interface ISMPServiceInformationManager
 
   /**
    * Check if the passed transport profile is used or not.
-   * 
+   *
    * @param sTransportProfileID
    *        The transport profile ID to be checked. May be <code>null</code>.
    * @return <code>true</code> if at least one endpoint uses the provided

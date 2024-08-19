@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnegative;
@@ -385,6 +386,12 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
+    forEachSMPServiceInformation (ret::add);
+    return ret;
+  }
+
+  public void forEachSMPServiceInformation (@Nonnull final Consumer <? super ISMPServiceInformation> aConsumer)
+  {
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                                                                           "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
                                                                           "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
@@ -459,11 +466,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         }
 
         final DocTypeAndExtension aDE = aEntry2.getKey ();
-        ret.add (new SMPServiceInformation (aServiceGroup, aDE.m_aDocTypeID, aProcesses, aDE.m_sExt));
+        aConsumer.accept (new SMPServiceInformation (aServiceGroup, aDE.m_aDocTypeID, aProcesses, aDE.m_sExt));
       }
     }
-
-    return ret;
   }
 
   @Nonnegative

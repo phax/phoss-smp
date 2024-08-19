@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.mock;
 
+import java.util.function.Consumer;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -62,6 +64,11 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
   }
 
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public void forEachSMPServiceInformation (@Nonnull final Consumer <? super ISMPServiceInformation> aConsumer)
   {
     throw new UnsupportedOperationException ();
   }
