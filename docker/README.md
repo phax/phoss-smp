@@ -2,6 +2,7 @@
 
 This folder contains the Docker configuration files for phoss SMP.
 It is based on the official `tomcat:10.1-jdk17` image since v7.0.0.
+It is recommended to run production Docker images with at least 4GB of RAM.
 
 Prebuild images are available from:
 * https://hub.docker.com/r/phelger/
