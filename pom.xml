@@ -78,6 +78,20 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-jaxb-pom</artifactId>
+        <version>2.0.4</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-jaxws-pom</artifactId>
+        <version>2.0.4</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
         <version>11.1.6</version>
@@ -136,7 +150,7 @@
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
-        <version>6.7.0</version>
+        <version>7.0.0</version>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
