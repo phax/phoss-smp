@@ -41,6 +41,11 @@ FROM tomcat:10.1-jdk17
 # Use non-blocking random
 ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.security.egd=file:/dev/urandom"
 
+# MinRAMPercentage - for low memory containers (<250MB)
+# MaxRAMPercentage - for large memory containers (>250MB)
+# See: https://medium.com/pernod-ricard-tech/how-to-control-java-memory-in-tomcat-running-on-docker-cec267f858d4
+ENV CATALINA_OPTS="$CATALINA_OPTS -XX:InitialRAMPercentage=10 -XX:MinRAMPercentage=50 -XX:MaxRAMPercentage=80"
+
 # Set arguments and labels after initial cleanup was performed
 ARG SMP_VERSION
 # Set to environment to be persistent

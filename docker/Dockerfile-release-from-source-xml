@@ -17,19 +17,18 @@
 
 FROM adoptopenjdk:11-hotspot AS build
 
-ARG SMP_VERSION
-
 # Install git and maven
 RUN apt-get update \
   && apt-get upgrade -y \
   && apt-get install -y git maven \
   && rm -rf /var/lib/apt/lists/*
 
+ARG SMP_VERSION
+
 RUN mkdir /build
 WORKDIR /build
 
 # Checkout from git and build
-# Note: Up to and including v5.1.2 the tag was called "peppol-smp-server-*" instead of "phoss-smp-*"
 RUN echo Building phoss SMP $SMP_VERSION \
   && git clone https://github.com/phax/phoss-smp.git . \
   && git checkout tags/phoss-smp-parent-pom-$SMP_VERSION -b work \
@@ -39,14 +38,21 @@ RUN echo Building phoss SMP $SMP_VERSION \
 # Use an official Tomcat runtime as a base image
 FROM tomcat:10.1-jdk17
 
-ARG SMP_VERSION
-ENV SMP_VERSION=$SMP_VERSION
-LABEL vendor="Philip Helger"
-LABEL version=$SMP_VERSION
-
 # Special encoded slash handling for SMP
 # Use non-blocking random
 ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.security.egd=file:/dev/urandom"
+
+# MinRAMPercentage - for low memory containers (<250MB)
+# MaxRAMPercentage - for large memory containers (>250MB)
+# See: https://medium.com/pernod-ricard-tech/how-to-control-java-memory-in-tomcat-running-on-docker-cec267f858d4
+ENV CATALINA_OPTS="$CATALINA_OPTS -XX:InitialRAMPercentage=10 -XX:MinRAMPercentage=50 -XX:MaxRAMPercentage=80"
+
+# Set arguments and labels after initial cleanup was performed
+ARG SMP_VERSION
+# Set to environment to be persistent
+ENV SMP_VERSION=$SMP_VERSION
+LABEL vendor="Philip Helger"
+LABEL version=$SMP_VERSION
 
 # Remove unused Tomcat web applications
 RUN rm -rf $CATALINA_HOME/webapps/manager \
@@ -57,3 +63,4 @@ RUN rm -rf $CATALINA_HOME/webapps/manager \
            $CATALINA_HOME/webapps.dist
 
 COPY --from=build /build/phoss-smp-webapp-xml/target/phoss-smp-webapp-xml-$SMP_VERSION/ $CATALINA_HOME/webapps/ROOT
+WORKDIR /home/git
