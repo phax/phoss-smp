@@ -42,6 +42,7 @@ import com.helger.network.proxy.ProxySelectorProxySettingsManager;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.IProxySettingsProvider;
 import com.helger.network.proxy.settings.ProxySettingsManager;
+import com.helger.pd.client.PDClient;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.pd.client.PDHttpClientSettings;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -335,9 +336,14 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
             if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
             {
               // Notify PD server: delete
-              PDClientProvider.getInstance ()
-                              .getPDClient ()
-                              .deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
+              final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
+              // Undocumented switch to avoid heavy usage
+              if (SMPConfigProvider.getConfig ().getAsBoolean ("smp.directory.integration.index-before-delete", false))
+              {
+                // Add before delete to make sure it works
+                aPDClient.addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
+              }
+              aPDClient.deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
             }
           }
         });
