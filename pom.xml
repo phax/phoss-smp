@@ -71,7 +71,7 @@
     <flyway.version>9.22.3</flyway.version>
     <log4j.version>2.23.1</log4j.version>
     <mongodb.version>5.1.3</mongodb.version>
-    <protobuf.version>4.27.3</protobuf.version>
+    <protobuf.version>4.27.4</protobuf.version>
     <ph-db.version>7.0.5</ph-db.version>
   </properties>
   
@@ -143,7 +143,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.13.4</version>
+        <version>0.13.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
