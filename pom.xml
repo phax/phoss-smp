@@ -70,7 +70,7 @@
     <expiringmap.version>0.5.11</expiringmap.version>
     <flyway.version>9.22.3</flyway.version>
     <log4j.version>2.24.1</log4j.version>
-    <mongodb.version>5.1.4</mongodb.version>
+    <mongodb.version>5.2.0</mongodb.version>
     <protobuf.version>4.28.2</protobuf.version>
     <ph-db.version>7.0.6</ph-db.version>
   </properties>
@@ -259,7 +259,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>7.0.2</version><!--$NO-MVN-MAN-VER$-->
+          <version>7.0.3</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>
