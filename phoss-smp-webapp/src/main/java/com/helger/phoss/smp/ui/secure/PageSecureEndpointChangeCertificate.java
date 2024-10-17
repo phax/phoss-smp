@@ -60,6 +60,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
@@ -123,7 +124,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         // Modify all endpoints
         final MutableInt aChangedEndpoints = new MutableInt (0);
         final MutableInt aSaveErrors = new MutableInt (0);
-        final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
+        final ICommonsList <ISMPServiceInformation> aChangedSIs = new CommonsArrayList <> ();
         aServiceInfoMgr.forEachSMPServiceInformation (aSI -> {
           boolean bChanged = false;
           for (final ISMPProcess aProcess : aSI.getAllProcesses ())
@@ -136,11 +137,19 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
               }
           if (bChanged)
           {
-            if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
-              aSaveErrors.inc ();
-            aChangedServiceGroup.add (aSI.getServiceGroupID ());
+            // Remember and do not merge here to avoid deadlock
+            aChangedSIs.add (aSI);
           }
         });
+
+        // Write out of read-lock
+        final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
+        for (final var aSI : aChangedSIs)
+        {
+          if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
+            aSaveErrors.inc ();
+          aChangedServiceGroup.add (aSI.getServiceGroupID ());
+        }
 
         final IHCNode aRes;
         if (aChangedEndpoints.isGT0 ())
