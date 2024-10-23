@@ -38,9 +38,12 @@ RUN echo Building phoss SMP $SMP_VERSION \
 # Use an official Tomcat runtime as a base image
 FROM tomcat:10.1-jdk17
 
-# Special encoded slash handling for SMP
 # Use non-blocking random
-ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.security.egd=file:/dev/urandom"
+ENV CATALINA_OPTS="$CATALINA_OPTS -Djava.security.egd=file:/dev/urandom"
+
+# Special encoded slash handling for SMP
+# Tomcat 10 removed: org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
+RUN sed -i 's/<Connector port="8080" protocol="HTTP\/1.1"/<Connector port="8080" protocol="HTTP\/1.1" encodedSolidusHandling="passthrough"/' ${CATALINA_HOME}/conf/server.xml
 
 # MinRAMPercentage - for low memory containers (<250MB)
 # MaxRAMPercentage - for large memory containers (>250MB)
