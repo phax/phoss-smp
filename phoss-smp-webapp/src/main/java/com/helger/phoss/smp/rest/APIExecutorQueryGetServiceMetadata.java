@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.commons.CGlobal;
-import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.base64.Base64;
 import com.helger.commons.datetime.OffsetDate;
@@ -36,16 +35,15 @@ import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.XMLOffsetDate;
 import com.helger.commons.http.CHttp;
 import com.helger.commons.mime.CMimeType;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
 import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
-import com.helger.json.JsonValue;
 import com.helger.json.serialize.JsonWriter;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppol.sml.ESMPAPIType;
-import com.helger.peppolid.CIdentifier;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -63,8 +61,6 @@ import com.helger.smpclient.json.SMPJsonResponse;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xsds.bdxr.smp2.ac.CertificateType;
-import com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType;
-import com.helger.xsds.bdxr.smp2.ac.ProcessType;
 
 public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExecutorQuery
 {
@@ -112,110 +108,13 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
     return ret;
   }
 
-  // TODO use SMPJsonResponse version in peppol-commons>8.8.0
-  @Nonnull
-  static IJsonObject convert (@Nonnull final IParticipantIdentifier aParticipantID,
-                              @Nonnull final IDocumentTypeIdentifier aDocTypeID,
-                              @Nonnull final com.helger.xsds.bdxr.smp2.ServiceMetadataType aSM)
-  {
-    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
-    ValueEnforcer.notNull (aDocTypeID, "DocTypeID");
-    ValueEnforcer.notNull (aSM, "SM");
-
-    final IJsonObject ret = new JsonObject ();
-    ret.add (SMPJsonResponse.JSON_SMPTYPE, ESMPAPIType.OASIS_BDXR_V2.getID ());
-    ret.add (SMPJsonResponse.JSON_PARTICIPANT_ID, aParticipantID.getURIEncoded ());
-    ret.add (SMPJsonResponse.JSON_DOCUMENT_TYPE_ID, aDocTypeID.getURIEncoded ());
-
-    for (final ProcessMetadataType aPM : aSM.getProcessMetadata ())
-    {
-      final IJsonObject aJsonProcessMetadata = new JsonObject ();
-
-      {
-        final SMPExtensionList aExts = SMPExtensionList.ofBDXR2 (aPM.getSMPExtensions ());
-        if (aExts != null)
-          aJsonProcessMetadata.addIfNotNull (SMPJsonResponse.JSON_EXTENSION, aExts.getExtensionsAsJsonString ());
-      }
-
-      {
-        // Convert all process IDs
-        final IJsonArray aJsonProcesses = new JsonArray ();
-        for (final ProcessType aProc : aPM.getProcess ())
-        {
-          final IJsonObject aJsonProc = new JsonObject ().add ("id",
-                                                               CIdentifier.getURIEncodedBDXR2 (aProc.getID ()
-                                                                                                    .getSchemeID (),
-                                                                                               aProc.getID ()
-                                                                                                    .getValue ()));
-          if (aProc.hasRoleIDEntries ())
-          {
-            aJsonProc.add ("roleids",
-                           new JsonArray ().addAllMapped (aProc.getRoleID (),
-                                                          x -> JsonValue.create (CIdentifier.getURIEncodedBDXR2 (x.getSchemeID (),
-                                                                                                                 x.getValue ()))));
-          }
-
-          final SMPExtensionList aExts = SMPExtensionList.ofBDXR2 (aProc.getSMPExtensions ());
-          if (aExts != null)
-            aJsonProc.addIfNotNull (SMPJsonResponse.JSON_EXTENSION, aExts.getExtensionsAsJsonString ());
-
-          aJsonProcesses.add (aJsonProc);
-        }
-        aJsonProcessMetadata.add ("processes", aJsonProcesses);
-      }
-
-      final com.helger.xsds.bdxr.smp2.ac.RedirectType aRedirect = aPM.getRedirect ();
-      if (aRedirect != null)
-      {
-        final IJsonObject aJsonRedirect = new JsonObject ().add (SMPJsonResponse.JSON_HREF,
-                                                                 aRedirect.getPublisherURIValue ());
-
-        // Add all certificates
-        final IJsonArray aJsonCerts = new JsonArray ();
-        for (final CertificateType aCert : aRedirect.getCertificate ())
-        {
-          final IJsonObject aJsonCert = new JsonObject ();
-          SMPJsonResponse.convertCertificate (aJsonCert, Base64.encodeBytes (aCert.getContentBinaryObjectValue ()));
-          aJsonCerts.add (aJsonCert);
-        }
-        aJsonRedirect.addJson ("certificates", aJsonCerts);
-
-        final SMPExtensionList aExts = SMPExtensionList.ofBDXR2 (aRedirect.getSMPExtensions ());
-        if (aExts != null)
-        {
-          // It's okay to add as string
-          aJsonRedirect.addIfNotNull (SMPJsonResponse.JSON_EXTENSION, aExts.getExtensionsAsJsonString ());
-        }
-        aJsonProcessMetadata.addJson (SMPJsonResponse.JSON_REDIRECT, aJsonRedirect);
-      }
-      else
-      {
-        final IJsonArray aJsonEPs = new JsonArray ();
-        // For all endpoints
-        for (final com.helger.xsds.bdxr.smp2.ac.EndpointType aEndpoint : aPM.getEndpoint ())
-        {
-          aJsonEPs.add (convertEndpoint (aEndpoint));
-        }
-        aJsonProcessMetadata.addJson (SMPJsonResponse.JSON_ENDPOINTS, aJsonEPs);
-      }
-    }
-
-    final SMPExtensionList aExts = SMPExtensionList.ofBDXR2 (aSM.getSMPExtensions ());
-    if (aExts != null)
-    {
-      // It's okay to add as string
-      ret.addIfNotNull (SMPJsonResponse.JSON_EXTENSION, aExts.getExtensionsAsJsonString ());
-    }
-    return ret;
-  }
-
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                          @Nonnull @Nonempty final String sPath,
                          @Nonnull final Map <String, String> aPathVariables,
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sPathServiceGroupID);
 
     // Is the remote query API disabled?
@@ -305,7 +204,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
                                                                                                          aDocTypeID);
         if (aSM != null)
         {
-          aJson = convert (aParticipantID, aDocTypeID, aSM);
+          aJson = SMPJsonResponse.convert (aParticipantID, aDocTypeID, aSM);
         }
         break;
       }

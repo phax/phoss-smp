@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.mime.CMimeType;
+import com.helger.commons.string.StringHelper;
 import com.helger.peppol.businesscard.v3.PD3BusinessCardMarshaller;
 import com.helger.peppol.businesscard.v3.PD3BusinessCardType;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -42,7 +43,7 @@ public final class APIExecutorBusinessCardGet extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
 
     if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
@@ -58,6 +59,8 @@ public final class APIExecutorBusinessCardGet extends AbstractSMPAPIExecutor
     final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
     final byte [] aBytes = new PD3BusinessCardMarshaller ().getAsBytes (ret);
 
-    aUnifiedResponse.setContent (aBytes).setMimeType (CMimeType.TEXT_XML).setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+    aUnifiedResponse.setContent (aBytes)
+                    .setMimeType (CMimeType.TEXT_XML)
+                    .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
   }
 }

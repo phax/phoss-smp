@@ -27,6 +27,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
+import com.helger.commons.string.StringHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -63,7 +64,7 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sPathUserLoginName = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
+    final String sPathUserLoginName = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_USER_ID));
 
     final String sLogPrefix = "[REST API Export-ByOwner-XML-V1] ";
     LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");

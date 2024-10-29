@@ -27,6 +27,7 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.mime.MimeType;
+import com.helger.commons.string.StringHelper;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -65,7 +66,7 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
 
     final String sLogPrefix = "[REST API Export-Specific-XML-V1] ";
     LOGGER.info (sLogPrefix + "Starting Export of '" + sPathServiceGroupID + "'");
