@@ -16,6 +16,7 @@
   <item id="cenbii-procid-ubl::urn:fdc:bits.no:2017:profile:09:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:bits.no:2017:profile:10:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:bits.no:2017:profile:11:1.0" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:fdc:dico:2018:maintenance:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:digital:ver1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:flyttet:ver1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:fdc:digdir.no:2020:profile:egovernment:innbyggerpost:utskrift:ver1.0" name="Peppol predefined" deprecated="false" />
@@ -78,6 +79,8 @@
   <item id="cenbii-procid-ubl::urn:kosit:profile:reporting:1.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:peppol:bis:billing" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:peppol:bis:selfbilling" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:peppol:france:billing:non-regulated" name="Peppol predefined" deprecated="false" />
+  <item id="cenbii-procid-ubl::urn:peppol:france:billing:regulated" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii01:ver1.0" name="Peppol predefined" deprecated="true" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii01:ver2.0" name="Peppol predefined" deprecated="false" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii03:ver1.0" name="Peppol predefined" deprecated="true" />
