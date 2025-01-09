@@ -68,51 +68,51 @@ import com.helger.security.keystore.LoadedKeyStore;
  */
 public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 {
-  private enum EPredefinedCert
+  private enum EPredefinedCA
   {
     // PEPPOL PKI v2
-    PEPPOL_PILOT_V2 ("Peppol pilot v2",
+    PEPPOL_PILOT_V2 ("Peppol Pilot CA v2",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK",
                      3,
                      true),
-    PEPPOL_PRODUCTION_V2 ("Peppol production v2",
+    PEPPOL_PRODUCTION_V2 ("Peppol Production CA v2",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK",
                           3,
                           true),
     // PEPPOL PKI v3
-    PEPPOL_PILOT_V3 ("Peppol pilot v3",
+    PEPPOL_PILOT_V3 ("Peppol Pilot CA v3",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
                      3,
                      false),
-    PEPPOL_PRODUCTION_V3 ("Peppol production v3",
+    PEPPOL_PRODUCTION_V3 ("Peppol Production CA v3",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
                           3,
                           false),
     // TOOP Pilot PKI
-    TOOP_PILOT_SMP ("TOOP pilot", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, true),
+    TOOP_PILOT_SMP ("TOOP Pilot CA", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, true),
 
     // DE4A PKIs
-    DE4A_TEST ("DE4A Test",
+    DE4A_TEST ("DE4A Test CA",
                "E=CEF-EDELIVERY-SUPPORT@ec.europa.eu,CN=DE4A_TEST_SMP_CA,OU=CEF,O=DE4A,ST=Brussels-Capital,C=BE",
                4,
                true),
-    DE4A_TELSEC1 ("DE4A Telesec [1]",
+    DE4A_TELSEC1 ("DE4A Telesec CA [1]",
                   "CN=TeleSec Business CA 1,OU=T-Systems Trust Center,O=T-Systems International GmbH,C=DE",
                   3,
                   true),
-    DE4A_TELSEC2 ("DE4A Telesec [2]", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, true),
+    DE4A_TELSEC2 ("DE4A Telesec CA [2]", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, true),
     DE4A_COMMISSIGN_2 ("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, true),
 
     // DBNA
-    DBNA_PRODUCTION ("DBNA Production",
+    DBNA_PRODUCTION ("DBNA Production CA",
                      "CN=Digital Business Networks Alliance Intermediate CA,O=Digital Business Networks Alliance,C=US",
                      3,
                      false),
-    DBNA_TEST ("DBNA Test",
+    DBNA_TEST ("DBNA Test CA",
                "CN=DBNAlliance Demo Intermediate Test,O=Digital Business Network Alliance,STREET=3 River Way Suite 920,PostalCode=77056,L=Houston,ST=Texas,C=US",
                3,
                false),
-    DBNA_PILOT ("DBNA Pilot",
+    DBNA_PILOT ("DBNA Pilot CA",
                 "CN=DBNAlliance Demo Intermediate Pilot,O=Digital Business Network Alliance,STREET=3 River Way Suite 920,PostalCode=77056,L=Houston,ST=Texas,C=US",
                 3,
                 false),;
@@ -130,10 +130,10 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
      * @param nCerts
      *        Required depth of PKI
      */
-    EPredefinedCert (@Nonnull @Nonempty final String sDisplayName,
-                     @Nonnull @Nonempty final String sIssuer,
-                     @Nonnegative final int nCerts,
-                     final boolean bDeprecated)
+    EPredefinedCA (@Nonnull @Nonempty final String sDisplayName,
+                   @Nonnull @Nonempty final String sIssuer,
+                   @Nonnegative final int nCerts,
+                   final boolean bDeprecated)
     {
       m_sDisplayName = sDisplayName;
       m_sIssuer = sIssuer;
@@ -160,10 +160,10 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     }
 
     @Nullable
-    public static EPredefinedCert getFromIssuerOrNull (@Nullable final String sIssuer)
+    public static EPredefinedCA getFromIssuerOrNull (@Nullable final String sIssuer)
     {
       if (StringHelper.hasText (sIssuer))
-        for (final EPredefinedCert e : values ())
+        for (final EPredefinedCA e : values ())
           if (e.m_sIssuer.equals (sIssuer))
             return e;
       return null;
@@ -176,7 +176,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 
   public PageSecureCertificateInformation (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "Certificate information");
+    super (sID, "Certificate Information");
   }
 
   @Override
@@ -241,15 +241,13 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 
     // Inline function to add a visual indicator if a certificate problem was
     // found
-    final Function <IHCNode, IHCNode> addErrorHint = x -> x instanceof HCSpan ? x
-                                                                              : new HCSpan ().addChild (x)
-                                                                                             .addChild (" ")
-                                                                                             .addChild (badgeDanger ("!!!"));
+    final Function <IHCNode, IHCNode> addErrorHint = x -> x instanceof HCSpan ? x : new HCSpan ().addChild (x)
+                                                                                                 .addChild (" ")
+                                                                                                 .addChild (badgeDanger ("!!!"));
 
-    final Function <IHCNode, IHCNode> addSuccessHint = x -> x instanceof HCSpan ? x
-                                                                                : new HCSpan ().addChild (x)
-                                                                                               .addChild (" ")
-                                                                                               .addChild (badgeSuccess ("OK"));
+    final Function <IHCNode, IHCNode> addSuccessHint = x -> x instanceof HCSpan ? x : new HCSpan ().addChild (x)
+                                                                                                   .addChild (" ")
+                                                                                                   .addChild (badgeSuccess ("OK"));
 
     // SMP Key store
     {
@@ -314,7 +312,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           {
             final X509Certificate aHead = (X509Certificate) aChain[0];
             final String sIssuer = aHead.getIssuerX500Principal ().getName ();
-            final EPredefinedCert eCert = EPredefinedCert.getFromIssuerOrNull (sIssuer);
+            final EPredefinedCA eCert = EPredefinedCA.getFromIssuerOrNull (sIssuer);
             if (eCert != null)
             {
               if (eCert.isDeprecated ())
@@ -457,17 +455,16 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             final Certificate [] aChain = aKeyEntry.getCertificateChain ();
 
             // Key store path and password are fine
-            aTab.addChild (success (div ("Keystore is located at '" +
-                                         sKeyStorePath +
-                                         "' and was successfully loaded.")).addChild (div ("The private key with the alias '" +
-                                                                                           sAlias +
-                                                                                           "' was successfully loaded.")));
+            aTab.addChild (success (div ("Keystore is located at '" + sKeyStorePath + "' and was successfully loaded."))
+                                                                                                                        .addChild (div ("The private key with the alias '" +
+                                                                                                                                        sAlias +
+                                                                                                                                        "' was successfully loaded.")));
 
             if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
             {
               final X509Certificate aHead = (X509Certificate) aChain[0];
               final String sIssuer = aHead.getIssuerX500Principal ().getName ();
-              final EPredefinedCert eCert = EPredefinedCert.getFromIssuerOrNull (sIssuer);
+              final EPredefinedCA eCert = EPredefinedCA.getFromIssuerOrNull (sIssuer);
               if (eCert != null)
               {
                 if (eCert.isDeprecated ())

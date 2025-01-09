@@ -64,7 +64,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
 
   public PageSecureSMPSettings (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "SMP settings");
+    super (sID, "SMP Settings");
   }
 
   @Override
@@ -108,8 +108,8 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
 
       final ISMLInfo aSMLInfo = aObject.getSMLInfo ();
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML to be used")
-                                                    .setCtrl (aSMLInfo == null ? em ("none")
-                                                                               : HCSMLSelect.getDisplayNameNode (aSMLInfo)));
+                                                    .setCtrl (aSMLInfo == null ? em ("none") : HCSMLSelect
+                                                                                                          .getDisplayNameNode (aSMLInfo)));
     }
 
     {

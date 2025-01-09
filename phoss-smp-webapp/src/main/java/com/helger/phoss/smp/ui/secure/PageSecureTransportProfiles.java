@@ -84,7 +84,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
 
   public PageSecureTransportProfiles (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "Transport profiles");
+    super (sID, "Transport Profiles");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPTransportProfile, WebPageExecutionContext> ()
     {
       @Override

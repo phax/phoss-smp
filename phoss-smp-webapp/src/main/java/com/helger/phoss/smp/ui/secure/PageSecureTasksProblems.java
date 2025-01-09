@@ -31,6 +31,9 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.collection.CollectionHelper;
@@ -72,6 +75,7 @@ import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.uicore.css.CUICoreCSS;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.certificate.CertificateHelper;
@@ -132,9 +136,11 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     }
   }
 
+  private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureTasksProblems.class);
+
   public PageSecureTasksProblems (@Nonnull @Nonempty final String sID)
   {
-    super (sID, "Tasks/problems");
+    super (sID, "Tasks/Problems");
   }
 
   @Nonnull
@@ -467,6 +473,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -480,9 +487,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     final HCOL aOL = new HCOL ();
 
     // Check for default password
-    if (PhotonSecurityManager.getUserMgr ()
-                             .areUserIDAndPasswordValid (CSecurity.USER_ADMINISTRATOR_ID,
-                                                         CSecurity.USER_ADMINISTRATOR_PASSWORD))
+    if (aUserMgr.areUserIDAndPasswordValid (CSecurity.USER_ADMINISTRATOR_ID, CSecurity.USER_ADMINISTRATOR_PASSWORD))
     {
       aOL.addItem (_createError ("Please change the password of the default user " +
                                  CSecurity.USER_ADMINISTRATOR_EMAIL +
@@ -519,6 +524,11 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
         for (final String sServiceGroupID : aServiceGroupIDs)
         {
           final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+          if (aParticipantID == null)
+          {
+            LOGGER.error ("Failed to parse '" + sServiceGroupID + "' to a participant identifier");
+            continue;
+          }
 
           final HCUL aULPerSG = new HCUL ();
           final ICommonsList <ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aParticipantID);
