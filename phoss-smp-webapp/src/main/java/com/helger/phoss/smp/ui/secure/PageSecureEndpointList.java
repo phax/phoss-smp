@@ -43,6 +43,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.nicename.NiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
+import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
@@ -90,6 +91,9 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
                           EDefaultIcon.MAGNIFIER);
     aNodeList.addChild (aToolbar);
 
+    // Use the cache here, to avoid too many DB lookups
+    final SMPTransportProfileCache aTPCache = new SMPTransportProfileCache ();
+
     final HCTable aTable = new HCTable (new DTCol ("Service Group").setInitialSorting (ESortOrder.ASCENDING)
                                                                    .setDataSort (0, 1, 2, 3),
                                         new DTCol ("Document Type ID").setDataSort (1, 0, 2, 3),
@@ -118,6 +122,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
           final String sTransportProfile = aEndpoint.getTransportProfile ();
           aRow.addCell (new HCA (createViewURL (aWPEC, CMenuSecure.MENU_TRANSPORT_PROFILES, sTransportProfile))
                                                                                                                .addChild (NiceNameUI.getTransportProfile (sTransportProfile,
+                                                                                                                                                          aTPCache.getFromCache (sTransportProfile),
                                                                                                                                                           false)));
 
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);

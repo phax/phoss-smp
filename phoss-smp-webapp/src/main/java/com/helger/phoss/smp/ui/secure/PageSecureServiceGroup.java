@@ -72,7 +72,7 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.phoss.smp.ui.SMPOwnerNameCache;
+import com.helger.phoss.smp.ui.cache.SMPOwnerNameCache;
 import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;

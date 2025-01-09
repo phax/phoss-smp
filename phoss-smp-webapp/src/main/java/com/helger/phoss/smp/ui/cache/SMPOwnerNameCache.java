@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.ui;
+package com.helger.phoss.smp.ui.cache;
 
 import com.helger.commons.cache.Cache;
+import com.helger.phoss.smp.ui.SMPCommonUI;
 
 /**
  * Simple owner name cache for Service Group list

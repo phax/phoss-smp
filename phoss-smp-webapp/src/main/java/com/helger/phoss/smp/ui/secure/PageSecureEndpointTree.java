@@ -46,6 +46,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.nicename.NiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestFilter;
+import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
@@ -86,6 +87,9 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
     aServiceInfoMgr.forEachSMPServiceInformation (x -> aMap.computeIfAbsent (x.getServiceGroupID (),
                                                                              k -> new CommonsArrayList <> ()).add (x));
 
+    // Use the cache here, to avoid too many DB lookups
+    final SMPTransportProfileCache aTPCache = new SMPTransportProfileCache ();
+
     final HCUL aULSG = new HCUL ();
     final ICommonsList <String> aServiceGroupIDs = aServiceGroupMgr.getAllSMPServiceGroupIDs ()
                                                                    .getSorted (Comparator.naturalOrder ());
@@ -123,6 +127,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
               final String sTransportProfile = aEndpoint.getTransportProfile ();
               final ISimpleURL aViewURL = createViewURL (aWPEC, aServiceInfo, aParams);
               aBodyRow.addCell (new HCA (aViewURL).addChild (NiceNameUI.getTransportProfile (sTransportProfile,
+                                                                                             aTPCache.getFromCache (sTransportProfile),
                                                                                              false)));
 
               aBodyRow.addCell (aEndpoint.getEndpointReference ());

@@ -186,9 +186,18 @@ public final class NiceNameUI
   public static IHCNode getTransportProfile (@Nullable final String sTransportProfile, final boolean bInDetails)
   {
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
-    final ISMPTransportProfile aTP = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfile);
-    final boolean bIsValid = true;
 
+    // This may be an SQL query
+    final ISMPTransportProfile aTP = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfile);
+    return getTransportProfile (sTransportProfile, aTP, bInDetails);
+  }
+
+  @Nonnull
+  public static IHCNode getTransportProfile (@Nullable final String sTransportProfile,
+                                             @Nullable final ISMPTransportProfile aTP,
+                                             final boolean bInDetails)
+  {
+    final boolean bIsValid = true;
     if (aTP == null)
       return _createFormattedID (sTransportProfile, null, null, false, null, null, bInDetails, bIsValid);
 
