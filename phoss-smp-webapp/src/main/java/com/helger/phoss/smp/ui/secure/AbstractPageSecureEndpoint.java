@@ -142,9 +142,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
 
         aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
-                                           aSelectedObject.getServiceGroup ()
-                                                          .getParticipantIdentifier ()
-                                                          .getURIEncoded ()));
+                                           aSelectedObject.getServiceGroupParticipantIdentifier ().getURIEncoded ()));
         aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_SCHEME,
                                            aSelectedObject.getDocumentTypeIdentifier ().getScheme ()));
         aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID_VALUE,
@@ -292,18 +290,16 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     // Important to use the Simple IDF here, in case rules get more strict (as
     // in 7.1.0)
     final IIdentifierFactory aIdentifierFactory = SimpleIdentifierFactory.INSTANCE;
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
     final String sServiceGroupID = aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
-    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
 
     final String sDocTypeIDScheme = aWPEC.params ().getAsString (FIELD_DOCTYPE_ID_SCHEME);
     final String sDocTypeIDValue = aWPEC.params ().getAsString (FIELD_DOCTYPE_ID_VALUE);
     final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (sDocTypeIDScheme,
                                                                                                 sDocTypeIDValue);
-    return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
+    return aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroupID, aDocTypeID);
   }
 
   @Override
@@ -359,7 +355,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                              @Nullable final ISMPEndpoint aEndpoint)
   {
     final StringMap ret = new StringMap ();
-    ret.putIn (FIELD_SERVICE_GROUP_ID, aServiceInfo.getServiceGroup ().getParticipantIdentifier ().getURIEncoded ());
+    ret.putIn (FIELD_SERVICE_GROUP_ID, aServiceInfo.getServiceGroupParticipantIdentifier ().getURIEncoded ());
     ret.putIn (FIELD_DOCTYPE_ID_SCHEME, aServiceInfo.getDocumentTypeIdentifier ().getScheme ());
     ret.putIn (FIELD_DOCTYPE_ID_VALUE, aServiceInfo.getDocumentTypeIdentifier ().getValue ());
     if (aProcess != null)
@@ -658,10 +654,10 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     }
     if (aFormErrors.isEmpty ())
     {
-      ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+      ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup.getParticipantIdentifier (),
                                                                                                                    aDocTypeID);
       if (aServiceInfo == null)
-        aServiceInfo = new SMPServiceInformation (aServiceGroup, aDocTypeID, null, null);
+        aServiceInfo = new SMPServiceInformation (aServiceGroup.getParticipantIdentifier (), aDocTypeID, null, null);
 
       ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
       if (aProcess == null)

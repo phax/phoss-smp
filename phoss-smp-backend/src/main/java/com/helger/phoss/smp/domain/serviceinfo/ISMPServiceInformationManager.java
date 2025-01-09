@@ -24,6 +24,7 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.ChangeSMPV8;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
@@ -61,7 +62,7 @@ public interface ISMPServiceInformationManager
    * If one of the parameters is <code>null</code> no match should be found and
    * <code>null</code> should be returned. This is a sanity method to find the
    * service information for a certain endpoint and is a specialization of
-   * {@link #getSMPServiceInformationOfServiceGroupAndDocumentType(ISMPServiceGroup, IDocumentTypeIdentifier)}
+   * {@link #getSMPServiceInformationOfServiceGroupAndDocumentType(IParticipantIdentifier, IDocumentTypeIdentifier)}
    * .
    *
    * @param aServiceGroup
@@ -74,7 +75,7 @@ public interface ISMPServiceInformationManager
    *        The transport profile to search. May be <code>null</code>.
    * @return <code>null</code> if any of the parameters is <code>null</code> or
    *         if no such service information exists.
-   * @see #getSMPServiceInformationOfServiceGroupAndDocumentType(ISMPServiceGroup,
+   * @see #getSMPServiceInformationOfServiceGroupAndDocumentType(IParticipantIdentifier,
    *      IDocumentTypeIdentifier)
    */
   @ChangeSMPV8 ("Rename to findSMPServiceInformation")
@@ -189,8 +190,8 @@ public interface ISMPServiceInformationManager
    * Get the service information for the passed tuple of service group and
    * document type identifier.
    *
-   * @param aServiceGroup
-   *        The service group of interest. May be <code>null</code>.
+   * @param aParticipantIdentifier
+   *        The service group ID of interest. May be <code>null</code>.
    * @param aDocumentTypeIdentifier
    *        The document type identifier to search. May be <code>null</code>.
    * @return <code>null</code> if any parameter is <code>null</code> or if the
@@ -198,7 +199,7 @@ public interface ISMPServiceInformationManager
    *         the service group.
    */
   @Nullable
-  ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable ISMPServiceGroup aServiceGroup,
+  ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable IParticipantIdentifier aParticipantIdentifier,
                                                                                 @Nullable IDocumentTypeIdentifier aDocumentTypeIdentifier);
 
   /**

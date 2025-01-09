@@ -70,6 +70,7 @@ public final class ISMPServiceInformationManagerFuncTest
     aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1, true);
     final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (sUserID, aPI1, null, true);
     assertNotNull (aSG);
+
     try
     {
       final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
@@ -88,7 +89,7 @@ public final class ISMPServiceInformationManagerFuncTest
 
       final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP), "<extproc/>");
 
-      final SMPServiceInformation aServiceInformation = new SMPServiceInformation (aSG,
+      final SMPServiceInformation aServiceInformation = new SMPServiceInformation (aPI1,
                                                                                    aDocTypeID,
                                                                                    new CommonsArrayList <> (aProcess),
                                                                                    "<extsi/>");

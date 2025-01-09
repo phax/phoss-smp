@@ -21,9 +21,9 @@ import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**
  * This interface represents the main information in a service metadata, if no
@@ -36,11 +36,11 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 public interface ISMPServiceInformation extends ISMPHasExtension, IHasID <String>
 {
   /**
-   * @return The service group to which this service information belongs. Never
-   *         <code>null</code>.
+   * @return The participant ID of the service group to which this service
+   *         information belongs. Never <code>null</code>.
    */
   @Nonnull
-  ISMPServiceGroup getServiceGroup ();
+  IParticipantIdentifier getServiceGroupParticipantIdentifier ();
 
   /**
    * @return The ID of the service group to which this service information
@@ -48,10 +48,7 @@ public interface ISMPServiceInformation extends ISMPHasExtension, IHasID <String
    */
   @Nonnull
   @Nonempty
-  default String getServiceGroupID ()
-  {
-    return getServiceGroup ().getID ();
-  }
+  String getServiceGroupID ();
 
   /**
    * @return The document type identifier of this service information. Never

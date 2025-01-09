@@ -362,8 +362,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                               aSettings.isDirectoryIntegrationAutoUpdate ())
                           {
                             // Only if a business card is present
-                            final IParticipantIdentifier aPID = aServiceInformation.getServiceGroup ()
-                                                                                   .getParticipantIdentifier ();
+                            final IParticipantIdentifier aPID = aServiceInformation.getServiceGroupParticipantIdentifier ();
                             if (aBusinessCardMgr.containsSMPBusinessCardOfID (aPID))
                             {
                               // Notify PD server: update

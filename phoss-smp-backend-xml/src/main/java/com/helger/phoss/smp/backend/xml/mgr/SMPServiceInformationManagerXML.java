@@ -39,6 +39,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -82,7 +83,7 @@ public final class SMPServiceInformationManagerXML extends
                                                         @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup.getParticipantIdentifier (),
                                                                                                        aDocTypeID);
     if (aServiceInfo != null)
     {
@@ -108,7 +109,7 @@ public final class SMPServiceInformationManagerXML extends
 
     // Check for an update
     boolean bChangeExisting = false;
-    final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroup (),
+    final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroupParticipantIdentifier (),
                                                                                                                                  aSMPServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
     {
@@ -342,15 +343,15 @@ public final class SMPServiceInformationManagerXML extends
   }
 
   @Nullable
-  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
+  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final IParticipantIdentifier aParticipantID,
                                                                                        @Nullable final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
-    if (aServiceGroup == null)
+    if (aParticipantID == null)
       return null;
     if (aDocumentTypeIdentifier == null)
       return null;
 
-    final String sServiceGroupID = aServiceGroup.getID ();
+    final String sServiceGroupID = aParticipantID.getURIEncoded ();
     final ICommonsList <ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ()
                                                                         .equals (sServiceGroupID) &&
                                                                      aSI.getDocumentTypeIdentifier ()

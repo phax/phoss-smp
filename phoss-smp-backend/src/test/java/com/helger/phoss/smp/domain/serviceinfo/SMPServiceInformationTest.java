@@ -30,10 +30,7 @@ import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
-import com.helger.photon.security.CSecurity;
 
 /**
  * Test class for class {@link SMPServiceInformation}.
@@ -49,7 +46,6 @@ public final class SMPServiceInformationTest
   public void testBasic ()
   {
     final IParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("0088:dummy");
-    final ISMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
     final XMLOffsetDateTime aEndDT = aStartDT.plusYears (1);
@@ -85,11 +81,11 @@ public final class SMPServiceInformationTest
 
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                  "testdoctype");
-    final SMPServiceInformation aSI = new SMPServiceInformation (aSG,
+    final SMPServiceInformation aSI = new SMPServiceInformation (aPI,
                                                                  aDocTypeID,
                                                                  CollectionHelper.newList (aProcess),
                                                                  "<extsi/>");
-    assertSame (aSG, aSI.getServiceGroup ());
+    assertSame (aPI, aSI.getServiceGroupParticipantIdentifier ());
     assertEquals (aDocTypeID, aSI.getDocumentTypeIdentifier ());
     assertEquals (1, aSI.getAllProcesses ().size ());
     assertEquals ("[{\"Any\":\"<extsi />\"}]", aSI.getExtensions ().getExtensionsAsJsonString ());
@@ -100,7 +96,6 @@ public final class SMPServiceInformationTest
   {
     final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                         "0088:dummy");
-    final ISMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
 
     final SMPEndpoint aEP = new SMPEndpoint ("tp",
                                              "http://localhost/as2",
@@ -134,11 +129,11 @@ public final class SMPServiceInformationTest
 
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                  "testdoctype");
-    final SMPServiceInformation aSI = new SMPServiceInformation (aSG,
+    final SMPServiceInformation aSI = new SMPServiceInformation (aPI,
                                                                  aDocTypeID,
                                                                  CollectionHelper.newList (aProcess),
                                                                  (String) null);
-    assertSame (aSG, aSI.getServiceGroup ());
+    assertSame (aPI, aSI.getServiceGroupParticipantIdentifier ());
     assertEquals (aDocTypeID, aSI.getDocumentTypeIdentifier ());
     assertEquals (1, aSI.getAllProcesses ().size ());
     assertNull (aSI.getExtensions ().getExtensionsAsJsonString ());

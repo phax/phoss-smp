@@ -37,7 +37,6 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -99,8 +98,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos)
     {
-      final ISMPServiceGroup aServiceGroup = aServiceInfo.getServiceGroup ();
-      final IParticipantIdentifier aParticipantID = aServiceGroup.getParticipantIdentifier ();
+      final IParticipantIdentifier aParticipantID = aServiceInfo.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aServiceInfo.getDocumentTypeIdentifier ();
       final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope, aParticipantID.getURIEncoded ());
 
@@ -113,15 +111,14 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 
           final HCRow aRow = aTable.addBodyRow ();
           final ISimpleURL aViewURL = createViewURL (aWPEC, aServiceInfo, aParams);
-          aRow.addCell (new HCA (aViewURL).addChild (aServiceGroup.getID ()));
+          aRow.addCell (new HCA (aViewURL).addChild (aServiceInfo.getServiceGroupID ()));
           aRow.addCell (NiceNameUI.getDocumentTypeID (aDocTypeID, false));
           aRow.addCell (NiceNameUI.getProcessID (aDocTypeID, aProcessID, false));
 
           final String sTransportProfile = aEndpoint.getTransportProfile ();
-          aRow.addCell (new HCA (createViewURL (aWPEC,
-                                                CMenuSecure.MENU_TRANSPORT_PROFILES,
-                                                sTransportProfile)).addChild (NiceNameUI.getTransportProfile (sTransportProfile,
-                                                                                                              false)));
+          aRow.addCell (new HCA (createViewURL (aWPEC, CMenuSecure.MENU_TRANSPORT_PROFILES, sTransportProfile))
+                                                                                                               .addChild (NiceNameUI.getTransportProfile (sTransportProfile,
+                                                                                                                                                          false)));
 
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);

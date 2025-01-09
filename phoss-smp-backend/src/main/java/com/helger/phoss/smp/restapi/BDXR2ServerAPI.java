@@ -125,7 +125,7 @@ public final class BDXR2ServerAPI
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
       {
         // Ignore all service information without endpoints
-        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                                            aDocTypeID);
         if (aServiceInfo != null && aServiceInfo.getTotalEndpointCount () > 0)
         {
@@ -304,7 +304,7 @@ public final class BDXR2ServerAPI
       {
         // Get as regular service information
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroup,
+        final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                                            aPathDocTypeID);
         if (aServiceInfo != null)
         {
@@ -505,7 +505,7 @@ public final class BDXR2ServerAPI
             }
             final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
             final String sExtensionXML = convertToJsonString (aServiceMetadata.getSMPExtensions ());
-            if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPathServiceGroup,
+            if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPathServiceGroup.getParticipantIdentifier (),
                                                                                        aPathDocTypeID,
                                                                                        aProcesses,
                                                                                        sExtensionXML)).isFailure ())
@@ -571,7 +571,7 @@ public final class BDXR2ServerAPI
                                         m_aAPIDataProvider.getCurrentURI ());
       }
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-      final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+      final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                                          aPathDocTypeID);
       if (aServiceInfo != null)
       {

@@ -140,7 +140,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new, aServiceGroupMgr);
+    return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new);
   }
 
   @Nonnull

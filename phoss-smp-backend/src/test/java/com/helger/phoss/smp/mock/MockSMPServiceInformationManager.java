@@ -23,6 +23,7 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
@@ -52,7 +53,7 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     return ESuccess.SUCCESS;
   }
 
-  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (final ISMPServiceGroup aServiceGroup,
+  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (final IParticipantIdentifier aParticipantIdentifier,
                                                                                        final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
     throw new UnsupportedOperationException ();

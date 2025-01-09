@@ -94,17 +94,17 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
   {
     private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
 
-    private final ISMPServiceGroup m_aServiceGroup;
+    private final IParticipantIdentifier m_aServiceGroupPID;
     private final String m_sOldURL;
     private final String m_sNewURL;
 
-    public BulkChangeEndpointURL (@Nullable final ISMPServiceGroup aServiceGroup,
+    public BulkChangeEndpointURL (@Nullable final IParticipantIdentifier aServiceGroupPID,
                                   @Nonnull @Nonempty final String sOldURL,
                                   @Nonnull @Nonempty final String sNewURL)
     {
       super ("BulkChangeEndpointURL",
              new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"));
-      m_aServiceGroup = aServiceGroup;
+      m_aServiceGroupPID = aServiceGroupPID;
       m_sOldURL = sOldURL;
       m_sNewURL = sNewURL;
     }
@@ -123,7 +123,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         final ICommonsList <ISMPServiceInformation> aChangedSIs = new CommonsArrayList <> ();
         // Run in a read-lock
         aServiceInfoMgr.forEachSMPServiceInformation (aSI -> {
-          if (m_aServiceGroup != null && !aSI.getServiceGroup ().equals (m_aServiceGroup))
+          if (m_aServiceGroupPID != null &&
+              !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (m_aServiceGroupPID))
           {
             // Wrong service group
             return;
@@ -236,7 +237,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     final MutableInt aTotalEndpointCount = new MutableInt (0);
     final MutableInt aTotalEndpointCountWithURL = new MutableInt (0);
     aServiceInfoMgr.forEachSMPServiceInformation (aSI -> {
-      final ISMPServiceGroup aSG = aSI.getServiceGroup ();
+      // Service Group needs to be resolved in here
+      final ISMPServiceGroup aSG = aServiceGroupMgr.getSMPServiceGroupOfID (aSI.getServiceGroupParticipantIdentifier ());
       for (final ISMPProcess aProcess : aSI.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
@@ -306,7 +308,10 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         {
           PhotonWorkerPool.getInstance ()
                           .run ("BulkChangeEndpointURL",
-                                new BulkChangeEndpointURL (aSelectedServiceGroup, sOldURL, sNewURL));
+                                new BulkChangeEndpointURL (aSelectedServiceGroup == null ? null : aSelectedServiceGroup
+                                                                                                                       .getParticipantIdentifier (),
+                                                           sOldURL,
+                                                           sNewURL));
 
           aWPEC.postRedirectGetInternal (success ("The bulk change of the endpoint URL from '" +
                                                   sOldURL +

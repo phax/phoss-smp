@@ -75,7 +75,10 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
       aProcesses.add (MicroTypeConverter.convertToNative (aProcess, SMPProcess.class));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPServiceInformation (aServiceGroup, aDocTypeIdentifier, aProcesses, sExtension);
+    return new SMPServiceInformation (aServiceGroup.getParticipantIdentifier (),
+                                      aDocTypeIdentifier,
+                                      aProcesses,
+                                      sExtension);
   }
 
   @Nonnull

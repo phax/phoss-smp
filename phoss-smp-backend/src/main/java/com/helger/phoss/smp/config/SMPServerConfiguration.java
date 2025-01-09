@@ -137,9 +137,9 @@ public final class SMPServerConfiguration
    *         <code>smp.keystore.password</code>.
    */
   @Nullable
-  public static String getKeyStorePassword ()
+  public static char [] getKeyStorePassword ()
   {
-    return _getConfig ().getAsString (KEY_SMP_KEYSTORE_PASSWORD);
+    return _getConfig ().getAsCharArray (KEY_SMP_KEYSTORE_PASSWORD);
   }
 
   /**
@@ -189,9 +189,9 @@ public final class SMPServerConfiguration
    *         <code>smp.truststore.password</code>.
    */
   @Nullable
-  public static String getTrustStorePassword ()
+  public static char [] getTrustStorePassword ()
   {
-    return _getConfig ().getAsString (KEY_SMP_TRUSTSTORE_PASSWORD);
+    return _getConfig ().getAsCharArray (KEY_SMP_TRUSTSTORE_PASSWORD);
   }
 
   /**

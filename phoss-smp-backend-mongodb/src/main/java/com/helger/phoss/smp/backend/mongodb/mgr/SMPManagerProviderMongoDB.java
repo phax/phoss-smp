@@ -90,7 +90,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
   public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                                     @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPServiceInformationManagerMongoDB (aIdentifierFactory, aServiceGroupMgr);
+    return new SMPServiceInformationManagerMongoDB (aIdentifierFactory);
   }
 
   @Nonnull

@@ -192,20 +192,20 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
                                                                                                                     .xml (m_aObjFactory.createServiceMetadata (aSM)));
           _testResponseJerseyClient (aResponseMsg, 200);
           assertNotNull (SMPMetaManager.getServiceInformationMgr ()
-                                       .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+                                       .getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
 
           // PUT 2 ServiceInformation
           aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).put (Entity
                                                                                                                     .xml (m_aObjFactory.createServiceMetadata (aSM)));
           _testResponseJerseyClient (aResponseMsg, 200);
           assertNotNull (SMPMetaManager.getServiceInformationMgr ()
-                                       .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+                                       .getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
 
           // DELETE 1 ServiceInformation
           aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
           _testResponseJerseyClient (aResponseMsg, 200);
           assertNull (SMPMetaManager.getServiceInformationMgr ()
-                                    .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+                                    .getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
         }
         finally
         {
@@ -213,7 +213,7 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
           aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
           _testResponseJerseyClient (aResponseMsg, 200, 404);
           assertNull (SMPMetaManager.getServiceInformationMgr ()
-                                    .getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+                                    .getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
         }
 
         assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
@@ -309,15 +309,15 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
         {
           // PUT 1 ServiceInformation
           aSMPClient.saveServiceInformation (aSI, CREDENTIALS);
-          assertNotNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+          assertNotNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
 
           // PUT 2 ServiceInformation
           aSMPClient.saveServiceInformation (aSI, CREDENTIALS);
-          assertNotNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+          assertNotNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
 
           // DELETE 1 ServiceInformation
           aSMPClient.deleteServiceRegistration (aPI_LC, aDT, CREDENTIALS);
-          assertNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+          assertNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
         }
         finally
         {
@@ -330,7 +330,7 @@ public final class ServiceMetadataInterfaceTest extends AbstractSMPWebAppSQLTest
           {
             // Expected
           }
-          assertNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup, aDT));
+          assertNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
         }
 
         assertNotNull (aSMPClient.getServiceGroup (aPI_LC));

@@ -103,7 +103,7 @@ public final class SMPServiceInformationManagerXMLTest
                                                  "ti",
                                                  "<extep />");
         final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP), "<extproc />");
-        assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aSG,
+        assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPI,
                                                                                                   aDocTypeID,
                                                                                                   new CommonsArrayList <> (aProcess),
                                                                                                   "<extsi />"))
@@ -122,7 +122,7 @@ public final class SMPServiceInformationManagerXMLTest
 
       {
         // Replace endpoint URL with equal transport profile -> replace
-        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI,
                                                                                                                          aDocTypeID);
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
@@ -161,7 +161,7 @@ public final class SMPServiceInformationManagerXMLTest
       {
         // Add endpoint with different transport profile -> added to existing
         // process
-        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI,
                                                                                                                          aDocTypeID);
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
@@ -193,7 +193,7 @@ public final class SMPServiceInformationManagerXMLTest
       {
         // Add endpoint with different process - add to existing
         // serviceGroup+docType part
-        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aSG,
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI,
                                                                                                                          aDocTypeID);
         assertNotNull (aSI);
         final SMPEndpoint aEP = new SMPEndpoint ("tp",

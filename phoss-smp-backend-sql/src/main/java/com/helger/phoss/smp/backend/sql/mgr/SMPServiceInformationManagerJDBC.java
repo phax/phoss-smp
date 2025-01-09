@@ -53,7 +53,6 @@ import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -104,7 +103,6 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     }
   }
 
-  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
   /**
@@ -113,14 +111,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be
    *        <code>null</code>.
-   * @param aServiceGroupMgr
-   *        The service group manager to use. May not be <code>null</code>.
    */
-  public SMPServiceInformationManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier,
-                                           @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public SMPServiceInformationManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
-    m_aServiceGroupMgr = aServiceGroupMgr;
   }
 
   @Nonnull
@@ -144,7 +138,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       aUpdated.set (eDeleted.isChanged ());
 
       // Insert new processes
-      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticipantIdentifier ();
+      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
 
       aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_service_metadata (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, extension) VALUES (?, ?, ?, ?, ?)",
@@ -230,7 +224,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                         @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup.getParticipantIdentifier (),
                                                                                                        aDocTypeID);
     if (aServiceInfo != null)
     {
@@ -251,7 +245,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (-1));
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
-      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticipantIdentifier ();
+      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
       final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_endpoint" +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
@@ -354,7 +348,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (0));
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
-      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroup ().getParticipantIdentifier ();
+      final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
       final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
       final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_endpoint" +
@@ -446,11 +440,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     // Per participant ID
     for (final Map.Entry <IParticipantIdentifier, ICommonsMap <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>>> aEntry : aGrouping.entrySet ())
     {
-      final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (aEntry.getKey ());
-      if (aServiceGroup == null)
-        throw new IllegalStateException ("Failed to resolve service group for participant ID '" +
-                                         aEntry.getKey ().getURIEncoded () +
-                                         "'");
+      final IParticipantIdentifier aParticipantID = aEntry.getKey ();
 
       // Per document type ID
       for (final Map.Entry <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>> aEntry2 : aEntry.getValue ()
@@ -466,7 +456,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         }
 
         final DocTypeAndExtension aDE = aEntry2.getKey ();
-        aConsumer.accept (new SMPServiceInformation (aServiceGroup, aDE.m_aDocTypeID, aProcesses, aDE.m_sExt));
+        aConsumer.accept (new SMPServiceInformation (aParticipantID, aDE.m_aDocTypeID, aProcesses, aDE.m_sExt));
       }
     }
   }
@@ -547,7 +537,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
           }
 
           final DocTypeAndExtension aDE = aEntry.getKey ();
-          ret.add (new SMPServiceInformation (aServiceGroup, aDE.m_aDocTypeID, aProcesses, aDE.m_sExt));
+          ret.add (new SMPServiceInformation (aServiceGroup.getParticipantIdentifier (),
+                                              aDE.m_aDocTypeID,
+                                              aProcesses,
+                                              aDE.m_sExt));
         }
       }
     }
@@ -575,15 +568,14 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   }
 
   @Nullable
-  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
+  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final IParticipantIdentifier aParticipantID,
                                                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
-    if (aServiceGroup == null)
+    if (aParticipantID == null)
       return null;
     if (aDocTypeID == null)
       return null;
 
-    final IParticipantIdentifier aPID = aServiceGroup.getParticipantIdentifier ();
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.extension," +
                                                                           "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
                                                                           "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
@@ -598,8 +590,8 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                           "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
                                                                           "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier" +
                                                                           " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=? AND sm.documentIdentifierScheme=? AND sm.documentIdentifier=?",
-                                                                          new ConstantPreparedStatementDataProvider (aPID.getScheme (),
-                                                                                                                     aPID.getValue (),
+                                                                          new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                                     aParticipantID.getValue (),
                                                                                                                      aDocTypeID.getScheme (),
                                                                                                                      aDocTypeID.getValue ()));
     if (aDBResult != null && aDBResult.isNotEmpty ())
@@ -637,7 +629,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         aProcess.addEndpoints (aEntry.getValue ());
         aProcesses.add (aProcess);
       }
-      return new SMPServiceInformation (aServiceGroup, aDocTypeID, aProcesses, sServiceInformationExtension);
+      return new SMPServiceInformation (aParticipantID, aDocTypeID, aProcesses, sServiceInformationExtension);
     }
     return null;
   }

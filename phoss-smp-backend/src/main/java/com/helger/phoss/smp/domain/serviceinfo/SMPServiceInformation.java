@@ -30,6 +30,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.bdxr.smp1.doctype.BDXR1DocumentTypeIdentifier;
 import com.helger.peppolid.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
@@ -38,8 +39,7 @@ import com.helger.peppolid.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
+import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 
 /**
  * Default implementation of the {@link ISMPServiceInformation} interface.
@@ -52,15 +52,16 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   public static final ObjectType OT = new ObjectType ("smpserviceinformation");
 
   private final String m_sID;
-  private final ISMPServiceGroup m_aServiceGroup;
+  private final IParticipantIdentifier m_aParticipantID;
+  private final String m_sServiceGroupID;
   private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
   private final ICommonsOrderedMap <String, SMPProcess> m_aProcesses = new CommonsLinkedHashMap <> ();
 
   /**
    * Constructor for new service information
    *
-   * @param aServiceGroup
-   *        Owning service group
+   * @param aParticipantID
+   *        Owning service group participant ID
    * @param aDocumentTypeIdentifier
    *        Document type ID
    * @param aProcesses
@@ -68,18 +69,19 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
    * @param sExtension
    *        Optional extension. May be <code>null</code>.
    */
-  public SMPServiceInformation (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public SMPServiceInformation (@Nonnull final IParticipantIdentifier aParticipantID,
                                 @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                 @Nullable final List <SMPProcess> aProcesses,
                                 @Nullable final String sExtension)
   {
-    m_aServiceGroup = ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    m_aParticipantID = ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+    m_sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     setDocumentTypeIdentifier (aDocumentTypeIdentifier);
     if (aProcesses != null)
       for (final SMPProcess aProcess : aProcesses)
         addProcess (aProcess);
     getExtensions ().setExtensionAsString (sExtension);
-    m_sID = aServiceGroup.getID () + "-" + aDocumentTypeIdentifier.getURIEncoded ();
+    m_sID = m_sServiceGroupID + "-" + aDocumentTypeIdentifier.getURIEncoded ();
   }
 
   @Nonnull
@@ -90,9 +92,16 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   }
 
   @Nonnull
-  public ISMPServiceGroup getServiceGroup ()
+  public IParticipantIdentifier getServiceGroupParticipantIdentifier ()
   {
-    return m_aServiceGroup;
+    return m_aParticipantID;
+  }
+
+  @Nonnull
+  @Nonempty
+  public String getServiceGroupID ()
+  {
+    return m_sServiceGroupID;
   }
 
   @Nonnull
@@ -193,7 +202,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
 
     final com.helger.xsds.peppol.smp1.ServiceInformationType aSI = new com.helger.xsds.peppol.smp1.ServiceInformationType ();
     // Explicit constructor call is needed here!
-    aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aServiceGroup.getParticipantIdentifier ()));
+    aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (m_aParticipantID));
     aSI.setDocumentIdentifier (new SimpleDocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.xsds.peppol.smp1.ProcessListType aProcesses = new com.helger.xsds.peppol.smp1.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
@@ -226,7 +235,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
 
     final com.helger.xsds.bdxr.smp1.ServiceInformationType aSI = new com.helger.xsds.bdxr.smp1.ServiceInformationType ();
     // Explicit constructor call is needed here!
-    aSI.setParticipantIdentifier (new BDXR1ParticipantIdentifier (m_aServiceGroup.getParticipantIdentifier ()));
+    aSI.setParticipantIdentifier (new BDXR1ParticipantIdentifier (m_aParticipantID));
     aSI.setDocumentIdentifier (new BDXR1DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     final com.helger.xsds.bdxr.smp1.ProcessListType aProcesses = new com.helger.xsds.bdxr.smp1.ProcessListType ();
     for (final ISMPProcess aProcess : m_aProcesses.values ())
@@ -264,7 +273,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     // It's okay to use the constructor directly
     ret.setID (new BDXR2DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     // Explicit constructor call is needed here!
-    ret.setParticipantID (new BDXR2ParticipantIdentifier (m_aServiceGroup.getParticipantIdentifier ()));
+    ret.setParticipantID (new BDXR2ParticipantIdentifier (m_aParticipantID));
 
     for (final ISMPProcess aProcess : m_aProcesses.values ())
     {
@@ -304,22 +313,9 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   {
     return ToStringGenerator.getDerived (super.toString ())
                             .append ("ID", m_sID)
-                            .append ("ServiceGroup", m_aServiceGroup)
+                            .append ("ServiceGroup", m_aParticipantID)
                             .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
                             .append ("Processes", m_aProcesses)
                             .getToString ();
-  }
-
-  @Nonnull
-  public static SMPServiceInformation createFromJAXB (@Nonnull final ISMPServiceGroup aServiceGroup,
-                                                      @Nonnull final com.helger.xsds.peppol.smp1.ServiceInformationType aServiceInformation)
-  {
-    final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
-    for (final com.helger.xsds.peppol.smp1.ProcessType aProcess : aServiceInformation.getProcessList ().getProcess ())
-      aProcesses.add (SMPProcess.createFromJAXB (aProcess));
-    return new SMPServiceInformation (aServiceGroup,
-                                      SimpleDocumentTypeIdentifier.wrap (aServiceInformation.getDocumentIdentifier ()),
-                                      aProcesses,
-                                      SMPExtensionConverter.convertToString (aServiceInformation.getExtension ()));
   }
 }

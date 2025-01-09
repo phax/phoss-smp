@@ -22,7 +22,7 @@ import com.helger.photon.security.CSecurity;
 abstract class AbstractCreateMany
 {
   protected static final int START_INDEX = 0;
-  protected static final int PARTICIPANTS = 1_000;
+  protected static final int PARTICIPANTS = 5_000;
   protected static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                   CSecurity.USER_ADMINISTRATOR_PASSWORD);
 }

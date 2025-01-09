@@ -42,10 +42,10 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.typeconvert.TypeConverter;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -87,15 +87,12 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   private static final String BSON_TECHINFOURL = "techinfourl";
 
   private final IIdentifierFactory m_aIdentifierFactory;
-  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceInformationManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                              @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public SMPServiceInformationManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory)
   {
     super ("smp-serviceinfo");
     m_aIdentifierFactory = aIdentifierFactory;
-    m_aServiceGroupMgr = aServiceGroupMgr;
   }
 
   @Nonnull
@@ -213,7 +210,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   @ReturnsMutableCopy
   public SMPServiceInformation toServiceInformation (@Nonnull final Document aDoc, final boolean bNeedProcesses)
   {
-    final ISMPServiceGroup aServiceGroup = m_aServiceGroupMgr.getSMPServiceGroupOfID (m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID)));
+    final IParticipantIdentifier aParticipantID = m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID));
     final IDocumentTypeIdentifier aDocTypeID = toDocumentTypeID (aDoc.get (BSON_DOCTYPE_ID, Document.class));
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     if (bNeedProcesses)
@@ -226,7 +223,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final String sExtension = aDoc.getString (BSON_EXTENSIONS);
 
     // The ID itself is derived from ServiceGroupID and DocTypeID
-    return new SMPServiceInformation (aServiceGroup, aDocTypeID, aProcesses, sExtension);
+    return new SMPServiceInformation (aParticipantID, aDocTypeID, aProcesses, sExtension);
   }
 
   @Nullable
@@ -235,7 +232,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                                                         @Nullable final IProcessIdentifier aProcessID,
                                                         @Nullable final ISMPTransportProfile aTransportProfile)
   {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup,
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup.getParticipantIdentifier (),
                                                                                                        aDocTypeID);
     if (aServiceInfo != null)
     {
@@ -261,7 +258,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
     // Check for an update
     boolean bChangedExisting = false;
-    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroup (),
+    final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroupParticipantIdentifier (),
                                                                                                           aSMPServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
     {
@@ -473,16 +470,16 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   }
 
   @Nullable
-  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
+  public ISMPServiceInformation getSMPServiceInformationOfServiceGroupAndDocumentType (@Nullable final IParticipantIdentifier aParticipantIdentifier,
                                                                                        @Nullable final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
-    if (aServiceGroup == null)
+    if (aParticipantIdentifier == null)
       return null;
     if (aDocumentTypeIdentifier == null)
       return null;
 
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
-    getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()),
+    getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID, aParticipantIdentifier.getURIEncoded ()),
                                         new Document (BSON_DOCTYPE_ID, toBson (aDocumentTypeIdentifier))))
                     .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, true)));
 
@@ -490,9 +487,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       return null;
     if (ret.size () > 1)
       LOGGER.warn ("Found more than one entry for service group '" +
-                   aServiceGroup.getID () +
+                   aParticipantIdentifier.getURIEncoded () +
                    "' and document type '" +
-                   aDocumentTypeIdentifier.getValue () +
+                   aDocumentTypeIdentifier.getURIEncoded () +
                    "'. This seems to be a bug! Using the first one.");
     return ret.getFirstOrNull ();
   }

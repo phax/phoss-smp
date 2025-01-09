@@ -288,6 +288,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     boolean bShowList = true;
 
@@ -295,7 +296,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     final ICommonsMap <String, ICommonsSet <ISMPServiceGroup>> aServiceGroupsGroupedPerURL = new CommonsHashMap <> ();
     final MutableInt aTotalEndpointCount = new MutableInt (0);
     aServiceInfoMgr.forEachSMPServiceInformation (aSI -> {
-      final ISMPServiceGroup aSG = aSI.getServiceGroup ();
+      // Service Group needs to be resolved in here
+      final ISMPServiceGroup aSG = aServiceGroupMgr.getSMPServiceGroupOfID (aSI.getServiceGroupParticipantIdentifier ());
       for (final ISMPProcess aProcess : aSI.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
