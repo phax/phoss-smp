@@ -41,6 +41,7 @@ import com.helger.commons.url.SimpleURL;
 import com.helger.dns.ip.IPV4Addr;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCExtHelper;
+import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.tabular.HCRow;
@@ -94,6 +95,7 @@ import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
+import com.helger.photon.core.form.RequestFieldBoolean;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -128,6 +130,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private static final String ACTION_REGISTER_TO_SML = "register-to-sml";
   private static final String ACTION_UNREGISTER_FROM_SML = "unregister-from-sml";
 
+  private static final String PARAM_DELETE_IN_SML = "delete-in-sml";
+
   public PageSecureServiceGroup (@Nonnull @Nonempty final String sID)
   {
     super (sID, "Service Groups");
@@ -138,15 +142,21 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                 @Nonnull final BootstrapForm aForm,
                                 @Nullable final ISMPServiceGroup aSelectedObject)
       {
+        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+
         final BootstrapQuestionBox aQB = question (div ("Are you sure you want to delete the complete SMP Service Group '" +
                                                         aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
                                                         "'?")).addChild (div ("This means that all Endpoints and all Redirects are deleted as well."));
         if (SMPMetaManager.hasBusinessCardMgr ())
           aQB.addChild (div ("If a Business Card for this Service Group exists, it will also be deleted."));
-        if (SMPMetaManager.getSettings ().isSMLEnabled ())
+        if (aSettings.isSMLEnabled ())
           aQB.addChild (div ("Since the connection to the SML is active this Service Group will also be deleted from the SML!"));
 
         aForm.addChild (aQB);
+
+        aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Delete in SML?")
+                                                     .setCtrl (new HCCheckBox (new RequestFieldBoolean (PARAM_DELETE_IN_SML,
+                                                                                                        aSettings.isSMLEnabled ()))));
       }
 
       @Override
@@ -154,13 +164,16 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                     @Nullable final ISMPServiceGroup aSelectedObject)
       {
         final HCNodeList aNL = new HCNodeList ();
+        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
         final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
 
         try
         {
+          final boolean bDeleteInSML = aWPEC.params ().getAsBoolean (PARAM_DELETE_IN_SML, aSettings.isSMLEnabled ());
+
           // Delete the service group both locally and on the SML (if active)!
           final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-          if (aServiceGroupMgr.deleteSMPServiceGroup (aParticipantID, true).isChanged ())
+          if (aServiceGroupMgr.deleteSMPServiceGroup (aParticipantID, bDeleteInSML).isChanged ())
           {
             aNL.addChild (success ("The SMP Service Group for participant '" +
                                    aParticipantID.getURIEncoded () +
