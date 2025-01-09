@@ -130,15 +130,13 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   }
 
   @Nonnull
-  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
   {
     return new SMPRedirectManagerJDBC (SMPDBExecutor::new);
   }
 
   @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                                    @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
   {
     return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new);
   }

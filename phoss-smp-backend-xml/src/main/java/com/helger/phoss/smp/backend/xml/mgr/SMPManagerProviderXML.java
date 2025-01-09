@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.xml.mgr;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.helger.commons.exception.InitializationException;
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.dao.DAOException;
@@ -71,7 +72,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new InitializationException (ex.getMessage (), ex);
     }
   }
 
@@ -84,7 +85,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new InitializationException (ex.getMessage (), ex);
     }
   }
 
@@ -97,7 +98,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new InitializationException (ex.getMessage (), ex);
     }
   }
 
@@ -110,13 +111,12 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new InitializationException (ex.getMessage (), ex);
     }
   }
 
   @Nonnull
-  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
   {
     try
     {
@@ -124,13 +124,12 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new InitializationException (ex.getMessage (), ex);
     }
   }
 
   @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                                    @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
   {
     try
     {
@@ -138,7 +137,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new InitializationException (ex.getMessage (), ex);
     }
   }
 
@@ -151,7 +150,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new InitializationException (ex.getMessage (), ex);
     }
   }
 
@@ -165,7 +164,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
     catch (final DAOException ex)
     {
-      throw new RuntimeException (ex.getMessage (), ex);
+      throw new InitializationException (ex.getMessage (), ex);
     }
   }
 

@@ -229,12 +229,11 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_aServiceGroupMgr == null)
         throw new IllegalStateException ("Failed to create ServiceGroup manager!");
 
-      m_aRedirectMgr = s_aManagerProvider.createRedirectMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
+      m_aRedirectMgr = s_aManagerProvider.createRedirectMgr (m_aIdentifierFactory);
       if (m_aRedirectMgr == null)
         throw new IllegalStateException ("Failed to create Redirect manager!");
 
-      m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr (m_aIdentifierFactory,
-                                                                                 m_aServiceGroupMgr);
+      m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr (m_aIdentifierFactory);
       if (m_aServiceInformationMgr == null)
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 

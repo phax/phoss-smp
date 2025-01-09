@@ -65,15 +65,13 @@ public final class MockSMPManagerProvider implements ISMPManagerProvider
   }
 
   @Nonnull
-  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
   {
     return new MockSMPRedirectManager ();
   }
 
   @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                                    @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
   {
     return new MockSMPServiceInformationManager ();
   }

@@ -85,25 +85,19 @@ public interface ISMPManagerProvider
   /**
    * @param aIdentifierFactory
    *        The identifier factory to be used. May not be <code>null</code>.
-   * @param aServiceGroupMgr
-   *        The service group manager to use. May not be <code>null</code>.
    * @return A new SMP redirect manager. May not be <code>null</code>.
    */
   @Nonnull
-  ISMPRedirectManager createRedirectMgr (@Nonnull IIdentifierFactory aIdentifierFactory,
-                                         @Nonnull ISMPServiceGroupManager aServiceGroupMgr);
+  ISMPRedirectManager createRedirectMgr (@Nonnull IIdentifierFactory aIdentifierFactory);
 
   /**
    * @param aIdentifierFactory
    *        The identifier factory to be used. May not be <code>null</code>.
-   * @param aServiceGroupMgr
-   *        The service group manager to use. May not be <code>null</code>.
    * @return A new SMP service information manager. May not be
    *         <code>null</code>.
    */
   @Nonnull
-  ISMPServiceInformationManager createServiceInformationMgr (@Nonnull IIdentifierFactory aIdentifierFactory,
-                                                             @Nonnull ISMPServiceGroupManager aServiceGroupMgr);
+  ISMPServiceInformationManager createServiceInformationMgr (@Nonnull IIdentifierFactory aIdentifierFactory);
 
   /**
    * @return A new SMP participant migration manager. May not be
