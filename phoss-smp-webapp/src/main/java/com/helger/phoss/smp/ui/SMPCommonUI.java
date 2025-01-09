@@ -356,6 +356,7 @@ public final class SMPCommonUI
   @Nonnull
   public static String getOwnerName (@Nonnull @Nonempty final String sOwnerID)
   {
+    // Will be a DB query
     final IUser aOwner = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwnerID);
     return aOwner == null ? sOwnerID : aOwner.getLoginName () + " (" + aOwner.getDisplayName () + ")";
   }
