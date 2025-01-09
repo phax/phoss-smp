@@ -26,6 +26,9 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class CMenuSecure
 {
+  // General start page
+  public static final String MENU_HOME = "home";
+
   // Menu item IDs
   public static final String MENU_SERVICE_GROUPS = "service_groups";
   public static final String MENU_SERVICE_GROUPS_EXPORT = "service_groups_export";

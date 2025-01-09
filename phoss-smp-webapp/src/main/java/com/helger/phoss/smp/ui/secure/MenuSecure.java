@@ -52,6 +52,8 @@ public final class MenuSecure
     final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> SMPMetaManager.getSettings ().isSMLEnabled () ||
                                                                       SMPMetaManager.getSettings ().isSMLRequired ();
 
+    aMenuTree.createRootItem (new PageSecureHome (CMenuSecure.MENU_HOME, aMenuTree));
+
     {
       final IMenuItemPage aServiceGroups = aMenuTree.createRootItem (new PageSecureServiceGroup (CMenuSecure.MENU_SERVICE_GROUPS));
       aMenuTree.createItem (aServiceGroups, new PageSecureServiceGroupExport (CMenuSecure.MENU_SERVICE_GROUPS_EXPORT));
@@ -119,6 +121,6 @@ public final class MenuSecure
     }
 
     // Default menu item
-    aMenuTree.setDefaultMenuItemID (CMenuSecure.MENU_SERVICE_GROUPS);
+    aMenuTree.setDefaultMenuItemID (CMenuSecure.MENU_HOME);
   }
 }
