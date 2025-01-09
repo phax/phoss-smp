@@ -165,12 +165,12 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   }
 
   @Nonnull
-  public EChange deleteProcess (@Nullable final ISMPProcess aProcess)
+  public EChange deleteProcess (@Nullable final IProcessIdentifier aProcessID)
   {
-    if (aProcess == null)
+    if (aProcessID == null)
       return EChange.UNCHANGED;
 
-    final String sProcessID = _getKey (aProcess.getProcessIdentifier ());
+    final String sProcessID = _getKey (aProcessID);
     return m_aProcesses.removeObject (sProcessID);
   }
 

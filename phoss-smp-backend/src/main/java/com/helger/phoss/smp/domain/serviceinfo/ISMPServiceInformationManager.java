@@ -22,12 +22,10 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
-import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.ChangeSMPV8;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**
  * Manager for {@link ISMPServiceInformation} objects. Service information
@@ -65,14 +63,14 @@ public interface ISMPServiceInformationManager
    * {@link #getSMPServiceInformationOfServiceGroupAndDocumentType(IParticipantIdentifier, IDocumentTypeIdentifier)}
    * .
    *
-   * @param aServiceGroup
-   *        The service group to be searched. May be <code>null</code>.
+   * @param aParticipantID
+   *        The service group ID to be searched. May be <code>null</code>.
    * @param aDocTypeID
    *        The document type ID to search. May be <code>null</code>.
    * @param aProcessID
    *        The process ID to search. May be <code>null</code>.
-   * @param aTransportProfile
-   *        The transport profile to search. May be <code>null</code>.
+   * @param sTransportProfileID
+   *        The transport profile ID to search. May be <code>null</code>.
    * @return <code>null</code> if any of the parameters is <code>null</code> or
    *         if no such service information exists.
    * @see #getSMPServiceInformationOfServiceGroupAndDocumentType(IParticipantIdentifier,
@@ -80,10 +78,10 @@ public interface ISMPServiceInformationManager
    */
   @ChangeSMPV8 ("Rename to findSMPServiceInformation")
   @Nullable
-  ISMPServiceInformation findServiceInformation (@Nullable ISMPServiceGroup aServiceGroup,
+  ISMPServiceInformation findServiceInformation (@Nullable IParticipantIdentifier aParticipantID,
                                                  @Nullable IDocumentTypeIdentifier aDocTypeID,
                                                  @Nullable IProcessIdentifier aProcessID,
-                                                 @Nullable ISMPTransportProfile aTransportProfile);
+                                                 @Nullable String sTransportProfileID);
 
   /**
    * Delete the provided service information object.

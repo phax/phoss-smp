@@ -111,14 +111,14 @@ public interface ISMPServiceInformation extends ISMPHasExtension, IHasID <String
   /**
    * Delete the provided process from this object.
    *
-   * @param aProcess
-   *        The process to be deleted. May be <code>null</code>.
+   * @param aProcessID
+   *        The process ID to be deleted. May be <code>null</code>.
    * @return {@link EChange#CHANGED} if deletion was successfully,
    *         {@link EChange#UNCHANGED} otherwise.
    * @since 5.0.0
    */
   @Nonnull
-  EChange deleteProcess (@Nullable ISMPProcess aProcess);
+  EChange deleteProcess (@Nullable IProcessIdentifier aProcessID);
 
   /**
    * @return This service information object as a Peppol SMP JAXB object for the

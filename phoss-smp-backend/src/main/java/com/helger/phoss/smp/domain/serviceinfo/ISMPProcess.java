@@ -18,7 +18,6 @@ import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.state.EChange;
-import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
@@ -51,17 +50,6 @@ public interface ISMPProcess extends ISMPHasExtension
    */
   @Nonnegative
   int getEndpointCount ();
-
-  /**
-   * Find the endpoint with the passed transport profile.
-   *
-   * @param aTransportProfile
-   *        The transport profile to search. May be <code>null</code>.
-   * @return <code>null</code> if the passed transport profile is
-   *         <code>null</code> or if no such endpoint exists.
-   */
-  @Nullable
-  ISMPEndpoint getEndpointOfTransportProfile (@Nullable ISMPTransportProfile aTransportProfile);
 
   /**
    * Find the endpoint with the passed transport profile ID.

@@ -21,11 +21,9 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.state.ESuccess;
-import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
@@ -87,10 +85,10 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     throw new UnsupportedOperationException ();
   }
 
-  public ISMPServiceInformation findServiceInformation (final ISMPServiceGroup aServiceGroup,
+  public ISMPServiceInformation findServiceInformation (final IParticipantIdentifier aParticpantID,
                                                         final IDocumentTypeIdentifier aDocTypeID,
                                                         final IProcessIdentifier aProcessID,
-                                                        final ISMPTransportProfile aTransportProfile)
+                                                        final String sTransportProfileID)
   {
     throw new UnsupportedOperationException ();
   }

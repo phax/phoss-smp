@@ -608,7 +608,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         aDocTypeID != null &&
         aProcessID != null &&
         aTransportProfile != null &&
-        aServiceInfoMgr.findServiceInformation (aServiceGroup, aDocTypeID, aProcessID, aTransportProfile) != null)
+        aServiceInfoMgr.findServiceInformation (aParticipantID, aDocTypeID, aProcessID, sTransportProfileID) != null)
     {
       final String sMsg = "Another endpoint for the provided service group, document type, process and transport profile is already present. Some of the identifiers may be treated case insensitive!";
       aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, sMsg);

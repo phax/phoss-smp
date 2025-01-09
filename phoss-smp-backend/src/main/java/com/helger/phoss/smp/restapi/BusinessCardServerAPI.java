@@ -94,7 +94,7 @@ public final class BusinessCardServerAPI
         throw new SMPBadRequestException ("This SMP server does not support the Business Card API",
                                           m_aAPIProvider.getCurrentURI ());
       }
-      final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfServiceGroup (aServiceGroup);
+      final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroupID);
       if (aBusinessCard == null)
       {
         // No such business card

@@ -482,7 +482,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aForm.addChild (getUIHandler ().createDataGroupHeader ("Business Card Details"));
 
       final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
-      final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfServiceGroup (aSelectedObject);
+      final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aSelectedObject.getParticipantIdentifier ());
       if (aBC != null)
       {
         int nIndex = 0;
@@ -719,7 +719,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       if (bShowBusinessCardName)
       {
         IHCNode aName = null;
-        final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfServiceGroup (aCurObject);
+        final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aCurObject.getParticipantIdentifier ());
         if (aBC != null)
         {
           final SMPBusinessCardEntity aEntity = aBC.getEntityAtIndex (0);

@@ -28,7 +28,6 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.bdxr.smp1.process.BDXR1ProcessIdentifier;
 import com.helger.peppolid.bdxr.smp2.process.BDXR2ProcessIdentifier;
@@ -76,12 +75,6 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   public int getEndpointCount ()
   {
     return m_aEndpoints.size ();
-  }
-
-  @Nullable
-  public SMPEndpoint getEndpointOfTransportProfile (@Nullable final ISMPTransportProfile eTransportProfile)
-  {
-    return getEndpointOfTransportProfile (eTransportProfile == null ? null : eTransportProfile.getID ());
   }
 
   @Nullable
