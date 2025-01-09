@@ -420,7 +420,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service Group")
                                                  .setCtrl (new HCA (createViewURL (aWPEC,
                                                                                    CMenuSecure.MENU_SERVICE_GROUPS,
-                                                                                   aSelectedObject.getServiceGroup ())).addChild (aSelectedObject.getServiceGroupID ())));
+                                                                                   aSelectedObject.getServiceGroupID ())).addChild (aSelectedObject.getServiceGroupID ())));
 
     // Document type identifier
     {

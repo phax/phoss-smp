@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import java.util.Comparator;
+
 import javax.annotation.Nonnull;
 
 import com.helger.commons.annotation.Nonempty;
@@ -35,8 +37,8 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
@@ -71,6 +73,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
@@ -79,23 +82,23 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
     aNodeList.addChild (aToolbar);
 
     // Create list of service groups
-    final ICommonsMap <ISMPServiceGroup, ICommonsList <ISMPServiceInformation>> aMap = new CommonsHashMap <> ();
-    aServiceInfoMgr.forEachSMPServiceInformation (x -> aMap.computeIfAbsent (x.getServiceGroup (),
+    final ICommonsMap <String, ICommonsList <ISMPServiceInformation>> aMap = new CommonsHashMap <> ();
+    aServiceInfoMgr.forEachSMPServiceInformation (x -> aMap.computeIfAbsent (x.getServiceGroupID (),
                                                                              k -> new CommonsArrayList <> ()).add (x));
 
     final HCUL aULSG = new HCUL ();
-    final ICommonsList <ISMPServiceGroup> aServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ()
-                                                                           .getSortedInline (ISMPServiceGroup.comparator ());
-    for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
+    final ICommonsList <String> aServiceGroupIDs = aServiceGroupMgr.getAllSMPServiceGroupIDs ()
+                                                                   .getSorted (Comparator.naturalOrder ());
+    for (final String sServiceGroupID : aServiceGroupIDs)
     {
       // Print service group
-      final IParticipantIdentifier aParticipantID = aServiceGroup.getParticipantIdentifier ();
+      final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       final HCLI aLISG = aULSG.addAndReturnItem (new HCA (createViewURL (aWPEC,
                                                                          CMenuSecure.MENU_SERVICE_GROUPS,
-                                                                         aServiceGroup)).addChild (aParticipantID.getURIEncoded ()));
+                                                                         sServiceGroupID)).addChild (sServiceGroupID));
       final HCUL aULDT = new HCUL ();
 
-      final ICommonsList <ISMPServiceInformation> aServiceInfos = aMap.get (aServiceGroup);
+      final ICommonsList <ISMPServiceInformation> aServiceInfos = aMap.get (sServiceGroupID);
       if (aServiceInfos != null)
       {
         for (final ISMPServiceInformation aServiceInfo : aServiceInfos.getSortedInline (ISMPServiceInformation.comparator ()))
