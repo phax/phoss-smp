@@ -76,7 +76,6 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
-  @SuppressWarnings ({ "deprecation", "resource" })
   public static void main (final String [] args)
   {
     final String sServerBasePath = "http://localhost:90";
@@ -89,15 +88,16 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
 
       final ExecutorService es = Executors.newFixedThreadPool (4);
 
+      // 12 endpoints per Service Group
       for (final EPredefinedDocumentTypeIdentifier aEDT : new EPredefinedDocumentTypeIdentifier [] { EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CREDITNOTE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V12,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V12,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V12,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V20,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V20,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V202,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V30,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V30,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_UBL_V20,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_CREDIT_NOTE_UBL_V20,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_CII_V202 })
@@ -160,16 +160,15 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
                              .delete ();
 
               // Create a new
-              try (
-                  final Response aResponseMsg = ClientBuilder.newClient ()
-                                                             .target (sServerBasePath)
-                                                             .path (sPI)
-                                                             .path ("services")
-                                                             .path (sDT)
-                                                             .request ()
-                                                             .header (CHttpHeader.AUTHORIZATION,
-                                                                      CREDENTIALS.getRequestValue ())
-                                                             .put (Entity.xml (aObjFactory.createServiceMetadata (aSM))))
+              try (final Response aResponseMsg = ClientBuilder.newClient ()
+                                                              .target (sServerBasePath)
+                                                              .path (sPI)
+                                                              .path ("services")
+                                                              .path (sDT)
+                                                              .request ()
+                                                              .header (CHttpHeader.AUTHORIZATION,
+                                                                       CREDENTIALS.getRequestValue ())
+                                                              .put (Entity.xml (aObjFactory.createServiceMetadata (aSM))))
               {
                 _testResponseJerseyClient (aResponseMsg, 200);
               }
