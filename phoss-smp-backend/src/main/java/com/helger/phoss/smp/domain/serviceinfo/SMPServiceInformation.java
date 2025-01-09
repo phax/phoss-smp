@@ -313,7 +313,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   {
     return ToStringGenerator.getDerived (super.toString ())
                             .append ("ID", m_sID)
-                            .append ("ServiceGroup", m_aParticipantID)
+                            .append ("ParticipantID", m_aParticipantID)
                             .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
                             .append ("Processes", m_aProcesses)
                             .getToString ();

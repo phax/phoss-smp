@@ -81,7 +81,7 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
                                                                                                                                     ELEMENT_CERTIFICATE));
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPRedirect (aServiceGroup,
+    return new SMPRedirect (aServiceGroup.getParticipantIdentifier (),
                             aDocTypeIdentifier,
                             sTargetHref,
                             sSubjectUniqueIdentifier,

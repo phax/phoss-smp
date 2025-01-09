@@ -84,7 +84,7 @@ public final class ServiceGroupExport
                                                                                                        CSMPExchange.ELEMENT_SERVICEGROUP));
 
       // Add all service information
-      final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
+      final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup.getParticipantIdentifier ());
       for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos.getSortedInline (ISMPServiceInformation.comparator ()))
       {
         eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
@@ -92,7 +92,7 @@ public final class ServiceGroupExport
       }
 
       // Add all redirects
-      final ICommonsList <ISMPRedirect> aAllRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aServiceGroup);
+      final ICommonsList <ISMPRedirect> aAllRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aServiceGroup.getParticipantIdentifier ());
       for (final ISMPRedirect aServiceInfo : aAllRedirects.getSortedInline (ISMPRedirect.comparator ()))
       {
         eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,

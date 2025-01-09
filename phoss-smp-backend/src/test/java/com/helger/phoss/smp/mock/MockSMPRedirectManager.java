@@ -19,10 +19,10 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**
  * Mock implementation of {@link ISMPRedirectManager}.
@@ -40,7 +40,7 @@ final class MockSMPRedirectManager implements ISMPRedirectManager
     return m_aCallbacks;
   }
 
-  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (final ISMPServiceGroup aServiceGroup,
+  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (final IParticipantIdentifier aParticipantID,
                                                                    final IDocumentTypeIdentifier aDocTypeID)
   {
     throw new UnsupportedOperationException ();
@@ -51,7 +51,7 @@ final class MockSMPRedirectManager implements ISMPRedirectManager
     return 0;
   }
 
-  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();
   }
@@ -66,12 +66,12 @@ final class MockSMPRedirectManager implements ISMPRedirectManager
     throw new UnsupportedOperationException ();
   }
 
-  public EChange deleteAllSMPRedirectsOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public EChange deleteAllSMPRedirectsOfServiceGroup (final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ISMPRedirect createOrUpdateSMPRedirect (final ISMPServiceGroup aServiceGroup,
+  public ISMPRedirect createOrUpdateSMPRedirect (final IParticipantIdentifier aParticipantID,
                                                  final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                                  final String sTargetHref,
                                                  final String sSubjectUniqueIdentifier,

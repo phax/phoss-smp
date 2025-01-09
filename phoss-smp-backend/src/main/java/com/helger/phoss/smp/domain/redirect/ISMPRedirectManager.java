@@ -23,7 +23,7 @@ import com.helger.commons.callback.CallbackList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.peppolid.IDocumentTypeIdentifier;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.peppolid.IParticipantIdentifier;
 
 /**
  * Manager for {@link ISMPRedirect} objects. Redirect objects require a service
@@ -43,8 +43,9 @@ public interface ISMPRedirectManager
   /**
    * Create or update a redirect for a service group.
    *
-   * @param aServiceGroup
-   *        Service group the redirect belongs to. May not be <code>null</code>.
+   * @param aParticipantID
+   *        Service group participant ID the redirect belongs to. May not be
+   *        <code>null</code>.
    * @param aDocumentTypeIdentifier
    *        Document type identifier effected. May not be <code>null</code>.
    * @param sTargetHref
@@ -63,7 +64,7 @@ public interface ISMPRedirectManager
    *         persistence failed.
    */
   @Nullable
-  ISMPRedirect createOrUpdateSMPRedirect (@Nonnull ISMPServiceGroup aServiceGroup,
+  ISMPRedirect createOrUpdateSMPRedirect (@Nonnull IParticipantIdentifier aParticipantID,
                                           @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                           @Nonnull @Nonempty String sTargetHref,
                                           @Nonnull @Nonempty String sSubjectUniqueIdentifier,
@@ -83,12 +84,12 @@ public interface ISMPRedirectManager
   /**
    * Delete all redirects owned by the passed service groups.-
    *
-   * @param aServiceGroup
-   *        The service group which is about to be deleted.
+   * @param aParticipantID
+   *        The service group ID which is about to be deleted.
    * @return {@link EChange#CHANGED} is something was deleted
    */
   @Nonnull
-  EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
    * @return All contained SMP redirects. Never <code>null</code> but maybe
@@ -101,14 +102,14 @@ public interface ISMPRedirectManager
   /**
    * Get all redirects of the passed service group.
    *
-   * @param aServiceGroup
-   *        The service group to use. May be <code>null</code>.
+   * @param aParticipantID
+   *        The service group ID to use. May be <code>null</code>.
    * @return All contained SMP redirects for the passed service group. Never
    *         <code>null</code> but maybe empty.
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
    * @return The count of all contained redirects. Always &ge; 0.
@@ -120,8 +121,8 @@ public interface ISMPRedirectManager
    * Find the redirect that matches the passed tuple of service group and
    * document type.
    *
-   * @param aServiceGroup
-   *        The service group to query. May be <code>null</code>.
+   * @param aParticipantID
+   *        The service group ID to query. May be <code>null</code>.
    * @param aDocTypeID
    *        The document type to query. May be <code>null</code>.
    * @return <code>null</code> if the passed service group is <code>null</code>
@@ -130,6 +131,6 @@ public interface ISMPRedirectManager
    *         passed service group.
    */
   @Nullable
-  ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable ISMPServiceGroup aServiceGroup,
+  ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable IParticipantIdentifier aParticipantID,
                                                             @Nullable IDocumentTypeIdentifier aDocTypeID);
 }

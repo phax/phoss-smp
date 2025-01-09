@@ -77,14 +77,14 @@ public final class SMPRedirectManagerXMLTest
                                                                                                   "xml::xml##doctype4711::1");
       assertNotNull (aDocTypeID);
 
-      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
+      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aPI,
                                                                              aDocTypeID,
                                                                              "bla",
                                                                              "foo",
                                                                              null,
                                                                              "<ext/>");
       assertNotNull (aRedirect);
-      assertSame (aSG, aRedirect.getServiceGroup ());
+      assertSame (aPI, aRedirect.getServiceGroupParticipantIdentifier ());
       assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
       assertEquals ("bla", aRedirect.getTargetHref ());
       assertEquals ("foo", aRedirect.getSubjectUniqueIdentifier ());
@@ -126,14 +126,14 @@ public final class SMPRedirectManagerXMLTest
                                                                                                   "xml::xml##DocType4711::1");
       assertNotNull (aDocTypeID);
 
-      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
+      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aPI,
                                                                              aDocTypeID,
                                                                              "bla",
                                                                              "foo",
                                                                              null,
                                                                              "<ext/>");
       assertNotNull (aRedirect);
-      assertSame (aSG, aRedirect.getServiceGroup ());
+      assertSame (aPI, aRedirect.getServiceGroupParticipantIdentifier ());
       assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
       assertEquals ("bla", aRedirect.getTargetHref ());
       assertEquals ("foo", aRedirect.getSubjectUniqueIdentifier ());

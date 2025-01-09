@@ -365,10 +365,10 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   }
 
   @Nonnull
-  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
     EChange eChange = EChange.UNCHANGED;
-    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
+    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationOfServiceGroup (aParticipantIdentifier))
       eChange = eChange.or (deleteSMPServiceInformation (aSMPServiceInformation));
     return eChange;
   }
@@ -446,23 +446,25 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
-    if (aServiceGroup != null)
-      getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()))
+    if (aParticipantIdentifier != null)
+    {
+      getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, aParticipantIdentifier.getURIEncoded ()))
                       .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, true)));
+    }
     return ret;
   }
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
     final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
-    if (aServiceGroup != null)
+    if (aParticipantIdentifier != null)
     {
-      getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, aServiceGroup.getID ()))
+      getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, aParticipantIdentifier.getURIEncoded ()))
                       .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, false)
                                                                                                    .getDocumentTypeIdentifier ()));
     }

@@ -525,6 +525,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID () : aWPEC.params ()
                                                                                        .getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
+    IParticipantIdentifier aParticipantID = null;
     ISMPServiceGroup aServiceGroup = null;
 
     final String sDocTypeIDScheme = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getScheme () : aWPEC.params ()
@@ -560,7 +561,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A service group must be selected!");
     else
     {
-      aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
+      aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
       if (aServiceGroup == null)
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided service group does not exist!");
     }
@@ -577,7 +579,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         else
         {
           if (aServiceGroup != null)
-            if (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID) != null)
+            if (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aParticipantID, aDocTypeID) != null)
               aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE,
                                          "At least one redirect is registered for this document type. Delete the redirect before you can create an endpoint.");
         }

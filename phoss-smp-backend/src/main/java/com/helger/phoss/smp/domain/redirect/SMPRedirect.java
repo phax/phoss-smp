@@ -23,11 +23,12 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.bdxr.smp2.doctype.BDXR2DocumentTypeIdentifier;
 import com.helger.peppolid.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
+import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.xsds.bdxr.smp2.bc.ContentBinaryObjectType;
 
@@ -42,26 +43,28 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   public static final ObjectType OT = new ObjectType ("smpredirect");
 
   private final String m_sID;
-  private final ISMPServiceGroup m_aServiceGroup;
+  private final IParticipantIdentifier m_aParticipantID;
+  private final String m_sServiceGroupID;
   private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
   private String m_sTargetHref;
   private String m_sSubjectUniqueIdentifier;
   private X509Certificate m_aCertificate;
 
-  public SMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public SMPRedirect (@Nonnull final IParticipantIdentifier aParticipantID,
                       @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                       @Nonnull @Nonempty final String sTargetHref,
                       @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
                       @Nullable final X509Certificate aCertificate,
                       @Nullable final String sExtension)
   {
-    m_aServiceGroup = ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    m_aParticipantID = ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+    m_sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     setDocumentTypeIdentifier (aDocumentTypeIdentifier);
     setTargetHref (sTargetHref);
     setSubjectUniqueIdentifier (sSubjectUniqueIdentifier);
     setCertificate (aCertificate);
     getExtensions ().setExtensionAsString (sExtension);
-    m_sID = aServiceGroup.getID () + "-" + aDocumentTypeIdentifier.getURIEncoded ();
+    m_sID = m_sServiceGroupID + "-" + aDocumentTypeIdentifier.getURIEncoded ();
   }
 
   @Nonnull
@@ -72,16 +75,16 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   }
 
   @Nonnull
-  public ISMPServiceGroup getServiceGroup ()
+  public IParticipantIdentifier getServiceGroupParticipantIdentifier ()
   {
-    return m_aServiceGroup;
+    return m_aParticipantID;
   }
 
   @Nonnull
   @Nonempty
   public String getServiceGroupID ()
   {
-    return m_aServiceGroup.getID ();
+    return m_sServiceGroupID;
   }
 
   @Nonnull
@@ -170,7 +173,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     // It's okay to use the constructor directly
     ret.setID (new BDXR2DocumentTypeIdentifier (m_aDocumentTypeIdentifier));
     // Explicit constructor call is needed here!
-    ret.setParticipantID (new BDXR2ParticipantIdentifier (m_aServiceGroup.getParticipantIdentifier ()));
+    ret.setParticipantID (new BDXR2ParticipantIdentifier (m_aParticipantID));
 
     final com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType aProc = new com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType ();
     {
@@ -216,7 +219,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   {
     return ToStringGenerator.getDerived (super.toString ())
                             .append ("ID", m_sID)
-                            .append ("ServiceGroup", m_aServiceGroup)
+                            .append ("ParticipantID", m_aParticipantID)
                             .append ("DocumentTypeIdentifier", m_aDocumentTypeIdentifier)
                             .append ("TargetHref", m_sTargetHref)
                             .append ("SubjectUniqueIdentifier", m_sSubjectUniqueIdentifier)

@@ -24,6 +24,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -53,11 +54,12 @@ import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.utils.PeppolKeyStoreHelper;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
@@ -467,6 +469,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
     final OffsetDateTime aNowPlusDT = aNowDT.plusMonths (3);
     final XMLOffsetDateTime aNowXMLDT = XMLOffsetDateTime.of (aNowDT);
@@ -502,8 +505,9 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
     // check service groups and redirects
     {
-      final ICommonsList <ISMPServiceGroup> aServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
-      if (aServiceGroups.isEmpty ())
+      final ICommonsList <String> aServiceGroupIDs = aServiceGroupMgr.getAllSMPServiceGroupIDs ()
+                                                                     .getSorted (Comparator.naturalOrder ());
+      if (aServiceGroupIDs.isEmpty ())
       {
         aOL.addItem (_createWarning ("No service group is configured. This SMP is currently empty."));
       }
@@ -512,11 +516,12 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
         final CertCache aCertCache = new CertCache ();
 
         // For all service groups
-        for (final ISMPServiceGroup aServiceGroup : CollectionHelper.getSorted (aServiceGroups,
-                                                                                ISMPServiceGroup.comparator ()))
+        for (final String sServiceGroupID : aServiceGroupIDs)
         {
+          final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+
           final HCUL aULPerSG = new HCUL ();
-          final ICommonsList <ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup);
+          final ICommonsList <ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aParticipantID);
           if (aServiceInfos.isEmpty ())
           {
             // This is merely a warning or an error
@@ -601,8 +606,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
           // Show per service group errors
           if (aULPerSG.hasChildren ())
-            aOL.addItem (div ("Service group ").addChild (code (aServiceGroup.getParticipantIdentifier ()
-                                                                             .getURIEncoded ())), aULPerSG);
+            aOL.addItem (div ("Service group ").addChild (code (sServiceGroupID)), aULPerSG);
         }
 
         // Check all AP certificates at the end

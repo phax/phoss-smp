@@ -127,7 +127,7 @@ public final class BDXR1ServerAPI
 
       // Then add the service metadata references
       final ServiceMetadataReferenceCollectionType aRefCollection = new ServiceMetadataReferenceCollectionType ();
-      for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
+      for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
       {
         // Ignore all service information without endpoints
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
@@ -148,7 +148,7 @@ public final class BDXR1ServerAPI
       final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
       aCompleteServiceGroup.setServiceGroup (aSG);
 
-      for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
+      for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aPathServiceGroupID))
       {
         final ServiceMetadataType aSM = aServiceInfo.getAsJAXBObjectBDXR1 ();
         if (aSM != null)
@@ -250,7 +250,7 @@ public final class BDXR1ServerAPI
       // Then add the service metadata references
       final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR1 ();
       final ServiceMetadataReferenceCollectionType aCollectionType = new ServiceMetadataReferenceCollectionType ();
-      for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
+      for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
       {
         // Ignore all service information without endpoints
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
@@ -427,7 +427,7 @@ public final class BDXR1ServerAPI
 
       // First check for redirection, then for actual service
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-      final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroup,
+      final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                aPathDocTypeID);
 
       final SignedServiceMetadataType aSignedServiceMetadata = new SignedServiceMetadataType ();
@@ -580,7 +580,7 @@ public final class BDXR1ServerAPI
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         // not available in OASIS BDXR SMP v1 mode
         final X509Certificate aCertificate = null;
-        if (aRedirectMgr.createOrUpdateSMPRedirect (aPathServiceGroup,
+        if (aRedirectMgr.createOrUpdateSMPRedirect (aPathServiceGroupID,
                                                     aPathDocTypeID,
                                                     aServiceMetadata.getRedirect ().getHref (),
                                                     aServiceMetadata.getRedirect ().getCertificateUID (),
@@ -689,8 +689,8 @@ public final class BDXR1ServerAPI
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
         throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
                                         m_aAPIDataProvider.getCurrentURI ());
@@ -720,7 +720,7 @@ public final class BDXR1ServerAPI
       {
         // No Service Info, so should be a redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-        final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
+        final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                  aPathDocTypeID);
         if (aRedirect != null)
         {
@@ -778,18 +778,18 @@ public final class BDXR1ServerAPI
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
         throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
 
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-      EChange eChange = aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup);
+      EChange eChange = aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aPathServiceGroupID);
 
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-      eChange = eChange.or (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aServiceGroup));
+      eChange = eChange.or (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aPathServiceGroupID));
 
       LOGGER.info (sLog + " SUCCESS - " + eChange);
 

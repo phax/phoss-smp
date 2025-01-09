@@ -121,12 +121,12 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *         and was successfully deleted, {@link EChange#UNCHANGED} otherwise.
    * @throws SMPServerException
    *         In case of error
-   * @see ISMPServiceInformationManager#deleteAllSMPServiceInformationOfServiceGroup(ISMPServiceGroup)
-   * @see ISMPRedirectManager#deleteAllSMPRedirectsOfServiceGroup(ISMPServiceGroup)
+   * @see ISMPServiceInformationManager#deleteAllSMPServiceInformationOfServiceGroup(IParticipantIdentifier)
+   * @see ISMPRedirectManager#deleteAllSMPRedirectsOfServiceGroup(IParticipantIdentifier)
    */
   @Nonnull
-  EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier,
-                                 boolean bDeleteInSML) throws SMPServerException;
+  EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier, boolean bDeleteInSML)
+                                                                                                               throws SMPServerException;
 
   /**
    * Delete the service group, and swallow all exceptions. This is only

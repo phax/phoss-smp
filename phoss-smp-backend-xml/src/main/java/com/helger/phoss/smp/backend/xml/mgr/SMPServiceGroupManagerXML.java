@@ -269,12 +269,12 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       }
 
       // Remember all redirects (in case of an error) and delete them
-      aOldRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
-      aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aSMPServiceGroup);
+      aOldRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aParticipantID);
+      aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aParticipantID);
 
       // Remember all service information (in case of an error) and delete them
-      aOldServiceInformation = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
-      aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aSMPServiceGroup);
+      aOldServiceInformation = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aParticipantID);
+      aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aParticipantID);
     }
     catch (final RuntimeException ex)
     {
@@ -289,7 +289,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
         for (final ISMPRedirect aOldRedirect : aOldRedirects)
         {
           // ignore return value - we cannot do anything anyway
-          aRedirectMgr.createOrUpdateSMPRedirect (aSMPServiceGroup,
+          aRedirectMgr.createOrUpdateSMPRedirect (aParticipantID,
                                                   aOldRedirect.getDocumentTypeIdentifier (),
                                                   aOldRedirect.getTargetHref (),
                                                   aOldRedirect.getSubjectUniqueIdentifier (),

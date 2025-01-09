@@ -64,7 +64,7 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     return 0;
   }
 
-  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();
   }
@@ -82,7 +82,7 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     return new CommonsArrayList <> ();
   }
 
-  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();
   }
@@ -100,7 +100,7 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     throw new UnsupportedOperationException ();
   }
 
-  public EChange deleteAllSMPServiceInformationOfServiceGroup (final ISMPServiceGroup aServiceGroup)
+  public EChange deleteAllSMPServiceInformationOfServiceGroup (final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();
   }

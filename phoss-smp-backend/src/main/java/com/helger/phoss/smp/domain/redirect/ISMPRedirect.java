@@ -19,8 +19,8 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.compare.IComparator;
 import com.helger.commons.id.IHasID;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 
 /**
  * This interface represents a single SMP redirect for a certain document type
@@ -39,10 +39,11 @@ public interface ISMPRedirect extends IHasID <String>, ISMPHasExtension
   String getID ();
 
   /**
-   * @return The service group which this redirect should handle.
+   * @return The participant ID of the service group to which this service
+   *         information belongs. Never <code>null</code>.
    */
   @Nonnull
-  ISMPServiceGroup getServiceGroup ();
+  IParticipantIdentifier getServiceGroupParticipantIdentifier ();
 
   /**
    * @return The ID of the service group to which this redirect belongs. Never

@@ -38,11 +38,11 @@ import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
@@ -74,9 +74,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   @IsLocked (ELockType.WRITE)
   private ISMPRedirect _createSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
   {
-    m_aRWLock.writeLocked ( () -> {
-      internalCreateItem (aSMPRedirect);
-    });
+    m_aRWLock.writeLocked ( () -> { internalCreateItem (aSMPRedirect); });
     AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
@@ -92,9 +90,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   @IsLocked (ELockType.WRITE)
   private ISMPRedirect _updateSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
   {
-    m_aRWLock.writeLocked ( () -> {
-      internalUpdateItem (aSMPRedirect);
-    });
+    m_aRWLock.writeLocked ( () -> { internalUpdateItem (aSMPRedirect); });
     AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
                                       "set-all",
                                       aSMPRedirect.getID (),
@@ -108,19 +104,19 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   }
 
   @Nonnull
-  public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final IParticipantIdentifier aParticipantID,
                                                  @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                                  @Nonnull @Nonempty final String sTargetHref,
                                                  @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
                                                  @Nullable final X509Certificate aCertificate,
                                                  @Nullable final String sExtension)
   {
-    ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createOrUpdateSMPRedirect (" +
-                    aServiceGroup +
+                    aParticipantID +
                     ", " +
                     aDocumentTypeIdentifier +
                     ", " +
@@ -133,13 +129,13 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
+    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aParticipantID,
                                                                                    aDocumentTypeIdentifier);
     SMPRedirect aNewRedirect;
     if (aOldRedirect == null)
     {
       // Create new ID
-      aNewRedirect = new SMPRedirect (aServiceGroup,
+      aNewRedirect = new SMPRedirect (aParticipantID,
                                       aDocumentTypeIdentifier,
                                       sTargetHref,
                                       sSubjectUniqueIdentifier,
@@ -154,7 +150,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     else
     {
       // Reuse old ID
-      aNewRedirect = new SMPRedirect (aServiceGroup,
+      aNewRedirect = new SMPRedirect (aParticipantID,
                                       aDocumentTypeIdentifier,
                                       sTargetHref,
                                       sSubjectUniqueIdentifier,
@@ -211,13 +207,13 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   }
 
   @Nonnull
-  public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    if (aServiceGroup == null)
+    if (aParticipantID == null)
       return EChange.UNCHANGED;
 
     EChange eChange = EChange.UNCHANGED;
-    for (final ISMPRedirect aRedirect : getAllSMPRedirectsOfServiceGroup (aServiceGroup.getID ()))
+    for (final ISMPRedirect aRedirect : getAllSMPRedirectsOfServiceGroup (aParticipantID.getURIEncoded ()))
       eChange = eChange.or (deleteSMPRedirect (aRedirect));
     return eChange;
   }
@@ -231,9 +227,9 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    return getAllSMPRedirectsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
+    return getAllSMPRedirectsOfServiceGroup (aParticipantID == null ? null : aParticipantID.getURIEncoded ());
   }
 
   @Nonnull
@@ -253,15 +249,15 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   }
 
   @Nullable
-  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
+  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final IParticipantIdentifier aParticipantID,
                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
-    if (aServiceGroup == null)
+    if (aParticipantID == null)
       return null;
     if (aDocTypeID == null)
       return null;
 
-    return findFirst (x -> x.getServiceGroupID ().equals (aServiceGroup.getID ()) &&
+    return findFirst (x -> x.getServiceGroupID ().equals (aParticipantID.getURIEncoded ()) &&
                            aDocTypeID.hasSameContent (x.getDocumentTypeIdentifier ()));
   }
 }

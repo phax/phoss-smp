@@ -95,10 +95,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                 @Nonnull final BootstrapForm aForm,
                                 @Nullable final ISMPRedirect aSelectedObject)
       {
-        aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID,
-                                           aSelectedObject.getServiceGroup ()
-                                                          .getParticipantIdentifier ()
-                                                          .getURIEncoded ()));
+        aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID, aSelectedObject.getServiceGroupID ()));
         aForm.addChild (new HCHiddenField (FIELD_DOCTYPE_ID,
                                            aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()));
 
@@ -155,7 +152,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       if (aDocTypeID != null)
       {
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-        return aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID);
+        return aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroupID, aDocTypeID);
       }
     }
     return null;
@@ -234,7 +231,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service Group")
                                                  .setCtrl (new HCA (createViewURL (aWPEC,
                                                                                    CMenuSecure.MENU_SERVICE_GROUPS,
-                                                                                   aSelectedObject.getServiceGroup ())).addChild (aSelectedObject.getServiceGroupID ())));
+                                                                                   aSelectedObject.getServiceGroupID ())).addChild (aSelectedObject.getServiceGroupID ())));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Document type ID")
                                                  .setCtrl (NiceNameUI.getDocumentTypeID (aSelectedObject.getDocumentTypeIdentifier (),
                                                                                          true)));
@@ -264,6 +261,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID () : aWPEC.params ()
                                                                                        .getAsString (FIELD_SERVICE_GROUP_ID);
+    IParticipantIdentifier aParticipantID = null;
     ISMPServiceGroup aServiceGroup = null;
     final String sDocTypeID = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded () : aWPEC.params ()
                                                                                                            .getAsString (FIELD_DOCTYPE_ID);
@@ -279,7 +277,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A Service Group must be selected!");
     else
     {
-      aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID));
+      aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      aServiceGroup = aServiceGroupManager.getSMPServiceGroupOfID (aParticipantID);
       if (aServiceGroup == null)
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided Service Group does not exist!");
     }
@@ -295,12 +294,12 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       {
         if (aServiceGroup != null)
         {
-          if (aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup.getParticipantIdentifier (),
-                                                                                     aDocTypeID) != null)
+          if (aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID, aDocTypeID) !=
+              null)
             aFormErrors.addFieldError (FIELD_DOCTYPE_ID,
                                        "At least one Endpoint is registered for this Document Type. Delete the Endpoint before you can create a Redirect.");
           else
-            if (!bEdit && aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup, aDocTypeID) != null)
+            if (!bEdit && aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aParticipantID, aDocTypeID) != null)
               aFormErrors.addFieldError (FIELD_DOCTYPE_ID,
                                          "Another Redirect for the provided Service Group and Document Type is already present.");
         }
@@ -325,7 +324,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
     if (aFormErrors.isEmpty ())
     {
-      if (aRedirectMgr.createOrUpdateSMPRedirect (aServiceGroup,
+      if (aRedirectMgr.createOrUpdateSMPRedirect (aParticipantID,
                                                   aDocTypeID,
                                                   sRedirectTo,
                                                   sSubjectUniqueIdentifier,
@@ -434,8 +433,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       final ISimpleURL aEditURL = createEditURL (aWPEC, aCurObject).addAll (aParams);
       final ISimpleURL aCopyURL = createCopyURL (aWPEC, aCurObject).addAll (aParams);
       final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aCurObject).addAll (aParams);
-      final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aCurObject.getServiceGroup ()
-                                                                                      .getParticipantIdentifier ()
+      final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aCurObject.getServiceGroupParticipantIdentifier ()
                                                                                       .getURIPercentEncoded () +
                                                                             SMPRestFilter.PATH_SERVICES +
                                                                             aCurObject.getDocumentTypeIdentifier ()

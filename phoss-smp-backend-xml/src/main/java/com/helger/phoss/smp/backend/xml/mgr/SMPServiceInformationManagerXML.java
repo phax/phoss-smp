@@ -232,10 +232,10 @@ public final class SMPServiceInformationManagerXML extends
   }
 
   @Nonnull
-  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     EChange eChange = EChange.UNCHANGED;
-    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
+    for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationOfServiceGroup (aParticipantID))
       eChange = eChange.or (deleteSMPServiceInformation (aSMPServiceInformation));
     return eChange;
   }
@@ -316,12 +316,12 @@ public final class SMPServiceInformationManagerXML extends
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
-    if (aServiceGroup != null)
+    if (aParticipantID != null)
     {
-      final String sServiceGroupID = aServiceGroup.getID ();
+      final String sServiceGroupID = aParticipantID.getURIEncoded ();
       findAll (x -> x.getServiceGroupID ().equals (sServiceGroupID), ret::add);
     }
     return ret;
@@ -329,12 +329,12 @@ public final class SMPServiceInformationManagerXML extends
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
-    if (aServiceGroup != null)
+    if (aParticipantID != null)
     {
-      final String sServiceGroupID = aServiceGroup.getID ();
+      final String sServiceGroupID = aParticipantID.getURIEncoded ();
       findAllMapped (aSI -> aSI.getServiceGroupID ().equals (sServiceGroupID),
                      ISMPServiceInformation::getDocumentTypeIdentifier,
                      ret::add);

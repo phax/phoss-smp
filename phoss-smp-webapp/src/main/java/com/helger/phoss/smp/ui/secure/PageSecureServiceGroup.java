@@ -710,7 +710,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     for (final ISMPServiceGroup aCurObject : aAllServiceGroups)
     {
-      final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
+      final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject.getID ());
       final String sDisplayName = aCurObject.getParticipantIdentifier ().getURIEncoded ();
 
       final HCRow aRow = aTable.addBodyRow ();
@@ -746,7 +746,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       {
         int nProcesses = 0;
         int nEndpoints = 0;
-        final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurObject);
+        final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurObject.getParticipantIdentifier ());
         for (final ISMPServiceInformation aSI : aSIs)
         {
           nProcesses += aSI.getProcessCount ();
@@ -758,6 +758,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         aRow.addCell (Integer.toString (nEndpoints));
       }
 
+      // Add the action cell
       final HCNodeList aActions = new HCNodeList ();
       aActions.addChildren (createEditLink (aWPEC, aCurObject, "Edit " + sDisplayName),
                             new HCTextNode (" "),
@@ -772,6 +773,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                 .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
       if (eRESTType.isCompleteServiceGroupSupported ())
       {
+        // This is implementation specific, but not contained for BDXR2
         aActions.addChildren (new HCTextNode (" "),
                               new HCA (LinkHelper.getURLWithServerAndContext ("complete/" +
                                                                               aCurObject.getParticipantIdentifier ()

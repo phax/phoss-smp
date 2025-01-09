@@ -416,7 +416,7 @@ public final class ServiceGroupImport
             {
               try
               {
-                if (aRedirectMgr.createOrUpdateSMPRedirect (aNewServiceGroup,
+                if (aRedirectMgr.createOrUpdateSMPRedirect (aNewServiceGroup.getParticipantIdentifier (),
                                                             aImportRedirect.getDocumentTypeIdentifier (),
                                                             aImportRedirect.getTargetHref (),
                                                             aImportRedirect.getSubjectUniqueIdentifier (),

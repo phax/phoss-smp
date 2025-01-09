@@ -294,9 +294,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   }
 
   @Nonnull
-  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    if (aServiceGroup == null)
+    if (aParticipantID == null)
       return EChange.UNCHANGED;
 
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (0));
@@ -304,26 +304,25 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // get the old ones first
-      aAllDeleted.set (getAllSMPServiceInformationOfServiceGroup (aServiceGroup));
+      aAllDeleted.set (getAllSMPServiceInformationOfServiceGroup (aParticipantID));
 
-      final IParticipantIdentifier aPID = aServiceGroup.getParticipantIdentifier ();
       final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_endpoint" +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                                              new ConstantPreparedStatementDataProvider (aPID.getScheme (),
-                                                                                                         aPID.getValue ()));
+                                                              new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                         aParticipantID.getValue ()));
       final long nCountProc = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_process" +
                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                                                new ConstantPreparedStatementDataProvider (aPID.getScheme (),
-                                                                                                           aPID.getValue ()));
+                                                                new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                           aParticipantID.getValue ()));
       final long nCountSM = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata" +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                                              new ConstantPreparedStatementDataProvider (aPID.getScheme (),
-                                                                                                         aPID.getValue ()));
+                                                              new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                         aParticipantID.getValue ()));
       ret.set (Long.valueOf (nCountEP + nCountProc + nCountSM));
     });
     if (eSuccess.isFailure () || ret.get ().longValue () <= 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aServiceGroup.getID ());
+      AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aParticipantID.getURIEncoded ());
       return EChange.UNCHANGED;
     }
 
@@ -469,12 +468,11 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
-    if (aServiceGroup != null)
+    if (aParticipantID != null)
     {
-      final IParticipantIdentifier aPID = aServiceGroup.getParticipantIdentifier ();
       final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                                                                             "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
                                                                             "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
@@ -489,8 +487,8 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                             "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
                                                                             "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier" +
                                                                             " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
-                                                                            new ConstantPreparedStatementDataProvider (aPID.getScheme (),
-                                                                                                                       aPID.getValue ()));
+                                                                            new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                                       aParticipantID.getValue ()));
       if (aDBResult != null)
       {
         final ICommonsMap <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>> aGrouping = new CommonsHashMap <> ();
@@ -537,10 +535,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
           }
 
           final DocTypeAndExtension aDE = aEntry.getKey ();
-          ret.add (new SMPServiceInformation (aServiceGroup.getParticipantIdentifier (),
-                                              aDE.m_aDocTypeID,
-                                              aProcesses,
-                                              aDE.m_sExt));
+          ret.add (new SMPServiceInformation (aParticipantID, aDE.m_aDocTypeID, aProcesses, aDE.m_sExt));
         }
       }
     }
@@ -549,17 +544,16 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     final ICommonsList <IDocumentTypeIdentifier> ret = new CommonsArrayList <> ();
-    if (aServiceGroup != null)
+    if (aParticipantID != null)
     {
-      final IParticipantIdentifier aPID = aServiceGroup.getParticipantIdentifier ();
       final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier" +
                                                                             " FROM smp_service_metadata sm" +
                                                                             " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
-                                                                            new ConstantPreparedStatementDataProvider (aPID.getScheme (),
-                                                                                                                       aPID.getValue ()));
+                                                                            new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                                       aParticipantID.getValue ()));
       if (aDBResult != null)
         for (final DBResultRow aRow : aDBResult)
           ret.add (new SimpleDocumentTypeIdentifier (aRow.getAsString (0), aRow.getAsString (1)));

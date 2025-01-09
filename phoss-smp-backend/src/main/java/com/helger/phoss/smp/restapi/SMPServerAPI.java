@@ -105,8 +105,8 @@ public final class SMPServerAPI
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
         // No such service group
         throw new SMPNotFoundException ("Unknown Service Group ID '" + sPathServiceGroupID + "'",
@@ -114,7 +114,7 @@ public final class SMPServerAPI
       }
       // Then add the service metadata references
       final ServiceMetadataReferenceCollectionType aRefCollection = new ServiceMetadataReferenceCollectionType ();
-      for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
+      for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
       {
         // Ignore all service information without endpoints
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
@@ -127,13 +127,13 @@ public final class SMPServerAPI
           aRefCollection.addServiceMetadataReference (aMetadataReference);
         }
       }
-      final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectPeppol ();
+      final ServiceGroupType aSG = aPathServiceGroup.getAsJAXBObjectPeppol ();
       aSG.setServiceMetadataReferenceCollection (aRefCollection);
 
       // a CompleteSG may be empty
       final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
       aCompleteServiceGroup.setServiceGroup (aSG);
-      for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup))
+      for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aPathServiceGroupID))
       {
         final ServiceMetadataType aSM = aServiceInfo.getAsJAXBObjectPeppol ();
         if (aSM != null)
@@ -217,17 +217,17 @@ public final class SMPServerAPI
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
       // Retrieve the service group
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
         // No such service group
         throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
       // Then add the service metadata references
-      final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectPeppol ();
+      final ServiceGroupType aSG = aPathServiceGroup.getAsJAXBObjectPeppol ();
       final ServiceMetadataReferenceCollectionType aCollectionType = new ServiceMetadataReferenceCollectionType ();
-      for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aServiceGroup))
+      for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
       {
         // Ignore all service information without endpoints
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
@@ -395,7 +395,7 @@ public final class SMPServerAPI
       }
       // First check for redirection, then for actual service
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-      final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroup,
+      final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                aPathDocTypeID);
 
       final SignedServiceMetadataType aSignedServiceMetadata = new SignedServiceMetadataType ();
@@ -548,7 +548,7 @@ public final class SMPServerAPI
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         // not available in Peppol mode
         final X509Certificate aCertificate = null;
-        if (aRedirectMgr.createOrUpdateSMPRedirect (aPathServiceGroup,
+        if (aRedirectMgr.createOrUpdateSMPRedirect (aPathServiceGroupID,
                                                     aPathDocTypeID,
                                                     aServiceMetadata.getRedirect ().getHref (),
                                                     aServiceMetadata.getRedirect ().getCertificateUID (),
@@ -651,8 +651,8 @@ public final class SMPServerAPI
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
         throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
                                         m_aAPIDataProvider.getCurrentURI ());
@@ -681,7 +681,7 @@ public final class SMPServerAPI
       {
         // No Service Info, so should be a redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-        final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
+        final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                  aPathDocTypeID);
         if (aRedirect != null)
         {
@@ -737,17 +737,17 @@ public final class SMPServerAPI
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
         throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-      EChange eChange = aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup);
+      EChange eChange = aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aPathServiceGroupID);
 
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-      eChange = eChange.or (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aServiceGroup));
+      eChange = eChange.or (aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aPathServiceGroupID));
 
       LOGGER.info (sLog + " SUCCESS - " + eChange);
 

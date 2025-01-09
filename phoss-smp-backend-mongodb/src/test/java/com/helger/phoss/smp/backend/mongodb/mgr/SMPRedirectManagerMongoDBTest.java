@@ -79,14 +79,14 @@ public final class SMPRedirectManagerMongoDBTest
                                                                                                   "xml::xml##doctype4711::1");
       assertNotNull (aDocTypeID);
 
-      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
+      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aPI,
                                                                              aDocTypeID,
                                                                              "bla",
                                                                              "foo",
                                                                              null,
                                                                              "<ext/>");
       assertNotNull (aRedirect);
-      assertSame (aSG, aRedirect.getServiceGroup ());
+      assertSame (aPI, aRedirect.getServiceGroupParticipantIdentifier ());
       assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
       assertEquals ("bla", aRedirect.getTargetHref ());
       assertEquals ("foo", aRedirect.getSubjectUniqueIdentifier ());
@@ -126,14 +126,14 @@ public final class SMPRedirectManagerMongoDBTest
                                                                                                   "xml::xml##DocType4711::1");
       assertNotNull (aDocTypeID);
 
-      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aSG,
+      final ISMPRedirect aRedirect = aRedirectMgr.createOrUpdateSMPRedirect (aPI,
                                                                              aDocTypeID,
                                                                              "bla",
                                                                              "foo",
                                                                              null,
                                                                              "<ext/>");
       assertNotNull (aRedirect);
-      assertSame (aSG, aRedirect.getServiceGroup ());
+      assertSame (aPI, aRedirect.getServiceGroupParticipantIdentifier ());
       assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
       assertEquals ("bla", aRedirect.getTargetHref ());
       assertEquals ("foo", aRedirect.getSubjectUniqueIdentifier ());
@@ -151,9 +151,7 @@ public final class SMPRedirectManagerMongoDBTest
     final Document aDoc = SMPRedirectManagerMongoDB.toBson (aSrc);
     assertNotNull (aDoc);
 
-    final ISMPRedirect aSrc2 = SMPRedirectManagerMongoDB.toDomain (SMPMetaManager.getIdentifierFactory (),
-                                                                   SMPMetaManager.getServiceGroupMgr (),
-                                                                   aDoc);
+    final ISMPRedirect aSrc2 = SMPRedirectManagerMongoDB.toDomain (SMPMetaManager.getIdentifierFactory (), aDoc);
     assertNotNull (aSrc2);
     assertEquals (aSrc, aSrc2);
   }
@@ -177,8 +175,8 @@ public final class SMPRedirectManagerMongoDBTest
     assertNotNull (aSG);
     try
     {
-      _testConversion (new SMPRedirect (aSG, aDocTypeID, "target href", "what ever", null, null));
-      _testConversion (new SMPRedirect (aSG, aDocTypeID, "target href", "what ever", null, "<ext/>"));
+      _testConversion (new SMPRedirect (aPI, aDocTypeID, "target href", "what ever", null, null));
+      _testConversion (new SMPRedirect (aPI, aDocTypeID, "target href", "what ever", null, "<ext/>"));
     }
     finally
     {

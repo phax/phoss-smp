@@ -241,11 +241,11 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
 
     // Delete all redirects (must be done before the SG is deleted)
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-    aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aServiceGroup);
+    aRedirectMgr.deleteAllSMPRedirectsOfServiceGroup (aParticipantID);
 
     // Delete all service information (must be done before the SG is deleted)
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-    aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aServiceGroup);
+    aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aParticipantID);
 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sServiceGroupID));

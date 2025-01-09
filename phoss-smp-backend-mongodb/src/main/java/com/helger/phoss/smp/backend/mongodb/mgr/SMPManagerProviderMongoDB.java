@@ -83,7 +83,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
   public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
                                                 @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPRedirectManagerMongoDB (aIdentifierFactory, aServiceGroupMgr);
+    return new SMPRedirectManagerMongoDB (aIdentifierFactory);
   }
 
   @Nonnull

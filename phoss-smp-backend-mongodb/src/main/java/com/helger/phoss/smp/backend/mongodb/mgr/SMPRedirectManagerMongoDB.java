@@ -38,13 +38,12 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.state.EChange;
 import com.helger.commons.string.StringHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.security.certificate.CertificateHelper;
 import com.mongodb.client.model.Filters;
@@ -69,15 +68,12 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   private static final String BSON_EXTENSIONS = "extensions";
 
   private final IIdentifierFactory m_aIdentifierFactory;
-  private final ISMPServiceGroupManager m_aServiceGroupMgr;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
-  public SMPRedirectManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                    @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public SMPRedirectManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory)
   {
     super ("smp-redirect");
     m_aIdentifierFactory = aIdentifierFactory;
-    m_aServiceGroupMgr = aServiceGroupMgr;
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
@@ -107,14 +103,13 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   @Nonnull
   @ReturnsMutableCopy
   public static SMPRedirect toDomain (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                      @Nonnull final ISMPServiceGroupManager aServiceGroupMgr,
                                       @Nonnull final Document aDoc)
   {
     // The ID itself is derived from ServiceGroupID and DocTypeID
-    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID)));
+    final IParticipantIdentifier aParticipantIdentifier = aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID));
     final IDocumentTypeIdentifier aDocTypeID = toDocumentTypeID (aDoc.get (BSON_DOCTYPE_ID, Document.class));
     final X509Certificate aCert = CertificateHelper.convertStringToCertficateOrNull (aDoc.getString (BSON_TARGET_CERTIFICATE));
-    return new SMPRedirect (aServiceGroup,
+    return new SMPRedirect (aParticipantIdentifier,
                             aDocTypeID,
                             aDoc.getString (BSON_TARGET_HREF),
                             aDoc.getString (BSON_TARGET_SUBJECT_CN),
@@ -126,7 +121,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   @ReturnsMutableCopy
   public SMPRedirect toDomain (@Nonnull final Document aDoc)
   {
-    return toDomain (m_aIdentifierFactory, m_aServiceGroupMgr, aDoc);
+    return toDomain (m_aIdentifierFactory, aDoc);
   }
 
   @Nonnull
@@ -167,19 +162,19 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   }
 
   @Nonnull
-  public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final ISMPServiceGroup aServiceGroup,
+  public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final IParticipantIdentifier aParticipantID,
                                                  @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                                  @Nonnull @Nonempty final String sTargetHref,
                                                  @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
                                                  @Nullable final X509Certificate aCertificate,
                                                  @Nullable final String sExtension)
   {
-    ValueEnforcer.notNull (aServiceGroup, "ServiceGroup");
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("createOrUpdateSMPRedirect (" +
-                    aServiceGroup +
+                    aParticipantID +
                     ", " +
                     aDocumentTypeIdentifier +
                     ", " +
@@ -192,9 +187,9 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                     (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
                     ")");
 
-    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aServiceGroup,
+    final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aParticipantID,
                                                                                    aDocumentTypeIdentifier);
-    final SMPRedirect aNewRedirect = new SMPRedirect (aServiceGroup,
+    final SMPRedirect aNewRedirect = new SMPRedirect (aParticipantID,
                                                       aDocumentTypeIdentifier,
                                                       sTargetHref,
                                                       sSubjectUniqueIdentifier,
@@ -255,13 +250,13 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   }
 
   @Nonnull
-  public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    if (aServiceGroup == null)
+    if (aParticipantID == null)
       return EChange.UNCHANGED;
 
     EChange eChange = EChange.UNCHANGED;
-    for (final ISMPRedirect aRedirect : getAllSMPRedirectsOfServiceGroup (aServiceGroup.getID ()))
+    for (final ISMPRedirect aRedirect : getAllSMPRedirectsOfServiceGroup (aParticipantID))
       eChange = eChange.or (deleteSMPRedirect (aRedirect));
     return eChange;
   }
@@ -277,9 +272,9 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
 
   @Nonnull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final ISMPServiceGroup aServiceGroup)
+  public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
-    return getAllSMPRedirectsOfServiceGroup (aServiceGroup == null ? null : aServiceGroup.getID ());
+    return getAllSMPRedirectsOfServiceGroup (aParticipantID == null ? null : aParticipantID.getURIEncoded ());
   }
 
   @Nonnull
@@ -300,16 +295,16 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   }
 
   @Nullable
-  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final ISMPServiceGroup aServiceGroup,
+  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final IParticipantIdentifier aParticipantID,
                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
-    if (aServiceGroup == null)
+    if (aParticipantID == null)
       return null;
     if (aDocTypeID == null)
       return null;
 
     final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID,
-                                                                              aServiceGroup.getID ()),
+                                                                              aParticipantID.getURIEncoded ()),
                                                                 new Document (BSON_DOCTYPE_ID, toBson (aDocTypeID))))
                                             .first ();
     if (aMatch == null)

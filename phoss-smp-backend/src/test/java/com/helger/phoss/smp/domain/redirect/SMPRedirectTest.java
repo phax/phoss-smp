@@ -24,9 +24,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
-import com.helger.photon.security.CSecurity;
 
 /**
  * Test class for class {@link SMPRedirect}.
@@ -46,11 +44,9 @@ public final class SMPRedirectTest
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                  "testdoctype");
 
-    final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
-
     // Create new one
-    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", null, "<extredirect/>");
-    assertSame (aSG, aRedirect.getServiceGroup ());
+    final ISMPRedirect aRedirect = new SMPRedirect (aPI, aDocTypeID, "target", "suid", null, "<extredirect/>");
+    assertSame (aPI, aRedirect.getServiceGroupParticipantIdentifier ());
     assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
     assertEquals ("target", aRedirect.getTargetHref ());
     assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());
@@ -67,11 +63,9 @@ public final class SMPRedirectTest
     final IDocumentTypeIdentifier aDocTypeID = new SimpleDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                  "testDocType");
 
-    final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
-
     // Create new one
-    final ISMPRedirect aRedirect = new SMPRedirect (aSG, aDocTypeID, "target", "suid", null, "<extredirect/>");
-    assertSame (aSG, aRedirect.getServiceGroup ());
+    final ISMPRedirect aRedirect = new SMPRedirect (aPI, aDocTypeID, "target", "suid", null, "<extredirect/>");
+    assertSame (aPI, aRedirect.getServiceGroupParticipantIdentifier ());
     assertEquals (aDocTypeID, aRedirect.getDocumentTypeIdentifier ());
     assertEquals ("target", aRedirect.getTargetHref ());
     assertEquals ("suid", aRedirect.getSubjectUniqueIdentifier ());

@@ -102,15 +102,15 @@ public interface ISMPServiceInformationManager
    * Delete all contained service information objects that belong to the passed
    * service group.
    *
-   * @param aServiceGroup
-   *        The service group for which all service information objects should
-   *        be deleted. May be <code>null</code>.
+   * @param aParticipantID
+   *        The service group ID for which all service information objects
+   *        should be deleted. May be <code>null</code>.
    * @return {@link EChange#CHANGED} only if the passed service group is not
    *         <code>null</code> and if at least one service information object
    *         was deleted. {@link EChange#UNCHANGED} must be returned otherwise.
    */
   @Nonnull
-  EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
    * Delete a single process with all endpoints from this service information.
@@ -156,8 +156,8 @@ public interface ISMPServiceInformationManager
    * Get all service information objects that belong to the provided service
    * group.
    *
-   * @param aServiceGroup
-   *        The service group of interest. May be <code>null</code>.
+   * @param aParticipantID
+   *        The service group ID of interest. May be <code>null</code>.
    * @return Never <code>null</code> but maybe empty list of all matching
    *         service information objects in arbitrary order. An empty result
    *         means that either a non-existing service group was passed <b>or</b>
@@ -166,7 +166,7 @@ public interface ISMPServiceInformationManager
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
    * Get all SMP document types that are registered for the provided service
@@ -174,17 +174,17 @@ public interface ISMPServiceInformationManager
    * (e.g. <code>/iso6523-actorid-upis::0088/example</code>) in an efficient
    * way.
    *
-   * @param aServiceGroup
-   *        The service group of interest. May be <code>null</code>.
+   * @param aParticipantID
+   *        The service group ID of interest. May be <code>null</code>.
    * @return Never <code>null</code> but may empty collection of document type
    *         identifiers in arbitrary order. An empty result means that either a
    *         non-existing service group was passed <b>or</b> that no service
    *         information objects exist for the provided service group.
-   * @see #getAllSMPDocumentTypesOfServiceGroup(ISMPServiceGroup)
+   * @see #getAllSMPDocumentTypesOfServiceGroup(IParticipantIdentifier)
    */
   @Nonnull
   @ReturnsMutableCopy
-  ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable ISMPServiceGroup aServiceGroup);
+  ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
    * Get the service information for the passed tuple of service group and
