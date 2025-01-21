@@ -1,5 +1,5 @@
 @REM
-@REM Copyright (C) 2015-2024 Philip Helger and contributors
+@REM Copyright (C) 2015-2025 Philip Helger and contributors
 @REM philip[at]helger[dot]com
 @REM
 @REM Licensed under the Apache License, Version 2.0 (the "License");
