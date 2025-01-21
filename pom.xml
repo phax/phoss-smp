@@ -70,8 +70,8 @@
     <expiringmap.version>0.5.11</expiringmap.version>
     <flyway.version>9.22.3</flyway.version>
     <log4j.version>2.24.3</log4j.version>
-    <mongodb.version>5.2.0</mongodb.version>
-    <protobuf.version>4.29.2</protobuf.version>
+    <mongodb.version>5.3.0</mongodb.version>
+    <protobuf.version>4.29.3</protobuf.version>
     <ph-db.version>7.0.6</ph-db.version>
   </properties>
   
@@ -94,7 +94,7 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>11.1.11</version>
+        <version>11.1.12</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -122,14 +122,14 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>10.1.9</version>
+        <version>10.2.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>9.2.7</version>
+        <version>9.2.8</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -155,7 +155,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-xmldsig</artifactId>
-        <version>5.0.2</version>
+        <version>5.0.3</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
