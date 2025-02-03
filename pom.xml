@@ -70,7 +70,7 @@
     <expiringmap.version>0.5.11</expiringmap.version>
     <flyway.version>9.22.3</flyway.version>
     <log4j.version>2.24.3</log4j.version>
-    <mongodb.version>5.3.0</mongodb.version>
+    <mongodb.version>5.3.1</mongodb.version>
     <protobuf.version>4.29.3</protobuf.version>
     <ph-db.version>7.0.6</ph-db.version>
   </properties>
@@ -94,7 +94,7 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>11.1.12</version>
+        <version>11.2.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -122,21 +122,21 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>10.2.0</version>
+        <version>10.3.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>9.2.8</version>
+        <version>9.2.9</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>9.7.2</version>
+        <version>10.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
