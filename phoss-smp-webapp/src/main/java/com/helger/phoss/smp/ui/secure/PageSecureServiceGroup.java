@@ -169,7 +169,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
         try
         {
-          final boolean bDeleteInSML = aWPEC.params ().getAsBoolean (PARAM_DELETE_IN_SML, aSettings.isSMLEnabled ());
+          final boolean bDeleteInSML = aWPEC.params ()
+                                            .isCheckBoxChecked (PARAM_DELETE_IN_SML, aSettings.isSMLEnabled ());
 
           // Delete the service group both locally and on the SML (if active)!
           final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
