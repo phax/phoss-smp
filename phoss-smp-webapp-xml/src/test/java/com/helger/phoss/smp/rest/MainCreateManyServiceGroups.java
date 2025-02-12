@@ -61,7 +61,6 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
-  @SuppressWarnings ("resource")
   public static void main (final String [] args) throws Throwable
   {
     final String sServerBasePath = "http://localhost:90";
