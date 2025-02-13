@@ -337,12 +337,13 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
             {
               // Notify PD server: delete
               final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
-              // Undocumented switch to avoid heavy usage
-              if (SMPConfigProvider.getConfig ().getAsBoolean ("smp.directory.integration.index-before-delete", false))
-              {
-                // Add before delete to make sure it works
-                aPDClient.addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
-              }
+
+              // "Add" before "delete" to make sure it works
+              // This will update the ownership in the Directory, in case a
+              // certificate change happened since the last time
+              aPDClient.addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
+
+              // This is the actual delete call
               aPDClient.deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
             }
           }
@@ -395,9 +396,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         // Register a handler that returns the "http" proxy, if an "http" URL is
         // requested
-        final IProxySettingsProvider aPSP = (sProtocol, sHost, nPort) -> "http".equals (sProtocol)
-                                                                                                   ? new CommonsArrayList <> (aProxyHttp)
-                                                                                                   : null;
+        final IProxySettingsProvider aPSP = (sProtocol,
+                                             sHost,
+                                             nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
+                                                                                 : null;
         ProxySettingsManager.registerProvider (aPSP);
         m_aProxySettingsProvider.add (aPSP);
       }
@@ -406,9 +408,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         // Register a handler that returns the "https" proxy, if an "https" URL
         // is requested
-        final IProxySettingsProvider aPSP = (sProtocol, sHost, nPort) -> "https".equals (sProtocol)
-                                                                                                    ? new CommonsArrayList <> (aProxyHttps)
-                                                                                                    : null;
+        final IProxySettingsProvider aPSP = (sProtocol,
+                                             sHost,
+                                             nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps)
+                                                                                  : null;
         ProxySettingsManager.registerProvider (aPSP);
         m_aProxySettingsProvider.add (aPSP);
       }
