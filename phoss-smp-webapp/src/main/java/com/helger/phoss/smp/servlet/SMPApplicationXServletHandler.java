@@ -23,6 +23,7 @@ import com.helger.http.csp.CSP2Directive;
 import com.helger.http.csp.CSP2Policy;
 import com.helger.http.csp.CSP2SourceList;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.photon.app.csrf.CSRFSessionManager;
 import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -46,8 +47,9 @@ public abstract class SMPApplicationXServletHandler extends AbstractApplicationX
       final boolean bReportingOnly = SMPWebAppConfiguration.isCSPReportingOnly ();
       final boolean bReporting = bReportingOnly || SMPWebAppConfiguration.isCSPReportingEnabled ();
 
-      final CSP2SourceList aScriptSrcList = new CSP2SourceList ().addKeywordSelf ().addKeywordUnsafeInline ();
-      final CSP2SourceList aStyleSrcList = new CSP2SourceList ().addKeywordSelf ().addKeywordUnsafeInline ();
+      final String sSessionNonce = CSRFSessionManager.getInstance ().getNonce ();
+      final CSP2SourceList aScriptSrcList = new CSP2SourceList ().addKeywordSelf ().addNonce (sSessionNonce);
+      final CSP2SourceList aStyleSrcList = new CSP2SourceList ().addKeywordSelf ().addNonce (sSessionNonce);
       // Allow data images for Bootstrap 4
       final CSP2SourceList aImgSrcList = new CSP2SourceList ().addKeywordSelf ().addHost ("data:");
       final CSP2SourceList aConnectSrcList = new CSP2SourceList ().addKeywordSelf ();

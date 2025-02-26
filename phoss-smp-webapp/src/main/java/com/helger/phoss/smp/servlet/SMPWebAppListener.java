@@ -38,6 +38,7 @@ import com.helger.commons.lang.priviledged.IPrivilegedAction;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
+import com.helger.html.hc.config.HCSettings;
 import com.helger.network.proxy.ProxySelectorProxySettingsManager;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.IProxySettingsProvider;
@@ -220,6 +221,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Content-Security-Policy header final that prevents the final execution of
     // embedded final JavaScript code.
     UnifiedResponseDefaultSettings.setEnableXSSFilter (false);
+
+    // Make sure the nonce attributes are used
+    HCSettings.setUseNonceInScript (true);
+    HCSettings.setUseNonceInStyle (true);
 
     // Avoid writing unnecessary stuff
     setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
