@@ -19,9 +19,9 @@ package com.helger.phoss.smp.servlet;
 import java.io.IOException;
 
 import com.helger.commons.http.CHttpHeader;
-import com.helger.http.csp.CSP2Directive;
-import com.helger.http.csp.CSP2Policy;
-import com.helger.http.csp.CSP2SourceList;
+import com.helger.http.csp.CSPDirective;
+import com.helger.http.csp.CSPPolicy;
+import com.helger.http.csp.CSPSourceList;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.app.csrf.CSRFSessionManager;
 import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
@@ -47,27 +47,33 @@ public abstract class SMPApplicationXServletHandler extends AbstractApplicationX
       final boolean bReportingOnly = SMPWebAppConfiguration.isCSPReportingOnly ();
       final boolean bReporting = bReportingOnly || SMPWebAppConfiguration.isCSPReportingEnabled ();
 
-      final String sSessionNonce = CSRFSessionManager.getInstance ().getNonce ();
-      final CSP2SourceList aScriptSrcList = new CSP2SourceList ().addKeywordSelf ().addNonce (sSessionNonce);
-      final CSP2SourceList aStyleSrcList = new CSP2SourceList ().addKeywordSelf ().addNonce (sSessionNonce);
+      final String sNonce = CSRFSessionManager.getInstance ().getNonce ();
+      final CSPSourceList aScriptSrcList = new CSPSourceList ().addKeywordSelf ()
+                                                               .addNonce (sNonce)
+                                                               .addKeywordReportSample ();
+      final CSPSourceList aStyleSrcList = new CSPSourceList ().addKeywordSelf ()
+                                                              .addNonce (sNonce)
+                                                              .addKeywordReportSample ();
+      final CSPSourceList aStyleSrcAttrList = new CSPSourceList ().addKeywordSelf ().addKeywordUnsafeInline ();
       // Allow data images for Bootstrap 4
-      final CSP2SourceList aImgSrcList = new CSP2SourceList ().addKeywordSelf ().addHost ("data:");
-      final CSP2SourceList aConnectSrcList = new CSP2SourceList ().addKeywordSelf ();
-      final CSP2SourceList aFontSrcList = new CSP2SourceList ().addKeywordSelf ();
+      final CSPSourceList aImgSrcList = new CSPSourceList ().addKeywordSelf ().addHost ("data:");
+      final CSPSourceList aConnectSrcList = new CSPSourceList ().addKeywordSelf ();
+      final CSPSourceList aFontSrcList = new CSPSourceList ().addKeywordSelf ();
 
-      final CSP2Policy aPolicy = new CSP2Policy ();
-      aPolicy.addDirective (CSP2Directive.createDefaultSrc (new CSP2SourceList ().addKeywordNone ()))
-             .addDirective (CSP2Directive.createScriptSrc (aScriptSrcList))
-             .addDirective (CSP2Directive.createStyleSrc (aStyleSrcList))
-             .addDirective (CSP2Directive.createImgSrc (aImgSrcList))
-             .addDirective (CSP2Directive.createConnectSrc (aConnectSrcList))
-             .addDirective (CSP2Directive.createFontSrc (aFontSrcList));
+      final CSPPolicy aPolicy = new CSPPolicy ();
+      aPolicy.addDirective (CSPDirective.createDefaultSrc (new CSPSourceList ().addKeywordNone ()))
+             .addDirective (CSPDirective.createScriptSrc (aScriptSrcList))
+             .addDirective (CSPDirective.createStyleSrc (aStyleSrcList))
+             .addDirective (CSPDirective.createStyleSrcAttr (aStyleSrcAttrList))
+             .addDirective (CSPDirective.createImgSrc (aImgSrcList))
+             .addDirective (CSPDirective.createConnectSrc (aConnectSrcList))
+             .addDirective (CSPDirective.createFontSrc (aFontSrcList));
 
       if (bReporting)
       {
         // Report only if enabled - avoid spaming
-        aPolicy.addDirective (CSP2Directive.createReportURI (aRequestScope.getContextPath () +
-                                                             SMPCSPReportingServlet.SERVLET_DEFAULT_PATH));
+        aPolicy.addDirective (CSPDirective.createReportURI (aRequestScope.getContextPath () +
+                                                            SMPCSPReportingServlet.SERVLET_DEFAULT_PATH));
       }
 
       // Default

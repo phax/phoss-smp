@@ -223,6 +223,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     UnifiedResponseDefaultSettings.setEnableXSSFilter (false);
 
     // Make sure the nonce attributes are used
+    // Required for CSP to work
     HCSettings.setUseNonceInScript (true);
     HCSettings.setUseNonceInStyle (true);
 
