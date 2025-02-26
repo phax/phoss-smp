@@ -38,6 +38,7 @@ import com.helger.commons.lang.priviledged.IPrivilegedAction;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
+import com.helger.html.hc.config.HCSettings;
 import com.helger.network.proxy.ProxySelectorProxySettingsManager;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.IProxySettingsProvider;
@@ -86,8 +87,7 @@ import com.helger.xservlet.requesttrack.RequestTrackerSettings;
 import jakarta.servlet.ServletContext;
 
 /**
- * Special SMP web app listener. This is the entry point for application
- * startup.
+ * Special SMP web app listener. This is the entry point for application startup.
  *
  * @author Philip Helger
  */
@@ -220,6 +220,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Content-Security-Policy header final that prevents the final execution of
     // embedded final JavaScript code.
     UnifiedResponseDefaultSettings.setEnableXSSFilter (false);
+
+    // Required for CSP to work
+    HCSettings.setUseNonceInScript (true);
+    HCSettings.setUseNonceInStyle (true);
 
     // Avoid writing unnecessary stuff
     setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
@@ -396,10 +400,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         // Register a handler that returns the "http" proxy, if an "http" URL is
         // requested
-        final IProxySettingsProvider aPSP = (sProtocol,
-                                             sHost,
-                                             nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
-                                                                                 : null;
+        final IProxySettingsProvider aPSP = (sProtocol, sHost, nPort) -> "http".equals (sProtocol)
+                                                                                                   ? new CommonsArrayList <> (aProxyHttp)
+                                                                                                   : null;
         ProxySettingsManager.registerProvider (aPSP);
         m_aProxySettingsProvider.add (aPSP);
       }
@@ -408,10 +411,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         // Register a handler that returns the "https" proxy, if an "https" URL
         // is requested
-        final IProxySettingsProvider aPSP = (sProtocol,
-                                             sHost,
-                                             nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps)
-                                                                                  : null;
+        final IProxySettingsProvider aPSP = (sProtocol, sHost, nPort) -> "https".equals (sProtocol)
+                                                                                                    ? new CommonsArrayList <> (aProxyHttps)
+                                                                                                    : null;
         ProxySettingsManager.registerProvider (aPSP);
         m_aProxySettingsProvider.add (aPSP);
       }
