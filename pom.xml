@@ -115,7 +115,7 @@
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css-parent-pom</artifactId>
-        <version>7.0.3</version>
+        <version>7.0.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -136,7 +136,7 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>10.0.0</version>
+        <version>10.0.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
