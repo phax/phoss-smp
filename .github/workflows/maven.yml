@@ -61,9 +61,14 @@ jobs:
         mysql database: 'smp'
         mysql user: 'smp'
         mysql password: 'smp'
-          
+              
     - name: Build and deploy with Maven
       run: mvn --batch-mode --update-snapshots deploy
+      if: matrix.Java == 11
       env:
         MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        
+    - name: Maven Build
+      run: mvn --batch-mode --update-snapshots install
+      if: matrix.Java != 11
