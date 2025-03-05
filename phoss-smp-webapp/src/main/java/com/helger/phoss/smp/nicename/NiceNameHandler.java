@@ -33,9 +33,11 @@ import com.helger.commons.io.resource.ClassPathResource;
 import com.helger.commons.io.resource.FileSystemResource;
 import com.helger.commons.io.resource.IReadableResource;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.string.StringParser;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.SimpleIdentifierFactory;
+import com.helger.peppolid.peppol.EPeppolCodeListItemState;
 import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifierParts;
@@ -86,7 +88,20 @@ public final class NiceNameHandler
       {
         String sID = eChild.getAttributeValue ("id");
         final String sName = eChild.getAttributeValue ("name");
-        final boolean bDeprecated = eChild.getAttributeValueAsBool ("deprecated", false);
+        EPeppolCodeListItemState eState = EPeppolCodeListItemState.getFromIDOrNull (eChild.getAttributeValue ("state"));
+        if (eState == null)
+        {
+          final String sDeprecated = eChild.getAttributeValue ("deprecated");
+          if (sDeprecated != null)
+          {
+            // Legacy attribute is present
+            eState = StringParser.parseBool (sDeprecated, false) ? EPeppolCodeListItemState.DEPRECATED
+                                                                 : EPeppolCodeListItemState.ACTIVE;
+          }
+          else
+            eState = EPeppolCodeListItemState.ACTIVE;
+        }
+
         ICommonsList <IProcessIdentifier> aProcIDs = null;
         if (bReadProcIDs)
         {
@@ -119,7 +134,7 @@ public final class NiceNameHandler
           }
         }
 
-        ret.put (sID, new NiceNameEntry (sName, bDeprecated, sSpecialLabel, aProcIDs));
+        ret.put (sID, new NiceNameEntry (sName, eState, sSpecialLabel, aProcIDs));
       }
     }
     return ret;

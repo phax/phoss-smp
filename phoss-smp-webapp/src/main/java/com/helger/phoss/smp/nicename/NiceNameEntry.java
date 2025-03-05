@@ -27,21 +27,22 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.peppolid.peppol.EPeppolCodeListItemState;
 
 public final class NiceNameEntry implements Serializable
 {
   private final String m_sName;
-  private final boolean m_bDeprecated;
+  private final EPeppolCodeListItemState m_eState;
   private final String m_sSpecialLabel;
   private final ICommonsList <IProcessIdentifier> m_aProcIDs;
 
   public NiceNameEntry (@Nonnull @Nonempty final String sName,
-                        final boolean bDeprecated,
+                        @Nonnull final EPeppolCodeListItemState eState,
                         @Nullable final String sSpecialLabel,
                         @Nullable final ICommonsList <IProcessIdentifier> aProcIDs)
   {
     m_sName = sName;
-    m_bDeprecated = bDeprecated;
+    m_eState = eState;
     m_sSpecialLabel = sSpecialLabel;
     m_aProcIDs = aProcIDs;
   }
@@ -53,9 +54,10 @@ public final class NiceNameEntry implements Serializable
     return m_sName;
   }
 
-  public boolean isDeprecated ()
+  @Nonnull
+  public EPeppolCodeListItemState getState ()
   {
-    return m_bDeprecated;
+    return m_eState;
   }
 
   @Nullable
@@ -88,21 +90,21 @@ public final class NiceNameEntry implements Serializable
     if (o == null || !getClass ().equals (o.getClass ()))
       return false;
     final NiceNameEntry rhs = (NiceNameEntry) o;
-    return m_sName.equals (rhs.m_sName) && m_bDeprecated == rhs.m_bDeprecated;
+    return m_sName.equals (rhs.m_sName) && m_eState == rhs.m_eState;
   }
 
   @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_sName).append (m_bDeprecated).getHashCode ();
+    return new HashCodeGenerator (this).append (m_sName).append (m_eState).getHashCode ();
   }
 
   @Override
   public String toString ()
   {
     return new ToStringGenerator (null).append ("Name", m_sName)
-                                       .append ("Deprecated", m_bDeprecated)
-                                       .append ("SpecialLabel", m_sSpecialLabel)
+                                       .append ("State", m_eState)
+                                       .appendIfNotNull ("SpecialLabel", m_sSpecialLabel)
                                        .append ("ProcessIDs", m_aProcIDs)
                                        .getToString ();
   }

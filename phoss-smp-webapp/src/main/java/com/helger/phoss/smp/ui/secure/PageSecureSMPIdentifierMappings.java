@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -35,7 +34,6 @@ import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.nav.BootstrapTabBox;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
-import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
@@ -61,16 +59,31 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
                                @Nonnull final ICommonsOrderedMap <String, NiceNameEntry> aEntries,
                                @Nonnull final String sSuffix)
   {
-    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final BootstrapTable aTable = new BootstrapTable (new DTCol ("ID").setWidthPerc (60),
                                                       new DTCol ("Name"),
-                                                      new DTCol ("Deprecated?").setWidth (100)).setID (getID () + sSuffix);
+                                                      new DTCol ("State").setWidth (100)).setID (getID () + sSuffix);
     for (final Map.Entry <String, NiceNameEntry> aEntry : aEntries.entrySet ())
     {
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (span (aEntry.getKey ()).addClass (CBootstrapCSS.TEXT_BREAK));
       aRow.addCell (aEntry.getValue ().getName ());
-      aRow.addCell (EPhotonCoreText.getYesOrNo (aEntry.getValue ().isDeprecated (), aDisplayLocale));
+
+      final String sState;
+      switch (aEntry.getValue ().getState ())
+      {
+        case ACTIVE:
+          sState = "Active";
+          break;
+        case DEPRECATED:
+          sState = "Deprecated";
+          break;
+        case REMOVED:
+          sState = "Removed";
+          break;
+        default:
+          sState = "Unknown";
+      }
+      aRow.addCell (sState);
     }
     return new HCNodeList ().addChild (aTable).addChild (BootstrapDataTables.createDefaultDataTables (aWPEC, aTable));
   }

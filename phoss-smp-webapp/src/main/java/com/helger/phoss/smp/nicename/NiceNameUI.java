@@ -31,6 +31,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.peppolid.peppol.EPeppolCodeListItemState;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
@@ -68,7 +69,7 @@ public final class NiceNameUI
   private static IHCNode _createFormattedID (@Nonnull final String sID,
                                              @Nullable final String sName,
                                              @Nullable final EBootstrapBadgeType eNameBadgeType,
-                                             final boolean bIsDeprecated,
+                                             @Nonnull final EPeppolCodeListItemState eState,
                                              @Nullable final String sSpecialLabel,
                                              @Nullable final EBootstrapBadgeType eSpecialLabelBadgeType,
                                              final boolean bInDetails,
@@ -87,11 +88,17 @@ public final class NiceNameUI
     else
     {
       final BootstrapBadge aNameBadge = ret.addAndReturnChild (new BootstrapBadge (eNameBadgeType).addChild (sName));
-      if (bIsDeprecated)
+      if (eState.isRemoved ())
       {
         ret.addChild (" ")
-           .addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Identifier is deprecated"));
+           .addChild (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("Identifier is removed"));
       }
+      else
+        if (eState.isDeprecated ())
+        {
+          ret.addChild (" ")
+             .addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Identifier is deprecated"));
+        }
       if (StringHelper.hasText (sSpecialLabel))
       {
         ret.addChild (" ").addChild (new BootstrapBadge (eSpecialLabelBadgeType).addChild (sSpecialLabel));
@@ -119,11 +126,11 @@ public final class NiceNameUI
                                     final boolean bIsValid)
   {
     if (aNiceName == null)
-      return _createFormattedID (sID, null, null, false, null, null, bInDetails, bIsValid);
+      return _createFormattedID (sID, null, null, EPeppolCodeListItemState.ACTIVE, null, null, bInDetails, bIsValid);
     return _createFormattedID (sID,
                                aNiceName.getName (),
                                EBootstrapBadgeType.SUCCESS,
-                               aNiceName.isDeprecated (),
+                               aNiceName.getState (),
                                aNiceName.getSpecialLabel (),
                                EBootstrapBadgeType.INFO,
                                bInDetails,
@@ -164,7 +171,7 @@ public final class NiceNameUI
         return _createFormattedID (sURI,
                                    "Matching Process Identifier",
                                    EBootstrapBadgeType.SUCCESS,
-                                   false,
+                                   EPeppolCodeListItemState.ACTIVE,
                                    null,
                                    null,
                                    bInDetails,
@@ -173,13 +180,13 @@ public final class NiceNameUI
       return _createFormattedID (sURI,
                                  "Unexpected Process Identifier",
                                  EBootstrapBadgeType.WARNING,
-                                 false,
+                                 EPeppolCodeListItemState.ACTIVE,
                                  null,
                                  null,
                                  bInDetails,
                                  bIsValid);
     }
-    return _createFormattedID (sURI, null, null, false, null, null, bInDetails, bIsValid);
+    return _createFormattedID (sURI, null, null, EPeppolCodeListItemState.ACTIVE, null, null, bInDetails, bIsValid);
   }
 
   @Nonnull
@@ -199,12 +206,35 @@ public final class NiceNameUI
   {
     final boolean bIsValid = true;
     if (aTP == null)
-      return _createFormattedID (sTransportProfile, null, null, false, null, null, bInDetails, bIsValid);
+      return _createFormattedID (sTransportProfile,
+                                 null,
+                                 null,
+                                 EPeppolCodeListItemState.ACTIVE,
+                                 null,
+                                 null,
+                                 bInDetails,
+                                 bIsValid);
 
+    // Transform from TP state to code list item state
+    final EPeppolCodeListItemState eState;
+    switch (aTP.getState ())
+    {
+      case ACTIVE:
+        eState = EPeppolCodeListItemState.ACTIVE;
+        break;
+      case DEPRECATED:
+        eState = EPeppolCodeListItemState.DEPRECATED;
+        break;
+      case DELETED:
+        eState = EPeppolCodeListItemState.REMOVED;
+        break;
+      default:
+        throw new IllegalStateException ("Unhandled state: " + aTP.getState ());
+    }
     return _createFormattedID (sTransportProfile,
                                aTP.getName (),
                                EBootstrapBadgeType.SUCCESS,
-                               aTP.getState ().isDeprecated (),
+                               eState,
                                null,
                                null,
                                bInDetails,
