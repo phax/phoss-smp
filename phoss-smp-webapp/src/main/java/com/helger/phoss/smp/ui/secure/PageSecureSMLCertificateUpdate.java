@@ -40,6 +40,7 @@ import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.BDMSLClient;
+import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
@@ -299,7 +300,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     if (bShowForm)
     {
       final BootstrapForm aForm = getUIHandler ().createFormFileUploadSelf (aWPEC);
-      aForm.setLeft (3, 3, 2, 2, 2);
+      aForm.setLeft (-1, -1, 12, -1, 2);
       aForm.addChild (warn ("It is your responsibility to actually perform the update of the certificate in this SMP at the specified time! This does NOT happen automatically."));
 
       final BootstrapDateTimePicker aDTP = BootstrapDateTimePicker.create (FIELD_PM_MIGRATION_DATE,
@@ -314,7 +315,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_PM_MIGRATION_DATE)));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New public certificate")
-                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_PM_PUBLIC_CERT)).setRows (10))
+                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_PM_PUBLIC_CERT)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
                                                    .setHelpText (span ("Paste the public part of your new certificate here (using PEM encoding)." +
                                                                        " Do NOT paste your new private key here." +
                                                                        " Must start with ").addChild (code (CertificateHelper.BEGIN_CERTIFICATE))

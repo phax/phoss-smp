@@ -54,6 +54,7 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.factory.SimpleIdentifierFactory;
 import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifierParts;
+import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -96,8 +97,8 @@ import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
 /**
- * Class to manage endpoints that belong to a service group. To use this page at
- * least one service group must exist.
+ * Class to manage endpoints that belong to a service group. To use this page at least one service
+ * group must exist.
  *
  * @author Philip Helger
  */
@@ -849,7 +850,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                  .setCtrl (new HCTextArea (new RequestField (FIELD_CERTIFICATE,
                                                                                              aSelectedEndpoint != null
                                                                                                                        ? aSelectedEndpoint.getCertificate ()
-                                                                                                                       : null)))
+                                                                                                                       : null)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
                                                  .setHelpText ("Holds the complete signing certificate of the recipient AP, as a " +
                                                                "PEM base 64 encoded X509 DER formatted value.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CERTIFICATE)));

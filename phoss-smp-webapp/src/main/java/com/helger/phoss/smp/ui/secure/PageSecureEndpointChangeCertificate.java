@@ -55,6 +55,7 @@ import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -385,6 +386,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
 
       // Show edit screen
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
+      aForm.setLeft (-1, -1, 12, -1, 2);
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT));
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_SUBACTION, CPageParam.ACTION_SAVE));
       aForm.addChild (new HCHiddenField (FIELD_OLD_CERTIFICATE, sOldUnifiedCert));
@@ -396,7 +398,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New certificate")
                                                    .setCtrl (new HCTextArea (new RequestField (FIELD_NEW_CERTIFICATE,
-                                                                                               sOldUnifiedCert)).setRows (10))
+                                                                                               sOldUnifiedCert)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
                                                    .setHelpText ("The new certificate that is used instead")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_NEW_CERTIFICATE)));
 
