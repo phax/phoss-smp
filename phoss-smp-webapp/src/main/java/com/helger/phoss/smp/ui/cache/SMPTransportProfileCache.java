@@ -29,6 +29,10 @@ public final class SMPTransportProfileCache extends Cache <String, ISMPTransport
 {
   public SMPTransportProfileCache ()
   {
-    super (x -> SMPMetaManager.getTransportProfileMgr ().getSMPTransportProfileOfID (x), -1, "Transport Profile cache");
+    // Allow null values!
+    super (x -> SMPMetaManager.getTransportProfileMgr ().getSMPTransportProfileOfID (x),
+           -1,
+           "Transport Profile cache",
+           true);
   }
 }
