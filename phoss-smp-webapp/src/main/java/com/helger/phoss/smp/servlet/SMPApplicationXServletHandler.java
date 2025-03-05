@@ -48,8 +48,10 @@ public abstract class SMPApplicationXServletHandler extends AbstractApplicationX
       final boolean bReporting = bReportingOnly || SMPWebAppConfiguration.isCSPReportingEnabled ();
 
       final String sNonce = CSRFSessionManager.getInstance ().getNonce ();
+      // srict-dynamic is needed for BusinessCard page, loading dynamic JS
       final CSPSourceList aScriptSrcList = new CSPSourceList ().addKeywordSelf ()
                                                                .addNonce (sNonce)
+                                                               .addKeywordStrictDynamic ()
                                                                .addKeywordReportSample ();
       final CSPSourceList aStyleSrcList = new CSPSourceList ().addKeywordSelf ()
                                                               .addNonce (sNonce)
