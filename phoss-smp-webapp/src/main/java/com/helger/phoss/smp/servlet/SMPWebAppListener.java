@@ -87,8 +87,7 @@ import com.helger.xservlet.requesttrack.RequestTrackerSettings;
 import jakarta.servlet.ServletContext;
 
 /**
- * Special SMP web app listener. This is the entry point for application
- * startup.
+ * Special SMP web app listener. This is the entry point for application startup.
  *
  * @author Philip Helger
  */
@@ -393,35 +392,36 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       }
     }
 
+    final IProxySettings aProxyHttp = SMPHttpConfiguration.getAsHttpProxySettings ();
+    final IProxySettings aProxyHttps = SMPHttpConfiguration.getAsHttpsProxySettings ();
+    if (aProxyHttp != null || aProxyHttps != null)
     {
       LOGGER.info ("Init of HTTP and Proxy settings");
+
       // Register global proxy servers
       ProxySelectorProxySettingsManager.setAsDefault (true);
-      final IProxySettings aProxyHttp = SMPHttpConfiguration.getAsHttpProxySettings ();
       if (aProxyHttp != null)
       {
         // Register a handler that returns the "http" proxy, if an "http" URL is
         // requested
-        final IProxySettingsProvider aPSP = (sProtocol,
-                                             sHost,
-                                             nPort) -> "http".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttp)
-                                                                                 : null;
+        final IProxySettingsProvider aPSP = (sProtocol, sHost, nPort) -> "http".equals (sProtocol)
+                                                                                                   ? new CommonsArrayList <> (aProxyHttp)
+                                                                                                   : null;
         ProxySettingsManager.registerProvider (aPSP);
         m_aProxySettingsProvider.add (aPSP);
       }
-      final IProxySettings aProxyHttps = SMPHttpConfiguration.getAsHttpsProxySettings ();
       if (aProxyHttps != null)
       {
         // Register a handler that returns the "https" proxy, if an "https" URL
         // is requested
-        final IProxySettingsProvider aPSP = (sProtocol,
-                                             sHost,
-                                             nPort) -> "https".equals (sProtocol) ? new CommonsArrayList <> (aProxyHttps)
-                                                                                  : null;
+        final IProxySettingsProvider aPSP = (sProtocol, sHost, nPort) -> "https".equals (sProtocol)
+                                                                                                    ? new CommonsArrayList <> (aProxyHttps)
+                                                                                                    : null;
         ProxySettingsManager.registerProvider (aPSP);
         m_aProxySettingsProvider.add (aPSP);
       }
     }
+
     // Special http client config
     BasePageUtilsHttpClient.HttpClientConfigRegistry.register (new HttpClientConfig ("directoryclient",
                                                                                      "Directory client settings",
