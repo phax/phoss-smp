@@ -57,8 +57,7 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
 
 /**
- * Create one million endpoints. Run this AFTER
- * {@link MainCreateManyServiceGroups}.
+ * Create one million endpoints. Run this AFTER {@link MainCreateManyServiceGroups}.
  *
  * @author Philip Helger
  */
@@ -92,12 +91,13 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
       for (final EPredefinedDocumentTypeIdentifier aEDT : new EPredefinedDocumentTypeIdentifier [] { EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CREDITNOTE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CROSSINDUSTRYINVOICE_CEN_EU_EN16931_2017,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V20,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V20,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V202,
+                                                                                                     // EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V20,
+                                                                                                     // EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V20,
+                                                                                                     // EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V202,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V30,
+
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_UBL_V20,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_CREDIT_NOTE_UBL_V20,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_CII_V202 })
