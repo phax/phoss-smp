@@ -51,7 +51,7 @@ public final class V21__MigrateUserTokensToDB extends BaseJavaMigration
   {
     try (final WebScoped aWS = new WebScoped ())
     {
-      LOGGER.info ("Migrating all roles to the DB");
+      LOGGER.info ("Migrating all user tokens to the DB");
 
       final String sFilename = PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
                                PhotonSecurityManager.FactoryXML.FILENAME_USERTOKENS_XML;
