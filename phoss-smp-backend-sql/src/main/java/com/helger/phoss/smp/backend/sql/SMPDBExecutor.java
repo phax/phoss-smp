@@ -21,7 +21,6 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.regex.RegExHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.db.jdbc.executor.DBExecutor;
 
@@ -36,8 +35,8 @@ public final class SMPDBExecutor extends DBExecutor
   public static final Function <String, String> TABLE_NAME_CUSTOMIZER;
   static
   {
-    final String sSchemaName = SMPJDBCConfiguration.getJdbcSchema ();
-    if (StringHelper.hasText (sSchemaName) && RegExHelper.stringMatchesPattern ("[0-9a-zA-Z_]+", sSchemaName))
+    final String sSchemaName = StringHelper.trim (SMPJDBCConfiguration.getJdbcSchema ());
+    if (StringHelper.hasText (sSchemaName))
       TABLE_NAME_CUSTOMIZER = x -> sSchemaName + ".smp_" + x;
     else
       TABLE_NAME_CUSTOMIZER = x -> "smp_" + x;
