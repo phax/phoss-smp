@@ -37,7 +37,10 @@ public final class SMPDBExecutor extends DBExecutor
   {
     final String sSchemaName = StringHelper.trim (SMPJDBCConfiguration.getJdbcSchema ());
     if (StringHelper.hasText (sSchemaName))
-      TABLE_NAME_CUSTOMIZER = x -> sSchemaName + ".smp_" + x;
+    {
+      // Quotes around are required for special chars
+      TABLE_NAME_CUSTOMIZER = x -> "\"" + sSchemaName + "\".smp_" + x;
+    }
     else
       TABLE_NAME_CUSTOMIZER = x -> "smp_" + x;
   }
