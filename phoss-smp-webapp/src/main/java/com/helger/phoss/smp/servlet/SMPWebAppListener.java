@@ -79,6 +79,7 @@ import com.helger.photon.core.menu.MenuTree;
 import com.helger.photon.core.requestparam.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.core.requestparam.RequestParameterManager;
 import com.helger.servlet.ServletContextPathHolder;
+import com.helger.servlet.ServletSettings;
 import com.helger.servlet.response.UnifiedResponseDefaultSettings;
 import com.helger.smpclient.config.SMPClientConfiguration;
 import com.helger.wsclient.WSHelper;
@@ -225,6 +226,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Required for CSP to work
     HCSettings.setUseNonceInScript (true);
     HCSettings.setUseNonceInStyle (true);
+
+    // Don't add the session ID in the URL (since 7.2.3)
+    ServletSettings.setEncodeURLs (false);
 
     // Avoid writing unnecessary stuff
     setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
