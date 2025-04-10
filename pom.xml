@@ -70,8 +70,8 @@
     <expiringmap.version>0.5.11</expiringmap.version>
     <flyway.version>9.22.3</flyway.version>
     <log4j.version>2.24.3</log4j.version>
-    <mongodb.version>5.3.1</mongodb.version>
-    <protobuf.version>4.29.3</protobuf.version>
+    <mongodb.version>5.4.0</mongodb.version>
+    <protobuf.version>4.30.1</protobuf.version>
     <ph-db.version>7.0.6</ph-db.version>
   </properties>
   
