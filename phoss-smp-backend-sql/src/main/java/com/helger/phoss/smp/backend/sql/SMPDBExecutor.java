@@ -38,8 +38,15 @@ public final class SMPDBExecutor extends DBExecutor
     final String sSchemaName = StringHelper.trim (SMPJDBCConfiguration.getJdbcSchema ());
     if (StringHelper.hasText (sSchemaName))
     {
-      // Quotes around are required for special chars
-      TABLE_NAME_CUSTOMIZER = x -> "\"" + sSchemaName + "\".smp_" + x;
+      final String sDBType = SMPJDBCConfiguration.getTargetDatabaseType ();
+      final EDatabaseType eDBType = EDatabaseType.getFromCaseIDInsensitiveOrNull (sDBType);
+
+      // Quotes around are required for special chars (does not work in MySQL)
+      final boolean bQuoteSchema = eDBType != EDatabaseType.MYSQL;
+      if (bQuoteSchema)
+        TABLE_NAME_CUSTOMIZER = x -> "\"" + sSchemaName + "\".smp_" + x;
+      else
+        TABLE_NAME_CUSTOMIZER = x -> sSchemaName + ".smp_" + x;
     }
     else
       TABLE_NAME_CUSTOMIZER = x -> "smp_" + x;
