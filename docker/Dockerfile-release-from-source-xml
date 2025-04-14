@@ -36,14 +36,17 @@ RUN echo Building phoss SMP $SMP_VERSION \
 
 
 # Use an official Tomcat runtime as a base image
-FROM tomcat:10.1-jdk17
+FROM tomcat:10.1-jdk21
 
 # Use non-blocking random
 ENV CATALINA_OPTS="$CATALINA_OPTS -Djava.security.egd=file:/dev/urandom"
 
 # Special encoded slash handling for SMP
-# Tomcat 10 removed: org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
-RUN sed -i 's/<Connector port="8080" protocol="HTTP\/1.1"/<Connector port="8080" protocol="HTTP\/1.1" encodedSolidusHandling="passthrough"/' ${CATALINA_HOME}/conf/server.xml
+#   Tomcat 10 removed: org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
+#   See: https://tomcat.apache.org/migration-10.html#encoded_slash
+# Second sed command adds a Valve to the Host element to suppress server info and error report
+RUN  sed -i 's/<Connector port="8080" protocol="HTTP\/1.1"/<Connector port="8080" protocol="HTTP\/1.1" encodedSolidusHandling="passthrough"/' ${CATALINA_HOME}/conf/server.xml \
+  && sed -i 's/^.*<\/Host>/<Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false" \/>\n&/' ${CATALINA_HOME}/conf/server.xml  
 
 # MinRAMPercentage - for low memory containers (<250MB)
 # MaxRAMPercentage - for large memory containers (>250MB)
