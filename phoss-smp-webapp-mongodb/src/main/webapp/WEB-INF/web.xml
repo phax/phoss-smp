@@ -99,6 +99,15 @@
     <servlet-name>LogoutServlet</servlet-name>
     <url-pattern>/logout/*</url-pattern>
   </servlet-mapping>
+    
+  <servlet>
+    <servlet-name>PingPongServlet</servlet-name>
+    <servlet-class>com.helger.photon.core.servlet.PingPongServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PingPongServlet</servlet-name>
+    <url-pattern>/ping/*</url-pattern>
+  </servlet-mapping>
   
   <servlet>
     <servlet-name>CSPReportingServlet</servlet-name>

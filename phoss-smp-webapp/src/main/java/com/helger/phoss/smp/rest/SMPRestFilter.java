@@ -337,7 +337,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     {
       LOGGER.debug ("REST Filter path variants:");
       LOGGER.debug ("a) " + aRequestScope.getRequest ().getRequestURI ());
-      LOGGER.debug ("b) " + aRequestScope.getRequest ().getRequestURL ().toString ());
+      LOGGER.debug ("b) " + new StringBuilder (aRequestScope.getRequest ().getRequestURL ().toString ()).toString ());
       LOGGER.debug ("c) " + aRequestScope.getRequestURIEncoded ());
       LOGGER.debug ("d) " + aRequestScope.getRequestURLEncoded ().toString ());
       LOGGER.debug ("e) " + aRequestScope.getRequestURIDecoded ());
@@ -346,7 +346,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     final APIPath aAPIPath = APIPath.createForFilter (aRequestScope);
 
     // Hard coded path with white listed requests
-    if (RegExHelper.stringMatchesPattern ("^/(ajax|error|favicon.ico|logout|public|resbundle|robots.txt|secure|smp-cspreporting|smp-status|stream)(/.*)?$",
+    if (RegExHelper.stringMatchesPattern ("^/(ajax|error|favicon.ico|logout|ping|public|resbundle|robots.txt|secure|smp-cspreporting|smp-status|stream)(/.*)?$",
                                           aAPIPath.getPath ()))
     {
       // Explicitly other servlet
