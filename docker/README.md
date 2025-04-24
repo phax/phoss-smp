@@ -46,7 +46,7 @@ My suggestion is to create a child dockerfile like `Example-Dockerfile-with-conf
 It sets the system properties to the SMP configuration files in the virtual path `/config`.
 See https://docs.docker.com/storage/volumes/ for the Docker configuration on volumes and mount points.
 
-The main change is the `-v` parameter that mounts a local directory into the running image. `/host-directory/config` in the example down below must be changed to an existing directory containing the files `smp-server.properties`, `webapp.properties` and `application.properties` (since v5.3.x) (or `pd-client.properties` before v5.3.x) (as named in the example dockerfile).
+The main change is the `-v` parameter that mounts a local directory into the running image. `/host-directory/config` in the example down below must be changed to an existing directory containing the files `application.properties` (since v5.3.x) (as named in the example dockerfile).
 
 ```
 docker build --pull -t phoss-smp-with-config -f Example-Dockerfile-with-configuration .
